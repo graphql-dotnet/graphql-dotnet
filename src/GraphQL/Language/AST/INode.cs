@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -8,19 +9,21 @@ namespace GraphQL.Language.AST
     public interface INode
     {
         /// <summary>
-        /// Returns a list of children nodes. If the node doesn't have children, returns <see langword="null"/>.
-        /// </summary>
-        IEnumerable<INode> Children { get; }
-
-        /// <summary>
         /// Returns the node's location within the source document.
         /// </summary>
         SourceLocation SourceLocation { get; }
 
         /// <summary>
-        /// Determines if the node is equal to another node.
-        /// This typically returns <see langword="true"/> if the node type and the node name matches.
+        /// Returns a list of children nodes. If the node doesn't have children, returns <see langword="null"/>.
         /// </summary>
-        bool IsEqualTo(INode node);
+        IEnumerable<INode> Children { get; }
+
+        /// <summary>
+        /// Visits every child node with the specified delegate and state. If the node doesn't have children, does nothing.
+        /// </summary>
+        /// <typeparam name="TState">Type of the provided state.</typeparam>
+        /// <param name="action">Delegate to execute on every child node of this node.</param>
+        /// <param name="state">An arbitrary state passed by the caller.</param>
+        void Visit<TState>(Action<INode, TState> action, TState state);
     }
 }

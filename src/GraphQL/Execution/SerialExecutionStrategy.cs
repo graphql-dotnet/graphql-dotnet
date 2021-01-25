@@ -1,13 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="SerialExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class SerialExecutionStrategy : ExecutionStrategy
     {
+        /// <summary>
+        /// Gets a static instance of <see cref="SerialExecutionStrategy"/> strategy.
+        /// </summary>
+        public static SerialExecutionStrategy Instance { get; } = new SerialExecutionStrategy();
+
         /// <summary>
         /// Executes document nodes serially. Nodes that return a <see cref="IDataLoaderResult"/> will
         /// execute once all other pending nodes have been completed.
@@ -42,10 +46,7 @@ namespace GraphQL.Execution
                     else if (node is IParentExecutionNode parentNode)
                     {
                         // Add in reverse order so fields are executed in the correct order
-                        foreach (var child in parentNode.GetChildNodes().Reverse())
-                        {
-                            nodes.Push(child);
-                        }
+                        parentNode.ApplyToChildren((node, state) => state.Push(node), nodes, reverse: true);
                     }
                 }
 
@@ -69,14 +70,10 @@ namespace GraphQL.Execution
                     else if (node is IParentExecutionNode parentNode)
                     {
                         // Add in reverse order so fields are executed in the correct order
-                        foreach (var child in parentNode.GetChildNodes().Reverse())
-                        {
-                            nodes.Push(child);
-                        }
+                        parentNode.ApplyToChildren((node, state) => state.Push(node), nodes, reverse: true);
                     }
                 }
             }
-
         }
     }
 }

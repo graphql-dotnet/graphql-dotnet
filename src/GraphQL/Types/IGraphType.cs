@@ -26,7 +26,5 @@ namespace GraphQL.Types
         /// Gets or sets the deprecation reason of the graph.
         /// </summary>
         string DeprecationReason { get; set; }
-
-        string CollectTypes(TypeCollectionContext context);
     }
 }

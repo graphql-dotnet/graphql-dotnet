@@ -7,34 +7,37 @@ namespace GraphQL.Benchmarks
     internal static class Program
     {
         // Call without args for BenchmarkDotNet
-        // Call with some arbitrary args for any memory profiler
-        private static void Main(string[] args)
+        // Call with some arbitrary args for any profiler
+        private static void Main(string[] args) => Run<ExecutionBenchmark>(args);
+
+        private static void Run<TBenchmark>(string[] args)
+            where TBenchmark : IBenchmark, new()
         {
             if (args.Length == 0)
-                BenchmarkRunner.Run<SerializationBenchmark>();
+                _ = BenchmarkRunner.Run<TBenchmark>();
             else
-                RunMemoryProfilerPayload();
+                RunProfilerPayload<TBenchmark>(100);
         }
 
-        private static void RunMemoryProfilerPayload()
+        private static void RunProfilerPayload<TBenchmark>(int count)
+            where TBenchmark : IBenchmark, new()
         {
-            var bench = new SerializationBenchmark();
+            var bench = new TBenchmark();
             bench.GlobalSetup();
 
-            int count = 0;
+            int index = 0;
             while (true)
             {
-                bench.SystemTextJson().Wait();
+                bench.Run();
 
                 Thread.Sleep(10);
 
-                ++count;
-                if (count == 100)
-                    break;
+                if (++index % count == 0)
+                {
+                    Console.WriteLine($"{count} iterations completed, press enter");
+                    Console.ReadLine();
+                }
             }
-
-            Console.WriteLine("========== END ==========");
-            Console.ReadLine();
         }
     }
 }

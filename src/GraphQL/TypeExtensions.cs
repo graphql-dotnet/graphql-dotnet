@@ -16,16 +16,6 @@ namespace GraphQL
     public static class TypeExtensions
     {
         /// <summary>
-        /// Conditionally casts the item into the indicated type using an "as" cast.
-        /// </summary>
-        /// <typeparam name="T">The desired type</typeparam>
-        /// <param name="item">The item.</param>
-        /// <returns><c>null</c> if the cast failed, otherwise item as T</returns>
-        public static T As<T>(this object item)
-            where T : class
-            => item as T;
-
-        /// <summary>
         /// Determines whether this instance is a concrete type.
         /// </summary>
         /// <param name="type">The type to check.</param>

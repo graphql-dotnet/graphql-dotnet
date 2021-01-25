@@ -4,9 +4,14 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="ParallelExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
+        /// <summary>
+        /// Gets a static instance of <see cref="ParallelExecutionStrategy"/> strategy.
+        /// </summary>
+        public static ParallelExecutionStrategy Instance { get; } = new ParallelExecutionStrategy();
+
         /// <summary>
         /// Executes document nodes in parallel. Field resolvers must be designed for multi-threaded use.
         /// Nodes that return a <see cref="IDataLoaderResult"/> will execute once all other pending nodes
@@ -48,10 +53,7 @@ namespace GraphQL.Execution
                             }
                             else if (pendingNode is IParentExecutionNode parentExecutionNode)
                             {
-                                foreach (var childNode in parentExecutionNode.GetChildNodes())
-                                {
-                                    pendingNodes.Enqueue(childNode);
-                                }
+                                parentExecutionNode.ApplyToChildren((node, state) => state.Enqueue(node), pendingNodes);
                             }
                         }
                         else
@@ -81,8 +83,7 @@ namespace GraphQL.Execution
                         }
                         else if (node is IParentExecutionNode p)
                         {
-                            foreach (var childNode in p.GetChildNodes())
-                                pendingNodes.Enqueue(childNode);
+                            p.ApplyToChildren((node, state) => state.Enqueue(node), pendingNodes);
                         }
                     }
 

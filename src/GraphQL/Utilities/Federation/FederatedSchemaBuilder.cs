@@ -113,13 +113,13 @@ namespace GraphQL.Utilities.Federation
         {
             if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
             {
-                setToAlter.Prepend(new Field(null, new NameNode("__typename")));
+                setToAlter.Prepend(new Field(default, new NameNode("__typename")));
             }
         }
 
         private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
         {
-            foreach (var selection in selectionSet.Selections)
+            foreach (var selection in selectionSet.SelectionsList)
             {
                 if (selection is Field childField && childField.Name == "__typename")
                 {

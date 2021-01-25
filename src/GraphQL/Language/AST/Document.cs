@@ -28,6 +28,13 @@ namespace GraphQL.Language.AST
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _definitions;
 
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            foreach (var definition in _definitions)
+                action(definition, state);
+        }
+
         /// <summary>
         /// Returns a list of operation nodes for this document.
         /// </summary>
@@ -61,18 +68,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc />
         public override string ToString() => $"Document{{definitions={string.Join(", ", _definitions)}}}";
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            if (node is null)
-                return false;
-            if (ReferenceEquals(this, node))
-                return true;
-            if (node.GetType() != GetType())
-                return false;
-
-            return true;
-        }
     }
 }

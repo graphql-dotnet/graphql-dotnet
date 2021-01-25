@@ -17,9 +17,8 @@ namespace GraphQL.Validation.Errors
         public VariablesInAllowedPositionError(ValidationContext context, VariableDefinition varDef, IGraphType varType, VariableUsage usage)
             : base(context.OriginalQuery, NUMBER, BadVarPosMessage(usage.Node.Name, context.Print(varType), context.Print(usage.Type)))
         {
-            var source = new Source(context.OriginalQuery);
-            var varDefPos = new Location(source, varDef.SourceLocation.Start);
-            var usagePos = new Location(source, usage.Node.SourceLocation.Start);
+            var varDefPos = new Location(context.OriginalQuery, varDef.SourceLocation.Start);
+            var usagePos = new Location(context.OriginalQuery, usage.Node.SourceLocation.Start);
 
             AddLocation(varDefPos.Line, varDefPos.Column);
             AddLocation(usagePos.Line, usagePos.Column);

@@ -9,6 +9,7 @@ namespace GraphQL.Types
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
         Func<object, bool> IsTypeOf { get; set; }
+
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 
@@ -19,7 +20,6 @@ namespace GraphQL.Types
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();
-        private readonly List<IInterfaceGraphType> _resolvedInterfaces = new List<IInterfaceGraphType>();
 
         /// <inheritdoc/>
         public Func<object, bool> IsTypeOf { get; set; }
@@ -37,28 +37,12 @@ namespace GraphQL.Types
             if (graphType == null)
                 throw new ArgumentNullException(nameof(graphType));
 
-            if (!_resolvedInterfaces.Contains(graphType))
-            {
-                _ = graphType.IsValidInterfaceFor(this, throwError: true);
-                _resolvedInterfaces.Add(graphType);
-            }
+            _ = graphType.IsValidInterfaceFor(this, throwError: true);
+            ResolvedInterfaces.Add(graphType);
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
-        {
-            get => _resolvedInterfaces;
-            set
-            {
-                _resolvedInterfaces.Clear();
-
-                if (value != null)
-                {
-                    foreach (var item in value)
-                        _resolvedInterfaces.Add(item ?? throw new ArgumentNullException(nameof(value), "value contains null item"));
-                }
-            }
-        }
+        public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
 
         /// <inheritdoc/>
         public IEnumerable<Type> Interfaces

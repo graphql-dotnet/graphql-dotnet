@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Errors
                     node.Name,
                     fieldDef.Name,
                     context.Print(parentType),
-                    StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.Select(q => q.Name))),
+                    StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))),
                 node)
         {
         }

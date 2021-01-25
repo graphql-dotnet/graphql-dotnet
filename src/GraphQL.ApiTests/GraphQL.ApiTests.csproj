@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
-  
+
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
   </PropertyGroup>
@@ -11,7 +11,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemReactive\GraphQL.SystemReactive.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
+    <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
   </ItemGroup>
 
 </Project>

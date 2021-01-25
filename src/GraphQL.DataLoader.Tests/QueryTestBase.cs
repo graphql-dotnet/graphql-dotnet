@@ -18,7 +18,7 @@ namespace GraphQL.DataLoader.Tests
 {
     public abstract class QueryTestBase : DataLoaderTestBase
     {
-        private readonly IDocumentExecuter executer = new DocumentExecuter();
+        private readonly IDocumentExecuter executer = new SubscriptionDocumentExecuter();
         private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
 
         protected IServiceProvider Services { get; }

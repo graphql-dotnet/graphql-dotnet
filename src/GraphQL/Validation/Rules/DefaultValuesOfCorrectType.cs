@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
@@ -20,25 +19,21 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="DefaultValuesOfCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>(varDefAst =>
-                {
-                    var defaultValue = varDefAst.DefaultValue;
-                    var inputType = context.TypeInfo.GetInputType();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-                    if (inputType != null && defaultValue != null)
-                    {
-                        var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
-                        if (errors.Count > 0)
-                        {
-                            context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
-                        }
-                    }
-                });
-            }).ToTask();
-        }
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDefAst, context) =>
+        {
+            var defaultValue = varDefAst.DefaultValue;
+            var inputType = context.TypeInfo.GetInputType();
+
+            if (inputType != null && defaultValue != null)
+            {
+                var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema);
+                if (errors.Length > 0)
+                {
+                    context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
+                }
+            }
+        }).ToTask();
     }
 }

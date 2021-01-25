@@ -57,6 +57,8 @@ namespace GraphQL.Utilities
 
             var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
+                .Dictionary
+                .Values
                 .Where(t => typeFilter(t.Name))
                 .OrderBy(x => x.Name, StringComparer.Ordinal)
                 .ToList();
@@ -176,7 +178,7 @@ namespace GraphQL.Utilities
 
         public virtual string PrintObject(IObjectGraphType type)
         {
-            var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
@@ -198,7 +200,7 @@ namespace GraphQL.Utilities
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var values = string.Join(Environment.NewLine, type.Values.Select(x => "  " + x.Name));
+            var values = string.Join(Environment.NewLine, type.Values.Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name));
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
@@ -232,7 +234,7 @@ namespace GraphQL.Utilities
                 return string.Empty;
             }
 
-            return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue)));
+            return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue))); //TODO: iterator allocation
         }
 
         public string PrintInputValue(FieldType field)

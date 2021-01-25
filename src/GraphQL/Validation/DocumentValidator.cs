@@ -55,7 +55,7 @@ namespace GraphQL.Validation
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
             UniqueInputFieldNames.Instance
-        }.AsReadOnly();
+        };
 
         /// <inheritdoc/>
         public async Task<IValidationResult> ValidateAsync(
@@ -71,9 +71,19 @@ namespace GraphQL.Validation
                 schema.Initialize();
             }
 
+            bool useOnlyStandardRules = rules == null;
+            if (useOnlyStandardRules)
+            {
+                rules = CoreRules;
+            }
+            else if (!rules.Any())
+            {
+                return SuccessfullyValidatedResult.Instance;
+            }
+
             var context = new ValidationContext
             {
-                OriginalQuery = originalQuery,
+                OriginalQuery = originalQuery ?? document.OriginalQuery,
                 Schema = schema,
                 Document = document,
                 TypeInfo = new TypeInfo(schema),
@@ -81,27 +91,32 @@ namespace GraphQL.Validation
                 Inputs = inputs
             };
 
-            if (rules == null)
-            {
-                rules = CoreRules;
-            }
+            List<INodeVisitor> visitors;
 
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
-            var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+            if (useOnlyStandardRules)
+            {
+                // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
+                visitors = new List<INodeVisitor>();
+                foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                {
+                    var visitor = rule.ValidateAsync(context)?.Result;
+                    if (visitor != null)
+                        visitors.Add(visitor);
+                }
+            }
+            else
+            {
+                var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
+                visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+            }   
 
             visitors.Insert(0, context.TypeInfo);
-            // #if DEBUG
-            //             visitors.Insert(1, new DebugNodeVisitor());
-            // #endif
 
-            var basic = new BasicVisitor(visitors);
+            new BasicVisitor(visitors).Visit(document, context);
 
-            basic.Visit(document);
-
-            if (context.HasErrors)
-                return new ValidationResult(context.Errors);
-
-            return SuccessfullyValidatedResult.Instance;
+            return context.HasErrors
+                ? new ValidationResult(context.Errors)
+                : (IValidationResult)SuccessfullyValidatedResult.Instance;
         }
     }
 }
