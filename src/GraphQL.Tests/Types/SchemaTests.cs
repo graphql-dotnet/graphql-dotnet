@@ -193,6 +193,19 @@ namespace GraphQL.Tests.Types
             Should.Throw<ObjectDisposedException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
         }
+
+        [Fact]
+        public void initialized_schema_throws_errors()
+        {
+            var schema = new Schema();
+            schema.Initialize();
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new IGraphType[] { }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
+            Should.Throw<InvalidOperationException>(() => schema.RegisterDirective(new DirectiveGraphType("test", new DirectiveLocation[] { DirectiveLocation.Field })));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
+        }
     }
 
     public class MyDto
