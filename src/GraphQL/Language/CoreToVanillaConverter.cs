@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQLParser.AST;
 using OperationType = GraphQL.Language.AST.OperationType;
@@ -254,31 +253,31 @@ namespace GraphQL.Language
                 case ASTNodeKind.StringValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new StringValue(str.Value) { SourceLocation = Convert(str.Location) };
+                    return new StringValue((string)str.Value) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.IntValue:
                 {
                     var str = (GraphQLScalarValue)source;
 
-                    if (int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
+                    if (Int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
                     {
                         return new IntValue(intResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    if (long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
+                    if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
                     {
                         return new LongValue(longResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
-                    if (decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
+                    if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
                     {
                         return new DecimalValue(decimalResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInteger.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
+                    if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult) { SourceLocation = Convert(str.Location) };
                     }
@@ -292,17 +291,17 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    if (double.TryParse(
+                    if (Double.TryParse(
                         str.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
-                        out var dbl) == false)
+                        out double dbl) == false)
                     {
-                        dbl = str.Value[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
+                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
                     }
 
                     //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
-                    if (decimal.TryParse(
+                    if (Decimal.TryParse(
                         str.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
@@ -321,12 +320,12 @@ namespace GraphQL.Language
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new BooleanValue(bool.Parse(str.Value)) { SourceLocation = Convert(str.Location) };
+                    return new BooleanValue(str.Value.Length == 4 /*true.Length=4*/) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.EnumValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new EnumValue(str.Value) { SourceLocation = Convert(str.Location) };
+                    return new EnumValue((string)str.Value) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.Variable:
                 {
@@ -406,7 +405,7 @@ namespace GraphQL.Language
         private static NameNode Name(GraphQLName name)
         {
             if (name == null) return default;
-            return new NameNode(name.Value, Convert(name.Location));
+            return new NameNode((string)name.Value, Convert(name.Location));
         }
 
         /// <summary>
@@ -416,7 +415,7 @@ namespace GraphQL.Language
         {
             return comment == null
                 ? null
-                : new CommentNode(comment.Text) { SourceLocation = Convert(comment.Location) };
+                : new CommentNode((string)comment.Text) { SourceLocation = Convert(comment.Location) };
         }
 
         /// <summary>
@@ -434,33 +433,5 @@ namespace GraphQL.Language
         /// Converts a location reference within a document.
         /// </summary>
         private static SourceLocation Convert(GraphQLLocation location) => new SourceLocation(location.Start, location.End);
-    }
-
-    // * DESCRIPTION TAKEN FROM MS REFERENCE SOURCE *
-    // https://github.com/microsoft/referencesource/blob/master/mscorlib/system/decimal.cs
-    // The lo, mid, hi, and flags fields contain the representation of the
-    // Decimal value. The lo, mid, and hi fields contain the 96-bit integer
-    // part of the Decimal. Bits 0-15 (the lower word) of the flags field are
-    // unused and must be zero; bits 16-23 contain must contain a value between
-    // 0 and 28, indicating the power of 10 to divide the 96-bit integer part
-    // by to produce the Decimal value; bits 24-30 are unused and must be zero;
-    // and finally bit 31 indicates the sign of the Decimal value, 0 meaning
-    // positive and 1 meaning negative.
-    internal readonly struct DecimalData
-    {
-        public readonly uint Flags;
-        public readonly uint Hi;
-        public readonly uint Lo;
-        public readonly uint Mid;
-
-        internal DecimalData(uint flags, uint hi, uint lo, uint mid)
-        {
-            Flags = flags;
-            Hi = hi;
-            Lo = lo;
-            Mid = mid;
-        }
-
-        internal bool Equals(in DecimalData other) => Flags == other.Flags && Hi == other.Hi && Lo == other.Lo && Mid == other.Mid;
     }
 }
