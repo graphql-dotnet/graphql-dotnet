@@ -190,8 +190,6 @@ namespace GraphQL.Benchmarks
                 _ = Serialize();
             }
 
-            private static readonly GraphQLParser.Parser _parser = new GraphQLParser.Parser(new GraphQLParser.Lexer());
-
             public ISchema BuildSchema()
             {
                 return SchemaBuilder();
@@ -199,7 +197,7 @@ namespace GraphQL.Benchmarks
 
             public GraphQLDocument Parse()
             {
-                return _parser.Parse(new GraphQLParser.Source(Query));
+                return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.IgnoreComments });
             }
 
             public Document Convert()
@@ -241,7 +239,7 @@ namespace GraphQL.Benchmarks
                     Extensions = new Dictionary<string, object>(),
                     CancellationToken = default,
 
-                    Metrics = new Instrumentation.Metrics(false),
+                    Metrics = Instrumentation.Metrics.None,
                     Listeners = new List<IDocumentExecutionListener>(),
                     ThrowOnUnhandledException = true,
                     UnhandledExceptionDelegate = context => { },
