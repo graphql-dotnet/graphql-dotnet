@@ -25,6 +25,24 @@ namespace GraphQL.Benchmarks
     //[RPlotExporter, CsvMeasurementsExporter]
     public class DetailedBenchmark : IBenchmark
     {
+        private class BenchmarkConfig : ManualConfig
+        {
+            public BenchmarkConfig()
+            {
+                Orderer = new GroupbyQueryOrderer();
+            }
+
+            private class GroupbyQueryOrderer : IOrderer
+            {
+                public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase) => benchmarksCase;
+                public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary) => benchmarksCase;
+                public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
+                public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase) => benchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
+                public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups) => logicalGroups;
+                public bool SeparateLogicalGroups => true;
+            }
+        }
+
         private BenchmarkInfo _bIntrospection;
         private BenchmarkInfo _bHero;
         private BenchmarkInfo _bVariable;
@@ -240,29 +258,6 @@ namespace GraphQL.Benchmarks
                 _documentWriter.WriteAsync(mem, ExecutionResult).GetAwaiter().GetResult();
                 mem.Position = 0;
                 return mem;
-            }
-        }
-
-        private class BenchmarkConfig : ManualConfig
-        {
-            public BenchmarkConfig()
-            {
-                Orderer = new GroupbyQueryOrderer();
-            }
-
-            private class GroupbyQueryOrderer : IOrderer
-            {
-                public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase) => benchmarksCase;
-
-                public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary) => benchmarksCase;
-
-                public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
-
-                public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase) => benchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
-
-                public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups) => logicalGroups;
-
-                public bool SeparateLogicalGroups => true;
             }
         }
     }
