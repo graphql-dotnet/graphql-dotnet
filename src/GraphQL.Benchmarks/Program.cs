@@ -14,7 +14,7 @@ namespace GraphQL.Benchmarks
         private static void Main(string[] args)
         {
             args = args.Select(x => x.ToLower()).ToArray();
-            bool profile = args.FirstOrDefault() == "/P";
+            bool profile = args.FirstOrDefault() == "/p";
             int skip = 0;
             int profileCount = 0;
             if (profile)
@@ -66,9 +66,9 @@ namespace GraphQL.Benchmarks
         {
             Console.WriteLine($"Invalid arguments: {string.Join(' ', args)}");
             Console.WriteLine(@"
-Argument syntax: [/P [count]] [benchmarkTypeName]
+Argument syntax: [/p [count]] [benchmarkTypeName]
 
-        /P                  Run profiler - if not specified, runs benchmarks
+        /p                  Runs profiler - if not specified, runs benchmarks
         count               Number of times to run execution before executing ReadLine
                                (defaults to 100)
         benchmarkTypeName   The name of the class to run; the class must inherit from IBenchmark
