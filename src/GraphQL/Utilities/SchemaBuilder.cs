@@ -62,7 +62,7 @@ namespace GraphQL.Utilities
 
         public virtual ISchema Build(string typeDefinitions)
         {
-            var document = typeDefinitions.Parse(new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
+            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
             Validate(document);
             return BuildSchemaFrom(document);
         }

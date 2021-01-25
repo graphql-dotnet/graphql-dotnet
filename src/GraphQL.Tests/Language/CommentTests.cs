@@ -19,7 +19,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse());
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
             document.Operations.First().Comment.ShouldBeNull();
         }
 
@@ -33,7 +33,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First().Comment.ShouldBe("comment");
         }
 
@@ -47,7 +47,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse());
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
             document.Operations.First()
@@ -67,7 +67,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment1");
             document.Operations.First()
@@ -90,7 +90,7 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Fragments.First().Comment.ShouldBe("comment");
         }
 
@@ -109,7 +109,7 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .SelectionSet.Selections.OfType<FragmentSpread>().First().Comment.ShouldBe("comment");
@@ -128,7 +128,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .SelectionSet.Selections.OfType<InlineFragment>().First().Comment.ShouldBe("comment");
@@ -146,7 +146,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .Arguments.First().Comment.ShouldBe("comment");
@@ -164,7 +164,7 @@ query _(
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(query.Parse(new ParserOptions { Ignore = IgnoreOptions.None }));
+            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
             document.Operations.First()
                 .Variables.First().Comment.ShouldBe("comment");
         }
