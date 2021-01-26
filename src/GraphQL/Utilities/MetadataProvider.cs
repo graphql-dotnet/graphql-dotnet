@@ -12,6 +12,9 @@ namespace GraphQL.Utilities
     public class MetadataProvider : IProvideMetadata
     {
         /// <inheritdoc />
+        public AppliedDirectives AppliedDirectives { get; set; } = new AppliedDirectives();
+
+        /// <inheritdoc />
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
         /// <inheritdoc />

@@ -38,13 +38,6 @@ namespace GraphQL.Tests.Introspection
       }
       isDeprecated
       deprecationReason
-      directives {
-        name
-        args {
-          name
-          value
-        }
-      }
     }
     inputFields {
       ...InputValue

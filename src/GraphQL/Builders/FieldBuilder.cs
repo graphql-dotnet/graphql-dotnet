@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Builders
 {
@@ -217,9 +216,38 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Directive(SchemaDirectiveVisitor directive)
+        /// <summary>
+        /// Apply directive without specifying arguments. If the directive declaration has arguments,
+        /// then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public FieldBuilder<TSourceType, TReturnType> Directive(string name)
         {
-            FieldType.AddDirective(directive);
+            FieldType.ApplyDirective(name);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive specifying one argument. If the directive declaration has other arguments,
+        /// then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argumentName">Argument name.</param>
+        /// <param name="argumentValue">Argument value.</param>
+        public FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
+        {
+            FieldType.ApplyDirective(name, argumentName, argumentValue);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive with configuration delegate.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="configure">Configuration delegate.</param>
+        public FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
+        {
+            FieldType.ApplyDirective(name, configure);
             return this;
         }
     }

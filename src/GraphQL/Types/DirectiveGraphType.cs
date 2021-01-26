@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -75,7 +76,7 @@ namespace GraphQL.Types
     /// Directives are used by the GraphQL runtime as a way of modifying execution
     /// behavior. Type system creators will usually not create these directly.
     /// </summary>
-    public class DirectiveGraphType : INamedType
+    public class DirectiveGraphType : MetadataProvider, INamedType
     {
         /// <summary>
         /// Returns a static instance of the predefined 'include' directive.

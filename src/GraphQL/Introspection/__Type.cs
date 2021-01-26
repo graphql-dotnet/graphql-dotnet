@@ -88,7 +88,7 @@ namespace GraphQL.Introspection
 
                     return interfaces.Constrained(index);
                 }
-                    
+
                 return null;
             });
 

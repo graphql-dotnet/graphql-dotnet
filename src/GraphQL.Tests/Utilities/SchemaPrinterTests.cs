@@ -831,6 +831,14 @@ directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
+# Directive applied to a schema element
+type __AppliedDirective {
+  # Directive name
+  name: String!
+  # Values of directive arguments
+  args: [__DirectiveArgument!]!
+}
+
 # A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
 #
 # In some cases, you need to provide options to alter GraphQL's execution behavior
@@ -896,14 +904,6 @@ enum __DirectiveLocation {
   INPUT_FIELD_DEFINITION
 }
 
-# Directive applied to a schema element
-type __DirectiveUsage {
-  # Directive name
-  name: String!
-  # Values of directive arguments
-  args: [__DirectiveArgument!]!
-}
-
 # One possible value for a given Enum. Enum values are unique values, not a
 # placeholder for a string or numeric value. However an Enum value is returned in
 # a JSON response as a string.
@@ -924,7 +924,7 @@ type __Field {
   isDeprecated: Boolean!
   deprecationReason: String
   # Directives applied to the field
-  directives: [__DirectiveUsage!]!
+  directives: [__AppliedDirective!]!
 }
 
 # Arguments provided to Fields or Directives and the input fields of an

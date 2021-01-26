@@ -128,106 +128,12 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "__DirectiveArgument",
-          "description": "Value of an argument provided to directive",
-          "fields": [
-            {
-              "name": "name",
-              "description": "Argument name",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
-            },
-            {
-              "name": "value",
-              "description": "A GraphQL-formatted string representing the value for argument.",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "SCALAR",
           "name": "String",
           "description": null,
           "fields": null,
           "inputFields": null,
           "interfaces": null,
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "__DirectiveUsage",
-          "description": "Directive applied to a schema element",
-          "fields": [
-            {
-              "name": "name",
-              "description": "Directive name",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
-            },
-            {
-              "name": "args",
-              "description": "Values of directive arguments",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "__DirectiveArgument",
-                      "ofType": null
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -309,8 +215,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "description",
@@ -322,8 +227,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "isDeprecated",
@@ -339,8 +243,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "deprecationReason",
@@ -352,8 +255,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -390,8 +292,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "description",
@@ -403,8 +304,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "locations",
@@ -428,8 +328,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "args",
@@ -453,8 +352,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "onOperation",
@@ -470,8 +368,7 @@
                 }
               },
               "isDeprecated": true,
-              "deprecationReason": "Use 'locations'.",
-              "directives": []
+              "deprecationReason": "Use 'locations'."
             },
             {
               "name": "onFragment",
@@ -487,8 +384,7 @@
                 }
               },
               "isDeprecated": true,
-              "deprecationReason": "Use 'locations'.",
-              "directives": []
+              "deprecationReason": "Use 'locations'."
             },
             {
               "name": "onField",
@@ -504,8 +400,7 @@
                 }
               },
               "isDeprecated": true,
-              "deprecationReason": "Use 'locations'.",
-              "directives": []
+              "deprecationReason": "Use 'locations'."
             }
           ],
           "inputFields": null,
@@ -532,8 +427,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "description",
@@ -545,8 +439,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "type",
@@ -562,8 +455,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "defaultValue",
@@ -575,8 +467,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -603,8 +494,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "name",
@@ -616,8 +506,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "description",
@@ -629,8 +518,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "fields",
@@ -661,8 +549,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "interfaces",
@@ -682,8 +569,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "possibleTypes",
@@ -703,8 +589,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "enumValues",
@@ -735,8 +620,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "inputFields",
@@ -756,8 +640,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "ofType",
@@ -769,8 +652,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -797,8 +679,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "description",
@@ -810,8 +691,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "args",
@@ -835,8 +715,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "type",
@@ -852,8 +731,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "isDeprecated",
@@ -869,8 +747,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "deprecationReason",
@@ -882,8 +759,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "directives",
@@ -900,15 +776,14 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "__DirectiveUsage",
+                      "name": "__AppliedDirective",
                       "ofType": null
                     }
                   }
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -931,8 +806,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "types",
@@ -956,8 +830,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "queryType",
@@ -973,8 +846,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "mutationType",
@@ -986,8 +858,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "subscriptionType",
@@ -999,8 +870,7 @@
                 "ofType": null
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             },
             {
               "name": "directives",
@@ -1024,8 +894,7 @@
                 }
               },
               "isDeprecated": false,
-              "deprecationReason": null,
-              "directives": []
+              "deprecationReason": null
             }
           ],
           "inputFields": null,

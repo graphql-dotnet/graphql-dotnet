@@ -16,8 +16,6 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        private const string DIRECTIVES_METADATA_KEY = "directives";
-
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
         /// </summary>
@@ -544,93 +542,6 @@ namespace GraphQL
                     ? converter.Convert(serialized, type)
                     : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
             }
-        }
-
-        /// <summary>
-        /// Add <paramref name="directive"/> to object metadata and apply it.
-        /// </summary>
-        /// <param name="metadataProvider"> Metadata. </param>
-        /// <param name="directive"> Schema directive. </param>
-        public static TMetadataProvider AddDirective<TMetadataProvider>(this TMetadataProvider metadataProvider, SchemaDirectiveVisitor directive)
-            where TMetadataProvider : IProvideMetadata
-        {
-            // apply directive to target
-            switch (metadataProvider)
-            {
-                case Schema schema:
-                    directive.VisitSchema(schema);
-                    break;
-                case ObjectGraphType objectGraphType:
-                    directive.VisitObject(objectGraphType);
-                    break;
-                case IObjectGraphType objectGraphType:
-                    directive.VisitObject(objectGraphType);
-                    break;
-                case EnumerationGraphType enumeration:
-                    directive.VisitEnum(enumeration);
-                    break;
-                case EnumValueDefinition value:
-                    directive.VisitEnumValue(value);
-                    break;
-                case ScalarGraphType scalar:
-                    directive.VisitScalar(scalar);
-                    break;
-                case FieldType field:
-                    directive.VisitFieldDefinition(field);
-                    break;
-                case QueryArgument argument:
-                    directive.VisitArgumentDefinition(argument);
-                    break;
-                case InterfaceGraphType interfaceGraphType:
-                    directive.VisitInterface(interfaceGraphType);
-                    break;
-                case UnionGraphType union:
-                    directive.VisitUnion(union);
-                    break;
-                case InputObjectGraphType type:
-                    directive.VisitInputObject(type);
-                    break;
-            }
-
-            return metadataProvider;
-        }
-
-        /// <summary>
-        /// Add <paramref name="directive"/> to object metadata.
-        /// </summary>
-        /// <param name="metadataProvider"> Metadata. </param>
-        /// <param name="directive"> Schema directive. </param>
-        public static void SetDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
-        {
-            if (directive == null)
-                throw new ArgumentNullException(nameof(directive));
-
-            Dictionary<string, SchemaDirectiveVisitor> directives;
-            if (metadataProvider.HasMetadata(DIRECTIVES_METADATA_KEY))
-            {
-                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DIRECTIVES_METADATA_KEY);
-            }
-            else
-            {
-                directives = new Dictionary<string, SchemaDirectiveVisitor>();
-                metadataProvider.Metadata.Add(DIRECTIVES_METADATA_KEY, directives);
-            }
-
-            directives[directive.Name] = directive;
-        }
-
-        /// <summary>
-        /// Get all directives applied to <paramref name="metadataProvider"/>.
-        /// </summary>
-        /// <param name="metadataProvider"> Metadata. </param>
-        public static IEnumerable<SchemaDirectiveVisitor> GetDirectives(this IProvideMetadata metadataProvider)
-        {
-            var directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DIRECTIVES_METADATA_KEY);
-
-            if (directives == null)
-                return Array.Empty<SchemaDirectiveVisitor>();
-
-            return directives.Values;
         }
     }
 }

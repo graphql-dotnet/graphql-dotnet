@@ -207,16 +207,8 @@ namespace GraphQL.Tests.StarWars
                         ""kind"": ""ENUM""
                     },
                     {
-                        ""name"": ""__DirectiveArgument"",
-                        ""kind"": ""OBJECT""
-                    },
-                    {
                         ""name"": ""String"",
                         ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""__DirectiveUsage"",
-                        ""kind"": ""OBJECT""
                     },
                     {
                         ""name"": ""__TypeKind"",
@@ -362,7 +354,7 @@ namespace GraphQL.Tests.StarWars
               ""__schema"": {
                 ""queryType"": {
                   ""fields"": [
-                    
+
                     {
                       ""name"": ""hero"",
                       ""args"": []

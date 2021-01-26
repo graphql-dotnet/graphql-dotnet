@@ -45,14 +45,17 @@ namespace GraphQL.Introspection
 
     /// <summary>
     /// The default schema filter. By default nothing is hidden.
+    /// Please note that some features may be hidden by default
+    /// that are not in the official specification. These features
+    /// can be unlocked using your own filter.
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
         private static readonly Task<bool> _allowed = Task.FromResult(true);
-        private static readonly Task<bool> _forbidden = Task.FromResult(true);
+        private static readonly Task<bool> _forbidden = Task.FromResult(false);
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowType(IGraphType type) => _allowed;
+        public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? _forbidden : _allowed;
 
         /// <inheritdoc/>
         public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => _allowed;

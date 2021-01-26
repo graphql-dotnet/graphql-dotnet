@@ -27,6 +27,21 @@ namespace GraphQL.Types
                 List.Add(directive);
         }
 
+        /// <summary>
+        /// Searches the directive by its name and returns it.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public DirectiveGraphType Find(string name)
+        {
+            foreach (var directive in List)
+            {
+                if (directive.Name == name)
+                    return directive;
+            }
+
+            return null;
+        }
+
         public bool Contains(DirectiveGraphType type) => List.Contains(type ?? throw new ArgumentNullException(nameof(type)));
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>

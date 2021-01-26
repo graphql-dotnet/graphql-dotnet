@@ -4,7 +4,10 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
-    public class __DirectiveArgument : ObjectGraphType<DirectiveArgumentValue>
+    /// <summary>
+    /// The <c>__DirectiveArgument</c> introspection type represents an argument of a directive applied to a schema element - type, field, argument, etc.
+    /// </summary>
+    public class __DirectiveArgument : ObjectGraphType<DirectiveArgument>
     {
         public __DirectiveArgument()
         {
@@ -21,10 +24,10 @@ namespace GraphQL.Introspection
                 "A GraphQL-formatted string representing the value for argument.",
                 resolve: context =>
                 {
-                    var argumentValue = context.Source;
-                    if (argumentValue.Value == null) return null;
+                    var argument = context.Source;
+                    if (argument.Value == null) return null;
 
-                    var ast = argumentValue.Value.AstFromValue(context.Schema, argumentValue.ResolvedType);
+                    var ast = argument.Value.AstFromValue(context.Schema, argument.ResolvedType);
                     if (ast is StringValue value) //TODO: ???
                     {
                         return value.Value;

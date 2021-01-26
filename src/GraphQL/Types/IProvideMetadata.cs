@@ -11,6 +11,11 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         /// <summary>
+        /// Provides all directives applied to this provider.
+        /// </summary>
+        AppliedDirectives AppliedDirectives { get; }
+
+        /// <summary>
         /// Provides all meta information as a key-value dictionary.
         /// </summary>
         IDictionary<string, object> Metadata { get; }

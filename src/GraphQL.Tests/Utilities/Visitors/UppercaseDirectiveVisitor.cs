@@ -19,14 +19,11 @@ namespace GraphQL.Tests.Utilities.Visitors
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new FuncFieldResolver<object>(context =>
             {
-                var result = inner.Resolve(context);
+                object result = inner.Resolve(context);
 
-                if (result is string str)
-                {
-                    return str.ToUpperInvariant();
-                }
-
-                return result;
+                return result is string str
+                    ? str.ToUpperInvariant()
+                    : result;
             });
         }
     }
@@ -46,14 +43,11 @@ namespace GraphQL.Tests.Utilities.Visitors
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new AsyncFieldResolver<object>(async context =>
             {
-                var result = await inner.ResolveAsync(context);
+                object result = await inner.ResolveAsync(context);
 
-                if (result is string str)
-                {
-                    return str.ToUpperInvariant();
-                }
-
-                return result;
+                return result is string str
+                    ? str.ToUpperInvariant()
+                    : result;
             });
         }
     }

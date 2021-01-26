@@ -25,7 +25,7 @@ namespace GraphQL.Types
         {
             new __DirectiveLocation(),
             new __DirectiveArgument(),
-            new __DirectiveUsage(),
+            new __AppliedDirective(),
             new __TypeKind(),
             new __EnumValue(),
             new __Directive(),
@@ -219,7 +219,7 @@ namespace GraphQL.Types
             {
                 if (item.Value is IComplexGraphType complex)
                 {
-                    foreach (var field in complex.Fields)
+                    foreach (var field in complex.Fields.List)
                     {
                         var inner = field.Resolver ?? NameFieldResolver.Instance;
 

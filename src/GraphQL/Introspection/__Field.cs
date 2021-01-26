@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
@@ -82,29 +81,30 @@ namespace GraphQL.Introspection
 
             Field(f => f.DeprecationReason, nullable: true).Description(null);
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveUsage>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__AppliedDirective>>>>(
                 name: "directives",
                 description: "Directives applied to the field",
                 resolve: async context =>
                 {
-                    var directives = context.Source.GetDirectives().ToArray();
-                    if (directives.Length == 0)
-                        return Array.Empty<SchemaDirectiveVisitor>();
-
-                    var result = context.ArrayPool.Rent<SchemaDirectiveVisitor>(directives.Length);
-
-                    int index = 0;
-                    foreach (var visitor in directives)
+                    if (context.Source.AppliedDirectives?.Count > 0)
                     {
-                        // return only registered directives allowed by filter
-                        var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == visitor.Name);
-                        if (registeredDirective != null && await context.Schema.Filter.AllowDirective(registeredDirective))
+                        var usages = context.ArrayPool.Rent<AppliedDirective>(context.Source.AppliedDirectives.Count);
+
+                        int index = 0;
+                        foreach (var usage in usages)
                         {
-                            result[index++] = visitor;
+                            // return only registered directives allowed by filter
+                            var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == usage.Name);
+                            if (registeredDirective != null && await context.Schema.Filter.AllowDirective(registeredDirective))
+                            {
+                                usages[index++] = usage;
+                            }
                         }
+
+                        return usages.Constrained(index);
                     }
 
-                    return result.Constrained(index);
+                    return Array.Empty<AppliedDirective>();
                 });
         }
     }

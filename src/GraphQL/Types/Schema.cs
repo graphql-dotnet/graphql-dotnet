@@ -350,6 +350,80 @@ namespace GraphQL.Types
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
             _allTypes.ApplyMiddleware(FieldMiddleware);
+
+            Validate();
+        }
+
+        protected virtual void Validate()
+        {
+            //TODO: add different validations
+            ValidateAppliedDirectives();
+        }
+
+        protected void ValidateAppliedDirectives()
+        {
+            ValidateAppliedDirectives(this);
+
+            foreach (var directive in Directives.List)
+            {
+                ValidateAppliedDirectives(directive);
+
+                if (directive.Arguments?.Count > 0)
+                {
+                    foreach (var argument in directive.Arguments.List)
+                        ValidateAppliedDirectives(argument);
+                }
+            }
+
+            foreach (var item in AllTypes.Dictionary)
+            {
+                ValidateAppliedDirectives(item.Value);
+
+                if (item.Value is IComplexGraphType complex)
+                {
+                    foreach (var field in complex.Fields.List)
+                    {
+                        ValidateAppliedDirectives(field);
+
+                        if (field.Arguments?.Count > 0)
+                        {
+                            foreach (var argument in field.Arguments.List)
+                                ValidateAppliedDirectives(argument);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ValidateAppliedDirectives(IProvideMetadata provider)
+        {
+            if (provider.AppliedDirectives?.Count > 0)
+            {
+                foreach (var appliedDirective in provider.AppliedDirectives)
+                {
+                    var schemaDirective = Directives.Find(appliedDirective.Name);
+                    if (schemaDirective == null)
+                        throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}'.");
+
+                    if (schemaDirective.Arguments?.Count > 0)
+                    {
+                        foreach (var arg in schemaDirective.Arguments.List)
+                        {
+                            if (arg.DefaultValue == null && appliedDirective.Find(arg.Name) == null)
+                                throw new InvalidOperationException($"Directive '{appliedDirective.Name}' must specify required argument '{arg.Name}'.");
+                        }
+                    }
+
+                    if (appliedDirective.Arguments?.Count > 0)
+                    {
+                        foreach (var arg in appliedDirective.Arguments)
+                        {
+                            if (schemaDirective.Arguments.Find(arg.Name) == null)
+                                throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}'.");
+                        }
+                    }
+                }
+            }
         }
     }
 }
