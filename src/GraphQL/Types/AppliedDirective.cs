@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using GraphQL.Utilities;
 
@@ -6,8 +8,12 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a directive applied to a schema element - type, field, argument, etc.
     /// </summary>
-    public class AppliedDirective
+    public class AppliedDirective : IEnumerable<DirectiveArgument>
     {
+        private string _name;
+
+        internal List<DirectiveArgument> Arguments { get; private set; }
+
         /// <summary>
         /// Creates directive.
         /// </summary>
@@ -16,8 +22,6 @@ namespace GraphQL.Types
         {
             Name = name;
         }
-
-        private string _name;
 
         /// <summary>
         /// Directive name.
@@ -30,6 +34,22 @@ namespace GraphQL.Types
                 NameValidator.ValidateName(value, "directive");
                 _name = value;
             }
+        }
+
+        /// <summary>
+        /// Returns the number of directive arguments.
+        /// </summary>
+        public int ArgumentsCount => Arguments?.Count ?? 0;
+
+        /// <summary>
+        /// Adds an argument to the directive.
+        /// </summary>
+        public void AddArgument(DirectiveArgument argument)
+        {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
+            (Arguments ??= new List<DirectiveArgument>()).Add(argument);
         }
 
         /// <summary>
@@ -50,9 +70,9 @@ namespace GraphQL.Types
             return null;
         }
 
-        /// <summary>
-        /// Directive arguments.
-        /// </summary>
-        public List<DirectiveArgument> Arguments { get; set; }
+        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+        public IEnumerator<DirectiveArgument> GetEnumerator() => (Arguments ?? System.Linq.Enumerable.Empty<DirectiveArgument>()).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

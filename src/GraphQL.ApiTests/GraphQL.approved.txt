@@ -1652,12 +1652,14 @@ namespace GraphQL.Types
         public static GraphQL.Types.IObjectGraphType GetTypeOf(this GraphQL.Types.IAbstractGraphType abstractType, object value) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
-    public class AppliedDirective
+    public class AppliedDirective : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
     {
         public AppliedDirective(string name) { }
-        public System.Collections.Generic.List<GraphQL.Types.DirectiveArgument> Arguments { get; set; }
+        public int ArgumentsCount { get; }
         public string Name { get; set; }
+        public void AddArgument(GraphQL.Types.DirectiveArgument argument) { }
         public GraphQL.Types.DirectiveArgument Find(string argumentName) { }
+        public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveArgument> GetEnumerator() { }
     }
     public class AppliedDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.AppliedDirective>, System.Collections.IEnumerable
     {

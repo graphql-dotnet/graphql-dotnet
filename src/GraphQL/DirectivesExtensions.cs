@@ -34,7 +34,7 @@ namespace GraphQL
         /// <param name="argumentValue">Argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
-            where TMetadataProvider : IProvideMetadata => provider.ApplyDirective(name, directive => directive.Arguments.Add(new DirectiveArgument(argumentName) { Value = argumentValue }));
+            where TMetadataProvider : IProvideMetadata => provider.ApplyDirective(name, directive => directive.AddArgument(new DirectiveArgument(argumentName) { Value = argumentValue }));
 
         /// <summary>
         /// Apply directive with configuration delegate.
