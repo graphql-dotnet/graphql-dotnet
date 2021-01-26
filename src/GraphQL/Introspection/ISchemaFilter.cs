@@ -58,7 +58,7 @@ namespace GraphQL.Introspection
         public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? _forbidden : _allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => _allowed;
+        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => parent is __Field && field.Name == "directives" ? _forbidden : _allowed;
 
         /// <inheritdoc/>
         public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => _allowed;
