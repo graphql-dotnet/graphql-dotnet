@@ -29,10 +29,14 @@ namespace GraphQL.Benchmarks.Merge
 
         public Table Table { get; set; } = new Table();
 
-        public BenchmarkResult RemoveColumns(params string[] columnNames)
+        public BenchmarkResult RemoveColumns(string[] columnNames)
         {
-            foreach (string name in columnNames)
-                Table.Remove(name);
+            if (columnNames != null)
+            {
+                foreach (string name in columnNames)
+                    Table.Remove(name);
+            }
+
             return this;
         }
 

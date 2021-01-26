@@ -29,16 +29,27 @@ namespace GraphQL.Benchmarks.Merge
                 return -1;
             }
 
-            var before = BenchmarkResult.Parse(Options.Before).RemoveColumns("Error", "StdDev", "Gen 0", "Gen 1", "Gen 2");
-            var after = BenchmarkResult.Parse(Options.After).RemoveColumns("Error", "StdDev", "Gen 0", "Gen 1", "Gen 2");
-            var result = Merge(before, after, "Mean", "Allocated");
+            var excludeColumns = Options.ExcludeColumns?.Split(';');
+            var compareColumns = Options.CompareColumns?.Split(';');
+
+            var before = BenchmarkResult.Parse(Options.Before).RemoveColumns(excludeColumns);
+            var after = BenchmarkResult.Parse(Options.After).RemoveColumns(excludeColumns);
+            var result = Merge(before, after, compareColumns);
             result.Save(Options.Result);
 
             return 0;
         }
 
-        private static BenchmarkResult Merge(BenchmarkResult before, BenchmarkResult after, params string[] diffColumns)
+        private static BenchmarkResult Merge(BenchmarkResult before, BenchmarkResult after, string[] compareColumns)
         {
+            if (!before.Header.SequenceEqual(after.Header))
+                throw new InvalidOperationException($@"Differences were found in the benchmark execution environments.
+BEFORE:
+{string.Join(Environment.NewLine, before.Header)}
+
+AFTER:
+{string.Join(Environment.NewLine, after.Header)}");
+
             var result = new BenchmarkResult
             {
                 Header = before.Header
@@ -46,7 +57,7 @@ namespace GraphQL.Benchmarks.Merge
 
             foreach (var column in before.Table.Columns)
             {
-                if (diffColumns.Contains(column.Name))
+                if (compareColumns.Contains(column.Name))
                 {
                     result.Table.Columns.Add(new Column { Name = column.Name + " [base]", Alignment = Alignment.Right });
                     result.Table.Columns.Add(new Column { Name = column.Name + " [current]", Alignment = Alignment.Right });
@@ -68,7 +79,7 @@ namespace GraphQL.Benchmarks.Merge
                     string beforeValue = before.Table.Rows[row][column];
                     string afterValue = after.Table.Rows[row][column];
 
-                    if (diffColumns.Contains(name))
+                    if (compareColumns.Contains(name))
                     {
                         resultList.Add(beforeValue);
                         resultList.Add(afterValue);
@@ -77,7 +88,7 @@ namespace GraphQL.Benchmarks.Merge
                     else
                     {
                         if (beforeValue != afterValue)
-                            throw new InvalidOperationException($"Different values: {beforeValue} | {afterValue}");
+                            throw new InvalidOperationException($"Different values in column '{name}': {beforeValue} | {afterValue}. Add this column either in --exclude or --compare command line switch.");
 
                         resultList.Add(beforeValue);
                     }

@@ -12,5 +12,11 @@ namespace GraphQL.Benchmarks.Merge
 
         [Option("result", Required = false, Default = "diff.md", HelpText = "BenchmarkDotNet resulting diff file")]
         public string Result { get; set; }
+
+        [Option("exclude", Required = false, Default = "Error;StdDev;Gen 0;Gen 1;Gen 2", HelpText = "Columns to exclude from the resulting diff file")]
+        public string ExcludeColumns { get; set; }
+
+        [Option("compare", Required = false, Default = "Mean;Allocated", HelpText = "Columns to compare in the resulting diff file")]
+        public string CompareColumns { get; set; }
     }
 }
