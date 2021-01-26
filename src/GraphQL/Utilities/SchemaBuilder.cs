@@ -75,7 +75,8 @@ namespace GraphQL.Utilities
                 throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
 
-            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
+            //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
+            // Also see Schema.Validate
         }
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)

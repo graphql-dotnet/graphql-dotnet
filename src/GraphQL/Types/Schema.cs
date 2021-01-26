@@ -356,7 +356,8 @@ namespace GraphQL.Types
 
         protected virtual void Validate()
         {
-            //TODO: add different validations
+            //TODO: add different validations, also see SchemaBuilder.Validate
+            //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
             ValidateAppliedDirectives();
         }
 
