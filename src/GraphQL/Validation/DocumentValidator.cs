@@ -71,6 +71,7 @@ namespace GraphQL.Validation
         {
             schema.Initialize();
 
+            bool success = false;
             bool useOnlyStandardRules = rules == null;
             if (useOnlyStandardRules)
             {
@@ -114,14 +115,18 @@ namespace GraphQL.Validation
 
                 new BasicVisitor(visitors).Visit(document, context);
 
-                return context.HasErrors
-                    ? new ValidationResult(context.Errors)
-                    : (IValidationResult)SuccessfullyValidatedResult.Instance;
+                success = !context.HasErrors;
+                return success
+                    ? SuccessfullyValidatedResult.Instance
+                    : new ValidationResult(context.Errors);
             }
             finally
             {
-                context.Reset();
-                System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                if (success)
+                {
+                    context.Reset();
+                    System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                }
             }
         }
     }

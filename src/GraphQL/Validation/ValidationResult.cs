@@ -32,7 +32,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns a static instance of this class.
         /// </summary>
-        public static readonly SuccessfullyValidatedResult Instance = new SuccessfullyValidatedResult();
+        public static readonly IValidationResult Instance = new SuccessfullyValidatedResult();
 
         /// <summary>
         /// Returns <see langword="true"/> indicating that the document was successfully validated.

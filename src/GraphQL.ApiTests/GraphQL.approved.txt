@@ -2646,7 +2646,7 @@ namespace GraphQL.Validation
     }
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
-        public static readonly GraphQL.Validation.SuccessfullyValidatedResult Instance;
+        public static readonly GraphQL.Validation.IValidationResult Instance;
         public GraphQL.ExecutionErrors Errors { get; }
         public bool IsValid { get; }
     }
