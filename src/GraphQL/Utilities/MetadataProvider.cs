@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using GraphQL.Types;
 
@@ -11,27 +10,64 @@ namespace GraphQL.Utilities
     /// </summary>
     public class MetadataProvider : IProvideMetadata
     {
-        /// <inheritdoc />
-        public AppliedDirectives AppliedDirectives { get; set; } = new AppliedDirectives();
+        private AppliedDirectives _appliedDirectives;
+        private Dictionary<string, object> _metadata;
 
         /// <inheritdoc />
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+        public AppliedDirectives AppliedDirectives
+        {
+            get
+            {
+                if (_appliedDirectives == null)
+                {
+                    lock (this)
+                    {
+                        if (_appliedDirectives == null)
+                        {
+                            _appliedDirectives = new AppliedDirectives();
+                        }
+                    }
+                }
+
+                return _appliedDirectives;
+            }
+        }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> Metadata
+        {
+            get
+            {
+                if (_metadata == null)
+                {
+                    lock (this)
+                    {
+                        if (_metadata == null)
+                        {
+                            _metadata = new Dictionary<string, object>();
+                        }
+                    }
+                }
+
+                return _metadata;
+            }
+        }
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
-            var local = Metadata;
+            var local = _metadata;
             return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValue;
         }
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, Func<TType> defaultValueFactory)
         {
-            var local = Metadata;
+            var local = _metadata;
             return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValueFactory();
         }
 
         /// <inheritdoc />
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
+        public bool HasMetadata(string key) => _metadata?.ContainsKey(key) ?? false;
     }
 }
