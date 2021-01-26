@@ -117,7 +117,7 @@ namespace GraphQL.Benchmarks
         [Benchmark]
         public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result);
 
-        void IBenchmark.Run()
+        void IBenchmark.RunProfiler()
         {
             Code = "Introspection";
             SystemTextJson().GetAwaiter().GetResult();
