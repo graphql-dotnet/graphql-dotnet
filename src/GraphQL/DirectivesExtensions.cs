@@ -4,13 +4,13 @@ using GraphQL.Types;
 namespace GraphQL
 {
     /// <summary>
-    /// Extension methods to configure directives applied for GraphQL elements: types, fields, arguments, etc.
+    /// Extension methods to configure directives applied to GraphQL elements: types, fields, arguments, etc.
     /// </summary>
     public static class DirectivesExtensions
     {
         /// <summary>
         /// Apply directive without specifying arguments. If the directive declaration has arguments,
-        /// then their default values (if any)will be used.
+        /// then their default values (if any) will be used.
         /// </summary>
         /// <param name="provider">
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,

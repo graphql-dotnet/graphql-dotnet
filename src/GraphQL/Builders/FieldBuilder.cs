@@ -217,7 +217,7 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Apply directive without specifying arguments. If the directive declaration has arguments,
+        /// Apply directive to field without specifying arguments. If the directive declaration has arguments,
         /// then their default values (if any) will be used.
         /// </summary>
         /// <param name="name">Directive name.</param>
@@ -228,7 +228,7 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Apply directive specifying one argument. If the directive declaration has other arguments,
+        /// Apply directive to field specifying one argument. If the directive declaration has other arguments,
         /// then their default values (if any) will be used.
         /// </summary>
         /// <param name="name">Directive name.</param>
@@ -241,7 +241,7 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Apply directive with configuration delegate.
+        /// Apply directive to field specifying configuration delegate.
         /// </summary>
         /// <param name="name">Directive name.</param>
         /// <param name="configure">Configuration delegate.</param>

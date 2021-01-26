@@ -94,8 +94,8 @@ namespace GraphQL.Introspection
                         foreach (var usage in usages)
                         {
                             // return only registered directives allowed by filter
-                            var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == usage.Name);
-                            if (registeredDirective != null && await context.Schema.Filter.AllowDirective(registeredDirective))
+                            var schemaDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == usage.Name);
+                            if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective))
                             {
                                 usages[index++] = usage;
                             }

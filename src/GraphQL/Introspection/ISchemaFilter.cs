@@ -44,10 +44,9 @@ namespace GraphQL.Introspection
     }
 
     /// <summary>
-    /// The default schema filter. By default nothing is hidden.
-    /// Please note that some features may be hidden by default
-    /// that are not in the official specification. These features
-    /// can be unlocked using your own filter.
+    /// The default schema filter. By default nothing is hidden. Please note that
+    /// some features that are not in the official specification may be hidden
+    /// by default. These features can be unlocked using your own filter.
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
