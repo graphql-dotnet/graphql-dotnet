@@ -25,6 +25,9 @@ namespace GraphQL.Validation
     /// <inheritdoc/>
     public class DocumentValidator : IDocumentValidator
     {
+        // frequently reused objects
+        private ValidationContext _reusableValidationContext;
+
         /// <summary>
         /// Returns the default set of validation rules: all except <see cref="OverlappingFieldsCanBeMerged"/>.
         /// </summary>
@@ -66,11 +69,9 @@ namespace GraphQL.Validation
             IDictionary<string, object> userContext = null,
             Inputs inputs = null)
         {
-            if (!schema.Initialized)
-            {
-                schema.Initialize();
-            }
+            schema.Initialize();
 
+            bool success = false;
             bool useOnlyStandardRules = rules == null;
             if (useOnlyStandardRules)
             {
@@ -81,42 +82,52 @@ namespace GraphQL.Validation
                 return SuccessfullyValidatedResult.Instance;
             }
 
-            var context = new ValidationContext
+            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            try
             {
-                OriginalQuery = originalQuery ?? document.OriginalQuery,
-                Schema = schema,
-                Document = document,
-                TypeInfo = new TypeInfo(schema),
-                UserContext = userContext,
-                Inputs = inputs
-            };
+                context.OriginalQuery = originalQuery ?? document.OriginalQuery;
+                context.Schema = schema;
+                context.Document = document;
+                context.TypeInfo = new TypeInfo(schema);
+                context.UserContext = userContext;
+                context.Inputs = inputs;
 
-            List<INodeVisitor> visitors;
+                List<INodeVisitor> visitors;
 
-            if (useOnlyStandardRules)
-            {
-                // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
-                visitors = new List<INodeVisitor>();
-                foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                if (useOnlyStandardRules)
                 {
-                    var visitor = rule.ValidateAsync(context)?.Result;
-                    if (visitor != null)
-                        visitors.Add(visitor);
+                    // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
+                    visitors = new List<INodeVisitor>();
+                    foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                    {
+                        var visitor = rule.ValidateAsync(context)?.Result;
+                        if (visitor != null)
+                            visitors.Add(visitor);
+                    }
+                }
+                else
+                {
+                    var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
+                    visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+                }
+
+                visitors.Insert(0, context.TypeInfo);
+
+                new BasicVisitor(visitors).Visit(document, context);
+
+                success = !context.HasErrors;
+                return success
+                    ? SuccessfullyValidatedResult.Instance
+                    : new ValidationResult(context.Errors);
+            }
+            finally
+            {
+                if (success)
+                {
+                    context.Reset();
+                    System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
-            else
-            {
-                var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
-                visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
-            }   
-
-            visitors.Insert(0, context.TypeInfo);
-
-            new BasicVisitor(visitors).Visit(document, context);
-
-            return context.HasErrors
-                ? new ValidationResult(context.Errors)
-                : (IValidationResult)SuccessfullyValidatedResult.Instance;
         }
     }
 }

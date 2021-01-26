@@ -23,8 +23,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
         {
-            if (string.IsNullOrWhiteSpace(op.Name)
-                && context.Document.Operations.Count > 1)
+            if (string.IsNullOrWhiteSpace(op.Name) && context.Document.Operations.Count > 1)
             {
                 context.ReportError(new LoneAnonymousOperationError(context, op));
             }

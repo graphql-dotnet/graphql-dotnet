@@ -12,6 +12,18 @@ namespace GraphQL.Language.AST
     {
         internal List<VariableDefinition> List { get; private set; }
 
+        internal VariableDefinitions(int capacity)
+        {
+            List = new List<VariableDefinition>(capacity);
+        }
+
+        /// <summary>
+        /// Creates an instance of a list of variable definition nodes within a document.
+        /// </summary>
+        public VariableDefinitions()
+        {
+        }
+
         /// <summary>
         /// Adds a variable definition node to the list.
         /// </summary>

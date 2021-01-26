@@ -12,6 +12,18 @@ namespace GraphQL.Language.AST
         private List<Directive> _directives;
         private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
 
+        internal Directives(int capacity)
+        {
+            _directives = new List<Directive>(capacity);
+        }
+
+        /// <summary>
+        /// Creates an instance of directives node.
+        /// </summary>
+        public Directives()
+        {
+        }
+
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _directives;
 

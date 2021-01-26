@@ -13,6 +13,18 @@ namespace GraphQL.Language.AST
         // for internal use only, do not modify this instance
         internal static readonly Arguments Empty = new Arguments();
 
+        internal Arguments(int capacity)
+        {
+            _arguments = new List<Argument>(capacity);
+        }
+
+        /// <summary>
+        /// Creates an instance of a list of argument nodes.
+        /// </summary>
+        public Arguments()
+        {
+        }
+
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _arguments;
 
