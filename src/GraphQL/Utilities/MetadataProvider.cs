@@ -11,24 +11,44 @@ namespace GraphQL.Utilities
     /// </summary>
     public class MetadataProvider : IProvideMetadata
     {
+        private readonly object _metadataLock = new object();
+        private IDictionary<string, object> _metadata;
+
         /// <inheritdoc />
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+        public IDictionary<string, object> Metadata
+        {
+            get
+            {
+                if (_metadata == null)
+                {
+                    lock (_metadataLock)
+                    {
+                        if (_metadata == null)
+                        {
+                            _metadata = new ConcurrentDictionary<string, object>();
+                        }
+                    }
+                }
+
+                return _metadata;
+            }
+        }
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
-            var local = Metadata;
+            var local = _metadata;
             return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValue;
         }
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, Func<TType> defaultValueFactory)
         {
-            var local = Metadata;
+            var local = _metadata;
             return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValueFactory();
         }
 
         /// <inheritdoc />
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
+        public bool HasMetadata(string key) => _metadata?.ContainsKey(key) ?? false;
     }
 }
