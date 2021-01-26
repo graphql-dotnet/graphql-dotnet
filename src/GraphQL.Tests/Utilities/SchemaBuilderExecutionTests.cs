@@ -187,7 +187,7 @@ namespace GraphQL.Tests.Utilities
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(18);
+            schema.AllTypes.Count.ShouldBe(18);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");

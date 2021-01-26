@@ -114,6 +114,11 @@ namespace GraphQL.Types
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Indicates whether the directive and its usages for schema elements should return in response
+        /// to an introspection request. By default (null) if the directive has all its locations of
+        /// type ExecutableDirectiveLocation, only then it will be present in the introspection response.
+        /// </summary>
         public virtual bool? Introspectable { get; }
 
         /// <summary>
@@ -182,6 +187,7 @@ namespace GraphQL.Types
     /// </summary>
     public class GraphQLDeprecatedDirective : DirectiveGraphType
     {
+        /// <inheritdoc/>
         public override bool? Introspectable => true;
 
         /// <summary>
