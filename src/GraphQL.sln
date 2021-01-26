@@ -125,7 +125,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subscriptions", "Subscripti
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "Caching", "{3DB29B96-B428-46A6-A4D3-FA677110B654}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.MemoryCache", "GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MemoryCache", "GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Benchmarks.Merge", "GraphQL.Benchmarks.Merge\GraphQL.Benchmarks.Merge.csproj", "{5287FEDA-83E8-4A71-9B02-94B1106C92F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,10 @@ Global
 		{92C246A6-E740-41AA-B77A-B939C54B1D8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92C246A6-E740-41AA-B77A-B939C54B1D8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92C246A6-E740-41AA-B77A-B939C54B1D8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5287FEDA-83E8-4A71-9B02-94B1106C92F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5287FEDA-83E8-4A71-9B02-94B1106C92F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5287FEDA-83E8-4A71-9B02-94B1106C92F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5287FEDA-83E8-4A71-9B02-94B1106C92F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
