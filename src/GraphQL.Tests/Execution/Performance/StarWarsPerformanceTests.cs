@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
 using Shouldly;
 using Xunit;
@@ -51,7 +50,6 @@ namespace GraphQL.Tests.Execution.Performance
                     _.UserContext = null;
                     _.CancellationToken = default;
                     _.ValidationRules = null;
-                    _.NameConverter = CamelCaseNameConverter.Instance;
                 }).GetAwaiter().GetResult();
             }
 

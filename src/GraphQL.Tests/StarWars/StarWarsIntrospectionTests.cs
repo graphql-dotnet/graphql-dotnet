@@ -111,10 +111,17 @@ namespace GraphQL.Tests.StarWars
                   ""name"": ""Droid"",
                   ""fields"": [
                     {
-                      ""name"": ""appearsIn"",
+                      ""name"": ""id"",
                       ""type"": {
                         ""name"": null,
-                        ""kind"": ""LIST""
+                        ""kind"": ""NON_NULL""
+                      }
+                    },
+                    {
+                      ""name"": ""name"",
+                      ""type"": {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
                       }
                     },
                     {
@@ -132,17 +139,10 @@ namespace GraphQL.Tests.StarWars
                       }
                     },
                     {
-                      ""name"": ""id"",
+                      ""name"": ""appearsIn"",
                       ""type"": {
                         ""name"": null,
-                        ""kind"": ""NON_NULL""
-                      }
-                    },
-                    {
-                      ""name"": ""name"",
-                      ""type"": {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
+                        ""kind"": ""LIST""
                       }
                     },
                     {
@@ -362,12 +362,17 @@ namespace GraphQL.Tests.StarWars
               ""__schema"": {
                 ""queryType"": {
                   ""fields"": [
+                    
                     {
-                      ""name"": ""droid"",
+                      ""name"": ""hero"",
+                      ""args"": []
+                    },
+                    {
+                      ""name"": ""human"",
                       ""args"": [
                         {
                           ""name"": ""id"",
-                          ""description"": ""id of the droid"",
+                          ""description"": ""id of the human"",
                           ""type"": {
                             ""name"": null,
                             ""kind"": ""NON_NULL"",
@@ -381,15 +386,11 @@ namespace GraphQL.Tests.StarWars
                       ]
                     },
                     {
-                      ""name"": ""hero"",
-                      ""args"": []
-                    },
-                    {
-                      ""name"": ""human"",
+                      ""name"": ""droid"",
                       ""args"": [
                         {
                           ""name"": ""id"",
-                          ""description"": ""id of the human"",
+                          ""description"": ""id of the droid"",
                           ""type"": {
                             ""name"": null,
                             ""kind"": ""NON_NULL"",

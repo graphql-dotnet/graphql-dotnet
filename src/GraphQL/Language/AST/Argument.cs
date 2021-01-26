@@ -26,7 +26,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of this argument.
         /// </summary>
-        public string Name => NameNode?.Name;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the name of this argument.
@@ -44,27 +44,10 @@ namespace GraphQL.Language.AST
             get { yield return Value; }
         }
 
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Value, state);
+
         /// <inheritdoc />
         public override string ToString() => $"Argument{{name={Name},value={Value}}}";
-
-        /// <summary>
-        /// Compares another node to this node by name.
-        /// </summary>
-        protected bool Equals(Argument other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((Argument)obj);
-        }
     }
 }

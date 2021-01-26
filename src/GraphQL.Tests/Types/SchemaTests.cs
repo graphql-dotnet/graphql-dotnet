@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Utilities.Federation;
 using Shouldly;
 using Xunit;
 
@@ -159,6 +161,51 @@ namespace GraphQL.Tests.Types
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
                 type.ShouldBe(null, $"Found {typeName} in type lookup.");
             });
+        }
+
+        [Fact]
+        public void middleware_can_reference_SchemaTypes()
+        {
+            var schema = new Schema { Query = new SomeQuery() };
+            schema.FieldMiddleware.Use(next =>
+            {
+                schema.AllTypes.Count.ShouldNotBe(0);
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "One " + res.ToString();
+                };
+            });
+            schema.Initialize();
+        }
+
+        [Fact]
+        public void disposed_schema_throws_errors()
+        {
+            var schema = new Schema();
+            schema.Dispose();
+            schema.Dispose();
+            Should.Throw<ObjectDisposedException>(() => schema.Initialize());
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(new IGraphType[] { }));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterDirective(new DirectiveGraphType("test", new DirectiveLocation[] { DirectiveLocation.Field })));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
+        }
+
+        [Fact]
+        public void initialized_schema_throws_errors()
+        {
+            var schema = new Schema();
+            schema.Initialize();
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new IGraphType[] { }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
+            Should.Throw<InvalidOperationException>(() => schema.RegisterDirective(new DirectiveGraphType("test", new DirectiveLocation[] { DirectiveLocation.Field })));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
         }
     }
 

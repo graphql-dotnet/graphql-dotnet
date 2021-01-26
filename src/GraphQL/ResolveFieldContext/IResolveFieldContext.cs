@@ -13,6 +13,9 @@ namespace GraphQL
 {
     /// <summary>
     /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>.
+    /// This object is only valid during the execution of the field; it is re-used once the field
+    /// has resolved. Use <see cref="ResolveFieldContextExtensions.Copy(IResolveFieldContext)"/>
+    /// if you need to preserve a copy of the context for later use or copy required properties from the context.
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
@@ -37,7 +40,7 @@ namespace GraphQL
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, object> Arguments { get; }
+        IDictionary<string, ArgumentValue> Arguments { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object RootValue { get; }
@@ -76,7 +79,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        IDictionary<string, Field> SubFields { get; }
+        Fields SubFields { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
@@ -89,6 +92,12 @@ namespace GraphQL
 
         /// <summary>The service provider for the executing request.</summary>
         IServiceProvider RequestServices { get; }
+
+        /// <summary>
+        /// Returns a resource pool from which arrays can be rented during the current execution.
+        /// Can be used to return lists of data from field resolvers.
+        /// </summary>
+        IExecutionArrayPool ArrayPool { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

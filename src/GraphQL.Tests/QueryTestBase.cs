@@ -15,18 +15,18 @@ using Shouldly;
 namespace GraphQL.Tests
 {
     public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder, SimpleContainer>
-        where TSchema : ISchema
+        where TSchema : Schema
     {
     }
 
     public class QueryTestBase<TSchema, TIocContainer> : QueryTestBase<TSchema, GraphQLDocumentBuilder, TIocContainer>
-       where TSchema : ISchema
+       where TSchema : Schema
        where TIocContainer : ISimpleContainer, new()
     {
     }
 
     public class QueryTestBase<TSchema, TDocumentBuilder, TIocContainer>
-        where TSchema : ISchema
+        where TSchema : Schema
         where TDocumentBuilder : IDocumentBuilder, new()
         where TIocContainer : ISimpleContainer, new()
     {
@@ -131,9 +131,11 @@ namespace GraphQL.Tests
             INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
+            var schema = Schema;
+            schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             var runResult = Executer.ExecuteAsync(options =>
             {
-                options.Schema = Schema;
+                options.Schema = schema;
                 options.Query = query;
                 options.Root = root;
                 options.Inputs = inputs;
@@ -141,7 +143,6 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
-                options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;

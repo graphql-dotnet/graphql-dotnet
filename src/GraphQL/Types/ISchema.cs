@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Conversion;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 
 namespace GraphQL.Types
@@ -22,17 +23,24 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes the schema. Called by <see cref="IDocumentExecuter"/> before validating or executing the request.
         /// <br/><br/>
-        /// Note that middleware cannot be applied once the schema has been initialized. See <see cref="ExecutionOptions.FieldMiddleware"/>.
+        /// Note that middleware cannot be applied once the schema has been initialized. See <see cref="FieldMiddleware"/>.
         /// <br/><br/>
-        /// This method should be safe to be called from multiple threads simultaneously. However, field middleware
-        /// must be applied in a thread-safe manner so that it is not applied to the schema multiple times.
+        /// This method should be safe to be called from multiple threads simultaneously.
         /// </summary>
         void Initialize();
 
         /// <summary>
-        /// The <see cref="INameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.NameConverter"/>.
+        /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
         /// </summary>
-        INameConverter NameConverter { get; set; }
+        INameConverter NameConverter { get; }
+
+        /// <summary>
+        /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized
+        /// then adding additional middleware through the builder does nothing. The schema is initialized (if not yet)
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
+        /// However, you can also apply middlewares at any time in runtime using SchemaTypes.ApplyMiddleware method.
+        /// </summary>
+        IFieldMiddlewareBuilder FieldMiddleware { get; }
 
         /// <summary>
         /// Description of the schema.
@@ -62,12 +70,12 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
         /// </summary>
-        IEnumerable<DirectiveGraphType> Directives { get; set; }
+        SchemaDirectives Directives { get; }
 
         /// <summary>
         /// Returns a list of all the graph types utilized by this schema.
         /// </summary>
-        IEnumerable<IGraphType> AllTypes { get; }
+        SchemaTypes AllTypes { get; }
 
         /// <summary>
         /// Returns a <see cref="IGraphType"/> for a given name.
@@ -143,25 +151,30 @@ namespace GraphQL.Types
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
 
         /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types. This is set by <see cref="IDocumentExecuter"/>
-        /// to the filter passed to it within <see cref="ExecutionOptions.SchemaFilter"/>. By default, no types are hidden.
-        /// Note that this filter in fact does not prohibit the execution of queries that contain hidden types. To limit
-        /// access to the particular fields, you should use some authorization logic.
+        /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
+        /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
+        /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
         /// </summary>
-        ISchemaFilter Filter { get; set; }
+        ISchemaFilter Filter { get; }
 
         /// <summary>
-        /// Returns a reference to the __schema introspection field available on the query graph type
+        /// Provides the ability to order the schema elements upon introspection.
+        /// By default all elements are returned as is, no sorting is applied.
+        /// </summary>
+        ISchemaComparer Comparer { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the __schema introspection field available on the query graph type.
         /// </summary>
         FieldType SchemaMetaFieldType { get; }
 
         /// <summary>
-        /// Returns a reference to the __type introspection field available on the query graph type
+        /// Returns a reference to the __type introspection field available on the query graph type.
         /// </summary>
         FieldType TypeMetaFieldType { get; }
 
         /// <summary>
-        /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type
+        /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
     }

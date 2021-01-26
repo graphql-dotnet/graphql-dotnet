@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Validation
 
         public void Loc(int line, int column)
         {
-            _locations.Add(new ErrorLocation { Line = line, Column = column });
+            _locations.Add(new ErrorLocation(line, column));
         }
     }
 }

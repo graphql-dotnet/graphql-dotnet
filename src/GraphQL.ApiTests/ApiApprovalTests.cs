@@ -11,8 +11,10 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
+        [InlineData(typeof(SubscriptionDocumentExecuter))]
         [InlineData(typeof(SystemTextJson.DocumentWriter))]
         [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
+        [InlineData(typeof(Caching.MemoryDocumentCache))]
         public void PublicApi(Type type)
         {
             string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions

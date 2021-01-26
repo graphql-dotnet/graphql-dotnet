@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Builders;
@@ -19,7 +17,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of the fields configured for this graph type.
         /// </summary>
-        IEnumerable<FieldType> Fields { get; }
+        TypeFields Fields { get; }
 
         /// <summary>
         /// Adds a field to this graph type.
@@ -44,7 +42,6 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
-        private readonly List<FieldType> _fields = new List<FieldType>();
 
         /// <inheritdoc/>
         protected ComplexGraphType()
@@ -54,7 +51,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FieldType> Fields => _fields;
+        public TypeFields Fields { get; } = new TypeFields();
 
         /// <inheritdoc/>
         public bool HasField(string name)
@@ -62,19 +59,28 @@ namespace GraphQL.Types
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var field in Fields.List)
+            {
+                if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _fields)
-                if (string.Equals(x.Name, name, StringComparison.Ordinal))
-                    return x;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                foreach (var field in Fields.List)
+                {
+                    if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                        return field;
+                }
+            }
 
             return null;
         }
@@ -123,7 +129,7 @@ namespace GraphQL.Types
                 }
             }
 
-            _fields.Add(fieldType);
+            Fields.Add(fieldType);
 
             return fieldType;
         }

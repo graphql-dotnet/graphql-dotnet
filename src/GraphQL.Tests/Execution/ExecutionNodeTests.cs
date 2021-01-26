@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -92,7 +92,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
     <OutputType>exe</OutputType>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -23,7 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Tests\GraphQL.Tests.csproj" />
+    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
+    <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
+    <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
   </ItemGroup>
 
 </Project>

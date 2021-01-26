@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Profiler": {
+      "commandName": "Project",
+      "commandLineArgs": "/P"
+    },
+    "Benchmarks": {
+      "commandName": "Project"
+    },
+    "DetailedBenchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "DetailedBenchmark"
+    }
+  }
+}

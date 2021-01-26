@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
-using GraphQL.Tests.Introspection;
 
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter, CsvMeasurementsExporter]
-    public class DeserializationBenchmark
+    //[RPlotExporter, CsvMeasurementsExporter]
+    public class DeserializationBenchmark : IBenchmark
     {
         private const string SHORT_JSON = @"{
   ""key0"": null,
@@ -36,6 +35,7 @@ namespace GraphQL.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
+            var loadedFromFile = IntrospectionResult.Data;
         }
 
         public IEnumerable<string> Codes => new[] { "Empty", "Short", "Introspection" };
@@ -56,5 +56,11 @@ namespace GraphQL.Benchmarks
 
         [Benchmark]
         public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
+
+        void IBenchmark.RunProfiler()
+        {
+            Code = "Introspection";
+            _ = SystemTextJson();
+        }
     }
 }

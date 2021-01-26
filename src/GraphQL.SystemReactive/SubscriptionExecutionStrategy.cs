@@ -11,6 +11,11 @@ namespace GraphQL.Execution
 {
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {
+        /// <summary>
+        /// Gets a static instance of <see cref="SubscriptionExecutionStrategy"/> strategy.
+        /// </summary>
+        public static new SubscriptionExecutionStrategy Instance { get; } = new SubscriptionExecutionStrategy();
+
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
@@ -49,7 +54,6 @@ namespace GraphQL.Execution
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var arguments = GetArgumentValues(
-                context.Schema,
                 node.FieldDefinition.Arguments,
                 node.Field.Arguments,
                 context.Variables);
@@ -164,12 +168,6 @@ namespace GraphQL.Execution
             string message,
             Field field,
             IEnumerable<object> path,
-            Exception ex = null)
-        {
-            var error = new ExecutionError(message, ex);
-            error.AddLocation(field, context.Document);
-            error.Path = path;
-            return error;
-        }
+            Exception ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }
 }

@@ -54,7 +54,14 @@ namespace GraphQL.Tests.Utilities
             result.Errors.Count.ShouldBe(1);
             result.Errors[0].Code.ShouldBe("OVERFLOW");
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
-            result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
         }
 
         [Fact]
@@ -77,7 +84,14 @@ namespace GraphQL.Tests.Utilities
             result.Errors.Count.ShouldBe(1);
             result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
-            result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
         }
 
         [Fact]
@@ -157,7 +171,7 @@ namespace GraphQL.Tests.Utilities
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
-            schema.AllTypes.Count().ShouldBe(expectedCount);
+            schema.AllTypes.Count.ShouldBe(expectedCount);
         }
 
         [Fact]
@@ -165,7 +179,11 @@ namespace GraphQL.Tests.Utilities
         {
             var schema = Schema.For(
                 ReadSchema("PetComplex.graphql"),
-                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+                builder =>
+                {
+                    builder.Types.ForAll(config => config.ResolveType = _ => null);
+                    builder.IgnoreComments = false;
+                }
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");

@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
-using GraphQL.Tests.Introspection;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter, CsvMeasurementsExporter]
-    public class SerializationBenchmark
+    //[RPlotExporter, CsvMeasurementsExporter]
+    public class SerializationBenchmark : IBenchmark
     {
         private IServiceProvider _provider;
         private ISchema _schema;
@@ -48,6 +47,7 @@ namespace GraphQL.Benchmarks
 
             _provider = services.BuildServiceProvider();
             _schema = _provider.GetRequiredService<ISchema>();
+            _schema.Initialize();
             _executer = new DocumentExecuter();
 
             _stjWriter = new SystemTextJson.DocumentWriter();
@@ -56,8 +56,8 @@ namespace GraphQL.Benchmarks
             _nsjWriter = new NewtonsoftJson.DocumentWriter();
             _nsjWriterIndented = new NewtonsoftJson.DocumentWriter(indent: true);
 
-            _introspectionResult = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
-            _smallResult = ExecuteQuery(_schema, "{ hero { id name } }");
+            _introspectionResult = ExecuteQuery(_schema, Queries.Introspection);
+            _smallResult = ExecuteQuery(_schema, Queries.Hero);
             _middleResult = ExecuteQuery(_schema, @"{
   hero
   {
@@ -116,5 +116,11 @@ namespace GraphQL.Benchmarks
 
         [Benchmark]
         public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result);
+
+        void IBenchmark.RunProfiler()
+        {
+            Code = "Introspection";
+            SystemTextJson().GetAwaiter().GetResult();
+        }
     }
 }

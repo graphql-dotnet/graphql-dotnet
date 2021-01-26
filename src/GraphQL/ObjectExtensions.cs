@@ -271,37 +271,6 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets the value of the named property.
-        /// </summary>
-        /// <param name="obj">The object to be read.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns>System.Object.</returns>
-        [Obsolete]
-        public static object GetPropertyValue(this object obj, string propertyName)
-        {
-            var val = obj.GetType()
-                .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
-                ?.GetValue(obj, null);
-
-            return val;
-        }
-
-        /// <summary>
-        /// Returns an interface implemented by the indicated type whose name matches the desired name.
-        /// </summary>
-        /// <param name="type">The type to check.</param>
-        /// <param name="name">The name of the desired interface. This is case sensitive.</param>
-        /// <returns>The interface, or <c>null</c> if no matches were found.</returns>
-        /// <remarks>If more than one interface matches, the returned interface is non-deterministic.</remarks>
-        [Obsolete]
-        public static Type GetInterface(this Type type, string name)
-            => type.GetInterfaces().FirstOrDefault(x => x.Name == name);
-
-        [Obsolete]
-        public static T GetPropertyValue<T>(this object value)
-            => (T)GetPropertyValue(value, typeof(T));
-
-        /// <summary>
         /// Returns true is the value is null, value.ToString equals an empty string, or the value can be converted into a named enum value.
         /// </summary>
         /// <param name="type">An enum type.</param>

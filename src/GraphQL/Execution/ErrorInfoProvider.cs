@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using GraphQL.Validation;
 
 namespace GraphQL.Execution
@@ -133,30 +132,13 @@ namespace GraphQL.Execution
                 code = code.Substring("GraphQL".Length);
             }
 
-            return GetAllCapsRepresentation(code);
-        }
+            var tickIndex = code.IndexOf('`');
+            if (tickIndex >= 0)
+            {
+                code = code.Substring(0, tickIndex);
+            }
 
-        private static string GetAllCapsRepresentation(string str)
-        {
-            return Regex
-                .Replace(NormalizeString(str), @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
-                .ToUpperInvariant();
-        }
-
-        private static string NormalizeString(string str)
-        {
-            str = str?.Trim();
-            return string.IsNullOrWhiteSpace(str)
-                ? string.Empty
-                : NormalizeTypeName(str);
-        }
-
-        private static string NormalizeTypeName(string name)
-        {
-            var tickIndex = name.IndexOf('`');
-            return tickIndex >= 0
-                ? name.Substring(0, tickIndex)
-                : name;
+            return code.ToConstantCase();
         }
     }
 }

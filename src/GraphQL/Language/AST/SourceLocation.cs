@@ -1,65 +1,57 @@
+using System;
+using System.Diagnostics;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
     /// Provides information regarding the location of a node within a document's original query text.
     /// </summary>
-    public class SourceLocation
+    [DebuggerDisplay("(Start={Start}, End={End})")]
+    public readonly struct SourceLocation : IEquatable<SourceLocation>
     {
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        public SourceLocation(int line, int column, int start = -1, int end = -1)
+        public SourceLocation(int start, int end)
         {
-            Line = line;
-            Column = column;
             Start = start;
             End = end;
         }
 
         /// <summary>
-        /// Returns the start position within the query text.
+        /// The index for the start of the node in the source (i.e. it's inclusive).
+        /// <br/>
+        /// For example:
+        /// <code>
+        /// { field { subfield } }
+        /// <br/>
+        /// --^ field.Location.Start = 2
+        /// </code>
         /// </summary>
         public int Start { get; }
 
         /// <summary>
-        /// Returns the end position within the query text.
+        /// The index for the character immediately after the node in the source (i.e. it's exclusive).
+        /// <br/>
+        /// For example:
+        /// <code>
+        /// { field { subfield } }
+        /// <br/>
+        /// --------------------^ field.Location.End = 20
+        /// </code>
         /// </summary>
         public int End { get; }
 
-        /// <summary>
-        /// Returns the line number within the query text.
-        /// </summary>
-        public int Line { get; }
-
-        /// <summary>
-        /// Returns the column number within the query text.
-        /// </summary>
-        public int Column { get; }
+        /// <inheritdoc/>
+        public bool Equals(SourceLocation other) => Start == other.Start && End == other.End;
 
         /// <inheritdoc/>
-        public override string ToString() => $"line={Line}, column={Column}, start={Start}, end={End}";
-
-        /// <summary>
-        /// Compares this instance to another based on the line and column values.
-        /// </summary>
-        protected bool Equals(SourceLocation other)
-        {
-            return Line == other.Line && Column == other.Column;
-        }
+        public override bool Equals(object obj) => obj is SourceLocation l && Equals(l);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((SourceLocation)obj);
-        }
+        public override int GetHashCode() => (Start, End).GetHashCode();
 
         /// <inheritdoc/>
-        public override int GetHashCode() => (Line, Column).GetHashCode();
+        public override string ToString() => $"({Start},{End})";
     }
 }

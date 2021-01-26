@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -32,10 +33,7 @@ namespace GraphQL.Language.AST
 
                 if (Directives != null)
                 {
-                    foreach (var directive in Directives)
-                    {
-                        yield return directive;
-                    }
+                    yield return Directives;
                 }
 
                 if (SelectionSet != null)
@@ -46,18 +44,14 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"InlineFragment{{typeCondition={Type}, directives={Directives}, selections={SelectionSet}}}";
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            action(Type, state);
+            action(Directives, state);
+            action(SelectionSet, state);
+        }
 
         /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals(Type, ((InlineFragment)obj).Type);
-        }
+        public override string ToString() => $"InlineFragment{{typeCondition={Type}, directives={Directives}, selections={SelectionSet}}}";
     }
 }

@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Instrumentation
             _context = new ResolveFieldContext
             {
                 FieldName = "Name",
-                FieldAst = new Field(null, new NameNode("Name")),
+                FieldAst = new Field(default, new NameNode("Name")),
                 Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
                 Schema = new Schema(),
@@ -30,9 +30,16 @@ namespace GraphQL.Tests.Instrumentation
         }
 
         [Fact]
+        public void no_middleware_build_returns_null()
+        {
+            _builder.BuildResolve().ShouldBeNull();
+        }
+
+        [Fact]
         public void default_resolves_named_field()
         {
-            _builder.Build().Invoke(_context).Result.ShouldBe("Quinn");
+            _builder.Use(next => next);
+            _builder.BuildResolve().Invoke(_context).Result.ShouldBe("Quinn");
         }
 
         [Fact]
@@ -40,7 +47,33 @@ namespace GraphQL.Tests.Instrumentation
         {
             _builder.Use(next => context => Task.FromResult<object>("One"));
 
-            _builder.Build().Invoke(_context).Result.ShouldBe("One");
+            _builder.BuildResolve().Invoke(_context).Result.ShouldBe("One");
+        }
+
+        [Fact]
+        public void multiple_middleware_runs_in_correct_order()
+        {
+            // verify that the middleware runs in the same order as it did in 3.x
+
+            _builder.Use(next =>
+            {
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "One " + res.ToString();
+                };
+            });
+            _builder.Use(next =>
+            {
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "Two " + res.ToString();
+                };
+            });
+
+            var result = _builder.BuildResolve().Invoke(_context).Result;
+            result.ShouldBe("One Two Quinn");
         }
 
         [Fact]
@@ -55,7 +88,7 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
             result.ShouldBe("One Quinn");
         }
 
@@ -73,7 +106,7 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -84,9 +117,9 @@ namespace GraphQL.Tests.Instrumentation
         [Fact]
         public void can_use_class()
         {
-            _builder.Use<SimpleMiddleware>();
+            _builder.Use(new SimpleMiddleware());
 
-            var result = _builder.Build(start: null, schema: _context.Schema).Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -106,7 +139,7 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
             result.ShouldBeNull();
             _context.Errors.ShouldContain(x => x.Message == "Custom error");
         }
@@ -128,7 +161,7 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
 
             result.ShouldBeNull();
             _context.Errors.ShouldContain(x => x.Message == "Custom error");
@@ -160,6 +193,10 @@ namespace GraphQL.Tests.Instrumentation
 
     internal static class TestExtensions
     {
-        public static FieldMiddlewareDelegate Build(this FieldMiddlewareBuilder builder) => builder.Build(null, null);
+        public static FieldMiddlewareDelegate BuildResolve(this FieldMiddlewareBuilder builder)
+        {
+            var transform = builder.Build();
+            return transform != null ? transform(null) : null;
+        }
     }
 }

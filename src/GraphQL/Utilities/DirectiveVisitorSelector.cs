@@ -8,11 +8,11 @@ namespace GraphQL.Utilities
 {
     public class DirectiveVisitorSelector : IVisitorSelector
     {
-        private readonly IDictionary<string, Type> _directiveVisitors;
+        private readonly Dictionary<string, Type> _directiveVisitors;
         private readonly Func<Type, SchemaDirectiveVisitor> _typeResolver;
 
         public DirectiveVisitorSelector(
-            IDictionary<string, Type> directiveVisitors,
+            Dictionary<string, Type> directiveVisitors,
             Func<Type, SchemaDirectiveVisitor> typeResolver)
         {
             _directiveVisitors = directiveVisitors;
@@ -33,22 +33,24 @@ namespace GraphQL.Utilities
             }
         }
 
-        private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
+        private IEnumerable<ISchemaNodeVisitor> BuildVisitors(List<GraphQLDirective> directives)
         {
-            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)))
+            foreach (var dir in directives)
             {
-                var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
-                if (visitor.Name != dir.Name.Value)
-                    throw new InvalidOperationException($"SchemaDirectiveVisitor '{visitor.GetType().Name}' has '{visitor.Name}' name but registered in {nameof(SchemaBuilder)} as '{dir.Name.Value}'. Names must match.");
-                if (dir.Arguments != null)
-                    visitor.Arguments = ToArguments(dir.Arguments);
-                yield return visitor;
-            }
-        }
+                var name = (string)dir.Name.Value;
+                if (_directiveVisitors.TryGetValue(name, out var type))
+                {
+                    var visitor = _typeResolver(type);
 
-        private Dictionary<string, object> ToArguments(IEnumerable<GraphQLArgument> arguments)
-        {
-            return arguments.ToDictionary(x => x.Name.Value, x => x.Value.ToValue());
+                    if (visitor.Name != name)
+                        throw new InvalidOperationException($"SchemaDirectiveVisitor '{visitor.GetType().Name}' has '{visitor.Name}' name but registered in {nameof(SchemaBuilder)} as '{name}'. Names must match.");
+
+                    if (dir.Arguments != null)
+                        visitor.Arguments = dir.Arguments.ToDictionary(x => (string)x.Name.Value, x => x.Value.ToValue());
+
+                    yield return visitor;
+                }
+            }
         }
     }
 }

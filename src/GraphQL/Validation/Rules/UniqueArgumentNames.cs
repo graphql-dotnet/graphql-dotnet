@@ -20,28 +20,24 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var knownArgs = new Dictionary<string, Argument>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
+            new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
+            new MatchingNodeVisitor<Argument>((argument, context) =>
             {
-                _.Match<Field>(__ => knownArgs = new Dictionary<string, Argument>());
-                _.Match<Directive>(__ => knownArgs = new Dictionary<string, Argument>());
-
-                _.Match<Argument>(argument =>
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
+                string argName = argument.Name;
+                if (knownArgs.ContainsKey(argName))
                 {
-                    var argName = argument.Name;
-                    if (knownArgs.ContainsKey(argName))
-                    {
-                        context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));
-                    }
-                    else
-                    {
-                        knownArgs[argName] = argument;
-                    }
-                });
-            }).ToTask();
-        }
+                    context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));
+                }
+                else
+                {
+                    knownArgs[argName] = argument;
+                }
+            })
+        ).ToTask();
     }
 }
