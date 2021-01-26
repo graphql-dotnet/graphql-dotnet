@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Version>1.0.0</Version>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>net5;netcoreapp3.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Title>.NET Core Global Tool for merging and comparing BenchmarkDotNet results obtained before and after improvements</Title>
@@ -13,6 +13,7 @@
       3. Build project.
       4. Copy obtained nupkg into directory from step 1.
       5. Run command: dotnet tool install -g dotnet-merge
+                  or: dotnet tool update -g dotnet-merge
       6. Now you can just run 'merge' being in the directory with before.md and after.md files. Command will generate diff.md file.
     </Description>
     <Description>$(Title)</Description>
