@@ -34,7 +34,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public IDictionary<string, object> Metadata
+        public Dictionary<string, object> Metadata
         {
             get
             {
