@@ -5,8 +5,7 @@ using GraphQL.Utilities;
 namespace GraphQL.Tests.Utilities.Visitors
 {
     /// <summary>
-    /// Visitor for unit tests. Replace field resolver to return uppercase letters.
-    /// Use <see cref="FuncFieldResolver{T}"/>.
+    /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
     /// </summary>
     public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
     {
@@ -29,8 +28,7 @@ namespace GraphQL.Tests.Utilities.Visitors
     }
 
     /// <summary>
-    /// Visitor for unit tests. Replace field resolver to return uppercase letters.
-    /// Use <see cref="AsyncFieldResolver{T}"/>.
+    /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
     /// </summary>
     public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
     {

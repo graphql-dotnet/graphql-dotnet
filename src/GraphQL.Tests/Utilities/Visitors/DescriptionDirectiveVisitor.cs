@@ -4,7 +4,7 @@ using GraphQL.Utilities;
 namespace GraphQL.Tests.Utilities.Visitors
 {
     /// <summary>
-    /// Visitor for unit tests. Add description to schema elements.
+    /// Visitor for unit tests. Adds descriptions to schema elements.
     /// </summary>
     public class DescriptionDirectiveVisitor : SchemaDirectiveVisitor
     {
