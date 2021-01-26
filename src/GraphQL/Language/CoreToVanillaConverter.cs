@@ -11,7 +11,10 @@ namespace GraphQL.Language
 {
     /// <summary>
     /// Converts an GraphQLParser AST representation of a document into a GraphQL.NET AST
-    /// representation of a document.
+    /// representation of a document. Works only with executable definitions - operations
+    /// and fragments, all other definitions are ignored.
+    /// <br/>
+    /// For more information see https://spec.graphql.org/June2018/#sec-Language.Document.
     /// </summary>
     public static class CoreToVanillaConverter
     {
@@ -35,12 +38,11 @@ namespace GraphQL.Language
             {
                 if (def is GraphQLOperationDefinition op)
                 {
-                    target.AddDefinition(Operation(op));
+                    target.Operations.Add(Operation(op));
                 }
-
-                if (def is GraphQLFragmentDefinition frag)
+                else if (def is GraphQLFragmentDefinition frag)
                 {
-                    target.AddDefinition(Fragment(frag));
+                    target.Fragments.Add(Fragment(frag));
                 }
             }
         }
@@ -107,16 +109,15 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of variable definition nodes and their children.
         /// </summary>
-        private static VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
+        private static VariableDefinitions VariableDefinitions(List<GraphQLVariableDefinition> source)
         {
             VariableDefinitions defs = null;
 
-            if (source != null)
+            if (source?.Count > 0)
             {
-                foreach (var def in source.Select(VariableDefinition))
-                {
-                    (defs ??= new VariableDefinitions()).Add(def);
-                }
+                defs = new VariableDefinitions(source.Count);
+                foreach (var def in source)
+                    defs.Add(VariableDefinition(def));
             }
 
             return defs;
@@ -192,16 +193,15 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of directive nodes and their children.
         /// </summary>
-        private static Directives Directives(IEnumerable<GraphQLDirective> source)
+        private static Directives Directives(List<GraphQLDirective> source)
         {
             Directives target = null;
 
-            if (source != null)
+            if (source?.Count > 0)
             {
+                target = new Directives(source.Count);
                 foreach (var d in source)
-                {
-                    (target ??= new Directives()).Add(Directive(d));
-                }
+                    target.Add(Directive(d));
             }
 
             return target;
@@ -226,8 +226,10 @@ namespace GraphQL.Language
         {
             Arguments target = null;
 
-            if (source != null)
+            if (source?.Count > 0)
             {
+                target = new Arguments(source.Count);
+
                 foreach (var a in source)
                 {
                     var arg = new Argument(Name(a.Name))
@@ -236,7 +238,7 @@ namespace GraphQL.Language
                         CommentNode = Comment(a.Comment),
                         Value = Value(a.Value)
                     };
-                    (target ??= new Arguments()).Add(arg);
+                    target.Add(arg);
                 }
             }
 
@@ -404,8 +406,9 @@ namespace GraphQL.Language
         /// </summary>
         private static NameNode Name(GraphQLName name)
         {
-            if (name == null) return default;
-            return new NameNode((string)name.Value, Convert(name.Location));
+            return name == null
+                ? default
+                : new NameNode((string)name.Value, Convert(name.Location));
         }
 
         /// <summary>

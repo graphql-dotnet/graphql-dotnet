@@ -10,17 +10,17 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Operations : IEnumerable<Operation>
     {
-        private List<Operation> _operations;
+        internal List<Operation> List { get; private set; }
 
         /// <summary>
         /// Returns the number of operation nodes the list contains.
         /// </summary>
-        public int Count => _operations?.Count ?? 0;
+        public int Count => List?.Count ?? 0;
 
         /// <summary>
         /// Adds an operation node to the list.
         /// </summary>
-        public void Add(Operation operation) => (_operations ??= new List<Operation>()).Add(operation ?? throw new ArgumentNullException(nameof(operation)));
+        public void Add(Operation operation) => (List ??= new List<Operation>()).Add(operation ?? throw new ArgumentNullException(nameof(operation)));
 
         /// <summary>
         /// Returns the first operation in the list that matches the specified name, or <see langword="null"/> if none are matched.
@@ -28,9 +28,9 @@ namespace GraphQL.Language.AST
         public Operation WithName(string operationName)
         {
             // DO NOT USE LINQ ON HOT PATH
-            if (_operations != null)
+            if (List != null)
             {
-                foreach (var op in _operations)
+                foreach (var op in List)
                 {
                     if (op.Name == operationName)
                         return op;
@@ -41,10 +41,10 @@ namespace GraphQL.Language.AST
         }
 
         // This method avoids LINQ and 'List+Enumerator<Operation>' allocation
-        internal Operation FirstOrDefault() => _operations?[0];
+        internal Operation FirstOrDefault() => List?[0];
 
         /// <inheritdoc/>
-        public IEnumerator<Operation> GetEnumerator() => (_operations ?? Enumerable.Empty<Operation>()).GetEnumerator();
+        public IEnumerator<Operation> GetEnumerator() => (List ?? Enumerable.Empty<Operation>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

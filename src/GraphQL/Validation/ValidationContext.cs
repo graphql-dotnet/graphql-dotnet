@@ -20,6 +20,20 @@ namespace GraphQL.Validation
         private readonly Dictionary<Operation, List<VariableUsage>> _variables =
             new Dictionary<Operation, List<VariableUsage>>();
 
+        internal void Reset()
+        {
+            _errors = null;
+            _fragments.Clear();
+            _variables.Clear();
+            OriginalQuery = null;
+            OperationName = null;
+            Schema = null;
+            Document = null;
+            TypeInfo = null;
+            UserContext = null;
+            Inputs = null;
+        }
+
         /// <summary>
         /// Returns the original GraphQL query string.
         /// </summary>
@@ -105,10 +119,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Searches the document for a fragment definition by name and returns it.
         /// </summary>
-        public FragmentDefinition GetFragment(string name)
-        {
-            return Document.Fragments.FindDefinition(name);
-        }
+        public FragmentDefinition GetFragment(string name) => Document.Fragments.FindDefinition(name);
 
         /// <summary>
         /// Returns a list of fragment spreads within the specified node.
@@ -187,18 +198,12 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns a string representation of the specified node.
         /// </summary>
-        public string Print(INode node)
-        {
-            return AstPrinter.Print(node);
-        }
+        public string Print(INode node) => AstPrinter.Print(node);
 
         /// <summary>
         /// Returns the name of the specified graph type.
         /// </summary>
-        public string Print(IGraphType type)
-        {
-            return SchemaPrinter.ResolveName(type);
-        }
+        public string Print(IGraphType type) => SchemaPrinter.ResolveName(type);
     }
 
     /// <summary>

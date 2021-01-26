@@ -50,10 +50,7 @@ namespace GraphQL.Utilities
 
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
         {
-            if (!Schema.Initialized)
-            {
-                Schema.Initialize();
-            }
+            Schema.Initialize();
 
             var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
