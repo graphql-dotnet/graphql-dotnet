@@ -13,8 +13,6 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitFieldDefinition(field);
-
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new FuncFieldResolver<object>(context =>
             {
@@ -36,8 +34,6 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitFieldDefinition(field);
-
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new AsyncFieldResolver<object>(async context =>
             {
