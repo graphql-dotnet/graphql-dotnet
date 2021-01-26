@@ -21,18 +21,18 @@ namespace GraphQL.Benchmarks.Merge
 
             ++i;
 
-            result.Columns = Columns.Parse(lines, i);
+            result.Table = Table.Parse(lines, i);
             return result;
         }
 
         public List<string> Header = new List<string>();
 
-        public Columns Columns { get; set; } = new Columns();
+        public Table Table { get; set; } = new Table();
 
-        public BenchmarkResult RemoveColumns(params string[] names)
+        public BenchmarkResult RemoveColumns(params string[] columnNames)
         {
-            foreach (string name in names)
-                Columns.Remove(name);
+            foreach (string name in columnNames)
+                Table.Remove(name);
             return this;
         }
 
@@ -46,15 +46,15 @@ namespace GraphQL.Benchmarks.Merge
                 sb.AppendLine(line);
 
             sb.Append('|');
-            foreach (string name in Columns.Names)
-                sb.Append(name).Append('|');
+            foreach (var column in Table.Columns)
+                sb.Append(column.Name).Append('|');
 
             sb.AppendLine().Append('|');
-            for (int i = 0; i < Columns.Names.Count; ++i)
-                sb.Append("-----").Append('|');
+            for (int i = 0; i < Table.ColumnCount; ++i)
+                sb.Append(Table.Columns[i].Alignment == Alignment.Right ? "--:" : "---").Append('|');
             sb.AppendLine();
 
-            foreach (var line in Columns.Data)
+            foreach (var line in Table.Rows)
             {
                 sb.Append('|');
                 foreach (string item in line)

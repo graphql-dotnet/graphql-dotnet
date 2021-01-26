@@ -44,29 +44,29 @@ namespace GraphQL.Benchmarks.Merge
                 Header = before.Header
             };
 
-            foreach (string column in before.Columns.Names)
+            foreach (var column in before.Table.Columns)
             {
-                if (diffColumns.Contains(column))
+                if (diffColumns.Contains(column.Name))
                 {
-                    result.Columns.Names.Add(column + " [base]");
-                    result.Columns.Names.Add(column + " [current]");
-                    result.Columns.Names.Add(column + " [% of base]");
+                    result.Table.Columns.Add(new Column { Name = column.Name + " [base]", Alignment = Alignment.Right });
+                    result.Table.Columns.Add(new Column { Name = column.Name + " [current]", Alignment = Alignment.Right });
+                    result.Table.Columns.Add(new Column { Name = column.Name + " [% of base]", Alignment = Alignment.Right });
                 }
                 else
                 {
-                    result.Columns.Names.Add(column);
+                    result.Table.Columns.Add(new Column { Name = column.Name, Alignment = Alignment.Left });
                 }
             }
 
-            for (int line = 0; line < before.Columns.Data.Count; ++line)
+            for (int row = 0; row < before.Table.RowCount; ++row)
             {
                 var resultList = new List<string>();
 
-                for (int column = 0; column < before.Columns.Names.Count; ++column)
+                for (int column = 0; column < before.Table.ColumnCount; ++column)
                 {
-                    string name = before.Columns.Names[column];
-                    string beforeValue = before.Columns.Data[line][column];
-                    string afterValue = after.Columns.Data[line][column];
+                    string name = before.Table.Columns[column].Name;
+                    string beforeValue = before.Table.Rows[row][column];
+                    string afterValue = after.Table.Rows[row][column];
 
                     if (diffColumns.Contains(name))
                     {
@@ -83,7 +83,7 @@ namespace GraphQL.Benchmarks.Merge
                     }
                 }
 
-                result.Columns.Data.Add(resultList);
+                result.Table.Rows.Add(resultList);
             }
 
             return result;
@@ -91,10 +91,12 @@ namespace GraphQL.Benchmarks.Merge
 
         private static string GetDifference(string before, string after)
         {
-            double valueBefore = GetValue(before);
-            double valueAfter = GetValue(after);
+            if (before == "" && after == "")
+                return "";
 
-            int percent = (int)(valueAfter * 100 / valueBefore);
+            int? percent = before == "-" || after == "-"
+                ? null
+                : (int?)(GetValue(after) * 100 / GetValue(before));
 
             string b1 = before.StartsWith('*') ? "<b>" : "";
             string b2 = before.StartsWith('*') ? "</b>" : "";
@@ -103,8 +105,10 @@ namespace GraphQL.Benchmarks.Merge
                 return $"<span style=\"color:green\">{b1}{percent} [better]{b2}</span>";
             if (percent > 100)
                 return $"<span style=\"color:red\">{b1}{percent} [worse]{b2}</span>";
-            else
+            else if (percent == 100)
                 return $"{b1}{percent}{b2}";
+            else
+                return "-";
         }
 
         private static double GetValue(string value)
