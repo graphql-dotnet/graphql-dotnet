@@ -1,5 +1,8 @@
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for strings.
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>
@@ -26,7 +29,10 @@ namespace GraphQL
             if (newFirstLetter == s[0])
                 return s;
 
-            return newFirstLetter + s.Substring(1);
+            return //s.Length <= 256
+                //? FastChangeFirstLetter(newFirstLetter, s)
+                //:
+                newFirstLetter + s.Substring(1);
         }
 
         /// <summary>
@@ -45,7 +51,18 @@ namespace GraphQL
             if (newFirstLetter == s[0])
                 return s;
 
-            return newFirstLetter + s.Substring(1);
+            return //s.Length <= 256
+               //? FastChangeFirstLetter(newFirstLetter, s)
+               //:
+               newFirstLetter + s.Substring(1);
         }
+
+        //private static string FastChangeFirstLetter(char newFirstLetter, string s)
+        //{
+        //    Span<char> buffer = stackalloc char[s.Length];
+        //    buffer[0] = newFirstLetter;
+        //    s.AsSpan().Slice(1).CopyTo(buffer.Slice(1));
+        //    return buffer.ToString();
+        //}
     }
 }

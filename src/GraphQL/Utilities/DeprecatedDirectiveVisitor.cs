@@ -13,7 +13,8 @@ namespace GraphQL.Utilities
             base.VisitFieldDefinition(field);
 
             // if a value has already been set, prefer that
-            if (!string.IsNullOrWhiteSpace(field.DeprecationReason)) return;
+            if (!string.IsNullOrWhiteSpace(field.DeprecationReason))
+                return;
             field.DeprecationReason = GetArgument<string>("reason") ?? DeprecatedDefaultValue;
         }
 
@@ -22,7 +23,8 @@ namespace GraphQL.Utilities
             base.VisitEnumValue(value);
 
             // if a value has already been set, prefer that
-            if (!string.IsNullOrWhiteSpace(value.DeprecationReason)) return;
+            if (!string.IsNullOrWhiteSpace(value.DeprecationReason))
+                return;
             value.DeprecationReason = GetArgument<string>("reason") ?? DeprecatedDefaultValue;
         }
     }

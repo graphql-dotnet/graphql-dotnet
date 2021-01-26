@@ -3,19 +3,31 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__schema</c> meta-field is available on the root of a query operation and returns a <c>__Schema</c> graph type for the schema.
+    /// </summary>
     public class SchemaMetaFieldType : FieldType
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__schema</c> meta-field.
+        /// </summary>
         public SchemaMetaFieldType()
         {
-            Name = "__schema";
+            SetName("__schema", validate: false);
             Type = typeof(__Schema);
             Description = "Access the current type schema of this server.";
             Resolver = new FuncFieldResolver<ISchema>(context => context.Schema);
         }
     }
 
+    /// <summary>
+    /// The <c>__Schema</c> introspection type allows querying the schema for available types and directives.
+    /// </summary>
     public class __Schema : ObjectGraphType<object>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__Schema</c> introspection type.
+        /// </summary>
         public __Schema()
         {
             Name = "__Schema";

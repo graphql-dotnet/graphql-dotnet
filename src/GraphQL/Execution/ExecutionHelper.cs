@@ -7,8 +7,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Provides helper methods for document execution.
+    /// </summary>
     public static class ExecutionHelper
     {
+        /// <summary>
+        /// Returns the root graph type for the execution -- for a specified schema and operation type.
+        /// </summary>
         public static IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
         {
             IObjectGraphType type;
@@ -48,6 +54,10 @@ namespace GraphQL.Execution
             return type;
         }
 
+        /// <summary>
+        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
+        /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
+        /// </summary>
         public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
@@ -71,6 +81,9 @@ namespace GraphQL.Execution
             return parentType.GetField(field.Name);
         }
 
+        /// <summary>
+        /// Returns all of the variable values defined for the document from the attached <see cref="Inputs"/> object.
+        /// </summary>
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
@@ -84,9 +97,16 @@ namespace GraphQL.Execution
                         Name = v.Name
                     };
 
-                    object variableValue = null;
-                    inputs?.TryGetValue(v.Name, out variableValue);
-                    variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    if (inputs.TryGetValue(v.Name, out var variableValue))
+                    {
+                        variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    }
+                    else
+                    {
+                        var value = GetVariableValue(document, schema, v, v.DefaultValue?.Value);
+                        if (value != null)
+                            variable.Value = value;
+                    }
 
                     variables.Add(variable);
                 }
@@ -95,6 +115,10 @@ namespace GraphQL.Execution
             return variables;
         }
 
+        /// <summary>
+        /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// Since v3.3, returns null for variables set to null rather than the variable's default value.
+        /// </summary>
         public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
         {
             var type = variable.Type.GraphTypeFromType(schema);
@@ -109,14 +133,17 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null && variable.DefaultValue != null)
+            if (input == null)
             {
-                return variable.DefaultValue.Value;
+                return null;
             }
 
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
+        /// <summary>
+        /// Ensures that the specified variable value is valid for the variable's graph type.
+        /// </summary>
         public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
         {
             // see also GraphQLExtensions.IsValidLiteralValue
@@ -232,6 +259,10 @@ namespace GraphQL.Execution
             throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
 
+        /// <summary>
+        /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
+        /// or variables as specified by the document.
+        /// </summary>
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
@@ -246,32 +277,39 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
 
-                var coercedValue = CoerceValue(schema, type, value, variables) ?? arg.DefaultValue;
-
-                if (coercedValue != null)
-                {
-                    values[arg.Name] = coercedValue;
-                }
+                values[arg.Name] = CoerceValue(schema, type, value, variables, arg.DefaultValue);
             }
 
             return values;
         }
 
-        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
+        /// <summary>
+        /// Coerces a variable value to a compatible .NET type for the variable's graph type.
+        /// </summary>
+        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
         {
             if (type is NonNullGraphType nonNull)
             {
-                return CoerceValue(schema, nonNull.ResolvedType, input, variables);
+                // validation rules and/or AssertValidVariableValue have verified that this is not null
+                return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
-            if (input == null || input is NullValue)
+            if (input == null)
+            {
+                return fieldDefault;
+            }
+
+            if (input is NullValue)
             {
                 return null;
             }
 
             if (input is VariableReference variable)
             {
-                return variables?.ValueFor(variable.Name);
+                if (variables == null)
+                    return fieldDefault;
+
+                return variables.ValueFor(variable.Name, fieldDefault);
             }
 
             if (type is ListGraphType listType)
@@ -297,20 +335,40 @@ namespace GraphQL.Execution
                     return null;
                 }
 
-                var complexType = type as IComplexGraphType;
+                var complexType = (IComplexGraphType)type; // both IObjectGraphType and IInputObjectGraphType inherit from IComplexGraphType
                 var obj = new Dictionary<string, object>();
 
                 foreach (var field in complexType.Fields)
                 {
+                    // https://spec.graphql.org/June2018/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                        // Rules covered:
+
+                        // If no default value is provided and the input object field’s type is non‐null, an error should be
+                        // thrown.
+
+                        // If a literal value is provided for an input object field, an entry in the coerced unordered map is
+                        // given the result of coercing that value according to the input coercion rules for the type of that field.
+
+                        // If a variable is provided for an input object field, the runtime value of that variable must be used.
+                        // If the runtime value is null and the field type is non‐null, a field error must be thrown.
+                        // If no runtime value is provided, the variable definition’s default value should be used.
+                        // If the variable definition does not provide a default value, the input object field definition’s
+                        // default value should be used.
+
+                        // so: do not pass the field's default value to this method, since the field was specified
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
                     }
                     else if (field.DefaultValue != null)
                     {
+                        // If no value is provided for a defined input object field and that field definition provides a default value,
+                        // the default value should be used. 
                         obj[field.Name] = field.DefaultValue;
                     }
+                    // Covered by validation rules and/or AssertValidVariableValue:
+                    // Otherwise, if the field is not required, then no entry is added to the coerced unordered map.
                 }
 
                 return obj;
@@ -382,6 +440,14 @@ namespace GraphQL.Execution
             return fields;
         }
 
+        /// <summary>
+        /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
+        /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
+        /// otherwise the field name). This ensures all fields with the same response key included via referenced
+        /// fragments are executed at the same time.
+        /// <br/><br/>
+        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
+        /// </summary>
         public static Dictionary<string, Field> CollectFields(
             ExecutionContext context,
             IGraphType specificType,
@@ -390,10 +456,14 @@ namespace GraphQL.Execution
             return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
-        // Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
-        // directives are provided on the same field or fragment, it must be queried only if the @skip condition
-        // is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
-        // if either the @skip condition is true or the @include condition is false.
+        /// <summary>
+        /// Examines @skip and @include directives for a node and returns a value indicating if the node should be included or not.
+        /// <br/><br/>
+        /// Note: Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
+        /// directives are provided on the same field or fragment, it must be queried only if the @skip condition
+        /// is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
+        /// if either the @skip condition is true or the @include condition is false.
+        /// </summary>
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
         {
             if (directives != null)
@@ -427,6 +497,12 @@ namespace GraphQL.Execution
             return true;
         }
 
+        /// <summary>
+        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
+        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
+        /// <br/><br/>
+        /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
+        /// </summary>
         public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
         {
             if (string.IsNullOrWhiteSpace(fragmentName))
@@ -454,6 +530,9 @@ namespace GraphQL.Execution
             return false;
         }
 
+        /// <summary>
+        /// Returns a list of subfields (child nodes) for a result node based on the selection set from the document.
+        /// </summary>
         public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
         {
             var selections = field?.SelectionSet?.Selections;

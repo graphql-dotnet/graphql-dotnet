@@ -1,7 +1,9 @@
-﻿using GraphQL.Language.AST;
+using System;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
+    [Obsolete]
     public class DebugNodeVisitor : INodeVisitor
     {
         public void Enter(INode node)

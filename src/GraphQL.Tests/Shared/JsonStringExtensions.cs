@@ -2,7 +2,7 @@ using GraphQL.SystemTextJson;
 
 namespace GraphQL
 {
-    public static class StringExtensions
+    public static class JsonStringExtensions
     {
         /// <summary>
         /// Creates an <see cref="ExecutionResult"/> with it's <see cref="ExecutionResult.Data" />

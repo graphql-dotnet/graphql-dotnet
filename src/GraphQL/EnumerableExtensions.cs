@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for working with <see cref="IEnumerable{T}"/> lists.
+    /// </summary>
     public static class EnumerableExtensions
     {
         /// <summary>
@@ -39,6 +42,7 @@ namespace GraphQL
         /// <param name="items">The dictionary of items to act on.</param>
         /// <param name="action">The action to be performed.</param>
         /// <remarks>If an exception occurs, the action will not be performed on the remaining items.</remarks>
+        [Obsolete]
         public static void Apply(this System.Collections.IDictionary items, Action<object, object> action)
         {
             foreach (object key in items.Keys)

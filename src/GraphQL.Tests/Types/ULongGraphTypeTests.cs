@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -35,5 +36,11 @@ namespace GraphQL.Tests.Types
         [InlineData(65535, 65535)]
         public void Coerces_input_to_valid_ulong(object input, ulong expected)
             => type.ParseValue(input).ShouldBe(expected);
+
+        [Fact]
+        public void Reads_BigInt_Literals()
+        {
+            Assert.Equal(18446744073709551615ul, (ulong)type.ParseLiteral(new BigIntValue(System.Numerics.BigInteger.Parse("18446744073709551615"))));
+        }
     }
 }

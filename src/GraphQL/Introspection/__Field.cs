@@ -3,8 +3,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__Field</c> introspection type represents each field in an Object or Interface type.
+    /// </summary>
     public class __Field : ObjectGraphType<IFieldType>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__Field</c> introspection type.
+        /// </summary>
         public __Field()
         {
             Name = nameof(__Field);
@@ -12,7 +18,7 @@ namespace GraphQL.Introspection
                 "Object and Interface types are described by a list of Fields, each of " +
                 "which has a name, potentially a list of arguments, and a return type.";
 
-            Field(f => f.Name);
+            Field(f => f.Name).Description(null);
             Field<StringGraphType>("description", resolve: context =>
             {
                 var description = context.Source.Description;
@@ -44,7 +50,7 @@ namespace GraphQL.Introspection
                 });
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
-            Field(f => f.DeprecationReason, nullable: true);
+            Field(f => f.DeprecationReason, nullable: true).Description(null);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveUsage>>>>(
                 name: "directives",

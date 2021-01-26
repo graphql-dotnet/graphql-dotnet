@@ -71,8 +71,14 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        options.FieldMiddleware.ApplyTo(options.Schema);
-                        options.Schema.Initialize();
+                        lock (options.Schema)
+                        {
+                            if (!options.Schema.Initialized)
+                            {
+                                options.FieldMiddleware.ApplyTo(options.Schema);
+                                options.Schema.Initialize();
+                            }
+                        }
                     }
                 }
 
@@ -225,7 +231,9 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
+#pragma warning disable CS0612 // Type or member is obsolete
                             await listener.BeforeExecutionAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                                 .ConfigureAwait(false);
                         }
 

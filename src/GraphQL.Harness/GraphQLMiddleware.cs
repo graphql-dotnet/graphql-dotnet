@@ -28,6 +28,7 @@ namespace Example
             _writer = writer;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
         public async Task Invoke(HttpContext context, ISchema schema)
         {
             if (!IsGraphQLRequest(context))

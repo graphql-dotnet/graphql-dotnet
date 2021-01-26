@@ -1,32 +1,47 @@
-﻿using Shouldly;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests
 {
     public class GraphQLExtensionsTester
     {
-        [Fact]
-        public void trims_nonnull_bang()
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("Human", "Human")]
+        [InlineData("Human!", "Human")]
+        [InlineData("[Human]", "Human")]
+        [InlineData("[Human]!", "Human")]
+        [InlineData("[[Human!]!]!", "Human")]
+        [InlineData("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]Human!!!!!!!!!!!!!]!!!!!!]]]]]]]!", "Human")]
+        public void TrimGraphQLTypes_Should_Return_Expected_Results(string sourceName, string expectedName)
         {
-            var nonNullName = "Human!";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
+            sourceName.TrimGraphQLTypes().ShouldBe(expectedName);
         }
 
-        [Fact]
-        public void trims_array()
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("\tAA", "\tAA")] // ???
+        [InlineData("a", "a")]
+        [InlineData("Aa", "aa")]
+        [InlineData("9a", "9a")]
+        [InlineData("aBC", "aBC")]
+        public void ToCamelCase_Should_Return_Expected_Results(string sourceName, string expectedName)
         {
-            var nonNullName = "[Human]";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
+            sourceName.ToCamelCase().ShouldBe(expectedName);
         }
 
-        [Fact]
-        public void trims_combo()
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("\tAA", "\tAA")] // ???
+        [InlineData("a", "A")]
+        [InlineData("Aa", "Aa")]
+        [InlineData("9a", "9a")]
+        [InlineData("aBC", "ABC")]
+        public void ToPascalCase_Should_Return_Expected_Results(string sourceName, string expectedName)
         {
-            var nonNullName = "[Human]!";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
+            sourceName.ToPascalCase().ShouldBe(expectedName);
         }
     }
 }

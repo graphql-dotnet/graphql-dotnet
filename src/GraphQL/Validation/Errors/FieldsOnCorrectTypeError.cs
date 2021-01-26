@@ -7,11 +7,15 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.FieldsOnCorrectType"/>
     [Serializable]
     public class FieldsOnCorrectTypeError : ValidationError
     {
         internal const string NUMBER = "5.3.1";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public FieldsOnCorrectTypeError(ValidationContext context, Field node, IGraphType type, IEnumerable<string> suggestedTypeNames, IEnumerable<string> suggestedFieldNames)
             : base(context.OriginalQuery, NUMBER, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
         {

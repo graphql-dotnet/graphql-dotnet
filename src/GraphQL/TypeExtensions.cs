@@ -10,6 +10,9 @@ using GraphQL.Utilities;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for types.
+    /// </summary>
     public static class TypeExtensions
     {
         /// <summary>
@@ -31,7 +34,8 @@ namespace GraphQL
         /// </returns>
         public static bool IsConcrete(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+                return false;
 
             return !type.IsAbstract && !type.IsInterface;
         }
@@ -189,9 +193,15 @@ namespace GraphQL
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
+        /// <summary>
+        /// Returns the type of element for a one-dimensional container type.
+        /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
+        /// as a one-dimensional container type.
+        /// </summary>
         public static Type GetEnumerableElementType(this Type type)
         {
-            if (_untypedContainers.Contains(type)) return typeof(object);
+            if (_untypedContainers.Contains(type))
+                return typeof(object);
 
             if (type.IsConstructedGenericType)
             {
@@ -238,8 +248,17 @@ namespace GraphQL
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
 
+        /// <summary>
+        /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
+        /// Otherwise returns xml documentation on the specified member, if any.
+        /// </summary>
         public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
 
+        /// <summary>
+        /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
+        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any.
+        /// </summary>
         public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }
 }

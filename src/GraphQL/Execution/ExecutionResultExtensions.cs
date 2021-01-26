@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Execution
+namespace GraphQL.Execution
 {
     internal static class ExecutionResultExtensions
     {

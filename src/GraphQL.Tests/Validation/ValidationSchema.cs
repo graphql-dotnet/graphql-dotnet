@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                    new QueryArgument<BooleanGraphType> { Name = "surname" }
                 ));
         }
     }
@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                    new QueryArgument<BooleanGraphType> { Name = "surname" }
                 ));
         }
     }
@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                    new QueryArgument<BooleanGraphType> { Name = "surname" }
                 ));
         }
     }
@@ -241,7 +241,7 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "complexArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<ComplexInput> { Name = "complexArg"}
+                    new QueryArgument<ComplexInput> { Name = "complexArg" }
                 ));
             Field<StringGraphType>(
                 "multipleReqs",
@@ -297,7 +297,7 @@ namespace GraphQL.Tests.Validation
             RegisterType<Human>();
             RegisterType<Alien>();
 
-            Directives = new []
+            Directives = new[]
             {
                 DirectiveGraphType.Include,
                 DirectiveGraphType.Skip,
