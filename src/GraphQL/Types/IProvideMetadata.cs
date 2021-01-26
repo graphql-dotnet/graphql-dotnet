@@ -44,5 +44,10 @@ namespace GraphQL.Types
         /// <param name="key"> String key. </param>
         /// <returns> <c>true</c> if value for such key exists, otherwise <c>false</c>. </returns>
         bool HasMetadata(string key);
+
+        /// <summary>
+        /// Indicates whether provider has any applied directives.
+        /// </summary>
+        bool HasAppliedDirectives { get; }
     }
 }

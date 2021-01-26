@@ -69,5 +69,8 @@ namespace GraphQL.Utilities
 
         /// <inheritdoc />
         public bool HasMetadata(string key) => _metadata?.ContainsKey(key) ?? false;
+
+        /// <inheritdoc />
+        public bool HasAppliedDirectives => _appliedDirectives?.Count > 0;
     }
 }

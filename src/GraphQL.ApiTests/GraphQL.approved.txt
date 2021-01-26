@@ -1666,7 +1666,7 @@ namespace GraphQL.Types
         public AppliedDirectives() { }
         public int Count { get; }
         public void Add(GraphQL.Types.AppliedDirective directive) { }
-        public bool Contains(GraphQL.Types.AppliedDirective directive) { }
+        public GraphQL.Types.AppliedDirective Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.AppliedDirective> GetEnumerator() { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
@@ -1952,6 +1952,7 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         GraphQL.Types.AppliedDirectives AppliedDirectives { get; }
+        bool HasAppliedDirectives { get; }
         System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         TType GetMetadata<TType>(string key, TType defaultValue = default);
@@ -2440,6 +2441,7 @@ namespace GraphQL.Utilities
     {
         public MetadataProvider() { }
         public GraphQL.Types.AppliedDirectives AppliedDirectives { get; }
+        public bool HasAppliedDirectives { get; }
         public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
