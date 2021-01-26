@@ -113,9 +113,9 @@ AFTER:
             string b2 = before.StartsWith('*') ? "</b>" : "";
 
             if (percent < 100)
-                return $"<span style=\"color:green\">{b1}{percent} [better]{b2}</span>";
+                return $"<span style=\"color:green\">{b1}{percent}{b2}</span>";
             if (percent > 100)
-                return $"<span style=\"color:red\">{b1}{percent} [worse]{b2}</span>";
+                return $"<span style=\"color:red\">{b1}{percent}{b2}</span>";
             else if (percent == 100)
                 return $"{b1}{percent}{b2}";
             else
