@@ -118,6 +118,12 @@ namespace GraphQL
         public FuncServiceProvider(System.Func<System.Type, object> resolver) { }
         public object GetService(System.Type type) { }
     }
+    public static class GlobalSwitches
+    {
+        public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
+        public static bool EnableReadDescriptionFromAttributes { get; set; }
+        public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
     {

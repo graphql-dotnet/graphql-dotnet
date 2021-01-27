@@ -240,15 +240,34 @@ namespace GraphQL
 
         /// <summary>
         /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
-        /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
-        /// Otherwise returns xml documentation on the specified member, if any.
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
+        /// returns xml documentation on the specified member, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
+        /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
         /// </summary>
-        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
+        public static string Description(this MemberInfo memberInfo)
+        {
+            string description = null;
+            if (GlobalSwitches.EnableReadDescriptionFromAttributes)
+            {
+                description = (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+                if (description == null && GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+                    description = memberInfo.GetXmlDocumentation();
+            }
+
+            return description;
+        }
 
         /// <summary>
         /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
-        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any.
+        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDeprecationReasonFromAttributes"/> setting.
         /// </summary>
-        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+        public static string ObsoleteMessage(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDeprecationReasonFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                : null;
+        }
     }
 }
