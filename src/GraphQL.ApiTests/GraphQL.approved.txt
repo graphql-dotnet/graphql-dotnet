@@ -1914,7 +1914,7 @@ namespace GraphQL.Types
     }
     public interface IProvideMetadata
     {
-        System.Collections.Generic.IDictionary<string, object> Metadata { get; }
+        System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
@@ -2397,7 +2397,7 @@ namespace GraphQL.Utilities
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
-        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
+        public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
