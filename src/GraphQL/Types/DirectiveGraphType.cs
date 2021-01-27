@@ -120,7 +120,7 @@ namespace GraphQL.Types
         /// to an introspection request. By default (null) if the directive has all its locations of
         /// type ExecutableDirectiveLocation, only then it will be present in the introspection response.
         /// </summary>
-        public virtual bool? Introspectable { get; }
+        public virtual bool? Introspectable => null;
 
         /// <summary>
         /// Gets or sets a list of arguments for the directive.
