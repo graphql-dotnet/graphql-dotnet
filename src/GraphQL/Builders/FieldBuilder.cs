@@ -221,7 +221,7 @@ namespace GraphQL.Builders
         /// then their default values (if any) will be used.
         /// </summary>
         /// <param name="name">Directive name.</param>
-        public FieldBuilder<TSourceType, TReturnType> Directive(string name)
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name)
         {
             FieldType.ApplyDirective(name);
             return this;
@@ -234,7 +234,7 @@ namespace GraphQL.Builders
         /// <param name="name">Directive name.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
-        public FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
         {
             FieldType.ApplyDirective(name, argumentName, argumentValue);
             return this;
@@ -245,7 +245,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <param name="name">Directive name.</param>
         /// <param name="configure">Configuration delegate.</param>
-        public FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
         {
             FieldType.ApplyDirective(name, configure);
             return this;

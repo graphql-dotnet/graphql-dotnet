@@ -421,9 +421,9 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType> resolve) { }
