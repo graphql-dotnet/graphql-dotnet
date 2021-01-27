@@ -19,7 +19,7 @@ namespace GraphQL.Introspection
                 "Object and Interface types are described by a list of Fields, each of " +
                 "which has a name, potentially a list of arguments, and a return type.";
 
-            Field(f => f.Name).Description(null);
+            Field(f => f.Name);
 
             Field<StringGraphType>("description", resolve: context =>
             {
@@ -78,7 +78,7 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
 
-            Field(f => f.DeprecationReason, nullable: true).Description(null);
+            Field(f => f.DeprecationReason, nullable: true);
         }
     }
 }
