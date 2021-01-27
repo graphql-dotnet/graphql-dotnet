@@ -30,7 +30,6 @@ namespace GraphQL.Benchmarks.Merge
             return table;
         }
 
-
         public List<Column> Columns { get; set; } = new List<Column>();
 
         public int ColumnCount => Columns.Count;
