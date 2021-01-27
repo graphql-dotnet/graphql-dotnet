@@ -42,7 +42,7 @@ namespace GraphQL.Introspection
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
-                        DefaultValue = false
+                        DefaultValue = BoolBox.False
                     }),
                 async context =>
                 {
@@ -118,7 +118,7 @@ namespace GraphQL.Introspection
                 new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
-                    DefaultValue = false
+                    DefaultValue = BoolBox.False
                 }),
                 async context =>
                 {
