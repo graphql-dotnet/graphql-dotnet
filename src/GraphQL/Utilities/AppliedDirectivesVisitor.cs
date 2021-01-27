@@ -3,7 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    internal sealed class AppliedDirectivesVisitor : BaseSchemaNodeVisitor
+    internal sealed class AppliedDirectivesVisitor : ISchemaNodeVisitor
     {
         public AppliedDirectivesVisitor(ISchema schema)
         {
@@ -12,31 +12,31 @@ namespace GraphQL.Utilities
 
         public ISchema Schema { get; }
 
-        public override void VisitFieldArgumentDefinition(QueryArgument argument) => ValidateAppliedDirectives(argument);
+        public void VisitFieldArgumentDefinition(QueryArgument argument) => ValidateAppliedDirectives(argument);
 
-        public override void VisitDirectiveArgumentDefinition(QueryArgument argument) => ValidateAppliedDirectives(argument);
+        public void VisitDirectiveArgumentDefinition(QueryArgument argument) => ValidateAppliedDirectives(argument);
 
-        public override void VisitEnum(EnumerationGraphType type) => ValidateAppliedDirectives(type);
+        public void VisitEnum(EnumerationGraphType type) => ValidateAppliedDirectives(type);
 
-        public override void VisitDirective(DirectiveGraphType directive) => ValidateAppliedDirectives(directive);
+        public void VisitDirective(DirectiveGraphType directive) => ValidateAppliedDirectives(directive);
 
-        public override void VisitEnumValue(EnumValueDefinition value) => ValidateAppliedDirectives(value);
+        public void VisitEnumValue(EnumValueDefinition value) => ValidateAppliedDirectives(value);
 
-        public override void VisitFieldDefinition(FieldType field) => ValidateAppliedDirectives(field);
+        public void VisitFieldDefinition(FieldType field) => ValidateAppliedDirectives(field);
 
-        public override void VisitInputFieldDefinition(FieldType field) => ValidateAppliedDirectives(field);
+        public void VisitInputFieldDefinition(FieldType field) => ValidateAppliedDirectives(field);
 
-        public override void VisitInputObject(IInputObjectGraphType type) => ValidateAppliedDirectives(type);
+        public void VisitInputObject(IInputObjectGraphType type) => ValidateAppliedDirectives(type);
 
-        public override void VisitInterface(IInterfaceGraphType iface) => ValidateAppliedDirectives(iface);
+        public void VisitInterface(IInterfaceGraphType iface) => ValidateAppliedDirectives(iface);
 
-        public override void VisitObject(IObjectGraphType type) => ValidateAppliedDirectives(type);
+        public void VisitObject(IObjectGraphType type) => ValidateAppliedDirectives(type);
 
-        public override void VisitScalar(ScalarGraphType scalar) => ValidateAppliedDirectives(scalar);
+        public void VisitScalar(ScalarGraphType scalar) => ValidateAppliedDirectives(scalar);
 
-        public override void VisitSchema(Schema schema) => ValidateAppliedDirectives(schema);
+        public void VisitSchema(Schema schema) => ValidateAppliedDirectives(schema);
 
-        public override void VisitUnion(UnionGraphType union) => ValidateAppliedDirectives(union);
+        public void VisitUnion(UnionGraphType union) => ValidateAppliedDirectives(union);
 
         private void ValidateAppliedDirectives(IProvideMetadata provider)
         {
