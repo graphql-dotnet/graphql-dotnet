@@ -129,6 +129,14 @@ namespace GraphQL
         public FuncServiceProvider(System.Func<System.Type, object> resolver) { }
         public object GetService(System.Type type) { }
     }
+    public static class GlobalSwitches
+    {
+        public static System.Action<string, string> Validation;
+        public static System.Action<string, string> ValidationOnSchemaInitialize;
+        public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
+        public static bool EnableReadDescriptionFromAttributes { get; set; }
+        public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
     {
@@ -2445,8 +2453,6 @@ namespace GraphQL.Utilities
     }
     public static class NameValidator
     {
-        public static System.Action<string, string> Validation;
-        public static System.Action<string, string> ValidationOnSchemaInitialize;
         public static void ValidateDefault(string name, string type) { }
         public static void ValidateName(string name, string type = "field") { }
         public static void ValidateNameOnSchemaInitialize(string name, string type = "field") { }

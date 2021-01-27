@@ -2,7 +2,7 @@
   "profiles": {
     "Profiler": {
       "commandName": "Project",
-      "commandLineArgs": "/P"
+      "commandLineArgs": "/p"
     },
     "Benchmarks": {
       "commandName": "Project"
