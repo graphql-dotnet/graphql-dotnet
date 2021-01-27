@@ -11,11 +11,6 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         /// <summary>
-        /// Provides all directives applied to this provider.
-        /// </summary>
-        AppliedDirectives AppliedDirectives { get; }
-
-        /// <summary>
         /// Provides all meta information as a key-value dictionary.
         /// </summary>
         Dictionary<string, object> Metadata { get; }
@@ -44,10 +39,5 @@ namespace GraphQL.Types
         /// <param name="key"> String key. </param>
         /// <returns> <c>true</c> if value for such key exists, otherwise <c>false</c>. </returns>
         bool HasMetadata(string key);
-
-        /// <summary>
-        /// Indicates whether provider has any applied directives.
-        /// </summary>
-        bool HasAppliedDirectives { get; }
     }
 }

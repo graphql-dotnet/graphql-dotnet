@@ -17,7 +17,8 @@ namespace GraphQL
         public const string POLICY_KEY = "Authorization__Policies";
 
         /// <summary>
-        /// Gets a list of authorization policy names for the specified metadata provider.
+        /// Gets a list of authorization policy names for the specified metadata provider if any.
+        /// Otherwise returns <see langword="null"/>.
         /// </summary>
         /// <param name="provider">
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
@@ -34,11 +35,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
-        public static bool RequiresAuthorization(this IProvideMetadata provider)
-        {
-            var policies = GetPolicies(provider);
-            return policies != null && policies.Count > 0;
-        }
+        public static bool RequiresAuthorization(this IProvideMetadata provider) => GetPolicies(provider)?.Count > 0;
 
         /// <summary>
         /// Adds authorization policy to the specified metadata provider. If the provider already contains

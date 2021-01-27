@@ -30,6 +30,8 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Types.AppliedDirectives GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
     }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
@@ -1951,8 +1953,6 @@ namespace GraphQL.Types
     }
     public interface IProvideMetadata
     {
-        GraphQL.Types.AppliedDirectives AppliedDirectives { get; }
-        bool HasAppliedDirectives { get; }
         System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         TType GetMetadata<TType>(string key, TType defaultValue = default);
@@ -2440,8 +2440,6 @@ namespace GraphQL.Utilities
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
-        public GraphQL.Types.AppliedDirectives AppliedDirectives { get; }
-        public bool HasAppliedDirectives { get; }
         public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = default) { }

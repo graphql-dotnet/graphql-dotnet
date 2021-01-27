@@ -398,9 +398,9 @@ namespace GraphQL.Types
 
         private void ValidateAppliedDirectives(IProvideMetadata provider)
         {
-            if (provider.HasAppliedDirectives)
+            if (provider.HasAppliedDirectives())
             {
-                foreach (var appliedDirective in provider.AppliedDirectives)
+                foreach (var appliedDirective in provider.GetAppliedDirectives())
                 {
                     var schemaDirective = Directives.Find(appliedDirective.Name);
                     if (schemaDirective == null)

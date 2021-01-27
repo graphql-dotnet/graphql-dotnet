@@ -10,48 +10,10 @@ namespace GraphQL.Utilities
     /// </summary>
     public class MetadataProvider : IProvideMetadata
     {
-        private AppliedDirectives _appliedDirectives;
         private Dictionary<string, object> _metadata;
 
         /// <inheritdoc />
-        public AppliedDirectives AppliedDirectives
-        {
-            get
-            {
-                if (_appliedDirectives == null)
-                {
-                    lock (this)
-                    {
-                        if (_appliedDirectives == null)
-                        {
-                            _appliedDirectives = new AppliedDirectives();
-                        }
-                    }
-                }
-
-                return _appliedDirectives;
-            }
-        }
-
-        /// <inheritdoc />
-        public Dictionary<string, object> Metadata
-        {
-            get
-            {
-                if (_metadata == null)
-                {
-                    lock (this)
-                    {
-                        if (_metadata == null)
-                        {
-                            _metadata = new Dictionary<string, object>();
-                        }
-                    }
-                }
-
-                return _metadata;
-            }
-        }
+        public Dictionary<string, object> Metadata => _metadata ??= new Dictionary<string, object>();
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, TType defaultValue = default)
@@ -69,8 +31,5 @@ namespace GraphQL.Utilities
 
         /// <inheritdoc />
         public bool HasMetadata(string key) => _metadata?.ContainsKey(key) ?? false;
-
-        /// <inheritdoc />
-        public bool HasAppliedDirectives => _appliedDirectives?.Count > 0;
     }
 }

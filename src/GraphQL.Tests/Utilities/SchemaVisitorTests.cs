@@ -157,47 +157,58 @@ namespace GraphQL.Tests.Utilities
         {
             var schema = new Schema();
             schema.ApplyDirective("schema");
-            schema.AppliedDirectives.Count.ShouldBe(1);
+            schema.HasAppliedDirectives().ShouldBeTrue();
+            schema.GetAppliedDirectives().Count.ShouldBe(1);
 
             var objectType = new ObjectGraphType();
             objectType.ApplyDirective("type");
-            objectType.AppliedDirectives.Count.ShouldBe(1);
+            objectType.HasAppliedDirectives().ShouldBeTrue();
+            objectType.GetAppliedDirectives().Count.ShouldBe(1);
 
             var field = objectType.Field<StringGraphType>("test");
             field.ApplyDirective("field");
-            field.AppliedDirectives.Count.ShouldBe(1);
+            field.HasAppliedDirectives().ShouldBeTrue();
+            field.GetAppliedDirectives().Count.ShouldBe(1);
 
             var interfaceType = new InterfaceGraphType();
             interfaceType.ApplyDirective("interface");
-            interfaceType.AppliedDirectives.Count.ShouldBe(1);
+            interfaceType.HasAppliedDirectives().ShouldBeTrue();
+            interfaceType.GetAppliedDirectives().Count.ShouldBe(1);
 
             var unionType = new UnionGraphType();
             unionType.ApplyDirective("union");
-            unionType.AppliedDirectives.Count.ShouldBe(1);
+            unionType.HasAppliedDirectives().ShouldBeTrue();
+            unionType.GetAppliedDirectives().Count.ShouldBe(1);
 
             var arg = new QueryArgument(new StringGraphType());
             arg.ApplyDirective("arg");
-            arg.AppliedDirectives.Count.ShouldBe(1);
+            arg.HasAppliedDirectives().ShouldBeTrue();
+            arg.GetAppliedDirectives().Count.ShouldBe(1);
 
             var enumType = new EnumerationGraphType();
             enumType.ApplyDirective("enumType");
-            enumType.AppliedDirectives.Count.ShouldBe(1);
+            enumType.HasAppliedDirectives().ShouldBeTrue();
+            enumType.GetAppliedDirectives().Count.ShouldBe(1);
 
             var enumValue = new EnumValueDefinition();
             enumValue.ApplyDirective("enumValue");
-            enumValue.AppliedDirectives.Count.ShouldBe(1);
+            enumValue.HasAppliedDirectives().ShouldBeTrue();
+            enumValue.GetAppliedDirectives().Count.ShouldBe(1);
 
             var inputType = new InputObjectGraphType();
             inputType.ApplyDirective("inputType");
-            inputType.AppliedDirectives.Count.ShouldBe(1);
+            inputType.HasAppliedDirectives().ShouldBeTrue();
+            inputType.GetAppliedDirectives().Count.ShouldBe(1);
 
-            field = inputType.Field<StringGraphType>("test");
-            field.ApplyDirective("inputField");
-            field.AppliedDirectives.Count.ShouldBe(1);
+            var input = inputType.Field<StringGraphType>("test");
+            input.ApplyDirective("inputField");
+            input.HasAppliedDirectives().ShouldBeTrue();
+            input.GetAppliedDirectives().Count.ShouldBe(1);
 
             var scalarType = new BigIntGraphType();
             scalarType.ApplyDirective("scalar");
-            scalarType.AppliedDirectives.Count.ShouldBe(1);
+            scalarType.HasAppliedDirectives().ShouldBeTrue();
+            scalarType.GetAppliedDirectives().Count.ShouldBe(1);
         }
     }
 }

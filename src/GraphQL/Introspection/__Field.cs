@@ -86,9 +86,10 @@ namespace GraphQL.Introspection
                 description: "Directives applied to the field",
                 resolve: async context =>
                 {
-                    if (context.Source.HasAppliedDirectives)
+                    if (context.Source.HasAppliedDirectives())
                     {
-                        var appliedDirectives = context.ArrayPool.Rent<AppliedDirective>(context.Source.AppliedDirectives.Count);
+                        var appliedDirectives = context.Source.GetAppliedDirectives();
+                        var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives.Count);
 
                         int index = 0;
                         foreach (var applied in appliedDirectives)
@@ -97,11 +98,11 @@ namespace GraphQL.Introspection
                             var schemaDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == applied.Name);
                             if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective))
                             {
-                                appliedDirectives[index++] = applied;
+                                result[index++] = applied;
                             }
                         }
 
-                        return appliedDirectives.Constrained(index);
+                        return result.Constrained(index);
                     }
 
                     return Array.Empty<AppliedDirective>();

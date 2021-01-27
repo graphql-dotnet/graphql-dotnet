@@ -8,6 +8,19 @@ namespace GraphQL
     /// </summary>
     public static class DirectivesExtensions
     {
+        private const string DIRECTIVES_KEY = "__APPLIED__DIRECTIVES__";
+
+        /// <summary>
+        /// Indicates whether provider has any applied directives.
+        /// </summary>
+        public static bool HasAppliedDirectives(this IProvideMetadata provider) => provider.HasMetadata(DIRECTIVES_KEY);
+
+        /// <summary>
+        /// Provides all directives applied to this provider if any.
+        /// Otherwise returns <see langword="null"/>.
+        /// </summary>
+        public static AppliedDirectives GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
+
         /// <summary>
         /// Apply directive without specifying arguments. If the directive declaration has arguments,
         /// then their default values (if any) will be used.
@@ -54,7 +67,11 @@ namespace GraphQL
 
             var directive = new AppliedDirective(name);
             configure(directive);
-            provider.AppliedDirectives.Add(directive);
+
+            var directives = provider.GetAppliedDirectives() ?? new AppliedDirectives();
+            directives.Add(directive);
+
+            provider.Metadata[DIRECTIVES_KEY] = directives;
 
             return provider;
         }
