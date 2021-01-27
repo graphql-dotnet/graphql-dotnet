@@ -120,6 +120,8 @@ namespace GraphQL
     }
     public static class GlobalSwitches
     {
+        public static System.Action<string, string> Validation;
+        public static System.Action<string, string> ValidationOnSchemaInitialize;
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
@@ -2402,8 +2404,6 @@ namespace GraphQL.Utilities
     }
     public static class NameValidator
     {
-        public static System.Action<string, string> Validation;
-        public static System.Action<string, string> ValidationOnSchemaInitialize;
         public static void ValidateDefault(string name, string type) { }
         public static void ValidateName(string name, string type = "field") { }
         public static void ValidateNameOnSchemaInitialize(string name, string type = "field") { }

@@ -248,11 +248,17 @@ namespace GraphQL
         public static string Description(this MemberInfo memberInfo)
         {
             string description = null;
+
             if (GlobalSwitches.EnableReadDescriptionFromAttributes)
             {
                 description = (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
-                if (description == null && GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
-                    description = memberInfo.GetXmlDocumentation();
+                if (description != null)
+                    return description;
+            }
+
+            if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+            {
+                description = memberInfo.GetXmlDocumentation();
             }
 
             return description;
