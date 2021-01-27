@@ -11,14 +11,10 @@ namespace GraphQL.Types
     {
         internal List<DirectiveGraphType> List { get; } = new List<DirectiveGraphType>();
 
-        internal Schema Schema { get; set; }
-
         /// <summary>
         /// Gets the count of directives.
         /// </summary>
         public int Count => List.Count;
-
-        internal void Clear() => List.Clear();
 
         /// <summary>
         /// Register the specified directive to the schema.
@@ -30,9 +26,6 @@ namespace GraphQL.Types
         {
             if (directive == null)
                 throw new ArgumentNullException(nameof(directive));
-
-            Schema?.CheckDisposed();
-            Schema?.CheckInitialized();
 
             if (!List.Contains(directive))
                 List.Add(directive);

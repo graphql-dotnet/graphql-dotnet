@@ -40,7 +40,7 @@ namespace GraphQL.Types
             _additionalInstances = new List<IGraphType>();
             _converters = new List<IAstFromValueConverter>();
 
-            Directives = new SchemaDirectives { Schema = this };
+            Directives = new SchemaDirectives();
             Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
         }
 
@@ -67,7 +67,7 @@ namespace GraphQL.Types
         public bool Initialized { get; private set; }
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
-        internal void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
+        private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
         {
             if (Initialized)
                 throw new InvalidOperationException($"Schema is already initialized and sealed for modifications. You should call '{name}' only when Schema.Initialized = false.");
@@ -238,7 +238,7 @@ namespace GraphQL.Types
 
                     _additionalInstances.Clear();
                     _additionalTypes.Clear();
-                    Directives.Clear();
+                    Directives.List.Clear();
                     _converters.Clear();
 
                     _allTypes?.Dictionary.Clear();
@@ -249,7 +249,7 @@ namespace GraphQL.Types
             }
         }
 
-        internal void CheckDisposed()
+        private void CheckDisposed()
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(Schema));

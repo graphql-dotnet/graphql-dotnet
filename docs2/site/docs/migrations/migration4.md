@@ -90,7 +90,7 @@
   Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
   so it is safe to preserve these instances without calling `.Copy()`.
 * `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
-* `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`
+* `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`, that is not thread safe anymore
 * `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
 * `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
 * Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
