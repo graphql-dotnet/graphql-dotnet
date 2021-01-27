@@ -59,9 +59,6 @@ namespace GraphQL.Harness
                     var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
                     foreach (var middleware in middlewares)
                         schema.FieldMiddleware.Use(middleware);
-                    //schema.FieldMiddleware
-                    //    .Use(services.GetRequiredService<CountFieldMiddleware>())
-                    //    .Use(services.GetRequiredService<InstrumentFieldsMiddleware>());
                 }
                 return schema;
             });

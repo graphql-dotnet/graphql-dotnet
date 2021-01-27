@@ -59,7 +59,7 @@ namespace GraphQL
             return true;
         }
 
-        /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
+        /// <summary>Determines if the specified field argument has been provided in the GraphQL query request.</summary>
         public static bool HasArgument(this IResolveFieldContext context, string name)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
@@ -69,12 +69,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Determines if this graph type is an introspection type
-        /// </summary>
-        private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
-
-        /// <summary>
-        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
+        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type.
         /// </summary>
         private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 

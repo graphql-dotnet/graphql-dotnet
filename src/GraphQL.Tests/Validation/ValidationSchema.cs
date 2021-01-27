@@ -297,25 +297,25 @@ namespace GraphQL.Tests.Validation
             RegisterType<Human>();
             RegisterType<Alien>();
 
-            RegisterDirectives(
-                new DirectiveGraphType("onQuery", new []{ DirectiveLocation.Query }),
-                new DirectiveGraphType("onMutation", new []{ DirectiveLocation.Mutation }),
-                new DirectiveGraphType("onSubscription", new []{ DirectiveLocation.Subscription }),
-                new DirectiveGraphType("onField", new []{ DirectiveLocation.Field }),
-                new DirectiveGraphType("onFragmentDefinition", new []{ DirectiveLocation.FragmentDefinition }),
-                new DirectiveGraphType("onFragmentSpread", new []{ DirectiveLocation.FragmentSpread }),
-                new DirectiveGraphType("onInlineFragment", new []{ DirectiveLocation.InlineFragment }),
-                new DirectiveGraphType("onSchema", new []{ DirectiveLocation.Schema }),
-                new DirectiveGraphType("onScalar", new []{ DirectiveLocation.Scalar }),
-                new DirectiveGraphType("onObject", new []{ DirectiveLocation.Object }),
-                new DirectiveGraphType("onFieldDefinition", new []{ DirectiveLocation.FieldDefinition }),
-                new DirectiveGraphType("onArgumentDefinition", new []{ DirectiveLocation.ArgumentDefinition }),
-                new DirectiveGraphType("onInterface", new []{ DirectiveLocation.Interface }),
-                new DirectiveGraphType("onUnion", new []{ DirectiveLocation.Union }),
-                new DirectiveGraphType("onEnum", new []{ DirectiveLocation.Enum }),
-                new DirectiveGraphType("onEnumValue", new []{ DirectiveLocation.EnumValue }),
-                new DirectiveGraphType("onInputObject", new []{ DirectiveLocation.InputObject }),
-                new DirectiveGraphType("onInputFieldDefinition", new []{ DirectiveLocation.InputFieldDefinition })
+            Directives.Register(
+                new DirectiveGraphType("onQuery", DirectiveLocation.Query),
+                new DirectiveGraphType("onMutation", DirectiveLocation.Mutation),
+                new DirectiveGraphType("onSubscription", DirectiveLocation.Subscription),
+                new DirectiveGraphType("onField", DirectiveLocation.Field),
+                new DirectiveGraphType("onFragmentDefinition", DirectiveLocation.FragmentDefinition),
+                new DirectiveGraphType("onFragmentSpread", DirectiveLocation.FragmentSpread),
+                new DirectiveGraphType("onInlineFragment", DirectiveLocation.InlineFragment),
+                new DirectiveGraphType("onSchema", DirectiveLocation.Schema),
+                new DirectiveGraphType("onScalar", DirectiveLocation.Scalar),
+                new DirectiveGraphType("onObject", DirectiveLocation.Object),
+                new DirectiveGraphType("onFieldDefinition", DirectiveLocation.FieldDefinition),
+                new DirectiveGraphType("onArgumentDefinition", DirectiveLocation.ArgumentDefinition),
+                new DirectiveGraphType("onInterface", DirectiveLocation.Interface),
+                new DirectiveGraphType("onUnion", DirectiveLocation.Union),
+                new DirectiveGraphType("onEnum", DirectiveLocation.Enum),
+                new DirectiveGraphType("onEnumValue", DirectiveLocation.EnumValue),
+                new DirectiveGraphType("onInputObject", DirectiveLocation.InputObject),
+                new DirectiveGraphType("onInputFieldDefinition", DirectiveLocation.InputFieldDefinition)
             );
         }
     }

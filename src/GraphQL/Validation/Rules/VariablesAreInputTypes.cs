@@ -36,7 +36,7 @@ namespace GraphQL.Validation.Rules
         {
             NonNullType nonnull => GetNamedGraphTypeFromType(nonnull.Type, schema),
             ListType list => GetNamedGraphTypeFromType(list.Type, schema),
-            NamedType named => schema.FindType(named.Name),
+            NamedType named => schema.AllTypes[named.Name],
             _ => null
         };
     }

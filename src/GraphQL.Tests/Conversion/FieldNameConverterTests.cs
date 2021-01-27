@@ -82,7 +82,7 @@ namespace GraphQL.Tests.Conversion
             var schema = build_schema();
             schema.Initialize();
 
-            var query = schema.FindType("Query") as IObjectGraphType;
+            var query = schema.AllTypes["Query"] as IObjectGraphType;
             var field = query.GetField("peRsoN");
             field.Arguments.Find("id").ShouldNotBeNull();
         }
@@ -93,7 +93,7 @@ namespace GraphQL.Tests.Conversion
             var schema = build_schema(new PascalCaseNameConverter(), "iD");
             schema.Initialize();
 
-            var query = schema.FindType("Query") as IObjectGraphType;
+            var query = schema.AllTypes["Query"] as IObjectGraphType;
             var field = query.GetField("PeRsoN");
             field.Arguments.Find("ID").ShouldNotBeNull();
         }

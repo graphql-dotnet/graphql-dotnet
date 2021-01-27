@@ -11,6 +11,8 @@ namespace GraphQL.Types
     {
         internal List<DirectiveGraphType> List { get; } = new List<DirectiveGraphType>();
 
+        internal Schema Schema { get; set; }
+
         /// <summary>
         /// Gets the count of directives.
         /// </summary>
@@ -18,13 +20,34 @@ namespace GraphQL.Types
 
         internal void Clear() => List.Clear();
 
-        internal void Add(DirectiveGraphType directive)
+        /// <summary>
+        /// Register the specified directive to the schema.
+        /// <br/><br/>
+        /// Directives are used by the GraphQL runtime as a way of modifying execution
+        /// behavior. Type system creators do not usually create them directly.
+        /// </summary>
+        public void Register(DirectiveGraphType directive)
         {
             if (directive == null)
                 throw new ArgumentNullException(nameof(directive));
 
+            Schema?.CheckDisposed();
+            Schema?.CheckInitialized();
+
             if (!List.Contains(directive))
                 List.Add(directive);
+        }
+
+        /// <summary>
+        /// Register the specified directives to the schema.
+        /// <br/><br/>
+        /// Directives are used by the GraphQL runtime as a way of modifying execution
+        /// behavior. Type system creators do not usually create them directly.
+        /// </summary>
+        public void Register(params DirectiveGraphType[] directives)
+        {
+            foreach (var directive in directives)
+                Register(directive);
         }
 
         /// <summary>
@@ -41,8 +64,6 @@ namespace GraphQL.Types
 
             return null;
         }
-
-        public bool Contains(DirectiveGraphType type) => List.Contains(type ?? throw new ArgumentNullException(nameof(type)));
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<DirectiveGraphType> GetEnumerator() => List.GetEnumerator();

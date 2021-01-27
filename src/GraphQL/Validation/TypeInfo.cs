@@ -101,7 +101,7 @@ namespace GraphQL.Validation
 
             if (node is Directive directive)
             {
-                _directive = _schema.FindDirective(directive.Name);
+                _directive = _schema.Directives.Find(directive.Name);
             }
 
             if (node is Operation op)
@@ -125,14 +125,14 @@ namespace GraphQL.Validation
 
             if (node is FragmentDefinition def1)
             {
-                var type = _schema.FindType(def1.Type.Name);
+                var type = _schema.AllTypes[def1.Type.Name];
                 _typeStack.Push(type);
                 return;
             }
 
             if (node is InlineFragment def)
             {
-                var type = def.Type != null ? _schema.FindType(def.Type.Name) : GetLastType();
+                var type = def.Type != null ? _schema.AllTypes[def.Type.Name] : GetLastType();
                 _typeStack.Push(type);
                 return;
             }

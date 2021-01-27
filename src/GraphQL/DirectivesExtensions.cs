@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Introspection;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -74,6 +75,37 @@ namespace GraphQL
             provider.Metadata[DIRECTIVES_KEY] = directives;
 
             return provider;
+        }
+
+        internal static void AddAppliedDirectivesField<TSourceType>(this ComplexGraphType<TSourceType> type, string element)
+            where TSourceType : IProvideMetadata
+        {
+            type.FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__AppliedDirective>>>>(
+               name: "appliedDirectives",
+               description: $"Directives applied to the {element}",
+               resolve: async context =>
+               {
+                   if (context.Source.HasAppliedDirectives())
+                   {
+                       var appliedDirectives = context.Source.GetAppliedDirectives();
+                       var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives.Count);
+
+                       int index = 0;
+                       foreach (var applied in appliedDirectives)
+                       {
+                           // return only registered directives allowed by filter
+                           var schemaDirective = context.Schema.Directives.Find(applied.Name);
+                           if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective))
+                           {
+                               result[index++] = applied;
+                           }
+                       }
+
+                       return result.Constrained(index);
+                   }
+
+                   return Array.Empty<AppliedDirective>();
+               });
         }
     }
 }

@@ -14,7 +14,6 @@ namespace GraphQL.Tests.Types
         public void registers_interfaces_when_not_used_in_fields()
         {
             var schema = new AnInterfaceSchema();
-            schema.FindType("a");
             var result = schema.AllTypes.SingleOrDefault(x => x.Name == "AnInterfaceType");
             result.ShouldNotBeNull("Interface type should be registered");
         }
@@ -23,7 +22,6 @@ namespace GraphQL.Tests.Types
         public void recursively_registers_children()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -38,7 +36,6 @@ namespace GraphQL.Tests.Types
         public void registers_argument_input_objects()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -49,7 +46,6 @@ namespace GraphQL.Tests.Types
         public void registers_argument_input_objects_when_argument_resolved_type_is_set()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -61,7 +57,6 @@ namespace GraphQL.Tests.Types
         public void registers_type_when_list()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -72,7 +67,6 @@ namespace GraphQL.Tests.Types
         public void registers_union_types()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -85,8 +79,8 @@ namespace GraphQL.Tests.Types
         public void throw_error_on_missing_istypeof()
         {
             var schema = new InvalidUnionSchema();
-            //note: The exception occurs during Schema.CreateTypesLookup(), not during Schema.FindType()
-            Should.Throw<InvalidOperationException>(() => schema.FindType("a"));
+            //note: The exception occurs during Schema.CreateTypesLookup(), not during Schema.AllTypes[)
+            Should.Throw<InvalidOperationException>(() => schema.AllTypes["a"]);
         }
 
         [Fact]
@@ -108,7 +102,6 @@ namespace GraphQL.Tests.Types
         public void registers_additional_types()
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
-            schema.FindType("abcd");
 
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
@@ -117,7 +110,6 @@ namespace GraphQL.Tests.Types
         public void registers_additional_duplicated_types()
         {
             var schema = new SchemaWithDuplicates();
-            schema.FindType("abcd");
 
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
@@ -126,7 +118,6 @@ namespace GraphQL.Tests.Types
         public void registers_only_root_types()
         {
             var schema = new ARootSchema();
-            schema.FindType("abcd");
 
             DoesNotContainTypeNames(schema, "ASchemaType!");
         }
@@ -135,21 +126,21 @@ namespace GraphQL.Tests.Types
         public void handles_cycle_field_type()
         {
             var schema = new SimpleCycleSchema();
-            schema.FindType("CycleType").ShouldNotBeNull();
+            schema.AllTypes["CycleType"].ShouldNotBeNull();
         }
 
         [Fact]
         public void handles_stackoverflow_exception_for_cycle_field_type()
         {
             var schema = new ACyclingDerivingSchema(new FuncServiceProvider(t => t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null));
-            Should.Throw<InvalidOperationException>(() => schema.FindType("abcd"));
+            Should.Throw<InvalidOperationException>(() => schema.AllTypes["abcd"]);
         }
 
         private void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
             {
-                var type = schema.FindType(typeName);
+                var type = schema.AllTypes[typeName];
                 type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
             });
         }
@@ -190,22 +181,26 @@ namespace GraphQL.Tests.Types
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(new IGraphType[] { }));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
-            Should.Throw<ObjectDisposedException>(() => schema.RegisterDirective(new DirectiveGraphType("test", new DirectiveLocation[] { DirectiveLocation.Field })));
-            Should.Throw<ObjectDisposedException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
+            Should.Throw<ObjectDisposedException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));
+            Should.Throw<ObjectDisposedException>(() => schema.Directives.Register(new DirectiveGraphType("test", DirectiveLocation.Field)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
         }
 
         [Fact]
-        public void initialized_schema_throws_errors()
+        public void initialized_schema_should_throw_error_when_register_type_or_directive()
         {
             var schema = new Schema();
+
+            schema.Initialized.ShouldBeFalse();
             schema.Initialize();
+            schema.Initialized.ShouldBeTrue();
+
             Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new IGraphType[] { }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
-            Should.Throw<InvalidOperationException>(() => schema.RegisterDirective(new DirectiveGraphType("test", new DirectiveLocation[] { DirectiveLocation.Field })));
-            Should.Throw<InvalidOperationException>(() => schema.RegisterDirectives(new DirectiveGraphType[] { }));
+            Should.Throw<InvalidOperationException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));
+            Should.Throw<InvalidOperationException>(() => schema.Directives.Register(new DirectiveGraphType("test", DirectiveLocation.Field)));
         }
     }
 

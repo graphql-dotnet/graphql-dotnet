@@ -78,7 +78,7 @@ namespace GraphQL.Utilities.Federation
                     foreach (var rep in reps)
                     {
                         var typeName = rep["__typename"].ToString();
-                        var type = context.Schema.FindType(typeName);
+                        var type = context.Schema.AllTypes[typeName];
                         if (type != null)
                         {
                             // execute resolver

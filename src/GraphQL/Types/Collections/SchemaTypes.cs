@@ -234,7 +234,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type instance from the lookup table by its GraphQL type name.
         /// </summary>
-        internal IGraphType this[string typeName]
+        public IGraphType this[string typeName]
         {
             get
             {
@@ -250,7 +250,7 @@ namespace GraphQL.Types
                 }
                 return type;
             }
-            set
+            internal set
             {
                 CheckSealed();
 

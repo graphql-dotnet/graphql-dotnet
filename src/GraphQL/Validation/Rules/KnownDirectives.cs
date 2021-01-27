@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
         {
-            var directiveDef = context.Schema.FindDirective(node.Name);
+            var directiveDef = context.Schema.Directives.Find(node.Name);
             if (directiveDef == null)
             {
                 context.ReportError(new KnownDirectivesError(context, node));

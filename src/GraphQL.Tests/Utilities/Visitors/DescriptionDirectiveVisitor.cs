@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Utilities.Visitors
             field.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitInterface(InterfaceGraphType interfaceDefinition)
+        public override void VisitInterface(IInterfaceGraphType interfaceDefinition)
         {
             interfaceDefinition.Description = GetArgument("description", string.Empty);
         }
@@ -52,12 +52,17 @@ namespace GraphQL.Tests.Utilities.Visitors
             union.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitArgumentDefinition(QueryArgument argument)
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument)
         {
             argument.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitInputObject(InputObjectGraphType type)
+        public override void VisitFieldArgumentDefinition(QueryArgument argument)
+        {
+            argument.Description = GetArgument("description", string.Empty);
+        }
+
+        public override void VisitInputObject(IInputObjectGraphType type)
         {
             type.Description = GetArgument("description", string.Empty);
         }

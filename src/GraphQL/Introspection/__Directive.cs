@@ -43,6 +43,8 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l => l == DirectiveLocation.Field));
+
+            this.AddAppliedDirectivesField("directive");
         }
     }
 

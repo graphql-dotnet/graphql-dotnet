@@ -9,6 +9,7 @@
 * Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 * `ExecutionOptions.EnableMetrics` is disabled by default
+* Ability to expose user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
 
 ## Breaking Changes
 

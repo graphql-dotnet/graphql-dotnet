@@ -38,13 +38,10 @@ namespace GraphQL.Types
 
             _additionalTypes = new List<Type>();
             _additionalInstances = new List<IGraphType>();
-            Directives = new SchemaDirectives
-            {
-                DirectiveGraphType.Include,
-                DirectiveGraphType.Skip,
-                DirectiveGraphType.Deprecated
-            };
             _converters = new List<IAstFromValueConverter>();
+
+            Directives = new SchemaDirectives { Schema = this };
+            Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
         }
 
         public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
@@ -70,7 +67,7 @@ namespace GraphQL.Types
         public bool Initialized { get; private set; }
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
-        private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
+        internal void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
         {
             if (Initialized)
                 throw new InvalidOperationException($"Schema is already initialized and sealed for modifications. You should call '{name}' only when Schema.Initialized = false.");
@@ -207,40 +204,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterDirective(DirectiveGraphType directive)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            Directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
-        }
-
-        public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
-
-        /// <inheritdoc/>
-        public void RegisterDirectives(params DirectiveGraphType[] directives)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
-
-        /// <inheritdoc/>
-        public DirectiveGraphType FindDirective(string name)
-        {
-            return Directives.FirstOrDefault(x => x.Name == name);
-        }
-
-        /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
             CheckDisposed();
@@ -252,17 +215,6 @@ namespace GraphQL.Types
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
             return _converters.FirstOrDefault(x => x.Matches(value, type));
-        }
-
-        /// <inheritdoc/>
-        public IGraphType FindType(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
-            }
-
-            return AllTypes[name];
         }
 
         /// <inheritdoc/>
@@ -297,7 +249,7 @@ namespace GraphQL.Types
             }
         }
 
-        private void CheckDisposed()
+        internal void CheckDisposed()
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(Schema));
@@ -354,77 +306,14 @@ namespace GraphQL.Types
             Validate();
         }
 
+        /// <summary>
+        /// Validates correctness of the created schema. This method is called only once - during schema initialization.
+        /// </summary>
         protected virtual void Validate()
         {
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
-            ValidateAppliedDirectives();
-        }
-
-        protected void ValidateAppliedDirectives()
-        {
-            ValidateAppliedDirectives(this);
-
-            foreach (var directive in Directives.List)
-            {
-                ValidateAppliedDirectives(directive);
-
-                if (directive.Arguments?.Count > 0)
-                {
-                    foreach (var argument in directive.Arguments.List)
-                        ValidateAppliedDirectives(argument);
-                }
-            }
-
-            foreach (var item in AllTypes.Dictionary)
-            {
-                ValidateAppliedDirectives(item.Value);
-
-                if (item.Value is IComplexGraphType complex)
-                {
-                    foreach (var field in complex.Fields.List)
-                    {
-                        ValidateAppliedDirectives(field);
-
-                        if (field.Arguments?.Count > 0)
-                        {
-                            foreach (var argument in field.Arguments.List)
-                                ValidateAppliedDirectives(argument);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ValidateAppliedDirectives(IProvideMetadata provider)
-        {
-            if (provider.HasAppliedDirectives())
-            {
-                foreach (var appliedDirective in provider.GetAppliedDirectives())
-                {
-                    var schemaDirective = Directives.Find(appliedDirective.Name);
-                    if (schemaDirective == null)
-                        throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}'.");
-
-                    if (schemaDirective.Arguments?.Count > 0)
-                    {
-                        foreach (var arg in schemaDirective.Arguments.List)
-                        {
-                            if (arg.DefaultValue == null && appliedDirective.Find(arg.Name) == null)
-                                throw new InvalidOperationException($"Directive '{appliedDirective.Name}' must specify required argument '{arg.Name}'.");
-                        }
-                    }
-
-                    if (appliedDirective.Arguments?.Count > 0)
-                    {
-                        foreach (var arg in appliedDirective.Arguments)
-                        {
-                            if (schemaDirective.Arguments.Find(arg.Name) == null)
-                                throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}'.");
-                        }
-                    }
-                }
-            }
+            this.Run(new AppliedDirectivesVisitor(this));
         }
     }
 }

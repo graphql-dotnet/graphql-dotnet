@@ -47,7 +47,7 @@ namespace GraphQL.Types
 
             if (type is NamedType named)
             {
-                return schema.FindType(named.Name);
+                return schema.AllTypes[named.Name];
             }
 
             return null;

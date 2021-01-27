@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Bugs
             : base(provider)
         {
             Query = query;
-            RegisterDirectives(new LinkDirective(), new SomeDirective());
+            Directives.Register(new LinkDirective(), new SomeDirective());
         }
     }
 
@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Bugs
 
     public class LinkDirective : DirectiveGraphType
     {
-        public LinkDirective() : base("link", new[] { DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface })
+        public LinkDirective() : base("link", DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface)
         {
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<UriGraphType>> { Name = "url" });
         }
@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Bugs
 
     public class SomeDirective : DirectiveGraphType
     {
-        public SomeDirective() : base("some", new[] { DirectiveLocation.Scalar })
+        public SomeDirective() : base("some", DirectiveLocation.Scalar)
         {
             Arguments = new QueryArguments(new QueryArgument<GuidGraphType> { Name = "one" }, new QueryArgument<BigIntGraphType> { Name = "two" }, new QueryArgument<TimeSpanSecondsGraphType> { Name = "three" });
         }

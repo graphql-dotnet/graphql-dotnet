@@ -853,6 +853,8 @@ type __Directive {
   onOperation: Boolean!
   onFragment: Boolean!
   onField: Boolean!
+  # Directives applied to the directive
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # Value of an argument provided to directive
@@ -912,6 +914,8 @@ type __EnumValue {
   description: String
   isDeprecated: Boolean!
   deprecationReason: String
+  # Directives applied to the enum value
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # Object and Interface types are described by a list of Fields, each of which has
@@ -924,7 +928,7 @@ type __Field {
   isDeprecated: Boolean!
   deprecationReason: String
   # Directives applied to the field
-  directives: [__AppliedDirective!]!
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # Arguments provided to Fields or Directives and the input fields of an
@@ -936,6 +940,8 @@ type __InputValue {
   type: __Type!
   # A GraphQL-formatted string representing the default value for this input value.
   defaultValue: String
+  # Directives applied to the input value
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all
@@ -953,6 +959,8 @@ type __Schema {
   subscriptionType: __Type
   # A list of all directives supported by this server.
   directives: [__Directive!]!
+  # Directives applied to the schema
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # The fundamental unit of any GraphQL Schema is the type. There are many kinds of
@@ -973,6 +981,8 @@ type __Type {
   enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
   inputFields: [__InputValue!]
   ofType: __Type
+  # Directives applied to the type
+  appliedDirectives: [__AppliedDirective!]!
 }
 
 # An enum describing what kind of type a given __Type is.

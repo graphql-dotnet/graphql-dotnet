@@ -10,7 +10,7 @@ namespace GraphQL.Types
     /// Represents a field of a graph type.
     /// </summary>
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class FieldType : MetadataProvider, IFieldType, IProvideResolvedType
+    public class FieldType : MetadataProvider, IFieldType
     {
         private object _defaultValue;
         private IValue _defaultValueAST;

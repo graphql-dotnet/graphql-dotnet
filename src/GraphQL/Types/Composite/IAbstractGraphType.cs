@@ -37,7 +37,7 @@ namespace GraphQL.Types
                 : GetTypeOf(abstractType, value);
 
             if (result is GraphQLTypeReference reference)
-                result = schema.FindType(reference.TypeName) as IObjectGraphType;
+                result = schema.AllTypes[reference.TypeName] as IObjectGraphType;
 
             return result;
         }

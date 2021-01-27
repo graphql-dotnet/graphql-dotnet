@@ -110,7 +110,7 @@ namespace GraphQL.Tests.Utilities
             schema.Initialize();
 
             // object type
-            var type = schema.FindType("TestType");
+            var type = schema.AllTypes["TestType"];
             type.ShouldNotBeNull();
             var objType = type.ShouldBeOfType<ObjectGraphType>();
             objType.Description.ShouldBe("type");
@@ -123,17 +123,17 @@ namespace GraphQL.Tests.Utilities
             arg.ShouldNotBeNull();
             arg.Description.ShouldBe("arg");
 
-            type = schema.FindType("TestInterface");
+            type = schema.AllTypes["TestInterface"];
             type.ShouldNotBeNull();
             var interfaceType = type.ShouldBeOfType<InterfaceGraphType>();
             interfaceType.Description.ShouldBe("interface");
 
-            type = schema.FindType("TestUnion");
+            type = schema.AllTypes["TestUnion"];
             type.ShouldNotBeNull();
             var unionType = type.ShouldBeOfType<UnionGraphType>();
             unionType.Description.ShouldBe("union");
 
-            type = schema.FindType("TestEnum");
+            type = schema.AllTypes["TestEnum"];
             type.ShouldNotBeNull();
             var enumType = type.ShouldBeOfType<EnumerationGraphType>();
             enumType.Description.ShouldBe("enum-definition");
@@ -142,7 +142,7 @@ namespace GraphQL.Tests.Utilities
             enumVal.ShouldNotBeNull();
             enumVal.Description.ShouldBe("enum-value");
 
-            type = schema.FindType("TestInputType");
+            type = schema.AllTypes["TestInputType"];
             type.ShouldNotBeNull();
             var inputType = type.ShouldBeOfType<InputObjectGraphType>();
             inputType.Description.ShouldBe("input-type");

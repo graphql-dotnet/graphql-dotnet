@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -81,32 +80,7 @@ namespace GraphQL.Introspection
 
             Field(f => f.DeprecationReason, nullable: true).Description(null);
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__AppliedDirective>>>>(
-                name: "directives",
-                description: "Directives applied to the field",
-                resolve: async context =>
-                {
-                    if (context.Source.HasAppliedDirectives())
-                    {
-                        var appliedDirectives = context.Source.GetAppliedDirectives();
-                        var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives.Count);
-
-                        int index = 0;
-                        foreach (var applied in appliedDirectives)
-                        {
-                            // return only registered directives allowed by filter
-                            var schemaDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == applied.Name);
-                            if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective))
-                            {
-                                result[index++] = applied;
-                            }
-                        }
-
-                        return result.Constrained(index);
-                    }
-
-                    return Array.Empty<AppliedDirective>();
-                });
+            this.AddAppliedDirectivesField("field");
         }
     }
 }

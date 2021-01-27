@@ -23,6 +23,8 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
             Field(f => f.DeprecationReason, nullable: true).Description(null);
+
+            this.AddAppliedDirectivesField("enum value");
         }
     }
 }
