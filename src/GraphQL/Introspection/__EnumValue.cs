@@ -18,11 +18,11 @@ namespace GraphQL.Introspection
                 "a placeholder for a string or numeric value. However an Enum value is " +
                 "returned in a JSON response as a string.";
 
-            Field(f => f.Name);
-            Field(f => f.Description, nullable: true);
+            Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source.Name);
+            Field<StringGraphType>("description", resolve: context => context.Source.Description);
 
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
-            Field(f => f.DeprecationReason, nullable: true);
+            Field<StringGraphType>("deprecationReason", resolve: context => context.Source.DeprecationReason);
         }
     }
 }

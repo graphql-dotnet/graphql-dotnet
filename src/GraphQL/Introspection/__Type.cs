@@ -19,14 +19,17 @@ namespace GraphQL.Introspection
             Description =
                 "The fundamental unit of any GraphQL Schema is the type. There are " +
                 "many kinds of types in GraphQL as represented by the `__TypeKind` enum." +
-                $"{Environment.NewLine}{Environment.NewLine}Depending on the kind of a type, certain fields describe " +
+               @"
+
+" +
+                "Depending on the kind of a type, certain fields describe " +
                 "information about that type. Scalar types provide no information " +
                 "beyond a name and description, while Enum types provide their values. " +
                 "Object and Interface types provide the fields they describe. Abstract " +
                 "types, Union and Interface, provide the Object types possible " +
                 "at runtime. List and NonNull types compose other types.";
 
-            Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
+            Field<NonNullGraphType<__TypeKind>>("kind", resolve: context =>
             {
                 return context.Source is IGraphType type
                     ? KindForInstance(type)
@@ -88,7 +91,7 @@ namespace GraphQL.Introspection
 
                     return interfaces.Constrained(index);
                 }
-                    
+
                 return null;
             });
 
@@ -115,13 +118,13 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
-                new QueryArguments(new QueryArgument<BooleanGraphType>
+            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues",
+                arguments: new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
                     DefaultValue = false
                 }),
-                async context =>
+                resolve: async context =>
                 {
                     if (context.Source is EnumerationGraphType type)
                     {

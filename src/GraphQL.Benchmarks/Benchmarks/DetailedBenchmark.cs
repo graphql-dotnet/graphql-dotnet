@@ -153,7 +153,11 @@ namespace GraphQL.Benchmarks
         [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
         public StageEnum Stage { get; set; }
 
-        void IBenchmark.RunProfiler() => throw new NotSupportedException();
+        void IBenchmark.RunProfiler()
+        {
+            Stage = StageEnum.Build;
+            Introspection();
+        }
 
         public enum StageEnum
         {
