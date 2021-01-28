@@ -51,7 +51,14 @@ namespace GraphQL.Introspection
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
+        /// <summary>
+        /// Cached <c>Task.FromResult(true)</c>.
+        /// </summary>
         protected static readonly Task<bool> Allowed = Task.FromResult(true);
+
+        /// <summary>
+        /// Cached <c>Task.FromResult(false)</c>.
+        /// </summary>
         protected static readonly Task<bool> Forbidden = Task.FromResult(false);
 
         /// <inheritdoc/>
