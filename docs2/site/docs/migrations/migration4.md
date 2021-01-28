@@ -10,7 +10,7 @@
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 * `ExecutionOptions.EnableMetrics` is disabled by default
 * `GlobalSwitches` - new global options for configuring GraphQL execution
-* Ability to apply directives to the schema elements and expose user-defined meta-information via introspection.
+* Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
   See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
 ## Breaking Changes

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -10,6 +11,20 @@ namespace GraphQL
     /// </summary>
     public static class SchemaExtensions
     {
+        /// <summary>
+        /// Enables some experimental features that are not in the official specification, i.e. ability to expose
+        /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
+        /// for more information.
+        /// </summary>
+        /// <param name="schema">The schema for which the features are enabled.</param>
+        /// <returns>Reference to the provided <paramref name="schema"/>.</returns>
+        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema)
+            where TSchema : Schema
+        {
+            schema.Filter = new ExperimentalFeaturesSchemaFilter();
+            return schema;
+        }
+
         /// <summary>
         /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IDocumentWriter"/>, and returns the result
         /// </summary>

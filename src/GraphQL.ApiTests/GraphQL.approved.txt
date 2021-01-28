@@ -344,6 +344,8 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
+        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema)
+            where TSchema : GraphQL.Types.Schema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void Run(this GraphQL.Types.Schema schema, GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
     }
@@ -1017,12 +1019,20 @@ namespace GraphQL.Introspection
     }
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
+        protected static readonly System.Threading.Tasks.Task<bool> _allowed;
+        protected static readonly System.Threading.Tasks.Task<bool> _forbidden;
         public DefaultSchemaFilter() { }
         public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument) { }
         public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive) { }
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
+    }
+    public class ExperimentalFeaturesSchemaFilter : GraphQL.Introspection.DefaultSchemaFilter
+    {
+        public ExperimentalFeaturesSchemaFilter() { }
+        public override System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
+        public override System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
     }
     public interface ISchemaComparer
     {

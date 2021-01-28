@@ -44,14 +44,15 @@ namespace GraphQL.Introspection
     }
 
     /// <summary>
-    /// The default schema filter. By default nothing is hidden. Please note that
-    /// some features that are not in the official specification may be hidden
-    /// by default. These features can be unlocked using your own filter.
+    /// The default schema filter. By default nothing is hidden. Please note
+    /// that some features that are not in the official specification may be
+    /// hidden by default. These features can be unlocked using special
+    /// <see cref="ExperimentalFeaturesSchemaFilter"/> filter.
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
-        private static readonly Task<bool> _allowed = Task.FromResult(true);
-        private static readonly Task<bool> _forbidden = Task.FromResult(false);
+        protected static readonly Task<bool> _allowed = Task.FromResult(true);
+        protected static readonly Task<bool> _forbidden = Task.FromResult(false);
 
         /// <inheritdoc/>
         public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? _forbidden : _allowed;
@@ -87,5 +88,20 @@ namespace GraphQL.Introspection
 
             return _allowed;
         }
+    }
+
+    /// <summary>
+    /// Schema filter that enables some experimental features that are not in the
+    /// official specification, i.e. ability to expose user-defined meta-information
+    /// via introspection. See https://github.com/graphql/graphql-spec/issues/300
+    /// for more information.
+    /// </summary>
+    public class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
+    {
+        /// <inheritdoc/>
+        public override Task<bool> AllowType(IGraphType type) => _allowed;
+
+        /// <inheritdoc/>
+        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => _allowed;
     }
 }
