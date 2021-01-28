@@ -15,6 +15,9 @@ namespace GraphQL.Types
     /// </summary>
     public interface ISchema : IProvideMetadata
     {
+        /// <inheritdoc cref="ExperimentalFeatures"/>
+        ExperimentalFeatures Features { get; set; }
+
         /// <summary>
         /// Returns true once the schema has been initialized.
         /// </summary>
@@ -151,5 +154,18 @@ namespace GraphQL.Types
         /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
+    }
+
+    /// <summary>
+    /// Options for configuring experimental features.
+    /// </summary>
+    public class ExperimentalFeatures
+    {
+        /// <summary>
+        /// Enables ability to expose user-defined meta-information via introspection.
+        /// See https://github.com/graphql/graphql-spec/issues/300 for more information.
+        /// It is experimental feature that are not in the official specification (yet).
+        /// </summary>
+        public bool AppliedDirectives { get; set; } = false;
     }
 }

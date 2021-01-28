@@ -119,6 +119,11 @@ namespace GraphQL
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
         public string Query { get; set; }
     }
+    public enum ExperimentalIntrospectionFeaturesMode
+    {
+        ExecutionOnly = 0,
+        IntrospectionAndExecution = 1,
+    }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
         public FuncServiceProvider(System.Func<System.Type, object> resolver) { }
@@ -340,7 +345,7 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
-        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.Introspection.ExperimentalIntrospectionFeaturesMode mode = 0)
+        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.Schema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void Run(this GraphQL.Types.Schema schema, GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
@@ -1025,17 +1030,11 @@ namespace GraphQL.Introspection
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
     }
-    public class ExperimentalFeaturesSchemaFilter : GraphQL.Introspection.DefaultSchemaFilter
+    public class ExperimentalIntrospectionFeaturesSchemaFilter : GraphQL.Introspection.DefaultSchemaFilter
     {
-        public ExperimentalFeaturesSchemaFilter() { }
-        public GraphQL.Introspection.ExperimentalIntrospectionFeaturesMode Mode { get; set; }
+        public ExperimentalIntrospectionFeaturesSchemaFilter() { }
         public override System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public override System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
-    }
-    public enum ExperimentalIntrospectionFeaturesMode
-    {
-        ExecutionOnly = 0,
-        IntrospectionAndExecution = 1,
     }
     public interface ISchemaComparer
     {
@@ -1881,6 +1880,11 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
+    public class ExperimentalFeatures
+    {
+        public ExperimentalFeatures() { }
+        public bool AppliedDirectives { get; set; }
+    }
     public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
@@ -1993,6 +1997,7 @@ namespace GraphQL.Types
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
+        GraphQL.Types.ExperimentalFeatures Features { get; set; }
         GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
@@ -2162,6 +2167,7 @@ namespace GraphQL.Types
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
+        public GraphQL.Types.ExperimentalFeatures Features { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }

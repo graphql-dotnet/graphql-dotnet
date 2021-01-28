@@ -160,7 +160,7 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             ISchema schema)
         {
-            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Filter is ExperimentalFeaturesSchemaFilter);
+            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives);
 
             var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {

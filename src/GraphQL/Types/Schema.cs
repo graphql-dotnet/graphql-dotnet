@@ -58,6 +58,9 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
+        public ExperimentalFeatures Features { get; set; } = new ExperimentalFeatures();
+
+        /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         /// <inheritdoc/>
@@ -313,7 +316,7 @@ namespace GraphQL.Types
         {
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
-            if (Filter is ExperimentalFeaturesSchemaFilter)
+            if (Features.AppliedDirectives)
                 this.Run(new AppliedDirectivesVisitor(this));
         }
     }

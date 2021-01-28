@@ -22,7 +22,13 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, ExperimentalIntrospectionFeaturesMode mode = ExperimentalIntrospectionFeaturesMode.ExecutionOnly)
             where TSchema : Schema
         {
-            schema.Filter = new ExperimentalFeaturesSchemaFilter { Mode = mode };
+            if (schema.Initialized)
+                throw new InvalidOperationException("Schema is already initialized");
+
+            schema.Features.AppliedDirectives = true;
+            if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
+                schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();
+
             return schema;
         }
 
@@ -110,5 +116,30 @@ namespace GraphQL
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// A way to use experimental features.
+    /// </summary>
+    public enum ExperimentalIntrospectionFeaturesMode
+    {
+        /// <summary>
+        /// Allow experimental features only for client queries but not for standard introspection
+        /// request. This means that the client, in response to a standard introspection request,
+        /// receives a standard response without all the new fields and types. However, client CAN
+        /// make requests to the server using the new fields and types. This mode is needed in order
+        /// to bypass the problem of tools such as GraphQL Playground, Voyager, GraphiQL that require
+        /// a standard response to an introspection request and refuse to work correctly if receive
+        /// unknown fields or types in the response.
+        /// </summary>
+        ExecutionOnly,
+
+        /// <summary>
+        /// Allow experimental features for both standard introspection query and client queries.
+        /// This means that the client, in response to a standard introspection request, receives
+        /// a response augmented with the new fields and types. Client can make requests to the
+        /// server using the new fields and types.
+        /// </summary>
+        IntrospectionAndExecution
     }
 }
