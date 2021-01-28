@@ -31,5 +31,20 @@ namespace GraphQL.Utilities
 
         /// <inheritdoc />
         public bool HasMetadata(string key) => _metadata?.ContainsKey(key) ?? false;
+
+        /// <summary>
+        /// Copies metadata to the specified target.
+        /// </summary>
+        /// <param name="target">Target for copying metadata.</param>
+        public void CopyMetadataTo(IProvideMetadata target)
+        {
+            var local = _metadata;
+            if (local?.Count > 0)
+            {
+                var to = target.Metadata;
+                foreach (var kv in local)
+                    to[kv.Key] = kv.Value;
+            }
+        }
     }
 }

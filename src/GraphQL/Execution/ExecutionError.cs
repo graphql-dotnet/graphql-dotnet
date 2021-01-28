@@ -13,8 +13,6 @@ namespace GraphQL
     [Serializable]
     public class ExecutionError : Exception
     {
-        private List<ErrorLocation> _errorLocations;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message.
         /// </summary>
@@ -47,7 +45,7 @@ namespace GraphQL
         /// <summary>
         /// Returns a list of locations within the document that this error applies to.
         /// </summary>
-        public IEnumerable<ErrorLocation> Locations => _errorLocations;
+        public List<ErrorLocation> Locations { get; private set; }
 
         /// <summary>
         /// Gets or sets a code for this error.
@@ -64,12 +62,7 @@ namespace GraphQL
         /// </summary>
         public void AddLocation(int line, int column)
         {
-            if (_errorLocations == null)
-            {
-                _errorLocations = new List<ErrorLocation>();
-            }
-
-            _errorLocations.Add(new ErrorLocation(line, column));
+            (Locations ??= new List<ErrorLocation>()).Add(new ErrorLocation(line, column));
         }
 
         private void SetCode(Exception exception)

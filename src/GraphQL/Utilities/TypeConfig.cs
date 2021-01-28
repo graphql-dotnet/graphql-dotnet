@@ -48,7 +48,12 @@ namespace GraphQL.Utilities
             if (Type != null && config.ResolverAccessor != null)
             {
                 config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
-                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
+                if (attrs != null)
+                {
+                    foreach (var a in attrs)
+                        a.Modify(config);
+                }
             }
 
             return config;
@@ -63,7 +68,12 @@ namespace GraphQL.Utilities
             if (Type != null && config.ResolverAccessor != null && config.SubscriberAccessor != null)
             {
                 config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
-                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
+                if (attrs != null)
+                {
+                    foreach (var a in attrs)
+                        a.Modify(config);
+                }
 
                 if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                 {

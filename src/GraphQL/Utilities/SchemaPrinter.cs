@@ -364,7 +364,7 @@ namespace GraphQL.Utilities
 
             var desc = !string.IsNullOrWhiteSpace(indentation) && !firstInBlock ? Environment.NewLine : "";
 
-            lines.Apply(line =>
+            foreach (var line in lines)
             {
                 if (line == "")
                 {
@@ -375,9 +375,10 @@ namespace GraphQL.Utilities
                     // For > 120 character long lines, cut at space boundaries into sublines
                     // of ~80 chars.
                     var sublines = BreakLine(line, 120 - indentation.Length);
-                    sublines.Apply(sub => desc += $"{indentation}# {sub}{Environment.NewLine}");
+                    foreach (string sub in sublines)
+                        desc += $"{indentation}# {sub}{Environment.NewLine}";
                 }
-            });
+            }
 
             return desc;
         }

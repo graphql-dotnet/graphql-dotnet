@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
 {
     public class SchemaBuilder
     {
-        protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
         private GraphQLSchemaDefinition _schemaDef;
 
@@ -52,13 +52,11 @@ namespace GraphQL.Utilities
 
         public void RegisterTypes(IEnumerable<IGraphType> types)
         {
-            types.Apply(t => _types[t.Name] = t);
+            foreach (var t in types)
+                _types[t.Name] = t;
         }
 
-        public virtual ISchema Build(string[] typeDefinitions)
-        {
-            return Build(string.Join(Environment.NewLine, typeDefinitions));
-        }
+        public virtual ISchema Build(string[] typeDefinitions) => Build(string.Join(Environment.NewLine, typeDefinitions));
 
         public virtual ISchema Build(string typeDefinitions)
         {
@@ -190,8 +188,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 schema.Subscription = GetType("Subscription") as IObjectGraphType;
             }
 
-            var typeList = _types.Values.ToArray();
-            typeList.Apply(schema.RegisterType);
+            foreach (var type in _types)
+                schema.RegisterType(type.Value);
             schema.RegisterDirectives(directives);
 
             return schema;
@@ -237,7 +235,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
-            CopyMetadata(type, typeConfig);
+            typeConfig.CopyMetadataTo(type);
 
             Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
             if (IsSubscriptionType(type))
@@ -251,15 +249,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (astType.Fields != null)
             {
-                var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
-                fields.Apply(f => type.AddField(f));
+                foreach (var f in astType.Fields)
+                    type.AddField(constructFieldType(type.Name, f));
             }
 
             if (astType.Interfaces != null)
             {
-                astType.Interfaces
-                    .Select(i => new GraphQLTypeReference((string)i.Name.Value))
-                    .Apply(type.AddResolvedInterface);
+                foreach (var i in astType.Interfaces)
+                    type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name.Value));
             }
 
             if (isExtensionType)
@@ -290,7 +287,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Resolver = fieldConfig.Resolver
             };
 
-            CopyMetadata(field, fieldConfig);
+            fieldConfig.CopyMetadataTo(field);
 
             field.Arguments = ToQueryArguments(fieldDef.Arguments);
             field.DeprecationReason = fieldConfig.DeprecationReason;
@@ -319,7 +316,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 DeprecationReason = fieldConfig.DeprecationReason
             };
 
-            CopyMetadata(field, fieldConfig);
+            fieldConfig.CopyMetadataTo(field);
 
             field.Arguments = ToQueryArguments(fieldDef.Arguments);
 
@@ -363,12 +360,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             VisitNode(type, v => v.VisitInterface(type));
 
-            CopyMetadata(type, typeConfig);
+            typeConfig.CopyMetadataTo(type);
 
             if (interfaceDef.Fields != null)
             {
-                var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
-                fields.Apply(f => type.AddField(f));
+                foreach (var f in interfaceDef.Fields)
+                    type.AddField(ToFieldType(type.Name, f));
             }
 
             return type;
@@ -388,14 +385,17 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             VisitNode(type, v => v.VisitUnion(type));
 
-            CopyMetadata(type, typeConfig);
+            typeConfig.CopyMetadataTo(type);
 
-            var possibleTypes = unionDef.Types.Select(x =>
+            if (unionDef.Types?.Count > 0) // just in case
             {
-                var name = (string)x.Name.Value;
-                return GetType(name) ?? new GraphQLTypeReference(name);
-            });
-            possibleTypes.Apply(x => type.AddPossibleType(x as IObjectGraphType));
+                foreach (var x in unionDef.Types)
+                {
+                    string n = (string)x.Name.Value;
+                    type.AddPossibleType((GetType(n) ?? new GraphQLTypeReference(n)) as IObjectGraphType);
+                }
+            }
+
             return type;
         }
 
@@ -412,12 +412,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             VisitNode(type, v => v.VisitInputObject(type));
 
-            CopyMetadata(type, typeConfig);
+            typeConfig.CopyMetadataTo(type);
 
             if (inputDef.Fields != null)
             {
-                var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
-                fields.Apply(f => type.AddField(f));
+                foreach (var f in inputDef.Fields)
+                    type.AddField(ToFieldType(type.Name, f));
             }
 
             return type;
@@ -436,8 +436,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             VisitNode(type, v => v.VisitEnum(type));
 
-            var values = enumDef.Values.Select(ToEnumValue);
-            values.Apply(type.AddValue);
+            if (enumDef.Values?.Count > 0) // just in case
+            {
+                foreach (var value in enumDef.Values)
+                    type.AddValue(ToEnumValue(value));
+            }
+
             return type;
         }
 
@@ -521,11 +525,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 default:
                     throw new ArgumentOutOfRangeException($"Unknown GraphQL type {astType.Kind}");
             }
-        }
-
-        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
-        {
-            source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
         }
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
@@ -663,7 +662,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
                     if (obj.Fields != null)
-                        obj.Fields.Apply(f => values[(string)f.Name.Value] = ToValue(f.Value));
+                        foreach (var f in obj.Fields)
+                            values[(string)f.Name.Value] = ToValue(f.Value);
                     return values;
                 }
                 case ASTNodeKind.ListValue:

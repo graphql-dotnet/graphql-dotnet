@@ -59,7 +59,8 @@ namespace GraphQL.StarWars
             var lookup = character.Friends;
             if (lookup != null)
             {
-                _characters.Where(h => lookup.Contains(h.Id)).Apply(friends.Add);
+                foreach (var c in _characters.Where(h => lookup.Contains(h.Id)))
+                    friends.Add(c);
             }
             return friends;
         }

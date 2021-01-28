@@ -462,7 +462,7 @@ namespace GraphQL.Utilities
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.FieldsList.Apply(f =>
+                foreach (var f in config.FieldsList)
                 {
                     var ctx = new ResolveValueContext(node);
 
@@ -477,7 +477,7 @@ namespace GraphQL.Utilities
                     }
 
                     vals[f.Name] = result;
-                });
+                }
 
                 return config.PrintAst(vals);
             }
