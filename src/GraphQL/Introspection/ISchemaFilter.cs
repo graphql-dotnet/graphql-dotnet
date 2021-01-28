@@ -73,6 +73,7 @@ namespace GraphQL.Introspection
         /// <inheritdoc/>
         public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => Allowed;
 
+        /// <inheritdoc/>
         public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
         {
             if (directive.Introspectable.HasValue)
