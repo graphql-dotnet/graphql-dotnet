@@ -16,8 +16,6 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => List.Count;
 
-        internal void Clear() => List.Clear();
-
         internal void Add(DirectiveGraphType directive)
         {
             if (directive == null)

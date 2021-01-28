@@ -274,5 +274,4 @@ namespace GraphQL.Benchmarks
             }
         }
     }
-
 }

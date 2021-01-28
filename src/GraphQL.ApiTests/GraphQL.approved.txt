@@ -1732,6 +1732,7 @@ namespace GraphQL.Types
         public static readonly GraphQL.Types.GraphQLDeprecatedDirective Deprecated;
         public static readonly GraphQL.Types.IncludeDirective Include;
         public static readonly GraphQL.Types.SkipDirective Skip;
+        public DirectiveGraphType(string name, params GraphQL.Types.DirectiveLocation[] locations) { }
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public string Description { get; set; }

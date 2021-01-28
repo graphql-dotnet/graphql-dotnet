@@ -354,7 +354,6 @@ namespace GraphQL.Tests.StarWars
               ""__schema"": {
                 ""queryType"": {
                   ""fields"": [
-                    
                     {
                       ""name"": ""hero"",
                       ""args"": []

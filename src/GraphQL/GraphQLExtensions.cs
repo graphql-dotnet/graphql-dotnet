@@ -17,6 +17,11 @@ namespace GraphQL
     public static class GraphQLExtensions
     {
         /// <summary>
+        /// Determines if this graph type is an introspection type.
+        /// </summary>
+        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__") ?? false;
+
+        /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
         /// </summary>
         public static bool IsCompositeType(this IGraphType type)
