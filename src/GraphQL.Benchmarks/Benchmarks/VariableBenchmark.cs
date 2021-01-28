@@ -153,8 +153,8 @@ namespace GraphQL.Benchmarks
             public MyInputObjectGraphType()
             {
                 Name = "MyInputObject";
-                Field(x => x.Ints, type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>));
-                Field(x => x.Widgets, type: typeof(NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>));
+                Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ints", resolve: context => context.Source.Ints);
+                Field<NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>>("widgets", resolve: context => context.Source.Widgets);
             }
         }
 
@@ -163,10 +163,10 @@ namespace GraphQL.Benchmarks
             public MySubInputObjectGraphType()
             {
                 Name = "MySubInputObject";
-                Field(x => x.Name);
-                Field(x => x.Description, true);
-                Field(x => x.Amount);
-                Field(x => x.Quantity);
+                Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source.Name);
+                Field<StringGraphType>("description", resolve: context => context.Source.Description);
+                Field<NonNullGraphType<FloatGraphType>>("amount", resolve: context => context.Source.Amount);
+                Field<NonNullGraphType<IntGraphType>>("quantity", resolve: context => context.Source.Quantity);
             }
         }
     }

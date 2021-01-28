@@ -9,8 +9,8 @@ namespace GraphQL.StarWars.Types
         {
             Name = "Character";
 
-            Field(d => d.Id).Description("The id of the character.");
-            Field(d => d.Name, nullable: true).Description("The name of the character.");
+            Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.", resolve: context => context.Source.Id);
+            Field<StringGraphType>("name", "The name of the character.", resolve: context => context.Source.Name);
 
             Field<ListGraphType<CharacterInterface>>("friends");
             Field<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>("friendsConnection");
