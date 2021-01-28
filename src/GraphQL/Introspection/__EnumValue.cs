@@ -10,12 +10,8 @@ namespace GraphQL.Introspection
         /// <summary>
         /// Initializes a new instance of the <c>__EnumValue</c> introspection type.
         /// </summary>
-        public __EnumValue()
-            : this(false)
-        {
-        }
-
-        internal __EnumValue(bool allowAppliedDirectives)
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __EnumValue(bool allowAppliedDirectives = false)
         {
             Name = nameof(__EnumValue);
             Description =

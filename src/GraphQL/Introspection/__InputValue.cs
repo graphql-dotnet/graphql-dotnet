@@ -11,12 +11,8 @@ namespace GraphQL.Introspection
         /// <summary>
         /// Initializes a new instance of the <c>__InputValue</c> introspection type.
         /// </summary>
-        public __InputValue()
-            : this(false)
-        {
-        }
-
-        internal __InputValue(bool allowAppliedDirectives)
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __InputValue(bool allowAppliedDirectives = false)
         {
             Name = nameof(__InputValue);
 

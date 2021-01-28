@@ -1091,7 +1091,7 @@ namespace GraphQL.Introspection
     }
     public class @__Directive : GraphQL.Types.ObjectGraphType<GraphQL.Types.DirectiveGraphType>
     {
-        public @__Directive() { }
+        public @__Directive(bool allowAppliedDirectives = false) { }
     }
     public class @__DirectiveArgument : GraphQL.Types.ObjectGraphType<GraphQL.Types.DirectiveArgument>
     {
@@ -1103,23 +1103,23 @@ namespace GraphQL.Introspection
     }
     public class @__EnumValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.EnumValueDefinition>
     {
-        public @__EnumValue() { }
+        public @__EnumValue(bool allowAppliedDirectives = false) { }
     }
     public class @__Field : GraphQL.Types.ObjectGraphType<GraphQL.Types.IFieldType>
     {
-        public @__Field() { }
+        public @__Field(bool allowAppliedDirectives = false) { }
     }
     public class @__InputValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.IProvideMetadata>
     {
-        public @__InputValue() { }
+        public @__InputValue(bool allowAppliedDirectives = false) { }
     }
     public class @__Schema : GraphQL.Types.ObjectGraphType<GraphQL.Types.ISchema>
     {
-        public @__Schema() { }
+        public @__Schema(bool allowAppliedDirectives = false) { }
     }
     public class @__Type : GraphQL.Types.ObjectGraphType<GraphQL.Types.IGraphType>
     {
-        public @__Type() { }
+        public @__Type(bool allowAppliedDirectives = false) { }
     }
     public class @__TypeKind : GraphQL.Types.EnumerationGraphType<GraphQL.Introspection.TypeKind>
     {

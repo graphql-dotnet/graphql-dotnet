@@ -117,12 +117,12 @@ namespace GraphQL.Types
                     //new __DirectiveArgument(), forbidden
                     //new __AppliedDirective(),  forbidden
                     new __TypeKind(),
-                    new __EnumValue(),
-                    new __Directive(),
-                    new __Field(),
-                    new __InputValue(),
-                    new __Type(),
-                    new __Schema()
+                    new __EnumValue(false),
+                    new __Directive(false),
+                    new __Field(false),
+                    new __InputValue(false),
+                    new __Type(false),
+                    new __Schema(false)
                 })
             .ToDictionary(t => t.GetType());
         }

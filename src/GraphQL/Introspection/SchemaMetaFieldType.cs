@@ -29,12 +29,8 @@ namespace GraphQL.Introspection
         /// <summary>
         /// Initializes a new instance of the <c>__Schema</c> introspection type.
         /// </summary>
-        public __Schema()
-            : this(false)
-        {
-        }
-
-        internal __Schema(bool allowAppliedDirectives)
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __Schema(bool allowAppliedDirectives = false)
         {
             Name = "__Schema";
 
