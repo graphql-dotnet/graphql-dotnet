@@ -99,11 +99,30 @@ namespace GraphQL.Types
         /// <param name="locations">A list of locations where the directive can be applied.</param>
         public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
         {
+            if (locations == null)
+                throw new ArgumentNullException(nameof(locations));
+
             Name = name;
             Locations.AddRange(locations);
 
             if (Locations.Count == 0)
                 throw new ArgumentException("Directive must have locations", nameof(locations));
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="name">The directive name within the GraphQL schema.</param>
+        /// <param name="locations">A list of locations where the directive can be applied.</param>
+        public DirectiveGraphType(string name, params DirectiveLocation[] locations)
+        {
+            if (locations == null)
+                throw new ArgumentNullException(nameof(locations));
+            if (locations.Length == 0)
+                throw new ArgumentException("Directive must have locations", nameof(locations));
+
+            Name = name;
+            Locations.AddRange(locations);
         }
 
         /// <inheritdoc/>
@@ -134,12 +153,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'include' directive.
         /// </summary>
         public IncludeDirective()
-            : base("include", new[]
-            {
-                DirectiveLocation.Field,
-                DirectiveLocation.FragmentSpread,
-                DirectiveLocation.InlineFragment
-            })
+           : base("include", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
         {
             Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
@@ -159,12 +173,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'skip' directive.
         /// </summary>
         public SkipDirective()
-            : base("skip", new[]
-            {
-                DirectiveLocation.Field,
-                DirectiveLocation.FragmentSpread,
-                DirectiveLocation.InlineFragment
-            })
+           : base("skip", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
         {
             Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
@@ -184,11 +193,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'deprecated' directive.
         /// </summary>
         public GraphQLDeprecatedDirective()
-            : base("deprecated", new[]
-            {
-                DirectiveLocation.FieldDefinition,
-                DirectiveLocation.EnumValue
-            })
+            : base("deprecated", DirectiveLocation.FieldDefinition, DirectiveLocation.EnumValue)
         {
             Description = "Marks an element of a GraphQL schema as no longer supported.";
             Arguments = new QueryArguments(new QueryArgument<StringGraphType>

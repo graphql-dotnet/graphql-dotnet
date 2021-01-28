@@ -286,7 +286,7 @@ namespace GraphQL.Types
 
                     _additionalInstances.Clear();
                     _additionalTypes.Clear();
-                    Directives.Clear();
+                    Directives.List.Clear();
                     _converters.Clear();
 
                     _allTypes?.Dictionary.Clear();

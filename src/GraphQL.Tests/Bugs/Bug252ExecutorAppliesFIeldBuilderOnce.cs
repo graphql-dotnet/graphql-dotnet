@@ -41,6 +41,7 @@ namespace GraphQL.Tests.Bugs
 
             mockMiddleware.AppliedCount.ShouldBe(0);
         }
+
         [Fact]
         public void apply_to_called_once()
         {

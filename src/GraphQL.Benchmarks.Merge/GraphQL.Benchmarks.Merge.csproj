@@ -1,20 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Version>1.0.0</Version>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>net5</TargetFramework>
     <IsPackable>false</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Title>.NET Core Global Tool for merging and comparing BenchmarkDotNet results obtained before and after improvements</Title>
     <Description>
       1. Setup your local nuget source (some local directory).
-      2. Set IsPackable and GeneratePackageOnBuild to true.
+      2. Set IsPackable and GeneratePackageOnBuild properties above to true.
       3. Build project.
-      4. Copy obtained nupkg into directory from step 1.
+      4. Copy obtained nupkg file into directory from step 1.
       5. Run command: dotnet tool install -g dotnet-merge
                   or: dotnet tool update -g dotnet-merge
-      6. Now you can just run 'merge' being in the directory with before.md and after.md files. Command will generate diff.md file.
+      6. Now you can just run 'merge' being in the directory with before.md and after.md files with BenchmarkDotNet results.
+         Command will generate easy to read diff.md file.
     </Description>
     <Description>$(Title)</Description>
     <PackAsTool>true</PackAsTool>

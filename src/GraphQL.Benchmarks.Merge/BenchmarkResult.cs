@@ -14,12 +14,10 @@ namespace GraphQL.Benchmarks.Merge
             int i = 0;
             for (; i < lines.Length; ++i)
             {
-                result.Header.Add(lines[i]);
-                if (lines[i] == "```")
+                if (lines[i].StartsWith('|'))
                     break;
+                result.Header.Add(lines[i]);
             }
-
-            ++i;
 
             result.Table = Table.Parse(lines, i);
             return result;

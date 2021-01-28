@@ -14,7 +14,7 @@ namespace GraphQL.Utilities
             return (TType)GetArgument(typeof(TType), name, defaultValue);
         }
 
-        public object GetArgument(Type argumentType, string name, object defaultValue = null)
+        public object GetArgument(Type argumentType, string name, object defaultValue = null) //TODO: rewrite
         {
             if (Arguments == null || !Arguments.TryGetValue(name, out var arg))
             {
@@ -24,7 +24,7 @@ namespace GraphQL.Utilities
             if (arg is IDictionary<string, object> inputObject)
             {
                 var type = argumentType;
-                if (type.Namespace?.StartsWith("System", StringComparison.InvariantCulture) == true)
+                if (type.Namespace?.StartsWith("System", StringComparison.InvariantCulture) == true) //TODO: rewrite
                 {
                     return arg;
                 }

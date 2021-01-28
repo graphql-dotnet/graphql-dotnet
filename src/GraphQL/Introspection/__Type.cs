@@ -45,13 +45,12 @@ namespace GraphQL.Introspection
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
-                        DefaultValue = false
+                        DefaultValue = BoolBox.False
                     }),
                 async context =>
                 {
-                    if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
+                    if (context.Source is IComplexGraphType type)
                     {
-                        var type = (IComplexGraphType)context.Source;
                         var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
@@ -122,7 +121,7 @@ namespace GraphQL.Introspection
                 arguments: new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
-                    DefaultValue = false
+                    DefaultValue = BoolBox.False
                 }),
                 resolve: async context =>
                 {
