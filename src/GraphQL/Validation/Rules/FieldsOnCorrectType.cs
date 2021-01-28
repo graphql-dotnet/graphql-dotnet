@@ -65,25 +65,23 @@ namespace GraphQL.Validation.Rules
                 var suggestedObjectTypes = new List<string>();
                 var interfaceUsageCount = new Dictionary<string, int>();
 
-                absType.PossibleTypes.Apply(possibleType =>
+                foreach (var possibleType in absType.PossibleTypes.List)
                 {
-                    if (!possibleType.HasField(fieldName))
+                    if (possibleType.HasField(fieldName))
                     {
-                        return;
-                    }
+                        // This object defines this field.
+                        suggestedObjectTypes.Add(possibleType.Name);
 
-                    // This object defines this field.
-                    suggestedObjectTypes.Add(possibleType.Name);
-
-                    possibleType.ResolvedInterfaces.List.Apply(possibleInterface =>
-                    {
-                        if (possibleInterface.HasField(fieldName))
+                        foreach (var possibleInterface in possibleType.ResolvedInterfaces.List)
                         {
-                            // This interface type defines this field.
-                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
+                            if (possibleInterface.HasField(fieldName))
+                            {
+                                // This interface type defines this field.
+                                interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
+                            }
                         }
-                    });
-                });
+                    }
+                }
 
                 var suggestedInterfaceTypes = interfaceUsageCount.Keys.OrderBy(x => interfaceUsageCount[x]);
                 return suggestedInterfaceTypes.Concat(suggestedObjectTypes);

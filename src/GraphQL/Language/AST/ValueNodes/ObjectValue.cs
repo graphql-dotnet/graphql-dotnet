@@ -26,20 +26,6 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
-        /// Returns a <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see>
-        /// containing the values of the field nodes that this object value node contains.
-        /// </summary>
-        public object Value
-        {
-            get
-            {
-                var obj = new Dictionary<string, object>();
-                FieldNames.Apply(name => obj.Add(name, Field(name).Value.Value));
-                return obj;
-            }
-        }
-
-        /// <summary>
         /// Returns the field value nodes that are contained within this object value node.
         /// </summary>
         public IEnumerable<ObjectField> ObjectFields => ObjectFieldsList;
@@ -57,6 +43,21 @@ namespace GraphQL.Language.AST
                 foreach (var item in ObjectFieldsList)
                     list.Add(item.Name);
                 return list;
+            }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see>
+        /// containing the values of the field nodes that this object value node contains.
+        /// </summary>
+        public object Value
+        {
+            get
+            {
+                var obj = new Dictionary<string, object>(ObjectFieldsList.Count);
+                foreach (var item in ObjectFieldsList)
+                    obj.Add(item.Name, Field(item.Name).Value.Value);
+                return obj;
             }
         }
 

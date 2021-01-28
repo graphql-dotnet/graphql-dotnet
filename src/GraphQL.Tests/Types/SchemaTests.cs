@@ -147,20 +147,20 @@ namespace GraphQL.Tests.Types
 
         private void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
-            typeNames.Apply(typeName =>
+            foreach (var typeName in typeNames)
             {
                 var type = schema.FindType(typeName);
                 type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
-            });
+            }
         }
 
         private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
         {
-            typeNames.Apply(typeName =>
+            foreach (var typeName in typeNames)
             {
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
                 type.ShouldBe(null, $"Found {typeName} in type lookup.");
-            });
+            }
         }
 
         [Fact]

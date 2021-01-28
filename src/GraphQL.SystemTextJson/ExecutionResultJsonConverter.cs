@@ -157,7 +157,7 @@ namespace GraphQL.SystemTextJson
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    foreach (var location in error.Locations)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -165,7 +165,7 @@ namespace GraphQL.SystemTextJson
                         writer.WritePropertyName("column");
                         JsonSerializer.Serialize(writer, location.Column, options);
                         writer.WriteEndObject();
-                    });
+                    }
                     writer.WriteEndArray();
                 }
 

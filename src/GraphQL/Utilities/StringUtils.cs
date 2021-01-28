@@ -35,7 +35,7 @@ namespace GraphQL.Utilities
 
             var optionsByDistance = new Dictionary<string, int>();
             var inputThreshold = input.Length / 2;
-            options?.Apply(t =>
+            foreach (string t in options)
             {
                 var distance = DamerauLevenshteinDistance(input, t, inputThreshold);
                 var threshold = Math.Max(inputThreshold, Math.Max(t.Length / 2, 1));
@@ -43,7 +43,7 @@ namespace GraphQL.Utilities
                 {
                     optionsByDistance[t] = distance;
                 }
-            });
+            }
 
             return optionsByDistance.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
         }
