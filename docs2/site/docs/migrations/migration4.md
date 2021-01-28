@@ -90,3 +90,4 @@
   so it is safe to preserve these instances without calling `.Copy()`.
 * `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
 * `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`, and is not thread safe anymore
+* By default, descriptions for fields, types, enums, and so on are not pulled from xml comments unless the corresponding global flag is enabled.
