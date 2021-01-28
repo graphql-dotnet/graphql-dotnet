@@ -50,11 +50,6 @@ namespace GraphQL
     {
         public static System.Threading.Tasks.Task<string> WriteToStringAsync<T>(this GraphQL.IDocumentWriter writer, T value) { }
     }
-    public static class EnumerableExtensions
-    {
-        public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
-        public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
-    }
     public readonly struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
         public ErrorLocation(int line, int column) { }
@@ -73,7 +68,7 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception exception) { }
         public string Code { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
+        public System.Collections.Generic.List<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public void AddLocation(int line, int column) { }
     }
@@ -133,6 +128,7 @@ namespace GraphQL
     {
         public static System.Action<string, string> Validation;
         public static System.Action<string, string> ValidationOnSchemaInitialize;
+        public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
@@ -358,6 +354,7 @@ namespace GraphQL
     }
     public static class TypeExtensions
     {
+        public static object DefaultValue(this System.Reflection.MemberInfo memberInfo) { }
         public static string Description(this System.Reflection.MemberInfo memberInfo) { }
         public static System.Type GetEnumerableElementType(this System.Type type) { }
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false) { }
@@ -1019,8 +1016,8 @@ namespace GraphQL.Introspection
     }
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
-        protected static readonly System.Threading.Tasks.Task<bool> _allowed;
-        protected static readonly System.Threading.Tasks.Task<bool> _forbidden;
+        protected static readonly System.Threading.Tasks.Task<bool> Allowed;
+        protected static readonly System.Threading.Tasks.Task<bool> Forbidden;
         public DefaultSchemaFilter() { }
         public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument) { }
         public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive) { }
@@ -2457,6 +2454,7 @@ namespace GraphQL.Utilities
     {
         public MetadataProvider() { }
         public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
+        public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
         public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
@@ -2483,7 +2481,7 @@ namespace GraphQL.Utilities
     }
     public class SchemaBuilder
     {
-        protected readonly System.Collections.Generic.IDictionary<string, GraphQL.Types.IGraphType> _types;
+        protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
         public System.Collections.Generic.Dictionary<string, System.Type> Directives { get; }
         public bool IgnoreComments { get; set; }
@@ -2491,7 +2489,6 @@ namespace GraphQL.Utilities
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.ISchema Build(string[] typeDefinitions) { }
         public virtual GraphQL.Types.ISchema Build(string typeDefinitions) { }
-        protected virtual void CopyMetadata(GraphQL.Types.IProvideMetadata target, GraphQL.Types.IProvideMetadata source) { }
         protected virtual GraphQL.Types.IGraphType GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         public GraphQL.Utilities.SchemaBuilder RegisterDirectiveVisitor<T>(string name)

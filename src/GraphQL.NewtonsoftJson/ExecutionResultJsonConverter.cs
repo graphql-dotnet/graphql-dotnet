@@ -66,7 +66,7 @@ namespace GraphQL.NewtonsoftJson
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    foreach (var location in error.Locations)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -74,7 +74,7 @@ namespace GraphQL.NewtonsoftJson
                         writer.WritePropertyName("column");
                         serializer.Serialize(writer, location.Column);
                         writer.WriteEndObject();
-                    });
+                    }
                     writer.WriteEndArray();
                 }
 

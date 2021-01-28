@@ -51,25 +51,25 @@ namespace GraphQL.Introspection
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
-        protected static readonly Task<bool> _allowed = Task.FromResult(true);
-        protected static readonly Task<bool> _forbidden = Task.FromResult(false);
+        protected static readonly Task<bool> Allowed = Task.FromResult(true);
+        protected static readonly Task<bool> Forbidden = Task.FromResult(false);
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? _forbidden : _allowed;
+        public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? Forbidden : Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => parent.IsIntrospectionType() && field.Name == "appliedDirectives" ? _forbidden : _allowed;
+        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => parent.IsIntrospectionType() && field.Name == "appliedDirectives" ? Forbidden : Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => _allowed;
+        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => _allowed;
+        public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => Allowed;
 
         public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
         {
             if (directive.Introspectable.HasValue)
-                return directive.Introspectable.Value ? _allowed : _forbidden;
+                return directive.Introspectable.Value ? Allowed : Forbidden;
 
             // If the directive has all its locations of type ExecutableDirectiveLocation,
             // only then it will be present in the introspection response.
@@ -83,10 +83,10 @@ namespace GraphQL.Introspection
                     location == DirectiveLocation.FragmentDefinition ||
                     location == DirectiveLocation.FragmentSpread ||
                     location == DirectiveLocation.InlineFragment))
-                    return _forbidden;
+                    return Forbidden;
             }
 
-            return _allowed;
+            return Allowed;
         }
     }
 
@@ -99,9 +99,9 @@ namespace GraphQL.Introspection
     public class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
     {
         /// <inheritdoc/>
-        public override Task<bool> AllowType(IGraphType type) => _allowed;
+        public override Task<bool> AllowType(IGraphType type) => Allowed;
 
         /// <inheritdoc/>
-        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => _allowed;
+        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => Allowed;
     }
 }
