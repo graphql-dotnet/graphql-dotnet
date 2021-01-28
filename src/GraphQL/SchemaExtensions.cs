@@ -17,11 +17,12 @@ namespace GraphQL
         /// for more information.
         /// </summary>
         /// <param name="schema">The schema for which the features are enabled.</param>
-        /// <returns>Reference to the provided <paramref name="schema"/>.</returns>
-        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema)
+        /// <param name="mode">Experimental features mode.</param>
+        /// <returns>Reference to the provided <paramref name="schema"/>Experimental features mode.</returns>
+        public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, ExperimentalIntrospectionFeaturesMode mode = ExperimentalIntrospectionFeaturesMode.ExecutionOnly)
             where TSchema : Schema
         {
-            schema.Filter = new ExperimentalFeaturesSchemaFilter();
+            schema.Filter = new ExperimentalFeaturesSchemaFilter { Mode = mode };
             return schema;
         }
 

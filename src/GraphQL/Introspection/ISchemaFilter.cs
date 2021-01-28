@@ -104,12 +104,42 @@ namespace GraphQL.Introspection
     /// via introspection. See https://github.com/graphql/graphql-spec/issues/300
     /// for more information.
     /// </summary>
-    public sealed class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
+    public class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
     {
-        /// <inheritdoc/>
-        public override Task<bool> AllowType(IGraphType type) => Allowed;
+        /// <summary>
+        /// Experimental features mode.
+        /// </summary>
+        public ExperimentalIntrospectionFeaturesMode Mode { get; set; } = ExperimentalIntrospectionFeaturesMode.ExecutionOnly;
 
         /// <inheritdoc/>
-        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => Allowed;
+        public override Task<bool> AllowType(IGraphType type) => Mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution ? Allowed : base.AllowType(type);
+
+        /// <inheritdoc/>
+        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => Mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution ? Allowed : base.AllowField(parent, field);
+    }
+
+    /// <summary>
+    /// A way to use experimental features.
+    /// </summary>
+    public enum ExperimentalIntrospectionFeaturesMode
+    {
+        /// <summary>
+        /// Allow experimental features only for client queries but not for standard introspection
+        /// request. This means that the client, in response to a standard introspection request,
+        /// receives a standard response without all the new fields and types. However, client CAN
+        /// make requests to the server using the new fields and types. This mode is needed in order
+        /// to bypass the problem of tools such as GraphQL Playground, Voyager, GraphiQL that require
+        /// a standard response to an introspection request and refuse to work correctly if receive
+        /// unknown fields or types in the response.
+        /// </summary>
+        ExecutionOnly,
+
+        /// <summary>
+        /// Allow experimental features for both standard introspection query and client queries.
+        /// This means that the client, in response to a standard introspection request, receives
+        /// a response augmented with the new fields and types. Client can make requests to the
+        /// server using the new fields and types.
+        /// </summary>
+        IntrospectionAndExecution
     }
 }

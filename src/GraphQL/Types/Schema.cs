@@ -313,7 +313,8 @@ namespace GraphQL.Types
         {
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
-            this.Run(new AppliedDirectivesVisitor(this));
+            if (Filter is ExperimentalFeaturesSchemaFilter)
+                this.Run(new AppliedDirectivesVisitor(this));
         }
     }
 }
