@@ -104,7 +104,7 @@ namespace GraphQL.Introspection
     /// via introspection. See https://github.com/graphql/graphql-spec/issues/300
     /// for more information.
     /// </summary>
-    public class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
+    public sealed class ExperimentalFeaturesSchemaFilter : DefaultSchemaFilter
     {
         /// <inheritdoc/>
         public override Task<bool> AllowType(IGraphType type) => Allowed;

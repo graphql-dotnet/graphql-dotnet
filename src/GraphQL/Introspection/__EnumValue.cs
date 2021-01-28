@@ -11,6 +11,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__EnumValue</c> introspection type.
         /// </summary>
         public __EnumValue()
+            : this(false)
+        {
+        }
+
+        internal __EnumValue(bool allowAppliedDirectives)
         {
             Name = nameof(__EnumValue);
             Description =
@@ -24,7 +29,8 @@ namespace GraphQL.Introspection
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
             Field<StringGraphType>("deprecationReason", resolve: context => context.Source.DeprecationReason);
 
-            this.AddAppliedDirectivesField("enum value");
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("enum value");
         }
     }
 }

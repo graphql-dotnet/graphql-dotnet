@@ -13,6 +13,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__Type</c> introspection type.
         /// </summary>
         public __Type()
+            : this(false)
+        {
+        }
+
+        internal __Type(bool allowAppliedDirectives)
         {
             Name = nameof(__Type);
 
@@ -181,7 +186,8 @@ namespace GraphQL.Introspection
                 };
             });
 
-            this.AddAppliedDirectivesField("type");
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("type");
         }
 
         private static object KindForInstance(IGraphType type) => type switch

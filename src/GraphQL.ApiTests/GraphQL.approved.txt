@@ -1025,7 +1025,7 @@ namespace GraphQL.Introspection
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
     }
-    public class ExperimentalFeaturesSchemaFilter : GraphQL.Introspection.DefaultSchemaFilter
+    public sealed class ExperimentalFeaturesSchemaFilter : GraphQL.Introspection.DefaultSchemaFilter
     {
         public ExperimentalFeaturesSchemaFilter() { }
         public override System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
@@ -2196,7 +2196,7 @@ namespace GraphQL.Types
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter) { }
+        public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Types.ISchema schema) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {

@@ -12,6 +12,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__InputValue</c> introspection type.
         /// </summary>
         public __InputValue()
+            : this(false)
+        {
+        }
+
+        internal __InputValue(bool allowAppliedDirectives)
         {
             Name = nameof(__InputValue);
 
@@ -40,7 +45,8 @@ namespace GraphQL.Introspection
                     return string.IsNullOrWhiteSpace(result) ? null : result;
                 });
 
-            this.AddAppliedDirectivesField("input value");
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("input value");
         }
     }
 }

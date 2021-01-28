@@ -12,6 +12,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__Field</c> introspection type.
         /// </summary>
         public __Field()
+            : this(false)
+        {
+        }
+
+        internal __Field(bool allowAppliedDirectives)
         {
             Name = nameof(__Field);
 
@@ -79,8 +84,9 @@ namespace GraphQL.Introspection
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
 
             Field<StringGraphType>("deprecationReason", resolve: context => context.Source.DeprecationReason);
-    
-            this.AddAppliedDirectivesField("field");
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("field");
         }
     }
 }

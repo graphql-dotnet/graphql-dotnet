@@ -831,14 +831,6 @@ directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
-# Directive applied to a schema element
-type __AppliedDirective {
-  # Directive name
-  name: String!
-  # Values of directive arguments
-  args: [__DirectiveArgument!]!
-}
-
 # A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
 #
 # In some cases, you need to provide options to alter GraphQL's execution behavior
@@ -853,16 +845,6 @@ type __Directive {
   onOperation: Boolean!
   onFragment: Boolean!
   onField: Boolean!
-  # Directives applied to the directive
-  appliedDirectives: [__AppliedDirective!]!
-}
-
-# Value of an argument provided to directive
-type __DirectiveArgument {
-  # Argument name
-  name: String!
-  # A GraphQL-formatted string representing the value for argument.
-  value: String
 }
 
 # A Directive can be adjacent to many parts of the GraphQL language, a
@@ -914,8 +896,6 @@ type __EnumValue {
   description: String
   isDeprecated: Boolean!
   deprecationReason: String
-  # Directives applied to the enum value
-  appliedDirectives: [__AppliedDirective!]!
 }
 
 # Object and Interface types are described by a list of Fields, each of which has
@@ -927,8 +907,6 @@ type __Field {
   type: __Type!
   isDeprecated: Boolean!
   deprecationReason: String
-  # Directives applied to the field
-  appliedDirectives: [__AppliedDirective!]!
 }
 
 # Arguments provided to Fields or Directives and the input fields of an
@@ -940,8 +918,6 @@ type __InputValue {
   type: __Type!
   # A GraphQL-formatted string representing the default value for this input value.
   defaultValue: String
-  # Directives applied to the input value
-  appliedDirectives: [__AppliedDirective!]!
 }
 
 # A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all
@@ -959,8 +935,6 @@ type __Schema {
   subscriptionType: __Type
   # A list of all directives supported by this server.
   directives: [__Directive!]!
-  # Directives applied to the schema
-  appliedDirectives: [__AppliedDirective!]!
 }
 
 # The fundamental unit of any GraphQL Schema is the type. There are many kinds of
@@ -981,8 +955,6 @@ type __Type {
   enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
   inputFields: [__InputValue!]
   ofType: __Type
-  # Directives applied to the type
-  appliedDirectives: [__AppliedDirective!]!
 }
 
 # An enum describing what kind of type a given __Type is.

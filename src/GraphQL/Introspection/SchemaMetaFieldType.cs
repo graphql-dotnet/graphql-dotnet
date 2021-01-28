@@ -30,6 +30,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__Schema</c> introspection type.
         /// </summary>
         public __Schema()
+            : this(false)
+        {
+        }
+
+        internal __Schema(bool allowAppliedDirectives)
         {
             Name = "__Schema";
 
@@ -110,7 +115,8 @@ namespace GraphQL.Introspection
                     return directives.Constrained(index);
                 });
 
-            this.AddAppliedDirectivesField("schema");
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("schema");
         }
     }
 }

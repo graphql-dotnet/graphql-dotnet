@@ -297,7 +297,7 @@ namespace GraphQL.Types
                 types,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter);
+                this);
 
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.

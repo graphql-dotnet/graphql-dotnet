@@ -207,16 +207,16 @@ namespace GraphQL.Tests.StarWars
                         ""kind"": ""ENUM""
                     },
                     {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
                         ""name"": ""__TypeKind"",
                         ""kind"": ""ENUM""
                     },
                     {
                         ""name"": ""__EnumValue"",
                         ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
                     },
                     {
                         ""name"": ""Boolean"",
