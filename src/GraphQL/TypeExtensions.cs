@@ -275,5 +275,17 @@ namespace GraphQL
                 ? (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
                 : null;
         }
+
+        /// <summary>
+        /// Looks for a <see cref="DefaultValueAttribute"/> on the specified member and returns
+        /// the <see cref="DefaultValueAttribute.Value">value</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDefaultValueFromAttributes"/> setting.
+        /// </summary>
+        public static object DefaultValue(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDefaultValueFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
+                : null;
+        }
     }
 }

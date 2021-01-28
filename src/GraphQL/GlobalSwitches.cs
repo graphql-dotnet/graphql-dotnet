@@ -10,6 +10,12 @@ namespace GraphQL
     public static class GlobalSwitches
     {
         /// <summary>
+        /// Enables or disables setting default values for 'defaultValue' from <see cref="DefaultValueAttribute"/>.
+        /// By default enabled.
+        /// </summary>
+        public static bool EnableReadDefaultValueFromAttributes { get; set; } = true;
+
+        /// <summary>
         /// Enables or disables setting default values for 'deprecationReason' from <see cref="ObsoleteAttribute"/>.
         /// By default enabled.
         /// </summary>
