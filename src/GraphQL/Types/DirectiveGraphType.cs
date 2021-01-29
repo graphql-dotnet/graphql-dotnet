@@ -126,6 +126,22 @@ namespace GraphQL.Types
             Locations.AddRange(locations);
         }
 
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="name">The directive name within the GraphQL schema.</param>
+        /// <param name="locations">A list of locations where the directive can be applied.</param>
+        public DirectiveGraphType(string name, params DirectiveLocation[] locations)
+        {
+            if (locations == null)
+                throw new ArgumentNullException(nameof(locations));
+            if (locations.Length == 0)
+                throw new ArgumentException("Directive must have locations", nameof(locations));
+
+            Name = name;
+            Locations.AddRange(locations);
+        }
+
         /// <inheritdoc/>
         public string Name { get; set; }
 
