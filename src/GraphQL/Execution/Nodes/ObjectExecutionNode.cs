@@ -48,8 +48,9 @@ namespace GraphQL.Execution
             if (SubFields == null)
                 return null;
 
-            var fields = new Dictionary<string, object>(SubFields.Count);
+            var fields = new ObjectProperty[SubFields.Count];
 
+            int i = 0;
             foreach (var kvp in SubFields)
             {
                 object value = kvp.Value.ToValue();
@@ -59,7 +60,7 @@ namespace GraphQL.Execution
                     return null;
                 }
 
-                fields[kvp.Key] = value;
+                fields[i++] = new ObjectProperty(kvp.Key, value);
             }
 
             return fields;

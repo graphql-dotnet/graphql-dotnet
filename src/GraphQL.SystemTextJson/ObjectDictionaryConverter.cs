@@ -10,7 +10,7 @@ namespace GraphQL.SystemTextJson
 {
     /// <summary>
     /// A custom JsonConverter for reading a dictionary of objects of their real underlying type.
-    /// Does not support write.
+    /// Doesn't support write.
     /// </summary>
     public class ObjectDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {
