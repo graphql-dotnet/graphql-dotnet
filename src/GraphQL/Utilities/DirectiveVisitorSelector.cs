@@ -41,9 +41,13 @@ namespace GraphQL.Utilities
                 if (_directiveVisitors.TryGetValue(name, out var type))
                 {
                     var visitor = _typeResolver(type);
-                    visitor.Name = name;
+
+                    if (visitor.Name != name)
+                        throw new InvalidOperationException($"SchemaDirectiveVisitor '{visitor.GetType().Name}' has '{visitor.Name}' name but registered in {nameof(SchemaBuilder)} as '{name}'. Names must match.");
+
                     if (dir.Arguments != null)
                         visitor.Arguments = dir.Arguments.ToDictionary(x => (string)x.Name.Value, x => x.Value.ToValue());
+
                     yield return visitor;
                 }
             }

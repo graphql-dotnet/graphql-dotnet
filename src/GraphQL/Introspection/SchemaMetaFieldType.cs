@@ -24,12 +24,13 @@ namespace GraphQL.Introspection
     /// <summary>
     /// The <c>__Schema</c> introspection type allows querying the schema for available types and directives.
     /// </summary>
-    public class __Schema : ObjectGraphType<object>
+    public class __Schema : ObjectGraphType<ISchema>
     {
         /// <summary>
         /// Initializes a new instance of the <c>__Schema</c> introspection type.
         /// </summary>
-        public __Schema()
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __Schema(bool allowAppliedDirectives = false)
         {
             Name = "__Schema";
 
@@ -109,6 +110,9 @@ namespace GraphQL.Introspection
 
                     return directives.Constrained(index);
                 });
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("schema");
         }
     }
 }

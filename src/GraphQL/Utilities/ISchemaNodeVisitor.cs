@@ -7,15 +7,19 @@ namespace GraphQL.Utilities
     {
         void VisitSchema(Schema schema);
 
+        void VisitDirective(DirectiveGraphType directive);
+
         void VisitScalar(ScalarGraphType scalar);
 
         void VisitObject(IObjectGraphType type);
 
         void VisitFieldDefinition(FieldType field);
 
-        void VisitArgumentDefinition(QueryArgument argument);
+        void VisitFieldArgumentDefinition(QueryArgument argument);
 
-        void VisitInterface(InterfaceGraphType iface);
+        void VisitDirectiveArgumentDefinition(QueryArgument argument);
+
+        void VisitInterface(IInterfaceGraphType iface);
 
         void VisitUnion(UnionGraphType union);
 
@@ -23,7 +27,7 @@ namespace GraphQL.Utilities
 
         void VisitEnumValue(EnumValueDefinition value);
 
-        void VisitInputObject(InputObjectGraphType type);
+        void VisitInputObject(IInputObjectGraphType type);
 
         void VisitInputFieldDefinition(FieldType field);
     }
@@ -31,6 +35,10 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : ISchemaNodeVisitor
     {
         public virtual void VisitSchema(Schema schema)
+        {
+        }
+
+        public virtual void VisitDirective(DirectiveGraphType directive)
         {
         }
 
@@ -46,11 +54,15 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitArgumentDefinition(QueryArgument argument)
+        public virtual void VisitFieldArgumentDefinition(QueryArgument argument)
         {
         }
 
-        public virtual void VisitInterface(InterfaceGraphType iface)
+        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument)
+        {
+        }
+
+        public virtual void VisitInterface(IInterfaceGraphType iface)
         {
         }
 
@@ -66,7 +78,7 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitInputObject(InputObjectGraphType type)
+        public virtual void VisitInputObject(IInputObjectGraphType type)
         {
         }
 

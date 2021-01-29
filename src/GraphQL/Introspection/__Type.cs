@@ -7,12 +7,13 @@ namespace GraphQL.Introspection
     /// <c>__Type</c> is at the core of the type introspection system.
     /// It represents scalars, interfaces, object types, unions, enums in the system.
     /// </summary>
-    public class __Type : ObjectGraphType
+    public class __Type : ObjectGraphType<IGraphType>
     {
         /// <summary>
         /// Initializes a new instance of the <c>__Type</c> introspection type.
         /// </summary>
-        public __Type()
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __Type(bool allowAppliedDirectives = false)
         {
             Name = nameof(__Type);
 
@@ -36,7 +37,7 @@ namespace GraphQL.Introspection
                     : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
 
-            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
+            Field<StringGraphType>("name", resolve: context => context.Source.Name);
 
             Field<StringGraphType>("description");
 
@@ -49,8 +50,9 @@ namespace GraphQL.Introspection
                     }),
                 async context =>
                 {
-                    if (context.Source is IComplexGraphType type)
+                    if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
+                        var type = (IComplexGraphType)context.Source;
                         var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
@@ -180,6 +182,9 @@ namespace GraphQL.Introspection
                     _ => null
                 };
             });
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("type");
         }
 
         private static object KindForInstance(IGraphType type) => type switch

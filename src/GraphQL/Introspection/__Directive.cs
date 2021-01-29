@@ -11,7 +11,8 @@ namespace GraphQL.Introspection
         /// <summary>
         /// Initializes a new instance of the <c>__Directive</c> introspection type.
         /// </summary>
-        public __Directive()
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __Directive(bool allowAppliedDirectives = false)
         {
             Name = nameof(__Directive);
             Description =
@@ -45,6 +46,9 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l => l == DirectiveLocation.Field));
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("directive");
         }
     }
 

@@ -25,7 +25,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
         {
-            var type = context.Schema.FindType(node.Name);
+            var type = context.Schema.AllTypes[node.Name];
             if (type == null)
             {
                 var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();

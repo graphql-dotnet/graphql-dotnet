@@ -10,6 +10,8 @@
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 * `ExecutionOptions.EnableMetrics` is disabled by default
 * `GlobalSwitches` - new global options for configuring GraphQL execution
+* Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
+  See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
 ## Breaking Changes
 
@@ -91,3 +93,6 @@
 * `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
 * `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`, and is not thread safe anymore
 * By default, descriptions for fields, types, enums, and so on are not pulled from xml comments unless the corresponding global flag is enabled.
+* `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
+* `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
+* Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal

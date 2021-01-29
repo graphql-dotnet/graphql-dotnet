@@ -44,25 +44,72 @@ namespace GraphQL.Introspection
     }
 
     /// <summary>
-    /// The default schema filter. By default nothing is hidden.
+    /// The default schema filter. By default nothing is hidden. Please note
+    /// that some features that are not in the official specification may be
+    /// hidden by default. These features can be unlocked using special
+    /// <see cref="ExperimentalIntrospectionFeaturesSchemaFilter"/> filter.
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {
-        private static readonly Task<bool> _completed = Task.FromResult(true);
+        /// <summary>
+        /// Cached <c>Task.FromResult(true)</c>.
+        /// </summary>
+        protected static readonly Task<bool> Allowed = Task.FromResult(true);
+
+        /// <summary>
+        /// Cached <c>Task.FromResult(false)</c>.
+        /// </summary>
+        protected static readonly Task<bool> Forbidden = Task.FromResult(false);
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowType(IGraphType type) => _completed;
+        public virtual Task<bool> AllowType(IGraphType type) => type is __AppliedDirective || type is __DirectiveArgument ? Forbidden : Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => _completed;
+        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field) => parent.IsIntrospectionType() && field.Name == "appliedDirectives" ? Forbidden : Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => _completed;
+        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => _completed;
+        public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowDirective(DirectiveGraphType directive) => _completed;
+        public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
+        {
+            if (directive.Introspectable.HasValue)
+                return directive.Introspectable.Value ? Allowed : Forbidden;
+
+            // If the directive has all its locations of type ExecutableDirectiveLocation,
+            // only then it will be present in the introspection response.
+            foreach (var location in directive.Locations)
+            {
+                if (!(
+                    location == DirectiveLocation.Query ||
+                    location == DirectiveLocation.Mutation ||
+                    location == DirectiveLocation.Subscription ||
+                    location == DirectiveLocation.Field ||
+                    location == DirectiveLocation.FragmentDefinition ||
+                    location == DirectiveLocation.FragmentSpread ||
+                    location == DirectiveLocation.InlineFragment))
+                    return Forbidden;
+            }
+
+            return Allowed;
+        }
+    }
+
+    /// <summary>
+    /// Schema filter that enables some experimental features that are not in the
+    /// official specification, i.e. ability to expose user-defined meta-information
+    /// via introspection. See https://github.com/graphql/graphql-spec/issues/300
+    /// for more information.
+    /// </summary>
+    public class ExperimentalIntrospectionFeaturesSchemaFilter : DefaultSchemaFilter
+    {
+        /// <inheritdoc/>
+        public override Task<bool> AllowType(IGraphType type) => Allowed;
+
+        /// <inheritdoc/>
+        public override Task<bool> AllowField(IGraphType parent, IFieldType field) => Allowed;
     }
 }

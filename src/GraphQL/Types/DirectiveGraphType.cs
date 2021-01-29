@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -75,7 +76,7 @@ namespace GraphQL.Types
     /// Directives are used by the GraphQL runtime as a way of modifying execution
     /// behavior. Type system creators will usually not create these directly.
     /// </summary>
-    public class DirectiveGraphType : INamedType
+    public class DirectiveGraphType : MetadataProvider, INamedType
     {
         /// <summary>
         /// Returns a static instance of the predefined 'include' directive.
@@ -134,6 +135,13 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         /// <summary>
+        /// Indicates whether the directive and its usages for schema elements should return in response
+        /// to an introspection request. By default (null) if the directive has all its locations of
+        /// type ExecutableDirectiveLocation, only then it will be present in the introspection response.
+        /// </summary>
+        public virtual bool? Introspectable => null;
+
+        /// <summary>
         /// Gets or sets a list of arguments for the directive.
         /// </summary>
         public QueryArguments Arguments { get; set; }
@@ -153,7 +161,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'include' directive.
         /// </summary>
         public IncludeDirective()
-           : base("include", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
+            : base("include", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
         {
             Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
@@ -173,7 +181,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'skip' directive.
         /// </summary>
         public SkipDirective()
-           : base("skip", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
+            : base("skip", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
         {
             Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
@@ -189,6 +197,9 @@ namespace GraphQL.Types
     /// </summary>
     public class GraphQLDeprecatedDirective : DirectiveGraphType
     {
+        /// <inheritdoc/>
+        public override bool? Introspectable => true;
+
         /// <summary>
         /// Initializes a new instance of the 'deprecated' directive.
         /// </summary>

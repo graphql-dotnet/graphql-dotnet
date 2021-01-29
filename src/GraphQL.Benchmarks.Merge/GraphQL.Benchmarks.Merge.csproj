@@ -15,7 +15,7 @@
       5. Run command: dotnet tool install -g dotnet-merge
                   or: dotnet tool update -g dotnet-merge
       6. Now you can just run 'merge' being in the directory with before.md and after.md files with BenchmarkDotNet results.
-         Command will generate easy to read diff.md file.
+         This tool will generate easy to read diff.md file.
     </Description>
     <Description>$(Title)</Description>
     <PackAsTool>true</PackAsTool>

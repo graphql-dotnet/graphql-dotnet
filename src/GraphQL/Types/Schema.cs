@@ -38,13 +38,10 @@ namespace GraphQL.Types
 
             _additionalTypes = new List<Type>();
             _additionalInstances = new List<IGraphType>();
-            Directives = new SchemaDirectives
-            {
-                DirectiveGraphType.Include,
-                DirectiveGraphType.Skip,
-                DirectiveGraphType.Deprecated
-            };
             _converters = new List<IAstFromValueConverter>();
+
+            Directives = new SchemaDirectives();
+            Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
         }
 
         public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
@@ -59,6 +56,9 @@ namespace GraphQL.Types
             configure?.Invoke(builder);
             return builder.Build(typeDefinitions);
         }
+
+        /// <inheritdoc/>
+        public ExperimentalFeatures Features { get; set; } = new ExperimentalFeatures();
 
         /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
@@ -207,40 +207,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterDirective(DirectiveGraphType directive)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            Directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
-        }
-
-        public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
-
-        /// <inheritdoc/>
-        public void RegisterDirectives(params DirectiveGraphType[] directives)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
-
-        /// <inheritdoc/>
-        public DirectiveGraphType FindDirective(string name)
-        {
-            return Directives.FirstOrDefault(x => x.Name == name);
-        }
-
-        /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
             CheckDisposed();
@@ -252,17 +218,6 @@ namespace GraphQL.Types
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
             return _converters.FirstOrDefault(x => x.Matches(value, type));
-        }
-
-        /// <inheritdoc/>
-        public IGraphType FindType(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
-            }
-
-            return AllTypes[name];
         }
 
         /// <inheritdoc/>
@@ -345,11 +300,24 @@ namespace GraphQL.Types
                 types,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter);
+                this);
 
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
             _allTypes.ApplyMiddleware(FieldMiddleware);
+
+            Validate();
+        }
+
+        /// <summary>
+        /// Validates correctness of the created schema. This method is called only once - during schema initialization.
+        /// </summary>
+        protected virtual void Validate()
+        {
+            //TODO: add different validations, also see SchemaBuilder.Validate
+            //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
+            if (Features.AppliedDirectives)
+                this.Run(new AppliedDirectivesVisitor(this));
         }
     }
 }

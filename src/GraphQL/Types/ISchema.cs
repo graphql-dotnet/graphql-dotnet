@@ -15,6 +15,9 @@ namespace GraphQL.Types
     /// </summary>
     public interface ISchema : IProvideMetadata
     {
+        /// <inheritdoc cref="ExperimentalFeatures"/>
+        ExperimentalFeatures Features { get; set; }
+
         /// <summary>
         /// Returns true once the schema has been initialized.
         /// </summary>
@@ -78,16 +81,6 @@ namespace GraphQL.Types
         SchemaTypes AllTypes { get; }
 
         /// <summary>
-        /// Returns a <see cref="IGraphType"/> for a given name.
-        /// </summary>
-        IGraphType FindType(string name);
-
-        /// <summary>
-        /// Returns a <see cref="DirectiveGraphType"/> for a given name.
-        /// </summary>
-        DirectiveGraphType FindDirective(string name);
-
-        /// <summary>
         /// A list of additional graph types manually added to the schema by RegisterType call.
         /// </summary>
         IEnumerable<Type> AdditionalTypes { get; }
@@ -123,22 +116,6 @@ namespace GraphQL.Types
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
         void RegisterType<T>() where T : IGraphType;
-
-        /// <summary>
-        /// Add a specific directive to the schema.
-        /// <br/><br/>
-        /// Directives are used by the GraphQL runtime as a way of modifying execution
-        /// behavior. Type system creators do not usually create them directly.
-        /// </summary>
-        void RegisterDirective(DirectiveGraphType directive);
-
-        /// <summary>
-        /// Add specific directives to the schema.
-        /// <br/><br/>
-        /// Directives are used by the GraphQL runtime as a way of modifying execution
-        /// behavior. Type system creators do not usually create them directly.
-        /// </summary>
-        void RegisterDirectives(params DirectiveGraphType[] directives);
 
         /// <summary>
         /// Register a custom value converter to the schema.
@@ -177,5 +154,18 @@ namespace GraphQL.Types
         /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
+    }
+
+    /// <summary>
+    /// Options for configuring experimental features.
+    /// </summary>
+    public class ExperimentalFeatures
+    {
+        /// <summary>
+        /// Enables ability to expose user-defined meta-information via introspection.
+        /// See https://github.com/graphql/graphql-spec/issues/300 for more information.
+        /// It is experimental feature that are not in the official specification (yet).
+        /// </summary>
+        public bool AppliedDirectives { get; set; } = false;
     }
 }

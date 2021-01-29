@@ -5,7 +5,7 @@ namespace GraphQL.Utilities
 {
     public abstract class SchemaDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public string Name { get; set; }
+        public abstract string Name { get; }
 
         public Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
 

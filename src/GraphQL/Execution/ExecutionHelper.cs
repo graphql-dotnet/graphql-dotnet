@@ -548,7 +548,7 @@ namespace GraphQL.Execution
                 return true;
             }
 
-            var conditionalType = context.Schema.FindType(fragmentName);
+            var conditionalType = context.Schema.AllTypes[fragmentName];
 
             if (conditionalType == null)
             {

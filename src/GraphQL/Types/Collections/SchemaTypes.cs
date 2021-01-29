@@ -21,18 +21,7 @@ namespace GraphQL.Types
     public class SchemaTypes : IEnumerable<IGraphType>
     {
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-        private readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
-        {
-            new __DirectiveLocation(),
-            new __TypeKind(),
-            new __EnumValue(),
-            new __Directive(),
-            new __Field(),
-            new __InputValue(),
-            new __Type(),
-            new __Schema()
-        }
-        .ToDictionary(t => t.GetType());
+        private readonly Dictionary<Type, IGraphType> _introspectionTypes;
 
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
         private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
@@ -75,12 +64,14 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance with the specified <see cref="INameConverter"/>.
         /// </summary>
-        private SchemaTypes(INameConverter nameConverter)
+        private SchemaTypes(INameConverter nameConverter, bool allowAppliedDirectives)
         {
 #pragma warning disable IDE0016 // Use 'throw' expression; if this rule is applied here, then the null check is moved to the very end of the method - this is not what we want
             if (nameConverter == null)
                 throw new ArgumentNullException(nameof(nameConverter));
 #pragma warning restore IDE0016
+
+            _introspectionTypes = CreateIntrospectionTypes(allowAppliedDirectives);
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
@@ -102,6 +93,38 @@ namespace GraphQL.Types
 
             // set the name converter properly
             _nameConverter = nameConverter;
+        }
+
+        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives)
+        {
+            return (allowAppliedDirectives
+                ? new IGraphType[]
+                {
+                    new __DirectiveLocation(),
+                    new __DirectiveArgument(),
+                    new __AppliedDirective(),
+                    new __TypeKind(),
+                    new __EnumValue(true),
+                    new __Directive(true),
+                    new __Field(true),
+                    new __InputValue(true),
+                    new __Type(true),
+                    new __Schema(true)
+                }
+                : new IGraphType[]
+                {
+                    new __DirectiveLocation(),
+                    //new __DirectiveArgument(), forbidden
+                    //new __AppliedDirective(),  forbidden
+                    new __TypeKind(),
+                    new __EnumValue(false),
+                    new __Directive(false),
+                    new __Field(false),
+                    new __InputValue(false),
+                    new __Type(false),
+                    new __Schema(false)
+                })
+            .ToDictionary(t => t.GetType());
         }
 
         internal Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
@@ -130,14 +153,14 @@ namespace GraphQL.Types
         /// <param name="types">A list of graph type instances to register in the lookup table.</param>
         /// <param name="directives">A list of directives to register.</param>
         /// <param name="resolveType">A delegate which returns an instance of a graph type from its .NET type.</param>
-        /// <param name="nameConverter">A name converter to use for the specified graph types.</param>
+        /// <param name="schema">A schema for which this instance is created.</param>
         public static SchemaTypes Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
-            INameConverter nameConverter)
+            ISchema schema)
         {
-            var lookup = new SchemaTypes(nameConverter ?? CamelCaseNameConverter.Instance);
+            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives);
 
             var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {
@@ -217,7 +240,7 @@ namespace GraphQL.Types
             {
                 if (item.Value is IComplexGraphType complex)
                 {
-                    foreach (var field in complex.Fields)
+                    foreach (var field in complex.Fields.List)
                     {
                         var inner = field.Resolver ?? NameFieldResolver.Instance;
 
@@ -232,7 +255,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type instance from the lookup table by its GraphQL type name.
         /// </summary>
-        internal IGraphType this[string typeName]
+        public IGraphType this[string typeName]
         {
             get
             {
@@ -248,7 +271,7 @@ namespace GraphQL.Types
                 }
                 return type;
             }
-            set
+            internal set
             {
                 CheckSealed();
 
