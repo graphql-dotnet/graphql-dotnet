@@ -16,6 +16,9 @@
 ## Breaking Changes
 
 * GraphQL.NET now uses GraphQL-Parser v7 with new memory model
+* `ExecutionResult.Data` format breaking changes. Now objects are serialized as `ObjectProperty` lists, not object dictionaries.
+  Both `GraphQL.NewtonsoftJson` and `GraphQL.SystemTextJson` serializers received the necessary changes to produce the same JSON as before.
+  However, consumers using `ExecutionResult` instances directly most likely will not work correctly.
 * `NameConverter`, `SchemaFilter` and `FieldMiddleware` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
   These properties can be set in the constructor of the `Schema` instance, or within your DI composition root, or at any time before
   any query is executed. Once a query has been executed, changes to these fields is not allowed, and adding middleware via the field middleware
