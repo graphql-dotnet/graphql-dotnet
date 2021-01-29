@@ -50,8 +50,9 @@ namespace GraphQL.Introspection
                     }),
                 async context =>
                 {
-                    if (context.Source is IComplexGraphType type)
+                    if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
+                        var type = (IComplexGraphType)context.Source;
                         var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
