@@ -55,7 +55,7 @@ namespace GraphQL.Execution
 
             return items;
         }
- 
+
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => Items ?? Enumerable.Empty<ExecutionNode>();
 
         /// <inheritdoc/>
