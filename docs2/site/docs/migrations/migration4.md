@@ -100,4 +100,4 @@
 * `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
 * Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
 * Most `ExecutionStrategy` methods are now `protected`
-* `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode> ` to `ExecutionNode[]`
+* `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
