@@ -15,7 +15,7 @@ To facilitate the performance changes, many changes were made to the API that ma
 
 ### Input Object Custom Deserializers (aka resolver)
 
-You can now add code to `InputObjectGraphType` derivatives to build an object from the collected 
+You can now add code to `InputObjectGraphType` descendants to build an object from the collected arguments. 
 
 (todo: update title, update description, discuss what happens if exceptions are thrown, add sample)
 
