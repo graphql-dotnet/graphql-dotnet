@@ -9,7 +9,7 @@ GraphQL.NET 4.0 has been highly optimized, typically executing queries at least 
 > Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
 > Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 
-To enable cached queries...(todo)
+To enable cached queries...(todo: add sample)
 
 To facilitate the performance changes, many changes were made to the API that may affect you if you have built custom execution strategies, scalars, parser, or similar core components. Please see the complete list of breaking changes below.
 
@@ -17,7 +17,7 @@ To facilitate the performance changes, many changes were made to the API that ma
 
 You can now add code to `InputObjectGraphType` derivatives to build an object from the collected 
 
-### Applied Directives
+### Experimental Features / Applied Directives
 
 > Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
@@ -28,25 +28,25 @@ You can now add code to `InputObjectGraphType` derivatives to build an object fr
 
 > New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
 
-(todo)
+(todo: update title, write descrption, add sample)
 
 ### ArrayPool
 
 > New property `IResolveFieldContext.ArrayPool`
 
-(todo)
+(todo: update title, write description, add sample)
 
 ### Global Switches
 
 > `GlobalSwitches` - new global options for configuring GraphQL execution
 
-(todo)
+(todo: write descrption of switches, where to configure, add samples)
 
 ### Authorization Extension Methods
 
 > Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 
-(todo)
+(todo: write more description about how it interacts with the other libraries, add simple sample)
 
 ### Other Features
 
@@ -68,11 +68,15 @@ builder has no effect.
 
 > The middleware `Use<T>` extension method has been removed. Please use the `Use` method with a middleware instance instead.
 
+(todo: confirm description, add sample of required changes)
+
 ### GetRequiredService
 
 > `GraphQL.Utilities.ServiceProviderExtensions` has been made internal. This affects usages of its extension method `GetRequiredService`.
 > Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` NuGet package and use the extension method from the
 > `Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions` class.
+
+(todo: confirm description, maybe add sample change to using statement)
 
 ### Default Sort Order of Introspection Query Results
 
@@ -97,7 +101,9 @@ By default fields returned by introspection query are no longer sorted by their 
     }
 ```
 
-### IResolveFieldContext Re-use
+(todo: add sample line of code of how to set the comparer in the schema)
+
+### `IResolveFieldContext` Re-use
 
 The `IResolveFieldContext` instance passed to field resolvers is re-used at the completion of the resolver. Be sure not to
 use this instance once the resolver finishes executing. To preserve a copy of the context, call `.Copy()` on the context
@@ -109,6 +115,8 @@ so it is safe to preserve these instances without calling `.Copy()`.
 ### Subscriptions Moved to Separate Project
 
 > Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
+
+(todo: revise description with reference to proper nuget package, describe changes required to project, etc)
 
 ### API Cleanup
 
@@ -149,13 +157,15 @@ so it is safe to preserve these instances without calling `.Copy()`.
 
 To enable metrics, please set the option to `true` before executing the query.
 
-(todo)
+(todo: add sample)
 
 ### GraphQL Member Descriptions
 
 > By default, descriptions for fields, types, enums, and so on are not pulled from xml comments unless the corresponding global flag is enabled.
 
 Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions from fields from xml comments as it did in 3.x. To re-enable that functionality, see Global Switches above.
+
+(todo: update/consolidate description)
 
 ### Changes to `IResolveFieldContext.Arguments`
 
@@ -169,6 +179,8 @@ specified by the query).
 ### Metadata is Not Thread Safe
 
 > `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`, and is not thread safe anymore
+
+(todo: update description, add description of how to lock on type, not dictionary)
 
 ### Other Breaking Changes
 
