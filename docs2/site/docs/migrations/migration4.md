@@ -186,7 +186,7 @@ specified by the query).
 
 ### Other Breaking Changes
 
-* GraphQL.NET now uses GraphQL-Parser v7 with new memory model
+* GraphQL.NET now uses GraphQL-Parser v7 with new memory model taking advantage of `System.Memory` APIs.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * `InputObjectGraphType.ParseDictionary` has been added so that customized deserialization behavior can be specified for input objects.
