@@ -189,7 +189,7 @@ specified by the query).
 * GraphQL.NET now uses GraphQL-Parser v7 with new memory model taking advantage of `System.Memory` APIs.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
-* `InputObjectGraphType.ParseDictionary` has been added so that customized deserialization behavior can be specified for input objects.
+* `InputObjectGraphType.ParseDictionary` has been added so that customized deserialization behavior can be specified for input objects (aka input resolvers).
   If `InputObjectGraphType<T>` is used, and `GetArgument<T>` is called with the same type, no behavior changes will occur by default.
   If `InputObjectGraphType<T>` is used, but `GetArgument<T>` is called with a different type, coercion may fail. Override `ParseDictionary`
   to force resolving the input object to the correct type.
