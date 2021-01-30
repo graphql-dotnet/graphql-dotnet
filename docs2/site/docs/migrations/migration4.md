@@ -175,7 +175,7 @@ Note that to improve performance, by default GraphQL.NET 4.0 does not pull descr
 can be determined if the value returned is a default value or if it is a specified literal or variable.
 
 `IResolveFieldContext.HasArgument` now returns `false` when `GetArgument` returns a field default value. Note that if a variable is specified,
-and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument is successfully resolving to a variable
+and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument has successfully resolved to a variable
 specified by the query).
 
 ### Metadata is Not Thread Safe
