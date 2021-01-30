@@ -125,7 +125,7 @@ namespace GraphQL.Tests.Execution.Performance
             });
 
             result.Errors.ShouldBeNull();
-            ((string)result.Data.ToLightDictionary()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
+            ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
         }
     }
 }

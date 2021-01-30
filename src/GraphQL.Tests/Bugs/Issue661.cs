@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Bugs
                 }).GetAwaiter().GetResult();
 
                 result.Errors.ShouldBeNull();
-                var data = result.Data.ToLightDictionary();
+                var data = result.Data.ToDict();
                 data.Count.ShouldBe(1);
                 data["get_cached"].ShouldBe("myvalue");
             }
