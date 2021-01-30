@@ -165,7 +165,7 @@ To enable metrics, please set the option to `true` before executing the query.
 
 > By default, descriptions for fields, types, enums, and so on are not pulled from xml comments unless the corresponding global flag is enabled.
 
-Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions from fields from xml comments as it did in 3.x. To re-enable that functionality, see Global Switches above.
+Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for fields from xml comments as it did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
 
 (todo: update/consolidate description)
 
