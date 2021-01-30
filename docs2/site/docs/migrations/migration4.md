@@ -17,6 +17,8 @@ To facilitate the performance changes, many changes were made to the API that ma
 
 You can now add code to `InputObjectGraphType` derivatives to build an object from the collected 
 
+(todo: update title, update description, discuss what happens if exceptions are thrown, add sample)
+
 ### Experimental Features / Applied Directives
 
 > Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
