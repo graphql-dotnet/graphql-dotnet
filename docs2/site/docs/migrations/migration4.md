@@ -150,7 +150,7 @@ so it is safe to preserve these instances without calling `.Copy()`.
 * Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
 * `SourceLocation`, `NameNode` and `BasicVisitor` have been changed to a `readonly struct`.
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
-* `void Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
+* `void INode.Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
 * Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
 * `INode.IsEqualTo` and related methods have been removed.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
