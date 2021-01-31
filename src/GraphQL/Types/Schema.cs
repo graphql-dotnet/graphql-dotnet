@@ -176,6 +176,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public FieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
 
+        /// <inheritdoc/>
         public void RegisterVisitor(ISchemaNodeVisitor visitor)
         {
             CheckDisposed();
@@ -184,6 +185,7 @@ namespace GraphQL.Types
             (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
         }
 
+        /// <inheritdoc/>
         public void RegisterVisitor(Type type)
         {
             CheckDisposed();
@@ -201,10 +203,6 @@ namespace GraphQL.Types
                 _visitorTypes.Add(type);
         }
 
-        public void RegisterVisitor<TVisitor>()
-            where TVisitor : ISchemaNodeVisitor
-            => RegisterVisitor(typeof(TVisitor));
-
         /// <inheritdoc/>
         public void RegisterType(IGraphType type)
         {
@@ -215,17 +213,11 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterTypes(params IGraphType[] types)
+        public void RegisterType(Type type)
         {
             CheckDisposed();
             CheckInitialized();
 
-            foreach (var type in types)
-                RegisterType(type);
-        }
-
-        private void RegisterType(Type type)
-        {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
@@ -256,15 +248,6 @@ namespace GraphQL.Types
             {
                 RegisterType(type);
             }
-        }
-
-        /// <inheritdoc/>
-        public void RegisterType<T>() where T : IGraphType
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            RegisterType(typeof(T));
         }
 
         /// <inheritdoc/>

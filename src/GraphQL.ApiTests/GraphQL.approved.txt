@@ -119,6 +119,11 @@ namespace GraphQL
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
         public string Query { get; set; }
     }
+    public class ExperimentalFeatures
+    {
+        public ExperimentalFeatures() { }
+        public bool AppliedDirectives { get; set; }
+    }
     public enum ExperimentalIntrospectionFeaturesMode
     {
         ExecutionOnly = 0,
@@ -354,6 +359,15 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.Schema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
+            where T : GraphQL.Types.IGraphType { }
+        public static void RegisterTypes<TSchema>(this TSchema schema, params GraphQL.Types.IGraphType[] types)
+            where TSchema : GraphQL.Types.ISchema { }
+        public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
+            where TSchema : GraphQL.Types.ISchema { }
+        public static TSchema RegisterVisitor<TSchema, TVisitor>(this TSchema schema)
+            where TSchema : GraphQL.Types.ISchema
+            where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
         public static void Run(this GraphQL.Types.Schema schema, GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
     }
     public static class StringExtensions
@@ -1889,11 +1903,6 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
-    public class ExperimentalFeatures
-    {
-        public ExperimentalFeatures() { }
-        public bool AppliedDirectives { get; set; }
-    }
     public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
@@ -2002,7 +2011,7 @@ namespace GraphQL.Types
         GraphQL.Types.SchemaTypes AllTypes { get; }
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
-        GraphQL.Types.ExperimentalFeatures Features { get; set; }
+        GraphQL.ExperimentalFeatures Features { get; set; }
         GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
@@ -2016,11 +2025,10 @@ namespace GraphQL.Types
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
-        void RegisterType<T>()
-            where T : GraphQL.Types.IGraphType;
-        void RegisterTypes(params GraphQL.Types.IGraphType[] types);
-        void RegisterTypes(params System.Type[] types);
+        void RegisterType(System.Type type);
         void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter);
+        void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
+        void RegisterVisitor(System.Type type);
     }
     public class IdGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2182,7 +2190,7 @@ namespace GraphQL.Types
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
-        public GraphQL.Types.ExperimentalFeatures Features { get; set; }
+        public GraphQL.ExperimentalFeatures Features { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
@@ -2198,15 +2206,11 @@ namespace GraphQL.Types
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public void Initialize() { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
-        public void RegisterType<T>()
-            where T : GraphQL.Types.IGraphType { }
-        public void RegisterTypes(params GraphQL.Types.IGraphType[] types) { }
+        public void RegisterType(System.Type type) { }
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
-        public void RegisterVisitor<TVisitor>()
-            where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
         protected virtual void Validate() { }
         public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
         public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder> configure = null)
