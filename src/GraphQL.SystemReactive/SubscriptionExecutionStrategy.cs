@@ -115,21 +115,25 @@ namespace GraphQL.Execution
                     .SelectMany(async executionNode =>
                     {
                         if (context.Listeners != null)
+                        {
                             foreach (var listener in context.Listeners)
                             {
                                 await listener.BeforeExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
+                        }
 
                         // Execute the whole execution tree and return the result
                         await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
                         if (context.Listeners != null)
+                        {
                             foreach (var listener in context.Listeners)
                             {
                                 await listener.AfterExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
+                        }
 
                         return new ExecutionResult
                         {

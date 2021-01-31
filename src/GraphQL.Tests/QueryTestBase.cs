@@ -114,7 +114,7 @@ namespace GraphQL.Tests
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
-            errors.Count().ShouldBe(expectedErrorCount);
+            errors.Count.ShouldBe(expectedErrorCount);
 
             return runResult;
         }

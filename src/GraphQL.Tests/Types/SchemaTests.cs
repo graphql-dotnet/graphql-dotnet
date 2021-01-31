@@ -177,7 +177,7 @@ namespace GraphQL.Tests.Types
             schema.Dispose();
             Should.Throw<ObjectDisposedException>(() => schema.Initialize());
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
-            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(new IGraphType[] { }));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(Array.Empty<IGraphType>()));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
             //Should.Throw<ObjectDisposedException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));
@@ -195,7 +195,7 @@ namespace GraphQL.Tests.Types
             schema.Initialized.ShouldBeTrue();
 
             Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
-            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new IGraphType[] { }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(Array.Empty<IGraphType>()));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
             //Should.Throw<InvalidOperationException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));

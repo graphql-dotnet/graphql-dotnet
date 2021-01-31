@@ -3,9 +3,12 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    internal sealed class AppliedDirectivesVisitor : ISchemaNodeVisitor
+    /// <summary>
+    /// This visitor verifies the correct application of directives to the schema elements.
+    /// </summary>
+    internal sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
     {
-        public AppliedDirectivesVisitor(ISchema schema)
+        public AppliedDirectivesValidationVisitor(ISchema schema)
         {
             Schema = schema;
         }
@@ -38,11 +41,11 @@ namespace GraphQL.Utilities
 
         public void VisitUnion(UnionGraphType union) => ValidateAppliedDirectives(union);
 
-        private void ValidateAppliedDirectives(IProvideMetadata provider)
+        private void ValidateAppliedDirectives(IProvideMetadata provider) //TODO: add check for argument value type
         {
             if (provider.HasAppliedDirectives())
             {
-                foreach (var appliedDirective in provider.GetAppliedDirectives())
+                foreach (var appliedDirective in provider.GetAppliedDirectives().List)
                 {
                     var schemaDirective = Schema.Directives.Find(appliedDirective.Name);
                     if (schemaDirective == null)
@@ -52,7 +55,7 @@ namespace GraphQL.Utilities
                     {
                         foreach (var arg in schemaDirective.Arguments.List)
                         {
-                            if (arg.DefaultValue == null && appliedDirective.Find(arg.Name) == null)
+                            if (arg.DefaultValue == null && appliedDirective.FindArgument(arg.Name) == null)
                                 throw new InvalidOperationException($"Directive '{appliedDirective.Name}' must specify required argument '{arg.Name}'.");
                         }
                     }

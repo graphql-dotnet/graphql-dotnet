@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GraphQL.Tests.Introspection;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -42,7 +41,7 @@ namespace GraphQL.Tests.Bugs
 
         private void VerifyIntrospection(ISchema schema)
         {
-            var result = ExecuteQuery(schema, SchemaIntrospection.IntrospectionQuery);
+            var result = ExecuteQuery(schema, "IntrospectionQuery".ReadGraphQLRequest());
             result.ShouldNotBeNull();
             result.Data.ShouldNotBeNull();
             result.Errors.ShouldBeNull();

@@ -15,13 +15,18 @@ namespace GraphQL.Types
         private IServiceProvider _services;
         private SchemaTypes _allTypes;
         private readonly object _allTypesInitializationLock = new object();
-        private readonly List<Type> _additionalTypes;
-        private readonly List<IGraphType> _additionalInstances;
+
+        private List<Type> _additionalTypes;
+        private List<IGraphType> _additionalInstances;
+
+        private List<Type> _visitorTypes;
+        private List<ISchemaNodeVisitor> _visitors;
+
         private readonly List<IAstFromValueConverter> _converters;
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
-        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects.
         /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
@@ -30,29 +35,39 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
-        /// to create required objects
+        /// to create required objects.
         /// </summary>
         public Schema(IServiceProvider services)
         {
             _services = services;
 
-            _additionalTypes = new List<Type>();
-            _additionalInstances = new List<IGraphType>();
             _converters = new List<IAstFromValueConverter>();
 
             Directives = new SchemaDirectives();
             Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
+            RegisterVisitor(new DeprecatedDirectiveVisitor());
         }
 
-        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
-        {
-            var defs = string.Join("\n", typeDefinitions);
-            return For(defs, configure);
-        }
+        /// <summary>
+        /// Builds schema from the specified string and configuration delegate.
+        /// </summary>
+        /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
+        /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
+        /// <returns>Created schema.</returns>
+        public static Schema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+            => For<SchemaBuilder>(typeDefinitions, configure);
 
-        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        /// <summary>
+        /// Builds schema from the specified string and configuration delegate.
+        /// </summary>
+        /// <typeparam name="TSchemaBuilder">The type of <see cref="SchemaBuilder"/> that will create the schema.</typeparam>
+        /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
+        /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
+        /// <returns>Created schema.</returns>
+        public static Schema For<TSchemaBuilder>(string typeDefinitions, Action<TSchemaBuilder> configure = null)
+            where TSchemaBuilder : SchemaBuilder, new()
         {
-            var builder = new SchemaBuilder();
+            var builder = new TSchemaBuilder();
             configure?.Invoke(builder);
             return builder.Build(typeDefinitions);
         }
@@ -150,7 +165,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+        public IEnumerable<Type> AdditionalTypes => _additionalTypes ?? Enumerable.Empty<Type>();
 
         /// <inheritdoc/>
         public FieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
@@ -161,13 +176,42 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public FieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
 
+        public void RegisterVisitor(ISchemaNodeVisitor visitor)
+        {
+            CheckDisposed();
+            CheckInitialized();
+
+            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+        }
+
+        public void RegisterVisitor(Type type)
+        {
+            CheckDisposed();
+            CheckInitialized();
+
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+            }
+
+            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
+                _visitorTypes.Add(type);
+        }
+
+        public void RegisterVisitor<TVisitor>()
+            where TVisitor : ISchemaNodeVisitor
+            => RegisterVisitor(typeof(TVisitor));
+
         /// <inheritdoc/>
         public void RegisterType(IGraphType type)
         {
             CheckDisposed();
             CheckInitialized();
 
-            _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
+            (_additionalInstances ??= new List<IGraphType>()).Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         /// <inheritdoc/>
@@ -178,6 +222,23 @@ namespace GraphQL.Types
 
             foreach (var type in types)
                 RegisterType(type);
+        }
+
+        private void RegisterType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!typeof(IGraphType).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
+            }
+
+            if (_additionalTypes == null)
+                _additionalTypes = new List<Type>();
+
+            if (!_additionalTypes.Contains(type))
+                _additionalTypes.Add(type);
         }
 
         /// <inheritdoc/>
@@ -239,8 +300,8 @@ namespace GraphQL.Types
                     Subscription = null;
                     Filter = null;
 
-                    _additionalInstances.Clear();
-                    _additionalTypes.Clear();
+                    _additionalInstances?.Clear();
+                    _additionalTypes?.Clear();
                     Directives.List.Clear();
                     _converters.Clear();
 
@@ -258,46 +319,53 @@ namespace GraphQL.Types
                 throw new ObjectDisposedException(nameof(Schema));
         }
 
-        private void RegisterType(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            if (!typeof(IGraphType).IsAssignableFrom(type))
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
-            }
-
-            if (!_additionalTypes.Contains(type))
-            {
-                _additionalTypes.Add(type);
-            }
-        }
-
-        private IEnumerable<IGraphType> GetRootTypes()
-        {
-            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
-            // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
-
-            if (Query != null)
-                yield return Query;
-
-            if (Mutation != null)
-                yield return Mutation;
-
-            if (Subscription != null)
-                yield return Subscription;
-        }
-
         private void CreateSchemaTypes()
         {
-            var types = _additionalInstances
-                .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
+            IEnumerable<IGraphType> GetTypes()
+            {
+                if (_additionalInstances != null)
+                {
+                    foreach (var instance in _additionalInstances)
+                        yield return instance;
+                }
+
+                //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
+                // if (Query == null)
+                //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+
+                if (Query != null)
+                    yield return Query;
+
+                if (Mutation != null)
+                    yield return Mutation;
+
+                if (Subscription != null)
+                    yield return Subscription;
+
+                if (_additionalTypes != null)
+                {
+                    foreach (var type in _additionalTypes)
+                        yield return (IGraphType)_services.GetRequiredService(type.GetNamedType());
+                }
+            }
+
+            IEnumerable<ISchemaNodeVisitor> GetVisitors()
+            {
+                if (_visitors != null)
+                {
+                    foreach (var visitor in _visitors)
+                        yield return visitor;
+                }
+
+                if (_visitorTypes != null)
+                {
+                    foreach (var type in _visitorTypes)
+                        yield return (ISchemaNodeVisitor)_services.GetRequiredService(type);
+                }
+            }
 
             _allTypes = SchemaTypes.Create(
-                types,
+                GetTypes(),
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 this);
@@ -305,6 +373,9 @@ namespace GraphQL.Types
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
             _allTypes.ApplyMiddleware(FieldMiddleware);
+
+            foreach (var visitor in GetVisitors())
+                this.Run(visitor);
 
             Validate();
         }
@@ -317,7 +388,7 @@ namespace GraphQL.Types
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
             if (Features.AppliedDirectives)
-                this.Run(new AppliedDirectivesVisitor(this));
+                this.Run(new AppliedDirectivesValidationVisitor(this));
         }
     }
 }
