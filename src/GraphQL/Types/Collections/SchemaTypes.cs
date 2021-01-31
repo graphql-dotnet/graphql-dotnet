@@ -415,7 +415,7 @@ namespace GraphQL.Types
             if (applyNameConverter)
             {
                 field.Name = _nameConverter.NameForField(field.Name, parentType);
-                NameValidator.ValidateNameOnSchemaInitialize(field.Name);
+                NameValidator.ValidateNameOnSchemaInitialize(field.Name, "field");
             }
 
             if (field.ResolvedType == null)
