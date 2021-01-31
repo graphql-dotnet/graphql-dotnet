@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_basic_custom_directive()
         {
-            Builder.RegisterDirectiveVisitor<UppercaseDirectiveVisitor>("upper");
+            Builder.RegisterVisitor<UppercaseDirectiveVisitor>();
 
             AssertQuery(_ =>
             {
@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_with_tasks()
         {
-            Builder.RegisterDirectiveVisitor<AsyncUppercaseDirectiveVisitor>("upper");
+            Builder.RegisterVisitor<AsyncUppercaseDirectiveVisitor>();
             Builder.Types.Include<Query>();
 
             AssertQuery(_ =>
@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_for_all_locations()
         {
-            Builder.RegisterDirectiveVisitor<DescriptionDirectiveVisitor>("description");
+            Builder.RegisterVisitor<DescriptionDirectiveVisitor>();
             Builder.Types.For("TestType").IsTypeOf<TestType>();
             Builder.Types.For("TestTypeForUnion").IsTypeOf<TestTypeForUnion>();
 
@@ -76,32 +76,32 @@ namespace GraphQL.Tests.Utilities
                         hello: String
                     }
 
-                    interface TestInterface @description(description: ""interface""){
+                    interface TestInterface @description(text: ""interface""){
                         id: ID!
                     }
 
-                    type TestType implements TestInterface @description(description: ""type"") {
+                    type TestType implements TestInterface @description(text: ""type"") {
                         id: ID!
-                        name(arg: Int @description(description: ""arg"")): String @description(description: ""field"")
+                        name(arg: Int @description(text: ""arg"")): String @description(text: ""field"")
                     }
 
                     type TestTypeForUnion {
                         field: ID!
                     }
 
-                    union TestUnion @description(description: ""union"") = TestType | TestTypeForUnion
+                    union TestUnion @description(text: ""union"") = TestType | TestTypeForUnion
 
-                    enum TestEnum @description(description: ""enum-definition""){
-                      TESTVAL1 @description(description: ""enum-value"")
+                    enum TestEnum @description(text: ""enum-definition""){
+                      TESTVAL1 @description(text: ""enum-value"")
                       TESTVAL2
                       TESTVAL3
                     }
 
-                    input TestInputType @description(description: ""input-type"") {
-                        id: Int = 0 @description(description: ""input-field"")
+                    input TestInputType @description(text: ""input-type"") {
+                        id: Int = 0 @description(text: ""input-field"")
                     }
 
-                    scalar TestScalar @description(description: ""scalar"")
+                    scalar TestScalar @description(text: ""scalar"")
 
                     schema @registerType {
                       query: Query

@@ -88,7 +88,7 @@ namespace GraphQL.Tests.Types
             type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
-            type.Fields.Count().ShouldBe(18);
+            type.Fields.Count.ShouldBe(18);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
@@ -122,7 +122,7 @@ namespace GraphQL.Tests.Types
             type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
-            type.Fields.Count().ShouldBe(18);
+            type.Fields.Count.ShouldBe(18);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));

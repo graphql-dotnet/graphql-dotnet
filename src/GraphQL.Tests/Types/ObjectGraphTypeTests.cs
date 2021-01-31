@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -18,7 +17,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ObjectGraphType();
             type.Interface(typeof(TestInterface));
-            type.Interfaces.Count().ShouldBe(1);
+            type.Interfaces.Count.ShouldBe(1);
         }
 
         private class TestPoco { }
@@ -28,7 +27,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ObjectGraphType<TestPoco>();
             type.Interface(typeof(TestInterface));
-            type.Interfaces.Count().ShouldBe(1);
+            type.Interfaces.Count.ShouldBe(1);
         }
 
         [Fact]

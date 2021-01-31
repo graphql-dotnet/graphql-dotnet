@@ -1,0 +1,26 @@
+query MyQuery {
+  __schema {
+    description
+    appliedDirectives { ...Info }
+    types {
+      name
+      appliedDirectives { ...Info }
+      fields {
+        name
+        appliedDirectives { ...Info }
+        args {
+          name
+          appliedDirectives { ...Info }
+        }
+      }
+    }
+  }
+}
+
+fragment Info on __AppliedDirective {
+  name
+  args {
+    name
+    value
+  }
+}

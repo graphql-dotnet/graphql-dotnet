@@ -23,12 +23,12 @@ namespace GraphQL.Tests.Introspection
                 {
                     Query = new TestQuery()
                 };
-                _.Query = SchemaIntrospection.IntrospectionQuery;
+                _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
-            ShouldBe(json, IntrospectionResult.Data);
+            ShouldBe(json, "IntrospectionResult".ReadJsonResult());
         }
 
         [Theory]
@@ -43,12 +43,12 @@ namespace GraphQL.Tests.Introspection
                     Query = new TestQuery(),
                     NameConverter = PascalCaseNameConverter.Instance,
                 };
-                _.Query = SchemaIntrospection.IntrospectionQuery;
+                _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
-            ShouldBe(json, IntrospectionResult.Data);
+            ShouldBe(json, "IntrospectionResult".ReadJsonResult());
         }
 
         [Theory]
@@ -63,12 +63,12 @@ namespace GraphQL.Tests.Introspection
                     Query = new TestQuery(),
                     NameConverter = new TestNameConverter(),
                 };
-                _.Query = SchemaIntrospection.IntrospectionQuery;
+                _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
-            ShouldBe(json, IntrospectionResult.Data);
+            ShouldBe(json, "IntrospectionResult".ReadJsonResult());
         }
 
         public class TestNameConverter : INameConverter
@@ -97,7 +97,7 @@ namespace GraphQL.Tests.Introspection
                 {
                     Query = TestQueryType(),
                 };
-                _.Query = SchemaIntrospection.GetFieldNamesOfTypesQuery;
+                _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
             });
             var scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
@@ -134,7 +134,7 @@ namespace GraphQL.Tests.Introspection
                     Query = TestQueryType(),
                     Comparer = new AlphabeticalSchemaComparer()
                 };
-                _.Query = SchemaIntrospection.GetFieldNamesOfTypesQuery;
+                _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
             });
             var scalarTypeNames = new[] { "String", "Boolean", "Int" };
 

@@ -11,7 +11,7 @@ namespace GraphQL
     internal sealed class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
         private IResolveFieldContext _baseContext;
-        private static readonly bool _acceptNulls = !typeof(T).IsValueType || (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>));
+        private static readonly bool _acceptNulls = !typeof(T).IsValueType || typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>);
 
         /// <summary>
         /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>

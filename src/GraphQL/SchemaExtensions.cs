@@ -12,6 +12,68 @@ namespace GraphQL
     public static class SchemaExtensions
     {
         /// <summary>
+        /// Adds the specified visitor type to the schema. When initializing a schema, all
+        /// registered visitors will be executed on each schema element when it is traversed.
+        /// </summary>
+        public static TSchema RegisterVisitor<TSchema, TVisitor>(this TSchema schema)
+            where TSchema : ISchema
+            where TVisitor : ISchemaNodeVisitor
+        {
+            schema.RegisterVisitor(typeof(TVisitor));
+            return schema;
+        }
+
+        /// <summary>
+        /// Adds the specified graph type to the schema.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="ISchema.Query"/>,
+        /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
+        /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
+        public static void RegisterType<T>(this ISchema schema)
+            where T : IGraphType
+        {
+            schema.RegisterType(typeof(T));
+        }
+
+        /// <summary>
+        /// Adds the specified graph types to the schema. Each type must implement <see cref="IGraphType"/>.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="ISchema.Query"/>,
+        /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
+        /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
+        public static TSchema RegisterTypes<TSchema>(this TSchema schema, params Type[] types)
+            where TSchema : ISchema
+        {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
+            foreach (var type in types)
+            {
+                schema.RegisterType(type);
+            }
+
+            return schema;
+        }
+
+        /// <summary>
+        /// Adds the specified instances of <see cref="IGraphType"/>s to the schema.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="ISchema.Query"/>,
+        /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
+        /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
+        public static void RegisterTypes<TSchema>(this TSchema schema, params IGraphType[] types)
+            where TSchema : ISchema
+        {
+            foreach (var type in types)
+                schema.RegisterType(type);
+        }
+
+        /// <summary>
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
         /// for more information.
