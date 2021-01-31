@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);1591;IDE1006</NoWarn>
-    <SingleTestPlatform Condition="'$(GITHUB_ACTIONS)' != 'true'">true</SingleTestPlatform>
+    <SingleTestPlatform>false</SingleTestPlatform>
   </PropertyGroup>
 
   <ItemGroup>
