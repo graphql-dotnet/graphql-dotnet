@@ -211,6 +211,7 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
+            // these are the only conditions upon which a node has already been executed when this method is called
             if (node is RootExecutionNode || node.Parent is ArrayExecutionNode)
                 return;
 
