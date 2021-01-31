@@ -144,8 +144,8 @@ namespace GraphQL.Tests.Utilities
             }).ConfigureAwait(false);
 
             result.Errors.ShouldBeNull();
-            var data = result.Data.ShouldBeOfType<ObjectProperty[]>();
-            var t = data.ToDict()["test"].ShouldBeOfType<ObjectProperty[]>().ToDict();
+            var data = result.Data.ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>();
+            var t = data.ToDict()["test"].ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>().ToDict();
             t["id"].ShouldBe("foo");
             t["name"].ShouldBe("bar");
         }

@@ -128,6 +128,51 @@ namespace GraphQL.SystemTextJson
                     writer.WriteNumberValue(sbt);
                     break;
                 }
+                case ObjectExecutionNode objectExecutionNode:
+                {
+                    if (objectExecutionNode.SubFields == null)
+                    {
+                        writer.WriteNullValue();
+                    }
+                    else
+                    {
+                        writer.WriteStartObject();
+                        foreach (var node in objectExecutionNode.SubFields)
+                        {
+                            WriteProperty(writer, node.Name, node is ValueExecutionNode valueNode ? valueNode.Result : node, options);
+                        }
+                        writer.WriteEndObject();
+                    }
+                    break;
+                }
+                case ArrayExecutionNode arrayExecutionNode:
+                {
+                    var items = arrayExecutionNode.Items;
+                    if (items == null)
+                    {
+                        writer.WriteNullValue();
+                    }
+                    else
+                    {
+                        writer.WriteStartArray();
+                        foreach (var node in items)
+                        {
+                            WriteValue(writer, node is ValueExecutionNode valueNode ? valueNode.Result : node, options);
+                        }
+                        writer.WriteEndArray();
+                    }
+                    break;
+                }
+                case ValueExecutionNode valueExecutionNode:
+                {
+                    WriteValue(writer, valueExecutionNode.Result, options);
+                    break;
+                }
+                case NullExecutionNode nullExecutionNode:
+                {
+                    writer.WriteNullValue();
+                    break;
+                }
                 case Dictionary<string, object> dictionary:
                 {
                     writer.WriteStartObject();

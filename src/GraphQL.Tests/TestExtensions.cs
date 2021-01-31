@@ -6,14 +6,20 @@ namespace GraphQL.Tests
 {
     internal static class TestExtensions
     {
-        public static Dictionary<string, object> ToDict(this object data)
+        public static IReadOnlyDictionary<string, object> ToDict(this object data)
         {
             if (data == null)
                 return new Dictionary<string, object>();
 
-            return data is ObjectProperty[] properties
-                ? properties.ToDictionary(x => x.Key, x => x.Value)
-                : throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type ObjectProperty[].", nameof(data));
+            if (data is IReadOnlyDictionary<string, object> properties)
+            {
+                var ret = new Dictionary<string, object>();
+                foreach (var obj in properties)
+                    ret.Add(obj.Key, obj.Value);
+                return ret;
+            }
+
+            throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type IDictionary<string, object>.", nameof(data));
         }
     }
 }

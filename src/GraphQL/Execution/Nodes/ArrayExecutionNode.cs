@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -9,12 +10,14 @@ namespace GraphQL.Execution
     /// <summary>
     /// Represents an execution node of a <see cref="ListGraphType"/>.
     /// </summary>
-    public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
+    public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode, IReadOnlyCollection<object>
     {
         /// <summary>
         /// Returns a list of child execution nodes.
         /// </summary>
         public List<ExecutionNode> Items { get; set; }
+
+        int IReadOnlyCollection<object>.Count => Items.Count;
 
         /// <summary>
         /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
@@ -56,6 +59,38 @@ namespace GraphQL.Execution
             return items;
         }
 
+        public override bool ClearErrorNodes()
+        {
+            if (Items == null)
+                return true;
+
+            if (Items.Count == 0)
+                return false;
+
+            var ok = false;
+
+            for (int i = 0; i < Items.Count; ++i)
+            {
+                var item = Items[i];
+                bool valueIsNull = item.ClearErrorNodes();
+
+                if (valueIsNull && !ok)
+                {
+                    if (((ListGraphType)GraphType).ResolvedType is NonNullGraphType)
+                    {
+                        Items = null;
+                        return true;
+                    }
+                    else
+                    {
+                        ok = true;
+                    } 
+                }
+            }
+
+            return false;
+        }
+
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => Items ?? Enumerable.Empty<ExecutionNode>();
 
         /// <inheritdoc/>
@@ -75,5 +110,23 @@ namespace GraphQL.Execution
                 }
             }
         }
+
+        IEnumerator<object> IEnumerable<object>.GetEnumerator() => GetEnumerator();
+
+        private IEnumerator<object> GetEnumerator()
+        {
+            foreach (var node in Items)
+            {
+                yield return node switch
+                {
+                    ArrayExecutionNode arrayNode => arrayNode.Items == null ? null : arrayNode,
+                    ObjectExecutionNode objectNode => objectNode.SubFields == null ? null : objectNode,
+                    null => null,
+                    _ => node.ToValue()
+                };
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

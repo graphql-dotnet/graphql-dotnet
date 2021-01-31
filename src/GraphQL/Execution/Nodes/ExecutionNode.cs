@@ -116,6 +116,11 @@ namespace GraphQL.Execution
         public abstract object ToValue();
 
         /// <summary>
+        /// Returns true if the node should return null
+        /// </summary>
+        public virtual bool ClearErrorNodes() => ToValue() == null;
+
+        /// <summary>
         /// Returns the parent graph type of this node.
         /// </summary>
         public IObjectGraphType GetParentType(ISchema schema)
