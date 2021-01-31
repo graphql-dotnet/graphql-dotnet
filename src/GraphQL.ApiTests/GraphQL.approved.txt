@@ -2417,6 +2417,7 @@ namespace GraphQL.Utilities
     {
         protected static readonly string DeprecatedDefaultValue;
         public DeprecatedDirectiveVisitor() { }
+        public static GraphQL.Utilities.DeprecatedDirectiveVisitor Instance { get; }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public override void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
     }
