@@ -66,6 +66,7 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
@@ -78,6 +79,7 @@ namespace GraphQL.Tests
                 root,
                 userContext,
                 cancellationToken,
+                rules,
                 expectedErrorCount,
                 renderErrors,
                 unhandledExceptionDelegate);
@@ -90,6 +92,7 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
@@ -102,6 +105,7 @@ namespace GraphQL.Tests
                 options.Inputs = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
+                options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 

@@ -4,6 +4,7 @@ using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -118,7 +119,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void executes_using_union_types()
         {
-            // NOTE: This is an *invalid* query, but it should be an *executable* query.
+            // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
             var query = @"
                 query AQuery {
@@ -137,14 +138,13 @@ namespace GraphQL.Tests.Execution
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
-                  ""pets"": [
-                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
-                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
-                  ]
+                  ""pets"": null
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>());
+            var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1);
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
+            result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
         }
 
         [Fact]
@@ -187,7 +187,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void executes_using_interface_types()
         {
-            // NOTE: This is an *invalid* query, but it should be an *executable* query.
+            // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
             var query = @"
                 query AQuery {
@@ -206,14 +206,13 @@ namespace GraphQL.Tests.Execution
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
-                  ""friends"": [
-                    { ""__typename"":  ""Person"", ""name"": ""Liz"" },
-                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
-                  ]
+                  ""friends"": null
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>());
+            var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1);
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'friends'.");
+            result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Person'.");
         }
 
         [Fact]

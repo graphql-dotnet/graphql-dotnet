@@ -32,9 +32,10 @@ namespace GraphQL.Execution
             if (Items == null)
                 return null;
 
-            var items = new List<object>(Items.Count);
-            foreach (ExecutionNode item in Items)
+            var items = new object[Items.Count];
+            for (int i = 0; i < Items.Count; ++i)
             {
+                var item = Items[i];
                 object value = item.ToValue();
 
                 if (value == null)
@@ -49,7 +50,7 @@ namespace GraphQL.Execution
                     }
                 }
 
-                items.Add(value);
+                items[i] = value;
             }
 
             return items;
