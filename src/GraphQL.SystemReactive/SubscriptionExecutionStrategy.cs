@@ -108,8 +108,7 @@ namespace GraphQL.Execution
                 return subscription
                     .Select(value =>
                     {
-                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
-                        executionNode.Source = value;
+                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode, value);
                         return executionNode;
                     })
                     .SelectMany(async executionNode =>

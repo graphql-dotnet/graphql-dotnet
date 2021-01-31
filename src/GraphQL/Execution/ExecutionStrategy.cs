@@ -207,6 +207,24 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Builds an execution node with the specified parameters.
+        /// </summary>
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        {
+            if (graphType is NonNullGraphType nonNullFieldType)
+                graphType = nonNullFieldType.ResolvedType;
+
+            return graphType switch
+            {
+                ListGraphType _ => new SubscriptionArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                IObjectGraphType _ => new SubscriptionObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                IAbstractGraphType _ => new SubscriptionObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                ScalarGraphType scalarGraphType => new SubscriptionValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode, source),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
+        }
+
+        /// <summary>
         /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
         /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
@@ -214,7 +232,7 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            if (node.IsResultSet)
+            if (node is RootExecutionNode || node.Parent is ArrayExecutionNode)
                 return;
 
             try
@@ -262,8 +280,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
             if (!(node.Result is IDataLoaderResult dataLoaderResult))
                 throw new InvalidOperationException("This execution node is not pending completion");
 
@@ -298,9 +314,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
-
             try
             {
                 ValidateNodeResult(context, node);
