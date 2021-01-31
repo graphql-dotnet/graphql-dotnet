@@ -31,19 +31,16 @@ namespace GraphQL.Execution
             return result;
         }
 
-        private async Task<IDictionary<string, IObservable<ExecutionResult>>> ExecuteSubscriptionNodesAsync(ExecutionContext context, IDictionary<string, ExecutionNode> nodes)
+        private async Task<IDictionary<string, IObservable<ExecutionResult>>> ExecuteSubscriptionNodesAsync(ExecutionContext context, ExecutionNode[] nodes)
         {
             var streams = new Dictionary<string, IObservable<ExecutionResult>>();
 
-            foreach (var kvp in nodes)
+            foreach (var node in nodes)
             {
-                var name = kvp.Key;
-                var node = kvp.Value;
-
                 if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
-                streams[name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+                streams[node.Name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
             }
 
             return streams;

@@ -37,7 +37,7 @@ namespace GraphQL.NewtonsoftJson
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
         public static Dictionary<string, object> ToDictionary(this string json)
         {
-            var values = JsonConvert.DeserializeObject(json,
+            object values = JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings
                 {
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -82,7 +82,7 @@ namespace GraphQL.NewtonsoftJson
 
             if (value is JValue rawValue)
             {
-                var val = rawValue.Value;
+                object val = rawValue.Value;
                 if (val is long l)
                 {
                     if (l >= int.MinValue && l <= int.MaxValue)

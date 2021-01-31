@@ -265,6 +265,12 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
             where T :  class { }
     }
+    public struct ObjectProperty
+    {
+        public ObjectProperty(string key, object value) { }
+        public string Key { get; }
+        public object Value { get; }
+    }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
@@ -764,12 +770,9 @@ namespace GraphQL.Execution
         protected bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
         protected void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
+        protected static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
         public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
-        public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
-        public static void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
-        public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
-        public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent, GraphQL.Language.AST.Fields fields) { }
+        protected static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
@@ -854,7 +857,7 @@ namespace GraphQL.Execution
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
         public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
-        public System.Collections.Generic.Dictionary<string, GraphQL.Execution.ExecutionNode> SubFields { get; set; }
+        public GraphQL.Execution.ExecutionNode[] SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
         public override object ToValue() { }
