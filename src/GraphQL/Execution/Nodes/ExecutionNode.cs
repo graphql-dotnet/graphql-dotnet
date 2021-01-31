@@ -69,7 +69,7 @@ namespace GraphQL.Execution
         public object Result { get; set; }
 
         /// <summary>
-        /// Returns the parent node's result. If set, the set value will override the parent node's result.
+        /// Returns the parent node's result.
         /// </summary>
         public virtual object Source => Parent?.Result;
 
