@@ -96,7 +96,7 @@ namespace GraphQL.Execution
         public abstract object ToValue();
 
         /// <summary>
-        /// Returns true if the node should return null
+        /// Returns <see langword="true"/> if the node should return <see langword="null"/>.
         /// </summary>
         public virtual bool ClearErrorNodes() => ToValue() == null;
 
