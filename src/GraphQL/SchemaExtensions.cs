@@ -120,18 +120,23 @@ namespace GraphQL
         /// <summary>
         /// Runs the specified visitor on the specified schema.
         /// </summary>
+        public static void Run(this ISchemaNodeVisitor visitor, Schema schema) => schema.Run(visitor);
+
+        /// <summary>
+        /// Runs the specified visitor on the specified schema.
+        /// </summary>
         public static void Run(this Schema schema, ISchemaNodeVisitor visitor)
         {
             visitor.VisitSchema(schema);
 
             foreach (var directive in schema.Directives.List)
             {
-                visitor.VisitDirective(directive);
+                visitor.VisitDirective(directive, schema);
 
                 if (directive.Arguments?.Count > 0)
                 {
                     foreach (var argument in directive.Arguments.List)
-                        visitor.VisitDirectiveArgumentDefinition(argument);
+                        visitor.VisitDirectiveArgumentDefinition(argument, schema);
                 }
             }
 
@@ -140,40 +145,40 @@ namespace GraphQL
                 switch (item.Value)
                 {
                     case EnumerationGraphType e:
-                        visitor.VisitEnum(e);
+                        visitor.VisitEnum(e, schema);
                         foreach (var value in e.Values.List)
-                            visitor.VisitEnumValue(value);
+                            visitor.VisitEnumValue(value, schema);
                         break;
 
                     case ScalarGraphType scalar:
-                        visitor.VisitScalar(scalar);
+                        visitor.VisitScalar(scalar, schema);
                         break;
 
                     case UnionGraphType union:
-                        visitor.VisitUnion(union);
+                        visitor.VisitUnion(union, schema);
                         break;
 
                     case InterfaceGraphType iface:
-                        visitor.VisitInterface(iface);
+                        visitor.VisitInterface(iface, schema);
                         break;
 
                     case IObjectGraphType output:
-                        visitor.VisitObject(output);
+                        visitor.VisitObject(output, schema);
                         foreach (var field in output.Fields.List)
                         {
-                            visitor.VisitFieldDefinition(field);
+                            visitor.VisitFieldDefinition(field, schema);
                             if (field.Arguments?.Count > 0)
                             {
                                 foreach (var argument in field.Arguments.List)
-                                    visitor.VisitFieldArgumentDefinition(argument);
+                                    visitor.VisitFieldArgumentDefinition(argument, schema);
                             }
                         }
                         break;
 
                     case IInputObjectGraphType input:
-                        visitor.VisitInputObject(input);
+                        visitor.VisitInputObject(input, schema);
                         foreach (var field in input.Fields.List)
-                            visitor.VisitInputFieldDefinition(field);
+                            visitor.VisitInputFieldDefinition(field, schema);
                         break;
                 }
             }

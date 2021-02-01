@@ -64,14 +64,14 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance with the specified <see cref="INameConverter"/>.
         /// </summary>
-        private SchemaTypes(INameConverter nameConverter, bool allowAppliedDirectives)
+        private SchemaTypes(INameConverter nameConverter, bool allowAppliedDirectives, bool allowRepeatable)
         {
 #pragma warning disable IDE0016 // Use 'throw' expression; if this rule is applied here, then the null check is moved to the very end of the method - this is not what we want
             if (nameConverter == null)
                 throw new ArgumentNullException(nameof(nameConverter));
 #pragma warning restore IDE0016
 
-            _introspectionTypes = CreateIntrospectionTypes(allowAppliedDirectives);
+            _introspectionTypes = CreateIntrospectionTypes(allowAppliedDirectives, allowRepeatable);
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
@@ -95,7 +95,7 @@ namespace GraphQL.Types
             _nameConverter = nameConverter;
         }
 
-        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives)
+        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
         {
             return (allowAppliedDirectives
                 ? new IGraphType[]
@@ -105,7 +105,7 @@ namespace GraphQL.Types
                     new __AppliedDirective(),
                     new __TypeKind(),
                     new __EnumValue(true),
-                    new __Directive(true),
+                    new __Directive(true, allowRepeatable),
                     new __Field(true),
                     new __InputValue(true),
                     new __Type(true),
@@ -118,7 +118,7 @@ namespace GraphQL.Types
                     //new __AppliedDirective(),  forbidden
                     new __TypeKind(),
                     new __EnumValue(false),
-                    new __Directive(false),
+                    new __Directive(false, allowRepeatable),
                     new __Field(false),
                     new __InputValue(false),
                     new __Type(false),
@@ -160,7 +160,7 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             ISchema schema)
         {
-            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives);
+            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {

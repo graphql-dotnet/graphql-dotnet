@@ -26,6 +26,15 @@ namespace GraphQL.Types
         public static readonly DeprecatedDirective Deprecated = new DeprecatedDirective();
 
         /// <summary>
+        /// Initializes a new instance with the specified name.
+        /// </summary>
+        /// <param name="name">The directive name within the GraphQL schema.</param>
+        internal DirectiveGraphType(string name)
+        {
+            Name = name;
+        }
+
+        /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
         /// <param name="name">The directive name within the GraphQL schema.</param>
@@ -72,6 +81,16 @@ namespace GraphQL.Types
         /// type ExecutableDirectiveLocation, only then it will be present in the introspection response.
         /// </summary>
         public virtual bool? Introspectable => null;
+
+        /// <summary>
+        /// Indicates if the directive may be used repeatedly at a single location.
+        /// <br/><br/>
+        /// Repeatable directives are often useful when the same directive
+        /// should be used with different arguments at a single location,
+        /// especially in cases where additional information needs to be
+        /// provided to a type or schema extension via a directive
+        /// </summary>
+        public bool Repeatable { get; set; }
 
         /// <summary>
         /// Gets or sets a list of arguments for the directive.
