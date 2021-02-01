@@ -6,9 +6,9 @@ A GraphQL object type has a name and fields, but at some point those fields have
 
 These are the scalars provided by the [GraphQL Specification](https://graphql.github.io/graphql-spec/June2018/#sec-Scalars).
 
-| GraphQL     | GraphQL .NET        | .NET                    |
-|-------------|---------------------|-------------------------|
-| `String`    | `StringGraphType`   | `string`                |
+| GraphQL | GraphQL.NET        | .NET                    |
+|----------|---------------------|-------------------------|
+| `String`   | `StringGraphType`   | `string`                |
 | `Int`       | `IntGraphType`      | `int`                   |
 | `Float`     | `FloatGraphType`    | `double`                |
 | `Boolean`   | `BooleanGraphType`  | `bool`                  |
@@ -18,28 +18,28 @@ These are the scalars provided by the [GraphQL Specification](https://graphql.gi
 
 These are additional scalars provided by this project.
 
-| GraphQL          | GraphQL .NET                    | .NET               |
-|------------------|---------------------------------|--------------------|
-| `Date`           | `DateGraphType`                 | `DateTime`         |
-| `DateTime`       | `DateTimeGraphType`             | `DateTime`         |
-| `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   |
-| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         |
-| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         |
-| `Decimal` | `DecimalGraphType` | `decimal` |
-| `Uri` | `UriGraphType` | `Uri` |
-| `Guid` | `GuidGraphType` | `Guid` |
-| `Short` | `ShortGraphType` | `short` |
-| `UShort` | `UShortGraphType` | `ushort` |
-| `UInt` | `UIntGraphType` | `uint` |
-| `Long` | `LongGraphType` | `long` |
-| `ULong` | `ULongGraphType` | `ulong` |
-| `Byte` | `ByteGraphType` | `byte` |
-| `SByte` | `SByteGraphType` | `sbyte`
-| `BigInt` | `BigIntGraphType` | `BigInteger`
+| GraphQL          | GraphQL.NET                    | .NET               | Format |
+|------------------|---------------------------------|--------------------|-------|
+| `Date`           | `DateGraphType`                 | `DateTime`         | ISO-8601: yyyy-MM-dd |
+| `DateTime`       | `DateTimeGraphType`             | `DateTime`         | ISO-8601, assume UTC |
+| `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   | ISO-8601 |
+| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         | number |
+| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
+| `Decimal` | `DecimalGraphType` | `decimal` | number |
+| `Uri` | `UriGraphType` | `Uri` | RFC 2396/2732/3986/3987 |
+| `Guid` | `GuidGraphType` | `Guid` | string |
+| `Short` | `ShortGraphType` | `short` | number |
+| `UShort` | `UShortGraphType` | `ushort` | number |
+| `UInt` | `UIntGraphType` | `uint` | number |
+| `Long` | `LongGraphType` | `long` | number |
+| `ULong` | `ULongGraphType` | `ulong` | number |
+| `Byte` | `ByteGraphType` | `byte` | number |
+| `SByte` | `SByteGraphType` | `sbyte` | number |
+| `BigInt` | `BigIntGraphType` | `BigInteger` | number |
 
 Lists of data are also supported with any Scalar or Object types.
 
-| GraphQL    | GraphQL .NET                        | .NET           |
+| GraphQL    | GraphQL.NET                        | .NET           |
 | -----------|-------------------------------------|----------------|
 | `[String]` | `ListGraphType<StringGraphType>`    | `List<string>` |
 | `[Boolean]` | `ListGraphType<BooleanGraphType>`    | `List<bool>` |
@@ -57,7 +57,7 @@ type Droid {
 }
 ```
 
-**GraphQL .NET**
+**GraphQL.NET**
 
 ```csharp
 public class DroidType : ObjectGraphType<Droid>
@@ -113,7 +113,7 @@ public enum Episodes
 
 Compare the two implementations. GraphQL does not specify backing values for members of its enums. The name of each member _is_ the value.
 
-**GraphQL .NET**
+**GraphQL.NET**
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
