@@ -6,10 +6,7 @@
 
 GraphQL.NET 4.0 has been highly optimized, typically executing queries at least 50% faster while also providing a 65% memory reduction. Small queries have been measured to run twice as fast as they previously ran. A cached query executor is also provided, which can reduce execution time another 20% once the query has been parsed (disabled by default). Variable parsing is also improved to run about 50% faster, and schema build time is now about 20x faster than previously and requires 1/25th the amount of memory.
 
-> Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
-> Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
-
-To enable cached queries...(todo: add sample)
+See the [Document Caching](https://graphql-dotnet.github.io/docs/guides/document-caching) guide to enable document caching.
 
 To facilitate the performance changes, many changes were made to the API that may affect you if you have built custom execution strategies, scalars, parser, or similar core components. Please see the complete list of breaking changes below.
 
