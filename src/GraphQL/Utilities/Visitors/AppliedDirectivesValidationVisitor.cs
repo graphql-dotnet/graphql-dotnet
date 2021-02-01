@@ -74,7 +74,7 @@ namespace GraphQL.Utilities
                 foreach (var directive in schema.Directives.List)
                 {
                     if (!directive.Repeatable && applied.Count(applied => applied.Name == directive.Name) > 1)
-                        throw new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to element '{provider.GetType().Name}' more than 1 time.");
+                        throw new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to element '{provider.GetType().Name}' more than one time.");
                 }
             }
         }
