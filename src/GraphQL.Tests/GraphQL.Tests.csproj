@@ -10,10 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Files\*.graphql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Introspection\IntrospectionResult.json">
+    <Content Include="Files\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

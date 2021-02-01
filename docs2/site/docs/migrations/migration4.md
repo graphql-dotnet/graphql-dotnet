@@ -101,3 +101,5 @@
 * Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
 * Most `ExecutionStrategy` methods are now `protected`
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
+* `ExecutionNode.IsResultSet` has been removed
+* `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions

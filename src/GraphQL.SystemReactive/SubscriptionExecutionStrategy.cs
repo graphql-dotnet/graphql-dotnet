@@ -103,30 +103,29 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value =>
-                    {
-                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
-                        executionNode.Source = value;
-                        return executionNode;
-                    })
+                    .Select(value => BuildSubscriptionExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
                     .SelectMany(async executionNode =>
                     {
                         if (context.Listeners != null)
+                        {
                             foreach (var listener in context.Listeners)
                             {
                                 await listener.BeforeExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
+                        }
 
                         // Execute the whole execution tree and return the result
                         await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
                         if (context.Listeners != null)
+                        {
                             foreach (var listener in context.Listeners)
                             {
                                 await listener.AfterExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
+                        }
 
                         return new ExecutionResult
                         {
@@ -158,6 +157,24 @@ namespace GraphQL.Execution
                 context.Errors.Add(error);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Builds an execution node with the specified parameters.
+        /// </summary>
+        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        {
+            if (graphType is NonNullGraphType nonNullFieldType)
+                graphType = nonNullFieldType.ResolvedType;
+
+            return graphType switch
+            {
+                ListGraphType _ => new SubscriptionArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                IObjectGraphType _ => new SubscriptionObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                IAbstractGraphType _ => new SubscriptionObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode, source),
+                ScalarGraphType scalarGraphType => new SubscriptionValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode, source),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
         }
 
         private ExecutionError GenerateError(

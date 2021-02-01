@@ -200,7 +200,7 @@ namespace GraphQL.Types
     /// A class that represents an enumeration definition.
     /// </summary>
     [DebuggerDisplay("{Name}: {Value}")]
-    public class EnumValueDefinition : MetadataProvider
+    public class EnumValueDefinition : MetadataProvider, IProvideDescription, IProvideDeprecationReason
     {
         /// <summary>
         /// The name of the enumeration member, as exposed through the GraphQL endpoint (e.g. "RED").

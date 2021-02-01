@@ -336,7 +336,7 @@ namespace GraphQL.Types
 
             if (type is IObjectGraphType obj)
             {
-                foreach (var objectInterface in obj.Interfaces)
+                foreach (var objectInterface in obj.Interfaces.List)
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
@@ -415,7 +415,7 @@ namespace GraphQL.Types
             if (applyNameConverter)
             {
                 field.Name = _nameConverter.NameForField(field.Name, parentType);
-                NameValidator.ValidateNameOnSchemaInitialize(field.Name);
+                NameValidator.ValidateNameOnSchemaInitialize(field.Name, "field");
             }
 
             if (field.ResolvedType == null)
@@ -454,9 +454,11 @@ namespace GraphQL.Types
         private void AddTypeWithLoopCheck(IGraphType resolvedType, TypeCollectionContext context, Type namedType)
         {
             if (context.InFlightRegisteredTypes.Any(t => t == namedType))
+            {
                 throw new InvalidOperationException($@"A loop has been detected while registering schema types.
 There was an attempt to re-register '{namedType.FullName}' with instance of '{resolvedType.GetType().FullName}'.
 Make sure that your ServiceProvider is configured correctly.");
+            }
 
             context.InFlightRegisteredTypes.Push(namedType);
             try

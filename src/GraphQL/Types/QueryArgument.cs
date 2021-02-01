@@ -25,7 +25,7 @@ namespace GraphQL.Types
     /// Represents an argument to a field or directive.
     /// </summary>
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class QueryArgument : MetadataProvider, IHaveDefaultValue
+    public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription
     {
         private Type _type;
         private IGraphType _resolvedType;

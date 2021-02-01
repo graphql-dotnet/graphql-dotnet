@@ -43,12 +43,14 @@ namespace GraphQL.Benchmarks.Merge
         private static BenchmarkResult Merge(BenchmarkResult before, BenchmarkResult after, string[] compareColumns)
         {
             if (!before.Header.SequenceEqual(after.Header))
+            {
                 throw new InvalidOperationException($@"Differences were found in the benchmark execution environments.
 BEFORE:
 {string.Join(Environment.NewLine, before.Header)}
 
 AFTER:
 {string.Join(Environment.NewLine, after.Header)}");
+            }
 
             var result = new BenchmarkResult
             {

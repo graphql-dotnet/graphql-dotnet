@@ -56,7 +56,7 @@ namespace GraphQL.Types
         /// Searches the directive arguments for an argument specified by its name and returns it.
         /// </summary>
         /// <param name="argumentName">Argument name.</param>
-        public DirectiveArgument Find(string argumentName)
+        public DirectiveArgument FindArgument(string argumentName)
         {
             if (Arguments != null)
             {

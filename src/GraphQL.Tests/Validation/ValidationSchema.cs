@@ -292,10 +292,10 @@ namespace GraphQL.Tests.Validation
         public ValidationSchema()
         {
             Query = new ValidationQueryRoot();
-            RegisterType<Dog>();
-            RegisterType<Cat>();
-            RegisterType<Human>();
-            RegisterType<Alien>();
+            this.RegisterType<Dog>();
+            this.RegisterType<Cat>();
+            this.RegisterType<Human>();
+            this.RegisterType<Alien>();
 
             Directives.Register(
                 new DirectiveGraphType("onQuery", DirectiveLocation.Query),

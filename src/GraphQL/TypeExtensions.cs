@@ -38,7 +38,7 @@ namespace GraphQL
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsNullable(this Type type)
-            => type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+            => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
         public static bool IsPrimitive(this Type type)
         {
@@ -138,7 +138,9 @@ namespace GraphQL
                     graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
                 }
                 else
+                {
                     throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                }
             }
 
             if (!isNullable)
@@ -235,7 +237,7 @@ namespace GraphQL
             }
 
             var baseType = type.BaseType;
-            return baseType == null ? false : ImplementsGenericType(baseType, genericType);
+            return baseType != null && ImplementsGenericType(baseType, genericType);
         }
 
         /// <summary>

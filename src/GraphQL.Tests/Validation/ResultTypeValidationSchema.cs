@@ -7,10 +7,10 @@ namespace GraphQL.Tests.Validation
         public ResultTypeValidationSchema()
         {
             Query = new ResultTypeValidationQueryRoot();
-            RegisterType<IntBox>();
-            RegisterType<StringBox>();
-            RegisterType<NonNullStringBox1Imp>();
-            RegisterType<NonNullStringBox2Imp>();
+            this.RegisterType<IntBox>();
+            this.RegisterType<StringBox>();
+            this.RegisterType<NonNullStringBox1Imp>();
+            this.RegisterType<NonNullStringBox2Imp>();
         }
     }
 

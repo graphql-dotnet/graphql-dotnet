@@ -211,7 +211,8 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            if (node.IsResultSet)
+            // these are the only conditions upon which a node has already been executed when this method is called
+            if (node is RootExecutionNode || node.Parent is ArrayExecutionNode)
                 return;
 
             try
@@ -259,8 +260,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
             if (!(node.Result is IDataLoaderResult dataLoaderResult))
                 throw new InvalidOperationException("This execution node is not pending completion");
 
@@ -295,9 +294,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
-
             try
             {
                 ValidateNodeResult(context, node);
@@ -431,11 +427,13 @@ namespace GraphQL.Execution
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
             if (context.Listeners != null)
+            {
                 foreach (var listener in context.Listeners)
                 {
                     await listener.BeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
                 }
+            }
         }
     }
 }
