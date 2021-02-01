@@ -1,7 +1,9 @@
 <Project>
+  <Import Project="$(MSBuildThisFileDirectory)Tests.local.props" Condition="Exists('$(MSBuildThisFileDirectory)Tests.local.props')" />
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);1591;IDE1006</NoWarn>
+    <SingleTestPlatform Condition="'$(SingleTestPlatform)' == ''">false</SingleTestPlatform>
   </PropertyGroup>
 
   <ItemGroup>
