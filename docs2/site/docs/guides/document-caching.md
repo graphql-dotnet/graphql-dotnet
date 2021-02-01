@@ -15,13 +15,18 @@ Below are samples of how to use the caching engine:
 
 ```cs
 var memoryDocumentCache = new MemoryDocumentCache(new MemoryDocumentCacheOptions {
-    // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage for 10MB maximum memory use by the cache)
+    // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
+    // for 10MB maximum memory use by the cache)
     SizeLimit = 1000000,
     // no expiration of cached queries (cached queries are only ejected when the cache is full)
     SlidingExpiration = null,
 });
 
-var executer = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), memoryDocumentCache);
+var executer = new DocumentExecuter(
+    new GraphQLDocumentBuilder(),
+    new DocumentValidator(),
+    new ComplexityAnalyzer(),
+    memoryDocumentCache);
 ```
 
 If you utilize dependency injection, register the memory cache and document executer as singletons. Below is a sample for the
@@ -31,7 +36,8 @@ Microsoft dependency injection service provider:
 services.AddSingleton<IDocumentCache>(services =>
 {
     return new MemoryDocumentCache(new MemoryDocumentCacheOptions {
-        // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage for 10MB maximum memory use by the cache)
+        // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
+        // for 10MB maximum memory use by the cache)
         SizeLimit = 1000000,
         // no expiration of cached queries (cached queries are only ejected when the cache is full)
         SlidingExpiration = null,
@@ -40,8 +46,21 @@ services.AddSingleton<IDocumentCache>(services =>
 
 services.AddSingleton<IDocumentExecuter>(services =>
 {
-    var memoryDocumentCache = services.GetRequiredService<IDocumentCache>();
-
-    return new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), memoryDocumentCache);
+    return new DocumentExecuter(
+        new GraphQLDocumentBuilder(),
+        new DocumentValidator(),
+        new ComplexityAnalyzer(),
+        services.GetRequiredService<IDocumentCache>());
 });
 ```
+
+## Notes
+
+If literal values are passed as arguments to a query, those literals are part of the cached document, so a
+similar request with different argument literals will be parsed, validated, and cached separately. So it is very
+important to provide arguments via variables and not as literals within the query (unless the arguments are constants).
+
+Document caching assumes that validation rules do not depend on the inputs or user context for the execution. Further,
+documents are not cached unless they pass validation. So it is assumed that validation need not run on queries that
+have been cached. If you have custom validation rules that examine the user context or inputs, you will want to add
+those validation rules to `ExecutionOptions.CachedDocumentValidationRules` so they run for every execution.
