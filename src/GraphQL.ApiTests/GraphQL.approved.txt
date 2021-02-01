@@ -762,13 +762,12 @@ namespace GraphQL.Execution
         public GraphQL.Types.FieldType FieldDefinition { get; }
         public GraphQL.Types.IGraphType GraphType { get; }
         public int? IndexInParentNode { get; }
-        public bool IsResultSet { get; }
         public string Name { get; }
         public GraphQL.Execution.ExecutionNode Parent { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public object Result { get; set; }
-        public object Source { get; set; }
+        public virtual object Source { get; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
         public abstract object ToValue();
     }
@@ -892,6 +891,21 @@ namespace GraphQL.Execution
         public SerialExecutionStrategy() { }
         public static GraphQL.Execution.SerialExecutionStrategy Instance { get; }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
+    }
+    public class SubscriptionArrayExecutionNode : GraphQL.Execution.ArrayExecutionNode
+    {
+        public SubscriptionArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public override object Source { get; }
+    }
+    public class SubscriptionObjectExecutionNode : GraphQL.Execution.ObjectExecutionNode
+    {
+        public SubscriptionObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public override object Source { get; }
+    }
+    public class SubscriptionValueExecutionNode : GraphQL.Execution.ValueExecutionNode
+    {
+        public SubscriptionValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public override object Source { get; }
     }
     [System.Serializable]
     public class SyntaxError : GraphQL.Execution.DocumentError
