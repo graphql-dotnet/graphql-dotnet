@@ -25,7 +25,17 @@ namespace GraphQL.Tests.Builders
         public void should_throw_error_if_name_is_null_or_empty(string fieldName)
         {
             var type = new ObjectGraphType();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            ArgumentOutOfRangeException exception;
+            // race condition with does_not_throw_with_filtering_nameconverter test
+            try
+            {
+                exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            }
+            catch (ShouldAssertException)
+            {
+                System.Threading.Thread.Sleep(100); // wait a bit and retry
+                exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            }
 
             exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
