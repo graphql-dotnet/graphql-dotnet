@@ -70,12 +70,12 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=opencover -p:Include=[GraphQL]* -p:CoverletOutput=../../${{ matrix.os }}.opencover.xml
+        run: dotnet test --no-restore -p:CollectCoverage=true
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.2.1
         with:
-          files: ${{ matrix.os }}.opencover.xml # net5 only, ignore netcoreapp3.1
+          files: ../.coverage/GraphQL.DataLoader.Tests/net5/coverage.opencover.xml,../.coverage/GraphQL.Harness.Tests/net5/coverage.opencover.xml,../.coverage/GraphQL.Tests/net5/coverage.opencover.xml
 
   buildcheck:
     needs:
