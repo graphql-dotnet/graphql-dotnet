@@ -8,6 +8,14 @@ on:
     paths:
       - src/**
       - .github/workflows/**
+  # save code coverage reports when PRs are merged
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - src/**
+      - .github/workflows/**
 
 env:
   DOTNET_NOLOGO: true
@@ -62,7 +70,24 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore
+        run: dotnet test --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=lcov -p:Include="[GraphQL]*,[GraphQL.Newtonsoft]*,[GraphQL.SystemTextJson]*,[GraphQL.SystemReactive]*,[GraphQL.MemoryCache]*" -p:CoverletOutput=../../${{ matrix.os }}.lcov.info
+      - name: Upload coverage to Coveralls # https://github.com/marketplace/actions/coveralls-github-action
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN }}
+          path-to-lcov: ${{ matrix.os }}.lcov.net5.info # net5 only, ignore netcoreapp3.1
+          parallel: true
+          flag-name: ${{ matrix.os }}
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
 
   buildcheck:
     needs:
