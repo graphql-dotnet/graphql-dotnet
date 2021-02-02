@@ -61,17 +61,9 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
-        /// <summary>
-        /// Initializes a new instance with the specified <see cref="INameConverter"/>.
-        /// </summary>
-        private SchemaTypes(INameConverter nameConverter, bool allowAppliedDirectives, bool allowRepeatable)
+        private SchemaTypes(ISchema schema)
         {
-#pragma warning disable IDE0016 // Use 'throw' expression; if this rule is applied here, then the null check is moved to the very end of the method - this is not what we want
-            if (nameConverter == null)
-                throw new ArgumentNullException(nameof(nameConverter));
-#pragma warning restore IDE0016
-
-            _introspectionTypes = CreateIntrospectionTypes(allowAppliedDirectives, allowRepeatable);
+            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
@@ -92,7 +84,7 @@ namespace GraphQL.Types
                 AddType(introspectionType, _context);
 
             // set the name converter properly
-            _nameConverter = nameConverter;
+            _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
         }
 
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
@@ -160,7 +152,7 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             ISchema schema)
         {
-            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
+            var lookup = new SchemaTypes(schema);
 
             var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {

@@ -12,7 +12,9 @@
 * `GlobalSwitches` - new global options for configuring GraphQL execution
 * Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
   See https://github.com/graphql/graphql-spec/issues/300 for more information.
-
+* Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
+* Schema validation on initialize and better support for schema traversal via `ISchemaNodeVisitor`
+ 
 ## Breaking Changes
 
 * GraphQL.NET now uses GraphQL-Parser v7 with new memory model
