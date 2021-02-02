@@ -125,7 +125,7 @@ namespace GraphQL.Types
         /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
         /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
         /// </summary>
-        ISchemaFilter Filter { get; }
+        ISchemaFilter Filter { get; set; }
 
         /// <summary>
         /// Provides the ability to order the schema elements upon introspection.

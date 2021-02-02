@@ -460,24 +460,25 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var locations = directiveDef.Locations.Select(l => ToDirectiveLocation((string)l.Value)); //TODO: can be rewritten without cast
-            return new DirectiveGraphType((string)directiveDef.Name.Value, locations)
+            var result = new DirectiveGraphType((string)directiveDef.Name.Value)
             {
                 Description = directiveDef.Comment?.Text.ToString(),
+                Repeatable = directiveDef.Repeatable,
                 Arguments = ToQueryArguments(directiveDef.Arguments)
             };
-        }
 
-        private DirectiveLocation ToDirectiveLocation(string name)
-        {
-            var enums = new __DirectiveLocation(); //TODO: remove new, also see TODO above
-            var result = enums.ParseValue(name);
-            if (result != null)
+            if (directiveDef.Locations?.Count > 0) // just in case
             {
-                return (DirectiveLocation)result;
+                foreach (var location in directiveDef.Locations)
+                {
+                    if (__DirectiveLocation.Instance.Values.FindByName(location.Value)?.Value is DirectiveLocation l)
+                        result.Locations.Add(l);
+                    else
+                        throw new InvalidOperationException($"Directive '{result.Name}' has an unknown directive location '{location.Value}'.");
+                }
             }
 
-            throw new ArgumentOutOfRangeException(nameof(name), $"{name} is an unknown directive location");
+            return result;
         }
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)

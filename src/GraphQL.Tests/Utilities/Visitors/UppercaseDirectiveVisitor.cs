@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public override void VisitFieldDefinition(FieldType field)
+        public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
             if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
             {
@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class AsyncUppercaseDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public override void VisitFieldDefinition(FieldType field)
+        public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
             if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
             {

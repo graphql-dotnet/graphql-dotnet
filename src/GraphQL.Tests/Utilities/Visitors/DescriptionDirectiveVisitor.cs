@@ -21,30 +21,30 @@ namespace GraphQL.Tests.Utilities.Visitors
             }
         }
 
-        public override void VisitSchema(Schema schema) => SetDescription(schema);
+        public override void VisitSchema(ISchema schema) => SetDescription(schema);
 
-        public override void VisitDirective(DirectiveGraphType directive) => SetDescription(directive);
+        public override void VisitDirective(DirectiveGraphType directive, ISchema schema) => SetDescription(directive);
 
-        public override void VisitScalar(ScalarGraphType scalar) => SetDescription(scalar);
+        public override void VisitScalar(ScalarGraphType scalar, ISchema schema) => SetDescription(scalar);
 
-        public override void VisitObject(IObjectGraphType type) => SetDescription(type);
+        public override void VisitObject(IObjectGraphType type, ISchema schema) => SetDescription(type);
 
-        public override void VisitInputObject(IInputObjectGraphType type) => SetDescription(type);
+        public override void VisitInputObject(IInputObjectGraphType type, ISchema schema) => SetDescription(type);
 
-        public override void VisitFieldDefinition(FieldType field) => SetDescription(field);
+        public override void VisitFieldDefinition(FieldType field, ISchema schema) => SetDescription(field);
 
-        public override void VisitInputFieldDefinition(FieldType field) => SetDescription(field);
+        public override void VisitInputFieldDefinition(FieldType field, ISchema schema) => SetDescription(field);
 
-        public override void VisitFieldArgumentDefinition(QueryArgument argument) => SetDescription(argument);
+        public override void VisitFieldArgumentDefinition(QueryArgument argument, ISchema schema) => SetDescription(argument);
 
-        public override void VisitDirectiveArgumentDefinition(QueryArgument argument) => SetDescription(argument);
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, ISchema schema) => SetDescription(argument);
 
-        public override void VisitInterface(IInterfaceGraphType iface) => SetDescription(iface);
+        public override void VisitInterface(IInterfaceGraphType iface, ISchema schema) => SetDescription(iface);
 
-        public override void VisitUnion(UnionGraphType union) => SetDescription(union);
+        public override void VisitUnion(UnionGraphType union, ISchema schema) => SetDescription(union);
 
-        public override void VisitEnum(EnumerationGraphType type) => SetDescription(type);
+        public override void VisitEnum(EnumerationGraphType type, ISchema schema) => SetDescription(type);
 
-        public override void VisitEnumValue(EnumValueDefinition value) => SetDescription(value);
+        public override void VisitEnumValue(EnumValueDefinition value, ISchema schema) => SetDescription(value);
     }
 }

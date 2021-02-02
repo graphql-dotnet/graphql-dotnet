@@ -282,8 +282,7 @@ namespace GraphQL.Utilities
 
         private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
         {
-            var enums = new __DirectiveLocation();
-            return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
+            return string.Join(" | ", locations.Select(x => __DirectiveLocation.Instance.Serialize(x))); //TODO: remove allocations
         }
 
         protected string FormatDescription(string description, string indentation = "") => Options.IncludeDescriptions ? PrintDescription(description, indentation) : "";
@@ -302,7 +301,7 @@ namespace GraphQL.Utilities
                     bool b => b ? "true" : "false",
                     _ => value.ToString() // TODO: how to print custom scalars ("") ?
                 },
-                _ => throw new NotSupportedException($"Unsopported graph type '{graphType}'")
+                _ => throw new NotSupportedException($"Unsupported graph type '{graphType}'")
             };
         }
 

@@ -171,6 +171,21 @@ namespace GraphQL.Types
         }
 
         /// <summary>
+        /// Returns an enumeration definition for the specified name.
+        /// </summary>
+        internal EnumValueDefinition FindByName(ReadOnlySpan<char> name)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in List)
+            {
+                if (name.SequenceEqual(def.Name.AsSpan()))
+                    return def;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Returns an enumeration definition for the specified value.
         /// </summary>
         public EnumValueDefinition FindByValue(object value)
