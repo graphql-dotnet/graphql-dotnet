@@ -70,7 +70,7 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=lcov -p:Include=&quot;[GraphQL]*,[GraphQL.Newtonsoft]*,[GraphQL.SystemTextJson]*,[GraphQL.SystemReactive]*,[GraphQL.MemoryCache]*&quot; -p:CoverletOutput=../../${{ matrix.os }}.lcov.info
+        run: dotnet test --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=lcov -p:Include=[GraphQL]* -p:CoverletOutput=../../${{ matrix.os }}.lcov.info
       - name: Upload coverage to Coveralls # https://github.com/marketplace/actions/coveralls-github-action
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: coverallsapp/github-action@v1.1.2
