@@ -8,7 +8,7 @@ on:
     paths:
       - src/**
       - .github/workflows/**
-  # save code coverage reports when PRs are merged
+  # Upload code coverage results when PRs are merged
   push:
     branches:
       - master

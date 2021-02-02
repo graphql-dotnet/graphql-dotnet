@@ -32,4 +32,3 @@ bundle.js
 style.css
 
 *.received.txt
-.coverage/
