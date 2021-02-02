@@ -30,9 +30,9 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public override void VisitFieldDefinition(FieldType field, Schema schema) => SetDeprecationReason(field);
+        public override void VisitFieldDefinition(FieldType field, ISchema schema) => SetDeprecationReason(field);
 
         /// <inheritdoc />
-        public override void VisitEnumValue(EnumValueDefinition value, Schema schema) => SetDeprecationReason(value);
+        public override void VisitEnumValue(EnumValueDefinition value, ISchema schema) => SetDeprecationReason(value);
     }
 }

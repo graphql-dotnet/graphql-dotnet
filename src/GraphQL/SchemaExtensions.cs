@@ -82,7 +82,7 @@ namespace GraphQL
         /// <param name="mode">Experimental features mode.</param>
         /// <returns>Reference to the provided <paramref name="schema"/>Experimental features mode.</returns>
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, ExperimentalIntrospectionFeaturesMode mode = ExperimentalIntrospectionFeaturesMode.ExecutionOnly)
-            where TSchema : Schema
+            where TSchema : ISchema
         {
             if (schema.Initialized)
                 throw new InvalidOperationException("Schema is already initialized");
@@ -120,12 +120,12 @@ namespace GraphQL
         /// <summary>
         /// Runs the specified visitor on the specified schema.
         /// </summary>
-        public static void Run(this ISchemaNodeVisitor visitor, Schema schema) => schema.Run(visitor);
+        public static void Run(this ISchemaNodeVisitor visitor, ISchema schema) => schema.Run(visitor);
 
         /// <summary>
         /// Runs the specified visitor on the specified schema.
         /// </summary>
-        public static void Run(this Schema schema, ISchemaNodeVisitor visitor)
+        public static void Run(this ISchema schema, ISchemaNodeVisitor visitor)
         {
             visitor.VisitSchema(schema);
 

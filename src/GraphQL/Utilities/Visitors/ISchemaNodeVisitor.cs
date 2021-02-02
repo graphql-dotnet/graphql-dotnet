@@ -13,66 +13,66 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Visits <see cref="Schema"/> object.
         /// </summary>
-        void VisitSchema(Schema schema);
+        void VisitSchema(ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="DirectiveGraphType"/>.
         /// </summary>
-        void VisitDirective(DirectiveGraphType directive, Schema schema);
+        void VisitDirective(DirectiveGraphType directive, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="ScalarGraphType"/>.
         /// </summary>
-        void VisitScalar(ScalarGraphType scalar, Schema schema);
+        void VisitScalar(ScalarGraphType scalar, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema output graph type.
         /// </summary>
-        void VisitObject(IObjectGraphType type, Schema schema);
+        void VisitObject(IObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema input graph type.
         /// </summary>
-        void VisitInputObject(IInputObjectGraphType type, Schema schema);
+        void VisitInputObject(IInputObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field of registered within the schema output graph type.
         /// </summary>
-        void VisitFieldDefinition(FieldType field, Schema schema);
+        void VisitFieldDefinition(FieldType field, ISchema schema);
 
         /// <summary>
         /// Visits field of registered within the schema input graph type.
         /// </summary>
-        void VisitInputFieldDefinition(FieldType field, Schema schema);
+        void VisitInputFieldDefinition(FieldType field, ISchema schema);
 
         /// <summary>
         /// Visits field argument of registered within the schema graph type.
         /// </summary>
-        void VisitFieldArgumentDefinition(QueryArgument argument, Schema schema);
+        void VisitFieldArgumentDefinition(QueryArgument argument, ISchema schema);
 
         /// <summary>
         /// Visits directive argument.
         /// </summary>
-        void VisitDirectiveArgumentDefinition(QueryArgument argument, Schema schema);
+        void VisitDirectiveArgumentDefinition(QueryArgument argument, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="IInterfaceGraphType"/>.
         /// </summary>
-        void VisitInterface(IInterfaceGraphType iface, Schema schema);
+        void VisitInterface(IInterfaceGraphType iface, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="UnionGraphType"/>.
         /// </summary>
-        void VisitUnion(UnionGraphType union, Schema schema);
+        void VisitUnion(UnionGraphType union, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="EnumerationGraphType"/>.
         /// </summary>
-        void VisitEnum(EnumerationGraphType type, Schema schema);
+        void VisitEnum(EnumerationGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits value of registered within the schema <see cref="EnumerationGraphType"/>.
         /// </summary>
-        void VisitEnumValue(EnumValueDefinition value, Schema schema);
+        void VisitEnumValue(EnumValueDefinition value, ISchema schema);
     }
 }

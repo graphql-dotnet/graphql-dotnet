@@ -11,33 +11,33 @@ namespace GraphQL.Utilities
     {
         internal static readonly AppliedDirectivesValidationVisitor Instance = new AppliedDirectivesValidationVisitor();
 
-        public void VisitFieldArgumentDefinition(QueryArgument argument, Schema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
+        public void VisitFieldArgumentDefinition(QueryArgument argument, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
-        public void VisitDirectiveArgumentDefinition(QueryArgument argument, Schema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
+        public void VisitDirectiveArgumentDefinition(QueryArgument argument, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
-        public void VisitEnum(EnumerationGraphType type, Schema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Enum);
+        public void VisitEnum(EnumerationGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Enum);
 
-        public void VisitDirective(DirectiveGraphType directive, Schema schema) => ValidateAppliedDirectives(directive, schema, null); // no location for directives (yet), see https://github.com/graphql/graphql-spec/issues/818
+        public void VisitDirective(DirectiveGraphType directive, ISchema schema) => ValidateAppliedDirectives(directive, schema, null); // no location for directives (yet), see https://github.com/graphql/graphql-spec/issues/818
 
-        public void VisitEnumValue(EnumValueDefinition value, Schema schema) => ValidateAppliedDirectives(value, schema, DirectiveLocation.EnumValue);
+        public void VisitEnumValue(EnumValueDefinition value, ISchema schema) => ValidateAppliedDirectives(value, schema, DirectiveLocation.EnumValue);
 
-        public void VisitFieldDefinition(FieldType field, Schema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
+        public void VisitFieldDefinition(FieldType field, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
 
-        public void VisitInputFieldDefinition(FieldType field, Schema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.InputFieldDefinition);
+        public void VisitInputFieldDefinition(FieldType field, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.InputFieldDefinition);
 
-        public void VisitInputObject(IInputObjectGraphType type, Schema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.InputObject);
+        public void VisitInputObject(IInputObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.InputObject);
 
-        public void VisitInterface(IInterfaceGraphType iface, Schema schema) => ValidateAppliedDirectives(iface, schema, DirectiveLocation.Interface);
+        public void VisitInterface(IInterfaceGraphType iface, ISchema schema) => ValidateAppliedDirectives(iface, schema, DirectiveLocation.Interface);
 
-        public void VisitObject(IObjectGraphType type, Schema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Object);
+        public void VisitObject(IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Object);
 
-        public void VisitScalar(ScalarGraphType scalar, Schema schema) => ValidateAppliedDirectives(scalar, schema, DirectiveLocation.Scalar);
+        public void VisitScalar(ScalarGraphType scalar, ISchema schema) => ValidateAppliedDirectives(scalar, schema, DirectiveLocation.Scalar);
 
-        public void VisitSchema(Schema schema) => ValidateAppliedDirectives(schema, schema, DirectiveLocation.Schema);
+        public void VisitSchema(ISchema schema) => ValidateAppliedDirectives(schema, schema, DirectiveLocation.Schema);
 
-        public void VisitUnion(UnionGraphType union, Schema schema) => ValidateAppliedDirectives(union, schema, DirectiveLocation.Union);
+        public void VisitUnion(UnionGraphType union, ISchema schema) => ValidateAppliedDirectives(union, schema, DirectiveLocation.Union);
 
-        private void ValidateAppliedDirectives(IProvideMetadata provider, Schema schema, DirectiveLocation? location) //TODO: add check for argument value type
+        private void ValidateAppliedDirectives(IProvideMetadata provider, ISchema schema, DirectiveLocation? location) //TODO: add check for argument value type
         {
             if (provider.HasAppliedDirectives())
             {
