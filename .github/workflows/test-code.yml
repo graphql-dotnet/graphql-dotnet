@@ -8,6 +8,14 @@ on:
     paths:
       - src/**
       - .github/workflows/**
+  # Upload code coverage results when PRs are merged
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - src/**
+      - .github/workflows/**
 
 env:
   DOTNET_NOLOGO: true
@@ -62,7 +70,12 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore
+        run: dotnet test --no-restore -p:CollectCoverage=true
+      - name: Upload coverage to codecov
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        uses: codecov/codecov-action@v1.2.1
+        with:
+          files: .coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml
 
   buildcheck:
     needs:
