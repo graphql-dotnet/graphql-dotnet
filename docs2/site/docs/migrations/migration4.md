@@ -77,7 +77,7 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `EnableReadDescriptionFromAttributes` enables or disables setting default values for 'description' from `DescriptionAttribute`. Enabled by default.
 - `EnableReadDescriptionFromXmlDocumentation` enables or disables setting default values for 'description' from XML documentation. Disabled by default.
 - `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
-  when the configured `INameConverter` fixes up invalid names.
+  when the configured `INameConverter` fixes up invalid names. See `ISchema.NameConverter`.
 - `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
   Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
