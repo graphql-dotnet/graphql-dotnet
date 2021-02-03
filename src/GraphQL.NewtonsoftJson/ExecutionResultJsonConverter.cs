@@ -32,15 +32,11 @@ namespace GraphQL.NewtonsoftJson
 
         private void WriteData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            object data = result.Data;
-
-            if (result.Errors?.Count > 0 && data == null)
+            if (result.Executed)
             {
-                return;
+                writer.WritePropertyName("data");
+                serializer.Serialize(writer, result.Data);
             }
-
-            writer.WritePropertyName("data");
-            serializer.Serialize(writer, data);
         }
 
         private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer)

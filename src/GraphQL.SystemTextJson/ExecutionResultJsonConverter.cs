@@ -38,14 +38,10 @@ namespace GraphQL.SystemTextJson
 
         private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
-            object data = result.Data;
-
-            if (result.Errors?.Count > 0 && data == null)
+            if (result.Executed)
             {
-                return;
+                WriteProperty(writer, "data", result.Data, options);
             }
-
-            WriteProperty(writer, "data", data, options);
         }
 
         private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)

@@ -25,6 +25,7 @@ namespace GraphQL.Execution
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
+                Executed = true,
                 Streams = streams
             }.With(context);
 

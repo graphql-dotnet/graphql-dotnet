@@ -210,14 +210,15 @@ namespace GraphQL.Tests.Bugs
             AssertResult(QUERY, EXPECTED, data, errors);
         }
 
-        private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors)
+        private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors, bool executed = true)
         {
             ExecutionResult result =
                 AssertQueryWithErrors(
                     query,
                     expected,
                     root: data,
-                    expectedErrorCount: errors.Count);
+                    expectedErrorCount: errors.Count,
+                    executed: executed);
 
             ExecutionErrors actualErrors = result.Errors;
 

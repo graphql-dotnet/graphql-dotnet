@@ -16,6 +16,7 @@ namespace GraphQL.Tests
         {
             var executionResult = new ExecutionResult
             {
+                Executed = true,
                 Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary(),
                 Errors = new ExecutionErrors
                 {
@@ -59,7 +60,7 @@ namespace GraphQL.Tests
         [ClassData(typeof(DocumentWritersTestData))]
         public async void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IDocumentWriter writer)
         {
-            var executionResult = new ExecutionResult();
+            var executionResult = new ExecutionResult { Executed = true };
 
             var expected = @"{
               ""data"": null
@@ -97,16 +98,36 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions(IDocumentWriter writer)
+        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IDocumentWriter writer)
         {
             var executionResult = new ExecutionResult
             {
                 Data = new Dictionary<string, object>(),
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>()
+                Extensions = new Dictionary<string, object>(),
+                Executed = true
             };
 
             var expected = @"{ ""data"": {} }";
+
+            var actual = await writer.WriteToStringAsync(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IDocumentWriter writer)
+        {
+            var executionResult = new ExecutionResult
+            {
+                Data = new Dictionary<string, object>(),
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
+                Executed = false
+            };
+
+            var expected = @"{ }";
 
             var actual = await writer.WriteToStringAsync(executionResult);
 
