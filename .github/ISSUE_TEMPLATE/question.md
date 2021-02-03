@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Usage question or discussion about GraphQL .NET.
+about: Usage question or discussion about GraphQL.NET.
 ---
 
 <!--
@@ -9,7 +9,7 @@ about: Usage question or discussion about GraphQL .NET.
   Useful Links:
   - Documentation: https://graphql-dotnet.github.io/
 
-  GraphQL .NET has community support channels, try asking your question on:
+  GraphQL.NET has community support channels, try asking your question on:
 
   - Gitter: https://gitter.im/graphql-dotnet/graphql-dotnet
   - Stack Overflow: https://stackoverflow.com/questions/tagged/graphql-dotnet

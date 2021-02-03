@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
                 Code = "KNOWN_TYPE_NAMES"
             };
             error2.AddLocation(1, 13);
-            var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 });
+            var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 }, executed: false);
             AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, inputs: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 2, renderErrors: true);
         }
     }

@@ -73,6 +73,7 @@ namespace GraphQL
 
             ExecutionResult result = null;
             ExecutionContext context = null;
+            bool executionOccurred = false;
 
             try
             {
@@ -230,6 +231,8 @@ namespace GraphQL
                     };
                 }
 
+                executionOccurred = true;
+
                 using (metrics.Subject("execution", "Executing operation"))
                 {
                     if (context.Listeners != null)
@@ -266,10 +269,7 @@ namespace GraphQL
                         }
                 }
 
-                if (context.Errors.Count > 0)
-                {
-                    result.Errors = context.Errors;
-                }
+                result.AddErrors(context.Errors);
             }
             catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
             {
@@ -277,13 +277,7 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                result = new ExecutionResult
-                {
-                    Errors = new ExecutionErrors
-                    {
-                        ex
-                    }
-                };
+                (result ??= new ExecutionResult()).AddError(ex);
             }
             catch (Exception ex)
             {
@@ -298,18 +292,14 @@ namespace GraphQL
                     ex = exceptionContext.Exception;
                 }
 
-                result = new ExecutionResult
-                {
-                    Errors = new ExecutionErrors
-                    {
-                        ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex)
-                    }
-                };
+                (result ??= new ExecutionResult()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
             }
             finally
             {
                 result ??= new ExecutionResult();
                 result.Perf = metrics.Finish();
+                if (executionOccurred)
+                    result.Executed = true;
                 context?.Dispose();
             }
 

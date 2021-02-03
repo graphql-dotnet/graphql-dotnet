@@ -6,7 +6,7 @@
 
 > A GraphQL service is created by defining types and fields on those types, then providing functions for each field on each type.
 
-Here is a "Hello World" example for GraphQL .NET using the System.Text.Json serialization engine.
+Here is a "Hello World" example for GraphQL.NET using the System.Text.Json serialization engine.
 
 ```csharp
 using System;

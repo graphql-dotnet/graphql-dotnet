@@ -1,6 +1,6 @@
 # Dependency Injection
 
-GraphQL .NET supports dependency injection through a `IServiceProvider` interface that is passed to the Schema class. Internally when trying to resolve a type the library will call the methods on this interface.
+GraphQL.NET supports dependency injection through a `IServiceProvider` interface that is passed to the Schema class. Internally when trying to resolve a type the library will call the methods on this interface.
 
 > The library resolves a `GraphType` only once and caches that type for the lifetime of the `Schema`.
 

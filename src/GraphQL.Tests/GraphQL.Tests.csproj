@@ -1,11 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
-  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+  <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
+    <TargetFramework>net5</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
     <TargetFrameworks>net5;netcoreapp3.1;netcoreapp2.1;net48</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
     <TargetFrameworks>net5;netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
 

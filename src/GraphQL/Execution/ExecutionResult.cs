@@ -12,6 +12,13 @@ namespace GraphQL
     public class ExecutionResult
     {
         /// <summary>
+        /// Indicates if the operation included execution. If an error was encountered BEFORE execution begins,
+        /// the data entry SHOULD NOT be present in the result. If an error was encountered DURING the execution
+        /// that prevented a valid response, the data entry in the response SHOULD BE null.
+        /// </summary>
+        public bool Executed { get; set; }
+
+        /// <summary>
         /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public object Data { get; set; }
@@ -68,6 +75,34 @@ namespace GraphQL
             Document = result.Document;
             Perf = result.Perf;
             Extensions = result.Extensions;
+        }
+
+        /// <summary>
+        /// Adds the specified error to <see cref="Errors"/>.
+        /// </summary>
+        /// <returns>Reference to this.</returns>
+        public ExecutionResult AddError(ExecutionError error)
+        {
+            (Errors ??= new ExecutionErrors()).Add(error);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds errors from the specified <see cref="ExecutionErrors"/> to <see cref="Errors"/>.
+        /// </summary>
+        /// <param name="errors">List of execution errors.</param>
+        /// <returns>Reference to this.</returns>
+        public ExecutionResult AddErrors(ExecutionErrors errors)
+        {
+            if (errors?.Count > 0)
+            {
+                if (Errors == null)
+                    Errors = new ExecutionErrors(errors.Count);
+                foreach (var error in errors.List)
+                    Errors.Add(error);
+            }
+
+            return this;
         }
     }
 

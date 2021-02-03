@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Introspection
             public override bool? Introspectable => true;
 
             public TraitsDirective()
-                : base("traits", DirectiveLocation.Schema | DirectiveLocation.Object | DirectiveLocation.FieldDefinition)
+                : base("traits", DirectiveLocation.Schema, DirectiveLocation.Object, DirectiveLocation.FieldDefinition, DirectiveLocation.ArgumentDefinition)
             {
                 Description = "Some traits";
                 Arguments = new QueryArguments(new QueryArgument<StringGraphType>

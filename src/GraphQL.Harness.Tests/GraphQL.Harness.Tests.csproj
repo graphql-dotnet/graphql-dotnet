@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
+  <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
+    <TargetFramework>net5</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true'">
+    <TargetFrameworks>net5;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

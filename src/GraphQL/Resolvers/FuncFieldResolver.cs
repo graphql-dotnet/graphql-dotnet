@@ -50,7 +50,7 @@ namespace GraphQL.Resolvers
                 return (context) => resolver(context.As<TSourceType>());
             }
 
-            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)))     
+            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)))
             {
                 // Data loaders cannot use pooled contexts
                 return (context) => resolver(context.As<TSourceType>());
