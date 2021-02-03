@@ -179,7 +179,8 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
-* `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
 * `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `ErrorLocation` struct became `readonly`.
@@ -190,7 +191,6 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 * `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
-* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
 * `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
 * Removed `TypeExtensions.As`
 * `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
