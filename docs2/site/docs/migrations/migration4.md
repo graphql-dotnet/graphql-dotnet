@@ -60,17 +60,26 @@ were defined.
 See [Default Sort Order of Introspection Query Results](#Default-Sort-Order-of-Introspection-Query-Results) below for a sample
 of how this can be used to return introspection results that are sorted alphabetically.
 
-### ArrayPool
+### Array Pooling
 
-> New property `IResolveFieldContext.ArrayPool`
-
-(todo: update title, write description, add sample)
+When returning lists of information from field resolvers, you can choose to rent an array from `IResolveFieldContext.ArrayPool`,
+populating it with your results and returning the array. The array will be released after the execution completes. This has
+limited uses, since the rented array is not guaranteed to be exactly the requested length, so the array would need to be
+wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one).
+It is not recommended to use this feature for interim calculations, as it is better to work directly with `System.Buffers.ArrayPool<T>`.
 
 ### Global Switches
 
-> `GlobalSwitches` - new global options for configuring GraphQL execution
+`GraphQL.GlobalSwitches` is a new static class with properties that affect the schema build process:
 
-(todo: write descrption of switches, where to configure, add samples)
+- `EnableReadDefaultValueFromAttributes` enables or disables setting default values for 'defaultValue' from `DefaultValueAttribute`. Enabled by default.
+- `EnableReadDeprecationReasonFromAttributes` enables or disables setting default values for 'deprecationReason' from `ObsoleteAttribute`. Enabled by default.
+- `EnableReadDescriptionFromAttributes` enables or disables setting default values for 'description' from `DescriptionAttribute`. Enabled by default.
+- `EnableReadDescriptionFromXmlDocumentation` enables or disables setting default values for 'description' from XML documentation. Disabled by default.
+- `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
+  when the configured `INameConverter` fixes up invalid names.
+- `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
+  Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
 ### Authorization Extension Methods
 
