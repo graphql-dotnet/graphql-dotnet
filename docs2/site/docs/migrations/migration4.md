@@ -12,9 +12,37 @@ To facilitate the performance changes, many changes were made to the API that ma
 
 ### Input Object Custom Deserializers (aka resolver)
 
-You can now add code to `InputObjectGraphType` descendants to build an object from the collected arguments. 
+You can now add code to `InputObjectGraphType` descendants to build an object from the collected argument fields. The new `ParseDictionary` method is called when variables are being parsed or `GetArgument` is called, depending on if the argument is stored within variables or as a literal. The method is passed a dictionary containing the input object's fields and deserialized values.
 
-(todo: update title, update description, discuss what happens if exceptions are thrown, add sample)
+By default, for `InputObjectGraphType<TSourceType>` implementations, the dictionary is passed to `ObjectExtensions.ToObject` in order to convert the dictionary to an object of `TSourceType`. You can override the method to have it return an instance of any appropriate type.
+
+Below is a sample which sets a default value for an unsupplied field (this could be done with a default value set on the field, of course) and converts the name to uppercase:
+
+```cs
+public class HumanInputType : InputObjectGraphType
+{
+    public HumanInputType()
+    {
+        Name = "HumanInput";
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Field<StringGraphType>("homePlanet");
+    }
+
+    public override object ParseDictionary(IDictionary<string, object> value)
+    {
+        return new Human
+        {
+            Name = ((string)value["name"]).ToUpper(),
+            HomePlanet = value.TryGetValue("homePlanet", out var homePlanet) ? (string)homePlanet : "Unknown",
+            Id = null,
+        };
+    }
+}
+```
+
+Note that pursuant to GraphQL specifications, if a field is optional, not supplied, and has no default, it will not be in the dictionary.
+
+For untyped `InputObjectGraphType` classes, like shown above, the default behavior of `ParseDictionary` will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the requested type via `ObjectExtensions.ToObject` as it did before.
 
 ### Experimental Features / Applied Directives
 
