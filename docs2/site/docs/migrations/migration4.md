@@ -51,11 +51,14 @@ For untyped `InputObjectGraphType` classes, like shown above, the default behavi
 
 (sungram3r todo)
 
-### Comparer
+### Ability to Sort Introspection Results
 
-> New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
+Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer by setting
+`ISchema.Comparer` to an implementation of `ISchemaComparer`. By default, introspection results are returned in the order they
+were defined.
 
-(todo: update title, write descrption, add sample)
+See [Default Sort Order of Introspection Query Results](#Default-Sort-Order-of-Introspection-Query-Results) below for a sample
+of how this can be used to return introspection results that are sorted alphabetically.
 
 ### ArrayPool
 
