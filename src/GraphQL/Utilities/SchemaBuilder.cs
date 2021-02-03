@@ -11,12 +11,21 @@ using OperationType = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Builds schema from string.
+    /// </summary>
     public class SchemaBuilder
     {
+        private List<Type> _visitorTypes;
+        private List<ISchemaNodeVisitor> _visitors;
         protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
-        private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
         private GraphQLSchemaDefinition _schemaDef;
 
+        /// <summary>
+        /// This <see cref="IServiceProvider"/> is used to create required objects during building schema.
+        /// <br/><br/>
+        /// By default equals to <see cref="DefaultServiceProvider"/>.
+        /// </summary>
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
         /// <summary>
@@ -27,38 +36,47 @@ namespace GraphQL.Utilities
 
         public TypeSettings Types { get; } = new TypeSettings();
 
-        public Dictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
-        {
-            { "deprecated", typeof(DeprecatedDirectiveVisitor) }
-        };
-
-        public SchemaBuilder RegisterDirectiveVisitor<T>(string name) where T : SchemaDirectiveVisitor
-        {
-            Directives[name] = typeof(T);
-            return this;
-        }
-
-        public SchemaBuilder RegisterVisitorSelector<T>(T selector) where T : IVisitorSelector
-        {
-            _visitorSelectors.Add(selector);
-            return this;
-        }
-
         public SchemaBuilder RegisterType(IGraphType type)
         {
-            _types[type.Name] = type;
+            _types[type.Name] = type ?? throw new ArgumentNullException(nameof(type));
             return this;
         }
 
         public void RegisterTypes(IEnumerable<IGraphType> types)
         {
-            foreach (var t in types)
-                _types[t.Name] = t;
+            foreach (var type in types)
+                _types[type.Name] = type ?? throw new ArgumentNullException(nameof(type));
         }
 
-        public virtual ISchema Build(string[] typeDefinitions) => Build(string.Join(Environment.NewLine, typeDefinitions));
+        public void RegisterVisitor(ISchemaNodeVisitor visitor)
+        {
+            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+        }
 
-        public virtual ISchema Build(string typeDefinitions)
+        public void RegisterVisitor(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+            }
+
+            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
+                _visitorTypes.Add(type);
+        }
+
+        public void RegisterVisitor<TVisitor>()
+           where TVisitor : ISchemaNodeVisitor
+           => RegisterVisitor(typeof(TVisitor));
+
+        /// <summary>
+        /// Builds schema from string.
+        /// </summary>
+        /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
+        /// <returns>Created schema.</returns>
+        public virtual Schema Build(string typeDefinitions)
         {
             var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
             Validate(document);
@@ -70,20 +88,17 @@ namespace GraphQL.Utilities
             var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name.Value);
             var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
             if (duplicates.Length > 0)
+            {
                 throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
+            }
 
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
             // Also see Schema.Validate
         }
 
-        private ISchema BuildSchemaFrom(GraphQLDocument document)
+        private Schema BuildSchemaFrom(GraphQLDocument document)
         {
-            if (Directives.Count > 0)
-            {
-                _visitorSelectors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetRequiredService(t)));
-            }
-
             var schema = new Schema(ServiceProvider);
 
             PreConfigure(schema);
@@ -98,8 +113,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     {
                         _schemaDef = def.As<GraphQLSchemaDefinition>();
                         schema.SetAstType(_schemaDef);
-
-                        VisitNode(schema, v => v.VisitSchema(schema));
                         break;
                     }
 
@@ -191,9 +204,23 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             foreach (var type in _types)
                 schema.RegisterType(type.Value);
+
             foreach (var directive in directives)
                 schema.Directives.Register(directive);
 
+            if (_visitors != null)
+            {
+                foreach (var visitor in _visitors)
+                    schema.RegisterVisitor(visitor);
+            }
+
+            if (_visitorTypes != null)
+            {
+                foreach (var type in _visitorTypes)
+                    schema.RegisterVisitor(type);
+            }
+
+            Debug.Assert(schema.Initialized == false);
             return schema;
         }
 
@@ -270,8 +297,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 type.SetAstType(astType);
             }
 
-            VisitNode(type, v => v.VisitObject(type));
-
             return type;
         }
 
@@ -291,12 +316,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldDef.Arguments, fieldDef);
+            field.Arguments = ToQueryArguments(fieldDef.Arguments);
             field.DeprecationReason = fieldConfig.DeprecationReason;
 
             field.SetAstType(fieldDef);
-
-            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -320,11 +343,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldDef.Arguments, fieldDef);
+            field.Arguments = ToQueryArguments(fieldDef.Arguments);
 
             field.SetAstType(fieldDef);
-
-            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -343,8 +364,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 DefaultValue = inputDef.DefaultValue.ToValue()
             }.SetAstType(inputDef);
 
-            VisitNode(field, v => v.VisitInputFieldDefinition(field));
-
             return field;
         }
 
@@ -359,8 +378,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text.ToString(),
                 ResolveType = typeConfig.ResolveType
             }.SetAstType(interfaceDef);
-
-            VisitNode(type, v => v.VisitInterface(type));
 
             typeConfig.CopyMetadataTo(type);
 
@@ -384,8 +401,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = typeConfig.Description ?? unionDef.Comment?.Text.ToString(),
                 ResolveType = typeConfig.ResolveType
             }.SetAstType(unionDef);
-
-            VisitNode(type, v => v.VisitUnion(type));
 
             typeConfig.CopyMetadataTo(type);
 
@@ -412,8 +427,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = typeConfig.Description ?? inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
 
-            VisitNode(type, v => v.VisitInputObject(type));
-
             typeConfig.CopyMetadataTo(type);
 
             if (inputDef.Fields != null)
@@ -436,8 +449,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = typeConfig.Description ?? enumDef.Comment?.Text.ToString()
             }.SetAstType(enumDef);
 
-            VisitNode(type, v => v.VisitEnum(type));
-
             if (enumDef.Values?.Count > 0) // just in case
             {
                 foreach (var value in enumDef.Values)
@@ -449,60 +460,46 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var locations = directiveDef.Locations.Select(l => ToDirectiveLocation((string)l.Value)); //TODO: can be rewritten without cast
-            return new DirectiveGraphType((string)directiveDef.Name.Value, locations)
+            var result = new DirectiveGraphType((string)directiveDef.Name.Value)
             {
                 Description = directiveDef.Comment?.Text.ToString(),
-                Arguments = ToQueryArguments(directiveDef.Arguments, directiveDef)
+                Repeatable = directiveDef.Repeatable,
+                Arguments = ToQueryArguments(directiveDef.Arguments)
             };
-        }
 
-        private DirectiveLocation ToDirectiveLocation(string name)
-        {
-            var enums = new __DirectiveLocation();
-            var result = enums.ParseValue(name);
-            if (result != null)
+            if (directiveDef.Locations?.Count > 0) // just in case
             {
-                return (DirectiveLocation)result;
+                foreach (var location in directiveDef.Locations)
+                {
+                    if (__DirectiveLocation.Instance.Values.FindByName(location.Value)?.Value is DirectiveLocation l)
+                        result.Locations.Add(l);
+                    else
+                        throw new InvalidOperationException($"Directive '{result.Name}' has an unknown directive location '{location.Value}'.");
+                }
             }
 
-            throw new ArgumentOutOfRangeException(nameof(name), $"{name} is an unknown directive location");
+            return result;
         }
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
         {
-            var val = new EnumValueDefinition
+            return new EnumValueDefinition
             {
                 Value = valDef.Name.Value,
                 Name = (string)valDef.Name.Value,
                 Description = valDef.Comment?.Text.ToString()
             }.SetAstType(valDef);
-
-            VisitNode(val, v => v.VisitEnumValue(val));
-
-            return val;
         }
 
-        protected virtual QueryArgument ToArgument(GraphQLInputValueDefinition inputDef, GraphQLTypeDefinition owner)
+        protected virtual QueryArgument ToArgument(GraphQLInputValueDefinition inputDef)
         {
-            var type = ToGraphType(inputDef.Type);
-
-            var argument = new QueryArgument(type)
+            return new QueryArgument(ToGraphType(inputDef.Type))
             {
                 Name = (string)inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
-
-            if (owner is GraphQLDirectiveDefinition)
-                VisitNode(argument, v => v.VisitDirectiveArgumentDefinition(argument));
-            else if (owner is GraphQLFieldDefinition)
-                VisitNode(argument, v => v.VisitFieldArgumentDefinition(argument));
-            else
-                throw new NotSupportedException();
-
-            return argument;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)
@@ -534,38 +531,17 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
-        protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
+        private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition> arguments)
         {
-            foreach (var selector in _visitorSelectors)
-            {
-                foreach (var visitor in selector.Select(node))
-                {
-                    action(visitor);
-                }
-            }
-        }
-
-        private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition> arguments, GraphQLTypeDefinition owner)
-        {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(arg => ToArgument(arg, owner)));
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(ToArgument));
         }
     }
 
-    internal static class SchemaExtensions
+    internal static class Extensions
     {
         public static TNode As<TNode>(this ASTNode node) where TNode : ASTNode
         {
             return node as TNode ?? throw new InvalidOperationException($"Node should be of type '{typeof(TNode).Name}' but it is of type '{node?.GetType().Name}'.");
-        }
-
-        public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
-        {
-            return directives?.FirstOrDefault(x => x.Name.Value == name);
-        }
-
-        public static GraphQLArgument Argument(this IEnumerable<GraphQLArgument> arguments, string name)
-        {
-            return arguments?.FirstOrDefault(x => x.Name.Value == name);
         }
 
         public static object ToValue(this GraphQLValue source)
@@ -669,8 +645,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
                     if (obj.Fields != null)
+                    {
                         foreach (var f in obj.Fields)
                             values[(string)f.Name.Value] = ToValue(f.Value);
+                    }
+
                     return values;
                 }
                 case ASTNodeKind.ListValue:

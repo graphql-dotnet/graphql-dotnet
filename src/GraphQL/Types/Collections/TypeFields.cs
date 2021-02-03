@@ -25,6 +25,20 @@ namespace GraphQL.Types
                 List.Add(field);
         }
 
+        /// <summary>
+        /// Searches the list for a field specified by its name and returns it.
+        /// </summary>
+        public FieldType Find(string name)
+        {
+            foreach (var field in List)
+            {
+                if (field.Name == name)
+                    return field;
+            }
+
+            return null;
+        }
+
         public bool Contains(FieldType field) => List.Contains(field ?? throw new ArgumentNullException(nameof(field)));
 
         public bool Contains(IFieldType field) => List.Contains((FieldType)field ?? throw new ArgumentNullException(nameof(field)));

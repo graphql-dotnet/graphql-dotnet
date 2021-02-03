@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Tests.Introspection;
 using GraphQL.Tests.StarWars;
 using Shouldly;
 using Xunit;
@@ -28,7 +27,7 @@ namespace GraphQL.Tests.Execution
             {
                 var result = await starWarsTest.Executer.ExecuteAsync(new ExecutionOptions
                 {
-                    Query = SchemaIntrospection.IntrospectionQuery,
+                    Query = "IntrospectionQuery".ReadGraphQLRequest(),
                     Schema = starWarsTest.Schema,
                 });
                 result.Errors.ShouldBeNull();

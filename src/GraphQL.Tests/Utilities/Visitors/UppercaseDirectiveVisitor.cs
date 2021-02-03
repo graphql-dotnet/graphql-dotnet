@@ -7,42 +7,44 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// <summary>
     /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
     /// </summary>
-    public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
+    public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public override string Name => "upper";
-
-        public override void VisitFieldDefinition(FieldType field)
+        public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
-            var inner = field.Resolver ?? NameFieldResolver.Instance;
-            field.Resolver = new FuncFieldResolver<object>(context =>
+            if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
             {
-                object result = inner.Resolve(context);
+                var inner = field.Resolver ?? NameFieldResolver.Instance;
+                field.Resolver = new FuncFieldResolver<object>(context =>
+                {
+                    object result = inner.Resolve(context);
 
-                return result is string str
-                    ? str.ToUpperInvariant()
-                    : result;
-            });
+                    return result is string str
+                        ? str.ToUpperInvariant()
+                        : result;
+                });
+            }
         }
     }
 
     /// <summary>
     /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
     /// </summary>
-    public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
+    public class AsyncUppercaseDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public override string Name => "upper";
-
-        public override void VisitFieldDefinition(FieldType field)
+        public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
-            var inner = field.Resolver ?? NameFieldResolver.Instance;
-            field.Resolver = new AsyncFieldResolver<object>(async context =>
+            if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
             {
-                object result = await inner.ResolveAsync(context);
+                var inner = field.Resolver ?? NameFieldResolver.Instance;
+                field.Resolver = new AsyncFieldResolver<object>(async context =>
+                {
+                    object result = await inner.ResolveAsync(context);
 
-                return result is string str
-                    ? str.ToUpperInvariant()
-                    : result;
-            });
+                    return result is string str
+                        ? str.ToUpperInvariant()
+                        : result;
+                });
+            }
         }
     }
 }

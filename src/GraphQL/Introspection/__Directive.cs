@@ -12,9 +12,11 @@ namespace GraphQL.Introspection
         /// Initializes a new instance of the <c>__Directive</c> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
-        public __Directive(bool allowAppliedDirectives = false)
+        /// <param name="allowRepeatable">Allows 'isRepeatable' field for this type. This feature is from a working draft of the specification.</param>
+        public __Directive(bool allowAppliedDirectives = false, bool allowRepeatable = false)
         {
             Name = nameof(__Directive);
+
             Description =
                 "A Directive provides a way to describe alternate runtime execution and " +
                 "type validation behavior in a GraphQL document." +
@@ -27,17 +29,24 @@ namespace GraphQL.Introspection
                 "describing additional information to the executor.";
 
             Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source.Name);
+
             Field<StringGraphType>("description", resolve: context => context.Source.Description);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
+
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
                 resolve: context => context.Source.Arguments?.List ?? Enumerable.Empty<QueryArgument>()
             );
+
+            if (allowRepeatable)
+                Field<NonNullGraphType<BooleanGraphType>>("isRepeatable", resolve: context => context.Source.Repeatable);
+
             Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l =>
                         l == DirectiveLocation.Query ||
                         l == DirectiveLocation.Mutation ||
                         l == DirectiveLocation.Subscription));
+
             Field<NonNullGraphType<BooleanGraphType>>("onFragment", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l =>
                         l == DirectiveLocation.FragmentSpread ||
@@ -49,23 +58,6 @@ namespace GraphQL.Introspection
 
             if (allowAppliedDirectives)
                 this.AddAppliedDirectivesField("directive");
-        }
-    }
-
-    /// <summary>
-    /// An enumeration representing a location that a directive may be placed.
-    /// </summary>
-    public class __DirectiveLocation : EnumerationGraphType<DirectiveLocation>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="__DirectiveLocation"/> graph type.
-        /// </summary>
-        public __DirectiveLocation()
-        {
-            SetName(nameof(__DirectiveLocation), validate: false);
-            Description =
-                "A Directive can be adjacent to many parts of the GraphQL language, a " +
-                "__DirectiveLocation describes one such possible adjacencies.";
         }
     }
 }

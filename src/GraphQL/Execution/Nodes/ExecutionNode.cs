@@ -63,35 +63,15 @@ namespace GraphQL.Execution
         public string Name => Field?.Alias ?? Field?.Name;
 
         /// <summary>
-        /// Returns true if the result has been set. Also returns true when the result is temporarily set to an <see cref="IDataLoaderResult"/>
-        /// pending execution at a later time.
-        /// </summary>
-        public bool IsResultSet { get; private set; }
-
-        private object _result;
-        /// <summary>
         /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
         /// result that has not yet finished executing.
         /// </summary>
-        public object Result
-        {
-            get => _result;
-            set
-            {
-                IsResultSet = true;
-                _result = value;
-            }
-        }
+        public object Result { get; set; }
 
-        private object _source;
         /// <summary>
-        /// Returns the parent node's result. If set, the set value will override the parent node's result.
+        /// Returns the parent node's result.
         /// </summary>
-        public object Source
-        {
-            get => _source ?? Parent?.Result;
-            set => _source = value;
-        }
+        public virtual object Source => Parent?.Result;
 
         /// <summary>
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
@@ -125,7 +105,7 @@ namespace GraphQL.Execution
             if (parentType is IObjectGraphType objectType)
                 return objectType;
 
-            if (parentType is IAbstractGraphType abstractType && Parent.IsResultSet)
+            if (parentType is IAbstractGraphType abstractType)
                 return abstractType.GetObjectType(Parent.Result, schema);
 
             return null;

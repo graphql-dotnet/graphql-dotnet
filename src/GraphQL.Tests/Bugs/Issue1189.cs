@@ -40,8 +40,9 @@ namespace GraphQL.Tests.Bugs
             error.Path = new string[] { "hero", "friend" };
             error.Code = code;
 
-            var queryResult = new ExecutionResult()
+            var queryResult = new ExecutionResult
             {
+                Executed = true,
                 Data = new { hero = new { id = "1", name = "R2-D2", friend = default(Issue1189_Character) } },
                 Errors = new ExecutionErrors { error }
             };

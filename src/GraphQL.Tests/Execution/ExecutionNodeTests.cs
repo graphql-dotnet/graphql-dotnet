@@ -23,7 +23,6 @@ namespace GraphQL.Tests.Execution
             root.GetParentType(null).ShouldBeNull();
             root.GraphType.ShouldBe(type);
             root.IndexInParentNode.ShouldBeNull();
-            root.IsResultSet.ShouldBeFalse();
             root.Name.ShouldBeNull();
             root.Parent.ShouldBeNull();
             root.Path.ToArray().Length.ShouldBe(0);

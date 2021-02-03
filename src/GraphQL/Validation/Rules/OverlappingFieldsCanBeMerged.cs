@@ -609,7 +609,7 @@ namespace GraphQL.Validation.Rules
 
         private static bool SameArguments(Arguments arguments1, Arguments arguments2)
         {
-            if (arguments1.Count() != arguments2.Count())
+            if (arguments1.Count != arguments2.Count)
             {
                 return false;
             }

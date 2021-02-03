@@ -144,8 +144,8 @@ namespace GraphQL.Tests.Utilities
             }).ConfigureAwait(false);
 
             result.Errors.ShouldBeNull();
-            var data = result.Data.ShouldBeOfType<Dictionary<string, object>>();
-            var t = data["test"].ShouldBeOfType<Dictionary<string, object>>();
+            var data = result.Data.ShouldBeOfType<ObjectProperty[]>();
+            var t = data.ToDict()["test"].ShouldBeOfType<ObjectProperty[]>().ToDict();
             t["id"].ShouldBe("foo");
             t["name"].ShouldBe("bar");
         }
@@ -153,7 +153,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_read_schema_with_custom_root_names()
         {
-            var schema = Schema.For(ReadSchema("CustomSubscription.graphql"));
+            var schema = Schema.For("CustomSubscription".ReadGraphQLRequest());
 
             schema.Query.Name.ShouldBe("CustomQuery");
             schema.Mutation.Name.ShouldBe("CustomMutation");
@@ -162,12 +162,12 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Theory]
-        [InlineData("PetAfterAll.graphql", 15)]
-        [InlineData("PetBeforeAll.graphql", 15)]
+        [InlineData("PetAfterAll", 15)]
+        [InlineData("PetBeforeAll", 15)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
-                ReadSchema(fileName),
+                fileName.ReadGraphQLRequest(),
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
@@ -178,7 +178,7 @@ namespace GraphQL.Tests.Utilities
         public void can_read_complex_schema()
         {
             var schema = Schema.For(
-                ReadSchema("PetComplex.graphql"),
+                "PetComplex".ReadGraphQLRequest(),
                 builder =>
                 {
                     builder.Types.ForAll(config => config.ResolveType = _ => null);
@@ -201,7 +201,7 @@ namespace GraphQL.Tests.Utilities
 
             var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
             pet.Description.ShouldBe("Cats with dogs");
-            pet.PossibleTypes.Count().ShouldBe(2);
+            pet.PossibleTypes.Count.ShouldBe(2);
 
             var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
             query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");

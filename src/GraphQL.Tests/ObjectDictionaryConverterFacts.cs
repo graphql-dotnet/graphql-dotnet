@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using GraphQL.SystemTextJson;
-using GraphQL.Tests.Introspection;
 using Shouldly;
 using Xunit;
 
@@ -30,7 +29,7 @@ namespace GraphQL.Tests
         [Fact]
         public void Deserialize_And_Serialize_Introspection()
         {
-            string json = IntrospectionResult.Data;
+            string json = "IntrospectionResult".ReadJsonResult();
 
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
 

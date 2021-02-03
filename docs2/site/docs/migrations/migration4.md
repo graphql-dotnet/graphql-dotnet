@@ -93,6 +93,8 @@ constructor of your schema, or a similar location.
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
+* Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
+* Schema validation on initialize and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
 
@@ -253,3 +255,10 @@ lock (field)
   If `InputObjectGraphType<T>` is used, and `GetArgument<T>` is called with the same type, no behavior changes will occur by default.
   If `InputObjectGraphType<T>` is used, but `GetArgument<T>` is called with a different type, coercion may fail. Override `ParseDictionary`
   to force resolving the input object to the correct type.
+  * `ExecutionResult.Data` format breaking changes. Now objects are serialized as `ObjectProperty` arrays, not object dictionaries.
+  Both `GraphQL.NewtonsoftJson` and `GraphQL.SystemTextJson` serializers received the necessary changes to produce the same JSON as before.
+  However, consumers using `ExecutionResult` instances directly most likely will not work correctly.
+* Most `ExecutionStrategy` methods are now `protected`
+* `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
+* `ExecutionNode.IsResultSet` has been removed
+* `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions

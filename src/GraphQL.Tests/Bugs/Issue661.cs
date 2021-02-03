@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.Caching.Distributed;
@@ -38,7 +37,7 @@ namespace GraphQL.Tests.Bugs
                 }).GetAwaiter().GetResult();
 
                 result.Errors.ShouldBeNull();
-                var data = (Dictionary<string, object>)result.Data;
+                var data = result.Data.ToDict();
                 data.Count.ShouldBe(1);
                 data["get_cached"].ShouldBe("myvalue");
             }

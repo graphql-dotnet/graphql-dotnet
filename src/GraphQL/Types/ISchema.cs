@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -13,7 +14,7 @@ namespace GraphQL.Types
     /// <br/><br/>
     /// <see cref="Schema"/> only requires the <see cref="Schema.Query">Query</see> property to be set; although commonly the <see cref="Schema.Mutation">Mutation</see> and/or <see cref="Schema.Subscription">Subscription</see> properties are also set.
     /// </summary>
-    public interface ISchema : IProvideMetadata
+    public interface ISchema : IProvideMetadata, IProvideDescription
     {
         /// <inheritdoc cref="ExperimentalFeatures"/>
         ExperimentalFeatures Features { get; set; }
@@ -44,11 +45,6 @@ namespace GraphQL.Types
         /// However, you can also apply middlewares at any time in runtime using SchemaTypes.ApplyMiddleware method.
         /// </summary>
         IFieldMiddlewareBuilder FieldMiddleware { get; }
-
-        /// <summary>
-        /// Description of the schema.
-        /// </summary>
-        string Description { get; set; }
 
         /// <summary>
         /// The 'query' base graph type; required.
@@ -86,7 +82,20 @@ namespace GraphQL.Types
         IEnumerable<Type> AdditionalTypes { get; }
 
         /// <summary>
-        /// Add a specific instance of an <see cref="IGraphType"/> to the schema.
+        /// Adds the specified instance of an <see cref="ISchemaNodeVisitor"/> to the schema.
+        /// When initializing a schema, all registered visitors will be executed on each
+        /// schema element when it is traversed.
+        /// </summary>
+        void RegisterVisitor(ISchemaNodeVisitor visitor);
+
+        /// <summary>
+        /// Adds the specified visitor type to the schema. When initializing a schema, all
+        /// registered visitors will be executed on each schema element when it is traversed.
+        /// </summary>
+        void RegisterVisitor(Type type);
+
+        /// <summary>
+        /// Adds the specified specific instance of an <see cref="IGraphType"/> to the schema.
         /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
@@ -94,28 +103,12 @@ namespace GraphQL.Types
         void RegisterType(IGraphType type);
 
         /// <summary>
-        /// Add specific instances of <see cref="IGraphType"/>s to the schema.
+        /// Adds the specified graph type to the schema. Type must implement <see cref="IGraphType"/>.
         /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        void RegisterTypes(params IGraphType[] types);
-
-        /// <summary>
-        /// Add specific graph types to the schema. Each type must implement <see cref="IGraphType"/>.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterTypes(params Type[] types);
-
-        /// <summary>
-        /// Add a specific graph type to the schema.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterType<T>() where T : IGraphType;
+        void RegisterType(Type type);
 
         /// <summary>
         /// Register a custom value converter to the schema.
@@ -132,7 +125,7 @@ namespace GraphQL.Types
         /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
         /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
         /// </summary>
-        ISchemaFilter Filter { get; }
+        ISchemaFilter Filter { get; set; }
 
         /// <summary>
         /// Provides the ability to order the schema elements upon introspection.
@@ -154,18 +147,5 @@ namespace GraphQL.Types
         /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
-    }
-
-    /// <summary>
-    /// Options for configuring experimental features.
-    /// </summary>
-    public class ExperimentalFeatures
-    {
-        /// <summary>
-        /// Enables ability to expose user-defined meta-information via introspection.
-        /// See https://github.com/graphql/graphql-spec/issues/300 for more information.
-        /// It is experimental feature that are not in the official specification (yet).
-        /// </summary>
-        public bool AppliedDirectives { get; set; } = false;
     }
 }

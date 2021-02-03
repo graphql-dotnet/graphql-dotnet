@@ -19,6 +19,11 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
+        /// Gets the count of argument nodes.
+        /// </summary>
+        public int Count => _arguments?.Count ?? 0;
+
+        /// <summary>
         /// Creates an instance of a list of argument nodes.
         /// </summary>
         public Arguments()

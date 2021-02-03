@@ -9,26 +9,37 @@ namespace GraphQL.Tests.Utilities
     {
         [Fact]
         public void ValidateName_whenNameIsNull_throwsArgumentOutOfRange() =>
-           Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(null));
+           Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(null, "field"));
 
         [Fact]
         public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange() =>
-            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(string.Empty));
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(string.Empty, "field"));
 
         [Fact]
         public void ValidateName_whenNameIsWhitespace_throwsArgumentOutOfRange() =>
-            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(" "));
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(" ", "field"));
 
         [Fact]
         public void ValidateName_whenNameStartsWithReservedCharacters_throwsArgumentOutOfRange() =>
-            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede"));
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede", "field"));
 
         [Theory]
         [InlineData("śćłó")]
         [InlineData("3test")]
         [InlineData("test Name")]
-        public void ValidateName_whenNameContainsInvalidCharacters_throwsArgumentOutOfRange(string invalidName) =>
-            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(invalidName));
+        public void ValidateName_whenNameContainsInvalidCharacters_throwsArgumentOutOfRange(string invalidName)
+        {
+            // race condition with does_not_throw_with_filtering_nameconverter test
+            try
+            {
+                Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(invalidName, "field"));
+            }
+            catch (ShouldAssertException)
+            {
+                System.Threading.Thread.Sleep(100); // wait a bit and retry
+                Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(invalidName, "field"));
+            }
+        }
 
         [Theory]
         [InlineData("goodName")]
@@ -38,7 +49,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData("_test")]
         public void ValidateName_whenNameIsCorrect_DoesntthrowsArgumentOutOfRange(string validName)
         {
-            NameValidator.ValidateName(validName);
+            NameValidator.ValidateName(validName, "field");
         }
     }
 }

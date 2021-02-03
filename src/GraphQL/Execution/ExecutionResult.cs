@@ -12,6 +12,13 @@ namespace GraphQL
     public class ExecutionResult
     {
         /// <summary>
+        /// Indicates if the operation included execution. If an error was encountered BEFORE execution begins,
+        /// the data entry SHOULD NOT be present in the result. If an error was encountered DURING the execution
+        /// that prevented a valid response, the data entry in the response SHOULD BE null.
+        /// </summary>
+        public bool Executed { get; set; }
+
+        /// <summary>
         /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public object Data { get; set; }
@@ -69,5 +76,64 @@ namespace GraphQL
             Perf = result.Perf;
             Extensions = result.Extensions;
         }
+
+        /// <summary>
+        /// Adds the specified error to <see cref="Errors"/>.
+        /// </summary>
+        /// <returns>Reference to this.</returns>
+        public ExecutionResult AddError(ExecutionError error)
+        {
+            (Errors ??= new ExecutionErrors()).Add(error);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds errors from the specified <see cref="ExecutionErrors"/> to <see cref="Errors"/>.
+        /// </summary>
+        /// <param name="errors">List of execution errors.</param>
+        /// <returns>Reference to this.</returns>
+        public ExecutionResult AddErrors(ExecutionErrors errors)
+        {
+            if (errors?.Count > 0)
+            {
+                if (Errors == null)
+                    Errors = new ExecutionErrors(errors.Count);
+                foreach (var error in errors.List)
+                    Errors.Add(error);
+            }
+
+            return this;
+        }
+    }
+
+    /// <summary>
+    /// Represents a property of an object as a pair of property name and its value. This struct is used
+    /// in order to be able to store properties as arrays, not dictionaries. It allows more efficient use of
+    /// memory from the managed heap for the <see cref="ExecutionResult.Data"/> property. The use of array
+    /// of <see cref="ObjectProperty"/> unambiguously indicates the need to convert the array into a json
+    /// object during serialization.
+    /// </summary>
+    public struct ObjectProperty
+    {
+        /// <summary>
+        /// Creates an instance of <see cref="ObjectProperty"/>.
+        /// </summary>
+        /// <param name="key">Property key (name).</param>
+        /// <param name="value">Property value.</param>
+        public ObjectProperty(string key, object value)
+        {
+            Key = key;
+            Value = value;
+        }
+
+        /// <summary>
+        /// Property key (name).
+        /// </summary>
+        public string Key { get; }
+
+        /// <summary>
+        /// Property value.
+        /// </summary>
+        public object Value { get; }
     }
 }

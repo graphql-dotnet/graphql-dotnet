@@ -12,9 +12,9 @@ namespace GraphQL.Execution
     public class ObjectExecutionNode : ExecutionNode, IParentExecutionNode
     {
         /// <summary>
-        /// Returns a dictionary of child execution nodes, with keys set to the names of the child fields that the child nodes represent.
+        /// Returns an array of child execution nodes.
         /// </summary>
-        public Dictionary<string, ExecutionNode> SubFields { get; set; }
+        public ExecutionNode[] SubFields { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
@@ -33,7 +33,7 @@ namespace GraphQL.Execution
         {
             var objectGraphType = GraphType as IObjectGraphType;
 
-            if (GraphType is IAbstractGraphType abstractGraphType && IsResultSet)
+            if (GraphType is IAbstractGraphType abstractGraphType)
                 objectGraphType = abstractGraphType.GetObjectType(Result, schema);
 
             return objectGraphType;
@@ -48,24 +48,25 @@ namespace GraphQL.Execution
             if (SubFields == null)
                 return null;
 
-            var fields = new Dictionary<string, object>(SubFields.Count);
+            var fields = new ObjectProperty[SubFields.Length];
 
-            foreach (var kvp in SubFields)
+            for (int i = 0; i < SubFields.Length; ++i)
             {
-                object value = kvp.Value.ToValue();
+                var child = SubFields[i];
+                object value = child.ToValue();
 
-                if (value == null && kvp.Value.FieldDefinition.ResolvedType is NonNullGraphType)
+                if (value == null && child.FieldDefinition.ResolvedType is NonNullGraphType)
                 {
                     return null;
                 }
 
-                fields[kvp.Key] = value;
+                fields[i] = new ObjectProperty(child.Name, value);
             }
 
             return fields;
         }
 
-        IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields?.Values ?? Enumerable.Empty<ExecutionNode>();
+        IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields ?? Enumerable.Empty<ExecutionNode>();
 
         /// <inheritdoc/>
         public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)
@@ -74,13 +75,13 @@ namespace GraphQL.Execution
             {
                 if (reverse)
                 {
-                    foreach (var item in SubFields.Reverse()) //TODO: write custom enumerator for reverse
-                        action(item.Value, state);
+                    for (int i = SubFields.Length - 1; i >= 0; --i)
+                        action(SubFields[i], state);
                 }
                 else
                 {
                     foreach (var item in SubFields)
-                        action(item.Value, state);
+                        action(item, state);
                 }
             }
         }

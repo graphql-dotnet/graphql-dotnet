@@ -36,7 +36,7 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public override ISchema Build(string typeDefinitions)
+        public override Schema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
             schema.RegisterType(BuildEntityGraphType());
@@ -180,7 +180,7 @@ namespace GraphQL.Utilities.Federation
                 return false;
             }
 
-            var directive = type.GetExtensionDirectives<ASTNode>().Directive("key");
+            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
             if (directive != null)
                 return true;
 
@@ -188,8 +188,13 @@ namespace GraphQL.Utilities.Federation
             if (ast == null)
                 return false;
 
-            var keyDir = ast.Directives.Directive("key");
+            var keyDir = Directive(ast.Directives, "key");
             return keyDir != null;
+        }
+
+        private static GraphQLDirective Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
+        {
+            return directives?.FirstOrDefault(x => x.Name.Value == name);
         }
     }
 }

@@ -91,7 +91,9 @@ namespace GraphQL.Introspection
                     location == DirectiveLocation.FragmentDefinition ||
                     location == DirectiveLocation.FragmentSpread ||
                     location == DirectiveLocation.InlineFragment))
+                {
                     return Forbidden;
+                }
             }
 
             return Allowed;

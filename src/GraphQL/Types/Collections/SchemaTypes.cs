@@ -61,17 +61,9 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
-        /// <summary>
-        /// Initializes a new instance with the specified <see cref="INameConverter"/>.
-        /// </summary>
-        private SchemaTypes(INameConverter nameConverter, bool allowAppliedDirectives)
+        private SchemaTypes(ISchema schema)
         {
-#pragma warning disable IDE0016 // Use 'throw' expression; if this rule is applied here, then the null check is moved to the very end of the method - this is not what we want
-            if (nameConverter == null)
-                throw new ArgumentNullException(nameof(nameConverter));
-#pragma warning restore IDE0016
-
-            _introspectionTypes = CreateIntrospectionTypes(allowAppliedDirectives);
+            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
@@ -92,10 +84,10 @@ namespace GraphQL.Types
                 AddType(introspectionType, _context);
 
             // set the name converter properly
-            _nameConverter = nameConverter;
+            _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
         }
 
-        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives)
+        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
         {
             return (allowAppliedDirectives
                 ? new IGraphType[]
@@ -105,7 +97,7 @@ namespace GraphQL.Types
                     new __AppliedDirective(),
                     new __TypeKind(),
                     new __EnumValue(true),
-                    new __Directive(true),
+                    new __Directive(true, allowRepeatable),
                     new __Field(true),
                     new __InputValue(true),
                     new __Type(true),
@@ -118,7 +110,7 @@ namespace GraphQL.Types
                     //new __AppliedDirective(),  forbidden
                     new __TypeKind(),
                     new __EnumValue(false),
-                    new __Directive(false),
+                    new __Directive(false, allowRepeatable),
                     new __Field(false),
                     new __InputValue(false),
                     new __Type(false),
@@ -160,7 +152,7 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             ISchema schema)
         {
-            var lookup = new SchemaTypes(schema.NameConverter ?? CamelCaseNameConverter.Instance, schema.Features.AppliedDirectives);
+            var lookup = new SchemaTypes(schema);
 
             var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {
@@ -336,7 +328,7 @@ namespace GraphQL.Types
 
             if (type is IObjectGraphType obj)
             {
-                foreach (var objectInterface in obj.Interfaces)
+                foreach (var objectInterface in obj.Interfaces.List)
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
@@ -415,7 +407,7 @@ namespace GraphQL.Types
             if (applyNameConverter)
             {
                 field.Name = _nameConverter.NameForField(field.Name, parentType);
-                NameValidator.ValidateNameOnSchemaInitialize(field.Name);
+                NameValidator.ValidateNameOnSchemaInitialize(field.Name, "field");
             }
 
             if (field.ResolvedType == null)
@@ -454,9 +446,11 @@ namespace GraphQL.Types
         private void AddTypeWithLoopCheck(IGraphType resolvedType, TypeCollectionContext context, Type namedType)
         {
             if (context.InFlightRegisteredTypes.Any(t => t == namedType))
+            {
                 throw new InvalidOperationException($@"A loop has been detected while registering schema types.
 There was an attempt to re-register '{namedType.FullName}' with instance of '{resolvedType.GetType().FullName}'.
 Make sure that your ServiceProvider is configured correctly.");
+            }
 
             context.InFlightRegisteredTypes.Push(namedType);
             try

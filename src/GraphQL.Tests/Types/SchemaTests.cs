@@ -173,15 +173,16 @@ namespace GraphQL.Tests.Types
         public void disposed_schema_throws_errors()
         {
             var schema = new Schema();
+
+            schema.Initialized.ShouldBeFalse();
             schema.Dispose();
             schema.Dispose();
+            schema.Initialized.ShouldBeFalse();
+
             Should.Throw<ObjectDisposedException>(() => schema.Initialize());
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
-            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(new IGraphType[] { }));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
-            //Should.Throw<ObjectDisposedException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));
-            //Should.Throw<ObjectDisposedException>(() => schema.Directives.Register(new DirectiveGraphType("test", DirectiveLocation.Field)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
         }
 
@@ -195,11 +196,8 @@ namespace GraphQL.Tests.Types
             schema.Initialized.ShouldBeTrue();
 
             Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
-            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new IGraphType[] { }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
-            //Should.Throw<InvalidOperationException>(() => schema.Directives.Register(new DirectiveGraphType[] { new DirectiveGraphType("test", DirectiveLocation.Field) }));
-            //Should.Throw<InvalidOperationException>(() => schema.Directives.Register(new DirectiveGraphType("test", DirectiveLocation.Field)));
         }
     }
 
@@ -213,7 +211,7 @@ namespace GraphQL.Tests.Types
         {
             Query = new SomeQuery();
 
-            RegisterType<SomeObject>();
+            this.RegisterType<SomeObject>();
         }
     }
 
@@ -223,14 +221,14 @@ namespace GraphQL.Tests.Types
         {
             Query = new SomeQuery();
 
-            RegisterType<SomeObject>();
-            RegisterType<SomeObject>();
-            RegisterType<SomeQuery>();
-            RegisterType<SomeQuery>();
-            RegisterType<SomeInterface>();
-            RegisterType<SomeInterface>();
-            RegisterType<StringGraphType>();
-            RegisterType<StringGraphType>();
+            this.RegisterType<SomeObject>();
+            this.RegisterType<SomeObject>();
+            this.RegisterType<SomeQuery>();
+            this.RegisterType<SomeQuery>();
+            this.RegisterType<SomeInterface>();
+            this.RegisterType<SomeInterface>();
+            this.RegisterType<StringGraphType>();
+            this.RegisterType<StringGraphType>();
         }
     }
 

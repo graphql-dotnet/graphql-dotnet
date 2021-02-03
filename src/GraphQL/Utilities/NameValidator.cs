@@ -12,14 +12,14 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateName(string name, string type = "field") => GlobalSwitches.Validation(name, type);
+        public static void ValidateName(string name, string type) => GlobalSwitches.Validation(name, type);
 
         /// <summary>
         /// Validates a specified name during schema initialization.
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateNameOnSchemaInitialize(string name, string type = "field") => GlobalSwitches.ValidationOnSchemaInitialize(name, type);
+        public static void ValidateNameOnSchemaInitialize(string name, string type) => GlobalSwitches.ValidationOnSchemaInitialize(name, type);
 
         /// <summary>
         /// Validates a specified name according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
@@ -55,7 +55,7 @@ namespace GraphQL.Utilities
         }
 
         //TODO: maybe remove after
-        internal static void ValidateNameNotNull(string name, string type = "field")
+        internal static void ValidateNameNotNull(string name, string type)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

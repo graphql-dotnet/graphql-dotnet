@@ -96,10 +96,10 @@ namespace GraphQL.Tests.Bugs
         public void HasArgument_WithDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":null}".ToInputs());
 
         [Fact]
-        public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1);
+        public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1, executed: false);
 
         [Fact]
-        public void CheckRequiredObjectFieldAreRequired_Literal() => AssertQueryWithErrors("{ testReqObjField(arg: { value2: null }) }", "null", expectedErrorCount: 1);
+        public void CheckRequiredObjectFieldAreRequired_Literal() => AssertQueryWithErrors("{ testReqObjField(arg: { value2: null }) }", "null", expectedErrorCount: 1, executed: false);
     }
 
     public class Bug2159Schema : Schema
