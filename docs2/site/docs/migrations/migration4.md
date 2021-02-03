@@ -81,6 +81,9 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
   Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
+It is recommended to configure these options once when your application starts, such as your `void Main()` method, or a static
+constructor of your schema, or a similar location.
+
 ### Authorization Extension Methods
 
 > Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
@@ -192,15 +195,17 @@ so it is safe to preserve these instances without calling `.Copy()`.
 
 To enable metrics, please set the option to `true` before executing the query.
 
-(todo: add sample)
+```cs
+var result = await schema.ExecuteAsync(options =>
+{
+    options.Query = "{ hero { id name } }";
+    options.EnableMetrics = true;
+});
+```
 
 ### GraphQL Member Descriptions
 
-> By default, descriptions for fields, types, enums, and so on are not pulled from xml comments unless the corresponding global flag is enabled.
-
-Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for fields from xml comments as it did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
-
-(todo: update/consolidate description)
+Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
 
 ### Changes to `IResolveFieldContext.Arguments`
 
@@ -213,9 +218,18 @@ specified by the query).
 
 ### Metadata is Not Thread Safe
 
-> `IProvideMetadata.Metadata` is now `Dictionary` instead of `ConcurrentDictionary`, and is not thread safe anymore
+`IProvideMetadata.Metadata` is now a `Dictionary<string, object>` instead of `ConcurrentDictionary<string, object>`, and is not thread safe anymore.
+If you need to write metadata during execution of field resolvers, lock on the graph type before accessing the dictionary. Do not lock on the
+`Metadata` property because there can be concurrency issues accessing the field.
 
-(todo: update description, add description of how to lock on type, not dictionary)
+```cs
+lock (field)
+{
+    int value;
+    if (field.Metadata.TryGetValue("counter", out var valueObject)) value = (int)valueObject;
+    field.Metadata["counter"] = value + 1;
+}
+```
 
 ### Other Breaking Changes
 
