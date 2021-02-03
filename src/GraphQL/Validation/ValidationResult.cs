@@ -8,8 +8,17 @@ namespace GraphQL.Validation
         /// <summary>
         /// Initializes a new instance with the specified set of validation errors.
         /// </summary>
-        /// <param name="errors"></param>
+        /// <param name="errors">Set of validation errors.</param>
         public ValidationResult(IEnumerable<ValidationError> errors)
+        {
+            Errors.AddRange(errors);
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified set of validation errors.
+        /// </summary>
+        /// <param name="errors">Set of validation errors.</param>
+        public ValidationResult(params ValidationError[] errors)
         {
             Errors.AddRange(errors);
         }

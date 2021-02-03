@@ -9,14 +9,14 @@ namespace GraphQL
     /// </summary>
     public class ExecutionErrors : IEnumerable<ExecutionError>
     {
-        private readonly List<ExecutionError> _errors = new List<ExecutionError>();
+        internal readonly List<ExecutionError> Errors = new List<ExecutionError>();
 
         /// <summary>
         /// Adds an execution error to the list.
         /// </summary>
         public virtual void Add(ExecutionError error)
         {
-            _errors.Add(error ?? throw new ArgumentNullException(nameof(error)));
+            Errors.Add(error ?? throw new ArgumentNullException(nameof(error)));
         }
 
         /// <summary>
@@ -31,15 +31,15 @@ namespace GraphQL
         /// <summary>
         /// Returns the number of execution errors in the list.
         /// </summary>
-        public int Count => _errors.Count;
+        public int Count => Errors.Count;
 
         /// <summary>
         /// Returns the execution error at the specified index.
         /// </summary>
-        public ExecutionError this[int index] => _errors[index];
+        public ExecutionError this[int index] => Errors[index];
 
         /// <inheritdoc/>
-        public IEnumerator<ExecutionError> GetEnumerator() => _errors.GetEnumerator();
+        public IEnumerator<ExecutionError> GetEnumerator() => Errors.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

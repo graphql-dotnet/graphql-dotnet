@@ -114,10 +114,13 @@ namespace GraphQL
         public object Data { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
+        public bool Executed { get; set; }
         public System.Collections.Generic.Dictionary<string, object> Extensions { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
         public string Query { get; set; }
+        public GraphQL.ExecutionResult AddError(GraphQL.ExecutionError error) { }
+        public GraphQL.ExecutionResult AddErrors(GraphQL.ExecutionErrors errors) { }
     }
     public class ExperimentalFeatures
     {
@@ -2791,6 +2794,7 @@ namespace GraphQL.Validation
     }
     public class ValidationResult : GraphQL.Validation.IValidationResult
     {
+        public ValidationResult(params GraphQL.Validation.ValidationError[] errors) { }
         public ValidationResult(System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> errors) { }
         public GraphQL.ExecutionErrors Errors { get; }
         public bool IsValid { get; }

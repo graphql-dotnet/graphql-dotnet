@@ -69,9 +69,10 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
+            bool executed = true)
         {
-            var queryResult = CreateQueryResult(expected);
+            var queryResult = CreateQueryResult(expected, executed: executed);
             return AssertQueryIgnoreErrors(
                 query,
                 queryResult,
@@ -109,7 +110,7 @@ namespace GraphQL.Tests
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
-            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
+            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
             var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
@@ -168,7 +169,7 @@ namespace GraphQL.Tests
             return runResult;
         }
 
-        public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
-            => result.ToExecutionResult(errors);
+        public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null, bool executed = true)
+            => result.ToExecutionResult(errors, executed);
     }
 }

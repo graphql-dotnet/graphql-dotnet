@@ -57,7 +57,7 @@ namespace GraphQL.Tests.Errors
                         ctx.Exception = new ExecutionError("Test error message");
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
 
         }
 
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Errors
                         ctx.ErrorMessage = "Test error message";
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
 
         }
 
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Errors
                         ctx.ErrorMessage = "Test error message";
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Executed = true });
         }
 
         public class DocListener : DocumentExecutionListenerBase

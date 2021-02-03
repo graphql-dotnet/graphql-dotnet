@@ -33,6 +33,7 @@ namespace GraphQL.Execution
 
             return new ExecutionResult
             {
+                Executed = true,
                 Data = data,
                 Query = context.Document.OriginalQuery,
                 Document = context.Document,

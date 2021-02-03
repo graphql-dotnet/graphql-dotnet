@@ -10,12 +10,14 @@ namespace GraphQL
         /// </summary>
         /// <param name="json">A json representation of the <see cref="ExecutionResult.Data"/> to be set.</param>
         /// <param name="errors">Any errors.</param>
+        /// <param name="executed">Indicates if the operation included execution.</param>
         /// <returns>ExecutionResult.</returns>
-        public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null)
+        public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null, bool executed = true)
             => new ExecutionResult
             {
                 Data = string.IsNullOrWhiteSpace(json) ? null : json.ToDictionary(),
-                Errors = errors
+                Errors = errors,
+                Executed = executed
             };
     }
 }

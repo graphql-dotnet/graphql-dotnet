@@ -30,7 +30,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -47,7 +47,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -64,7 +64,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();

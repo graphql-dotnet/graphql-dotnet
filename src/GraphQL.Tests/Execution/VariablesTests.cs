@@ -286,7 +286,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": null } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -300,7 +300,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": ""foo bar"" }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
 
@@ -316,7 +316,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"" } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -330,7 +330,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"", ""e"": ""dog"" } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -502,7 +502,7 @@ namespace GraphQL.Tests.Execution
 
             string expected = null;
 
-            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -522,7 +522,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{""value"": null}".ToInputs();
 
-            var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();

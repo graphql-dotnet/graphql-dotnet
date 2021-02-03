@@ -99,7 +99,7 @@ namespace GraphQL.Tests.StarWars
             error.AddLocation(4, 25);
             errors.Add(error);
 
-            AssertQuery(query, CreateQueryResult(null, errors), null, null);
+            AssertQuery(query, CreateQueryResult(null, errors, executed: false), null, null);
         }
     }
 }
