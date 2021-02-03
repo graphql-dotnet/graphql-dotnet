@@ -152,9 +152,22 @@ so it is safe to preserve these instances without calling `.Copy()`.
 
 ### Subscriptions Moved to Separate Project
 
-> Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
+The implementation for subscriptions, contained within `SubscriptionExecutionStrategy`, has been moved into the
+[`GraphQL.SystemReactive`](https://www.nuget.org/packages/GraphQL.SystemReactive/) NuGet package. The default document executer
+will now throw a `NotSupportedException` when attempting to execute a subscription. Please import the NuGet package and use the
+`SubscriptionDocumentExecuter` instead. If you have a custom document executer, you can override `SelectExecutionStrategy` in
+order to select the `SubscriptionExecutionStrategy` instance for subscriptions.
 
-(todo: revise description with reference to proper nuget package, describe changes required to project, etc)
+```cs
+protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
+{
+    return context.Operation.OperationType switch
+    {
+        OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
+        _ => base.SelectExecutionStrategy(context)
+    };
+}
+```
 
 ### API Cleanup
 
