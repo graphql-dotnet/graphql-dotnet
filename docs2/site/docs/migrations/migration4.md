@@ -93,54 +93,50 @@ It is not recommended to use this feature for interim calculations, as it is bet
 
 ## Breaking Changes
 
-### Properties moved to Schema (rename title)
+### Schema Configuration Options Moved
 
-`NameConverter`, `SchemaFilter` and `FieldMiddleware` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
+`NameConverter`, `SchemaFilter` and `FieldMiddleware` have been removed from `ExecutionOptions` and are now properties on `Schema`.
 These properties can be set in the constructor of the `Schema` instance, or within your DI composition root, or at any time before
 any query is executed. Once a query has been executed, changes to these fields is not allowed, and adding middleware via the field middleware
 builder has no effect.
 
-### Middleware
+### Middleware Builders
 
-> The signature of `IFieldMiddlewareBuilder.Use` has been changed to remove the schema from delegate. Since the schema is now known, there is no
-> need for it to be passed to the middleware builder.
+- The signature of `IFieldMiddlewareBuilder.Use` has been changed to remove the schema from delegate. Since the schema is now known, there is no
+  need for it to be passed to the middleware builder.
+- The middleware `Use<T>` extension method has been removed. Please use the `Use` method with a middleware instance instead.
 
-> The middleware `Use<T>` extension method has been removed. Please use the `Use` method with a middleware instance instead.
+See [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware) for more information.
 
-(todo: confirm description, add sample of required changes)
+### Dependency Injection / GetRequiredService
 
-### GetRequiredService
-
-> `GraphQL.Utilities.ServiceProviderExtensions` has been made internal. This affects usages of its extension method `GetRequiredService`.
-> Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` NuGet package and use the extension method from the
-> `Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions` class.
-
-(todo: confirm description, maybe add sample change to using statement)
+`GraphQL.Utilities.ServiceProviderExtensions` has been made internal. This affects usages of its extension method `GetRequiredService`.
+Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` NuGet package and use the extension method from the
+`Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions` class.
 
 ### Default Sort Order of Introspection Query Results
 
 By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
 
 ```c#
-    /// <summary>
-    /// Default schema comparer for GraphQL.NET v3.x.x.
-    /// By default only fields are ordered by their names within enclosing type.
-    /// </summary>
-    public sealed class LegacyV3SchemaComparer : DefaultSchemaComparer
+/// <summary>
+/// Default schema comparer for GraphQL.NET v3.x.x.
+/// By default only fields are ordered by their names within enclosing type.
+/// </summary>
+public sealed class LegacyV3SchemaComparer : DefaultSchemaComparer
+{
+    private static readonly FieldByNameComparer _instance = new FieldByNameComparer();
+
+    private sealed class FieldByNameComparer : IComparer<IFieldType>
     {
-        private static readonly FieldByNameComparer _instance = new FieldByNameComparer();
-
-        private sealed class FieldByNameComparer : IComparer<IFieldType>
-        {
-            public int Compare(IFieldType x, IFieldType y) => x.Name.CompareTo(y.Name);
-        }
-
-        /// <inheritdoc/>
-        public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
+        public int Compare(IFieldType x, IFieldType y) => x.Name.CompareTo(y.Name);
     }
-```
+    /// <inheritdoc/>
+    public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
+}
 
-(todo: add sample line of code of how to set the comparer in the schema)
+schema.Comparer = new LegacyV3SchemaComparer();
+```
 
 ### `IResolveFieldContext` Re-use
 
