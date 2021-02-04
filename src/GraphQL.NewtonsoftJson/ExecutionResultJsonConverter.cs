@@ -90,7 +90,7 @@ namespace GraphQL.NewtonsoftJson
                     writer.WriteEndArray();
                 }
             }
-            else if (node == null)
+            else if (node == null || node is NullExecutionNode)
             {
                 writer.WriteNull();
             }
