@@ -407,7 +407,7 @@ namespace GraphQL.Types
             if (applyNameConverter)
             {
                 field.Name = _nameConverter.NameForField(field.Name, parentType);
-                NameValidator.ValidateNameOnSchemaInitialize(field.Name, "field");
+                NameValidator.ValidateNameOnSchemaInitialize(field.Name, NameType.Field);
             }
 
             if (field.ResolvedType == null)
@@ -427,7 +427,7 @@ namespace GraphQL.Types
                     if (applyNameConverter)
                     {
                         arg.Name = _nameConverter.NameForArgument(arg.Name, parentType, field);
-                        NameValidator.ValidateNameOnSchemaInitialize(arg.Name, "argument");
+                        NameValidator.ValidateNameOnSchemaInitialize(arg.Name, NameType.Argument);
                     }
 
                     if (arg.ResolvedType != null)

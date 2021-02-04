@@ -40,7 +40,7 @@ namespace GraphQL
         /// Setting this delegate allows you to use names not conforming to the specification, for example
         /// 'enum-member'. Only change it when absolutely necessary.
         /// </summary>
-        public static Action<string, string> Validation = NameValidator.ValidateDefault;
+        public static Action<string, NameType> Validation = NameValidator.ValidateDefault;
 
         /// <summary>
         /// Gets or sets current validation delegate during schema initialization. By default this delegate
@@ -49,6 +49,6 @@ namespace GraphQL
         /// Setting this delegate allows you to use names not conforming to the specification, for example
         /// 'enum-member'. Only change it when absolutely necessary.
         /// </summary>
-        public static Action<string, string> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
+        public static Action<string, NameType> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
     }
 }

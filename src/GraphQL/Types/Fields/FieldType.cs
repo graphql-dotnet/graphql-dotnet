@@ -29,7 +29,7 @@ namespace GraphQL.Types
             {
                 if (validate)
                 {
-                    NameValidator.ValidateName(name, "field");
+                    NameValidator.ValidateName(name, NameType.Field);
                 }
 
                 _name = name;

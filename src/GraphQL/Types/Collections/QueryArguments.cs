@@ -45,7 +45,7 @@ namespace GraphQL.Types
             {
                 if (value != null)
                 {
-                    NameValidator.ValidateName(value.Name, "argument");
+                    NameValidator.ValidateName(value.Name, NameType.Argument);
                 }
 
                 if (List == null)
@@ -68,7 +68,7 @@ namespace GraphQL.Types
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            NameValidator.ValidateName(argument.Name, "argument");
+            NameValidator.ValidateName(argument.Name, NameType.Argument);
 
             (List ??= new List<QueryArgument>()).Add(argument);
         }
