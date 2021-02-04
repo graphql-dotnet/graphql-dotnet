@@ -128,13 +128,17 @@ namespace GraphQL.Execution
                             }
                         }
 
+                        // Set the execution node's value to null if necessary
+                        executionNode.ClearErrorNodes();
+
+                        // Return the result
                         return new ExecutionResult
                         {
                             Data = new RootExecutionNode(null)
                             {
                                 SubFields = new ExecutionNode[]
                                 {
-                                    executionNode.ClearErrorNodes() ? null : executionNode,
+                                    executionNode,
                                 }
                             },
                         }.With(context);
