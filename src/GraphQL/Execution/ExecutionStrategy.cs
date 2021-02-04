@@ -29,7 +29,7 @@ namespace GraphQL.Execution
                 .ConfigureAwait(false);
 
             // After the entire node tree has been executed, get the values
-            object data = rootNode.ClearErrorNodes() ? null : rootNode;// rootNode.ToValue();
+            object data = rootNode.ClearErrorNodes() ? null : rootNode;
 
             return new ExecutionResult
             {
