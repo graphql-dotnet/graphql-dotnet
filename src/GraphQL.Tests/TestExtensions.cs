@@ -24,7 +24,7 @@ namespace GraphQL.Tests
             throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type ObjectExecutionNode or IDictionary<string, object>.", nameof(data));
         }
 
-        public static RootExecutionNode ToData(this IReadOnlyDictionary<string, object> dictionary)
+        public static RootExecutionNode ToExecutionTree(this IReadOnlyDictionary<string, object> dictionary)
         {
             var root = new RootExecutionNode(null)
             {
