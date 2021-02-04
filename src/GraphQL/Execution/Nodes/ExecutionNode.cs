@@ -96,7 +96,7 @@ namespace GraphQL.Execution
         public abstract object ToValue();
 
         /// <summary>
-        /// Returns <see langword="true"/> if the node should return <see langword="null"/>.
+        /// Prepares this node and children nodes for serialization. Returns <see langword="true"/> if this node should return <see langword="null"/>.
         /// </summary>
         public virtual bool ClearErrorNodes() => ToValue() == null;
 
