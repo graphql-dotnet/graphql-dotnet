@@ -46,63 +46,63 @@ namespace GraphQL.Tests.Subscription
     public class Subscription
     {
         [GraphQLMetadata(Name = "messageAdded", Type = ResolverType.Subscriber)]
-        public IObservable<Message> SubscribeMessageAdded(ResolveEventStreamContext context)
+        public IObservable<Message> SubscribeMessageAdded(IResolveEventStreamContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.Messages();
         }
 
         [GraphQLMetadata(Name = "messageAdded")]
-        public Message ResolveMessageAdded(ResolveFieldContext context)
+        public Message ResolveMessageAdded(IResolveFieldContext context)
         {
             return context.Source as Message;
         }
 
         [GraphQLMetadata(Name = "messageGetAll", Type = ResolverType.Subscriber)]
-        public IObservable<List<Message>> SubscribeMessageGetAll(ResolveEventStreamContext context)
+        public IObservable<List<Message>> SubscribeMessageGetAll(IResolveEventStreamContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
         }
 
         [GraphQLMetadata(Name = "messageGetAll")]
-        public List<Message> ResolveMessageGetAll(ResolveFieldContext context)
+        public List<Message> ResolveMessageGetAll(IResolveFieldContext context)
         {
             return context.Source as List<Message>;
         }
 
         [GraphQLMetadata(Name = "messageAddedByUser", Type = ResolverType.Subscriber)]
-        public IObservable<Message> SubscribeMessageAddedByUser(ResolveEventStreamContext context, string id)
+        public IObservable<Message> SubscribeMessageAddedByUser(IResolveEventStreamContext context, string id)
         {
             var messages = SubscriptionSchemaWithReflection.Chat.Messages();
             return messages.Where(message => message.From.Id == id);
         }
 
         [GraphQLMetadata(Name = "messageAddedByUser")]
-        public Message ResolveMessageAddedByUser(ResolveFieldContext context)
+        public Message ResolveMessageAddedByUser(IResolveFieldContext context)
         {
             return context.Source as Message;
         }
 
         [GraphQLMetadata(Name = "messageAddedAsync", Type = ResolverType.Subscriber)]
-        public Task<IObservable<Message>> SubscribeMessageAddedAsync(ResolveEventStreamContext context)
+        public Task<IObservable<Message>> SubscribeMessageAddedAsync(IResolveEventStreamContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesAsync();
         }
 
         [GraphQLMetadata(Name = "messageAddedAsync")]
-        public Message ResolveMessageAddedAsync(ResolveFieldContext context)
+        public Message ResolveMessageAddedAsync(IResolveFieldContext context)
         {
             return context.Source as Message;
         }
 
         [GraphQLMetadata(Name = "messageAddedByUserAsync", Type = ResolverType.Subscriber)]
-        public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(ResolveEventStreamContext context, string id)
+        public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(IResolveEventStreamContext context, string id)
         {
             var messages = await SubscriptionSchemaWithReflection.Chat.MessagesAsync();
             return messages.Where(message => message.From.Id == id);
         }
 
         [GraphQLMetadata(Name = "messageAddedByUserAsync")]
-        public Message ResolveMessageAddedByUserAsync(ResolveFieldContext context)
+        public Message ResolveMessageAddedByUserAsync(IResolveFieldContext context)
         {
             return context.Source as Message;
         }

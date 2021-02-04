@@ -130,10 +130,13 @@ namespace GraphQL.Execution
 
                         return new ExecutionResult
                         {
-                            Data = new Dictionary<string, object>
+                            Data = new RootExecutionNode(null)
                             {
-                                { executionNode.Name, executionNode.ToValue() }
-                            }
+                                SubFields = new ExecutionNode[]
+                                {
+                                    executionNode.ClearErrorNodes() ? null : executionNode,
+                                }
+                            },
                         }.With(context);
                     })
                     .Catch<ExecutionResult, Exception>(exception =>
