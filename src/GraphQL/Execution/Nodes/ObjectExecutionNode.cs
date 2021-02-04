@@ -10,20 +10,12 @@ namespace GraphQL.Execution
     /// <summary>
     /// Represents an object execution node, which will contain child execution nodes.
     /// </summary>
-    public class ObjectExecutionNode : ExecutionNode, IParentExecutionNode, IReadOnlyDictionary<string, object>
+    public class ObjectExecutionNode : ExecutionNode, IParentExecutionNode
     {
         /// <summary>
         /// Returns an array of child execution nodes.
         /// </summary>
         public ExecutionNode[] SubFields { get; set; }
-
-        int IReadOnlyCollection<KeyValuePair<string, object>>.Count => SubFields.Length;
-
-        IEnumerable<string> IReadOnlyDictionary<string, object>.Keys => throw new NotImplementedException();
-
-        IEnumerable<object> IReadOnlyDictionary<string, object>.Values => throw new NotImplementedException();
-
-        object IReadOnlyDictionary<string, object>.this[string key] => throw new NotImplementedException();
 
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
@@ -51,30 +43,25 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a representation of the result of this execution node and its children
         /// within a <see cref="Dictionary{TKey, TValue}"/>.
+        /// <see cref="ClearErrorNodes"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
             if (SubFields == null)
                 return null;
 
-            var fields = new ObjectProperty[SubFields.Length];
+            var fields = new Dictionary<string, object>(SubFields.Length);
 
             for (int i = 0; i < SubFields.Length; ++i)
             {
                 var child = SubFields[i];
-                object value = child.ToValue();
-
-                if (value == null && child.FieldDefinition.ResolvedType is NonNullGraphType)
-                {
-                    return null;
-                }
-
-                fields[i] = new ObjectProperty(child.Name, value);
+                fields.Add(child.Name, child.ToValue());
             }
 
             return fields;
         }
 
+        /// <inheritdoc/>
         public override bool ClearErrorNodes()
         {
             if (SubFields == null)
@@ -117,24 +104,5 @@ namespace GraphQL.Execution
                 }
             }
         }
-
-        private IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-        {
-            foreach (var node in SubFields)
-            {
-                var result = node switch
-                {
-                    ArrayExecutionNode arrayNode => arrayNode.Items == null ? null : arrayNode,
-                    ObjectExecutionNode objectNode => objectNode.SubFields == null ? null : objectNode,
-                    _ => node.ToValue()
-                };
-                yield return new KeyValuePair<string, object>(node?.Name, result);
-            }
-        }
-
-        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        bool IReadOnlyDictionary<string, object>.ContainsKey(string key) => throw new NotImplementedException();
-        bool IReadOnlyDictionary<string, object>.TryGetValue(string key, out object value) => throw new NotImplementedException();
     }
 }

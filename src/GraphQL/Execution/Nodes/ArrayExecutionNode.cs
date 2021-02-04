@@ -10,14 +10,12 @@ namespace GraphQL.Execution
     /// <summary>
     /// Represents an execution node of a <see cref="ListGraphType"/>.
     /// </summary>
-    public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode, IReadOnlyCollection<object>
+    public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     {
         /// <summary>
         /// Returns a list of child execution nodes.
         /// </summary>
         public List<ExecutionNode> Items { get; set; }
-
-        int IReadOnlyCollection<object>.Count => Items.Count;
 
         /// <summary>
         /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
@@ -28,7 +26,8 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns a <see cref="List{T}"/> containing the results of the child execution nodes.
+        /// Returns an object array containing the results of the child execution nodes.
+        /// <see cref="ClearErrorNodes"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
@@ -38,27 +37,13 @@ namespace GraphQL.Execution
             var items = new object[Items.Count];
             for (int i = 0; i < Items.Count; ++i)
             {
-                var item = Items[i];
-                object value = item.ToValue();
-
-                if (value == null)
-                {
-                    var listType = item.FieldDefinition.ResolvedType;
-                    if (listType is NonNullGraphType nonNull)
-                        listType = nonNull.ResolvedType;
-
-                    if (((ListGraphType)listType).ResolvedType is NonNullGraphType)
-                    {
-                        return null;
-                    }
-                }
-
-                items[i] = value;
+                items[i] = Items[i].ToValue();
             }
 
             return items;
         }
 
+        /// <inheritdoc/>
         public override bool ClearErrorNodes()
         {
             if (Items == null)
@@ -67,14 +52,14 @@ namespace GraphQL.Execution
             if (Items.Count == 0)
                 return false;
 
-            var ok = false;
+            var isNullableType = false;
 
             for (int i = 0; i < Items.Count; ++i)
             {
                 var item = Items[i];
                 bool valueIsNull = item.ClearErrorNodes();
 
-                if (valueIsNull && !ok)
+                if (valueIsNull && !isNullableType)
                 {
                     if (((ListGraphType)GraphType).ResolvedType is NonNullGraphType)
                     {
@@ -83,7 +68,7 @@ namespace GraphQL.Execution
                     }
                     else
                     {
-                        ok = true;
+                        isNullableType = true;
                     } 
                 }
             }
@@ -110,23 +95,5 @@ namespace GraphQL.Execution
                 }
             }
         }
-
-        IEnumerator<object> IEnumerable<object>.GetEnumerator() => GetEnumerator();
-
-        private IEnumerator<object> GetEnumerator()
-        {
-            foreach (var node in Items)
-            {
-                yield return node switch
-                {
-                    ArrayExecutionNode arrayNode => arrayNode.Items == null ? null : arrayNode,
-                    ObjectExecutionNode objectNode => objectNode.SubFields == null ? null : objectNode,
-                    null => null,
-                    _ => node.ToValue()
-                };
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
