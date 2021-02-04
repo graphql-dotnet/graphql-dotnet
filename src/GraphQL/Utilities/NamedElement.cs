@@ -3,7 +3,7 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Indicates a field, type, argument, enum or directive.
     /// </summary>
-    public enum NameType
+    public enum NamedElement
     {
         /// <summary>
         /// A field
@@ -23,7 +23,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// An enum
         /// </summary>
-        Enum,
+        EnumValue,
 
         /// <summary>
         /// A directive

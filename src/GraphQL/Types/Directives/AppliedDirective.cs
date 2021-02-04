@@ -31,7 +31,7 @@ namespace GraphQL.Types
             get => _name;
             set
             {
-                NameValidator.ValidateName(value, NameType.Directive);
+                NameValidator.ValidateName(value, NamedElement.Directive);
                 _name = value;
             }
         }

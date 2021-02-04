@@ -26,7 +26,7 @@ namespace GraphQL.Types
             get => _name;
             set
             {
-                NameValidator.ValidateName(value, NameType.Argument);
+                NameValidator.ValidateName(value, NamedElement.Argument);
                 _name = value;
             }
         }

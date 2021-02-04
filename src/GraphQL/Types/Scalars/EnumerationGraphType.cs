@@ -52,7 +52,7 @@ namespace GraphQL.Types
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            NameValidator.ValidateName(value.Name, NameType.Enum);
+            NameValidator.ValidateName(value.Name, NamedElement.EnumValue);
             Values.Add(value);
         }
 

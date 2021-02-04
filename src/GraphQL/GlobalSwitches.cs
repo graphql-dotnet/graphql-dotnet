@@ -42,7 +42,7 @@ namespace GraphQL
         /// 'enum-member'. Only change it when absolutely necessary. This is typically only overridden
         /// when implementing a custom <see cref="INameConverter"/> that fixes names, making them spec-compliant.
         /// </summary>
-        public static Action<string, NameType> Validation = NameValidator.ValidateDefault;
+        public static Action<string, NamedElement> Validation = NameValidator.ValidateDefault;
 
         /// <summary>
         /// Gets or sets current validation delegate during schema initialization. By default this delegate
@@ -53,6 +53,6 @@ namespace GraphQL
         /// parse incoming queries with invalid characters in the names, so it is likely that the resulting
         /// member will be unusable.
         /// </summary>
-        public static Action<string, NameType> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
+        public static Action<string, NamedElement> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
     }
 }
