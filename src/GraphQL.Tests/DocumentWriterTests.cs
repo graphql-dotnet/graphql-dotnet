@@ -17,7 +17,7 @@ namespace GraphQL.Tests
             var executionResult = new ExecutionResult
             {
                 Executed = true,
-                Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary(),
+                Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary().ToData(),
                 Errors = new ExecutionErrors
                 {
                     new ExecutionError("some error 1"),
@@ -102,7 +102,7 @@ namespace GraphQL.Tests
         {
             var executionResult = new ExecutionResult
             {
-                Data = new Dictionary<string, object>(),
+                Data = new Dictionary<string, object>().ToData(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>(),
                 Executed = true
@@ -121,7 +121,7 @@ namespace GraphQL.Tests
         {
             var executionResult = new ExecutionResult
             {
-                Data = new Dictionary<string, object>(),
+                Data = new Dictionary<string, object>().ToData(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>(),
                 Executed = false
