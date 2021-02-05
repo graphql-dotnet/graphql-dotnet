@@ -677,7 +677,7 @@ namespace GraphQL.Execution
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
-        public override bool ClearErrorNodes() { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public abstract class DocumentError : GraphQL.ExecutionError
@@ -768,8 +768,8 @@ namespace GraphQL.Execution
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public object Result { get; set; }
         public virtual object Source { get; }
-        public virtual bool ClearErrorNodes() { }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
+        public virtual bool PropagateNull() { }
         public abstract object ToValue();
     }
     public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
@@ -873,8 +873,8 @@ namespace GraphQL.Execution
         public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Execution.ExecutionNode[] SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
-        public override bool ClearErrorNodes() { }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy

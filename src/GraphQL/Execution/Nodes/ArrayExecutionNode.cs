@@ -26,7 +26,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Returns an object array containing the results of the child execution nodes.
-        /// <see cref="ClearErrorNodes"/> must be called prior to calling this method.
+        /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
@@ -43,7 +43,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public override bool ClearErrorNodes()
+        public override bool PropagateNull()
         {
             if (Items == null)
                 return true;
@@ -56,7 +56,7 @@ namespace GraphQL.Execution
             for (int i = 0; i < Items.Count; ++i)
             {
                 var item = Items[i];
-                bool valueIsNull = item.ClearErrorNodes();
+                bool valueIsNull = item.PropagateNull();
 
                 if (valueIsNull && !isNullableType)
                 {

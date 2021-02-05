@@ -105,3 +105,4 @@
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
 * `ExecutionNode.IsResultSet` has been removed
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
+* `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation

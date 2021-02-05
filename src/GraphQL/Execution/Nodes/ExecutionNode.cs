@@ -98,7 +98,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Prepares this node and children nodes for serialization. Returns <see langword="true"/> if this node should return <see langword="null"/>.
         /// </summary>
-        public virtual bool ClearErrorNodes() => ToValue() == null;
+        public virtual bool PropagateNull() => ToValue() == null;
 
         /// <summary>
         /// Returns the parent graph type of this node.

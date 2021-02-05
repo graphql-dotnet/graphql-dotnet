@@ -129,7 +129,7 @@ namespace GraphQL.Execution
                         }
 
                         // Set the execution node's value to null if necessary
-                        executionNode.ClearErrorNodes();
+                        executionNode.PropagateNull();
 
                         // Return the result
                         return new ExecutionResult

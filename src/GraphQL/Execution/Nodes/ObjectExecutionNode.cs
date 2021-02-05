@@ -42,7 +42,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a representation of the result of this execution node and its children
         /// within a <see cref="Dictionary{TKey, TValue}"/>.
-        /// <see cref="ClearErrorNodes"/> must be called prior to calling this method.
+        /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
@@ -61,7 +61,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public override bool ClearErrorNodes()
+        public override bool PropagateNull()
         {
             if (SubFields == null)
                 return true;
@@ -69,7 +69,7 @@ namespace GraphQL.Execution
             for (int i = 0; i < SubFields.Length; ++i)
             {
                 var child = SubFields[i];
-                bool valueIsNull = child.ClearErrorNodes();
+                bool valueIsNull = child.PropagateNull();
 
                 if (valueIsNull)
                 {
