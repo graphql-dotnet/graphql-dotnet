@@ -129,6 +129,10 @@ namespace GraphQL.Execution
                         }
 
                         // Set the execution node's value to null if necessary
+                        // Note: assumes that the subscription field is nullable, regardless of how it was defined
+                        // See https://github.com/graphql-dotnet/graphql-dotnet/pull/2240#discussion_r570631402
+                        //TODO: check if a non-null subscription field is allowed per the spec
+                        //TODO: check if errors should be returned along with the data
                         executionNode.PropagateNull();
 
                         // Return the result
