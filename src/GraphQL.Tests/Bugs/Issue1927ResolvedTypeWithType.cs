@@ -47,12 +47,6 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void test_nonnull_constructor()
-        {
-            Should.Throw<ArgumentOutOfRangeException>(() => new NonNullGraphType<NonNullGraphType<StringGraphType>>());
-        }
-
-        [Fact]
         public void test_fieldtype_type()
         {
             Should.Throw<ArgumentOutOfRangeException>(() => new FieldType { Type = typeof(string) });

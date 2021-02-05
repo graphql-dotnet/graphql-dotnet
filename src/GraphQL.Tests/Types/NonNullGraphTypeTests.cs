@@ -56,7 +56,8 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void NonNull_Wrapped_With_NonNull_Should_Throw()
         {
-            Should.Throw<ArgumentException>(() => new NonNullGraphType(new NonNullGraphType(new StringGraphType()))).ParamName.ShouldBe("type");
+            Should.Throw<ArgumentOutOfRangeException>(() => new NonNullGraphType<NonNullGraphType<StringGraphType>>()).ParamName.ShouldBe("type");
+            Should.Throw<ArgumentOutOfRangeException>(() => new NonNullGraphType(new NonNullGraphType(new StringGraphType()))).ParamName.ShouldBe("type");
         }
     }
 

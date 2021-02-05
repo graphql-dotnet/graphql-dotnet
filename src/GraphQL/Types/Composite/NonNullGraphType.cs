@@ -2,17 +2,6 @@ using System;
 
 namespace GraphQL.Types
 {
-    /// <inheritdoc cref="NonNullGraphType"/>
-    public class NonNullGraphType<T> : NonNullGraphType
-        where T : GraphType
-    {
-        /// <inheritdoc cref="NonNullGraphType(Type)"/>
-        public NonNullGraphType()
-            : base(typeof(T))
-        {
-        }
-    }
-
     /// <summary>
     /// Represents a graph type that, for output graphs, is never null, or for input graphs, is not optional.
     /// In other words the NonNull type wraps another type, and denotes that the resulting value will never be null.
@@ -24,37 +13,62 @@ namespace GraphQL.Types
         /// </summary>
         public NonNullGraphType(IGraphType type)
         {
-            if (type is NonNullGraphType)
-            {
-                // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
-                throw new ArgumentOutOfRangeException(nameof(type), "Cannot nest NonNull inside NonNull.");
-            }
-
             ResolvedType = type;
-        }
-
-        /// <inheritdoc cref="NonNullGraphType(IGraphType)"/>
-        protected NonNullGraphType(Type type)
-        {
-            if (typeof(NonNullGraphType).IsAssignableFrom(type))
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), "Cannot nest NonNull inside NonNull.");
-            }
-
-            Type = type;
         }
 
         /// <summary>
         /// Returns the .NET type of the inner (wrapped) graph type.
         /// </summary>
-        public Type Type { get; private set; }
+        public virtual Type Type => null;
+
+        private IGraphType _resolvedType;
 
         /// <summary>
         /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
-        public IGraphType ResolvedType { get; set; }
+        public IGraphType ResolvedType
+        {
+            get => _resolvedType;
+            set
+            {
+                if (value is NonNullGraphType) //TODO: null check here or in ctor
+                {
+                    // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
+                    throw new ArgumentOutOfRangeException("type", "Cannot nest NonNull inside NonNull.");
+                }
+
+                if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
+                    throw new InvalidOperationException($"Type '{Type.Name}' should be assignable from ResolvedType '{value.Name}'.");
+
+                _resolvedType = value;
+            }
+        }
 
         /// <inheritdoc/>
         public override string ToString() => $"{ResolvedType}!";
+    }
+
+    /// <inheritdoc cref="NonNullGraphType"/>
+    public class NonNullGraphType<T> : NonNullGraphType
+        where T : GraphType
+    {
+        private readonly Type _type;
+
+        /// <summary>
+        /// Initializes a new instance for the specified inner graph type.
+        /// </summary>
+        public NonNullGraphType()
+            : base(null)
+        {
+            if (typeof(NonNullGraphType).IsAssignableFrom(typeof(T)))
+            {
+                throw new ArgumentOutOfRangeException("type", "Cannot nest NonNull inside NonNull.");
+            }
+
+            _type = typeof(T);
+        }
+
+        /// <inheritdoc/>
+        public override Type Type => _type;
     }
 }
