@@ -21,7 +21,7 @@ namespace GraphQL.Utilities
         Argument,
 
         /// <summary>
-        /// An enum
+        /// An enum value
         /// </summary>
         EnumValue,
 
