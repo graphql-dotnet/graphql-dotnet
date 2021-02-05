@@ -20,8 +20,7 @@ namespace GraphQL.Language.AST
             if (variable == null)
                 throw new ArgumentNullException(nameof(variable));
 
-            if (_variables == null)
-                _variables = new List<Variable>();
+            _variables ??= new List<Variable>();
 
             _variables.Add(variable);
         }

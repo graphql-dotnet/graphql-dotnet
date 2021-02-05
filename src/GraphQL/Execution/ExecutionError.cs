@@ -64,10 +64,7 @@ namespace GraphQL
         /// </summary>
         public void AddLocation(int line, int column)
         {
-            if (_errorLocations == null)
-            {
-                _errorLocations = new List<ErrorLocation>();
-            }
+            _errorLocations ??= new List<ErrorLocation>();
 
             _errorLocations.Add(new ErrorLocation { Line = line, Column = column });
         }

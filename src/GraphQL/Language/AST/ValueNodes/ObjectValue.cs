@@ -14,10 +14,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public ObjectValue(IEnumerable<ObjectField> fields)
         {
-            if (fields == null)
-                ObjectFields = Array.Empty<ObjectField>();
-            else
-                ObjectFields = fields;
+            ObjectFields = fields ?? Array.Empty<ObjectField>();
         }
 
         /// <summary>

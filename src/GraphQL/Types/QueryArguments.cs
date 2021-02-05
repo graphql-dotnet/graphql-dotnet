@@ -70,8 +70,7 @@ namespace GraphQL.Types
 
             NameValidator.ValidateName(argument.Name, "argument");
 
-            if (ArgumentsList == null)
-                ArgumentsList = new List<QueryArgument>();
+            ArgumentsList ??= new List<QueryArgument>();
 
             ArgumentsList.Add(argument);
         }

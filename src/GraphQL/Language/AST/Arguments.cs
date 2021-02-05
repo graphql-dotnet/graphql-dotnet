@@ -24,8 +24,7 @@ namespace GraphQL.Language.AST
             if (arg == null)
                 throw new ArgumentNullException(nameof(arg));
 
-            if (_arguments == null)
-                _arguments = new List<Argument>();
+            _arguments ??= new List<Argument>();
 
             _arguments.Add(arg);
         }

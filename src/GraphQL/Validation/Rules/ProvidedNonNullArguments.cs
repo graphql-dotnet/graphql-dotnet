@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
                 {
                     var fieldDef = context.TypeInfo.GetFieldDef();
 
-                    if (fieldDef == null || fieldDef.Arguments == null)
+                    if (fieldDef?.Arguments == null)
                     {
                         return;
                     }

@@ -85,10 +85,7 @@ namespace GraphQL
                 var document = options.Document;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null)
-                    {
-                        document = _documentBuilder.Build(options.Query);
-                    }
+                    document ??= _documentBuilder.Build(options.Query);
                 }
 
                 if (document.Operations.Count == 0)

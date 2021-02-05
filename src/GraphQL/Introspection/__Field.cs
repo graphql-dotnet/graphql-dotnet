@@ -28,7 +28,7 @@ namespace GraphQL.Introspection
                 {
                     // We have to iterate over all schema types because FieldType has no reference to the GraphType to which it belongs.
                     var fieldOwner = context.Schema.AllTypes.OfType<IComplexGraphType>().Single(t => t.Fields.Contains(context.Source));
-                    if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
+                    if (fieldOwner is IImplementInterfaces {ResolvedInterfaces: { }} implementation)
                     {
                         foreach (var iface in implementation.ResolvedInterfaces)
                         {

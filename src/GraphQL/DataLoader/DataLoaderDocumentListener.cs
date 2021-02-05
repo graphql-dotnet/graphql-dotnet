@@ -27,8 +27,7 @@ namespace GraphQL.DataLoader
         /// <inheritdoc/>
         public Task BeforeExecutionAsync(IExecutionContext context)
         {
-            if (_accessor.Context == null)
-                _accessor.Context = new DataLoaderContext();
+            _accessor.Context ??= new DataLoaderContext();
 
             return Task.CompletedTask;
         }

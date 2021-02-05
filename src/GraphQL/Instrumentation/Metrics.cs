@@ -111,8 +111,7 @@ namespace GraphQL.Instrumentation
             /// </summary>
             public void Dispose()
             {
-                if (_record != null)
-                    _record.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
+                _record?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             }
         }
     }

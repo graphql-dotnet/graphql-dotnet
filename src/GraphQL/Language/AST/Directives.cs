@@ -23,8 +23,7 @@ namespace GraphQL.Language.AST
             if (directive == null)
                 throw new ArgumentNullException(nameof(directive));
 
-            if (_directives == null)
-                _directives = new List<Directive>();
+            _directives ??= new List<Directive>();
 
             _directives.Add(directive);
 

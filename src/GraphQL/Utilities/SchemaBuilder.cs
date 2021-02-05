@@ -255,12 +255,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 fields.Apply(f => type.AddField(f));
             }
 
-            if (astType.Interfaces != null)
-            {
-                astType.Interfaces
-                    .Select(i => new GraphQLTypeReference(i.Name.Value))
-                    .Apply(type.AddResolvedInterface);
-            }
+            astType.Interfaces?.Select(i => new GraphQLTypeReference(i.Name.Value))
+                .Apply(type.AddResolvedInterface);
 
             if (isExtensionType)
             {
@@ -623,8 +619,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     var values = new Dictionary<string, object>();
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
-                    if (obj.Fields != null)
-                        obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
+                    obj.Fields?.Apply(f => values[f.Name.Value] = ToValue(f.Value));
                     return values;
                 }
                 case ASTNodeKind.ListValue:
