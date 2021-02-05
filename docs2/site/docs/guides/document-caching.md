@@ -13,7 +13,7 @@ executer instance with a `IDocumentCache` implementation. There is a memory-back
 
 Below are samples of how to use the caching engine:
 
-```cs
+```csharp
 var memoryDocumentCache = new MemoryDocumentCache(new MemoryDocumentCacheOptions {
     // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
     // for 10MB maximum memory use by the cache)
