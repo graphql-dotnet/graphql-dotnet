@@ -35,18 +35,10 @@ namespace GraphQL.Tests.Bugs
                 options.Query = "{ get_cached }";
             }).GetAwaiter().GetResult();
 
-                var executer = provider.GetRequiredService<IDocumentExecuter>();
-                var result = executer.ExecuteAsync(options =>
-                {
-                    options.Schema = provider.GetRequiredService<ISchema>();
-                    options.Query = "{ get_cached }";
-                }).GetAwaiter().GetResult();
-
-                result.Errors.ShouldBeNull();
-                var data = result.Data.ToDict();
-                data.Count.ShouldBe(1);
-                data["get_cached"].ShouldBe("myvalue");
-            }
+            result.Errors.ShouldBeNull();
+            var data = result.Data.ToDict();
+            data.Count.ShouldBe(1);
+            data["get_cached"].ShouldBe("myvalue");
         }
     }
 
