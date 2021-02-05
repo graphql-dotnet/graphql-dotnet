@@ -6,7 +6,7 @@ namespace GraphQL.Types
     public class NonNullGraphType<T> : NonNullGraphType
         where T : GraphType
     {
-        /// <inheritdoc cref="NonNullGraphType.NonNullGraphType(Type)"/>
+        /// <inheritdoc cref="NonNullGraphType(Type)"/>
         public NonNullGraphType()
             : base(typeof(T))
         {
@@ -27,18 +27,18 @@ namespace GraphQL.Types
             if (type is NonNullGraphType)
             {
                 // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
-                throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
+                throw new ArgumentOutOfRangeException(nameof(type), "Cannot nest NonNull inside NonNull.");
             }
 
             ResolvedType = type;
         }
 
-        /// <inheritdoc cref="NonNullGraphType.NonNullGraphType(IGraphType)"/>
+        /// <inheritdoc cref="NonNullGraphType(IGraphType)"/>
         protected NonNullGraphType(Type type)
         {
-            if (type == typeof(NonNullGraphType))
+            if (typeof(NonNullGraphType).IsAssignableFrom(type))
             {
-                throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
+                throw new ArgumentOutOfRangeException(nameof(type), "Cannot nest NonNull inside NonNull.");
             }
 
             Type = type;

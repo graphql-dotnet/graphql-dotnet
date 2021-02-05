@@ -1,4 +1,6 @@
+using System;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -42,6 +44,12 @@ namespace GraphQL.Tests.Bugs
                 Query = obj
             };
             schema.Initialize();
+        }
+
+        [Fact]
+        public void test_nonnull_constructor()
+        {
+            Should.Throw<ArgumentOutOfRangeException>(() => new NonNullGraphType<NonNullGraphType<StringGraphType>>());
         }
     }
 }

@@ -56,7 +56,7 @@ namespace GraphQL
         ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsGraphType(this Type type)
-            => type.GetInterfaces().Contains(typeof(IGraphType));
+            => typeof(IGraphType).IsAssignableFrom(type);
 
         /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
