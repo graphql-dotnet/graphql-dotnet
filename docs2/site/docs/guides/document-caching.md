@@ -3,7 +3,7 @@
 In order to process a GraphQL request, the incoming request must be parsed and validated prior to execution. The parsed and validated
 request may be cached in order to save execution time the next time the same request is executed. For usage patterns where the same
 requests are executed repeatedly, caching can be enabled in order to increase throughput at the cost of memory use. As this may be
-detrimental to performance for certain workloads, it is disabled by default.
+detrimental for performance for certain workloads, it is disabled by default.
 
 Document caching is provided through the `IDocumentCache` interface. To enable document caching, you will need to construct the document
 executer instance with a `IDocumentCache` implementation. There is a memory-backed implementation called `MemoryDocumentCache` in the NuGet
