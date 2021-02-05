@@ -165,10 +165,10 @@ type User @key(fields: ""id"") {
 
             var data = executionResult.Data.ToDict();
             var schema = data["__schema"].ToDict();
-            var types = (object[])schema["types"];
+            var types = (IEnumerable<object>)schema["types"];
             var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
-            var possibleTypes = (object[])entityType["possibleTypes"];
-            var possibleType = possibleTypes[0].ToDict();
+            var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
+            var possibleType = possibleTypes.First().ToDict();
             var name = (string)possibleType["name"];
 
             Assert.Equal("User", name);

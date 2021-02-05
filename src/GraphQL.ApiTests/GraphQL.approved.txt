@@ -274,12 +274,6 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
             where T :  class { }
     }
-    public struct ObjectProperty
-    {
-        public ObjectProperty(string key, object value) { }
-        public string Key { get; }
-        public object Value { get; }
-    }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
@@ -683,6 +677,7 @@ namespace GraphQL.Execution
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public abstract class DocumentError : GraphQL.ExecutionError
@@ -774,6 +769,7 @@ namespace GraphQL.Execution
         public object Result { get; set; }
         public virtual object Source { get; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
+        public virtual bool PropagateNull() { }
         public abstract object ToValue();
     }
     public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
@@ -878,6 +874,7 @@ namespace GraphQL.Execution
         public GraphQL.Execution.ExecutionNode[] SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy

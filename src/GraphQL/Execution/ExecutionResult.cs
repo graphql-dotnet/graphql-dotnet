@@ -105,35 +105,4 @@ namespace GraphQL
             return this;
         }
     }
-
-    /// <summary>
-    /// Represents a property of an object as a pair of property name and its value. This struct is used
-    /// in order to be able to store properties as arrays, not dictionaries. It allows more efficient use of
-    /// memory from the managed heap for the <see cref="ExecutionResult.Data"/> property. The use of array
-    /// of <see cref="ObjectProperty"/> unambiguously indicates the need to convert the array into a json
-    /// object during serialization.
-    /// </summary>
-    public struct ObjectProperty
-    {
-        /// <summary>
-        /// Creates an instance of <see cref="ObjectProperty"/>.
-        /// </summary>
-        /// <param name="key">Property key (name).</param>
-        /// <param name="value">Property value.</param>
-        public ObjectProperty(string key, object value)
-        {
-            Key = key;
-            Value = value;
-        }
-
-        /// <summary>
-        /// Property key (name).
-        /// </summary>
-        public string Key { get; }
-
-        /// <summary>
-        /// Property value.
-        /// </summary>
-        public object Value { get; }
-    }
 }
