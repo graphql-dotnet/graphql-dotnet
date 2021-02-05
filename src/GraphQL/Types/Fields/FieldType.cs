@@ -68,12 +68,11 @@ namespace GraphQL.Types
             set
             {
                 if (value != null && !value.IsGraphType())
-                    ThrowInvalidType(value);
+                    throw new ArgumentOutOfRangeException("value", $"Type '{value}' is not a graph type");
                 _type = value;
             }
         }
 
-        private void ThrowInvalidType(Type type) => throw new ArgumentOutOfRangeException("value", $"Type '{type}' is not a graph type");
 
         /// <summary>
         /// Gets or sets the graph type of this field.
