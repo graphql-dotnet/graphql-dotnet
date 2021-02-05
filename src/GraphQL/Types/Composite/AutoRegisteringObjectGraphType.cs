@@ -113,7 +113,7 @@ namespace GraphQL.Types
             if (expression.Body is MemberExpression m1)
                 return m1.Member.Name;
 
-            if (expression.Body is UnaryExpression {Operand: MemberExpression m2} u)
+            if (expression.Body is UnaryExpression u && u.Operand is MemberExpression m2)
                 return m2.Member.Name;
 
             throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");

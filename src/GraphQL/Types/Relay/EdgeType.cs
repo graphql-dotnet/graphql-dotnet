@@ -14,7 +14,8 @@ namespace GraphQL.Types.Relay
         /// <inheritdoc/>
         public EdgeType()
         {
-            Name = $"{typeof(TNodeType).GraphQLName()}Edge";
+            string graphQLTypeName = typeof(TNodeType).GraphQLName();
+            Name = $"{graphQLTypeName}Edge";
             Description =
                 $"An edge in a connection from an object to another object of type `{typeof(TNodeType).GraphQLName()}`.";
 

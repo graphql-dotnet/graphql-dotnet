@@ -49,7 +49,7 @@ namespace GraphQL
 
                 return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed();
             });
-            Register<string, Guid>(Guid.Parse);
+            Register<string, Guid>(value => Guid.Parse(value));
             Register<string, Uri>(value => new Uri(value));
             Register<string, byte[]>(Convert.FromBase64String); // such a built-in conversion for string->byte[] seems useful
 

@@ -121,7 +121,7 @@ namespace GraphQL.Utilities.Federation
         {
             foreach (var selection in selectionSet.SelectionsList)
             {
-                if (selection is Field {Name: "__typename"} childField)
+                if (selection is Field childField && childField.Name == "__typename")
                 {
                     setToAlter = null;
                     return false;
@@ -185,6 +185,8 @@ namespace GraphQL.Utilities.Federation
                 return true;
 
             var ast = type.GetAstType<IHasDirectivesNode>();
+            if (ast == null)
+                return false;
 
             var keyDir = Directive(ast.Directives, "key");
             return keyDir != null;
