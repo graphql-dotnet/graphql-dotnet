@@ -91,7 +91,7 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
-            NameValidator.ValidateNameNotNull(fieldType.Name, "field");
+            NameValidator.ValidateNameNotNull(fieldType.Name, NamedElement.Field);
 
             if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
             {

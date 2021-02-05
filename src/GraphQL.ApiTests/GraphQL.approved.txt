@@ -140,8 +140,8 @@ namespace GraphQL
     }
     public static class GlobalSwitches
     {
-        public static System.Action<string, string> Validation;
-        public static System.Action<string, string> ValidationOnSchemaInitialize;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> Validation;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> ValidationOnSchemaInitialize;
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -2509,9 +2509,17 @@ namespace GraphQL.Utilities
     }
     public static class NameValidator
     {
-        public static void ValidateDefault(string name, string type) { }
-        public static void ValidateName(string name, string type) { }
-        public static void ValidateNameOnSchemaInitialize(string name, string type) { }
+        public static void ValidateDefault(string name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateName(string name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateNameOnSchemaInitialize(string name, GraphQL.Utilities.NamedElement type) { }
+    }
+    public enum NamedElement
+    {
+        Field = 0,
+        Type = 1,
+        Argument = 2,
+        EnumValue = 3,
+        Directive = 4,
     }
     public class PrintFormat<T>
     {
