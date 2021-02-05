@@ -16,7 +16,7 @@ Below are samples of how to use the caching engine:
 ```csharp
 var memoryDocumentCache = new MemoryDocumentCache(new MemoryDocumentCacheOptions {
     // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
-    // for 10MB maximum memory use by the cache)
+    // for 10MB maximum memory use by the cache - parsed AST and other stuff)
     SizeLimit = 1000000,
     // no expiration of cached queries (cached queries are only ejected when the cache is full)
     SlidingExpiration = null,
