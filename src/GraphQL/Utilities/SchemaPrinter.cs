@@ -203,7 +203,7 @@ namespace GraphQL.Utilities
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
-            var fields = type.Fields.Select(x => PrintInputValue(x));
+            var fields = type.Fields.Select(PrintInputValue);
             return FormatDescription(type.Description) + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 

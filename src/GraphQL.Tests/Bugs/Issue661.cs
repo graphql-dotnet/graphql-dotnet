@@ -22,12 +22,18 @@ namespace GraphQL.Tests.Bugs
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
-            using (var provider = services.BuildServiceProvider())
+            using var provider = services.BuildServiceProvider();
+            var cache = provider.GetRequiredService<IDistributedCache>();
+            cache.GetString("mykey").ShouldBeNull();
+            cache.SetString("mykey", "myvalue");
+            cache.GetString("mykey").ShouldBe("myvalue");
+
+            var executer = provider.GetRequiredService<IDocumentExecuter>();
+            var result = executer.ExecuteAsync(options =>
             {
-                var cache = provider.GetRequiredService<IDistributedCache>();
-                cache.GetString("mykey").ShouldBeNull();
-                cache.SetString("mykey", "myvalue");
-                cache.GetString("mykey").ShouldBe("myvalue");
+                options.Schema = provider.GetRequiredService<ISchema>();
+                options.Query = "{ get_cached }";
+            }).GetAwaiter().GetResult();
 
                 var executer = provider.GetRequiredService<IDocumentExecuter>();
                 var result = executer.ExecuteAsync(options =>

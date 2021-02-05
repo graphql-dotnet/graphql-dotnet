@@ -67,10 +67,6 @@ namespace GraphQL.Types
                 _types.Add(type);
         }
 
-        private void EnsureTypes()
-        {
-            if (_types == null)
-                _types = new List<Type>();
-        }
+        private void EnsureTypes() => _types ??= new List<Type>();
     }
 }

@@ -49,9 +49,9 @@ namespace GraphQL
 
                 return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed();
             });
-            Register<string, Guid>(value => Guid.Parse(value));
+            Register<string, Guid>(Guid.Parse);
             Register<string, Uri>(value => new Uri(value));
-            Register<string, byte[]>(value => Convert.FromBase64String(value)); // such a built-in conversion for string->byte[] seems useful
+            Register<string, byte[]>(Convert.FromBase64String); // such a built-in conversion for string->byte[] seems useful
 
             Register<DateTime, DateTimeOffset>(value => value);
             Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
@@ -235,6 +235,6 @@ namespace GraphQL
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
             where TTarget : class
-            => Register<IDictionary<string, object>, TTarget>(conversion == null ? (Func<IDictionary<string, object>, TTarget>)null : v => conversion(v));
+            => Register<IDictionary<string, object>, TTarget>(conversion);
     }
 }

@@ -14,10 +14,9 @@ namespace GraphQL.Types.Relay
         /// <inheritdoc/>
         public EdgeType()
         {
-            Name = string.Format("{0}Edge", typeof(TNodeType).GraphQLName());
-            Description = string.Format(
-                "An edge in a connection from an object to another object of type `{0}`.",
-                typeof(TNodeType).GraphQLName());
+            Name = $"{typeof(TNodeType).GraphQLName()}Edge";
+            Description =
+                $"An edge in a connection from an object to another object of type `{typeof(TNodeType).GraphQLName()}`.";
 
             Field<NonNullGraphType<StringGraphType>>()
                 .Name("cursor")
