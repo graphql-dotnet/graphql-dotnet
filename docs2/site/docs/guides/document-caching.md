@@ -33,7 +33,7 @@ var executer = new DocumentExecuter(
 If you utilize dependency injection, register the memory cache and document executer as singletons. Below is a sample for the
 `Microsoft.Extensions.DependencyInjection` service provider:
 
-```cs
+```csharp
 services.AddSingleton<IDocumentCache>(services =>
 {
     return new MemoryDocumentCache(new MemoryDocumentCacheOptions {
