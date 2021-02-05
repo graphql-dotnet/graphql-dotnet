@@ -27,7 +27,7 @@ namespace GraphQL.Types
             ResolvedType = type;
         }
 
-        /// <inheritdoc cref="ListGraphType.ListGraphType(IGraphType)"/>
+        /// <inheritdoc cref="ListGraphType(IGraphType)"/>
         protected ListGraphType(Type type)
         {
             Type = type;

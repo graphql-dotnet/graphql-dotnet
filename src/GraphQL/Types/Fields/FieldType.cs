@@ -58,10 +58,21 @@ namespace GraphQL.Types
             }
         }
 
+        private Type _type;
         /// <summary>
         /// Gets or sets the graph type of this field.
         /// </summary>
-        public Type Type { get; set; }
+        public Type Type
+        {
+            get => _type;
+            set
+            {
+                if (value != null && !value.IsGraphType())
+                    throw new ArgumentOutOfRangeException("value", $"Type '{value}' is not a graph type");
+                _type = value;
+            }
+        }
+
 
         /// <summary>
         /// Gets or sets the graph type of this field.
