@@ -51,7 +51,7 @@ namespace GraphQL
             });
             Register<string, Guid>(value => Guid.Parse(value));
             Register<string, Uri>(value => new Uri(value));
-            Register<string, byte[]>(Convert.FromBase64String); // such a built-in conversion for string->byte[] seems useful
+            Register<string, byte[]>(value => Convert.FromBase64String(value)); // such a built-in conversion for string->byte[] seems useful
 
             Register<DateTime, DateTimeOffset>(value => value);
             Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
