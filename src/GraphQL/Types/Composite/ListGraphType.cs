@@ -46,18 +46,15 @@ namespace GraphQL.Types
     public class ListGraphType<T> : ListGraphType
         where T : IGraphType
     {
-        private readonly Type _type;
-
         /// <summary>
         /// Initializes a new instance for the specified inner graph type.
         /// </summary>
         public ListGraphType()
             : base(null)
         {
-            _type = typeof(T);
         }
 
         /// <inheritdoc/>
-        public override Type Type => _type;
+        public override Type Type => typeof(T);
     }
 }
