@@ -887,10 +887,7 @@ namespace GraphQL.Tests.Validation
             int column,
             IEnumerable<string> errors = null)
         {
-            if (errors == null)
-            {
-                errors = new[] { $"Expected type \"{typeName}\", found {value}." };
-            }
+            errors ??= new[] { $"Expected type \"{typeName}\", found {value}." };
 
             config.Error(
                 ArgumentsOfCorrectTypeError.BadValueMessage(argName, value, errors),

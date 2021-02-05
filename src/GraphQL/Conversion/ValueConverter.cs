@@ -235,6 +235,6 @@ namespace GraphQL
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
             where TTarget : class
-            => Register<IDictionary<string, object>, TTarget>(conversion == null ? (Func<IDictionary<string, object>, TTarget>)null : v => conversion(v));
+            => Register<IDictionary<string, object>, TTarget>(conversion);
     }
 }
