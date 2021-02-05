@@ -15,18 +15,18 @@ using Shouldly;
 namespace GraphQL.Tests
 {
     public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder, SimpleContainer>
-        where TSchema : ISchema
+        where TSchema : Schema
     {
     }
 
     public class QueryTestBase<TSchema, TIocContainer> : QueryTestBase<TSchema, GraphQLDocumentBuilder, TIocContainer>
-       where TSchema : ISchema
+       where TSchema : Schema
        where TIocContainer : ISimpleContainer, new()
     {
     }
 
     public class QueryTestBase<TSchema, TDocumentBuilder, TIocContainer>
-        where TSchema : ISchema
+        where TSchema : Schema
         where TDocumentBuilder : IDocumentBuilder, new()
         where TIocContainer : ISimpleContainer, new()
     {
@@ -66,11 +66,13 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
+            bool executed = true)
         {
-            var queryResult = CreateQueryResult(expected);
+            var queryResult = CreateQueryResult(expected, executed: executed);
             return AssertQueryIgnoreErrors(
                 query,
                 queryResult,
@@ -78,6 +80,7 @@ namespace GraphQL.Tests
                 root,
                 userContext,
                 cancellationToken,
+                rules,
                 expectedErrorCount,
                 renderErrors,
                 unhandledExceptionDelegate);
@@ -90,6 +93,7 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
@@ -102,10 +106,11 @@ namespace GraphQL.Tests
                 options.Inputs = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
+                options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
-            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
+            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
             var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
@@ -114,7 +119,7 @@ namespace GraphQL.Tests
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
-            errors.Count().ShouldBe(expectedErrorCount);
+            errors.Count.ShouldBe(expectedErrorCount);
 
             return runResult;
         }
@@ -131,9 +136,11 @@ namespace GraphQL.Tests
             INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
+            var schema = Schema;
+            schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             var runResult = Executer.ExecuteAsync(options =>
             {
-                options.Schema = Schema;
+                options.Schema = schema;
                 options.Query = query;
                 options.Root = root;
                 options.Inputs = inputs;
@@ -141,7 +148,6 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
-                options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;
@@ -163,7 +169,7 @@ namespace GraphQL.Tests
             return runResult;
         }
 
-        public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
-            => result.ToExecutionResult(errors);
+        public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null, bool executed = true)
+            => result.ToExecutionResult(errors, executed);
     }
 }

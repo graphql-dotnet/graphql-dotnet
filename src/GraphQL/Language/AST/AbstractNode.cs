@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -18,12 +19,12 @@ namespace GraphQL.Language.AST
         public CommentNode CommentNode { get; set; }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<INode> Children => null;
-
-        /// <inheritdoc/>
         public SourceLocation SourceLocation { get; set; }
 
         /// <inheritdoc/>
-        public abstract bool IsEqualTo(INode node);
+        public virtual IEnumerable<INode> Children => null;
+
+        /// <inheritdoc/>
+        public virtual void Visit<TState>(Action<INode, TState> action, TState state) { }
     }
 }

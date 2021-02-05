@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Execution;
 using Shouldly;
 using Xunit;
 
@@ -11,15 +12,15 @@ namespace GraphQL.Tests.Bugs
         {
             var context = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    ["root"] = new Dictionary<string, object>
+                    ["root"] = new ArgumentValue(new Dictionary<string, object>
                     {
                         ["MyChildProperty"] = new Dictionary<string, object>
                         {
                             ["MyProperty"] = "graphql"
                         }
-                    }
+                    }, ArgumentSource.Literal)
                 }
             };
 

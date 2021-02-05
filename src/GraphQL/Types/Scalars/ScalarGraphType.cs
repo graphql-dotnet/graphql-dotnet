@@ -29,7 +29,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Literal input coercion. It takes an abstract syntax tree (AST) element from a schema
-        /// definition or query and converts it into an appropriate intenal value. In other words
+        /// definition or query and converts it into an appropriate internal value. In other words
         /// it transforms a scalar from its client-side representation as an argument to its
         /// server-side representation. Input coercion may not only return primitive values like
         /// String but rather complex ones when appropriate.

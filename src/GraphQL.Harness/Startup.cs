@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Example;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -49,7 +50,18 @@ namespace GraphQL.Harness
             services.AddSingleton<EpisodeEnum>();
 
             // add schema
-            services.AddSingleton<ISchema, StarWarsSchema>();
+            services.AddSingleton<ISchema, StarWarsSchema>(services =>
+            {
+                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                var schema = new StarWarsSchema(services);
+                if (settings.Value.EnableMetrics)
+                {
+                    var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
+                    foreach (var middleware in middlewares)
+                        schema.FieldMiddleware.Use(middleware);
+                }
+                return schema;
+            });
 
             // add infrastructure stuff
             services.AddHttpContextAccessor();
@@ -60,8 +72,8 @@ namespace GraphQL.Harness
             services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
 
             // add Field Middlewares
-            services.AddSingleton<CountFieldMiddleware>();
-            services.AddSingleton<InstrumentFieldsMiddleware>();
+            services.AddSingleton<IFieldMiddleware, CountFieldMiddleware>();
+            services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

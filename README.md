@@ -76,14 +76,15 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Training
 
-* [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.
+* [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL.NET framework to build a fully functional GraphQL endpoint.
 * [Building GraphQL APIs with ASP.NET Core](https://app.pluralsight.com/library/courses/building-graphql-apis-aspdotnet-core/table-of-contents) by [Roland Guijt](https://github.com/RolandGuijt)
 
 ## Upgrade Guides
 
 You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0/lib/netstandard2.0/diff/2.4.0/).
- 
-* [2.4.0 to 3.0](https://graphql-dotnet.github.io/docs/migrations/migration3)
+
+* [3.x to 4.x - under development](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/docs2/site/docs/guides/migration4.md)
+* [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/migrations/migration3)
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/migrations/migration2)
 * [0.11.0](https://graphql-dotnet.github.io/docs/migrations/v0_11_0)
 * [0.8.0](https://graphql-dotnet.github.io/docs/migrations/v0_8_0)

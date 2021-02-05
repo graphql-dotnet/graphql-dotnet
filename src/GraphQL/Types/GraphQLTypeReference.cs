@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace GraphQL.Types
@@ -9,7 +8,7 @@ namespace GraphQL.Types
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
     [DebuggerDisplay("ref {TypeName,nq}")]
-    public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
+    internal sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         /// <summary>
         /// Initializes a new instance for the specified GraphQL type name.
@@ -36,30 +35,19 @@ namespace GraphQL.Types
         public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
         /// <inheritdoc/>
-        public IEnumerable<Type> Interfaces
-        {
-            get => throw Invalid();
-            set => throw Invalid();
-        }
+        public Interfaces Interfaces => throw Invalid();
 
         /// <inheritdoc/>
-        public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
-        {
-            get => throw Invalid();
-            set => throw Invalid();
-        }
+        public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
 
-        private InvalidOperationException Invalid() => new InvalidOperationException(
-            $"This is just a reference to '{TypeName}'. Resolve the real type first.");
+        private InvalidOperationException Invalid() => new InvalidOperationException($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (obj is GraphQLTypeReference other)
-            {
-                return TypeName == other.TypeName;
-            }
-            return base.Equals(obj);
+            return obj is GraphQLTypeReference other
+                ? TypeName == other.TypeName
+                : base.Equals(obj);
         }
 
         /// <inheritdoc />

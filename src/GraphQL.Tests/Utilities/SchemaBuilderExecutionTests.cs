@@ -54,7 +54,14 @@ namespace GraphQL.Tests.Utilities
             result.Errors.Count.ShouldBe(1);
             result.Errors[0].Code.ShouldBe("OVERFLOW");
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
-            result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
         }
 
         [Fact]
@@ -77,7 +84,14 @@ namespace GraphQL.Tests.Utilities
             result.Errors.Count.ShouldBe(1);
             result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
-            result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
         }
 
         [Fact]
@@ -130,8 +144,8 @@ namespace GraphQL.Tests.Utilities
             }).ConfigureAwait(false);
 
             result.Errors.ShouldBeNull();
-            var data = result.Data.ShouldBeOfType<Dictionary<string, object>>();
-            var t = data["test"].ShouldBeOfType<Dictionary<string, object>>();
+            var data = result.Data.ShouldBeOfType<ObjectProperty[]>();
+            var t = data.ToDict()["test"].ShouldBeOfType<ObjectProperty[]>().ToDict();
             t["id"].ShouldBe("foo");
             t["name"].ShouldBe("bar");
         }
@@ -139,7 +153,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_read_schema_with_custom_root_names()
         {
-            var schema = Schema.For(ReadSchema("CustomSubscription.graphql"));
+            var schema = Schema.For("CustomSubscription".ReadGraphQLRequest());
 
             schema.Query.Name.ShouldBe("CustomQuery");
             schema.Mutation.Name.ShouldBe("CustomMutation");
@@ -148,28 +162,32 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Theory]
-        [InlineData("PetAfterAll.graphql", 15)]
-        [InlineData("PetBeforeAll.graphql", 15)]
+        [InlineData("PetAfterAll", 15)]
+        [InlineData("PetBeforeAll", 15)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
-                ReadSchema(fileName),
+                fileName.ReadGraphQLRequest(),
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
-            schema.AllTypes.Count().ShouldBe(expectedCount);
+            schema.AllTypes.Count.ShouldBe(expectedCount);
         }
 
         [Fact]
         public void can_read_complex_schema()
         {
             var schema = Schema.For(
-                ReadSchema("PetComplex.graphql"),
-                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+                "PetComplex".ReadGraphQLRequest(),
+                builder =>
+                {
+                    builder.Types.ForAll(config => config.ResolveType = _ => null);
+                    builder.IgnoreComments = false;
+                }
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(16);
+            schema.AllTypes.Count.ShouldBe(16);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
@@ -183,7 +201,7 @@ namespace GraphQL.Tests.Utilities
 
             var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
             pet.Description.ShouldBe("Cats with dogs");
-            pet.PossibleTypes.Count().ShouldBe(2);
+            pet.PossibleTypes.Count.ShouldBe(2);
 
             var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
             query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");

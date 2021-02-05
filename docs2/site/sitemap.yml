@@ -1,4 +1,4 @@
-- title: GraphQL .NET
+- title: GraphQL.NET
   dir: ./
   url: /
   file: pages/landing.js
@@ -82,6 +82,8 @@
       - title: Migration Guides
         dir: migrations
         items:
+          - title: Migration Guide [v3 -> v4]
+            file: migration4.md
           - title: Migration Guide [v2 -> v3]
             file: migration3.md
           - title: Migration Guide [v0.17.x -> v2]

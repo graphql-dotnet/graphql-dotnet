@@ -19,7 +19,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of this fragment definition.
         /// </summary>
-        public string Name => NameNode?.Name;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of this fragment definition.
@@ -48,10 +48,7 @@ namespace GraphQL.Language.AST
 
                 if (Directives != null)
                 {
-                    foreach (var directive in Directives)
-                    {
-                        yield return directive;
-                    }
+                    yield return Directives;
                 }
 
                 yield return SelectionSet;
@@ -59,26 +56,14 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"FragmentDefinition{{name='{Name}', typeCondition={Type}, directives={Directives}, selectionSet={SelectionSet}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by name.
-        /// </summary>
-        protected bool Equals(FragmentDefinition other)
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
         {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
+            action(Type, state);
+            action(Directives, state);
+            action(SelectionSet, state);
         }
 
         /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((FragmentDefinition)obj);
-        }
+        public override string ToString() => $"FragmentDefinition{{name='{Name}', typeCondition={Type}, directives={Directives}, selectionSet={SelectionSet}}}";
     }
 }

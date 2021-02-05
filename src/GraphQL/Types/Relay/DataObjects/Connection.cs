@@ -12,9 +12,9 @@ namespace GraphQL.Types.Relay.DataObjects
         where TEdge : Edge<TNode>
     {
         /// <summary>
-        /// The total number of records available.
+        /// The total number of records available. Returns <see langword="null"/> if the total number is unknown.
         /// </summary>
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; set; }
 
         /// <summary>
         /// Additional pagination information for this result data set.

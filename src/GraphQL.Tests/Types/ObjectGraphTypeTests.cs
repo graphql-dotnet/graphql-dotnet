@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -18,7 +17,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ObjectGraphType();
             type.Interface(typeof(TestInterface));
-            type.Interfaces.Count().ShouldBe(1);
+            type.Interfaces.Count.ShouldBe(1);
         }
 
         private class TestPoco { }
@@ -28,13 +27,13 @@ namespace GraphQL.Tests.Types
         {
             var type = new ObjectGraphType<TestPoco>();
             type.Interface(typeof(TestInterface));
-            type.Interfaces.Count().ShouldBe(1);
+            type.Interfaces.Count.ShouldBe(1);
         }
 
         [Fact]
         public void should_throw_on_invalid_graphtype_name()
         {
-            var ex = new ArgumentOutOfRangeException("name", "A type name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but ::: does not.");
+            var ex = new ArgumentOutOfRangeException("name", "A type name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but ':::' does not.");
             Should.Throw<ArgumentOutOfRangeException>(() => new TypeWithInvalidName())
                 .Message.ShouldBe(ex.Message);
         }

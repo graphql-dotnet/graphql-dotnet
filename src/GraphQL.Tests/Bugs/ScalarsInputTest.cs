@@ -177,7 +177,7 @@ mutation {
         {
             var query = @"mutation { long(number: ""100"") }";
             string expected = null;
-            AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
+            AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
         }
 
         // TODO: rework to throw exception

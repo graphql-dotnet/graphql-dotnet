@@ -16,13 +16,10 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        private static readonly char[] _bangs = new char[] { '!', '[', ']' };
-
         /// <summary>
-        /// Removes brackets and exclamation points from a GraphQL type name -- for example,
-        /// converts <c>[Int!]</c> to <c>Int</c>
+        /// Determines if this graph type is an introspection type.
         /// </summary>
-        public static string TrimGraphQLTypes(this string name) => name.Trim().Trim(_bangs);
+        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__") ?? false;
 
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
@@ -188,12 +185,14 @@ namespace GraphQL
                        $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
         }
 
+        private static readonly string[] _foundNull = new[] { "Expected non-null value, found null" };
+
         /// <summary>
         /// Validates that the specified AST value is valid for the specified scalar or input graph type.
         /// Graph types that are lists or non-null types are handled appropriately by this method.
         /// Returns a list of strings representing the errors encountered while validating the value.
         /// </summary>
-        public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
+        public static string[] IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
@@ -207,7 +206,7 @@ namespace GraphQL
                         return new[] { $"Expected \"{ofType.Name}!\", found null." };
                     }
 
-                    return new[] { "Expected non-null value, found null" };
+                    return _foundNull;
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -240,7 +239,7 @@ namespace GraphQL
                             IsValidLiteralValue(ofType, value, schema)
                                 .Select((err, index) => $"In element #{index + 1}: {err}")
                         )
-                        .ToList();
+                        .ToArray();
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -277,7 +276,7 @@ namespace GraphQL
                     errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
                 }
 
-                return errors;
+                return errors.ToArray();
             }
 
             var scalar = (ScalarGraphType)type;
@@ -339,7 +338,7 @@ namespace GraphQL
         public static object DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
+                ? expr.Member.DefaultValue()
                 : null;
         }
 
@@ -433,7 +432,14 @@ namespace GraphQL
             {
                 if (b != null)
                 {
-                    return a.PossibleTypes.Any(type => b.IsPossibleType(type));
+                    // DO NOT USE LINQ ON HOT PATH
+                    foreach (var type in a.PossibleTypes.List)
+                    {
+                        if (b.IsPossibleType(type))
+                            return true;
+                    }
+
+                    return false;
                 }
 
                 return a.IsPossibleType(typeB);

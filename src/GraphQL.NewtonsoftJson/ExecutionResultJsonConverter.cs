@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {
+    /// <summary>
+    /// Converts an instance of <see cref="ExecutionResult"/> to JSON. Doesn't support read from JSON.
+    /// </summary>
     public class ExecutionResultJsonConverter : JsonConverter
     {
         private readonly IErrorInfoProvider _errorInfoProvider;
@@ -16,29 +19,24 @@ namespace GraphQL.NewtonsoftJson
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is ExecutionResult result)
-            {
-                writer.WriteStartObject();
+            var result = (ExecutionResult)value;
 
-                WriteErrors(result.Errors, writer, serializer);
-                WriteData(result, writer, serializer);
-                WriteExtensions(result, writer, serializer);
+            writer.WriteStartObject();
 
-                writer.WriteEndObject();
-            }
+            WriteErrors(result.Errors, writer, serializer);
+            WriteData(result, writer, serializer);
+            WriteExtensions(result, writer, serializer);
+
+            writer.WriteEndObject();
         }
 
         private void WriteData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            var data = result.Data;
-
-            if (result.Errors?.Count > 0 && data == null)
+            if (result.Executed)
             {
-                return;
+                writer.WritePropertyName("data");
+                serializer.Serialize(writer, result.Data);
             }
-
-            writer.WritePropertyName("data");
-            serializer.Serialize(writer, data);
         }
 
         private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer)
@@ -66,7 +64,7 @@ namespace GraphQL.NewtonsoftJson
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    foreach (var location in error.Locations)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -74,7 +72,7 @@ namespace GraphQL.NewtonsoftJson
                         writer.WritePropertyName("column");
                         serializer.Serialize(writer, location.Column);
                         writer.WriteEndObject();
-                    });
+                    }
                     writer.WriteEndArray();
                 }
 

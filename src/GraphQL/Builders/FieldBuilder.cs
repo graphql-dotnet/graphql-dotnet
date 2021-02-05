@@ -215,5 +215,40 @@ namespace GraphQL.Builders
             FieldType.AsyncSubscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
             return this;
         }
+
+        /// <summary>
+        /// Apply directive to field without specifying arguments. If the directive declaration has arguments,
+        /// then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name)
+        {
+            FieldType.ApplyDirective(name);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to field specifying one argument. If the directive declaration has other arguments,
+        /// then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argumentName">Argument name.</param>
+        /// <param name="argumentValue">Argument value.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
+        {
+            FieldType.ApplyDirective(name, argumentName, argumentValue);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to field specifying configuration delegate.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="configure">Configuration delegate.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
+        {
+            FieldType.ApplyDirective(name, configure);
+            return this;
+        }
     }
 }

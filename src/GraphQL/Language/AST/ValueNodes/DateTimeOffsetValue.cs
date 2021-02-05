@@ -14,8 +14,5 @@ namespace GraphQL.Language.AST
         {
             Value = value;
         }
-
-        /// <inheritdoc/>
-        protected override bool Equals(ValueNode<DateTimeOffset> other) => DateTimeOffset.Equals(Value, other.Value);
     }
 }

@@ -14,8 +14,5 @@ namespace GraphQL.Language.AST
         {
             Value = value;
         }
-
-        /// <inheritdoc/>
-        protected override bool Equals(ValueNode<Uri> other) => Equals(Value, other.Value);
     }
 }

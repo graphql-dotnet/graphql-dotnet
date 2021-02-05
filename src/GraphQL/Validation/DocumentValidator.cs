@@ -25,6 +25,9 @@ namespace GraphQL.Validation
     /// <inheritdoc/>
     public class DocumentValidator : IDocumentValidator
     {
+        // frequently reused objects
+        private ValidationContext _reusableValidationContext;
+
         /// <summary>
         /// Returns the default set of validation rules: all except <see cref="OverlappingFieldsCanBeMerged"/>.
         /// </summary>
@@ -55,7 +58,7 @@ namespace GraphQL.Validation
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
             UniqueInputFieldNames.Instance
-        }.AsReadOnly();
+        };
 
         /// <inheritdoc/>
         public async Task<IValidationResult> ValidateAsync(
@@ -66,39 +69,65 @@ namespace GraphQL.Validation
             IDictionary<string, object> userContext = null,
             Inputs inputs = null)
         {
-            if (!schema.Initialized)
+            schema.Initialize();
+
+            bool success = false;
+            bool useOnlyStandardRules = rules == null;
+            if (useOnlyStandardRules)
             {
-                schema.Initialize();
+                rules = CoreRules;
+            }
+            else if (!rules.Any())
+            {
+                return SuccessfullyValidatedResult.Instance;
             }
 
-            var context = new ValidationContext
+            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            try
             {
-                OriginalQuery = originalQuery,
-                Schema = schema,
-                Document = document,
-                TypeInfo = new TypeInfo(schema),
-                UserContext = userContext,
-                Inputs = inputs
-            };
+                context.OriginalQuery = originalQuery ?? document.OriginalQuery;
+                context.Schema = schema;
+                context.Document = document;
+                context.TypeInfo = new TypeInfo(schema);
+                context.UserContext = userContext;
+                context.Inputs = inputs;
 
-            rules ??= CoreRules;
+                List<INodeVisitor> visitors;
 
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
-            var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+                if (useOnlyStandardRules)
+                {
+                    // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
+                    visitors = new List<INodeVisitor>();
+                    foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                    {
+                        var visitor = rule.ValidateAsync(context)?.Result;
+                        if (visitor != null)
+                            visitors.Add(visitor);
+                    }
+                }
+                else
+                {
+                    var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
+                    visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+                }
 
-            visitors.Insert(0, context.TypeInfo);
-            // #if DEBUG
-            //             visitors.Insert(1, new DebugNodeVisitor());
-            // #endif
+                visitors.Insert(0, context.TypeInfo);
 
-            var basic = new BasicVisitor(visitors);
+                new BasicVisitor(visitors).Visit(document, context);
 
-            basic.Visit(document);
-
-            if (context.HasErrors)
-                return new ValidationResult(context.Errors);
-
-            return SuccessfullyValidatedResult.Instance;
+                success = !context.HasErrors;
+                return success
+                    ? SuccessfullyValidatedResult.Instance
+                    : new ValidationResult(context.Errors);
+            }
+            finally
+            {
+                if (success)
+                {
+                    context.Reset();
+                    System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                }
+            }
         }
     }
 }

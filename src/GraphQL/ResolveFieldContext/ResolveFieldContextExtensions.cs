@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Execution;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
@@ -39,11 +40,11 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg is IDictionary<string, object> inputObject)
+            if (arg.Value is IDictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
                 {
-                    result = arg;
+                    result = arg.Value;
                     return true;
                 }
 
@@ -54,26 +55,21 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
+            result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
-        /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
+        /// <summary>Determines if the specified field argument has been provided in the GraphQL query request.</summary>
         public static bool HasArgument(this IResolveFieldContext context, string name)
         {
             var isIntrospection = context.ParentType?.IsIntrospectionType() ?? context.FieldDefinition.IsIntrospectionField();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
-            object value = null;
-            return ((context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value != null);
+            ArgumentValue value = default;
+            return (context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value.Source != ArgumentSource.FieldDefault;
         }
 
         /// <summary>
-        /// Determines if this graph type is an introspection type
-        /// </summary>
-        private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
-
-        /// <summary>
-        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
+        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type.
         /// </summary>
         private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
@@ -183,5 +179,17 @@ namespace GraphQL
                 }
             }
         }
+
+        /// <summary>
+        /// Make a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static IResolveFieldContext Copy(this IResolveFieldContext context) => new ResolveFieldContext(context);
+
+        /// <summary>
+        /// Make a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static IResolveFieldContext<TSource> Copy<TSource>(this IResolveFieldContext<TSource> context) => new ResolveFieldContext<TSource>(context);
     }
 }

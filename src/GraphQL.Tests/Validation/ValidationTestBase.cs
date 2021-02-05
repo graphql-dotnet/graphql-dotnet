@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Validation
                 error.Message.ShouldBe(assert.Message);
 
                 var allLocations = string.Concat(error.Locations.Select(l => $"({l.Line},{l.Column})"));
-                var locations = error.Locations.ToList();
+                var locations = error.Locations;
 
                 for (int j = 0; j < assert.Locations.Count; j++)
                 {

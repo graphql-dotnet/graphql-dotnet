@@ -13,32 +13,26 @@ namespace GraphQL.Execution
     /// </summary>
     public class GraphQLDocumentBuilder : IDocumentBuilder
     {
-        private readonly Parser _parser;
-
         /// <summary>
-        /// Initializes a new instance.
+        /// Specifies whether to ignore comments when parsing GraphQL document.
+        /// By default, all comments are ignored
         /// </summary>
-        public GraphQLDocumentBuilder()
-        {
-            var lexer = new Lexer();
-            _parser = new Parser(lexer);
-        }
+        public bool IgnoreComments { get; set; } = true;
 
         /// <inheritdoc/>
         public Document Build(string body)
         {
-            var source = new Source(body);
             GraphQLDocument result;
             try
             {
-                result = _parser.Parse(source);
+                result = Parser.Parse(body, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
             }
             catch (GraphQLSyntaxErrorException ex)
             {
                 throw new SyntaxError(ex);
             }
 
-            var document = CoreToVanillaConverter.Convert(body, result);
+            var document = CoreToVanillaConverter.Convert(result);
             document.OriginalQuery = body;
             return document;
         }

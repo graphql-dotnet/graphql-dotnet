@@ -1,7 +1,9 @@
 # Authorization
 
 > See the [Authorization](https://github.com/graphql-dotnet/authorization) project for a
-> more in depth implementation of the following idea.
+> more in depth implementation of the following idea. Keep in mind that alongside this
+> project there is a similar [Authorization.AspNetCore](https://github.com/graphql-dotnet/server/tree/develop/src/Authorization.AspNetCore)
+> project specifically for ASP.NET Core apps.
 
 You can write validation rules that will run before a query is executed. You can use this
 pattern to check that the user is authenticated or has permissions for a specific field.
@@ -36,9 +38,9 @@ public class RequiresAuthValidationRule : IValidationRule
         {
           context.ReportError(new ValidationError(
               context.OriginalQuery,
-              "auth-required",
+              "6.1.1", // the rule number of this validation error corresponding to the paragraph number from the official specification
               $"Authorization is required to access {op.Name}.",
-              op));
+              op) { Code = "auth-required" });
         }
       });
 
@@ -54,9 +56,9 @@ public class RequiresAuthValidationRule : IValidationRule
         {
           context.ReportError(new ValidationError(
               context.OriginalQuery,
-              "auth-required",
+              "6.1.1", // the rule number of this validation error corresponding to the paragraph number from the official specification
               $"You are not authorized to run this query.",
-              fieldAst));
+              fieldAst) { Code = "auth-required" });
         }
       });
     }));

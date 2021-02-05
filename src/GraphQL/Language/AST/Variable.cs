@@ -28,5 +28,10 @@ namespace GraphQL.Language.AST
         /// Indicates if the variable value has been set.
         /// </summary>
         public bool ValueSpecified { get; private set; }
+
+        /// <summary>
+        /// Indicates if the variable's value is the variable's configured default value.
+        /// </summary>
+        public bool IsDefault { get; set; }
     }
 }

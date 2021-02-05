@@ -23,7 +23,6 @@ namespace GraphQL.Tests.Execution
             root.GetParentType(null).ShouldBeNull();
             root.GraphType.ShouldBe(type);
             root.IndexInParentNode.ShouldBeNull();
-            root.IsResultSet.ShouldBeFalse();
             root.Name.ShouldBeNull();
             root.Parent.ShouldBeNull();
             root.Path.ToArray().Length.ShouldBe(0);
@@ -60,7 +59,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -92,7 +91,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 

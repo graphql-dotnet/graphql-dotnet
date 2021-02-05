@@ -6,7 +6,6 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
 {
@@ -23,19 +22,24 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode)
                 .ConfigureAwait(false);
 
             // After the entire node tree has been executed, get the values
-            var data = rootNode.ToValue();
+            object data = rootNode.ToValue();
 
             return new ExecutionResult
             {
-                Data = data
-            }.With(context);
+                Executed = true,
+                Data = data,
+                Query = context.Document.OriginalQuery,
+                Document = context.Document,
+                Operation = context.Operation,
+                Extensions = context.Extensions
+            };
         }
 
         /// <summary>
@@ -47,20 +51,19 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        protected static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
             {
                 Result = context.RootValue
             };
 
-            var fields = CollectFields(
-                context,
-                rootType,
-                context.Operation.SelectionSet);
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
+            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
 
-            SetSubFieldNodes(context, root, fields);
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
 
             return root;
         }
@@ -69,40 +72,38 @@ namespace GraphQL.Execution
         /// Creates execution nodes for child fields of an object execution node. Only run if
         /// the object execution node result is not null.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
+        private static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
-            SetSubFieldNodes(context, parent, fields);
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
+
+            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
+
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
+        private static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Fields fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
-            var subFields = new Dictionary<string, ExecutionNode>(fields.Count);
+            var subFields = new ExecutionNode[fields.Count];
 
+            int i = 0;
             foreach (var kvp in fields)
             {
-                var name = kvp.Key;
                 var field = kvp.Value;
 
-                if (!ShouldIncludeNode(context, field.Directives))
-                    continue;
-
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
+                var fieldDefinition = ExecutionHelper.GetFieldDefinition(context.Schema, parentType, field);
 
                 if (fieldDefinition == null)
-                    continue;
+                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{parentType.Name}'.");
 
                 var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
 
-                if (node == null)
-                    continue;
-
-                subFields[name] = node;
+                subFields[i++] = node;
             }
 
             parent.SubFields = subFields;
@@ -112,7 +113,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not null.
         /// </summary>
-        public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        private static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
@@ -125,12 +126,26 @@ namespace GraphQL.Execution
                 throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
-            var index = 0;
+            int index = 0;
             var arrayItems = (data is ICollection collection)
                 ? new List<ExecutionNode>(collection.Count)
                 : new List<ExecutionNode>();
 
-            foreach (var d in data)
+            if (data is IList list)
+            {
+                for (int i=0; i<list.Count; ++i)
+                    SetArrayItemNode(list[i]);
+            }
+            else
+            {
+                foreach (object d in data)
+                    SetArrayItemNode(d);
+            }
+
+            parent.Items = arrayItems;
+
+            // local function uses 'struct closure' without heap allocation
+            void SetArrayItemNode(object d)
             {
                 if (d != null)
                 {
@@ -169,14 +184,12 @@ namespace GraphQL.Execution
 
                 index++;
             }
-
-            parent.Items = arrayItems;
         }
 
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        protected static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
@@ -199,12 +212,14 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            if (node.IsResultSet)
+            // these are the only conditions upon which a node has already been executed when this method is called
+            if (node is RootExecutionNode || node.Parent is ArrayExecutionNode)
                 return;
 
             try
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                ReadonlyResolveFieldContext resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -220,6 +235,9 @@ namespace GraphQL.Execution
                 if (!(result is IDataLoaderResult))
                 {
                     CompleteNode(context, node);
+                    // for non-dataloader nodes that completed without throwing an error, we can re-use the context
+                    resolveContext.Reset(null, null);
+                    System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -243,8 +261,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
             if (!(node.Result is IDataLoaderResult dataLoaderResult))
                 throw new InvalidOperationException("This execution node is not pending completion");
 
@@ -279,9 +295,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
         {
-            if (!node.IsResultSet)
-                throw new InvalidOperationException("This execution node has not yet been executed");
-
             try
             {
                 ValidateNodeResult(context, node);
@@ -339,6 +352,7 @@ namespace GraphQL.Execution
             UnhandledExceptionContext exceptionContext = null;
             if (context.UnhandledExceptionDelegate != null)
             {
+                // be sure not to re-use this instance of `IResolveFieldContext`
                 var resolveContext = new ReadonlyResolveFieldContext(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
                 context.UnhandledExceptionDelegate(exceptionContext);
@@ -414,11 +428,13 @@ namespace GraphQL.Execution
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
             if (context.Listeners != null)
+            {
                 foreach (var listener in context.Listeners)
                 {
                     await listener.BeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
                 }
+            }
         }
     }
 }

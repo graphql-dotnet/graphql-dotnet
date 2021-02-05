@@ -16,16 +16,6 @@ namespace GraphQL
     public static class TypeExtensions
     {
         /// <summary>
-        /// Conditionally casts the item into the indicated type using an "as" cast.
-        /// </summary>
-        /// <typeparam name="T">The desired type</typeparam>
-        /// <param name="item">The item.</param>
-        /// <returns><c>null</c> if the cast failed, otherwise item as T</returns>
-        public static T As<T>(this object item)
-            where T : class
-            => item as T;
-
-        /// <summary>
         /// Determines whether this instance is a concrete type.
         /// </summary>
         /// <param name="type">The type to check.</param>
@@ -48,7 +38,7 @@ namespace GraphQL
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsNullable(this Type type)
-            => type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+            => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
         public static bool IsPrimitive(this Type type)
         {
@@ -148,7 +138,9 @@ namespace GraphQL
                     graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
                 }
                 else
+                {
                     throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                }
             }
 
             if (!isNullable)
@@ -245,20 +237,57 @@ namespace GraphQL
             }
 
             var baseType = type.BaseType;
-            return baseType == null ? false : ImplementsGenericType(baseType, genericType);
+            return baseType != null && ImplementsGenericType(baseType, genericType);
         }
 
         /// <summary>
         /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
-        /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
-        /// Otherwise returns xml documentation on the specified member, if any.
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
+        /// returns xml documentation on the specified member, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
+        /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
         /// </summary>
-        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
+        public static string Description(this MemberInfo memberInfo)
+        {
+            string description = null;
+
+            if (GlobalSwitches.EnableReadDescriptionFromAttributes)
+            {
+                description = (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+                if (description != null)
+                    return description;
+            }
+
+            if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+            {
+                description = memberInfo.GetXmlDocumentation();
+            }
+
+            return description;
+        }
 
         /// <summary>
         /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
-        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any.
+        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDeprecationReasonFromAttributes"/> setting.
         /// </summary>
-        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+        public static string ObsoleteMessage(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDeprecationReasonFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                : null;
+        }
+
+        /// <summary>
+        /// Looks for a <see cref="DefaultValueAttribute"/> on the specified member and returns
+        /// the <see cref="DefaultValueAttribute.Value">value</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDefaultValueFromAttributes"/> setting.
+        /// </summary>
+        public static object DefaultValue(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDefaultValueFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
+                : null;
+        }
     }
 }

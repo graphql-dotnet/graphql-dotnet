@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Types
 {
@@ -11,7 +9,10 @@ namespace GraphQL.Types
     {
         Func<object, IObjectGraphType> ResolveType { get; set; }
 
-        IEnumerable<IObjectGraphType> PossibleTypes { get; }
+        /// <summary>
+        /// Returns a set of possible types for this abstract graph type.
+        /// </summary>
+        PossibleTypes PossibleTypes { get; }
 
         void AddPossibleType(IObjectGraphType type);
     }
@@ -20,7 +21,13 @@ namespace GraphQL.Types
     {
         public static bool IsPossibleType(this IAbstractGraphType abstractType, IGraphType type)
         {
-            return abstractType.PossibleTypes.Any(x => x.Equals(type));
+            foreach (var possible in abstractType.PossibleTypes.List)
+            {
+                if (possible.Equals(type))
+                    return true;
+            }
+
+            return false;
         }
 
         public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
@@ -30,14 +37,20 @@ namespace GraphQL.Types
                 : GetTypeOf(abstractType, value);
 
             if (result is GraphQLTypeReference reference)
-                result = schema.FindType(reference.TypeName) as IObjectGraphType;
+                result = schema.AllTypes[reference.TypeName] as IObjectGraphType;
 
             return result;
         }
 
         public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value)
         {
-            return abstractType.PossibleTypes.FirstOrDefault(type => type.IsTypeOf != null && type.IsTypeOf(value));
+            foreach (var possible in abstractType.PossibleTypes.List)
+            {
+                if (possible.IsTypeOf != null && possible.IsTypeOf(value))
+                    return possible;
+            }
+
+            return null;
         }
     }
 }

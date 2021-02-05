@@ -37,30 +37,10 @@ namespace GraphQL.Language.AST
             get { yield return Arguments; }
         }
 
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Arguments, state);
+
         /// <inheritdoc />
         public override string ToString() => $"Directive{{name='{Name}',arguments={Arguments}}}";
-
-        /// <summary>
-        /// Compares this instance with another instance by name.
-        /// </summary>
-        protected bool Equals(Directive other)
-        {
-            if (other == null)
-                return false;
-
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((Directive)obj);
-        }
     }
 }

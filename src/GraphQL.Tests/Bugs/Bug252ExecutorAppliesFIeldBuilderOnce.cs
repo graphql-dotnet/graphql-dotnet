@@ -15,13 +15,13 @@ namespace GraphQL.Tests.Bugs
         public int AppliedCount;
         private readonly FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
 
-        public void ApplyTo(ISchema schema)
+        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
         {
             AppliedCount++;
-            overriddenBuilder.ApplyTo(schema);
+            return overriddenBuilder.Build();
         }
 
-        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
             => overriddenBuilder.Use(middleware);
     }
 
@@ -31,26 +31,29 @@ namespace GraphQL.Tests.Bugs
         public void apply_to_not_called_without_execute()
         {
             var docExec = new DocumentExecuter();
-            var execOptions = new ExecutionOptions { Schema = new Schema() };
+            var schema = new Schema();
+            var execOptions = new ExecutionOptions { Schema = schema };
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
-            execOptions.FieldMiddleware = mockMiddleware;
+            schema.FieldMiddleware = mockMiddleware;
 
             // no execute in this test
             //docExec.ExecuteAsync(execOptions).Wait();
 
             mockMiddleware.AppliedCount.ShouldBe(0);
         }
+
         [Fact]
         public void apply_to_called_once()
         {
             var docExec = new DocumentExecuter();
+            var schema = new Schema();
             var execOptions = new ExecutionOptions
             {
-                Schema = new Schema(),
+                Schema = schema,
                 Query = "{ abcd }"
             };
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
-            execOptions.FieldMiddleware = mockMiddleware;
+            schema.FieldMiddleware = mockMiddleware;
 
             docExec.ExecuteAsync(execOptions).Wait();
 
@@ -61,13 +64,14 @@ namespace GraphQL.Tests.Bugs
         public void apply_to_called_once_with_multiple_execute()
         {
             var docExec = new DocumentExecuter();
+            var schema = new Schema();
             var execOptions = new ExecutionOptions
             {
-                Schema = new Schema(),
+                Schema = schema,
                 Query = "{ abcd }"
             };
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
-            execOptions.FieldMiddleware = mockMiddleware;
+            schema.FieldMiddleware = mockMiddleware;
 
             docExec.ExecuteAsync(execOptions).Wait();
             docExec.ExecuteAsync(execOptions).Wait();

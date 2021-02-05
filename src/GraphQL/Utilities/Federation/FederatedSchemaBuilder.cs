@@ -36,7 +36,7 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public override ISchema Build(string typeDefinitions)
+        public override Schema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
             schema.RegisterType(BuildEntityGraphType());
@@ -78,7 +78,7 @@ namespace GraphQL.Utilities.Federation
                     foreach (var rep in reps)
                     {
                         var typeName = rep["__typename"].ToString();
-                        var type = context.Schema.FindType(typeName);
+                        var type = context.Schema.AllTypes[typeName];
                         if (type != null)
                         {
                             // execute resolver
@@ -113,13 +113,13 @@ namespace GraphQL.Utilities.Federation
         {
             if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
             {
-                setToAlter.Prepend(new Field(null, new NameNode("__typename")));
+                setToAlter.Prepend(new Field(default, new NameNode("__typename")));
             }
         }
 
         private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
         {
-            foreach (var selection in selectionSet.Selections)
+            foreach (var selection in selectionSet.SelectionsList)
             {
                 if (selection is Field {Name: "__typename"} childField)
                 {
@@ -180,14 +180,19 @@ namespace GraphQL.Utilities.Federation
                 return false;
             }
 
-            var directive = type.GetExtensionDirectives<ASTNode>().Directive("key");
+            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
             if (directive != null)
                 return true;
 
             var ast = type.GetAstType<IHasDirectivesNode>();
 
-            var keyDir = ast?.Directives.Directive("key");
+            var keyDir = Directive(ast.Directives, "key");
             return keyDir != null;
+        }
+
+        private static GraphQLDirective Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
+        {
+            return directives?.FirstOrDefault(x => x.Name.Value == name);
         }
     }
 }

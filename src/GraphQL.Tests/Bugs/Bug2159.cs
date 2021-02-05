@@ -62,24 +62,19 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void HasArgument_NoDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }", "{\"input\":true}".ToInputs());
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_NoDefault_SetNull() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: null) }", @"{ ""hasArgumentNoDefault"": true }");
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_NoDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }");
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_NoDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }", "{\"input\":null}".ToInputs());
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
-        public void HasArgument_WithDefault_None() => AssertQuerySuccess("{ hasArgumentDefault }", @"{ ""hasArgumentWithDefault"": false }");
+        [Fact]
+        public void HasArgument_WithDefault_None() => AssertQuerySuccess("{ hasArgumentWithDefault }", @"{ ""hasArgumentWithDefault"": false }");
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_WithDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": false }");
 
         [Fact]
@@ -91,22 +86,20 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void HasArgument_WithDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":true}".ToInputs());
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_WithDefault_SetNull() => AssertQuerySuccess("{ hasArgumentWithDefault(arg: null) }", @"{ ""hasArgumentWithDefault"": true }");
 
         [Fact]
         public void HasArgument_WithDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }");
 
-        //todo: fix HasArgument so it returns false only when no value was supplied
-        [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
+        [Fact]
         public void HasArgument_WithDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":null}".ToInputs());
 
         [Fact]
-        public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1);
+        public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1, executed: false);
 
         [Fact]
-        public void CheckRequiredObjectFieldAreRequired_Literal() => AssertQueryWithErrors("{ testReqObjField(arg: { value2: null }) }", "null", expectedErrorCount: 1);
+        public void CheckRequiredObjectFieldAreRequired_Literal() => AssertQueryWithErrors("{ testReqObjField(arg: { value2: null }) }", "null", expectedErrorCount: 1, executed: false);
     }
 
     public class Bug2159Schema : Schema

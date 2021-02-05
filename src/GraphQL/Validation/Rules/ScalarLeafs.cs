@@ -20,13 +20,13 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ScalarLeafsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ => _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context)))
-                .ToTask();
-        }
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-        private void Field(IGraphType type, Field field, ValidationContext context)
+        private static readonly Task<INodeVisitor> _nodeVisitor =
+            new MatchingNodeVisitor<Field>((f, context) => Field(context.TypeInfo.GetLastType(), f, context))
+                .ToTask();
+
+        private static void Field(IGraphType type, Field field, ValidationContext context)
         {
             if (type == null)
             {

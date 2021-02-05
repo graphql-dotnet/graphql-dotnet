@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -14,8 +12,5 @@ namespace GraphQL.Language.AST
         {
             Value = value;
         }
-
-        /// <inheritdoc/>
-        protected override bool Equals(ValueNode<string> other) => string.Equals(Value, other.Value, StringComparison.InvariantCulture);
     }
 }

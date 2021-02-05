@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using GraphQL.Execution;
 using Shouldly;
 using Xunit;
 
@@ -13,16 +14,16 @@ namespace GraphQL.Tests.Bugs
         {
             var context = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "int", 10 },
-                    { "string", "hello" },
-                    { "vector", new Vector3(1.1f, 2.2f, 3.3f) },
-                    { "object", new Dictionary<string, object>
+                    { "int", new ArgumentValue(10, ArgumentSource.Literal) },
+                    { "string", new ArgumentValue("hello", ArgumentSource.Literal) },
+                    { "vector", new ArgumentValue(new Vector3(1.1f, 2.2f, 3.3f), ArgumentSource.Literal) },
+                    { "object", new ArgumentValue(new Dictionary<string, object>
                                 {
                                     { "inner_int", 15 },
                                     { "inner_string", "ok" }
-                                }
+                                }, ArgumentSource.Literal)
                     }
                 }
             };

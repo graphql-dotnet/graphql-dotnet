@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Builders;
@@ -19,7 +17,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of the fields configured for this graph type.
         /// </summary>
-        IEnumerable<FieldType> Fields { get; }
+        TypeFields Fields { get; }
 
         /// <summary>
         /// Adds a field to this graph type.
@@ -44,7 +42,6 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
-        private readonly List<FieldType> _fields = new List<FieldType>();
 
         /// <inheritdoc/>
         protected ComplexGraphType()
@@ -54,7 +51,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FieldType> Fields => _fields;
+        public TypeFields Fields { get; } = new TypeFields();
 
         /// <inheritdoc/>
         public bool HasField(string name)
@@ -62,19 +59,28 @@ namespace GraphQL.Types
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var field in Fields.List)
+            {
+                if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _fields)
-                if (string.Equals(x.Name, name, StringComparison.Ordinal))
-                    return x;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                foreach (var field in Fields.List)
+                {
+                    if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                        return field;
+                }
+            }
 
             return null;
         }
@@ -85,7 +91,7 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
-            NameValidator.ValidateNameNotNull(fieldType.Name);
+            NameValidator.ValidateNameNotNull(fieldType.Name, NamedElement.Field);
 
             if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
             {
@@ -123,7 +129,7 @@ namespace GraphQL.Types
                 }
             }
 
-            _fields.Add(fieldType);
+            Fields.Add(fieldType);
 
             return fieldType;
         }
@@ -387,6 +393,9 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="name">The name of this field.</param>
@@ -431,6 +440,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
         /// The default name of this field is inferred by the property represented within the expression.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="expression">The property of the source object represented within an expression.</param>
@@ -449,7 +461,7 @@ namespace GraphQL.Types
             catch
             {
                 throw new ArgumentException(
-                    $"Cannot infer a Field name from the expression: '{expression.Body.ToString()}' " +
+                    $"Cannot infer a Field name from the expression: '{expression.Body}' " +
                     $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
             }
             return Field(name, expression, nullable, type);

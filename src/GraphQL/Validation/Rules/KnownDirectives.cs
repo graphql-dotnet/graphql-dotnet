@@ -22,35 +22,31 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownDirectivesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var directiveDef = context.Schema.Directives.Find(node.Name);
+            if (directiveDef == null)
             {
-                _.Match<Directive>(node =>
-                {
-                    var directiveDef = context.Schema.FindDirective(node.Name);
-                    if (directiveDef == null)
-                    {
-                        context.ReportError(new KnownDirectivesError(context, node));
-                        return;
-                    }
+                context.ReportError(new KnownDirectivesError(context, node));
+                return;
+            }
 
-                    var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
-                    if (!directiveDef.Locations.Any(x => x == candidateLocation))
-                    {
-                        context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
-                    }
-                });
-            }).ToTask();
-        }
+            var candidateLocation = getDirectiveLocationForAstPath(context);
+            if (!directiveDef.Locations.Any(x => x == candidateLocation))
+            {
+                context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
+            }
+        }).ToTask();
 
-        private DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
+        private static DirectiveLocation getDirectiveLocationForAstPath(ValidationContext context)
         {
-            var appliedTo = ancestors[ancestors.Length - 1];
+            var appliedTo = context.TypeInfo.GetAncestor(1);
 
             if (appliedTo is Directives || appliedTo is Arguments)
             {
-                appliedTo = ancestors[ancestors.Length - 2];
+                appliedTo = context.TypeInfo.GetAncestor(2);
             }
 
             if (appliedTo is Operation op)

@@ -31,20 +31,18 @@ public class InstrumentFieldsMiddleware : IFieldMiddleware
 }
 ```
 
-Then register your Field Middleware in `ExecutionOptions`.
+Then register your Field Middleware on the schema.
 
 ```csharp
-await schema.ExecuteAsync(options =>
-{
-  options.Query = "...";
-  options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-});
+var schema = new Schema();
+schema.Query = new MyQuery();
+schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
 ```
 
 Or, you can register a middleware delegate directly:
 
 ```csharp
-_.FieldMiddleware.Use((schema, next) =>
+schema.FieldMiddleware.Use(next =>
 {
   return context =>
   {
@@ -75,16 +73,54 @@ public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext contex
 
 First, you are advised to read the article about [Dependency Injection](Dependency-Injection).
 
-If you use `IFieldMiddlewareBuilder.Use` overloads which accept type parameter (that is,
-those that do not accept a `IFieldMiddleware` instance or a middleware delegate) then your
-middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
+Typically you will want to set the middleware within the schema constructor.
+
+```csharp
+public MySchema : Schema
+{
+  public MySchema(
+    IServiceProvider services,
+    MyQuery query,
+    InstrumentFieldsMiddleware middleware)
+    : base(services)
+  {
+    Query = query;
+    FieldMiddleware.Use(middleware);
+  }
+}
+```
+
+Then your middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
 the Field Middleware constructor, provided that you have registered them correctly in DI.
-Note that it is required to have a schema that inherits from `Schema` or implements `IServiceProvider`.
 
 Also, the middleware itself should be registered in DI:
 
 ```csharp
 services.AddSingleton<InstrumentFieldsMiddleware>();
+```
+
+Alternatively, you can use an enumerable in your constructor to add all DI-registered middlewares:
+
+```csharp
+public MySchema : Schema
+{
+  public MySchema(
+    IServiceProvider services,
+    MyQuery query,
+    IEnumerable<IFieldMiddleware> middlewares)
+    : base(services)
+  {
+    Query = query;
+    foreach (var middleware in middlewares)
+      FieldMiddleware.Use(middleware);
+  }
+}
+
+// within Startup.cs
+services.AddSingleton<ISchema, MySchema>();
+services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
+services.AddSingleton<IFieldMiddleware, MyMiddleware>();
+...
 ```
 
 ## Known issues

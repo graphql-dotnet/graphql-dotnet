@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.Caching.Distributed;
@@ -36,10 +35,18 @@ namespace GraphQL.Tests.Bugs
                 options.Query = "{ get_cached }";
             }).GetAwaiter().GetResult();
 
-            result.Errors.ShouldBeNull();
-            var data = (Dictionary<string, object>)result.Data;
-            data.Count.ShouldBe(1);
-            data["get_cached"].ShouldBe("myvalue");
+                var executer = provider.GetRequiredService<IDocumentExecuter>();
+                var result = executer.ExecuteAsync(options =>
+                {
+                    options.Schema = provider.GetRequiredService<ISchema>();
+                    options.Query = "{ get_cached }";
+                }).GetAwaiter().GetResult();
+
+                result.Errors.ShouldBeNull();
+                var data = result.Data.ToDict();
+                data.Count.ShouldBe(1);
+                data["get_cached"].ShouldBe("myvalue");
+            }
         }
     }
 

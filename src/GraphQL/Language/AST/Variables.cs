@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Execution;
 
 namespace GraphQL.Language.AST
 {
@@ -13,42 +14,70 @@ namespace GraphQL.Language.AST
         private List<Variable> _variables;
 
         /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public Variables()
+        {
+        }
+
+        internal Variables(int initialCount)
+        {
+            _variables = new List<Variable>(initialCount);
+        }
+
+        /// <summary>
         /// Adds a variable to the list.
         /// </summary>
-        public void Add(Variable variable)
-        {
-            if (variable == null)
-                throw new ArgumentNullException(nameof(variable));
-
-            _variables ??= new List<Variable>();
-
-            _variables.Add(variable);
-        }
+        public virtual void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <summary>
         /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
         /// </summary>
         public object ValueFor(string name, object defaultValue = null)
         {
-            var variable = _variables?.FirstOrDefault(v => v.Name == name);
-            return variable != null && variable.ValueSpecified
-                ? variable.Value
-                : defaultValue;
+            return ValueFor(name, out var value) ? value.Value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
+        /// </summary>
+        public bool ValueFor(string name, out ArgumentValue value)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            if (_variables != null)
+            {
+                foreach (var v in _variables)
+                {
+                    if (v.Name == name)
+                    {
+                        value = new ArgumentValue(v.Value, v.IsDefault || !v.ValueSpecified ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+                        return v.ValueSpecified;
+                    }
+                }
+            }
+
+            value = default;
+            return false;
         }
 
         /// <inheritdoc/>
-        public IEnumerator<Variable> GetEnumerator()
-        {
-            if (_variables == null)
-                return Enumerable.Empty<Variable>().GetEnumerator();
-
-            return _variables.GetEnumerator();
-        }
+        public IEnumerator<Variable> GetEnumerator() => (_variables ?? Enumerable.Empty<Variable>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
         public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
+
+        /// <summary>
+        /// Returns a static instance that holds no variables.
+        /// </summary>
+        public static Variables None { get; } = new NoVariables();
+
+        private sealed class NoVariables : Variables
+        {
+            public NoVariables() : base() { }
+            public override void Add(Variable variable) => throw new InvalidOperationException("Cannot add variables to this instance.");
+        }
     }
 
 }

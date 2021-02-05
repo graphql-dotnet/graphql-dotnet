@@ -19,47 +19,50 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="VariablesInAllowedPositionError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var varDefMap = new Dictionary<string, VariableDefinition>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>(
-                    varDefAst => varDefMap[varDefAst.Name] = varDefAst
-                );
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<VariableDefinition>(
+                (varDefAst, context) => {
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
+                    varDefMap[varDefAst.Name] = varDefAst;
+                }
+            ),
 
-                _.Match<Operation>(
-                    enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
-                    leave: op =>
+            new MatchingNodeVisitor<Operation>(
+                enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap?.Clear(),
+                leave: (op, context) =>
+                {
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap;
+                    if (varDefMap == null)
+                        return;
+
+                    foreach (var usage in context.GetRecursiveVariables(op))
                     {
-                        foreach (var usage in context.GetRecursiveVariables(op))
+                        var varName = usage.Node.Name;
+                        if (!varDefMap.TryGetValue(varName, out var varDef))
                         {
-                            var varName = usage.Node.Name;
-                            if (!varDefMap.TryGetValue(varName, out var varDef))
-                            {
-                                return;
-                            }
+                            return;
+                        }
 
-                            if (varDef != null && usage.Type != null)
+                        if (varDef != null && usage.Type != null)
+                        {
+                            var varType = varDef.Type.GraphTypeFromType(context.Schema);
+                            if (varType != null &&
+                                !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
                             {
-                                var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                                if (varType != null &&
-                                    !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
-                                {
-                                    context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
-                                }
+                                context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
                             }
                         }
                     }
-                );
-            }).ToTask();
-        }
+                }
+            )
+        ).ToTask();
 
         /// <summary>
         /// if a variable definition has a default value, it is effectively non-null.
         /// </summary>
-        private GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
+        private static GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)
             {

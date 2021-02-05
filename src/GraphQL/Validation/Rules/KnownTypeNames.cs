@@ -21,21 +21,17 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownTypeNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var type = context.Schema.AllTypes[node.Name];
+            if (type == null)
             {
-                _.Match<NamedType>(leave: node =>
-                {
-                    var type = context.Schema.FindType(node.Name);
-                    if (type == null)
-                    {
-                        var typeNames = context.Schema.AllTypes.Select(x => x.Name).ToArray();
-                        var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
-                        context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
-                    }
-                });
-            }).ToTask();
-        }
+                var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
+                var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
+                context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
+            }
+        }).ToTask();
     }
 }

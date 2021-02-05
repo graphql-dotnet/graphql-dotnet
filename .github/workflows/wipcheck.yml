@@ -2,7 +2,7 @@ name: Check if PR title contains [WIP]
 
 on:
   pull_request:
-    types: 
+    types:
       - opened        # when PR is opened
       - edited        # when PR is edited
       - synchronize   # when code is added
