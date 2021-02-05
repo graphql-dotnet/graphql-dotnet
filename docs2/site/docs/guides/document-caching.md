@@ -7,7 +7,7 @@ detrimental for performance for certain workloads, it is disabled by default.
 
 Document caching is provided through the `IDocumentCache` interface. To enable document caching, you will need to construct the document
 executer instance with a `IDocumentCache` implementation. There is a memory-backed implementation called `MemoryDocumentCache` in the NuGet
-[GraphQL.Caching](https://www.nuget.org/packages/GraphQL.Caching/) package. The implementation is backed by
+[GraphQL.Caching](https://www.nuget.org/packages/GraphQL.Caching) package. The implementation is backed by
 `Microsoft.Extensions.Caching.Memory.IMemoryCache` and provides options for specifying the maximum amount of objects to cache
 (measured in total length of the cached queries), and/or the expiration time of cached queries.
 
