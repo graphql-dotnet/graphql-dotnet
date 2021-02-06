@@ -32,7 +32,7 @@ namespace GraphQL.Types
             set
             {
                 if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
-                    throw new InvalidOperationException($"Type '{Type.Name}' should be assignable from ResolvedType '{value.Name}'.");
+                    throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
 
                 _resolvedType = value;
             }
@@ -43,7 +43,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="ListGraphType"/>
-    public class ListGraphType<T> : ListGraphType
+    public sealed class ListGraphType<T> : ListGraphType
         where T : IGraphType
     {
         /// <summary>

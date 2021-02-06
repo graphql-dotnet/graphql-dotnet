@@ -34,11 +34,11 @@ namespace GraphQL.Types
                 if (value is NonNullGraphType) //TODO: null check here or in ctor
                 {
                     // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
-                    throw new ArgumentOutOfRangeException("type", "Cannot nest NonNull inside NonNull.");
+                    throw new ArgumentOutOfRangeException("ResolvedType", "Cannot nest NonNull inside NonNull.");
                 }
 
                 if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
-                    throw new InvalidOperationException($"Type '{Type.Name}' should be assignable from ResolvedType '{value.Name}'.");
+                    throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
 
                 _resolvedType = value;
             }
@@ -49,7 +49,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="NonNullGraphType"/>
-    public class NonNullGraphType<T> : NonNullGraphType
+    public sealed class NonNullGraphType<T> : NonNullGraphType
         where T : GraphType
     {
         /// <summary>

@@ -2101,7 +2101,7 @@ namespace GraphQL.Types
         public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class ListGraphType<T> : GraphQL.Types.ListGraphType
+    public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
@@ -2120,7 +2120,7 @@ namespace GraphQL.Types
         public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
+    public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.GraphType
     {
         public NonNullGraphType() { }
