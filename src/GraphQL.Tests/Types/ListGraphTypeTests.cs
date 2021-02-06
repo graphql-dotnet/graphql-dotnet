@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Types
         public void List_ResolvedType_And_Type_Should_Match()
         {
             var type = new NonNullGraphType<StringGraphType>();
-            Should.Throw<ArgumentOutOfRangeException>(() => type.ResolvedType = new IntGraphType()).Message.ShouldBe("Type 'StringGraphType' should be assignable from ResolvedType 'IntGraphType'. (Parameter 'ResolvedType')");
+            Should.Throw<ArgumentOutOfRangeException>(() => type.ResolvedType = new IntGraphType()).Message.ShouldStartWith("Type 'StringGraphType' should be assignable from ResolvedType 'IntGraphType'.");
         }
 
         [Fact]
