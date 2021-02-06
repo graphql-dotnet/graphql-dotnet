@@ -2097,15 +2097,15 @@ namespace GraphQL.Types
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
-        protected ListGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public System.Type Type { get; }
+        public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class ListGraphType<T> : GraphQL.Types.ListGraphType
+    public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
+        public override System.Type Type { get; }
     }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2116,15 +2116,15 @@ namespace GraphQL.Types
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
-        protected NonNullGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public System.Type Type { get; }
+        public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
+    public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.GraphType
     {
         public NonNullGraphType() { }
+        public override System.Type Type { get; }
     }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object>
     {
