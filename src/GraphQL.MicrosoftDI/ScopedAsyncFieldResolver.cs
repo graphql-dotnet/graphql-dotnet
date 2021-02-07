@@ -25,7 +25,7 @@ namespace GraphQL.MicrosoftDI
             {
                 using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
-                    return await resolver(new ScopedResolveFieldContextAdapter(context, scope.ServiceProvider));
+                    return await resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
                 }
             };
         }

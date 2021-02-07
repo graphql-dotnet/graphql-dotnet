@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Moq;
 using Shouldly;
@@ -18,15 +19,15 @@ namespace GraphQL.MicrosoftDI.Tests
                 Arguments = new Dictionary<string, ArgumentValue>() { { "6", default } },
                 ArrayPool = Mock.Of<IExecutionArrayPool>(),
                 CancellationToken = default,
-                Document = new GraphQL.Language.AST.Document(),
+                Document = new Document(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>() { { "1", new object() } },
-                FieldAst = new GraphQL.Language.AST.Field(),
+                FieldAst = new Field(),
                 FieldDefinition = new FieldType(),
                 FieldName = "test",
-                Fragments = new GraphQL.Language.AST.Fragments(),
-                Metrics = new GraphQL.Instrumentation.Metrics(),
-                Operation = new GraphQL.Language.AST.Operation(new GraphQL.Language.AST.NameNode()),
+                Fragments = new Fragments(),
+                Metrics = new Instrumentation.Metrics(),
+                Operation = new Operation(new NameNode()),
                 ParentType = Mock.Of<IObjectGraphType>(),
                 Path = new object[] { "5" },
                 RequestServices = Mock.Of<IServiceProvider>(),
@@ -35,12 +36,12 @@ namespace GraphQL.MicrosoftDI.Tests
                 RootValue = new object(),
                 Schema = Mock.Of<ISchema>(),
                 Source = "hello",
-                SubFields = new GraphQL.Language.AST.Fields(),
+                SubFields = new Fields(),
                 UserContext = new Dictionary<string, object>() { { "3", new object() } },
-                Variables = new GraphQL.Language.AST.Variables(),
+                Variables = new Variables(),
             };
             var rs = Mock.Of<IServiceProvider>();
-            var mocked = new GraphQL.MicrosoftDI.ScopedResolveFieldContextAdapter(rfc, rs);
+            var mocked = new ScopedResolveFieldContextAdapter<object>(rfc, rs);
             mocked.Arguments.ShouldBe(rfc.Arguments);
             mocked.ArrayPool.ShouldBe(rfc.ArrayPool);
             mocked.CancellationToken.ShouldBe(rfc.CancellationToken);
