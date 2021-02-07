@@ -185,7 +185,7 @@ will now throw a `NotSupportedException` when attempting to execute a subscripti
 `SubscriptionDocumentExecuter` instead. If you have a custom document executer, you can override `SelectExecutionStrategy` in
 order to select the `SubscriptionExecutionStrategy` instance for subscriptions.
 
-```cs
+```csharp
 protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
 {
     return context.Operation.OperationType switch
