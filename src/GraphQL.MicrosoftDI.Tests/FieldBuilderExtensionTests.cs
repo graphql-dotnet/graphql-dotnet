@@ -110,6 +110,62 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Fact]
+        public void WithScope2Alt()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .WithService<string, int>()
+                .Resolve((context, value, v2) => value + v2)
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2");
+            VerifyScoped();
+        }
+
+        [Fact]
+        public void WithScope3Alt()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .WithService<string, int, short>()
+                .Resolve((context, value, v2, v3) => value + v2 + v3)
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBe("hello23");
+            VerifyScoped();
+        }
+
+        [Fact]
+        public void WithScope4Alt()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .WithService<string, int, short, byte>()
+                .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBe("hello234");
+            VerifyScoped();
+        }
+
+        [Fact]
+        public void WithScope5Alt()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .WithService<string, int, short, byte, long>()
+                .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2345");
+            VerifyScoped();
+        }
+
+        [Fact]
         public void WithoutScope1()
         {
             var graph = new ObjectGraphType();

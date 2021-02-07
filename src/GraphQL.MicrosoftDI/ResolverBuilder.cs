@@ -30,6 +30,24 @@ namespace GraphQL.MicrosoftDI
             => new ResolverBuilder<TSourceType, TReturnType, T1>(_builder, _scoped);
 
         /// <summary>
+        /// Specifies types that are to be resolved via dependency injection during the resolver's execution.
+        /// </summary>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T1, T2>()
+            => new ResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithService{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T1, T2, T3>()
+            => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithService{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T1, T2, T3, T4>()
+            => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithService{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T1, T2, T3, T4, T5>()
+            => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+
+        /// <summary>
         /// Specifies that the resolver should run within its own dependency injection scope.
         /// </summary>
         /// <returns></returns>
