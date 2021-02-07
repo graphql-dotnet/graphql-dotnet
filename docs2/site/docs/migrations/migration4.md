@@ -254,7 +254,7 @@ lock (field)
 * `InputObjectGraphType.ParseDictionary` has been added so that customized deserialization behavior can be specified for input objects (aka input resolvers).
   If `InputObjectGraphType<T>` is used, and `GetArgument<T>` is called with the same type, no behavior changes will occur by default.
   If `InputObjectGraphType<T>` is used, but `GetArgument<T>` is called with a different type, coercion may fail. Override `ParseDictionary`
-  to force resolving the input object to the correct type.
+  to force resolving the input object to the correct type. See [Input Object Custom Deserializers](#Input-Object-Custom-Deserializers-(aka-resolver)) above.
 * `ExecutionResult.Data` format breaking changes. Now objects are serialized as `ObjectProperty` arrays, not object dictionaries.
   Both `GraphQL.NewtonsoftJson` and `GraphQL.SystemTextJson` serializers received the necessary changes to produce the same JSON as before.
   However, consumers using `ExecutionResult` instances directly most likely will not work correctly.
