@@ -36,7 +36,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         TSource IResolveFieldContext<TSource>.Source => Source;
     }
 
-    internal class ScopedResolveFieldContextAdapter : IResolveFieldContext, IResolveFieldContext<object>
+    internal sealed class ScopedResolveFieldContextAdapter : IResolveFieldContext, IResolveFieldContext<object>
     {
         protected readonly IResolveFieldContext _baseContext;
 
