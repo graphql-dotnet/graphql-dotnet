@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Builders;
 
-namespace GraphQL.Extensions.DI.Microsoft
+namespace GraphQL.MicrosoftDI
 {
     public static class ScopedFieldBuilderExtensions
     {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GraphQL.Extensions.DI.Microsoft
+namespace GraphQL.MicrosoftDI
 {
     public class ScopedAsyncFieldResolver<TReturnType> : AsyncFieldResolver<TReturnType>
     {
@@ -13,8 +13,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return async (context) =>
             {
-                var requestServices = context.RequestServices ?? throw new InvalidOperationException("context.RequestServices is null; check that ExecutionOptions.RequestServices is set when calling DocumentExecuter.ExecuteAsync.");
-                using (var scope = requestServices.CreateScope())
+                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
                     return await resolver(new ScopedResolveFieldContextAdapter(context, scope.ServiceProvider));
                 }
@@ -30,8 +29,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return async (context) =>
             {
-                var requestServices = context.RequestServices ?? throw new InvalidOperationException("context.RequestServices is null; check that ExecutionOptions.RequestServices is set when calling DocumentExecuter.ExecuteAsync.");
-                using (var scope = requestServices.CreateScope())
+                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
                     return await resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
                 }

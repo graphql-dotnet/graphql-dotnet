@@ -2,7 +2,7 @@ using System;
 using GraphQL.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GraphQL.Extensions.DI.Microsoft
+namespace GraphQL.MicrosoftDI
 {
     public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
     {
@@ -12,7 +12,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new InvalidOperationException("No service provider specified. Please set the value of the ExecutionOptions.RequestServices to a valid service provider. Typically, this would be a scoped service provider from your dependency injection framework.")).CreateScope())
+                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
                     return resolver(new ScopedResolveFieldContextAdapter(context, scope.ServiceProvider));
                 }
@@ -28,7 +28,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new InvalidOperationException("No service provider specified. Please set the value of the ExecutionOptions.RequestServices to a valid service provider. Typically, this would be a scoped service provider from your dependency injection framework.")).CreateScope())
+                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
                     return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
                 }

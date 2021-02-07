@@ -6,7 +6,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
-namespace GraphQL.Extensions.DI.Microsoft
+namespace GraphQL.MicrosoftDI
 {
     internal sealed class ScopedResolveFieldContextAdapter<TSource> : ScopedResolveFieldContextAdapter, IResolveFieldContext<TSource>
     {
