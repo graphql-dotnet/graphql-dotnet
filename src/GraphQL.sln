@@ -84,7 +84,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.SystemTextJson", "G
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serialization", "Serialization", "{7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Extensions.DI.Microsoft", "GraphQL.Extensions.DI.Microsoft\GraphQL.Extensions.DI.Microsoft.csproj", "{806E7A14-668C-46A9-9C68-E98A49400E08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI", "GraphQL.Extensions.DI.Microsoft\GraphQL.MicrosoftDI.csproj", "{806E7A14-668C-46A9-9C68-E98A49400E08}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "DependencyInjection", "{2EA5354E-F4EF-4469-86AE-F1D36C7F8977}"
 EndProject
@@ -129,7 +129,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subscriptions", "Subscripti
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "Caching", "{3DB29B96-B428-46A6-A4D3-FA677110B654}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.MemoryCache", "GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MemoryCache", "GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
