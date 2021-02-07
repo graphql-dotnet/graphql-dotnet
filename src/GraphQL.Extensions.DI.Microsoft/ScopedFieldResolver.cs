@@ -6,7 +6,7 @@ namespace GraphQL.Extensions.DI.Microsoft
 {
     public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
     {
-        public ScopedFieldResolver(Func<IResolveFieldContext, TReturnType> resolver):base(GetScopedResolver(resolver)) { }
+        public ScopedFieldResolver(Func<IResolveFieldContext, TReturnType> resolver) : base(GetScopedResolver(resolver)) { }
 
         private static Func<IResolveFieldContext, TReturnType> GetScopedResolver(Func<IResolveFieldContext, TReturnType> resolver)
         {
