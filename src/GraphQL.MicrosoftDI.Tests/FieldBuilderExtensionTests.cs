@@ -346,12 +346,12 @@ namespace GraphQL.MicrosoftDI.Tests
             var graph = new ObjectGraphType();
             var field = graph.Field<StringGraphType>()
                 .Resolve()
-                .WithScope()
                 .WithService<string>()
                 .WithService<int>()
                 .WithService<short>()
                 .WithService<byte>()
                 .WithService<long>()
+                .WithScope()
                 .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5))
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello2345");
