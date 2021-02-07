@@ -7,10 +7,10 @@ namespace GraphQL.MicrosoftDI
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
         public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType> WithScope() { }
         public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1> WithService<T1>() { }
-        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T1, T2>() { }
-        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T1, T2, T3>() { }
-        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T1, T2, T3, T4>() { }
-        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T1, T2, T3, T4, T5>() { }
+        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2> WithServices<T1, T2>() { }
+        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithServices<T1, T2, T3>() { }
+        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithServices<T1, T2, T3, T4>() { }
+        public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithServices<T1, T2, T3, T4, T5>() { }
     }
     public class ResolverBuilder<TSourceType, TReturnType, T1>
     {
