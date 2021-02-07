@@ -71,7 +71,7 @@ requested type via `ObjectExtensions.ToObject` as it did before.
 ### Microsoft-specific Dependency Injection Extensions
 
 If you are using the Microsoft dependency injection library, extension methods are provided within
-the [GraphQL.MicrosoftDI](https://www.nuget.org/packages/GraphQL.MicrosoftDI) NuGet package for creating a service provider scope
+the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI) for creating a service provider scope
 during a field resolver's execution. This is useful when accessing a scoped service with a parallel execution strategy, as
 typically scoped services are not multi-threaded compatible. The library also provides a builder to assist constructing
 a field resolver that relies on scoped services. Below is a sample of a field resolver that relies on a scoped

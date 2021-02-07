@@ -200,7 +200,7 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
-There are classes to assist with this within the GraphQL.MicrosoftDI NuGet package.
+There are classes to assist with this within the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI).
 Sample usage is as follows:
 
 ```csharp
