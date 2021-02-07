@@ -35,7 +35,7 @@ namespace GraphQL.Tests.MicrosoftDI
                 RootValue = new object(),
                 Schema = Mock.Of<ISchema>(),
                 Source = "hello",
-                SubFields = new Dictionary<string, GraphQL.Language.AST.Field>() { { "2", null } },
+                SubFields = new GraphQL.Language.AST.Fields(),
                 UserContext = new Dictionary<string, object>() { { "3", new object() } },
                 Variables = new GraphQL.Language.AST.Variables(),
             };
