@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.MicrosoftDI;
 using Shouldly;
 using Xunit;
 

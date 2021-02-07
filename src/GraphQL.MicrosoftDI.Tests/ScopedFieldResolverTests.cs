@@ -1,4 +1,3 @@
-using GraphQL.MicrosoftDI;
 using Shouldly;
 using Xunit;
 
