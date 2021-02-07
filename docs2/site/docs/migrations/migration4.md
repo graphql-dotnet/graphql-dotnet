@@ -68,6 +68,32 @@ requested type via `ObjectExtensions.ToObject` as it did before.
 
 (sungam3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
 
+### Microsoft-specific Dependency Injection Extensions
+
+If you are using the Microsoft dependency injection library, extension methods are provided within
+the [GraphQL.MicrosoftDI](https://www.nuget.org/packages/GraphQL.MicrosoftDI) NuGet package for creating a service provider scope
+during a field resolver's execution. This is useful when accessing a scoped service with a parallel execution strategy, as
+typically scoped services are not multi-threaded compatible. The library also provides a builder to assist constructing
+a field resolver that relies on scoped services. Below is a sample of a field resolver that relies on a scoped
+service and can run concurrently with other field resolvers:
+
+```csharp
+public class MyGraphType : Types.ObjectGraphType<Category>
+{
+    public MyGraphType()
+    {
+        Field("Name", context => context.Source.Name);
+        Field<ListGraphType<ProductGraphType>>().Name("Products")
+            .Resolve()
+            .WithScope()
+            .WithType<MyDbContext>()
+            .ResolveAsync((context, db) => db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync());
+    }
+}
+```
+
+See [Dependency Injection](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection) for more details.
+
 ### Ability to Sort Introspection Results
 
 Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer by setting
