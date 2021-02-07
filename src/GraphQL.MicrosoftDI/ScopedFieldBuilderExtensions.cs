@@ -5,7 +5,7 @@ using GraphQL.Builders;
 namespace GraphQL.MicrosoftDI
 {
     /// <summary>
-    /// Extension methods for creating resolver builders
+    /// Extension methods for creating resolver builders.
     /// </summary>
     public static class ScopedFieldBuilderExtensions
     {
