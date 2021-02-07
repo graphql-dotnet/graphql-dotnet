@@ -66,7 +66,7 @@ requested type via `ObjectExtensions.ToObject` as it did before.
   via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
-(sungram3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
+(sungam3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
 
 ### Ability to Sort Introspection Results
 
@@ -82,7 +82,15 @@ of how this can be used to return introspection results that are sorted alphabet
 When returning lists of information from field resolvers, you can choose to rent an array from `IResolveFieldContext.ArrayPool`,
 populating it with your results and returning the array. The array will be released after the execution completes. This has
 limited uses, since the rented array is not guaranteed to be exactly the requested length, so the array would need to be
-wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one).
+wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one):
+```c#
+ resolve: context =>
+{
+    var ints = context.ArrayPool.Rent<int>(1000); // ints.Length >= 1000
+    for (int i=0; i<1000; ++i)
+        ints[i] = i;
+    return ints.Constrained(1000); // extension method to return an array or array-like object of a given length
+});
 It is not recommended to use this feature for interim calculations, as it is better to work directly with `System.Buffers.ArrayPool<T>`.
 
 ### Global Switches
@@ -105,7 +113,7 @@ constructor of your schema, or a similar location.
 
 > Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 
-(sungram3r todo: write more description about how it interacts with the other libraries, add simple sample)
+(sungam3r todo: write more description about how it interacts with the other libraries, add simple sample)
 
 ### Other Features
 
