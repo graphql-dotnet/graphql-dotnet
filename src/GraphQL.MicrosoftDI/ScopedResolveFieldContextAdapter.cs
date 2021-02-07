@@ -16,6 +16,7 @@ namespace GraphQL.MicrosoftDI
 
         public ScopedResolveFieldContextAdapter(IResolveFieldContext baseContext, IServiceProvider serviceProvider)
         {
+            _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
             if (baseContext.Source == null && !_acceptNulls)
             {
                 throw new ArgumentException("baseContext.Source is null and cannot be cast to non-nullable value type " + typeof(TSource).Name, nameof(baseContext));
@@ -31,7 +32,6 @@ namespace GraphQL.MicrosoftDI
                     throw new ArgumentException("baseContext.Source is not of type " + typeof(TSource).Name, nameof(baseContext));
                 }
             }
-            _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
             RequestServices = serviceProvider;
         }
 
