@@ -83,6 +83,7 @@ When returning lists of information from field resolvers, you can choose to rent
 populating it with your results and returning the array. The array will be released after the execution completes. This has
 limited uses, since the rented array is not guaranteed to be exactly the requested length, so the array would need to be
 wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one):
+
 ```c#
  resolve: context =>
 {
@@ -91,6 +92,8 @@ wrapped in order to only return the correct number of entries, triggering a memo
         ints[i] = i;
     return ints.Constrained(1000); // extension method to return an array or array-like object of a given length
 });
+```
+
 It is not recommended to use this feature for interim calculations, as it is better to work directly with `System.Buffers.ArrayPool<T>`.
 
 ### Global Switches
