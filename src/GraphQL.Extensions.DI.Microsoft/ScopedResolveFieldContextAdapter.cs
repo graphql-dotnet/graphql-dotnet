@@ -8,7 +8,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Extensions.DI.Microsoft
 {
-    internal class ScopedResolveFieldContextAdapter<TSource> : ScopedResolveFieldContextAdapter, IResolveFieldContext<TSource>
+    internal sealed class ScopedResolveFieldContextAdapter<TSource> : ScopedResolveFieldContextAdapter, IResolveFieldContext<TSource>
     {
         private static readonly bool _acceptNulls = !typeof(TSource).IsValueType || (typeof(TSource).IsGenericType && typeof(TSource).GetGenericTypeDefinition() == typeof(Nullable<>));
 
