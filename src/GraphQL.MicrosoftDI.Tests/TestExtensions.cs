@@ -7,7 +7,8 @@ namespace GraphQL.MicrosoftDI.Tests
     {
         public static void ShouldBeTask(this object value, object expected)
         {
-            value.ShouldBeAssignableTo(typeof(Task<object>)).Result.ShouldBe(expected);
+            value.ShouldBeAssignableTo(typeof(Task<object>));
+            ((Task<object>)value).Result.ShouldBe(expected);
         }
     }
 }
