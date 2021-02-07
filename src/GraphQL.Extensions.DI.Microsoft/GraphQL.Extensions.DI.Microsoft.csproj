@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>GraphQL.Extensions.DI.Microsoft</RootNamespace>
     <Description>Microsoft DI extensions for GraphQL.NET</Description>
     <PackageTags>GraphQL;dependency injection;di</PackageTags>
   </PropertyGroup>
