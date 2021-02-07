@@ -116,7 +116,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var field = graph.Field<StringGraphType>()
                 .Resolve()
                 .WithScope()
-                .WithService<string, int>()
+                .WithServices<string, int>()
                 .Resolve((context, value, v2) => value + v2)
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello2");
@@ -130,7 +130,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var field = graph.Field<StringGraphType>()
                 .Resolve()
                 .WithScope()
-                .WithService<string, int, short>()
+                .WithServices<string, int, short>()
                 .Resolve((context, value, v2, v3) => value + v2 + v3)
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello23");
@@ -144,7 +144,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var field = graph.Field<StringGraphType>()
                 .Resolve()
                 .WithScope()
-                .WithService<string, int, short, byte>()
+                .WithServices<string, int, short, byte>()
                 .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello234");
@@ -158,7 +158,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var field = graph.Field<StringGraphType>()
                 .Resolve()
                 .WithScope()
-                .WithService<string, int, short, byte, long>()
+                .WithServices<string, int, short, byte, long>()
                 .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello2345");

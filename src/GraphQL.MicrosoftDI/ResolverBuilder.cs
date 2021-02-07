@@ -32,19 +32,19 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Specifies types that are to be resolved via dependency injection during the resolver's execution.
         /// </summary>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T1, T2>()
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2> WithServices<T1, T2>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
 
-        /// <inheritdoc cref="WithService{T1, T2}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T1, T2, T3>()
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithServices<T1, T2, T3>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
 
-        /// <inheritdoc cref="WithService{T1, T2}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T1, T2, T3, T4>()
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithServices<T1, T2, T3, T4>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
 
-        /// <inheritdoc cref="WithService{T1, T2}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T1, T2, T3, T4, T5>()
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithServices<T1, T2, T3, T4, T5>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
 
         /// <summary>
