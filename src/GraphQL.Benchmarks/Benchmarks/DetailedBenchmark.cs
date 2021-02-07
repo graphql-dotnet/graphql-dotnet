@@ -47,6 +47,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bHero;
         private BenchmarkInfo _bVariable;
         private BenchmarkInfo _bLiteral;
+        private DocumentExecuter _documentExecuter = new DocumentExecuter();
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -124,6 +125,14 @@ namespace GraphQL.Benchmarks
                 case StageEnum.Build:
                     benchmarkInfo.BuildSchema();
                     break;
+                case StageEnum.TypicalExecution:
+                    _documentExecuter.ExecuteAsync(o =>
+                    {
+                        o.Schema = benchmarkInfo.Schema;
+                        o.Query = benchmarkInfo.Query;
+                        o.Inputs = benchmarkInfo.InputsString?.ToInputs();
+                    }).GetAwaiter().GetResult();
+                    break;
                 case StageEnum.Parse:
                     benchmarkInfo.Parse();
                     break;
@@ -150,6 +159,7 @@ namespace GraphQL.Benchmarks
             }
         }
 
+        //[Params(StageEnum.Build, StageEnum.TypicalExecution, StageEnum.Serialize)]
         [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
         public StageEnum Stage { get; set; }
 
@@ -169,6 +179,7 @@ namespace GraphQL.Benchmarks
             ParseVariables,
             Execute,
             Serialize,
+            TypicalExecution,
         }
 
         public class BenchmarkInfo
