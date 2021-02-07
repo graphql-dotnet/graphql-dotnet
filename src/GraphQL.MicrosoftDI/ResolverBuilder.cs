@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Extensions.DI.Microsoft
 {
+
+
     public class ResolverBuilder<TSourceType, TReturnType>
     {
         private readonly FieldBuilder<TSourceType, TReturnType> _builder;

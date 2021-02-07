@@ -13,7 +13,8 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return async (context) =>
             {
-                using (var scope = context.RequestServices.CreateScope())
+                var requestServices = context.RequestServices ?? throw new InvalidOperationException("context.RequestServices is null; check that ExecutionOptions.RequestServices is set when calling DocumentExecuter.ExecuteAsync.");
+                using (var scope = requestServices.CreateScope())
                 {
                     return await resolver(new ScopedResolveFieldContextAdapter(context, scope.ServiceProvider));
                 }
@@ -29,7 +30,8 @@ namespace GraphQL.Extensions.DI.Microsoft
         {
             return async (context) =>
             {
-                using (var scope = context.RequestServices.CreateScope())
+                var requestServices = context.RequestServices ?? throw new InvalidOperationException("context.RequestServices is null; check that ExecutionOptions.RequestServices is set when calling DocumentExecuter.ExecuteAsync.");
+                using (var scope = requestServices.CreateScope())
                 {
                     return await resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
                 }
