@@ -269,7 +269,7 @@ specified by the query).
 If you need to write metadata during execution of field resolvers, lock on the graph type before accessing the dictionary. Do not lock on the
 `Metadata` property because there can be concurrency issues accessing the field.
 
-```cs
+```csharp
 lock (field)
 {
     int value;
