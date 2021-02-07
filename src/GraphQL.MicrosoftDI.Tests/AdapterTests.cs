@@ -6,7 +6,7 @@ using Moq;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.MicrosoftDI
+namespace GraphQL.MicrosoftDI.Tests
 {
     public class AdapterTests
     {

@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace GraphQL.Tests.MicrosoftDI
+namespace GraphQL.MicrosoftDI.Tests
 {
     public class ScopedContextBase
     {

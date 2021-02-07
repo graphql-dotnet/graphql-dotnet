@@ -2,7 +2,7 @@ using GraphQL.MicrosoftDI;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.MicrosoftDI
+namespace GraphQL.MicrosoftDI.Tests
 {
     public class ScopedFieldResolverTests : ScopedContextBase
     {
