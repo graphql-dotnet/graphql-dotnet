@@ -47,7 +47,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bHero;
         private BenchmarkInfo _bVariable;
         private BenchmarkInfo _bLiteral;
-        private DocumentExecuter _documentExecuter = new DocumentExecuter();
+        private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
 
         [GlobalSetup]
         public void GlobalSetup()
