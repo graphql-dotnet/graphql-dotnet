@@ -15,7 +15,6 @@ namespace GraphQL.Tests.MicrosoftDI
 
         public ScopedContextBase()
         {
-
             _scopedServiceProviderMock = new Mock<IServiceProvider>(MockBehavior.Strict);
             _scopedServiceProvider = _scopedServiceProviderMock.Object;
             _scopedServiceScopeMock = new Mock<IServiceScope>(MockBehavior.Strict);
