@@ -30,5 +30,19 @@ namespace GraphQL.MicrosoftDI.Tests
             resolver.Resolve(_scopedContext).ShouldBe(2);
             VerifyScoped();
         }
+
+        [Fact]
+        public void RequiresRequestServices_TReturn_only()
+        {
+            var resolver = new ScopedFieldResolver<int>(context => 5);
+            Should.Throw<MissingRequestServicesException>(() => resolver.Resolve(new ResolveFieldContext()));
+        }
+
+        [Fact]
+        public void RequiresRequestServices_TSource_and_TReturn()
+        {
+            var resolver = new ScopedFieldResolver<string, int>(context => 5);
+            Should.Throw<MissingRequestServicesException>(() => resolver.Resolve(new ResolveFieldContext()));
+        }
     }
 }
