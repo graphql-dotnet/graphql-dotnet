@@ -80,7 +80,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, TReturnType> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>());
 
@@ -91,7 +91,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, Task<TReturnType>> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>());
 
@@ -129,7 +129,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, TReturnType> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>());
@@ -141,7 +141,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, Task<TReturnType>> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>());
@@ -180,7 +180,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, TReturnType> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),
@@ -193,7 +193,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, Task<TReturnType>> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),
@@ -233,7 +233,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, TReturnType> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),
@@ -247,7 +247,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType>> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),
@@ -284,7 +284,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),
@@ -299,7 +299,7 @@ namespace GraphQL.MicrosoftDI
         public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType>> resolver)
         {
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
-                (context) => resolver(
+                context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
                     context.RequestServices.GetRequiredService<T2>(),

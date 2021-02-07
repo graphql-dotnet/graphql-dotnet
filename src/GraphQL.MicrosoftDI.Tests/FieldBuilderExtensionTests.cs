@@ -11,7 +11,7 @@ namespace GraphQL.MicrosoftDI.Tests
     {
         private readonly ResolveFieldContext _unscopedContext;
 
-        public FieldBuilderExtensionTests() : base()
+        public FieldBuilderExtensionTests()
         {
             _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(string)))).Returns("hello").Verifiable();
             _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(int)))).Returns(2);
