@@ -230,7 +230,7 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * `void INode.Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
 * Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections:
-  `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, and `ResolvedInterfaces`
+  `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `Interfaces` and `ResolvedInterfaces`
 * `INode.IsEqualTo` and related methods have been removed.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 
