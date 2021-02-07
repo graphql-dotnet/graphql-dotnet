@@ -98,20 +98,20 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
   Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
-It is recommended to configure these options once when your application starts, such as your `void Main()` method, or a static
+It is recommended to configure these options once when your application starts, such as within your `void Main()` method, a static
 constructor of your schema, or a similar location.
 
 ### Authorization Extension Methods
 
 > Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 
-(todo: write more description about how it interacts with the other libraries, add simple sample)
+(sungram3r todo: write more description about how it interacts with the other libraries, add simple sample)
 
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
 * Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
-* Schema validation on initialize and better support for schema traversal via `ISchemaNodeVisitor`
+* Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
 
@@ -240,7 +240,7 @@ var result = await schema.ExecuteAsync(options =>
 
 ### GraphQL Member Descriptions
 
-Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it
+To improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it
 did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
 
 ### Changes to `IResolveFieldContext.Arguments`
