@@ -224,7 +224,7 @@ Another approach to resolve scoped services is to use the SteroidsDI project, as
 Within the GraphQL.MicrosoftDI package, there is also a builder approach to adding scoped dependencies:
 
 ```csharp
-public class MyGraphType : Types.ObjectGraphType<Category>
+public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {

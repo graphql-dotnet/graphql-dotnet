@@ -78,7 +78,7 @@ a field resolver that relies on scoped services. Below is a sample of a field re
 service and can run concurrently with other field resolvers:
 
 ```csharp
-public class MyGraphType : Types.ObjectGraphType<Category>
+public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {
