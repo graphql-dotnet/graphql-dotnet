@@ -4,19 +4,32 @@
 
 ### Improved Performance
 
-GraphQL.NET 4.0 has been highly optimized, typically executing queries at least 50% faster while also providing a 65% memory reduction. Small queries have been measured to run twice as fast as they previously ran. A cached query executor is also provided, which can reduce execution time another 20% once the query has been parsed (disabled by default). Variable parsing is also improved to run about 50% faster, and schema build time is now about 20x faster than previously and requires 1/25th the amount of memory.
+GraphQL.NET 4.0 has been highly optimized, typically executing queries at least 50% faster while also providing
+a 65% memory reduction. Small queries have been measured to run twice as fast as they previously ran. A cached
+query executor is also provided, which can reduce execution time another 20% once the query has been parsed
+(disabled by default). Variable parsing is also improved to run about 50% faster, and schema build time is
+now about 20x faster than previously and requires 1/25th the amount of memory.
 
-See the [Document Caching](https://graphql-dotnet.github.io/docs/guides/document-caching) guide to enable document caching.
+See the [Document Caching](https://graphql-dotnet.github.io/docs/guides/document-caching) guide to enable
+document caching.
 
-To facilitate the performance changes, many changes were made to the API that may affect you if you have built custom execution strategies, scalars, parser, or similar core components. Please see the complete list of breaking changes below.
+To facilitate the performance changes, many changes were made to the API that may affect you if you have
+built custom execution strategies, scalars, parser, or similar core components. Please see the complete list
+of breaking changes below.
 
 ### Input Object Custom Deserializers (aka resolver)
 
-You can now add code to `InputObjectGraphType` descendants to build an object from the collected argument fields. The new `ParseDictionary` method is called when variables are being parsed or `GetArgument` is called, depending on if the argument is stored within variables or as a literal. The method is passed a dictionary containing the input object's fields and deserialized values.
+You can now add code to `InputObjectGraphType` descendants to build an object from the collected argument
+fields. The new `ParseDictionary` method is called when variables are being parsed or `GetArgument` is called,
+depending on if the argument is stored within variables or as a literal. The method is passed a dictionary
+containing the input object's fields and deserialized values.
 
-By default, for `InputObjectGraphType<TSourceType>` implementations, the dictionary is passed to `ObjectExtensions.ToObject` in order to convert the dictionary to an object of `TSourceType`. You can override the method to have it return an instance of any appropriate type.
+By default, for `InputObjectGraphType<TSourceType>` implementations, the dictionary is passed to
+`ObjectExtensions.ToObject` in order to convert the dictionary to an object of `TSourceType`.
+You can override the method to have it return an instance of any appropriate type.
 
-Below is a sample which sets a default value for an unsupplied field (this could be done with a default value set on the field, of course) and converts the name to uppercase:
+Below is a sample which sets a default value for an unsupplied field (this could be done with a default
+value set on the field, of course) and converts the name to uppercase:
 
 ```cs
 public class HumanInputType : InputObjectGraphType
@@ -40,16 +53,20 @@ public class HumanInputType : InputObjectGraphType
 }
 ```
 
-Note that pursuant to GraphQL specifications, if a field is optional, not supplied, and has no default, it will not be in the dictionary.
+Note that pursuant to GraphQL specifications, if a field is optional, not supplied, and has no default,
+it will not be in the dictionary.
 
-For untyped `InputObjectGraphType` classes, like shown above, the default behavior of `ParseDictionary` will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the requested type via `ObjectExtensions.ToObject` as it did before.
+For untyped `InputObjectGraphType` classes, like shown above, the default behavior of `ParseDictionary`
+will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the
+requested type via `ObjectExtensions.ToObject` as it did before.
 
 ### Experimental Features / Applied Directives
 
-> Ability to apply directives to the schema elements and expose user-defined meta-information via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
+> Ability to apply directives to the schema elements and expose user-defined meta-information
+  via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
-(sungram3r todo)
+(sungram3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
 
 ### Ability to Sort Introspection Results
 
@@ -173,7 +190,8 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 
 ### API Cleanup
 
-* `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into your project if you require these classes.
+* `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
+  your project if you require these classes.
 * `LightweightCache.First` method has been removed.
 * `IGraphType.CollectTypes` method has been removed.
 * `ExecutionHelper.SubFieldsFor` method has been removed.
@@ -190,7 +208,8 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 * Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
 * `EnumerableExtensions.Apply` for dictionaries has been removed.
 * `ISubscriptionExecuter` has been removed.
-* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
+* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have
+  changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
 * `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
@@ -202,7 +221,8 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 * `SourceLocation`, `NameNode` and `BasicVisitor` have been changed to a `readonly struct`.
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * `void INode.Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
-* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
+* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections:
+  `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, and `ResolvedInterfaces`
 * `INode.IsEqualTo` and related methods have been removed.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 
@@ -220,7 +240,8 @@ var result = await schema.ExecuteAsync(options =>
 
 ### GraphQL Member Descriptions
 
-Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
+Note that to improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it
+did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
 
 ### Changes to `IResolveFieldContext.Arguments`
 
