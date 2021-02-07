@@ -26,7 +26,7 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Specifies a type that is to be resolved via dependency injection during the resolver's execution.
         /// </summary>
-        public ResolverBuilder<TSourceType, TReturnType, T1> WithType<T1>()
+        public ResolverBuilder<TSourceType, TReturnType, T1> WithService<T1>()
             => new ResolverBuilder<TSourceType, TReturnType, T1>(_builder, _scoped);
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace GraphQL.MicrosoftDI
             _scoped = scoped;
         }
 
-        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithType{T1}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2> WithType<T2>()
+        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T2>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithScope"/>
@@ -114,8 +114,8 @@ namespace GraphQL.MicrosoftDI
             _scoped = scoped;
         }
 
-        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithType{T1}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithType<T3>()
+        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T3>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithScope"/>
@@ -165,8 +165,8 @@ namespace GraphQL.MicrosoftDI
             _scoped = scoped;
         }
 
-        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithType{T1}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithType<T4>()
+        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T4>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithScope"/>
@@ -218,8 +218,8 @@ namespace GraphQL.MicrosoftDI
             _scoped = scoped;
         }
 
-        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithType{T1}"/>
-        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithType<T5>()
+        /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T5>()
             => new ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.WithScope"/>

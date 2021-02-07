@@ -232,7 +232,7 @@ public class MyGraphType : ObjectGraphType<Category>
         Field<ListGraphType<ProductGraphType>>().Name("Products")
             .Resolve()
             .WithScope() // creates a service scope as described above; not necessary for serial execution
-            .WithType<MyDbContext>()
+            .WithService<MyDbContext>()
             .ResolveAsync((context, db) => db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync());
     }
 }

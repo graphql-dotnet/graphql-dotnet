@@ -86,7 +86,7 @@ public class MyGraphType : ObjectGraphType<Category>
         Field<ListGraphType<ProductGraphType>>().Name("Products")
             .Resolve()
             .WithScope()
-            .WithType<MyDbContext>()
+            .WithService<MyDbContext>()
             .ResolveAsync((context, db) => db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync());
     }
 }
