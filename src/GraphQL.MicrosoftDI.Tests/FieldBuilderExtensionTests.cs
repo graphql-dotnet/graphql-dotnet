@@ -13,7 +13,7 @@ namespace GraphQL.MicrosoftDI.Tests
 
         public FieldBuilderExtensionTests()
         {
-            _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(string)))).Returns("hello").Verifiable();
+            _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(string)))).Returns("hello");
             _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(int)))).Returns(2);
             _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(short)))).Returns((short)3);
             _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(byte)))).Returns((byte)4);
@@ -27,6 +27,19 @@ namespace GraphQL.MicrosoftDI.Tests
         private void VerifyUnscoped()
         {
             _scopedServiceProviderMock.Verify();
+        }
+
+        [Fact]
+        public void WithScope0()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .Resolve(context => "hello")
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
+            VerifyScoped();
         }
 
         [Fact]
@@ -166,6 +179,18 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Fact]
+        public void WithoutScope0()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .Resolve(context => "hello")
+                .FieldType;
+            field.Resolver.Resolve(_unscopedContext).ShouldBe("hello");
+            VerifyUnscoped();
+        }
+
+        [Fact]
         public void WithoutScope1()
         {
             var graph = new ObjectGraphType();
@@ -238,6 +263,19 @@ namespace GraphQL.MicrosoftDI.Tests
                 .FieldType;
             field.Resolver.Resolve(_unscopedContext).ShouldBe("hello2345");
             VerifyUnscoped();
+        }
+
+        [Fact]
+        public void WithScope0Async()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .WithScope()
+                .ResolveAsync(context => Task.FromResult<object>("hello"))
+                .FieldType;
+            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello");
+            VerifyScoped();
         }
 
         [Fact]
@@ -318,6 +356,18 @@ namespace GraphQL.MicrosoftDI.Tests
                 .FieldType;
             field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello2345");
             VerifyScoped();
+        }
+
+        [Fact]
+        public void WithoutScope0Async()
+        {
+            var graph = new ObjectGraphType();
+            var field = graph.Field<StringGraphType>()
+                .Resolve()
+                .ResolveAsync(context => Task.FromResult<object>("hello"))
+                .FieldType;
+            field.Resolver.Resolve(_unscopedContext).ShouldBeTask("hello");
+            VerifyUnscoped();
         }
 
         [Fact]
