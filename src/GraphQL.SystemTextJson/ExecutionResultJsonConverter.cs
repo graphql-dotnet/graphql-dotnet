@@ -40,7 +40,65 @@ namespace GraphQL.SystemTextJson
         {
             if (result.Executed)
             {
-                WriteProperty(writer, "data", result.Data, options);
+                writer.WritePropertyName("data");
+                if (result.Data is ExecutionNode executionNode)
+                {
+                    WriteExecutionNode(writer, executionNode, options);
+                }
+                else
+                {
+                    WriteValue(writer, result.Data, options);
+                }
+            }
+        }
+
+        private static void WriteExecutionNode(Utf8JsonWriter writer, ExecutionNode node, JsonSerializerOptions options)
+        {
+            if (node is ValueExecutionNode valueExecutionNode)
+            {
+                WriteValue(writer, valueExecutionNode.ToValue(), options);
+            }
+            else if (node is ObjectExecutionNode objectExecutionNode)
+            {
+                if (objectExecutionNode.SubFields == null)
+                {
+                    writer.WriteNullValue();
+                }
+                else
+                {
+                    writer.WriteStartObject();
+                    foreach (var childNode in objectExecutionNode.SubFields)
+                    {
+                        writer.WritePropertyName(childNode.Name);
+                        WriteExecutionNode(writer, childNode, options);
+                    }
+                    writer.WriteEndObject();
+                }
+            }
+            else if (node is ArrayExecutionNode arrayExecutionNode)
+            {
+                var items = arrayExecutionNode.Items;
+                if (items == null)
+                {
+                    writer.WriteNullValue();
+                }
+                else
+                {
+                    writer.WriteStartArray();
+                    foreach (var childNode in items)
+                    {
+                        WriteExecutionNode(writer, childNode, options);
+                    }
+                    writer.WriteEndArray();
+                }
+            }
+            else if (node == null || node is NullExecutionNode)
+            {
+                writer.WriteNullValue();
+            }
+            else
+            {
+                WriteValue(writer, node.ToValue(), options);
             }
         }
 
@@ -125,17 +183,6 @@ namespace GraphQL.SystemTextJson
                     break;
                 }
                 case Dictionary<string, object> dictionary:
-                {
-                    writer.WriteStartObject();
-
-                    foreach (var kvp in dictionary)
-                        WriteProperty(writer, kvp.Key, kvp.Value, options);
-
-                    writer.WriteEndObject();
-
-                    break;
-                }
-                case ObjectProperty[] dictionary:
                 {
                     writer.WriteStartObject();
 

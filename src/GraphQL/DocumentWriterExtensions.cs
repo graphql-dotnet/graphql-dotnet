@@ -16,15 +16,11 @@ namespace GraphQL
         /// </summary>
         public static async Task<string> WriteToStringAsync<T>(this IDocumentWriter writer, T value)
         {
-            using (var stream = new MemoryStream())
-            {
-                await writer.WriteAsync(stream, value).ConfigureAwait(false);
-                stream.Position = 0;
-                using (var reader = new StreamReader(stream, _utf8Encoding))
-                {
-                    return await reader.ReadToEndAsync().ConfigureAwait(false);
-                }
-            }
+            using var stream = new MemoryStream();
+            await writer.WriteAsync(stream, value).ConfigureAwait(false);
+            stream.Position = 0;
+            using var reader = new StreamReader(stream, _utf8Encoding);
+            return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
     }
 }

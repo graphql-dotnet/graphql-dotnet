@@ -25,7 +25,8 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns a <see cref="List{T}"/> containing the results of the child execution nodes.
+        /// Returns an object array containing the results of the child execution nodes.
+        /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
@@ -35,25 +36,43 @@ namespace GraphQL.Execution
             var items = new object[Items.Count];
             for (int i = 0; i < Items.Count; ++i)
             {
-                var item = Items[i];
-                object value = item.ToValue();
-
-                if (value == null)
-                {
-                    var listType = item.FieldDefinition.ResolvedType;
-                    if (listType is NonNullGraphType nonNull)
-                        listType = nonNull.ResolvedType;
-
-                    if (((ListGraphType)listType).ResolvedType is NonNullGraphType)
-                    {
-                        return null;
-                    }
-                }
-
-                items[i] = value;
+                items[i] = Items[i].ToValue();
             }
 
             return items;
+        }
+
+        /// <inheritdoc/>
+        public override bool PropagateNull()
+        {
+            if (Items == null)
+                return true;
+
+            if (Items.Count == 0)
+                return false;
+
+            var isNullableType = false;
+
+            for (int i = 0; i < Items.Count; ++i)
+            {
+                var item = Items[i];
+                bool valueIsNull = item.PropagateNull();
+
+                if (valueIsNull && !isNullableType)
+                {
+                    if (((ListGraphType)GraphType).ResolvedType is NonNullGraphType)
+                    {
+                        Items = null;
+                        return true;
+                    }
+                    else
+                    {
+                        isNullableType = true;
+                    } 
+                }
+            }
+
+            return false;
         }
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => Items ?? Enumerable.Empty<ExecutionNode>();

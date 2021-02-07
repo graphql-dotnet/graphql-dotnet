@@ -16,9 +16,10 @@ namespace GraphQL.Types.Relay
         /// <inheritdoc/>
         public ConnectionType()
         {
-            Name = string.Format("{0}Connection", typeof(TNodeType).GraphQLName());
-            Description = string.Format("A connection from an object to a list of objects of type `{0}`.",
-                typeof(TNodeType).GraphQLName());
+            string graphQLTypeName = typeof(TNodeType).GraphQLName();
+            Name = $"{graphQLTypeName}Connection";
+            Description =
+                $"A connection from an object to a list of objects of type `{graphQLTypeName}`.";
 
             Field<IntGraphType>()
                 .Name("totalCount")

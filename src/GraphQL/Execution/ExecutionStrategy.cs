@@ -29,7 +29,7 @@ namespace GraphQL.Execution
                 .ConfigureAwait(false);
 
             // After the entire node tree has been executed, get the values
-            object data = rootNode.ToValue();
+            object data = rootNode.PropagateNull() ? null : rootNode;
 
             return new ExecutionResult
             {

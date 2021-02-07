@@ -42,28 +42,46 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a representation of the result of this execution node and its children
         /// within a <see cref="Dictionary{TKey, TValue}"/>.
+        /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
         public override object ToValue()
         {
             if (SubFields == null)
                 return null;
 
-            var fields = new ObjectProperty[SubFields.Length];
+            var fields = new Dictionary<string, object>(SubFields.Length);
 
             for (int i = 0; i < SubFields.Length; ++i)
             {
                 var child = SubFields[i];
-                object value = child.ToValue();
-
-                if (value == null && child.FieldDefinition.ResolvedType is NonNullGraphType)
-                {
-                    return null;
-                }
-
-                fields[i] = new ObjectProperty(child.Name, value);
+                fields.Add(child.Name, child.ToValue());
             }
 
             return fields;
+        }
+
+        /// <inheritdoc/>
+        public override bool PropagateNull()
+        {
+            if (SubFields == null)
+                return true;
+
+            for (int i = 0; i < SubFields.Length; ++i)
+            {
+                var child = SubFields[i];
+                bool valueIsNull = child.PropagateNull();
+
+                if (valueIsNull)
+                {
+                    if (child.FieldDefinition.ResolvedType is NonNullGraphType)
+                    {
+                        SubFields = null;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields ?? Enumerable.Empty<ExecutionNode>();

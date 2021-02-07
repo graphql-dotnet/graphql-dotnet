@@ -91,19 +91,19 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
-            NameValidator.ValidateNameNotNull(fieldType.Name, "field");
+            NameValidator.ValidateNameNotNull(fieldType.Name, NamedElement.Field);
 
             if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
             {
                 if (this is IInputObjectGraphType)
                 {
-                    if (fieldType.ResolvedType?.IsInputType() == false || fieldType.Type?.IsInputType() == false)
+                    if (fieldType.ResolvedType != null ? fieldType.ResolvedType.IsInputType() == false : fieldType.Type?.IsInputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
                             $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field '{fieldType.Name}' has an output type.");
                 }
                 else
                 {
-                    if (fieldType.ResolvedType?.IsOutputType() == false || fieldType.Type?.IsOutputType() == false)
+                    if (fieldType.ResolvedType != null ? fieldType.ResolvedType.IsOutputType() == false : fieldType.Type?.IsOutputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
                             $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType. Field '{fieldType.Name}' has an input type.");
                 }

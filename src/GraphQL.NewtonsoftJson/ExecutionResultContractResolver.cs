@@ -18,9 +18,6 @@ namespace GraphQL.NewtonsoftJson
 
         protected override JsonConverter ResolveContractConverter(Type objectType)
         {
-            if (objectType == typeof(ObjectProperty[]))
-                return new ObjectPropertyArrayJsonConverter();
-
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider);
 

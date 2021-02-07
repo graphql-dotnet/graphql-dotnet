@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -144,8 +145,8 @@ namespace GraphQL.Tests.Utilities
             }).ConfigureAwait(false);
 
             result.Errors.ShouldBeNull();
-            var data = result.Data.ShouldBeOfType<ObjectProperty[]>();
-            var t = data.ToDict()["test"].ShouldBeOfType<ObjectProperty[]>().ToDict();
+            var data = result.Data.ShouldBeAssignableTo<RootExecutionNode>();
+            var t = data.ToDict()["test"].ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>().ToDict();
             t["id"].ShouldBe("foo");
             t["name"].ShouldBe("bar");
         }

@@ -140,8 +140,8 @@ namespace GraphQL
     }
     public static class GlobalSwitches
     {
-        public static System.Action<string, string> Validation;
-        public static System.Action<string, string> ValidationOnSchemaInitialize;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> Validation;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> ValidationOnSchemaInitialize;
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -273,12 +273,6 @@ namespace GraphQL
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object> source, System.Type type, GraphQL.Types.IGraphType mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
             where T :  class { }
-    }
-    public struct ObjectProperty
-    {
-        public ObjectProperty(string key, object value) { }
-        public string Key { get; }
-        public object Value { get; }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
@@ -683,6 +677,7 @@ namespace GraphQL.Execution
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public abstract class DocumentError : GraphQL.ExecutionError
@@ -774,6 +769,7 @@ namespace GraphQL.Execution
         public object Result { get; set; }
         public virtual object Source { get; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
+        public virtual bool PropagateNull() { }
         public abstract object ToValue();
     }
     public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
@@ -878,6 +874,7 @@ namespace GraphQL.Execution
         public GraphQL.Execution.ExecutionNode[] SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
+        public override bool PropagateNull() { }
         public override object ToValue() { }
     }
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy
@@ -2100,15 +2097,15 @@ namespace GraphQL.Types
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
-        protected ListGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public System.Type Type { get; }
+        public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class ListGraphType<T> : GraphQL.Types.ListGraphType
+    public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
+        public override System.Type Type { get; }
     }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2119,15 +2116,15 @@ namespace GraphQL.Types
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
-        protected NonNullGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public System.Type Type { get; }
+        public virtual System.Type Type { get; }
         public override string ToString() { }
     }
-    public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
+    public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.GraphType
     {
         public NonNullGraphType() { }
+        public override System.Type Type { get; }
     }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object>
     {
@@ -2509,9 +2506,17 @@ namespace GraphQL.Utilities
     }
     public static class NameValidator
     {
-        public static void ValidateDefault(string name, string type) { }
-        public static void ValidateName(string name, string type) { }
-        public static void ValidateNameOnSchemaInitialize(string name, string type) { }
+        public static void ValidateDefault(string name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateName(string name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateNameOnSchemaInitialize(string name, GraphQL.Utilities.NamedElement type) { }
+    }
+    public enum NamedElement
+    {
+        Field = 0,
+        Type = 1,
+        Argument = 2,
+        EnumValue = 3,
+        Directive = 4,
     }
     public class PrintFormat<T>
     {

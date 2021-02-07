@@ -12,28 +12,28 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateName(string name, string type) => GlobalSwitches.Validation(name, type);
+        public static void ValidateName(string name, NamedElement type) => GlobalSwitches.Validation(name, type);
 
         /// <summary>
         /// Validates a specified name during schema initialization.
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateNameOnSchemaInitialize(string name, string type) => GlobalSwitches.ValidationOnSchemaInitialize(name, type);
+        public static void ValidateNameOnSchemaInitialize(string name, NamedElement type) => GlobalSwitches.ValidationOnSchemaInitialize(name, type);
 
         /// <summary>
         /// Validates a specified name according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
         /// </summary>
         /// <param name="name">GraphQL name.</param>
-        /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateDefault(string name, string type)
+        /// <param name="type">Type of element: field, type, argument, enum or directive.</param>
+        public static void ValidateDefault(string name, NamedElement type)
         {
             ValidateNameNotNull(name, type);
 
             if (name.Length > 1 && name[0] == '_' && name[1] == '_')
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name: '{name}' must not begin with \"__\", which is reserved by GraphQL introspection.");
+                    $"A {type.ToString().ToLower()} name: '{name}' must not begin with \"__\", which is reserved by GraphQL introspection.");
             }
 
             var c = name[0];
@@ -50,17 +50,17 @@ namespace GraphQL.Utilities
             void ThrowMatchError()
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but '{name}' does not.");
+                    $"A {type.ToString().ToLower()} name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but '{name}' does not.");
             }
         }
 
         //TODO: maybe remove after
-        internal static void ValidateNameNotNull(string name, string type)
+        internal static void ValidateNameNotNull(string name, NamedElement type)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name can not be null or empty.");
+                    $"A {type.ToString().ToLower()} name can not be null or empty.");
             }
         }
     }

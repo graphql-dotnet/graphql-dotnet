@@ -96,6 +96,11 @@ namespace GraphQL.Execution
         public abstract object ToValue();
 
         /// <summary>
+        /// Prepares this node and children nodes for serialization. Returns <see langword="true"/> if this node should return <see langword="null"/>.
+        /// </summary>
+        public virtual bool PropagateNull() => ToValue() == null;
+
+        /// <summary>
         /// Returns the parent graph type of this node.
         /// </summary>
         public IObjectGraphType GetParentType(ISchema schema)
