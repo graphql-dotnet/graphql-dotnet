@@ -31,7 +31,7 @@ You can override the method to have it return an instance of any appropriate typ
 Below is a sample which sets a default value for an unsupplied field (this could be done with a default
 value set on the field, of course) and converts the name to uppercase:
 
-```cs
+```csharp
 public class HumanInputType : InputObjectGraphType
 {
     public HumanInputType()
