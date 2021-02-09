@@ -154,7 +154,33 @@ namespace GraphQL.Utilities
         // Directive types have the potential to be invalid if incorrectly defined.
         public override void VisitDirective(DirectiveGraphType directive, ISchema schema)
         {
-            //TODO:
+            if (directive.Locations.Count == 0)
+                throw new InvalidOperationException($"Directive '{directive.Name}' must have locations");
+
+            // 1. A directive definition must not contain the use of a directive which references itself directly.
+            // TODO:
+
+            // 2. A directive definition must not contain the use of a directive which references itself indirectly
+            // by referencing a Type or Directive which transitively includes a reference to this directive.
+            // TODO:
+
+            // 3
+            if (directive.Name.StartsWith("__"))
+                throw new InvalidOperationException($"The directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+
+            if (directive.Arguments?.Count > 0)
+            {
+                foreach (var argument in directive.Arguments.List)
+                {
+                    // 4.1
+                    if (argument.Name.StartsWith("__"))
+                        throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+
+                    // 4.2
+                    if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
+                        throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type.");
+                }
+            }
         }
     }
 }
