@@ -31,9 +31,8 @@ by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.
 
 ## Documentation
 
-http://graphql-dotnet.github.io
-
-This site is in sync with `master` branch.
+1. http://graphql-dotnet.github.io - documentation site that is built from the [docs](/docs2/site/) folder in the `master` branch.
+2. https://graphql.org/learn - learn about GraphQL, how it works, and how to use it.
 
 ## Installation
 
