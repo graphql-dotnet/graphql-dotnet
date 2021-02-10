@@ -808,6 +808,7 @@ scalar Uri"
                     Name = "Root"
                 }
             };
+            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
             var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 

@@ -2600,6 +2600,16 @@ namespace GraphQL.Utilities
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }
     }
+    public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public SchemaValidationVisitor() { }
+        public override void VisitDirective(GraphQL.Types.DirectiveGraphType directive, GraphQL.Types.ISchema schema) { }
+        public override void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterface(GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.ISchema schema) { }
+        public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitUnion(GraphQL.Types.UnionGraphType union, GraphQL.Types.ISchema schema) { }
+    }
     public static class StringUtils
     {
         public static int DamerauLevenshteinDistance(string source, string target, int threshold) { }

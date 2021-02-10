@@ -410,10 +410,18 @@ namespace GraphQL.Tests.Types
 
     public class WithoutIsTypeOf1Type : ObjectGraphType
     {
+        public WithoutIsTypeOf1Type()
+        {
+            Field<StringGraphType>("unused");
+        }
     }
 
     public class WithoutIsTypeOf2Type : ObjectGraphType
     {
+        public WithoutIsTypeOf2Type()
+        {
+            Field<StringGraphType>("unused");
+        }
     }
 
     public class SimpleCycleSchema : Schema
