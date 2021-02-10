@@ -1,5 +1,8 @@
+using System.Linq;
+using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -17,6 +20,35 @@ namespace GraphQL.Tests.Bugs
                 }";
 
             AssertQuerySuccess(query, @"{ ""bytes"": { ""bytes"": [1, 2, 3, 4] } }", @"{ ""bytesHolder"": { ""bytes"": [1, 2, 3, 4] } }".ToInputs());
+        }
+
+        [Fact]
+        public void string_should_work()
+        {
+            var query = @"
+                query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
+                    bytes64(bytesObject: $bytesHolder) {
+                        bytes
+                    }
+                }";
+
+            var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+            AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }", (@"{ ""bytesHolder"": { ""bytes"": """ + str1234 + @""" } }").ToInputs());
+        }
+
+        [Fact]
+        public void string_literal_should_work()
+        {
+            var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+
+            var query = @"
+                query BytesRequest {
+                    bytes64(bytesObject: { bytes: """ + str1234 + @"""}) {
+                        bytes
+                    }
+                }";
+
+            AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }");
         }
     }
 
@@ -38,6 +70,17 @@ namespace GraphQL.Tests.Bugs
                 resolve: context =>
                 {
                     var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
+                    return bytesObject;
+                }
+            );
+
+            Field<Issue1874Output64BytesType>(
+                "bytes64",
+                arguments: new QueryArguments(new QueryArgument<Issue1874Input64BytesType> { Name = "bytesObject" }),
+                resolve: context =>
+                {
+                    var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
+                    bytesObject.Bytes.ShouldBe(new byte[] { 1, 2, 3, 4 });
                     return bytesObject;
                 }
             );
@@ -63,5 +106,33 @@ namespace GraphQL.Tests.Bugs
         {
             Field(x => x.Bytes);
         }
+    }
+
+    public class Issue1874Output64BytesType : ObjectGraphType<Issue1874BytesHolder>
+    {
+        public Issue1874Output64BytesType()
+        {
+            Field(x => x.Bytes, type: typeof(Issue1874Base64GraphType));
+        }
+    }
+
+    public class Issue1874Input64BytesType : InputObjectGraphType<Issue1874BytesHolder>
+    {
+        public Issue1874Input64BytesType()
+        {
+            Field(x => x.Bytes, type: typeof(Issue1874Base64GraphType));
+        }
+    }
+
+    public class Issue1874Base64GraphType : ScalarGraphType
+    {
+        public override object ParseLiteral(IValue value)
+            => System.Convert.FromBase64String(value.Value.ToString());
+
+        public override object ParseValue(object value)
+            => System.Convert.FromBase64String(value.ToString());
+
+        public override object Serialize(object value)
+            => System.Convert.ToBase64String(value is byte[] valueBytes ? valueBytes : ((System.Collections.Generic.IEnumerable<byte>)value).ToArray());
     }
 }
