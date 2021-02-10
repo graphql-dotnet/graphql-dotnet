@@ -4,7 +4,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class Bug11874 : QueryTestBase<Bug11874Schema>
+    public class Issue1874 : QueryTestBase<Bug11874Schema>
     {
         [Fact]
         public void duplicated_type_names_should_throw_error()
