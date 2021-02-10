@@ -4,13 +4,13 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class Issue1874 : QueryTestBase<Bug1874Schema>
+    public class Issue1874 : QueryTestBase<Issue1874Schema>
     {
         [Fact]
-        public void duplicated_type_names_should_throw_error()
+        public void byte_array_should_work()
         {
             var query = @"
-                query BytesRequest($bytesHolder: InputBytesType) {
+                query BytesRequest($bytesHolder: Issue1874InputBytesType) {
                     bytes(bytesObject: $bytesHolder) {
                         bytes
                     }
@@ -20,46 +20,46 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug1874Schema : Schema
+    public class Issue1874Schema : Schema
     {
-        public Bug1874Schema()
+        public Issue1874Schema()
         {
-            Query = new Bug1874Query();
+            Query = new Issue1874Query();
         }
     }
 
-    public class Bug1874Query : ObjectGraphType
+    public class Issue1874Query : ObjectGraphType
     {
-        public Bug1874Query()
+        public Issue1874Query()
         {
-            Field<Bug1874OutputBytesType>(
+            Field<Issue1874OutputBytesType>(
                 "bytes",
-                arguments: new QueryArguments(new QueryArgument<Bug1874InputBytesType> { Name = "bytesObject" }),
+                arguments: new QueryArguments(new QueryArgument<Issue1874InputBytesType> { Name = "bytesObject" }),
                 resolve: context =>
                 {
-                    var bytesObject = context.GetArgument<Bug1874BytesHolder>("bytesObject");
+                    var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
                     return bytesObject;
                 }
             );
         }
     }
 
-    public class Bug1874BytesHolder
+    public class Issue1874BytesHolder
     {
         public byte[] Bytes { get; set; }
     }
 
-    public class Bug1874OutputBytesType : ObjectGraphType<Bug1874BytesHolder>
+    public class Issue1874OutputBytesType : ObjectGraphType<Issue1874BytesHolder>
     {
-        public Bug1874OutputBytesType()
+        public Issue1874OutputBytesType()
         {
             Field(x => x.Bytes);
         }
     }
 
-    public class Bug1874InputBytesType : InputObjectGraphType<Bug1874BytesHolder>
+    public class Issue1874InputBytesType : InputObjectGraphType<Issue1874BytesHolder>
     {
-        public Bug1874InputBytesType()
+        public Issue1874InputBytesType()
         {
             Field(x => x.Bytes);
         }
