@@ -4,7 +4,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class Issue1874 : QueryTestBase<Bug11874Schema>
+    public class Issue1874 : QueryTestBase<Bug1874Schema>
     {
         [Fact]
         public void duplicated_type_names_should_throw_error()
@@ -20,46 +20,46 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug11874Schema : Schema
+    public class Bug1874Schema : Schema
     {
-        public Bug11874Schema()
+        public Bug1874Schema()
         {
-            Query = new DemoQuery();
+            Query = new Bug1874Query();
         }
     }
 
-    public class DemoQuery : ObjectGraphType
+    public class Bug1874Query : ObjectGraphType
     {
-        public DemoQuery()
+        public Bug1874Query()
         {
-            Field<OutputBytesType>(
+            Field<Bug1874OutputBytesType>(
                 "bytes",
-                arguments: new QueryArguments(new QueryArgument<InputBytesType> { Name = "bytesObject" }),
+                arguments: new QueryArguments(new QueryArgument<Bug1874InputBytesType> { Name = "bytesObject" }),
                 resolve: context =>
                 {
-                    var bytesObject = context.GetArgument<BytesHolder>("bytesObject");
+                    var bytesObject = context.GetArgument<Bug1874BytesHolder>("bytesObject");
                     return bytesObject;
                 }
             );
         }
     }
 
-    public class BytesHolder
+    public class Bug1874BytesHolder
     {
         public byte[] Bytes { get; set; }
     }
 
-    public class OutputBytesType : ObjectGraphType<BytesHolder>
+    public class Bug1874OutputBytesType : ObjectGraphType<Bug1874BytesHolder>
     {
-        public OutputBytesType()
+        public Bug1874OutputBytesType()
         {
             Field(x => x.Bytes);
         }
     }
 
-    public class InputBytesType : InputObjectGraphType<BytesHolder>
+    public class Bug1874InputBytesType : InputObjectGraphType<Bug1874BytesHolder>
     {
-        public InputBytesType()
+        public Bug1874InputBytesType()
         {
             Field(x => x.Bytes);
         }
