@@ -4,7 +4,10 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    internal sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
+    /// <summary>
+    /// Validates the schema as required by the official specification.
+    /// </summary>
+    public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         internal static readonly SchemaValidationVisitor Instance = new SchemaValidationVisitor();
 
