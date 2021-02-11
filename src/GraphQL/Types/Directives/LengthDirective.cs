@@ -1,9 +1,16 @@
 using System;
+using GraphQL.Validation.Rules;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// Used to specify the minimum and/or maximum length for an input field or argument.
+    /// <br/><br/>
+    /// When applied to argument or input field, this directive itself does not check anything. It only
+    /// declares the necessary requirements and these requirements will be visible in introspection if
+    /// <see cref="ExperimentalFeatures.AppliedDirectives">ExperimentalFeatures.AppliedDirectives</see>
+    /// feature is enabled on schema. Use <see cref="InputFieldsAndArgumentsOfCorrectLength"/> validation
+    /// rule if you want to enable checking for the length of arguments and input fields.
     /// </summary>
     public class LengthDirective : DirectiveGraphType
     {
