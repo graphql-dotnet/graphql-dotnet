@@ -58,7 +58,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 Document = new Document(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>() { { "1", new object() } },
-                FieldAst = new Field(),
+                FieldAst = new Field(default, default),
                 FieldDefinition = new FieldType(),
                 FieldName = "test",
                 Fragments = new Fragments(),
