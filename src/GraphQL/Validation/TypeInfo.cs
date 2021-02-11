@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -36,6 +37,9 @@ namespace GraphQL.Validation
             }
             else
             {
+                if (index >= from.Count)
+                    throw new InvalidOperationException($"Stack contains only {from.Count} items");
+
                 var e = from.GetEnumerator();
 
                 int i = index;
@@ -45,7 +49,7 @@ namespace GraphQL.Validation
                 }
                 while (i-- > 0);
 
-                return e.Current; // throws if index is out of range
+                return e.Current;
             }
         }
 
@@ -58,21 +62,25 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns the last graph type matched, or null if none.
         /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetLastType(int index = 0) => PeekElement(_typeStack, index);
 
         /// <summary>
         /// Returns the last input graph type matched, or null if none.
         /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
 
         /// <summary>
         /// Returns the parent graph type of the current node, or null if none.
         /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
 
         /// <summary>
         /// Returns the last field type matched, or null if none.
         /// </summary>
+        /// <param name="index">Index of the field; 0 for the top-most field, 1 for the direct ancestor and so on.</param>
         public FieldType GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
 
         /// <summary>
