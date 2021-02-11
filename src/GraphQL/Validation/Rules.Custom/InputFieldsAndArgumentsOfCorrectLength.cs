@@ -11,7 +11,10 @@ namespace GraphQL.Validation.Rules
     /// arguments that marked with <see cref="LengthDirective"/> directive. Doesn't check default values.
     ///
     /// <br/><br/>
-    /// This is not a standard validation rule that is not in the specification.
+    /// This is not a standard validation rule that is not in the official specification. Note that this
+    /// rule will be required to run on cached queries also since it works with request variables, so
+    /// <see cref="ExecutionOptions.CachedDocumentValidationRules">ExecutionOptions.CachedDocumentValidationRules</see>
+    /// needs to be set as well (if using caching).
     /// </summary>
     public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule
     {
