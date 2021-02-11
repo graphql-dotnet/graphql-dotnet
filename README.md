@@ -31,9 +31,14 @@ by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.
 
 ## Documentation
 
-http://graphql-dotnet.github.io
+1. http://graphql-dotnet.github.io - documentation site that is built from the [docs](/docs2/site/) folder in the `master` branch.
+2. https://graphql.org/learn - learn about GraphQL, how it works, and how to use it.
 
-This site is in sync with `master` branch.
+## Debugging
+
+All packages generated from this repository come with embedded pdb and support [Source Link](https://github.com/dotnet/sourcelink).
+If you are having difficulty understanding how the code works or have encountered an error, then it is just enough to enable
+Source Link in your IDE settings. Then you can debug GraphQL.NET source code as if it were part of your project.
 
 ## Installation
 

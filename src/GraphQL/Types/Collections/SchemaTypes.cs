@@ -412,6 +412,9 @@ namespace GraphQL.Types
 
             if (field.ResolvedType == null)
             {
+                if (field.Type == null)
+                    throw new InvalidOperationException($"Both ResolvedType and Type properties on field '{parentType?.Name}.{field.Name}' are null.");
+
                 AddTypeIfNotRegistered(field.Type, context);
                 field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
             }

@@ -294,7 +294,7 @@ namespace GraphQL.Utilities
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType),
                 ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
-                EnumerationGraphType enumeration => enumeration.Serialize(value).ToString(),
+                EnumerationGraphType enumeration => (enumeration.Serialize(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unknown value '{value}' for enumeration '{enumeration.Name}'")).ToString(),
                 ScalarGraphType _ => value switch
                 {
                     string s => $"\"{s}\"",

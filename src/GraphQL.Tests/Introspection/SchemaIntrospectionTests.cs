@@ -48,34 +48,7 @@ namespace GraphQL.Tests.Introspection
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
-            ShouldBe(json, "IntrospectionResult".ReadJsonResult());
-        }
-
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema_doesnt_use_nameconverter(IDocumentWriter documentWriter)
-        {
-            var documentExecuter = new DocumentExecuter();
-            var executionResult = await documentExecuter.ExecuteAsync(_ =>
-            {
-                _.Schema = new Schema
-                {
-                    Query = new TestQuery(),
-                    NameConverter = new TestNameConverter(),
-                };
-                _.Query = "IntrospectionQuery".ReadGraphQLRequest();
-            });
-
-            var json = await documentWriter.WriteToStringAsync(executionResult);
-
-            ShouldBe(json, "IntrospectionResult".ReadJsonResult());
-        }
-
-        public class TestNameConverter : INameConverter
-        {
-            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => throw new Exception();
-
-            public string NameForField(string fieldName, IComplexGraphType parentGraphType) => throw new Exception();
+            ShouldBe(json, "IntrospectionResult".ReadJsonResult().Replace("\"test\"", "\"Test\""));
         }
 
         public class TestQuery : ObjectGraphType
@@ -83,6 +56,7 @@ namespace GraphQL.Tests.Introspection
             public TestQuery()
             {
                 Name = "TestQuery";
+                Field<StringGraphType>("test");
             }
         }
 
