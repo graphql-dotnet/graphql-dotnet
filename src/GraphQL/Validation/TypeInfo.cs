@@ -28,43 +28,52 @@ namespace GraphQL.Validation
             _schema = schema;
         }
 
+        private static T PeekElement<T>(Stack<T> from, int index)
+        {
+            if (index == 0)
+            {
+                return from.Count > 0 ? from.Peek() : default;
+            }
+            else
+            {
+                var e = from.GetEnumerator();
+
+                int i = index;
+                do
+                {
+                    _ = e.MoveNext();
+                }
+                while (i-- > 0);
+
+                return e.Current; // throws if index is out of range
+            }
+        }
+
         /// <summary>
         /// Returns an ancestor of the current node.
         /// </summary>
         /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
-        public INode GetAncestor(int index)
-        {
-            var e = _ancestorStack.GetEnumerator();
-
-            int i = index;
-            do
-            {
-                _ = e.MoveNext();
-            }
-            while (i-- > 0);
-
-            return e.Current; // throws if index is out of range
-        }
+        public INode GetAncestor(int index) => PeekElement(_ancestorStack, index);
 
         /// <summary>
         /// Returns the last graph type matched, or null if none.
         /// </summary>
-        public IGraphType GetLastType() => _typeStack.Count > 0 ? _typeStack.Peek() : null;
+        public IGraphType GetLastType(int index = 0) => PeekElement(_typeStack, index);
 
         /// <summary>
         /// Returns the last input graph type matched, or null if none.
         /// </summary>
-        public IGraphType GetInputType() => _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
+        public IGraphType GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
 
         /// <summary>
         /// Returns the parent graph type of the current node, or null if none.
         /// </summary>
-        public IGraphType GetParentType() => _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
+        public IGraphType GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
 
         /// <summary>
         /// Returns the last field type matched, or null if none.
         /// </summary>
-        public FieldType GetFieldDef() => _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
+        public FieldType GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
 
         /// <summary>
         /// Returns the last directive specified, or null if none.

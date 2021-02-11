@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Validation
 
             config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules);
+            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Inputs);
 
             result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
             result.Errors.Count.ShouldBe(
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Validation
 
             config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules);
+            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Inputs);
             var message = "";
             if (result.Errors?.Any() == true)
             {
@@ -86,12 +86,12 @@ namespace GraphQL.Tests.Validation
             result.IsValid.ShouldBeTrue(message);
         }
 
-        private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules)
+        private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules, Inputs inputs)
         {
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.ValidateAsync(query, schema, document, rules).Result;
+            return validator.ValidateAsync(query, schema, document, rules, inputs: inputs).Result;
         }
     }
 }

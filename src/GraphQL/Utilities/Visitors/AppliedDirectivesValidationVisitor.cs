@@ -37,13 +37,19 @@ namespace GraphQL.Utilities
 
         public void VisitUnion(UnionGraphType union, ISchema schema) => ValidateAppliedDirectives(union, schema, DirectiveLocation.Union);
 
-        private void ValidateAppliedDirectives(IProvideMetadata provider, ISchema schema, DirectiveLocation? location) //TODO: add check for argument value type
+        private void ValidateAppliedDirectives(IProvideMetadata provider, ISchema schema, DirectiveLocation? location)
         {
             if (provider.HasAppliedDirectives())
             {
-                var applied = provider.GetAppliedDirectives().List;
+                var appliedDirectives = provider.GetAppliedDirectives().List;
 
-                foreach (var appliedDirective in applied)
+                foreach (var directive in schema.Directives.List)
+                {
+                    if (!directive.Repeatable && appliedDirectives.Count(applied => applied.Name == directive.Name) > 1)
+                        throw new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to element '{provider.GetType().Name}' more than one time.");
+                }
+
+                foreach (var appliedDirective in appliedDirectives)
                 {
                     var schemaDirective = schema.Directives.Find(appliedDirective.Name);
                     if (schemaDirective == null)
@@ -56,8 +62,15 @@ namespace GraphQL.Utilities
                     {
                         foreach (var arg in schemaDirective.Arguments.List)
                         {
-                            if (arg.DefaultValue == null && appliedDirective.FindArgument(arg.Name) == null)
+                            var a = appliedDirective.FindArgument(arg.Name);
+                            if (arg.DefaultValue == null && a == null)
                                 throw new InvalidOperationException($"Directive '{appliedDirective.Name}' must specify required argument '{arg.Name}'.");
+
+                            if (a != null)
+                            {
+                                //TODO: add check for applied directive argument value type
+                                //a.Value should be of arg.ResolvedType / arg.Type
+                            }
                         }
                     }
 
@@ -69,12 +82,8 @@ namespace GraphQL.Utilities
                                 throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}'.");
                         }
                     }
-                }
 
-                foreach (var directive in schema.Directives.List)
-                {
-                    if (!directive.Repeatable && applied.Count(applied => applied.Name == directive.Name) > 1)
-                        throw new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to element '{provider.GetType().Name}' more than one time.");
+                    schemaDirective.Validate(appliedDirective);
                 }
             }
         }

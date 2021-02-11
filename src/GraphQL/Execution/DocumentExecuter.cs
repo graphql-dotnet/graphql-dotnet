@@ -9,7 +9,6 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
-using static GraphQL.Execution.ExecutionHelper;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
@@ -329,7 +328,7 @@ namespace GraphQL
                 UserContext = userContext,
 
                 Operation = operation,
-                Variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs),
+                Variables = inputs == null ? null : ExecutionHelper.GetVariableValues(document, schema, operation?.Variables, inputs),
                 Fragments = document.Fragments,
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>(),

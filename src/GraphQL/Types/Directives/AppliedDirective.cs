@@ -44,12 +44,14 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds an argument to the directive.
         /// </summary>
-        public void AddArgument(DirectiveArgument argument)
+        public AppliedDirective AddArgument(DirectiveArgument argument)
         {
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
             (Arguments ??= new List<DirectiveArgument>()).Add(argument);
+
+            return this;
         }
 
         /// <summary>

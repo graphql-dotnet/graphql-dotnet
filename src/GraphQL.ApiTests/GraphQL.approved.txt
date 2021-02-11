@@ -30,6 +30,8 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object argument1Value, string argument2Name, object argument2Value)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Types.AppliedDirectives GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
     }
@@ -1169,14 +1171,13 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
         public virtual void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class Argument : GraphQL.Language.AST.AbstractNode
+    public class Argument : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveValue, GraphQL.Language.AST.INode
     {
-        public Argument() { }
-        public Argument(GraphQL.Language.AST.NameNode name) { }
+        public Argument(GraphQL.Language.AST.NameNode name, GraphQL.Language.AST.IValue value) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        public GraphQL.Language.AST.IValue Value { get; set; }
+        public GraphQL.Language.AST.IValue Value { get; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
@@ -1220,13 +1221,13 @@ namespace GraphQL.Language.AST
     {
         public DecimalValue(decimal value) { }
     }
-    public class Directive : GraphQL.Language.AST.AbstractNode
+    public class Directive : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode
     {
         public Directive(GraphQL.Language.AST.NameNode node) { }
         public GraphQL.Language.AST.Arguments Arguments { get; set; }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public string Name { get; }
-        public GraphQL.Language.AST.NameNode NameNode { get; set; }
+        public GraphQL.Language.AST.NameNode NameNode { get; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
@@ -1266,9 +1267,8 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public override string ToString() { }
     }
-    public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
+    public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
-        public Field() { }
         public Field(GraphQL.Language.AST.NameNode alias, GraphQL.Language.AST.NameNode name) { }
         public string Alias { get; set; }
         public GraphQL.Language.AST.NameNode AliasNode { get; }
@@ -1291,7 +1291,7 @@ namespace GraphQL.Language.AST
     {
         public FloatValue(double value) { }
     }
-    public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
+    public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public FragmentDefinition(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1303,7 +1303,7 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
+    public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public FragmentSpread(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1325,11 +1325,19 @@ namespace GraphQL.Language.AST
     {
         public GuidValue(System.Guid value) { }
     }
-    public interface IDefinition : GraphQL.Language.AST.INode { }
+    public interface IDefinition : GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode { }
     public interface IFragment : GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection { }
+    public interface IHaveName : GraphQL.Language.AST.INode
+    {
+        GraphQL.Language.AST.NameNode NameNode { get; }
+    }
     public interface IHaveSelectionSet : GraphQL.Language.AST.INode
     {
         GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
+    }
+    public interface IHaveValue : GraphQL.Language.AST.INode
+    {
+        GraphQL.Language.AST.IValue Value { get; }
     }
     public interface INode
     {
@@ -1391,7 +1399,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; }
         public void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class NamedType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
+    public class NamedType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
     {
         public NamedType(GraphQL.Language.AST.NameNode node) { }
         public string Name { get; }
@@ -1411,7 +1419,7 @@ namespace GraphQL.Language.AST
         public NullValue() { }
         public override string ToString() { }
     }
-    public class ObjectField : GraphQL.Language.AST.AbstractNode
+    public class ObjectField : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveValue, GraphQL.Language.AST.INode
     {
         public ObjectField(GraphQL.Language.AST.NameNode name, GraphQL.Language.AST.IValue value) { }
         public ObjectField(string name, GraphQL.Language.AST.IValue value) { }
@@ -1434,7 +1442,7 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
+    public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public Operation(GraphQL.Language.AST.NameNode name) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1528,14 +1536,13 @@ namespace GraphQL.Language.AST
         public object Value { get; set; }
         public bool ValueSpecified { get; }
     }
-    public class VariableDefinition : GraphQL.Language.AST.AbstractNode
+    public class VariableDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode
     {
-        public VariableDefinition() { }
         public VariableDefinition(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IValue DefaultValue { get; set; }
         public string Name { get; }
-        public GraphQL.Language.AST.NameNode NameNode { get; set; }
+        public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.IType Type { get; set; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
@@ -1714,7 +1721,7 @@ namespace GraphQL.Types
         public AppliedDirective(string name) { }
         public int ArgumentsCount { get; }
         public string Name { get; set; }
-        public void AddArgument(GraphQL.Types.DirectiveArgument argument) { }
+        public GraphQL.Types.AppliedDirective AddArgument(GraphQL.Types.DirectiveArgument argument) { }
         public GraphQL.Types.DirectiveArgument FindArgument(string argumentName) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveArgument> GetEnumerator() { }
     }
@@ -1840,6 +1847,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.List<GraphQL.Types.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
         public bool Repeatable { get; set; }
+        public virtual void Validate(GraphQL.Types.AppliedDirective applied) { }
     }
     public enum DirectiveLocation
     {
@@ -2093,6 +2101,12 @@ namespace GraphQL.Types
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
+    }
+    public class LengthDirective : GraphQL.Types.DirectiveGraphType
+    {
+        public LengthDirective() { }
+        public override bool? Introspectable { get; }
+        public override void Validate(GraphQL.Types.AppliedDirective applied) { }
     }
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
@@ -2762,10 +2776,10 @@ namespace GraphQL.Validation
         public GraphQL.Language.AST.INode GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument GetArgument() { }
         public GraphQL.Types.DirectiveGraphType GetDirective() { }
-        public GraphQL.Types.FieldType GetFieldDef() { }
-        public GraphQL.Types.IGraphType GetInputType() { }
-        public GraphQL.Types.IGraphType GetLastType() { }
-        public GraphQL.Types.IGraphType GetParentType() { }
+        public GraphQL.Types.FieldType GetFieldDef(int index = 0) { }
+        public GraphQL.Types.IGraphType GetInputType(int index = 0) { }
+        public GraphQL.Types.IGraphType GetLastType(int index = 0) { }
+        public GraphQL.Types.IGraphType GetParentType(int index = 0) { }
         public void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
@@ -2861,6 +2875,11 @@ namespace GraphQL.Validation.Errors
     {
         public FragmentsOnCompositeTypesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentDefinition node) { }
         public FragmentsOnCompositeTypesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.InlineFragment node) { }
+    }
+    [System.Serializable]
+    public class InputFieldsAndArgumentsOfCorrectLengthError : GraphQL.Validation.ValidationError
+    {
+        public InputFieldsAndArgumentsOfCorrectLengthError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.INode node, int? length, int? min, int? max) { }
     }
     [System.Serializable]
     public class KnownArgumentNamesError : GraphQL.Validation.ValidationError
@@ -3002,6 +3021,12 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.FragmentsOnCompositeTypes Instance;
         public FragmentsOnCompositeTypes() { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+    }
+    public class InputFieldsAndArgumentsOfCorrectLength : GraphQL.Validation.IValidationRule
+    {
+        public static readonly GraphQL.Validation.Rules.InputFieldsAndArgumentsOfCorrectLength Instance;
+        public InputFieldsAndArgumentsOfCorrectLength() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class KnownArgumentNames : GraphQL.Validation.IValidationRule

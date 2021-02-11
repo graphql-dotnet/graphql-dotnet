@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Subscription;
 using GraphQL.Types;
-using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
 {
@@ -18,7 +17,7 @@ namespace GraphQL.Execution
 
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
@@ -51,7 +50,7 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var arguments = GetArgumentValues(
+            var arguments = ExecutionHelper.GetArgumentValues(
                 node.FieldDefinition.Arguments,
                 node.Field.Arguments,
                 context.Variables);

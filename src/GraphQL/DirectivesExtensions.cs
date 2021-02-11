@@ -13,12 +13,13 @@ namespace GraphQL
 
         /// <summary>
         /// Indicates whether provider has any applied directives.
+        /// Note that built-in @deprecated directive is not taken into account and ignored.
         /// </summary>
         public static bool HasAppliedDirectives(this IProvideMetadata provider) => provider.HasMetadata(DIRECTIVES_KEY);
 
         /// <summary>
-        /// Provides all directives applied to this provider if any.
-        /// Otherwise returns <see langword="null"/>.
+        /// Provides all directives applied to this provider if any. Otherwise returns <see langword="null"/>.
+        /// Note that built-in @deprecated directive is not taken into account and ignored.
         /// </summary>
         public static AppliedDirectives GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
 
@@ -48,7 +49,28 @@ namespace GraphQL
         /// <param name="argumentValue">Argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
-            where TMetadataProvider : IProvideMetadata => provider.ApplyDirective(name, directive => directive.AddArgument(new DirectiveArgument(argumentName) { Value = argumentValue }));
+            where TMetadataProvider : IProvideMetadata
+            => provider.ApplyDirective(name, directive => directive.AddArgument(new DirectiveArgument(argumentName) { Value = argumentValue }));
+
+        /// <summary>
+        /// Apply directive specifying two arguments. If the directive declaration has other arguments,
+        /// then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argument1Name">First argument name.</param>
+        /// <param name="argument1Value">First argument value.</param>
+        /// <param name="argument2Name">Second argument name.</param>
+        /// <param name="argument2Value">Second argument value.</param>
+        /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object argument1Value, string argument2Name, object argument2Value)
+            where TMetadataProvider : IProvideMetadata
+            => provider.ApplyDirective(name, directive => directive
+                                                .AddArgument(new DirectiveArgument(argument1Name) { Value = argument1Value })
+                                                .AddArgument(new DirectiveArgument(argument2Name) { Value = argument2Value }));
 
         /// <summary>
         /// Apply directive with configuration delegate.
