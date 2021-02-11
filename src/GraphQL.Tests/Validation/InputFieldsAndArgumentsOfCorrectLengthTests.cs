@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.SystemTextJson;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -6,7 +7,7 @@ namespace GraphQL.Tests.Validation
 {
     public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<InputFieldsAndArgumentsOfCorrectLength, ValidationSchema>
     {
-        // INPUT FIELD
+        // SCALAR INPUT FIELD (LITERAL + VARIABLE TESTS)
 
         [Fact]
         public void good_literal_input_field_length()
@@ -145,7 +146,81 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        // ARGUMENT
+        // COMPLEX INPUT FIELD (VARIABLE TESTS ONLY)
+
+        [Fact]
+        public void good_variable_input_complex_field_length()
+        {
+            ShouldPassRule(_ =>
+            {
+                _.Query = @"query q($complex: ComplexInput!)
+                {
+                  complicatedArgs {
+                    complexArgField(complexArg: $complex)
+                  }
+                }";
+                _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aaaa"" } }".ToInputs();
+            });
+        }
+
+        [Fact]
+        public void below_min_variable_input_complex_field_length()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"query q($complex: ComplexInput!)
+                {
+                  complicatedArgs {
+                    complexArgField(complexArg: $complex)
+                  }
+                }";
+                _.Error(
+                   message: "Variable \"complex.stringField\" has invalid length (2). Length must be in range [3, 7].",
+                   line: 1,
+                   column: 9);
+                _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aa"" } }".ToInputs();
+            });
+        }
+
+        [Fact]
+        public void above_max_variable_input_complex_field_length()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"query q($complex: ComplexInput!)
+                {
+                  complicatedArgs {
+                    complexArgField(complexArg: $complex)
+                  }
+                }";
+                _.Error(
+                   message: "Variable \"complex.stringField\" has invalid length (8). Length must be in range [3, 7].",
+                   line: 1,
+                   column: 9);
+                _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aaaaaaaa"" } }".ToInputs();
+            });
+        }
+
+        [Fact]
+        public void null_variable_input_complex_field_length()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"query q($complex: ComplexInput!)
+                {
+                  complicatedArgs {
+                    complexArgField(complexArg: $complex)
+                  }
+                }";
+                _.Error(
+                   message: "Variable \"complex.stringField\" has invalid length (null). Length must be in range [3, 7].",
+                   line: 1,
+                   column: 9);
+                _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": null } }".ToInputs();
+            });
+        }
+
+        // ARGUMENT (LITERAL + VARIABLE TESTS)
 
         [Fact]
         public void good_literal_argument_length()

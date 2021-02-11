@@ -74,7 +74,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Inputs"/> object.
         /// </summary>
-        public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
+        public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs, IVariableVisitor visitor = null)
         {
             if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
@@ -107,7 +107,7 @@ namespace GraphQL.Execution
                     if (inputs.TryGetValue(variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
-                        variable.Value = GetVariableValue(document, graphType, variableDef, variableValue);
+                        variable.Value = GetVariableValue(document, graphType, variableDef, variableValue, visitor);
                     }
                     else if (variableDef.DefaultValue != null)
                     {
@@ -136,36 +136,6 @@ namespace GraphQL.Execution
         private static void ThrowNullError(string variableName)
             => throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
 
-        private struct VariableName
-        {
-            public VariableName(VariableName variableName, int index)
-            {
-                Name = variableName;
-                Index = index;
-                ChildName = null;
-            }
-            public VariableName(VariableName variableName, string childName)
-            {
-                if (variableName.ChildName == null)
-                {
-                    Name = variableName.Name;
-                    Index = variableName.Index;
-                }
-                else
-                {
-                    Name = variableName;
-                    Index = default;
-                }
-                ChildName = childName;
-            }
-            public string Name { get; set; }
-            public int? Index { get; set; }
-            public string ChildName { get; set; }
-            public override string ToString() => (!Index.HasValue ? Name : Name + "[" + Index.Value + "]") + (ChildName != null ? '.' + ChildName : null);
-            public static implicit operator VariableName(string name) => new VariableName { Name = name };
-            public static implicit operator string(VariableName variableName) => variableName.ToString();
-        }
-
         /// <summary>
         /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
         /// <br/><br/>
@@ -175,11 +145,11 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        private static object GetVariableValue(Document document, IGraphType graphType, VariableDefinition variable, object input)
+        private static object GetVariableValue(Document document, IGraphType graphType, VariableDefinition variable, object input, IVariableVisitor visitor)
         {
             try
             {
-                return ParseValue(graphType, variable.Name, input);
+                return ParseValue(graphType, variable, variable.Name, input, visitor);
             }
             catch (InvalidVariableError error)
             {
@@ -188,26 +158,32 @@ namespace GraphQL.Execution
             }
 
             // Coerces a value depending on the graph type.
-            static object ParseValue(IGraphType type, VariableName variableName, object value)
+            static object ParseValue(IGraphType type, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    return ParseValueObject(inputObjectGraphType, variableName, value);
+                    var parsedValue = ParseValueObject(inputObjectGraphType, variable, variableName, value, visitor);
+                    visitor?.VisitObject(variable, variableName, inputObjectGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
                     if (value == null)
                         ThrowNullError(variableName);
 
-                    return ParseValue(nonNullGraphType.ResolvedType, variableName, value);
+                    return ParseValue(nonNullGraphType.ResolvedType, variable, variableName, value, visitor);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
-                    return ParseValueList(listGraphType, variableName, value);
+                    var parsedValue = ParseValueList(listGraphType, variable, variableName, value, visitor);
+                    visitor?.VisitList(variable, variableName, listGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
-                    return ParseValueScalar(scalarGraphType, variableName, value);
+                    var parsedValue = ParseValueScalar(scalarGraphType, variableName, value);
+                    visitor?.VisitScalar(variable, variableName, scalarGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else
                 {
@@ -238,7 +214,7 @@ namespace GraphQL.Execution
                 return ret;
             }
 
-            static object ParseValueList(ListGraphType listGraphType, VariableName variableName, object value)
+            static object ParseValueList(ListGraphType listGraphType, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (value == null)
                     return null;
@@ -254,7 +230,7 @@ namespace GraphQL.Execution
                         for (int index = 0; index < list.Count; index++)
                         {
                             // parse/validate values as required by graph type
-                            valueOutputs[index] = ParseValue(listGraphType.ResolvedType, new VariableName(variableName, index), list[index]);
+                            valueOutputs[index] = ParseValue(listGraphType.ResolvedType, variable, new VariableName(variableName, index), list[index], visitor);
                         }
                         return valueOutputs;
                     }
@@ -265,7 +241,7 @@ namespace GraphQL.Execution
                         foreach (var val in values)
                         {
                             // parse/validate values as required by graph type
-                            valueOutputs.Add(ParseValue(listGraphType.ResolvedType, new VariableName(variableName, index++), val));
+                            valueOutputs.Add(ParseValue(listGraphType.ResolvedType, variable, new VariableName(variableName, index++), val, visitor));
                         }
                         return valueOutputs;
                     }
@@ -276,12 +252,12 @@ namespace GraphQL.Execution
                     // then the result of input coercion is a list of size one, where the single item value is the
                     // result of input coercion for the list’s item type on the provided value (note this may apply
                     // recursively for nested lists).
-                    var result = ParseValue(listGraphType.ResolvedType, variableName, value);
+                    var result = ParseValue(listGraphType.ResolvedType, variable, variableName, value, visitor);
                     return new object[] { result };
                 }
             }
 
-            static object ParseValueObject(IInputObjectGraphType graphType, VariableName variableName, object value)
+            static object ParseValueObject(IInputObjectGraphType graphType, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (value == null)
                     return null;
@@ -310,7 +286,9 @@ namespace GraphQL.Execution
 
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
-                        newDictionary[field.Name] = ParseValue(field.ResolvedType, childFieldVariableName, fieldValue);
+                        var parsedValue = ParseValue(field.ResolvedType, variable, childFieldVariableName, fieldValue, visitor);
+                        visitor?.VisitField(variable, childFieldVariableName, graphType, field, fieldValue, parsedValue);
+                        newDictionary[field.Name] = parsedValue;
                     }
                     else if (field.DefaultValue != null)
                     {
