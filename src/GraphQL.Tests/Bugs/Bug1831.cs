@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
                 Code = "KNOWN_TYPE_NAMES"
             };
             error2.AddLocation(1, 13);
-            var error3 = new ValidationError(null, "5.6.1",
+            var error3 = new ValidationError(null, "5.8",
                "Variable \u0027$arg\u0027 is invalid. Variable has unknown type \u0027abcdefg\u0027")
             {
                 Code = "INVALID_VALUE"

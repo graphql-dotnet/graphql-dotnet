@@ -9,7 +9,8 @@ namespace GraphQL.Validation
     [Serializable]
     public class InvalidVariableError : ValidationError
     {
-        private const string NUMBER = "5.6.1";
+        // The specification does not contain rules for validating the actual variables values, so the number of the entire section of the specification is used.
+        private const string NUMBER = "5.8";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidVariableError"/> class for a specified variable and error message.
