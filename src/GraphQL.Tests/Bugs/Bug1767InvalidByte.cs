@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Bugs
             ExecutionError error;
             if (number != null)
             {
-                error = exception == null ? new ValidationError(null, number, message) : new ValidationError(null, number, message,  exception);
+                error = exception == null ? new ValidationError(null, number, message) : new ValidationError(null, number, message, exception);
             }
             else
             {
