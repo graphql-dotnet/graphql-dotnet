@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
