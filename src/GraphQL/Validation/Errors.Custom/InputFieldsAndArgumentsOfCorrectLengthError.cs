@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Errors
     [Serializable]
     public class InputFieldsAndArgumentsOfCorrectLengthError : ValidationError
     {
-        internal const string NUMBER = "5.6.1";
+        private const string NUMBER = "5.6.1";
 
         /// <summary>
         /// Initializes a new instance with the specified properties.

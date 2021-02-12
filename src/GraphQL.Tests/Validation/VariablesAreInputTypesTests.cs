@@ -13,7 +13,8 @@ namespace GraphQL.Tests.Validation
               query Foo($a: String, $b: [Boolean!]!, $c: ComplexInput) {
                 field(a: $a, b: $b, c: $c)
               }
-            ");
+            ",
+            "{ \"b\": [true] }");
         }
 
         [Fact]
@@ -38,6 +39,10 @@ namespace GraphQL.Tests.Validation
                     message: VariablesAreInputTypesError.UndefinedVarMessage("c", "Pet"),
                     line: 2,
                     column: 58);
+                _.Error(
+                   message: "Variable '$b' is invalid. Received a null input for a non-null variable.",
+                   line: 2,
+                   column: 38);
             });
         }
     }

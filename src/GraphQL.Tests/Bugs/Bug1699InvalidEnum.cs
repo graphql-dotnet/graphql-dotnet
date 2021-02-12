@@ -79,10 +79,10 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_Valid_Default_Required_Variable() => AssertQuerySuccess("query($arg: Bug1699Enum! = GRUMPY) { input(arg: $arg) }", @"{ ""input"": ""Grumpy"" }", null);
 
         [Fact]
-        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}", executed: false);
+        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}", number: "5.6.1", executed: false);
 
         [Fact]
-        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}", executed: false);
+        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}", number: "5.6.1", executed: false);
 
         [Fact]
         public void Input_Enum_UndefinedDefault() => AssertQuerySuccess("{ input }", @"{ ""input"": ""Grumpy"" }");

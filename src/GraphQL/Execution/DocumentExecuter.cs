@@ -119,12 +119,14 @@ namespace GraphQL
                 }
 
                 IValidationResult validationResult;
+                Variables variables;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    validationResult = await _documentValidator.ValidateAsync(
+                    (validationResult, variables) = await _documentValidator.ValidateAsync(
                         options.Query,
                         options.Schema,
                         document,
+                        operation,
                         validationRules,
                         options.UserContext,
                         options.Inputs);
@@ -141,74 +143,31 @@ namespace GraphQL
                     _documentCache[options.Query] = document;
                 }
 
-                try
+                context = new ExecutionContext
                 {
-                    context = BuildExecutionContext(
-                        options.Schema,
-                        options.Root,
-                        document,
-                        operation,
-                        options.Inputs ?? Inputs.Empty,
-                        options.UserContext,
-                        options.CancellationToken,
-                        metrics,
-                        options.Listeners,
-                        options.ThrowOnUnhandledException,
-                        options.UnhandledExceptionDelegate,
-                        options.MaxParallelExecutionCount,
-                        options.RequestServices);
-                }
-                catch (InvalidVariableError)
-                {
-                    // error parsing variables
-                    // attempt to run AfterValidationAsync with null for the 'ExecutionContext.Variables' property
+                    Document = document,
+                    Schema = options.Schema,
+                    RootValue = options.Root,
+                    UserContext = options.UserContext,
 
-                    context = BuildExecutionContext(
-                        options.Schema,
-                        options.Root,
-                        document,
-                        operation,
-                        null,
-                        options.UserContext,
-                        options.CancellationToken,
-                        metrics,
-                        options.Listeners,
-                        options.ThrowOnUnhandledException,
-                        options.UnhandledExceptionDelegate,
-                        options.MaxParallelExecutionCount,
-                        options.RequestServices);
+                    Operation = operation,
+                    Variables = variables,
+                    Fragments = document.Fragments,
+                    Errors = new ExecutionErrors(),
+                    Extensions = new Dictionary<string, object>(),
+                    CancellationToken = options.CancellationToken,
 
-                    try
-                    {
-                        foreach (var listener in options.Listeners)
-                        {
-                            await listener.AfterValidationAsync(context, validationResult)
-                                .ConfigureAwait(false);
-                        }
-
-                        // if there was a validation error, return that, and ignore the variable parsing error
-                        if (!validationResult.IsValid)
-                        {
-                            return new ExecutionResult
-                            {
-                                Errors = validationResult.Errors,
-                                Perf = metrics.Finish()
-                            };
-                        }
-                    }
-                    catch
-                    {
-                        // if there was an error within AfterValidationAsync (such as a NullReferenceException
-                        // due to ExecutionContext.Variables being null), skip this step and throw the variable parsing error
-                    }
-
-                    // if there was no validation errors returned, throw the variable parsing error
-                    throw;
-                }
+                    Metrics = metrics,
+                    Listeners = options.Listeners,
+                    ThrowOnUnhandledException = options.ThrowOnUnhandledException,
+                    UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
+                    MaxParallelExecutionCount = options.MaxParallelExecutionCount,
+                    RequestServices = options.RequestServices
+                };
 
                 foreach (var listener in options.Listeners)
                 {
-                    await listener.AfterValidationAsync(context, validationResult)
+                    await listener.AfterValidationAsync(context, validationResult) // TODO: remove ExecutionContext or make different type ?
                         .ConfigureAwait(false);
                 }
 
@@ -235,11 +194,13 @@ namespace GraphQL
                 using (metrics.Subject("execution", "Executing operation"))
                 {
                     if (context.Listeners != null)
+                    {
                         foreach (var listener in context.Listeners)
                         {
                             await listener.BeforeExecutionAsync(context)
                                 .ConfigureAwait(false);
                         }
+                    }
 
                     IExecutionStrategy executionStrategy = SelectExecutionStrategy(context);
 
@@ -250,6 +211,7 @@ namespace GraphQL
                         .ConfigureAwait(false);
 
                     if (context.Listeners != null)
+                    {
                         foreach (var listener in context.Listeners)
                         {
 #pragma warning disable CS0612 // Type or member is obsolete
@@ -257,15 +219,18 @@ namespace GraphQL
 #pragma warning restore CS0612 // Type or member is obsolete
                                 .ConfigureAwait(false);
                         }
+                    }
 
                     result = await task;
 
                     if (context.Listeners != null)
+                    {
                         foreach (var listener in context.Listeners)
                         {
                             await listener.AfterExecutionAsync(context)
                                 .ConfigureAwait(false);
                         }
+                    }
                 }
 
                 result.AddErrors(context.Errors);
@@ -303,46 +268,6 @@ namespace GraphQL
             }
 
             return result;
-        }
-
-        private ExecutionContext BuildExecutionContext(
-            ISchema schema,
-            object root,
-            Document document,
-            Operation operation,
-            Inputs inputs,
-            IDictionary<string, object> userContext,
-            CancellationToken cancellationToken,
-            Metrics metrics,
-            List<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate,
-            int? maxParallelExecutionCount,
-            IServiceProvider requestServices)
-        {
-            var context = new ExecutionContext
-            {
-                Document = document,
-                Schema = schema,
-                RootValue = root,
-                UserContext = userContext,
-
-                Operation = operation,
-                Variables = inputs == null ? null : ExecutionHelper.GetVariableValues(document, schema, operation?.Variables, inputs),
-                Fragments = document.Fragments,
-                Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>(),
-                CancellationToken = cancellationToken,
-
-                Metrics = metrics,
-                Listeners = listeners,
-                ThrowOnUnhandledException = throwOnUnhandledException,
-                UnhandledExceptionDelegate = unhandledExceptionDelegate,
-                MaxParallelExecutionCount = maxParallelExecutionCount,
-                RequestServices = requestServices
-            };
-
-            return context;
         }
 
         /// <summary>

@@ -204,16 +204,18 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void does_not_use_incorrect_value()
+        public void fail_on_incorrect_value()
         {
             var query = @"
             {
               fieldWithObjectInput(input: [""foo"", ""bar"", ""baz""])
             }
             ";
-            var expected = "{ \"fieldWithObjectInput\": \"null\" }";
+            var expected = "{ \"fieldWithObjectInput\": null }";
 
-            AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
+            var result = AssertQueryWithErrors(query, expected, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: true);
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'fieldWithObjectInput'.");
+            result.Errors[0].InnerException.Message.ShouldStartWith("Expected object value for 'TestInputObject', found not an object 'ListValue{values=StringValue{value=foo}, StringValue{value=bar}, StringValue{value=baz}}'.");
         }
     }
 

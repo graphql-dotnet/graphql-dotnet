@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Shouldly;
@@ -64,9 +65,13 @@ namespace GraphQL.Tests.Validation
             }
         }
 
-        protected void ShouldPassRule(string query)
+        protected void ShouldPassRule(string query, string variables = null)
         {
-            ShouldPassRule(_ => _.Query = query);
+            ShouldPassRule(config =>
+            {
+                config.Query = query;
+                config.Inputs = variables.ToInputs();
+            });
         }
 
         protected void ShouldPassRule(Action<ValidationTestConfig> configure)
@@ -91,7 +96,7 @@ namespace GraphQL.Tests.Validation
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.ValidateAsync(query, schema, document, rules, inputs: inputs).Result;
+            return validator.ValidateAsync(query, schema, document, document.Operations.FirstOrDefault(), rules, inputs: inputs).Result.validationResult;
         }
     }
 }

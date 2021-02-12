@@ -14,9 +14,14 @@ namespace GraphQL.Tests.Bugs
         {
             ExecutionError error;
             if (number != null)
-                error = new ValidationError(null, number, message);
+            {
+                error = exception == null ? new ValidationError(null, number, message) : new ValidationError(null, number, message,  exception);
+            }
             else
+            {
                 error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
+            }
+
             if (line != 0)
                 error.AddLocation(line, column);
             error.Path = path;
@@ -33,7 +38,7 @@ namespace GraphQL.Tests.Bugs
         public void Input_Byte_Valid_Argument() => AssertQuerySuccess("query { input(arg: 2) }", @"{ ""input"": ""2"" }", "{\"arg\":2}".ToInputs());
 
         [Fact]
-        public void Input_Byte_Invalid_Variable() => AssertQueryWithError("query($arg: Byte!) { input(arg: $arg) }", null, "Variable '$arg' is invalid. Unable to convert '300' to 'Byte'", 1, 7, null, new OverflowException(), "INVALID_VALUE", "{\"arg\":300}", executed: false);
+        public void Input_Byte_Invalid_Variable() => AssertQueryWithError("query($arg: Byte!) { input(arg: $arg) }", null, "Variable '$arg' is invalid. Unable to convert '300' to 'Byte'", 1, 7, null, new OverflowException(), "INVALID_VALUE", "{\"arg\":300}", "5.6.1", executed: false);
 
         [Fact]
         public void Input_Byte_Invalid_Argument() => AssertQueryWithError("query { input(arg: 300) }", null, "Argument \"arg\" has invalid value 300.\nExpected type \"Byte\", found 300.", 1, 15, null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER, executed: false);

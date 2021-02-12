@@ -13,10 +13,11 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<IValidationResult> ValidateAsync(
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
             string originalQuery,
             ISchema schema,
             Document document,
+            Operation operation,
             IEnumerable<IValidationRule> rules = null,
             IDictionary<string, object> userContext = null,
             Inputs inputs = null);
@@ -61,14 +62,27 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public async Task<IValidationResult> ValidateAsync(
+        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
             string originalQuery,
             ISchema schema,
             Document document,
+            Operation operation,
             IEnumerable<IValidationRule> rules = null,
             IDictionary<string, object> userContext = null,
             Inputs inputs = null)
         {
+            ValidationContext Initialize()
+            {
+                var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+                context.OriginalQuery = originalQuery ?? document?.OriginalQuery;
+                context.Schema = schema;
+                context.Document = document;
+                context.TypeInfo = new TypeInfo(schema);
+                context.UserContext = userContext;
+                context.Inputs = inputs;
+                return context;
+            }
+
             schema.Initialize();
 
             bool success = false;
@@ -79,22 +93,20 @@ namespace GraphQL.Validation
             }
             else if (!rules.Any())
             {
-                return SuccessfullyValidatedResult.Instance;
+                var ctx = Initialize();
+                var variables = ctx.GetVariableValues(schema, operation?.Variables, inputs);
+                ctx.Reset();
+                _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, ctx, null);
+                return (SuccessfullyValidatedResult.Instance, variables);
             }
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            var context = Initialize();
             try
             {
-                context.OriginalQuery = originalQuery ?? document.OriginalQuery;
-                context.Schema = schema;
-                context.Document = document;
-                context.TypeInfo = new TypeInfo(schema);
-                context.UserContext = userContext;
-                context.Inputs = inputs;
-
                 List<INodeVisitor> visitors;
+                List<IVariableVisitor> variableVisitors = null;
 
-                if (useOnlyStandardRules)
+                if (useOnlyStandardRules) // standard rules don't validate variables
                 {
                     // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
                     visitors = new List<INodeVisitor>();
@@ -107,7 +119,16 @@ namespace GraphQL.Validation
                 }
                 else
                 {
-                    var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
+                    var awaitedVisitors = rules.Select(x =>
+                    {
+                        if (x is IVariableValidation validation)
+                        {
+                            var variableVisitor = validation.GetVisitor(context);
+                            if (variableVisitor != null)
+                                (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                        }
+                        return x.ValidateAsync(context);
+                    }).Where(x => x != null);
                     visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
                 }
 
@@ -115,17 +136,19 @@ namespace GraphQL.Validation
 
                 new BasicVisitor(visitors).Visit(document, context);
 
+                var variables = context.GetVariableValues(schema, operation?.Variables, inputs ?? Inputs.Empty, variableVisitors == null ? null : new CompositeVariableVisitor(variableVisitors));
+
                 success = !context.HasErrors;
                 return success
-                    ? SuccessfullyValidatedResult.Instance
-                    : new ValidationResult(context.Errors);
+                    ? (SuccessfullyValidatedResult.Instance, variables)
+                    : (new ValidationResult(context.Errors), variables);
             }
             finally
             {
                 if (success)
                 {
                     context.Reset();
-                    System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

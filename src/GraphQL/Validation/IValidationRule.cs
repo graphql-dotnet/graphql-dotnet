@@ -11,6 +11,11 @@ namespace GraphQL.Validation
         /// Prepares and returns a node visitor to be used to validate a document (via a node walker) against this
         /// validation rule. Validation failures are added then by this visitor to a list stored within <see cref="ValidationContext.Errors"/>.
         /// </summary>
-        Task<INodeVisitor> ValidateAsync(ValidationContext context);
+        Task<INodeVisitor> ValidateAsync(ValidationContext context); //TODO: make sync?
+    }
+
+    public interface IVariableValidation
+    {
+        IVariableVisitor GetVisitor(ValidationContext context);
     }
 }

@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
@@ -16,33 +15,13 @@ namespace GraphQL.Validation.Rules
     /// <see cref="ExecutionOptions.CachedDocumentValidationRules">ExecutionOptions.CachedDocumentValidationRules</see>
     /// needs to be set as well (if using caching).
     /// </summary>
-    public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule
+    public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule, IVariableValidation
     {
-        private sealed class VariableVisitor : IVariableVisitor
+        private sealed class FieldVisitor : VariableVisitorBase
         {
-            private readonly ValidationContext _context;
+            public static readonly FieldVisitor Instance = new FieldVisitor();
 
-            public VariableVisitor(ValidationContext context)
-            {
-                _context = context;
-            }
-
-            public void VisitScalar(VariableDefinition variable, VariableName variableName, ScalarGraphType type, object variableValue, object parsedValue)
-            {
-
-            }
-
-            public void VisitList(VariableDefinition variable, VariableName variableName, ListGraphType type, object variableValue, object parsedValue)
-            {
-
-            }
-
-            public void VisitObject(VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, object variableValue, object parsedValue)
-            {
-
-            }
-
-            public void VisitField(VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object variableValue, object parsedValue)
+            public override void VisitField(ValidationContext context, VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object variableValue, object parsedValue)
             {
                 if (!field.HasAppliedDirectives())
                     return;
@@ -57,15 +36,17 @@ namespace GraphQL.Validation.Rules
                 if (parsedValue == null)
                 {
                     if (min != null)
-                        _context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(_context, variable, variableName, null, (int?)min, (int?)max));
+                        context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, variable, variableName, null, (int?)min, (int?)max));
                 }
                 else if (parsedValue is string str)
                 {
                     if (min != null && str.Length < (int)min || max != null && str.Length > (int)max)
-                        _context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(_context, variable, variableName, str.Length, (int?)min, (int?)max));
+                        context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, variable, variableName, str.Length, (int?)min, (int?)max));
                 }
             }
         }
+
+        public IVariableVisitor GetVisitor(ValidationContext context) => FieldVisitor.Instance;
 
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -77,15 +58,6 @@ namespace GraphQL.Validation.Rules
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Document>((document, context) =>
-            {
-                var operation = string.IsNullOrWhiteSpace(context.OperationName)
-                   ? context.Document.Operations.FirstOrDefault()
-                   : context.Document.Operations.WithName(context.OperationName);
-
-                //TODO: change to get single variable / rework validation framework for variables
-                ExecutionHelper.GetVariableValues(context.Document, context.Schema, operation?.Variables, context.Inputs, new VariableVisitor(context));
-            }),
             new MatchingNodeVisitor<Argument>((arg, context) => CheckLength(arg, context.TypeInfo.GetArgument(), context)),
             new MatchingNodeVisitor<ObjectField>((field, context) =>
             {
@@ -117,17 +89,11 @@ namespace GraphQL.Validation.Rules
             }
             else if (node.Value is VariableReference vRef && context.Inputs != null)
             {
-                var operation = string.IsNullOrWhiteSpace(context.OperationName)
-                    ? context.Document.Operations.FirstOrDefault()
-                    : context.Document.Operations.WithName(context.OperationName);
-
-                //TODO: change to get single variable / rework validation framework for variables
-                var values = ExecutionHelper.GetVariableValues(context.Document, context.Schema, operation?.Variables, context.Inputs);
-                if (values.ValueFor(vRef.Name, out var argValue))
+                if (context.Inputs.TryGetValue(vRef.Name, out var value))
                 {
-                    if (argValue.Value is string strVariable)
+                    if (value is string strVariable)
                         CheckStringLength(strVariable);
-                    else if (argValue.Value is null && min != null)
+                    else if (value is null && min != null)
                         context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
                 }
             }
