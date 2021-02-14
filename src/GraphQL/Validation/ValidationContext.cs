@@ -262,7 +262,7 @@ namespace GraphQL.Validation
                     else if (graphType is NonNullGraphType)
                     {
                         ReportNullError(variableDef, variable.Name);
-                        return Variables.None;
+                        continue;
                     }
 
                     // if the variable was not specified and no default was specified, do not set variable.Value
