@@ -1,11 +1,10 @@
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// The UInt scalar graph type represents an unsigned 32-bit integer value.
-    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="uint"/> .NET values to this scalar graph type.
+    /// By default <see cref="SchemaTypes"/> maps all <see cref="uint"/> .NET values to this scalar graph type.
     /// </summary>
     public class UIntGraphType : ScalarGraphType
     {
