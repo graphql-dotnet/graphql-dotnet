@@ -229,7 +229,7 @@ namespace GraphQL.Validation
                     if (graphType == null)
                     {
                         ReportError(new InvalidVariableError(this, variableDef, variableDef.Name, $"Variable has unknown type '{variableDef.Type.Name()}'"));
-                        return Variables.None;
+                        continue;
                     }
 
                     // create a new variable object
