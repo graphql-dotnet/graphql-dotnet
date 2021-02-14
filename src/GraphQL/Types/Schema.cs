@@ -250,6 +250,14 @@ namespace GraphQL.Types
             }
         }
 
+        private List<(Type, Type)> _clrToGraphTypeMappings;
+
+        /// <inheritdoc/>
+        public void RegisterTypeMapping(Type clrType, Type graphType)
+        {
+            (_clrToGraphTypeMappings ??= new List<(Type, Type)>()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+        }
+
         /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
@@ -349,6 +357,7 @@ namespace GraphQL.Types
 
             _allTypes = SchemaTypes.Create(
                 GetTypes(),
+                 _clrToGraphTypeMappings,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 this);

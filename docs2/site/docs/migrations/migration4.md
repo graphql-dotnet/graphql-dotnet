@@ -60,6 +60,53 @@ For untyped `InputObjectGraphType` classes, like shown above, the default behavi
 will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the
 requested type via `ObjectExtensions.ToObject` as it did before.
 
+### Ability to map CLR types to GraphTypes
+
+Strictly speaking, this feature was available before via `GraphTypeTypeRegistry`, but it had a significant
+drawbacks, since the mapping was static and did not allow registering the same CLR type both as input and output.
+In v4 `GraphTypeTypeRegistry` was completely removed and the `ISchema.RegisterTypeMapping(Type, Type)` method was added
+instead (also there are several extension methods). An alternative way to define the mapping is to use the new properties in
+the `GraphQLMetadata` attribute.
+
+Consider the following example:
+
+```c#
+[GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
+public class Filter
+{
+    public string Key { get; set; }
+    public int Value { get; set; }
+}
+
+public class ContainerRequest
+{
+    public IList<Filter> Filters { get; set; }
+    public int ClientId { get; set; }
+    public int AppId { get; set; }
+}
+
+public class FilterInputGraphType : InputObjectGraphType<Filter>
+{
+    public FilterInputGraphType()
+    {
+        Name = "FilterInput";
+        Field(x => x.Key);
+        Field(x => x.Value);
+    }
+}
+
+public class MyInputType : InputObjectGraphType<ContainerRequest>
+{
+    public MyInputType()
+    {
+        Name = "Input";
+        Field(x => x.Filters); // when building this field, its type is implicitly inferred to list of FilterInputGraphType
+        Field(x => x.ClientId);
+        Field(x => x.AppId, nullable: true);
+    }
+}
+```
+
 ### Experimental Features / Applied Directives
 
 > Ability to apply directives to the schema elements and expose user-defined meta-information
@@ -322,3 +369,4 @@ lock (field)
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
 * `NameValidator.ValidateName` and `NameValidator.ValidateNameOnSchemaInitialize` accept an enum instead of a string for their second argument
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
+* `GraphQLMetadataAttribute.Type` property was renamed to `ResolverType`

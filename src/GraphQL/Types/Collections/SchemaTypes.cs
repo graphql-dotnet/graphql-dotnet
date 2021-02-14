@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -20,6 +21,28 @@ namespace GraphQL.Types
     /// </summary>
     public class SchemaTypes : IEnumerable<IGraphType>
     {
+        internal static readonly Dictionary<Type, Type> BuiltInScalarMappings = new Dictionary<Type, Type>
+        {
+            [typeof(int)] = typeof(IntGraphType),
+            [typeof(long)] = typeof(LongGraphType),
+            [typeof(BigInteger)] = typeof(BigIntGraphType),
+            [typeof(double)] = typeof(FloatGraphType),
+            [typeof(float)] = typeof(FloatGraphType),
+            [typeof(decimal)] = typeof(DecimalGraphType),
+            [typeof(string)] = typeof(StringGraphType),
+            [typeof(bool)] = typeof(BooleanGraphType),
+            [typeof(DateTime)] = typeof(DateTimeGraphType),
+            [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
+            [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
+            [typeof(Guid)] = typeof(IdGraphType),
+            [typeof(short)] = typeof(ShortGraphType),
+            [typeof(ushort)] = typeof(UShortGraphType),
+            [typeof(ulong)] = typeof(ULongGraphType),
+            [typeof(uint)] = typeof(UIntGraphType),
+            [typeof(byte)] = typeof(ByteGraphType),
+            [typeof(sbyte)] = typeof(SByteGraphType),
+        };
+
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
         private readonly Dictionary<Type, IGraphType> _introspectionTypes;
 
@@ -61,7 +84,7 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
-        private SchemaTypes(ISchema schema)
+        private SchemaTypes(ISchema schema, List<(Type, Type)> typeMappings)
         {
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
@@ -74,7 +97,8 @@ namespace GraphQL.Types
                        SetGraphType(name, type);
                    }
                    ctx.AddType(name, type, null);
-               });
+               },
+               typeMappings);
 
             // Add introspection types. Note that introspection types rely on the
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
@@ -148,19 +172,23 @@ namespace GraphQL.Types
         /// <param name="schema">A schema for which this instance is created.</param>
         public static SchemaTypes Create(
             IEnumerable<IGraphType> types,
+            List<(Type,Type)> typeMappings,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
             ISchema schema)
         {
-            var lookup = new SchemaTypes(schema);
+            var lookup = new SchemaTypes(schema, typeMappings);
 
-            var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
-            {
-                if (lookup[name] == null)
+            var ctx = new TypeCollectionContext(
+                t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t),
+                (name, graphType, context) =>
                 {
-                    lookup.AddType(graphType, context);
-                }
-            });
+                    if (lookup[name] == null)
+                    {
+                        lookup.AddType(graphType, context);
+                    }
+                },
+                typeMappings);
 
             foreach (var type in types)
             {
@@ -415,6 +443,11 @@ namespace GraphQL.Types
                 if (field.Type == null)
                     throw new InvalidOperationException($"Both ResolvedType and Type properties on field '{parentType?.Name}.{field.Name}' are null.");
 
+                object typeOrError = RebuildType(field.Type, parentType is IInputObjectGraphType, context.TypeMappings);
+                if (typeOrError is string error)
+                    throw new InvalidOperationException($"The GraphQL type for field '{parentType.Name}.{field.Name}' could not be derived implicitly. " + error);
+                field.Type = (Type)typeOrError;
+
                 AddTypeIfNotRegistered(field.Type, context);
                 field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
             }
@@ -499,6 +532,53 @@ Make sure that your ServiceProvider is configured correctly.");
             {
                 AddType(namedType, context);
             }
+        }
+
+        private object RebuildType(Type type, bool input, List<(Type, Type)> typeMappings)
+        {
+            if (!type.IsGenericType)
+                return type;
+
+            var genericDef = type.GetGenericTypeDefinition();
+            if (genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>))
+            {
+                var innerType = type.GenericTypeArguments[0];
+                object typeOrError = RebuildType(innerType, input, typeMappings);
+                if (typeOrError is string)
+                    return typeOrError;
+                var changed = (Type)typeOrError;
+                return changed == innerType ? type : genericDef.MakeGenericType(changed);
+            }
+            else if (genericDef == typeof(GraphQLClrOutputTypeReference<>) || genericDef == typeof(GraphQLClrInputTypeReference<>))
+            {
+                return GetGraphType(type.GetGenericArguments()[0], input, typeMappings);
+            }
+            else
+            {
+                return type;
+            }
+        }
+
+        private object GetGraphType(Type clrType, bool input, List<(Type clr, Type graph)> typeMappings)
+        {
+            // check custom mappings first
+            if (typeMappings != null)
+            {
+                foreach (var mapping in typeMappings)
+                {
+                    if (mapping.clr == clrType)
+                    {
+                        if (input && mapping.graph.IsInputType() || !input && mapping.graph.IsOutputType())
+                            return mapping.graph;
+                    }
+                }
+            }
+
+            // then built-in mappings
+            if (BuiltInScalarMappings.TryGetValue(clrType, out var graphType))
+                return graphType;
+
+            return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
         }
 
         private void ApplyTypeReferences()

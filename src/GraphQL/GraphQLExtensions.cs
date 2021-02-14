@@ -46,9 +46,22 @@ namespace GraphQL
         /// </summary>
         public static bool IsInputType(this Type type)
         {
-            var namedType = type.GetNamedType();
-            return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
-                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
+            if (type.IsGenericType)
+            {
+                var genericDef = type.GetGenericTypeDefinition();
+
+                if (genericDef == typeof(GraphQLClrInputTypeReference<>))
+                    return true;
+
+                if (genericDef == typeof(GraphQLClrOutputTypeReference<>))
+                    return false;
+
+                if (genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>))
+                    return type.GenericTypeArguments[0].IsInputType();
+            }
+
+            return typeof(ScalarGraphType).IsAssignableFrom(type) ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(type);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -68,11 +81,24 @@ namespace GraphQL
         /// </summary>
         public static bool IsOutputType(this Type type)
         {
-            var namedType = type.GetNamedType();
-            return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
-                   typeof(IObjectGraphType).IsAssignableFrom(namedType) ||
-                   typeof(IInterfaceGraphType).IsAssignableFrom(namedType) ||
-                   typeof(UnionGraphType).IsAssignableFrom(namedType);
+            if (type.IsGenericType)
+            {
+                var genericDef = type.GetGenericTypeDefinition();
+
+                if (genericDef == typeof(GraphQLClrInputTypeReference<>))
+                    return false;
+
+                if (genericDef == typeof(GraphQLClrOutputTypeReference<>))
+                    return true;
+
+                if (genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>))
+                    return type.GenericTypeArguments[0].IsOutputType();
+            }
+
+            return typeof(ScalarGraphType).IsAssignableFrom(type) ||
+                   typeof(IObjectGraphType).IsAssignableFrom(type) ||
+                   typeof(IInterfaceGraphType).IsAssignableFrom(type) ||
+                   typeof(UnionGraphType).IsAssignableFrom(type);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types

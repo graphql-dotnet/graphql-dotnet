@@ -401,7 +401,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of this field.</param>
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
+        /// <param name="type">The graph type of the field; in <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
@@ -411,14 +411,11 @@ namespace GraphQL.Types
             try
             {
                 if (type == null)
-                    type = typeof(TProperty).GetGraphTypeFromType(nullable);
+                    type = typeof(TProperty).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
             }
             catch (ArgumentOutOfRangeException exp)
             {
-                throw new ArgumentException(
-                    $"The GraphQL type for Field: '{name}' on parent type: '{Name ?? GetType().Name}' could not be derived implicitly. \n",
-                    exp
-                 );
+                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'.", exp);
             }
 
             var builder = FieldBuilder.Create<TSourceType, TProperty>(type)

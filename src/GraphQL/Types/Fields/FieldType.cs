@@ -73,7 +73,6 @@ namespace GraphQL.Types
             }
         }
 
-
         /// <summary>
         /// Gets or sets the graph type of this field.
         /// </summary>
