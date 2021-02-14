@@ -1,6 +1,10 @@
 # Metrics
 
-Metrics are captured during execution.  This can help you determine performance issues within a resolver or validation.  Field metrics are captured using Field Middleware and the results are returned as a `PerfRecord` array on the `ExecutionResult`.  You can then generate [Apollo Tracing](https://github.com/apollographql/apollo-tracing) data with the `EnrichWithApolloTracing()` extension method.
+Metrics are captured during execution. This can help you determine performance issues within
+a resolver or validation. Field metrics are captured using Field Middleware and the results
+are returned as a `PerfRecord` array on the `ExecutionResult`. You can then generate
+[Apollo Tracing](https://github.com/apollographql/apollo-tracing) data with the
+`EnrichWithApolloTracing()` extension method.
 
 ```csharp
 var start = DateTime.UtcNow;
@@ -112,3 +116,6 @@ result.EnrichWithApolloTracing(start);
   }
 }
 ```
+
+Also you could create a listener that hooks in after the execution and uses the Apollo tracing
+data to synthesize some other traces, for example, for Application Insights.
