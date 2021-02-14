@@ -256,6 +256,7 @@ namespace GraphQL.Validation
                         catch (Exception ex)
                         {
                             ReportError(new InvalidVariableError(this, variableDef, variableDef.Name, "Error coercing default value.", ex));
+                            continue;
                         }
                         variable.IsDefault = true;
                     }
