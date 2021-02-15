@@ -17,7 +17,7 @@ namespace GraphQL.Validation
             string originalQuery,
             ISchema schema,
             Document document,
-            Operation operation,
+            VariableDefinitions variableDefinitions,
             IEnumerable<IValidationRule> rules = null,
             IDictionary<string, object> userContext = null,
             Inputs inputs = null);
@@ -66,7 +66,7 @@ namespace GraphQL.Validation
             string originalQuery,
             ISchema schema,
             Document document,
-            Operation operation,
+            VariableDefinitions variableDefinitions,
             IEnumerable<IValidationRule> rules = null,
             IDictionary<string, object> userContext = null,
             Inputs inputs = null)
@@ -94,7 +94,7 @@ namespace GraphQL.Validation
             else if (!rules.Any())
             {
                 var ctx = Initialize();
-                var variables = ctx.GetVariableValues(schema, operation?.Variables, inputs);
+                var variables = ctx.GetVariableValues(schema, variableDefinitions, inputs);
                 ctx.Reset();
                 _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, ctx, null);
                 return (SuccessfullyValidatedResult.Instance, variables);
@@ -136,7 +136,7 @@ namespace GraphQL.Validation
 
                 new BasicVisitor(visitors).Visit(document, context);
 
-                var variables = context.GetVariableValues(schema, operation?.Variables, inputs ?? Inputs.Empty, variableVisitors == null ? null : new CompositeVariableVisitor(variableVisitors));
+                var variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty, variableVisitors == null ? null : new CompositeVariableVisitor(variableVisitors));
 
                 success = !context.HasErrors;
                 return success

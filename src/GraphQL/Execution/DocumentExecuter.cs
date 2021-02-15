@@ -124,7 +124,7 @@ namespace GraphQL
                         options.Query,
                         options.Schema,
                         document,
-                        operation,
+                        operation.Variables,
                         validationRules,
                         options.UserContext,
                         options.Inputs);
