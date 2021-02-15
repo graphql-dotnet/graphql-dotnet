@@ -322,3 +322,4 @@ lock (field)
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
 * `NameValidator.ValidateName` and `NameValidator.ValidateNameOnSchemaInitialize` accept an enum instead of a string for their second argument
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
+* `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead

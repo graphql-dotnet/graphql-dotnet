@@ -121,7 +121,6 @@ namespace GraphQL
                 using (metrics.Subject("document", "Validating document"))
                 {
                     (validationResult, variables) = await _documentValidator.ValidateAsync(
-                        options.Query,
                         options.Schema,
                         document,
                         operation.Variables,

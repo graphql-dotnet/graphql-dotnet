@@ -240,7 +240,6 @@ namespace GraphQL.Benchmarks
             public IValidationResult Validate()
             {
                 return _documentValidator.ValidateAsync(
-                    Query,
                     Schema,
                     Document,
                     null,

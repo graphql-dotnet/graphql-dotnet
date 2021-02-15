@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownDirectivesError(ValidationContext context, Directive node)
-            : base(context.OriginalQuery, NUMBER, UnknownDirectiveMessage(node.Name), node)
+            : base(context.Document.OriginalQuery, NUMBER, UnknownDirectiveMessage(node.Name), node)
         {
         }
 
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownDirectivesError(ValidationContext context, Directive node, DirectiveLocation candidateLocation)
-            : base(context.OriginalQuery, NUMBER, MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()), node)
+            : base(context.Document.OriginalQuery, NUMBER, MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()), node)
         {
         }
 

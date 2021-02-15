@@ -14,7 +14,6 @@ namespace GraphQL.Validation
     {
         /// <inheritdoc cref="IDocumentValidator"/>
         Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            string originalQuery,
             ISchema schema,
             Document document,
             VariableDefinitions variableDefinitions,
@@ -63,7 +62,6 @@ namespace GraphQL.Validation
 
         /// <inheritdoc/>
         public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            string originalQuery,
             ISchema schema,
             Document document,
             VariableDefinitions variableDefinitions,
@@ -74,7 +72,6 @@ namespace GraphQL.Validation
             ValidationContext Initialize()
             {
                 var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
-                context.OriginalQuery = originalQuery ?? document?.OriginalQuery;
                 context.Schema = schema;
                 context.Document = document;
                 context.TypeInfo = new TypeInfo(schema);

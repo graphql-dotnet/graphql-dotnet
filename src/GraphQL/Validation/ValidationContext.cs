@@ -27,7 +27,6 @@ namespace GraphQL.Validation
             _errors = null;
             _fragments.Clear();
             _variables.Clear();
-            OriginalQuery = null;
             OperationName = null;
             Schema = null;
             Document = null;
@@ -35,11 +34,6 @@ namespace GraphQL.Validation
             UserContext = null;
             Inputs = null;
         }
-
-        /// <summary>
-        /// Returns the original GraphQL query string.
-        /// </summary>
-        public string OriginalQuery { get; set; }
 
         /// <summary>
         /// Returns the operation name requested to be executed.
