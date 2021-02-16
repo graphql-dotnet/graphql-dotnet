@@ -281,7 +281,15 @@ namespace GraphQL
 
             var scalar = (ScalarGraphType)type;
 
-            var parseResult = scalar.ParseLiteral(valueAst);
+            object parseResult = null;
+            try
+            {
+                parseResult = scalar.ParseLiteral(valueAst);
+            }
+            catch (Exception)
+            {
+                // do nothing, just do not throw from IsValidLiteralValue
+            }
 
             if (parseResult == null)
             {
