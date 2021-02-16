@@ -284,7 +284,15 @@ namespace GraphQL
             object parseResult = null;
             try
             {
-                parseResult = scalar.ParseLiteral(valueAst);
+                if (scalar is ICanParseScalar parseable)
+                {
+                    if (parseable.CanParseLiteral(valueAst)) // it still can throw
+                        return Array.Empty<string>();
+                }
+                else
+                {
+                    parseResult = scalar.ParseLiteral(valueAst);
+                }
             }
             catch (Exception)
             {

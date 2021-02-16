@@ -1810,9 +1810,11 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
-    public class DecimalGraphType : GraphQL.Types.ScalarGraphType
+    public class DecimalGraphType : GraphQL.Types.ScalarGraphType, GraphQL.Types.ICanParseScalar
     {
         public DecimalGraphType() { }
+        public bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -1949,9 +1951,11 @@ namespace GraphQL.Types
         public override int GetHashCode() { }
         public override string ToString() { }
     }
-    public class GuidGraphType : GraphQL.Types.ScalarGraphType
+    public class GuidGraphType : GraphQL.Types.ScalarGraphType, GraphQL.Types.ICanParseScalar
     {
         public GuidGraphType() { }
+        public bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -1965,6 +1969,11 @@ namespace GraphQL.Types
     {
         GraphQL.Language.AST.IValue Convert(object value, GraphQL.Types.IGraphType type);
         bool Matches(object value, GraphQL.Types.IGraphType type);
+    }
+    public interface ICanParseScalar
+    {
+        bool CanParseLiteral(GraphQL.Language.AST.IValue value);
+        bool CanParseValue(object value);
     }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {

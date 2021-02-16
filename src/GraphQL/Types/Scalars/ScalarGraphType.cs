@@ -50,4 +50,31 @@ namespace GraphQL.Types
         /// <returns> Internal scalar representation. Returning null indicates a failed conversion. </returns>
         public abstract object ParseValue(object value);
     }
+
+    /// <summary>
+    /// This (optional) interface can be implemented by descendants of <see cref="ScalarGraphType"/> to provide
+    /// the ability to validate input values without directly getting those values, i.e. without boxing.
+    /// </summary>
+    public interface ICanParseScalar
+    {
+        /// <summary>
+        /// Checks for literal input coercion possibility. It takes an abstract syntax tree (AST) element from a schema
+        /// definition or query and checks if it can be converted into an appropriate internal value. In other words
+        /// it checks if a scalar can be converted from its client-side representation as an argument to its
+        /// server-side representation.
+        /// </summary>
+        /// <param name="value"> AST value node. </param>
+        public abstract bool CanParseLiteral(IValue value);
+
+        /// <summary>
+        /// Checks for value input coercion possibility. Argument values can not only provided via GraphQL syntax inside a
+        /// query, but also via variable. It checks if a scalar can be converted from its client-side representation
+        /// as a variable to its server-side representation.
+        /// <br/><br/>
+        /// Parsing for arguments and variables are handled separately because while arguments must
+        /// always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
+        /// </summary>
+        /// <param name="value"> Runtime object from variables. </param>
+        public abstract bool CanParseValue(object value);
+    }
 }
