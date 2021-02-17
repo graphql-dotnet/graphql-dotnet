@@ -20,7 +20,6 @@ namespace GraphQL.Tests.Instrumentation
             _builder = new FieldMiddlewareBuilder();
             _context = new ResolveFieldContext
             {
-                FieldName = "Name",
                 FieldAst = new Field(default, new NameNode("Name")),
                 Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),

@@ -15,16 +15,10 @@ namespace GraphQL
     public class ResolveFieldContext : IResolveFieldContext<object>
     {
         /// <inheritdoc/>
-        public string FieldName { get; set; }
-
-        /// <inheritdoc/>
         public Field FieldAst { get; set; }
 
         /// <inheritdoc/>
         public FieldType FieldDefinition { get; set; }
-
-        /// <inheritdoc/>
-        public IGraphType ReturnType { get; set; }
 
         /// <inheritdoc/>
         public IObjectGraphType ParentType { get; set; }
@@ -94,10 +88,8 @@ namespace GraphQL
         public ResolveFieldContext(IResolveFieldContext context)
         {
             Source = context.Source;
-            FieldName = context.FieldName;
             FieldAst = context.FieldAst;
             FieldDefinition = context.FieldDefinition;
-            ReturnType = context.ReturnType;
             ParentType = context.ParentType;
             Arguments = context.Arguments;
             Schema = context.Schema;

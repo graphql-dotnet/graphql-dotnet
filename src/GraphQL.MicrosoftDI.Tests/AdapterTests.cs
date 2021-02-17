@@ -58,9 +58,8 @@ namespace GraphQL.MicrosoftDI.Tests
                 Document = new Document(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>() { { "1", new object() } },
-                FieldAst = new Field(),
+                FieldAst = new Field(default, new NameNode("test")),
                 FieldDefinition = new FieldType(),
-                FieldName = "test",
                 Fragments = new Fragments(),
                 Metrics = new Instrumentation.Metrics(),
                 Operation = new Operation(new NameNode()),
@@ -68,7 +67,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 Path = new object[] { "5" },
                 RequestServices = Mock.Of<IServiceProvider>(),
                 ResponsePath = new object[] { "4" },
-                ReturnType = Mock.Of<IGraphType>(),
                 RootValue = new object(),
                 Schema = Mock.Of<ISchema>(),
                 Source = "hello",
@@ -86,7 +84,6 @@ namespace GraphQL.MicrosoftDI.Tests
             mocked.Extensions.ShouldBe(rfc.Extensions);
             mocked.FieldAst.ShouldBe(rfc.FieldAst);
             mocked.FieldDefinition.ShouldBe(rfc.FieldDefinition);
-            mocked.FieldName.ShouldBe(rfc.FieldName);
             mocked.Fragments.ShouldBe(rfc.Fragments);
             mocked.Metrics.ShouldBe(rfc.Metrics);
             mocked.Operation.ShouldBe(rfc.Operation);
@@ -94,7 +91,6 @@ namespace GraphQL.MicrosoftDI.Tests
             mocked.Path.ShouldBe(rfc.Path);
             mocked.RequestServices.ShouldBe(rs);
             mocked.ResponsePath.ShouldBe(rfc.ResponsePath);
-            mocked.ReturnType.ShouldBe(rfc.ReturnType);
             mocked.RootValue.ShouldBe(rfc.RootValue);
             mocked.Schema.ShouldBe(rfc.Schema);
             mocked.Source.ShouldBe(rfc.Source);

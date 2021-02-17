@@ -19,25 +19,19 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>The name of the field being resolved.</summary>
-        string FieldName { get; }
-
-        /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
+        /// <summary>The resolved <see cref="Field"/> AST as derived from the query request.</summary>
         Field FieldAst { get; }
 
         /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type.</summary>
         FieldType FieldDefinition { get; }
-
-        /// <summary>The return value's graph type.</summary>
-        IGraphType ReturnType { get; }
 
         /// <summary>The field's parent graph type.</summary>
         IObjectGraphType ParentType { get; }
 
         /// <summary>
         /// A dictionary of arguments passed to the field. It is recommended to use the
-        /// <see cref="GraphQL.ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
-        /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
+        /// <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// and <see cref="ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
         IDictionary<string, ArgumentValue> Arguments { get; }

@@ -64,10 +64,8 @@ namespace GraphQL.Execution
             {
                 var resolveContext = new ResolveEventStreamContext
                 {
-                    FieldName = node.Field.Name,
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
-                    ReturnType = node.FieldDefinition.ResolvedType,
                     ParentType = node.GetParentType(context.Schema),
                     Arguments = arguments,
                     Source = source,

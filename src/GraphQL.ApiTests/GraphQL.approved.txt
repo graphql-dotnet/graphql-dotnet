@@ -209,7 +209,6 @@ namespace GraphQL
         System.Collections.Generic.IDictionary<string, object> Extensions { get; }
         GraphQL.Language.AST.Field FieldAst { get; }
         GraphQL.Types.FieldType FieldDefinition { get; }
-        string FieldName { get; }
         GraphQL.Language.AST.Fragments Fragments { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
@@ -217,7 +216,6 @@ namespace GraphQL
         System.Collections.Generic.IEnumerable<object> Path { get; }
         System.IServiceProvider RequestServices { get; }
         System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
-        GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         object Source { get; }
@@ -285,7 +283,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> Extensions { get; }
         public GraphQL.Language.AST.Field FieldAst { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
-        public string FieldName { get; }
         public GraphQL.Language.AST.Fragments Fragments { get; }
         public GraphQL.Instrumentation.Metrics Metrics { get; }
         public GraphQL.Language.AST.Operation Operation { get; }
@@ -293,7 +290,6 @@ namespace GraphQL
         public System.Collections.Generic.IEnumerable<object> Path { get; }
         public System.IServiceProvider RequestServices { get; }
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
-        public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
         public object Source { get; }
@@ -313,7 +309,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> Extensions { get; set; }
         public GraphQL.Language.AST.Field FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
-        public string FieldName { get; set; }
         public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
@@ -321,7 +316,6 @@ namespace GraphQL
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public System.IServiceProvider RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; set; }
-        public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public object Source { get; set; }
