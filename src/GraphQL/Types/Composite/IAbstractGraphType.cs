@@ -42,7 +42,7 @@ namespace GraphQL.Types
             return result;
         }
 
-        public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value)
+        public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value) //TODO: possible merge this into method above
         {
             foreach (var possible in abstractType.PossibleTypes.List)
             {

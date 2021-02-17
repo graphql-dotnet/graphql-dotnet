@@ -13,10 +13,12 @@ namespace GraphQL
     /// </summary>
     public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {
+        // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue> _arguments;
         private Fields _subFields;
+        private IResolveFieldContext _parent;
 
         /// <summary>
         /// Initializes an instance with the specified <see cref="ExecutionNode"/> and <see cref="ExecutionContext"/>.
@@ -33,6 +35,8 @@ namespace GraphQL
             _executionContext = context;
             _arguments = null;
             _subFields = null;
+            _parent = null;
+
             return this;
         }
 
@@ -57,6 +61,9 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
+
+        /// <inheritdoc/>
+        public IResolveFieldContext Parent => _executionNode.Parent is RootExecutionNode || _executionNode.Parent == null ? null : _parent ??= new ReadonlyResolveFieldContext(_executionNode.Parent, _executionContext);
 
         /// <inheritdoc/>
         public IDictionary<string, ArgumentValue> Arguments => _arguments ??= GetArguments();

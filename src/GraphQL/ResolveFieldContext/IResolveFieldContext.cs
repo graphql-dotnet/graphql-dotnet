@@ -29,6 +29,12 @@ namespace GraphQL
         IObjectGraphType ParentType { get; }
 
         /// <summary>
+        /// Provides access to the parent context (up to the root). This may be needed to get the parameters of parent nodes.
+        /// Returns <see langword="null"/> when called on the root.
+        /// </summary>
+        IResolveFieldContext Parent { get; }
+
+        /// <summary>
         /// A dictionary of arguments passed to the field. It is recommended to use the
         /// <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
         /// and <see cref="ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension

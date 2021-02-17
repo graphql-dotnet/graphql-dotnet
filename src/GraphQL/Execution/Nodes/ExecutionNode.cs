@@ -12,7 +12,7 @@ namespace GraphQL.Execution
     public abstract class ExecutionNode
     {
         /// <summary>
-        /// Returns the parent node, or null if this is the root node.
+        /// Returns the parent node, or <see langword="null"/> if this is the root node.
         /// </summary>
         public ExecutionNode Parent { get; }
 

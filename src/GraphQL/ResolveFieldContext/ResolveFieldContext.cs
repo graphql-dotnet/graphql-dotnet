@@ -24,6 +24,9 @@ namespace GraphQL
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
+        public IResolveFieldContext Parent { get; set; }
+
+        /// <inheritdoc/>
         public IDictionary<string, ArgumentValue> Arguments { get; set; }
 
         /// <inheritdoc/>
@@ -91,6 +94,7 @@ namespace GraphQL
             FieldAst = context.FieldAst;
             FieldDefinition = context.FieldDefinition;
             ParentType = context.ParentType;
+            Parent = context.Parent;
             Arguments = context.Arguments;
             Schema = context.Schema;
             Document = context.Document;
