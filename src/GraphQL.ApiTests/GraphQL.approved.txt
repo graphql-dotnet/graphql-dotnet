@@ -212,6 +212,7 @@ namespace GraphQL
         GraphQL.Language.AST.Fragments Fragments { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
+        GraphQL.IResolveFieldContext Parent { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
         System.Collections.Generic.IEnumerable<object> Path { get; }
         System.IServiceProvider RequestServices { get; }
@@ -286,6 +287,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Fragments Fragments { get; }
         public GraphQL.Instrumentation.Metrics Metrics { get; }
         public GraphQL.Language.AST.Operation Operation { get; }
+        public GraphQL.IResolveFieldContext Parent { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
         public System.IServiceProvider RequestServices { get; }
@@ -312,6 +314,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
+        public GraphQL.IResolveFieldContext Parent { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public System.IServiceProvider RequestServices { get; set; }
