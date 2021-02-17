@@ -737,6 +737,7 @@ namespace GraphQL.Execution
         public System.IServiceProvider RequestServices { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
+        public System.Func<GraphQL.Execution.ExecutionContext, GraphQL.Language.AST.IHaveDirectives, bool> ShouldIncludeNode { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
@@ -830,6 +831,7 @@ namespace GraphQL.Execution
         System.IServiceProvider RequestServices { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
+        System.Func<GraphQL.Execution.ExecutionContext, GraphQL.Language.AST.IHaveDirectives, bool> ShouldIncludeNode { get; set; }
         bool ThrowOnUnhandledException { get; }
         System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
         GraphQL.Language.AST.Variables Variables { get; }
@@ -1266,7 +1268,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public override string ToString() { }
     }
-    public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
+    public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public Field() { }
         public Field(GraphQL.Language.AST.NameNode alias, GraphQL.Language.AST.NameNode name) { }
@@ -1291,7 +1293,7 @@ namespace GraphQL.Language.AST
     {
         public FloatValue(double value) { }
     }
-    public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
+    public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public FragmentDefinition(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1303,7 +1305,7 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
+    public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public FragmentSpread(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1325,8 +1327,12 @@ namespace GraphQL.Language.AST
     {
         public GuidValue(System.Guid value) { }
     }
-    public interface IDefinition : GraphQL.Language.AST.INode { }
-    public interface IFragment : GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection { }
+    public interface IDefinition : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode { }
+    public interface IFragment : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection { }
+    public interface IHaveDirectives : GraphQL.Language.AST.INode
+    {
+        GraphQL.Language.AST.Directives Directives { get; set; }
+    }
     public interface IHaveSelectionSet : GraphQL.Language.AST.INode
     {
         GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
@@ -1337,7 +1343,7 @@ namespace GraphQL.Language.AST
         GraphQL.Language.AST.SourceLocation SourceLocation { get; }
         void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state);
     }
-    public interface ISelection : GraphQL.Language.AST.INode { }
+    public interface ISelection : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode { }
     public interface IType : GraphQL.Language.AST.INode { }
     public interface IValue : GraphQL.Language.AST.INode
     {
@@ -1347,7 +1353,7 @@ namespace GraphQL.Language.AST
     {
         T Value { get; }
     }
-    public class InlineFragment : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
+    public class InlineFragment : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public InlineFragment() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1434,7 +1440,7 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
+    public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public Operation(GraphQL.Language.AST.NameNode name) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }

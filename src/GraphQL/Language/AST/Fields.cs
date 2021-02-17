@@ -32,7 +32,7 @@ namespace GraphQL.Language.AST
                 {
                     if (selection is Field field)
                     {
-                        if (!ExecutionHelper.ShouldIncludeNode(context, field.Directives))
+                        if (!context.ShouldIncludeNode(context, field))
                         {
                             continue;
                         }
@@ -42,7 +42,7 @@ namespace GraphQL.Language.AST
                     else if (selection is FragmentSpread spread)
                     {
                         if ((visitedFragmentNames != null && visitedFragmentNames.Contains(spread.Name))
-                            || !ExecutionHelper.ShouldIncludeNode(context, spread.Directives))
+                            || !context.ShouldIncludeNode(context, spread))
                         {
                             continue;
                         }
@@ -51,7 +51,7 @@ namespace GraphQL.Language.AST
 
                         var fragment = context.Fragments.FindDefinition(spread.Name);
                         if (fragment == null
-                            || !ExecutionHelper.ShouldIncludeNode(context, fragment.Directives)
+                            || !context.ShouldIncludeNode(context, fragment)
                             || !ExecutionHelper.DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
                         {
                             continue;
@@ -63,7 +63,7 @@ namespace GraphQL.Language.AST
                     {
                         var name = inline.Type != null ? inline.Type.Name : specificType.Name;
 
-                        if (!ExecutionHelper.ShouldIncludeNode(context, inline.Directives)
+                        if (!context.ShouldIncludeNode(context, inline)
                           || !ExecutionHelper.DoesFragmentConditionMatch(context, name, specificType))
                         {
                             continue;
