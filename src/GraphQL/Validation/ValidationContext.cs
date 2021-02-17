@@ -236,10 +236,15 @@ namespace GraphQL.Validation
                     if (inputs.TryGetValue(variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
-                        if (GetVariableValue(graphType, variableDef, variableValue, visitor, out var parsedValue))
-                            variable.Value = parsedValue;
-                        else
+                        try
+                        {
+                            variable.Value = GetVariableValue(graphType, variableDef, variableValue, visitor);
+                        }
+                        catch (ValidationError error)
+                        {
+                            ReportError(error);
                             continue;
+                        }
                     }
                     else if (variableDef.DefaultValue != null)
                     {
@@ -259,7 +264,7 @@ namespace GraphQL.Validation
                     }
                     else if (graphType is NonNullGraphType)
                     {
-                        ReportNullError(variableDef, variable.Name);
+                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "Received a null input for a non-null variable."));
                         continue;
                     }
 
@@ -274,11 +279,6 @@ namespace GraphQL.Validation
             return variables;
         }
 
-        private void ReportNullError(VariableDefinition variable, VariableName variableName)
-        {
-            ReportError(new InvalidVariableError(this, variable, variableName, "Received a null input for a non-null variable."));
-        }
-
         /// <summary>
         /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
         /// <br/><br/>
@@ -288,97 +288,68 @@ namespace GraphQL.Validation
         /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        private bool GetVariableValue(IGraphType graphType, VariableDefinition variable, object input, IVariableVisitor visitor, out object parsedValue)
+        private object GetVariableValue(IGraphType graphType, VariableDefinition variableDef, object input, IVariableVisitor visitor)
         {
-            return ParseValue(graphType, variable, variable.Name, input, visitor, out parsedValue);
+            return ParseValue(graphType, variableDef, variableDef.Name, input, visitor);
 
             // Coerces a value depending on the graph type.
-            bool ParseValue(IGraphType type, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor, out object parsedValue)
+            object ParseValue(IGraphType type, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    if (ParseValueObject(inputObjectGraphType, variable, variableName, value, visitor, out parsedValue))
-                    {
-                        visitor?.VisitObject(this, variable, variableName, inputObjectGraphType, value, parsedValue);
-                        return true;
-                    }
-                    return false;
+                    var parsedValue = ParseValueObject(inputObjectGraphType, variableDef, variableName, value, visitor);
+                    visitor?.VisitObject(this, variableDef, variableName, inputObjectGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
                     if (value == null)
-                    {
-                        ReportNullError(variable, variableName);
-                        parsedValue = null;
-                        return false;
-                    }
-                    else
-                    {
-                        return ParseValue(nonNullGraphType.ResolvedType, variable, variableName, value, visitor, out parsedValue);
-                    }
+                        throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.");
+
+                    return ParseValue(nonNullGraphType.ResolvedType, variableDef, variableName, value, visitor);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
-                    if (ParseValueList(listGraphType, variable, variableName, value, visitor, out parsedValue))
-                    {
-                        visitor?.VisitList(this, variable, variableName, listGraphType, value, parsedValue);
-                        return true;
-                    }
-                    return false;
+                    var parsedValue = ParseValueList(listGraphType, variableDef, variableName, value, visitor);
+                    visitor?.VisitList(this, variableDef, variableName, listGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
-                    if (ParseValueScalar(scalarGraphType, variable, variableName, value, out parsedValue))
-                    {
-                        visitor?.VisitScalar(this, variable, variableName, scalarGraphType, value, parsedValue);
-                        return true;
-                    }
-                    return false;
+                    var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
+                    visitor?.VisitScalar(this, variableDef, variableName, scalarGraphType, value, parsedValue);
+                    return parsedValue;
                 }
                 else
                 {
-                    ReportError(new InvalidVariableError(this, variable, variableName, $"The graph type '{type.Name}' is not an input graph type."));
-                    parsedValue = null;
-                    return false;
+                    throw new InvalidVariableError(this, variableDef, variableName, $"The graph type '{type.Name}' is not an input graph type.");
                 }
             }
 
             // Coerces a scalar value
-            bool ParseValueScalar(ScalarGraphType scalarGraphType, VariableDefinition variable, VariableName variableName, object value, out object parsedValue)
+            object ParseValueScalar(ScalarGraphType scalarGraphType, VariableDefinition variableDef, VariableName variableName, object value)
             {
                 if (value == null)
-                {
-                    parsedValue = null;
-                    return true;
-                }
+                    return null;
+
+                object ret;
 
                 try
                 {
-                    parsedValue = scalarGraphType.ParseValue(value);
+                    ret = scalarGraphType.ParseValue(value); //TODO: change to TryParseValue after #2293
                 }
                 catch (Exception ex)
                 {
-                    ReportError(new InvalidVariableError(this, variable, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex));
-                    parsedValue = null;
-                    return false;
+                    throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
                 }
 
-                if (parsedValue == null)
-                {
-                    ReportError(new InvalidVariableError(this, variable, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'"));
-                    return false;
-                }
-
-                return true;
+                return ret ?? throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
             }
 
-            bool ParseValueList(ListGraphType listGraphType, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor, out object parsedValue)
+            object ParseValueList(ListGraphType listGraphType, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (value == null)
-                {
-                    parsedValue = null;
-                    return true;
-                }
+                    return null;
 
                 // note: a list can have a single child element which will automatically be interpreted as a list of 1 elements. (see below rule)
                 // so, to prevent a string as being interpreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
@@ -391,40 +362,20 @@ namespace GraphQL.Validation
                         for (int index = 0; index < list.Count; index++)
                         {
                             // parse/validate values as required by graph type
-                            if (ParseValue(listGraphType.ResolvedType, variable, new VariableName(variableName, index), list[index], visitor, out var parsedElement))
-                            {
-                                valueOutputs[index] = parsedElement;
-                            }
-                            else
-                            {
-                                parsedValue = null;
-                                return false;
-                            }
+                            valueOutputs[index] = ParseValue(listGraphType.ResolvedType, variableDef, new VariableName(variableName, index), list[index], visitor);
                         }
-
-                        parsedValue = valueOutputs;
-                        return true;
+                        return valueOutputs;
                     }
                     else
                     {
                         var valueOutputs = new List<object>(values is ICollection collection ? collection.Count : 0);
                         int index = 0;
-                        foreach (var val in values)
+                        foreach (object val in values)
                         {
                             // parse/validate values as required by graph type
-                            if (ParseValue(listGraphType.ResolvedType, variable, new VariableName(variableName, index++), val, visitor, out var parsedElement))
-                            {
-                                valueOutputs.Add(parsedElement);
-                            }
-                            else
-                            {
-                                parsedValue = null;
-                                return false;
-                            }
+                            valueOutputs.Add(ParseValue(listGraphType.ResolvedType, variableDef, new VariableName(variableName, index++), val, visitor));
                         }
-
-                        parsedValue = valueOutputs;
-                        return true;
+                        return valueOutputs;
                     }
                 }
                 else
@@ -433,24 +384,15 @@ namespace GraphQL.Validation
                     // then the result of input coercion is a list of size one, where the single item value is the
                     // result of input coercion for the list’s item type on the provided value (note this may apply
                     // recursively for nested lists).
-                    if (ParseValue(listGraphType.ResolvedType, variable, variableName, value, visitor, out var parsedElement))
-                    {
-                        parsedValue = new object[] { parsedElement };
-                        return true;
-                    }
-
-                    parsedValue = null;
-                    return false;
+                    object result = ParseValue(listGraphType.ResolvedType, variableDef, variableName, value, visitor);
+                    return new object[] { result };
                 }
             }
 
-            bool ParseValueObject(IInputObjectGraphType graphType, VariableDefinition variable, VariableName variableName, object value, IVariableVisitor visitor, out object parsedValue)
+            object ParseValueObject(IInputObjectGraphType graphType, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (value == null)
-                {
-                    parsedValue = null;
-                    return false;
-                }
+                    return null;
 
                 if (!(value is IDictionary<string, object> dic))
                 {
@@ -458,9 +400,7 @@ namespace GraphQL.Validation
                     // or an unordered map supplied by a variable, otherwise a query error
                     // must be thrown.
 
-                    ReportError(new InvalidVariableError(this, variable, variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?"));
-                    parsedValue = null;
-                    return false;
+                    throw new InvalidVariableError(this, variableDef, variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
                 var newDictionary = new Dictionary<string, object>(dic.Count);
@@ -478,16 +418,9 @@ namespace GraphQL.Validation
 
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
-                        if (ParseValue(field.ResolvedType, variable, childFieldVariableName, fieldValue, visitor, out var parsedFieldValue))
-                        {
-                            visitor?.VisitField(this, variable, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
-                            newDictionary[field.Name] = parsedFieldValue;
-                        }
-                        else
-                        {
-                            parsedValue = null;
-                            return false;
-                        }
+                        object parsedFieldValue = ParseValue(field.ResolvedType, variableDef, childFieldVariableName, fieldValue, visitor);
+                        visitor?.VisitField(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
+                        newDictionary[field.Name] = parsedFieldValue;
                     }
                     else if (field.DefaultValue != null)
                     {
@@ -499,9 +432,7 @@ namespace GraphQL.Validation
                     {
                         // RULE: If no default value is provided and the input object field’s type is non‐null,
                         // an error should be thrown.
-                        ReportNullError(variable, childFieldVariableName);
-                        parsedValue = null;
-                        return false;
+                        throw new InvalidVariableError(this, variableDef, childFieldVariableName, "Received a null input for a non-null variable.");
                     }
 
                     // RULE: Otherwise, if the field is not required, then no
@@ -535,13 +466,10 @@ namespace GraphQL.Validation
 
                 if (unknownFields?.Count > 0)
                 {
-                    ReportError(new InvalidVariableError(this, variable, variableName, $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'."));
-                    parsedValue = null;
-                    return false;
+                    throw new InvalidVariableError(this, variableDef, variableName, $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'.");
                 }
 
-                parsedValue = graphType.ParseDictionary(newDictionary);
-                return true;
+                return graphType.ParseDictionary(newDictionary);
             }
         }
     }

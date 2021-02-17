@@ -82,22 +82,34 @@ namespace GraphQL.Validation
 
             schema.Initialize();
 
+            ValidationContext context = null;
             bool success = false;
             bool useOnlyStandardRules = rules == null;
+
             if (useOnlyStandardRules)
             {
                 rules = CoreRules;
             }
             else if (!rules.Any())
             {
-                var ctx = Initialize();
-                var variables = ctx.GetVariableValues(schema, variableDefinitions, inputs);
-                ctx.Reset();
-                _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, ctx, null);
-                return (SuccessfullyValidatedResult.Instance, variables);
+                context = Initialize();
+                try
+                {
+                    var variables = context.GetVariableValues(schema, variableDefinitions, inputs); // can report errors even without rules enabled
+
+                    return MakeResult(context, variables);
+                }
+                finally
+                {
+                    if (success)
+                    {
+                        context.Reset();
+                        _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    }
+                }
             }
 
-            var context = Initialize();
+            context = Initialize();
             try
             {
                 List<INodeVisitor> visitors;
@@ -135,10 +147,7 @@ namespace GraphQL.Validation
 
                 var variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty, variableVisitors == null ? null : new CompositeVariableVisitor(variableVisitors));
 
-                success = !context.HasErrors;
-                return success
-                    ? (SuccessfullyValidatedResult.Instance, variables)
-                    : (new ValidationResult(context.Errors), variables);
+                return MakeResult(context, variables);
             }
             finally
             {
@@ -147,6 +156,14 @@ namespace GraphQL.Validation
                     context.Reset();
                     _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
+            }
+
+            (IValidationResult validationResult, Variables variables) MakeResult(ValidationContext context, Variables variables)
+            {
+                success = !context.HasErrors;
+                return success
+                    ? (SuccessfullyValidatedResult.Instance, variables)
+                    : (new ValidationResult(context.Errors), variables);
             }
         }
     }
