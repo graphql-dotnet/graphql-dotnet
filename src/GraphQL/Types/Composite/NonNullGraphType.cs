@@ -3,8 +3,8 @@ using System;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Represents a graph type that, for output graphs, is never null, or for input graphs, is not optional.
-    /// In other words the NonNull type wraps another type, and denotes that the resulting value will never be null.
+    /// Represents a graph type that, for output graphs, is never <see langword="null"/>, or for input graphs, is not optional.
+    /// In other words the NonNull type wraps another type, and denotes that the resulting value will never be <see langword="null"/>.
     /// </summary>
     public class NonNullGraphType : GraphType, IProvideResolvedType
     {

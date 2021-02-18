@@ -47,33 +47,33 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Returns the last graph type matched, or null if none.
+        /// Returns the last graph type matched, or <see langword="null"/> if none.
         /// </summary>
         public IGraphType GetLastType() => _typeStack.Count > 0 ? _typeStack.Peek() : null;
 
         /// <summary>
-        /// Returns the last input graph type matched, or null if none.
+        /// Returns the last input graph type matched, or <see langword="null"/> if none.
         /// </summary>
         public IGraphType GetInputType() => _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
 
         /// <summary>
-        /// Returns the parent graph type of the current node, or null if none.
+        /// Returns the parent graph type of the current node, or <see langword="null"/> if none.
         /// </summary>
         public IGraphType GetParentType() => _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
 
         /// <summary>
-        /// Returns the last field type matched, or null if none.
+        /// Returns the last field type matched, or <see langword="null"/> if none.
         /// </summary>
         public FieldType GetFieldDef() => _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
 
         /// <summary>
-        /// Returns the last directive specified, or null if none.
+        /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
         public DirectiveGraphType GetDirective() => _directive;
 
         /// <summary>
-        /// Returns the last query argument matched, or null if none.
+        /// Returns the last query argument matched, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
         public QueryArgument GetArgument() => _argument;
