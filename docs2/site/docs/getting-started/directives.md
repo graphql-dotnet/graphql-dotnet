@@ -250,6 +250,11 @@ public class Query : ObjectGraphType
 As you can see, the GraphQL server simply provides additional information that is available to clients through introspection.
 The GraphQL server does not assume any processing of it.
 
+Another case is when the directive is not used by a corresponding schema visitor, but by another GraphQL.NET "module", for
+example, a validation rule. Consider the [@length](#How-to-apply-a-directive) directive example above. The purpose of this
+directive for server (for the client, the purpose is also clear - it makes no sense for client to send request with data
+exceeding the declared size) is to validate inputs before executing a GraphQL request. 
+
 # Can a schema visitor be used without creating/registering a directive
 
 Yes. Strictly speaking, schema visitors do not necessarily process directives. `ISchemaNodeVisitor` interface is a general
