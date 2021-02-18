@@ -110,7 +110,7 @@ populating it with your results and returning the array. The array will be relea
 limited uses, since the rented array is not guaranteed to be exactly the requested length, so the array would need to be
 wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one):
 
-```c#
+```csharp
  resolve: context =>
 {
     var ints = context.ArrayPool.Rent<int>(1000); // ints.Length >= 1000
@@ -158,6 +158,7 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
+* New property `IResolveFieldContext.Parent`
 * Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
@@ -188,7 +189,7 @@ Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` N
 
 By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
 
-```c#
+```csharp
 /// <summary>
 /// Default schema comparer for GraphQL.NET v3.x.x.
 /// By default only fields are ordered by their names within enclosing type.
@@ -278,7 +279,7 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 
 To enable metrics, please set the option to `true` before executing the query.
 
-```cs
+```csharp
 var result = await schema.ExecuteAsync(options =>
 {
     options.Query = "{ hero { id name } }";
@@ -288,7 +289,7 @@ var result = await schema.ExecuteAsync(options =>
 
 ### GraphQL Member Descriptions
 
-To improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it
+To improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from XML comments as it
 did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
 
 ### Changes to `IResolveFieldContext.Arguments`
