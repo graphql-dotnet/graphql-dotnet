@@ -365,8 +365,7 @@ namespace GraphQL
             where TSchema : GraphQL.Types.ISchema { }
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
             where TSchema : GraphQL.Types.ISchema { }
-        public static TSchema RegisterVisitor<TSchema, TVisitor>(this TSchema schema)
-            where TSchema : GraphQL.Types.ISchema
+        public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
         public static void Run(this GraphQL.Types.ISchema schema, GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
@@ -2563,12 +2562,6 @@ namespace GraphQL.Utilities
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
         protected virtual GraphQL.Types.IGraphType GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
-        public GraphQL.Utilities.SchemaBuilder RegisterType(GraphQL.Types.IGraphType type) { }
-        public void RegisterTypes(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types) { }
-        public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
-        public void RegisterVisitor(System.Type type) { }
-        public void RegisterVisitor<TVisitor>()
-            where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }

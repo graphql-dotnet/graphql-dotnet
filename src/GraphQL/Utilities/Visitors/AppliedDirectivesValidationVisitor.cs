@@ -63,7 +63,7 @@ namespace GraphQL.Utilities
                         foreach (var arg in schemaDirective.Arguments.List)
                         {
                             var a = appliedDirective.FindArgument(arg.Name);
-                            if (arg.DefaultValue == null && a == null)
+                            if (a == null && arg.ResolvedType is NonNullGraphType && arg.DefaultValue == null)
                                 throw new InvalidOperationException($"Directive '{appliedDirective.Name}' must specify required argument '{arg.Name}'.");
 
                             if (a != null)
@@ -78,7 +78,7 @@ namespace GraphQL.Utilities
                     {
                         foreach (var arg in appliedDirective.Arguments)
                         {
-                            if (schemaDirective.Arguments.Find(arg.Name) == null)
+                            if (schemaDirective.Arguments?.Find(arg.Name) == null)
                                 throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}'.");
                         }
                     }

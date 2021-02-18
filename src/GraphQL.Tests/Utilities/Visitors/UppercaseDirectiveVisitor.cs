@@ -1,9 +1,22 @@
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Tests.Utilities.Visitors
 {
+    public class UpperDirective : DirectiveGraphType
+    {
+        /// <summary>
+        /// Initializes a new instance of the 'length' directive.
+        /// </summary>
+        public UpperDirective()
+            : base("upper", DirectiveLocation.FieldDefinition)
+        {
+            Description = "Converts the value of string fields to uppercase.";
+        }
+    }
+
     /// <summary>
     /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
     /// </summary>
@@ -18,9 +31,12 @@ namespace GraphQL.Tests.Utilities.Visitors
                 {
                     object result = inner.Resolve(context);
 
-                    return result is string str
-                        ? str.ToUpperInvariant()
-                        : result;
+                    return result switch
+                    {
+                        string str => str?.ToUpperInvariant(),
+                        Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
+                        _ => result
+                    };
                 });
             }
         }

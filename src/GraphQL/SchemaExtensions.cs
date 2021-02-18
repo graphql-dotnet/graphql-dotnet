@@ -15,12 +15,10 @@ namespace GraphQL
         /// Adds the specified visitor type to the schema. When initializing a schema, all
         /// registered visitors will be executed on each schema element when it is traversed.
         /// </summary>
-        public static TSchema RegisterVisitor<TSchema, TVisitor>(this TSchema schema)
-            where TSchema : ISchema
+        public static void RegisterVisitor<TVisitor>(this ISchema schema)
             where TVisitor : ISchemaNodeVisitor
         {
             schema.RegisterVisitor(typeof(TVisitor));
-            return schema;
         }
 
         /// <summary>
