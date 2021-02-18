@@ -88,6 +88,8 @@ namespace GraphQL
                 throw new InvalidOperationException("Schema is already initialized");
 
             schema.Features.AppliedDirectives = true;
+            schema.Features.RepeatableDirectives = true;
+
             if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
                 schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();
 
