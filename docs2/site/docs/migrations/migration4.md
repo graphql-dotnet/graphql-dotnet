@@ -62,20 +62,19 @@ requested type via `ObjectExtensions.ToObject` as it did before.
 
 ### Experimental Features / Applied Directives
 
-> Ability to apply directives to the schema elements and expose user-defined meta-information
-  via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
-> See https://github.com/graphql/graphql-spec/issues/300 for more information.
-
-(sungam3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
+In v4 we added ability to apply directives to the schema elements and expose user-defined meta-information
+via introspection. This was one of the most requested features not only in GraphQL.NET, but in the entire
+GraphQL ecosystem as a whole. See the [Directives](https://graphql-dotnet.github.io/docs/getting-started/directives)
+documentation page which describes the new features in detail.
 
 ### Microsoft-specific Dependency Injection Extensions
 
 If you are using the `Microsoft.Extensions.DependencyInjection` package, extension methods are provided within
-the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI) for creating a service provider scope
-during a field resolver's execution. This is useful when accessing a scoped service with a parallel execution strategy, as
-typically scoped services are not multi-threaded compatible. The library also provides a builder to assist constructing
-a field resolver that relies on scoped services. Below is a sample of a field resolver that relies on a scoped
-service and can run concurrently with other field resolvers:
+the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI) for creating a service
+provider scope during a field resolver's execution. This is useful when accessing a scoped service with a parallel
+execution strategy, as typically scoped services are not multi-threaded compatible. The library also provides a
+builder to assist constructing a field resolver that relies on scoped services. Below is a sample of a field resolver
+that relies on a scoped service and can run concurrently with other field resolvers:
 
 ```csharp
 public class MyGraphType : ObjectGraphType<Category>
@@ -96,9 +95,9 @@ See [Dependency Injection](https://graphql-dotnet.github.io/docs/getting-started
 
 ### Ability to Sort Introspection Results
 
-Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer by setting
-`ISchema.Comparer` to an implementation of `ISchemaComparer`. By default, introspection results are returned in the order they
-were defined.
+Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer
+by setting `ISchema.Comparer` to an implementation of `ISchemaComparer`. By default, introspection results are
+returned in the order they were defined.
 
 See [Default Sort Order of Introspection Query Results](#Default-Sort-Order-of-Introspection-Query-Results) below for a sample
 of how this can be used to return introspection results that are sorted alphabetically.
@@ -140,7 +139,8 @@ constructor of your schema, or a similar location.
 
 ### Authorization Extension Methods
 
-Historically, there are two repositories in [graphql-dotnet](https://github.com/graphql-dotnet) org that provide APIs for configuring authorization requirements:
+Historically, there are two repositories in [graphql-dotnet](https://github.com/graphql-dotnet) org that provide APIs for configuring
+authorization requirements.
 
 | Name | Package | Description |
 |------|---------|-------------| 
@@ -159,7 +159,6 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 
 * New method `IParentExecutionNode.ApplyToChildren`
 * New property `IResolveFieldContext.Parent`
-* Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
@@ -237,44 +236,6 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 }
 ```
 
-### API Cleanup
-
-* `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
-  your project if you require these classes.
-* `LightweightCache.First` method has been removed.
-* `IGraphType.CollectTypes` method has been removed.
-* `ExecutionHelper.SubFieldsFor` method has been removed.
-* `NodeExtensions`, `AstNodeExtensions` classes have been removed.
-* `CoreToVanillaConverter` class became `static` and most of its members have been removed.
-* `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
-* `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
-* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
-* `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
-* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
-* `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
-* `ErrorLocation` struct became `readonly`.
-* `DebugNodeVisitor` class has been removed.
-* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
-* `EnumerableExtensions.Apply` for dictionaries has been removed.
-* `ISubscriptionExecuter` has been removed.
-* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have
-  changed. `NodeVisitors` class has been added in its place.
-* `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
-* Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
-* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
-* Removed `TypeExtensions.As`
-* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
-* `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
-* `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
-* Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
-* `SourceLocation`, `NameNode` and `BasicVisitor` have been changed to a `readonly struct`.
-* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
-* `void INode.Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
-* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections:
-  `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `Interfaces` and `ResolvedInterfaces`
-* `INode.IsEqualTo` and related methods have been removed.
-* `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
-
 ### `ExecutionOptions.EnableMetrics` is disabled by default
 
 To enable metrics, please set the option to `true` before executing the query.
@@ -315,6 +276,44 @@ lock (field)
     field.Metadata["counter"] = value + 1;
 }
 ```
+
+### API Cleanup
+
+* `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
+  your project if you require these classes.
+* `LightweightCache.First` method has been removed.
+* `IGraphType.CollectTypes` method has been removed.
+* `ExecutionHelper.SubFieldsFor` method has been removed.
+* `NodeExtensions`, `AstNodeExtensions` classes have been removed.
+* `CoreToVanillaConverter` class became `static` and most of its members have been removed.
+* `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
+* `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
+* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
+* `ErrorLocation` struct became `readonly`.
+* `DebugNodeVisitor` class has been removed.
+* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
+* `EnumerableExtensions.Apply` for dictionaries has been removed.
+* `ISubscriptionExecuter` has been removed.
+* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have
+  changed. `NodeVisitors` class has been added in its place.
+* `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
+* Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
+* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
+* Removed `TypeExtensions.As`
+* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
+* `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
+* `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
+* Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal
+* `SourceLocation`, `NameNode` and `BasicVisitor` have been changed to a `readonly struct`.
+* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
+* `void INode.Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
+* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections:
+  `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `Interfaces` and `ResolvedInterfaces`
+* `INode.IsEqualTo` and related methods have been removed.
+* `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 
 ### Other Breaking Changes
 
