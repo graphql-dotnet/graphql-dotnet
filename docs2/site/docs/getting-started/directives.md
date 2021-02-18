@@ -52,7 +52,7 @@ public class MyDirective : DirectiveGraphType
 }
 ```
 
-Then register it withing your schema.
+Then register an instance of this class within your schema.
 
 ```csharp
 public class MySchema : Schema
@@ -70,6 +70,198 @@ A directive may be defined as repeatable by including the `repeatable` keyword. 
 when the same directive should be used with different arguments at a single location, especially in cases where additional
 information needs to be provided to a type or schema extension via a directive. GraphQL.NET v4 supports repeatable directives.
 To make your directive repeatable set `DirectiveGraphType.Repeatable` property to `true`.
+
+# How to apply a directive
+
+After you have defined your directive, then it can be applied to the corresponding elements of the schema.
+If you try to apply the directive in locations that are not allowed for this, an exception will be thrown
+when initializing the schema. Also, during the schema initialization, the compliance of all applied
+directives with the corresponding directives definitions (names, number and types of parameters, and so on)
+will be checked.
+
+The following is an example of using the `@length` directive.
+
+```csharp
+public class LengthDirective : DirectiveGraphType
+{
+    public override bool? Introspectable => true;
+
+    public LengthDirective()
+        : base("length", DirectiveLocation.InputFieldDefinition, DirectiveLocation.ArgumentDefinition)
+    {
+        Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
+        Arguments = new QueryArguments(
+            new QueryArgument<IntGraphType>
+            {
+                Name = "min",
+                Description = "If specified, specifies the minimum length that the input field or argument must have."
+            },
+            new QueryArgument<IntGraphType>
+            {
+                Name = "max",
+                Description = "If specified, specifies the maximum length that the input field or argument must have."
+            }
+        );
+    }
+}
+```
+
+Applying `@length` directive to an input field.
+
+```csharp
+public class ComplexInput : InputObjectGraphType
+{
+    public ComplexInput()
+    {
+        Name = "ComplexInput";
+        Field<IntGraphType>("intField");
+        Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
+    }
+}
+```
+
+Applying `@length` directive to a field argument.
+
+```csharp
+public class Query : ObjectGraphType
+{
+    public Query()
+    {
+        Field<Human>(
+            "human",
+            arguments: new QueryArguments(
+                new QueryArgument<IdGraphType>
+                {
+                    Name = "id"
+                }
+                .ApplyDirective("length", "min", 2, "max", 5)
+            ));
+    }
+}
+```
+
+# How do directives work
+
+So you have defined a directive. Then you have applied (or not in case of client-side directive) this
+directive to the required locations in your schema. What's next? So far, all you have done is set some
+meta information, and there is still no code anywhere that is responsible for the actions of the added
+directive. The next step is to define a class that will customize the schema using the information
+provided by the applied directive. This class should implement `ISchemaNodeVisitor` interface.
+
+Let's imagine an `@upper` directive.
+
+```csharp
+public class UpperDirective : DirectiveGraphType
+{
+    public UpperDirective()
+        : base("upper", DirectiveLocation.FieldDefinition)
+    {
+        Description = "Converts the value of string fields to uppercase.";
+    }
+}
+```
+
+To make this directive work, you need to write a class like the following (`BaseSchemaNodeVisitor` is just
+a base class implementing `ISchemaNodeVisitor` with empty `virtual` methods, it does nothing).
+
+```csharp
+public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
+{
+    public override void VisitFieldDefinition(FieldType field, ISchema schema)
+    {
+        if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
+        {
+            var inner = field.Resolver ?? NameFieldResolver.Instance;
+            field.Resolver = new FuncFieldResolver<object>(context =>
+            {
+                object result = inner.Resolve(context);
+
+                return result switch
+                {
+                    string str => str?.ToUpperInvariant(),
+                    Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
+                    _ => result
+                };
+            });
+        }
+    }
+}
+```
+
+And then register schema visitor within your schema just like you did to register the directive.
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema()
+    {
+        RegisterVisitor(new UppercaseDirectiveVisitor());
+        // or
+        RegisterVisitor(typeof(UppercaseDirectiveVisitor));
+    }
+}
+```
+
+Note that a schema visitor, unlike a directive, can be registered not only as an instance but also as
+a type. In this case, when initializing the schema, schema visitor will be created according to how
+you configure the DI container. In other words, schema visitors support dependency injection.
+
+# Is it mandatory to create a schema visitor in addition to the directive
+
+No. The applied directives (along with the directive definition itself) can exist without the corresponding
+schema visitors. In this case, the directive is usually set to provide additional information to clients by
+means of introspection. For example, consider such directive:
+
+```csharp
+public class AuthorDirective : DirectiveGraphType
+{
+    public AuthorDirective()
+        : base("author", DirectiveLocation.Field)
+    {
+        Description = "Provides information about the author of the field";
+        Arguments = new QueryArguments(
+            new QueryArgument<StringGraphType>
+            {
+                Name = "name",
+                Description = "Author's name"
+            },
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
+                Name = "email",
+               Description = "Email where you can ask your question"
+            }
+        );
+    }
+}
+```
+
+Then the directive can be applied like this:
+
+```csharp
+public class Query : ObjectGraphType
+{
+    public Query()
+    {
+        Field<Human>("human", resolve: context => GetHuman(context)).ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com")
+    }
+}
+```
+
+As you can see, the GraphQL server simply provides additional information that is available to clients through introspection.
+The GraphQL server does not assume any processing of it.
+
+# Can a schema visitor be used without creating/registering a directive
+
+Yes. Strictly speaking, schema visitors do not necessarily process directives. `ISchemaNodeVisitor` interface is a general
+means of traversing a schema. You can traverse your schema at any time using the `Run` extension method. Just remember that
+if your schema visitor modifies the schema, then you must ensure synchronization if you call `Run` method in parallel with
+the processing of incoming GraphQL requests to the schema.
+
+```csharp
+var schema = new MySchema();
+var visitor = new MyVisitor();
+visitor.Run(schema);
+```
 
 # Directives and introspection
 
@@ -252,72 +444,8 @@ will be present in the introspection response if and only if it has all its loca
 
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
-# How to apply a directive
+# Directive vs Field Middleware 
 
-After you have defined your directive, then it can be applied to the corresponding elements of the schema.
-If you try to apply the directive in locations that are not allowed for this, an exception will be thrown
-when initializing the schema.
-
-The following is an example of using the `@length` directive defined as
-
-```csharp
-public class LengthDirective : DirectiveGraphType
-{
-    public override bool? Introspectable => true;
-
-    public LengthDirective()
-        : base("length", DirectiveLocation.InputFieldDefinition, DirectiveLocation.ArgumentDefinition)
-    {
-        Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
-        Arguments = new QueryArguments(
-            new QueryArgument<IntGraphType>
-            {
-                Name = "min",
-                Description = "If specified, specifies the minimum length that the input field or argument must have."
-            },
-            new QueryArgument<IntGraphType>
-            {
-                Name = "max",
-                Description = "If specified, specifies the maximum length that the input field or argument must have."
-            }
-        );
-    }
-}
-```
-
-Applying `@length` directive to an input field:
-
-```csharp
-public class ComplexInput : InputObjectGraphType
-{
-    public ComplexInput()
-    {
-        Name = "ComplexInput";
-        Field<IntGraphType>("intField");
-        Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
-    }
-}
-```
-
-Applying `@length` directive to a field argument:
-
-```csharp
-public class Query : ObjectGraphType
-{
-    public Query()
-    {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
-    }
-}
-```
-
-Also, during the schema initialization, the compliance of all applied directives with the corresponding
-directives definitions (names, number and types of parameters, and so on) will be checked.
+If we consider Field Middleware as a way to globally affect the method of calculating all fields
+of all types in the Schema, then the directive can be considered as a way to locally affect only
+specific schema elements. For more information about field middlewares see [Field Middleware](field-middleware).

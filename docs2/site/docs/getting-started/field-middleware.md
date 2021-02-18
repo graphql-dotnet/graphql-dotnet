@@ -179,5 +179,4 @@ Options are also possible using transient lifetime, but are not given here (not 
 
 If we consider Field Middleware as a way to globally affect the method of calculating all fields
 of all types in the Schema, then the directive can be considered as a way to locally affect only
-specific fields. The mechanism of their work is similar. For more information about directives
-see [Directives](Directives).
+specific schema elements. For more information about directives see [Directives](directives).
