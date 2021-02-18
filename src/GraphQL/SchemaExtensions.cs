@@ -118,15 +118,10 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Runs the specified visitor on the specified schema.
-        /// </summary>
-        public static void Run(this ISchemaNodeVisitor visitor, ISchema schema) => schema.Run(visitor);
-
-        /// <summary>
         /// Runs the specified visitor on the specified schema. This method traverses
         /// all the schema elements and calls the appropriate visitor methods.
         /// </summary>
-        public static void Run(this ISchema schema, ISchemaNodeVisitor visitor)
+        public static void Run(this ISchemaNodeVisitor visitor, ISchema schema)
         {
             visitor.VisitSchema(schema);
 

@@ -7,9 +7,6 @@ namespace GraphQL.Tests.Utilities.Visitors
 {
     public class UpperDirective : DirectiveGraphType
     {
-        /// <summary>
-        /// Initializes a new instance of the 'length' directive.
-        /// </summary>
         public UpperDirective()
             : base("upper", DirectiveLocation.FieldDefinition)
         {

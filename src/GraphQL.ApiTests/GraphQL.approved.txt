@@ -367,7 +367,6 @@ namespace GraphQL
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
-        public static void Run(this GraphQL.Types.ISchema schema, GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
     }
     public static class StringExtensions
