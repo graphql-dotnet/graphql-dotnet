@@ -133,16 +133,27 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
   when the configured `INameConverter` fixes up invalid names. See `ISchema.NameConverter`.
 - `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
-  Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
+  Disabling this validator is unlikely to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
 It is recommended to configure these options once when your application starts, such as within your `void Main()` method, a static
 constructor of your schema, or a similar location.
 
 ### Authorization Extension Methods
 
-> Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
+Historically, there are two repositories in [graphql-dotnet](https://github.com/graphql-dotnet) org that provide APIs for configuring authorization requirements:
 
-(sungam3r todo: write more description about how it interacts with the other libraries, add simple sample)
+| Name | Package | Description |
+|------|---------|-------------| 
+| [server](https://github.com/graphql-dotnet/server) | [GraphQL.Server.Authorization.AspNetCore](https://www.nuget.org/packages/GraphQL.Server.Authorization.AspNetCore) | Integration of GraphQL.NET validation subsystem into ASP.NET Core |
+| [authorization](https://github.com/graphql-dotnet/authorization) | [GraphQL.Authorization](https://www.nuget.org/packages/GraphQL.Authorization) | A toolset for authorizing access to graph types for GraphQL.NET |
+
+Authorization itself is not a specific part of the GraphQL.NET repository, so it was quite natural to keep this functionality
+in separate repositories. However, this resulted in some code duplication between repositories. In addition, there was constant
+confusion about which of the two projects to use. In v4, we began the process of converging the two projects to a common denominator.
+Extension methods (see `AuthorizationExtensions`) to configure authorization requirements for GraphQL elements (types, fields, schema)
+were moved to GraphQL.NET repository. These methods will be removed from their respective projects after v4 release.
+
+GraphQL.NET will not receive new dependencies, since all methods just read or write meta information. Calling code changes not required.
 
 ### Other Features
 
