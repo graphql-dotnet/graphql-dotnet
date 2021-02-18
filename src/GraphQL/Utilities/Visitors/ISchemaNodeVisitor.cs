@@ -3,7 +3,7 @@ using GraphQL.Types;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Visitor which methods are called when traversing the schema either calling <see cref="SchemaExtensions.Run(ISchema, ISchemaNodeVisitor)"/>
+    /// Visitor which methods are called when traversing the schema either calling <see cref="SchemaExtensions.Run(ISchemaNodeVisitor, ISchema)"/>
     /// directly or during building schema via <see cref="SchemaBuilder.Build(string)"/>.
     /// <br/>
     /// Also see <see href="https://www.apollographql.com/docs/graphql-tools/schema-directives/#implementing-schema-directives"/>
