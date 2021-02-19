@@ -32,9 +32,23 @@ Client-side examples:
 - [@skip](http://spec.graphql.org/June2018/#sec--skip)
 - [@include](http://spec.graphql.org/June2018/#sec--include)
 
-# Defining your own directive
+# Repeatable Directives
 
-To define your own directive create a directive class inherited from `DirectiveGraphType`.
+In GraphQL language a directive may be defined as repeatable by including the `repeatable` keyword.
+Repeatable directives are often useful when the same directive should be used with different arguments
+at a single location, especially in cases where additional information needs to be provided to a type
+or schema extension via a directive. GraphQL.NET v4 supports repeatable directives. To make your directive
+repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`.
+
+# Basic steps when adding a directive
+
+1. Define your custom directive.
+2. Apply the directive to the desired schema elements.
+3. Write the code that will implement the logic of the directive.
+
+# Defining your custom directive
+
+To define your custom directive create a directive class inherited from `DirectiveGraphType`.
 
 ```csharp
 public class MyDirective : DirectiveGraphType
@@ -64,19 +78,12 @@ public class MySchema : Schema
 }
 ```
 
-# Repeatable Directives
-
-A directive may be defined as repeatable by including the `repeatable` keyword. Repeatable directives are often useful
-when the same directive should be used with different arguments at a single location, especially in cases where additional
-information needs to be provided to a type or schema extension via a directive. GraphQL.NET v4 supports repeatable directives.
-To make your directive repeatable set `DirectiveGraphType.Repeatable` property to `true`.
-
 # How to apply a directive
 
 After you have defined your directive, then it can be applied to the corresponding elements of the schema.
 If you try to apply the directive in locations that are not allowed for this, an exception will be thrown
 when initializing the schema. Also, during the schema initialization, the compliance of all applied
-directives with the corresponding directives definitions (names, number and types of parameters, and so on)
+directives with the corresponding directives' definitions (names, number and types of parameters, and so on)
 will be checked.
 
 The following is an example of using the server-side `@length` directive.
@@ -140,6 +147,13 @@ public class Query : ObjectGraphType
     }
 }
 ```
+
+> Above was an example of how to create and how to apply the `@length` directive. Also, for the directive
+> to work, additional code is required that would use the requirements specified by the directive. The
+> implementation of this code for `@length` directive is intentionally omitted, due to the complexity,
+> those who interested can look at it in the [sources](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Validation/Rules/InputFieldsAndArgumentsOfCorrectLength.cs).
+> For a much simpler example of such an implementation, see [How do directives work](#How-do-directives-work)
+> paragraph below describing the `@upper` directive.
 
 # How do directives work
 
@@ -256,10 +270,11 @@ public class Query : ObjectGraphType
 As you can see, the GraphQL server simply provides additional information that is available to clients through introspection.
 The GraphQL server does not assume any processing of it.
 
-Another case is when the directive is not used by a corresponding schema visitor, but by another GraphQL.NET "module", for
+Another case is when the directive is not used by a corresponding schema visitor, but by another GraphQL.NET component, for
 example, a validation rule. Consider the [@length](#How-to-apply-a-directive) directive example above. The purpose of this
-directive for server (for the client, the purpose is also clear - it makes no sense for client to send request with data
-exceeding the declared size) is to validate inputs before executing a GraphQL request. 
+directive for server is to validate inputs before executing a GraphQL request. The same can be said for a client - it wouldn't
+make sense to send a request with data not within the declared length limits. That is, of course, if client is ready to
+recognize a custom server-defined directive.
 
 # Can a schema visitor be used without creating/registering a directive
 
@@ -293,7 +308,7 @@ type __Schema {
 Since v4 Graph.NET provides the ability to apply directives to the
 schema elements and expose this user-defined meta-information via introspection. This is an experimental feature that
 is not in the official specification (yet). To enable it call `ISchema.EnableExperimentalIntrospectionFeatures()`.
-This method also enables ability to expose `isRepeatable` field for directives via introspection (feature from the
+This method also makes it possible to expose directives' `isRepeatable` field via introspection (a feature from the
 GraphQL specification working draft). Note that you can also set the `mode` parameter in this method which by default
 equals to `ExecutionOnly`.
 
@@ -306,11 +321,11 @@ public enum ExperimentalIntrospectionFeaturesMode
     /// <summary>
     /// Allow experimental features only for client queries but not for standard introspection
     /// request. This means that the client, in response to a standard introspection request,
-    /// receives a standard response without all the new fields and types. However, client CAN
+    /// receives a standard response without any new fields and types. However, client CAN
     /// make requests to the server using the new fields and types. This mode is needed in order
     /// to bypass the problem of tools such as GraphQL Playground, Voyager, GraphiQL that require
-    /// a standard response to an introspection request and refuse to work correctly if receive
-    /// unknown fields or types in the response.
+    /// a standard response to an introspection request and refuse to work correctly if there are
+    /// any unknown fields or types in the response.
     /// </summary>
     ExecutionOnly,
 
@@ -428,8 +443,8 @@ type __DirectiveArgument {                    <--- NEW INTROSPECTION TYPE
 }
 ```
 
-To allow clients to get your defined directive along with all applications of this directive to the
-schema elements through introspection, override the `Introspectable` property of your directive.
+To make your defined directive and all its applications to the schema elements available through
+introspection, override the `Introspectable` property of your directive.
 
 ```csharp
 public class MyDirective : DirectiveGraphType
@@ -449,17 +464,17 @@ public class MyDirective : DirectiveGraphType
 }
 ```
 
-If you do not explicitly set this property (either to `true` or `false`) then by default
-your directive definition along with all applications of this directive to the schema elements
-will be present in the introspection response if and only if it has all its locations of type
-[`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
+If you do not explicitly set this property (either to `true` or `false`) then by default your
+directive definition along with all applications of this directive to the schema elements will
+be present in the introspection response if and only if directive definition has all its locations
+of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
 (so called client-side directive).
 
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
 
 # Directive vs Field Middleware 
 
-If we consider Field Middleware as a way to globally affect the method of resolving all fields
-of all types in the schema, then the directive can be considered as a way to locally affect only
-specific schema elements. In addition, the potential effect of the directive is not limited to
-only resolving fields. For more information about field middlewares see [Field Middleware](field-middleware).
+You can think of a Field Middleware as something global that controls how all fields of all types
+in the schema are resolved. A directive, at the same time, would only affect specific schema elements
+and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
+For more information about field middlewares see [Field Middleware](field-middleware).

@@ -189,11 +189,11 @@ namespace GraphQL
         /// <summary>
         /// Allow experimental features only for client queries but not for standard introspection
         /// request. This means that the client, in response to a standard introspection request,
-        /// receives a standard response without all the new fields and types. However, client CAN
+        /// receives a standard response without any new fields and types. However, client CAN
         /// make requests to the server using the new fields and types. This mode is needed in order
         /// to bypass the problem of tools such as GraphQL Playground, Voyager, GraphiQL that require
-        /// a standard response to an introspection request and refuse to work correctly if receive
-        /// unknown fields or types in the response.
+        /// a standard response to an introspection request and refuse to work correctly if there are
+        /// any unknown fields or types in the response.
         /// </summary>
         ExecutionOnly,
 
