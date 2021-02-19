@@ -125,7 +125,8 @@ namespace GraphQL.Validation
 
                     new BasicVisitor(visitors).Visit(document, context);
 
-                    variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty, variableVisitors == null ? null : new CompositeVariableVisitor(variableVisitors));
+                    variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty,
+                        variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
                 }
 
                 return context.HasErrors
