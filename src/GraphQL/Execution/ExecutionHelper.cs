@@ -207,8 +207,8 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// Note: Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
         /// directives are provided on the same field or fragment, it must be queried only if the @skip condition
-        /// is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
-        /// if either the @skip condition is true or the @include condition is false.
+        /// is <see langword="false"/> and the @include condition is <see langword="true"/>. Stated conversely, the field or
+        /// fragment must not be queried if either the @skip condition is <see langword="true"/> or the @include condition is <see langword="false"/>.
         /// </summary>
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
         {

@@ -271,11 +271,11 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns true is the value is null, value.ToString equals an empty string, or the value can be converted into a named enum value.
+        /// Returns <see langword="true"/> if the value is <see langword="null"/>, value.ToString equals an empty string, or the value can be converted into a named enum value.
         /// </summary>
         /// <param name="type">An enum type.</param>
         /// <param name="value">The value being tested.</param>
-        public static bool IsDefinedEnumValue(Type type, object value)
+        public static bool IsDefinedEnumValue(Type type, object value) //TODO: rewrite, comment above seems wrong
         {
             try
             {

@@ -1,10 +1,10 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Represents an execution node which always returns null.
+    /// Represents an execution node which always returns <see langword="null"/>.
     /// </summary>
     public class NullExecutionNode : ExecutionNode
     {
@@ -18,7 +18,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns null.
+        /// Returns <see langword="null"/>.
         /// </summary>
         public override object ToValue() => null;
     }

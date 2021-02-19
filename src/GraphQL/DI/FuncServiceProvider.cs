@@ -21,7 +21,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets an instance of the specified type. May return null. Also you can use GetRequiredService extension method.
+        /// Gets an instance of the specified type. May return <see langword="null"/>. Also you can use GetRequiredService extension method.
         /// </summary>
         /// <param name="type">Desired type</param>
         public object GetService(Type type) => _resolver(type);

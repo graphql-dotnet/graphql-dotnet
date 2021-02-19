@@ -197,7 +197,7 @@ namespace GraphQL.Utilities
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var values = string.Join(Environment.NewLine, type.Values.Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name));
+            var values = string.Join(Environment.NewLine, type.Values.Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name + (Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "")));
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 

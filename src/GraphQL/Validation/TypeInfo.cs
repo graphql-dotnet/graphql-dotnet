@@ -60,37 +60,37 @@ namespace GraphQL.Validation
         public INode GetAncestor(int index) => PeekElement(_ancestorStack, index);
 
         /// <summary>
-        /// Returns the last graph type matched, or null if none.
+        /// Returns the last graph type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetLastType(int index = 0) => PeekElement(_typeStack, index);
 
         /// <summary>
-        /// Returns the last input graph type matched, or null if none.
+        /// Returns the last input graph type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
 
         /// <summary>
-        /// Returns the parent graph type of the current node, or null if none.
+        /// Returns the parent graph type of the current node, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
         public IGraphType GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
 
         /// <summary>
-        /// Returns the last field type matched, or null if none.
+        /// Returns the last field type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the field; 0 for the top-most field, 1 for the direct ancestor and so on.</param>
         public FieldType GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
 
         /// <summary>
-        /// Returns the last directive specified, or null if none.
+        /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
         public DirectiveGraphType GetDirective() => _directive;
 
         /// <summary>
-        /// Returns the last query argument matched, or null if none.
+        /// Returns the last query argument matched, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
         public QueryArgument GetArgument() => _argument;

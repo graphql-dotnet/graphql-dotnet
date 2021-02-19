@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Utilities
 
         private string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true });
         }
 
         private string print(ISchema schema, SchemaPrinterOptions options)
@@ -164,7 +164,7 @@ type Foo {
   # This is of type String
   str: String
   # This is of type Integer
-  int: Int
+  int: Int @deprecated(reason: ""This field is now deprecated"")
 }"
                 },
                 {
@@ -532,7 +532,7 @@ type Foo {
   # This is of type String
   str: String
   # This is of type Integer
-  int: Int
+  int: Int @deprecated(reason: ""This field is now deprecated"")
 }
 
 # This is a Foo interface type
@@ -746,7 +746,7 @@ scalar Uri"
                     "RGB",
 @"enum RGB {
   # Red!
-  RED
+  RED @deprecated(reason: ""Use green!"")
   # Green!
   GREEN
   # Blue!
@@ -787,7 +787,7 @@ scalar Uri"
                     "RGB",
 @"enum RGB {
   # Red!
-  RED
+  RED @deprecated(reason: ""Use green!"")
   # Green!
   GREEN
   # Blue!
@@ -1332,7 +1332,7 @@ enum __TypeKind {
             public RgbEnum()
             {
                 Name = "RGB";
-                AddValue("RED", "Red!", 0);
+                AddValue("RED", "Red!", 0, "Use green!");
                 AddValue("GREEN", "Green!", 1);
                 AddValue("BLUE", "Blue!", 2);
             }

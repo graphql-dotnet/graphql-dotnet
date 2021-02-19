@@ -12,7 +12,7 @@ namespace GraphQL.Execution
     public abstract class ExecutionNode
     {
         /// <summary>
-        /// Returns the parent node, or null if this is the root node.
+        /// Returns the parent node, or <see langword="null"/> if this is the root node.
         /// </summary>
         public ExecutionNode Parent { get; }
 
@@ -33,7 +33,7 @@ namespace GraphQL.Execution
         public FieldType FieldDefinition { get; }
 
         /// <summary>
-        /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, null.
+        /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, <see langword="null"/>.
         /// </summary>
         public int? IndexInParentNode { get; }
 
@@ -76,11 +76,11 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
         /// </summary>
-        /// <param name="parent">The parent node, or null if this is the root node</param>
+        /// <param name="parent">The parent node, or <see langword="null"/> if this is the root node</param>
         /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>. Array nodes will be a <see cref="ListGraphType"/> instance.</param>
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
-        /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
+        /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
