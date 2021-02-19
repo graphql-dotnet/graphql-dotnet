@@ -84,7 +84,7 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
-        private SchemaTypes(ISchema schema, List<(Type, Type)> typeMappings)
+        private SchemaTypes(ISchema schema, List<(Type clrType, Type graphType)> typeMappings)
         {
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
@@ -167,12 +167,13 @@ namespace GraphQL.Types
         /// Initializes a new instance for the specified graph types and directives, and with the specified type resolver and name converter.
         /// </summary>
         /// <param name="types">A list of graph type instances to register in the lookup table.</param>
+        /// <param name="typeMappings">CLR-GraphType type mappings.</param>
         /// <param name="directives">A list of directives to register.</param>
         /// <param name="resolveType">A delegate which returns an instance of a graph type from its .NET type.</param>
         /// <param name="schema">A schema for which this instance is created.</param>
         public static SchemaTypes Create(
             IEnumerable<IGraphType> types,
-            List<(Type,Type)> typeMappings,
+            List<(Type clrType, Type graphType)> typeMappings,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
             ISchema schema)

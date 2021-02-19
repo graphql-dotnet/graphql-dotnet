@@ -250,7 +250,7 @@ namespace GraphQL.Types
             }
         }
 
-        private List<(Type, Type)> _clrToGraphTypeMappings;
+        private List<(Type clrType, Type graphType)> _clrToGraphTypeMappings;
 
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType, Type graphType)

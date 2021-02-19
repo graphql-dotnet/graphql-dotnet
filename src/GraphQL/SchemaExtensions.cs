@@ -99,6 +99,7 @@ namespace GraphQL
         /// Field(x => x.Filters);
         /// </c>
         /// </summary>
+        /// <param name="schema">The schema for which the mapping is registered.</param>
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
         public static void AutoRegister(this ISchema schema, Type clrType, AutoRegisteringMode mode = AutoRegisteringMode.Both)
@@ -118,6 +119,7 @@ namespace GraphQL
         /// Field(x => x.Filters);
         /// </c>
         /// </summary>
+        /// <param name="schema">The schema for which the mapping is registered.</param>
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
