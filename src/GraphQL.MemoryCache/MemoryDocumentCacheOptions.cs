@@ -19,7 +19,7 @@ namespace GraphQL.Caching
 
         /// <summary>
         /// The maximum lifetime of queries cached within this instance. Upon cache hit, the expiration time
-        /// for the query is reset to this value. Defaults to null, indicating that there is no expiration.
+        /// for the query is reset to this value. Defaults to <see langword="null"/>, indicating that there is no expiration.
         /// </summary>
         public TimeSpan? SlidingExpiration { get; set; }
 

@@ -70,7 +70,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
-        /// the object execution node result is not null.
+        /// the object execution node result is not <see langword="null"/>.
         /// </summary>
         private static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
@@ -111,7 +111,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Creates execution nodes for array elements of an array execution node. Only run if
-        /// the array execution node result is not null.
+        /// the array execution node result is not <see langword="null"/>.
         /// </summary>
         private static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
@@ -329,7 +329,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Sets the location and path information to the error and adds it to the document. Sets the node result to null.
+        /// Sets the location and path information to the error and adds it to the document. Sets the node result to <see langword="null"/>.
         /// </summary>
         protected void SetNodeError(ExecutionContext context, ExecutionNode node, ExecutionError error)
         {
