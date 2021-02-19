@@ -21,7 +21,8 @@ namespace GraphQL.Tests.Utilities.Visitors
     {
         public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
-            if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
+            var applied = field.FindAppliedDirective("upper");
+            if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
                 field.Resolver = new FuncFieldResolver<object>(context =>
@@ -46,7 +47,8 @@ namespace GraphQL.Tests.Utilities.Visitors
     {
         public override void VisitFieldDefinition(FieldType field, ISchema schema)
         {
-            if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
+            var applied = field.FindAppliedDirective("upper");
+            if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
                 field.Resolver = new AsyncFieldResolver<object>(async context =>

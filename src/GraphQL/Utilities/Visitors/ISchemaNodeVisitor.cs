@@ -3,8 +3,9 @@ using GraphQL.Types;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Visitor which methods are called when traversing the schema either calling <see cref="SchemaExtensions.Run(ISchemaNodeVisitor, ISchema)"/>
-    /// directly or during building schema via <see cref="SchemaBuilder.Build(string)"/>.
+    /// Visitor which methods are called when traversing the schema. This happens either explicitly, i.e. when calling
+    /// <see cref="SchemaExtensions.Run(ISchemaNodeVisitor, ISchema)"/> method directly or during schema creation when
+    /// this method is executed on all schema visitors registered on the schema.
     /// <br/>
     /// Also see <see href="https://www.apollographql.com/docs/graphql-tools/schema-directives/#implementing-schema-directives"/>
     /// </summary>

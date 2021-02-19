@@ -14,14 +14,32 @@ namespace GraphQL
         /// <summary>
         /// Indicates whether provider has any applied directives.
         /// Note that built-in @deprecated directive is not taken into account and ignored.
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
         /// </summary>
         public static bool HasAppliedDirectives(this IProvideMetadata provider) => provider.HasMetadata(DIRECTIVES_KEY);
 
         /// <summary>
         /// Provides all directives applied to this provider if any. Otherwise returns <see langword="null"/>.
         /// Note that built-in @deprecated directive is not taken into account and ignored.
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
         /// </summary>
         public static AppliedDirectives GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
+
+        /// <summary>
+        /// Finds applied directive by its name from the specified provider if any. Otherwise returns <see langword="null"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
+        /// <param name="name">Directive name.</param>
+        public static AppliedDirective FindAppliedDirective(this IProvideMetadata provider, string name) => provider.GetAppliedDirectives()?.Find(name);
 
         /// <summary>
         /// Apply directive without specifying arguments. If the directive declaration has arguments,

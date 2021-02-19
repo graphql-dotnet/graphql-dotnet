@@ -22,8 +22,8 @@ query HeroQuery($id: ID, $withFriends: Boolean!) {
 # Executable Directives and Type System Directives
 
 There are two types of directives - those that are applied on incoming requests (so called client directives) and applied
-on the schema (so called server directives). This is determined by the specified locations when defining the directive.
-Also it is acceptable to define a directive that will be both client-side and server-side.
+on the schema (so called server directives). This is determined by the specified [locations](http://spec.graphql.org/June2018/#sec-Type-System.Directives)
+when defining the directive. Also it is acceptable to define a directive that will be both client-side and server-side.
 
 Server-side examples:
 - [@deprecated](http://spec.graphql.org/June2018/#sec--deprecated)
@@ -79,11 +79,12 @@ when initializing the schema. Also, during the schema initialization, the compli
 directives with the corresponding directives definitions (names, number and types of parameters, and so on)
 will be checked.
 
-The following is an example of using the `@length` directive.
+The following is an example of using the server-side `@length` directive.
 
 ```csharp
 public class LengthDirective : DirectiveGraphType
 {
+    // The meaning of this property will be explained below in the 'Directives and introspection' paragraph. 
     public override bool? Introspectable => true;
 
     public LengthDirective()
@@ -161,27 +162,27 @@ public class UpperDirective : DirectiveGraphType
 }
 ```
 
-To make this directive work, you need to write a class like the following (`BaseSchemaNodeVisitor` is just
-a base class implementing `ISchemaNodeVisitor` with empty `virtual` methods, it does nothing).
+To make this directive work, you need to write a class like the following by implementing the necessary
+schema visitor methods. `BaseSchemaNodeVisitor` is just a base class implementing `ISchemaNodeVisitor`
+interface with empty `virtual` methods, so it does nothing. For this example, we need to override just
+one method - `VisitFieldDefinition`. This method wraps the original field resolver.
 
 ```csharp
 public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
 {
     public override void VisitFieldDefinition(FieldType field, ISchema schema)
     {
-        if (field.HasAppliedDirectives() && field.GetAppliedDirectives().Find("upper") != null)
+        var applied = field.FindAppliedDirective("upper");
+        if (applied != null)
         {
             var inner = field.Resolver ?? NameFieldResolver.Instance;
-            field.Resolver = new FuncFieldResolver<object>(context =>
+            field.Resolver = new AsyncFieldResolver<object>(async context =>
             {
-                object result = inner.Resolve(context);
+                object result = await inner.ResolveAsync(context);
 
-                return result switch
-                {
-                    string str => str?.ToUpperInvariant(),
-                    Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
-                    _ => result
-                };
+                return result is string str
+                    ? str.ToUpperInvariant()
+                    : result;
             });
         }
     }
@@ -196,8 +197,10 @@ public class MySchema : Schema
     public MySchema()
     {
         RegisterVisitor(new UppercaseDirectiveVisitor());
-        // or
-        RegisterVisitor(typeof(UppercaseDirectiveVisitor));
+
+        // there are also registration methods that take the type, see below for details
+        // RegisterVisitor(typeof(UppercaseDirectiveVisitor));
+        // this.RegisterVisitor<UppercaseDirectiveVisitor>(); // extension method
     }
 }
 ```
@@ -210,13 +213,13 @@ you configure the DI container. In other words, schema visitors support dependen
 
 No. The applied directives (along with the directive definition itself) can exist without the corresponding
 schema visitors. In this case, the directive is usually set to provide additional information to clients by
-means of introspection. For example, consider such directive:
+means of introspection. For example, consider such server-side `@author` directive:
 
 ```csharp
 public class AuthorDirective : DirectiveGraphType
 {
     public AuthorDirective()
-        : base("author", DirectiveLocation.Field)
+        : base("author", DirectiveLocation.FieldDefinition)
     {
         Description = "Provides information about the author of the field";
         Arguments = new QueryArguments(
@@ -242,7 +245,8 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>("human", resolve: context => GetHuman(context)).ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com")
+        Field<Human>("human", resolve: context => GetHuman(context))
+            .ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
     }
 }
 ```
@@ -288,7 +292,8 @@ Since v4 Graph.NET provides the ability to apply directives to the
 schema elements and expose this user-defined meta-information via introspection. This is an experimental feature that
 is not in the official specification (yet). To enable it call `ISchema.EnableExperimentalIntrospectionFeatures()`.
 This method also enables ability to expose `isRepeatable` field for directives via introspection (feature from the
-GraphQL specification working draft). Note that you can also set the `mode` parameter (`ExecutionOnly` by default).
+GraphQL specification working draft). Note that you can also set the `mode` parameter in this method which by default
+equals to `ExecutionOnly`.
 
 ```csharp
 /// <summary>
@@ -445,7 +450,8 @@ public class MyDirective : DirectiveGraphType
 If you do not explicitly set this property (either to `true` or `false`) then by default
 your directive definition along with all applications of this directive to the schema elements
 will be present in the introspection response if and only if it has all its locations of type
-`ExecutableDirectiveLocation` (so called client-side directive).
+[`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
+(so called client-side directive).
 
 > See https://github.com/graphql/graphql-spec/issues/300 for more information.
 

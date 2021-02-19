@@ -17,9 +17,9 @@ namespace GraphQL.Utilities
         private static void SetDeprecationReason<T>(T element) where T : IProvideMetadata, IProvideDeprecationReason
         {
             // if a value has already been set, prefer that
-            if (element.DeprecationReason == null && element.HasAppliedDirectives())
+            if (element.DeprecationReason == null)
             {
-                var deprecated = element.GetAppliedDirectives().Find("deprecated");
+                var deprecated = element.FindAppliedDirective("deprecated");
                 if (deprecated != null)
                 {
                     element.DeprecationReason = deprecated.FindArgument("reason")?.Value is string str

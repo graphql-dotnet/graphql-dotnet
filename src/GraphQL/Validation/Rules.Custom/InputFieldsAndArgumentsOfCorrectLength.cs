@@ -23,10 +23,7 @@ namespace GraphQL.Validation.Rules
 
             public override void VisitField(ValidationContext context, VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object variableValue, object parsedValue)
             {
-                if (!field.HasAppliedDirectives())
-                    return;
-
-                var lengthDirective = field.GetAppliedDirectives().Find("length");
+                var lengthDirective = field.FindAppliedDirective("length");
                 if (lengthDirective == null)
                     return;
 
@@ -68,10 +65,7 @@ namespace GraphQL.Validation.Rules
 
         private static void CheckLength(IHaveValue node, IProvideMetadata provider, ValidationContext context)
         {
-            if (provider == null || !provider.HasAppliedDirectives())
-                return;
-
-            var lengthDirective = provider.GetAppliedDirectives().Find("length");
+            var lengthDirective = provider?.FindAppliedDirective("length");
             if (lengthDirective == null)
                 return;
 

@@ -32,6 +32,7 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object argument1Value, string argument2Name, object argument2Value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Types.AppliedDirective FindAppliedDirective(this GraphQL.Types.IProvideMetadata provider, string name) { }
         public static GraphQL.Types.AppliedDirectives GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
     }
