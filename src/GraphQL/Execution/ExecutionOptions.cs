@@ -55,7 +55,7 @@ namespace GraphQL
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
         public bool EnableMetrics { get; set; }
 
-        /// <summary>When false, captures unhandled exceptions and returns them within <see cref="ExecutionResult.Errors">ExecutionResult.Errors</see></summary>
+        /// <summary>When <see langword="false"/>, captures unhandled exceptions and returns them within <see cref="ExecutionResult.Errors">ExecutionResult.Errors</see></summary>
         public bool ThrowOnUnhandledException { get; set; }
 
         /// <summary>

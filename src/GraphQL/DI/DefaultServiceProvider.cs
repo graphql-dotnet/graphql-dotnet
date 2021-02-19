@@ -9,7 +9,7 @@ namespace GraphQL
     public sealed class DefaultServiceProvider : IServiceProvider
     {
         /// <summary>
-        /// Gets an instance of the specified type. Can not return null but may throw exception.
+        /// Gets an instance of the specified type. Can not return <see langword="null"/> but may throw exception.
         /// </summary>
         /// <param name="serviceType">Desired type</param>
         /// <returns>An instance of <paramref name="serviceType"/>.</returns>

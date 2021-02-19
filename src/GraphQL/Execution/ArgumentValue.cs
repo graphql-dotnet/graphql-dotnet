@@ -6,12 +6,12 @@ namespace GraphQL.Execution
     public readonly struct ArgumentValue
     {
         /// <summary>
-        /// Returns an instance of this struct containing a null value supplied as a literal.
+        /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a literal.
         /// </summary>
         public static ArgumentValue NullLiteral => new ArgumentValue(null, ArgumentSource.Literal);
 
         /// <summary>
-        /// Returns an instance of this struct containing a null value supplied as a variable.
+        /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a variable.
         /// </summary>
         public static ArgumentValue NullVariable => new ArgumentValue(null, ArgumentSource.Variable);
 

@@ -26,46 +26,46 @@ namespace GraphQL.DataLoader
         protected internal readonly int MaxBatchSize;
 
         /// <summary>
-        /// Returns the equality comparer to be used, or null for the default equality comparer.
+        /// Returns the equality comparer to be used, or <see langword="null"/> for the default equality comparer.
         /// </summary>
         protected internal readonly IEqualityComparer<TKey> EqualityComparer;
 
         /// <summary>
-        /// Initialize a DataLoaderBase with caching enabled and the default equality comparer
+        /// Initialize a DataLoaderBase with caching enabled and the default equality comparer.
         /// </summary>
         public DataLoaderBase() : this(true, null, int.MaxValue) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with the specified options
+        /// Initialize a DataLoaderBase with the specified options.
         /// </summary>
         /// <param name="caching">Indicates if responses should be cached</param>
         public DataLoaderBase(bool caching) : this(caching, null, int.MaxValue) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with the specified options
+        /// Initialize a DataLoaderBase with the specified options.
         /// </summary>
         /// <param name="caching">Indicates if responses should be cached</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
         public DataLoaderBase(bool caching, int maxBatchSize) : this(caching, null, maxBatchSize) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with caching enabled and the specified equality comparer
+        /// Initialize a DataLoaderBase with caching enabled and the specified equality comparer.
         /// </summary>
-        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or <see langword="null"/> for the default equality comparer</param>
         public DataLoaderBase(IEqualityComparer<TKey> equalityComparer) : this(true, equalityComparer, int.MaxValue) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with caching enabled and the specified options
+        /// Initialize a DataLoaderBase with caching enabled and the specified options.
         /// </summary>
-        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or <see langword="null"/> for the default equality comparer</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
         public DataLoaderBase(IEqualityComparer<TKey> equalityComparer, int maxBatchSize) : this(true, equalityComparer, maxBatchSize) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with the specified options
+        /// Initialize a DataLoaderBase with the specified options.
         /// </summary>
         /// <param name="caching">Indicates if responses should be cached</param>
-        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or <see langword="null"/> for the default equality comparer</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
         public DataLoaderBase(bool caching, IEqualityComparer<TKey> equalityComparer, int maxBatchSize)
         {
@@ -78,7 +78,7 @@ namespace GraphQL.DataLoader
         }
 
         /// <summary>
-        /// Asynchronously load data for the provided given key
+        /// Asynchronously load data for the provided given key.
         /// </summary>
         /// <param name="key">Key to use for loading data</param>
         /// <returns>
@@ -114,7 +114,7 @@ namespace GraphQL.DataLoader
         }
 
         /// <summary>
-        /// An abstract asynchronous function to load the values for a given list of keys
+        /// An abstract asynchronous function to load the values for a given list of keys.
         /// </summary>
         /// <remarks>
         /// This may be called on multiple threads if IDataLoader.LoadAsync is called on multiple threads.
@@ -123,7 +123,7 @@ namespace GraphQL.DataLoader
         protected abstract Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Internally used by DataLoaderList to start the fetch operation
+        /// Internally used by DataLoaderList to start the fetch operation.
         /// </summary>
         /// <returns>A Task representing the asynchronous fetch operation</returns>
         private Task StartLoading(DataLoaderList listToLoad, CancellationToken cancellationToken)
@@ -140,7 +140,7 @@ namespace GraphQL.DataLoader
         }
 
         /// <summary>
-        /// Dispatch any pending operations
+        /// Dispatch any pending operations.
         /// </summary>
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to the fetch delegate</param>
         public Task DispatchAsync(CancellationToken cancellationToken = default)
