@@ -322,7 +322,7 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null variable.");
+            caughtError.Message.ShouldBe("Variable '$input.c' is invalid. No value provided for a non-null variable.");
         }
 
         [Fact]
@@ -508,7 +508,7 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null variable.");
+            caughtError.Message.ShouldBe("Variable '$value' is invalid. No value provided for a non-null variable.");
         }
 
         [Fact]

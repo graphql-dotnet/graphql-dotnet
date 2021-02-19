@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Validation
                     line: 2,
                     column: 58);
                 _.Error(
-                   message: "Variable '$b' is invalid. Received a null input for a non-null variable.",
+                   message: "Variable '$b' is invalid. No value provided for a non-null variable.",
                    line: 2,
                    column: 38);
             });

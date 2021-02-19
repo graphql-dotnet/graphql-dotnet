@@ -264,7 +264,7 @@ namespace GraphQL.Validation
                     }
                     else if (graphType is NonNullGraphType)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "Received a null input for a non-null variable."));
+                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
                         continue;
                     }
 
@@ -432,7 +432,7 @@ namespace GraphQL.Validation
                     {
                         // RULE: If no default value is provided and the input object field’s type is non‐null,
                         // an error should be thrown.
-                        throw new InvalidVariableError(this, variableDef, childFieldVariableName, "Received a null input for a non-null variable.");
+                        throw new InvalidVariableError(this, variableDef, childFieldVariableName, "No value provided for a non-null variable.");
                     }
 
                     // RULE: Otherwise, if the field is not required, then no
