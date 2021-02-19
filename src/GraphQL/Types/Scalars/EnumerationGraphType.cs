@@ -32,7 +32,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of the enumeration member, as exposed through the GraphQL endpoint (e.g. "RED").</param>
         /// <param name="description">A description of the enumeration member.</param>
         /// <param name="value">The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).</param>
-        /// <param name="deprecationReason">The reason this enumeration member has been deprecated; null if this member has not been deprecated.</param>
+        /// <param name="deprecationReason">The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.</param>
         public void AddValue(string name, string description, object value, string deprecationReason = null)
         {
             AddValue(new EnumValueDefinition
@@ -228,7 +228,7 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         /// <summary>
-        /// The reason this enumeration member has been deprecated; null if this member has not been deprecated.
+        /// The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.
         /// </summary>
         public string DeprecationReason { get; set; }
 

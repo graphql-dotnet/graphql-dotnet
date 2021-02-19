@@ -20,7 +20,7 @@ namespace GraphQL.Types
         ExperimentalFeatures Features { get; set; }
 
         /// <summary>
-        /// Returns true once the schema has been initialized.
+        /// Returns <see langword="true"/> once the schema has been initialized.
         /// </summary>
         bool Initialized { get; }
 
