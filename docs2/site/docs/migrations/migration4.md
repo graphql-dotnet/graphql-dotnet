@@ -148,6 +148,7 @@ constructor of your schema, or a similar location.
 
 * New method `IParentExecutionNode.ApplyToChildren`
 * Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
+* New property `IResolveFieldContext.Parent`
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes

@@ -22,11 +22,11 @@ query {
 ";
             var expected = @"{
   ""level1"": {
-    ""level2"": {
-      ""level3"": {
+    ""level2"": [[{
+      ""level3"": [{
         ""level4"": ""X""
-      }
-    }
+      }]
+    }]]
   }
 }";
             AssertQuerySuccess(query, expected, null);
@@ -60,13 +60,13 @@ query {
     {
         public Issue899Level1()
         {
-            Field<Issue899Level2>("level2", resolve: context =>
+            Field<ListGraphType<ListGraphType<Issue899Level2>>>("level2", resolve: context =>
             {
                 context.GetArgument<string>("arg2").ShouldBe("2");
                 context.Parent.GetArgument<string>("arg1").ShouldBe("1");
                 context.Parent.Parent.ShouldBeNull();
 
-                return new object();
+                return new[] { new[] { new object() } };
             },
             arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "arg2" }));
         }
@@ -76,14 +76,14 @@ query {
     {
         public Issue899Level2()
         {
-            Field<Issue899Level3>("level3", resolve: context =>
+            Field<ListGraphType<Issue899Level3>>("level3", resolve: context =>
             {
                 context.GetArgument<string>("arg3").ShouldBe("3");
                 context.Parent.GetArgument<string>("arg2").ShouldBe("2");
                 context.Parent.Parent.GetArgument<string>("arg1").ShouldBe("1");
                 context.Parent.Parent.Parent.ShouldBeNull();
 
-                return new object();
+                return new[] { new object() };
             },
             arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "arg3" }));
         }

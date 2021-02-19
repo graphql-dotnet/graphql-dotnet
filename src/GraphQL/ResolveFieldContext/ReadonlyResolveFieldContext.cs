@@ -63,7 +63,23 @@ namespace GraphQL
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
         /// <inheritdoc/>
-        public IResolveFieldContext Parent => _executionNode.Parent is RootExecutionNode || _executionNode.Parent == null ? null : _parent ??= new ReadonlyResolveFieldContext(_executionNode.Parent, _executionContext);
+        public IResolveFieldContext Parent
+        {
+            get
+            {
+                if (_parent == null)
+                {
+                    var parent = _executionNode.Parent;
+                    while (parent is ArrayExecutionNode)
+                        parent = parent.Parent;
+
+                    if (parent != null && !(parent is RootExecutionNode))
+                        _parent = new ReadonlyResolveFieldContext(parent, _executionContext);
+                }
+
+                return _parent;
+            }
+        }
 
         /// <inheritdoc/>
         public IDictionary<string, ArgumentValue> Arguments => _arguments ??= GetArguments();
