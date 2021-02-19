@@ -7,7 +7,6 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
-using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {

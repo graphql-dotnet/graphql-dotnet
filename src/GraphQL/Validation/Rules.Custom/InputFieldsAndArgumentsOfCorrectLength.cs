@@ -8,7 +8,6 @@ namespace GraphQL.Validation.Rules
     /// <summary>
     /// Validation rule that checks minimum and maximum length of provided values for input fields and
     /// arguments that marked with <see cref="LengthDirective"/> directive. Doesn't check default values.
-    ///
     /// <br/><br/>
     /// This is not a standard validation rule that is not in the official specification. Note that this
     /// rule will be required to run on cached queries also since it works with request variables, so
