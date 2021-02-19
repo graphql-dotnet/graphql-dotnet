@@ -108,15 +108,15 @@ namespace GraphQL.Validation
                     }
                     else
                     {
-                        var awaitedVisitors = rules.Select(x =>
+                        var awaitedVisitors = rules.Select(rule =>
                         {
-                            if (x is IVariableValidation validation)
+                            if (rule is IVariableVisitorProvider provider)
                             {
-                                var variableVisitor = validation.GetVisitor(context);
+                                var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
                                     (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
                             }
-                            return x.ValidateAsync(context);
+                            return rule.ValidateAsync(context);
                         }).Where(x => x != null);
                         visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
                     }

@@ -346,7 +346,7 @@ namespace GraphQL.Validation
                 return ret ?? throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
             }
 
-            object ParseValueList(ListGraphType listGraphType, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)
+            IList<object> ParseValueList(ListGraphType listGraphType, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)
             {
                 if (value == null)
                     return null;

@@ -15,9 +15,9 @@ namespace GraphQL.Validation.Rules
     /// <see cref="ExecutionOptions.CachedDocumentValidationRules">ExecutionOptions.CachedDocumentValidationRules</see>
     /// needs to be set as well (if using caching).
     /// </summary>
-    public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule, IVariableValidation
+    public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule, IVariableVisitorProvider
     {
-        private sealed class FieldVisitor : VariableVisitorBase
+        private sealed class FieldVisitor : BaseVariableVisitor
         {
             public static readonly FieldVisitor Instance = new FieldVisitor();
 
@@ -43,7 +43,8 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        public IVariableVisitor GetVisitor(ValidationContext context) => FieldVisitor.Instance;
+        /// <inheritdoc/>
+        public IVariableVisitor GetVisitor(ValidationContext _) => FieldVisitor.Instance;
 
         /// <summary>
         /// Returns a static instance of this validation rule.

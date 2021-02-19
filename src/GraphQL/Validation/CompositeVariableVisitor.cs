@@ -19,7 +19,7 @@ namespace GraphQL.Validation
                 visitor.VisitField(context, variable, variableName, type, field, variableValue, parsedValue);
         }
 
-        public void VisitList(ValidationContext context, VariableDefinition variable, VariableName variableName, ListGraphType type, object variableValue, object parsedValue)
+        public void VisitList(ValidationContext context, VariableDefinition variable, VariableName variableName, ListGraphType type, object variableValue, IList<object> parsedValue)
         {
             foreach (var visitor in _visitors)
                 visitor.VisitList(context, variable, variableName, type, variableValue, parsedValue);
