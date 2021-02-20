@@ -39,7 +39,7 @@ namespace GraphQL
         private Fields GetSubFields()
         {
             return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
-                ? new Fields().CollectFrom(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
+                ? new Fields().CollectFrom(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet, _executionContext.ExecutionStrategy as IFieldCollectionStrategy)
                 : null;
         }
 

@@ -13,6 +13,11 @@ namespace GraphQL.Execution
     public interface IExecutionContext : IProvideUserContext
     {
         /// <summary>
+        /// Execution strategy for the currently executing document.
+        /// </summary>
+        IExecutionStrategy ExecutionStrategy { get; }
+
+        /// <summary>
         /// Propagates notification that the GraphQL request should be canceled
         /// </summary>
         CancellationToken CancellationToken { get; }
@@ -73,17 +78,6 @@ namespace GraphQL.Execution
         /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
         /// </summary>
         Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
-
-        /// <summary>
-        /// A delegate that allows you to control the set of fields being executed.
-        /// By default, it SHOULD be set to <see cref="ExecutionHelper.ShouldIncludeNode"/>
-        /// to work as required by the specification.
-        /// <br/><br/>
-        /// Set this delegate if you understand exactly what you are doing, because your
-        /// actions may lead to the fact that the server's behavior ceases to comply with
-        /// the specification requirements.
-        /// </summary>
-        Func<ExecutionContext, IHaveDirectives, bool> ShouldIncludeNode { get; set; }
 
         /// <summary>
         /// Input variables to the GraphQL request

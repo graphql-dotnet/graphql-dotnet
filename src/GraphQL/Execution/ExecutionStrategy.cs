@@ -12,7 +12,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// The base class for the included serial and parallel execution strategies.
     /// </summary>
-    public abstract class ExecutionStrategy : IExecutionStrategy
+    public abstract class ExecutionStrategy : IExecutionStrategy, IFieldCollectionStrategy
     {
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
@@ -25,8 +25,7 @@ namespace GraphQL.Execution
             var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            await ExecuteNodeTreeAsync(context, rootNode)
-                .ConfigureAwait(false);
+            await ExecuteNodeTreeAsync(context, rootNode).ConfigureAwait(false);
 
             // After the entire node tree has been executed, get the values
             object data = rootNode.PropagateNull() ? null : rootNode;
@@ -51,7 +50,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        protected static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        protected RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
             {
@@ -60,7 +59,7 @@ namespace GraphQL.Execution
 
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
-            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
+            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet, this));
 
             fields.Clear();
             System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
@@ -68,15 +67,17 @@ namespace GraphQL.Execution
             return root;
         }
 
+        bool IFieldCollectionStrategy.ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives) => ExecutionHelper.ShouldIncludeNode(context, directives.Directives);
+
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
         /// the object execution node result is not <see langword="null"/>.
         /// </summary>
-        private static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
+        private void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
-            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
+            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet, this));
 
             fields.Clear();
             System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
@@ -113,7 +114,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not <see langword="null"/>.
         /// </summary>
-        private static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        private void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;

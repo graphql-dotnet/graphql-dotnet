@@ -13,6 +13,9 @@ namespace GraphQL.Execution
     public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
         /// <inheritdoc/>
+        public IExecutionStrategy ExecutionStrategy { get; set; }
+
+        /// <inheritdoc/>
         public Document Document { get; set; }
 
         /// <inheritdoc/>
@@ -50,9 +53,6 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
-
-        /// <inheritdoc/>
-        public Func<ExecutionContext, IHaveDirectives, bool> ShouldIncludeNode { get; set; } = (context, node) => ExecutionHelper.ShouldIncludeNode(context, node.Directives);
 
         /// <inheritdoc/>
         public int? MaxParallelExecutionCount { get; set; }
