@@ -6,7 +6,7 @@ namespace GraphQL.Language.AST
     /// <summary>
     /// Represents a fragment spread node within a document.
     /// </summary>
-    public class FragmentSpread : AbstractNode, IFragment
+    public class FragmentSpread : AbstractNode, IFragment, IHaveName
     {
         /// <summary>
         /// Initializes a new instance with the specified <see cref="NameNode"/> containing the name of this fragment spread node.

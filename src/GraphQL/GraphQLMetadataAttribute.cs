@@ -3,7 +3,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
     public abstract class GraphQLAttribute : Attribute
     {
         public virtual void Modify(TypeConfig type)

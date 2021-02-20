@@ -6,6 +6,7 @@ namespace GraphQL.Types
 {
     /// <summary>
     /// A class that represents a list of directives applied to a schema element (type, field, argument, etc.).
+    /// Note that built-in @deprecated directive is not taken into account and ignored.
     /// </summary>
     public class AppliedDirectives : IEnumerable<AppliedDirective>
     {

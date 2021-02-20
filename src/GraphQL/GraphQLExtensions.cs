@@ -384,7 +384,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Provided a type and a super type, return true if the first type is either
+        /// Provided a type and a super type, return <see langword="true"/> if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]

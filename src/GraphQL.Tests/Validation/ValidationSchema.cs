@@ -186,7 +186,7 @@ namespace GraphQL.Tests.Validation
             Name = "ComplexInput";
             Field<NonNullGraphType<BooleanGraphType>>("requiredField");
             Field<IntGraphType>("intField");
-            Field<StringGraphType>("stringField");
+            Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
             Field<BooleanGraphType>("booleanField");
             Field<ListGraphType<StringGraphType>>("stringListField");
         }
@@ -277,6 +277,7 @@ namespace GraphQL.Tests.Validation
                     {
                         Name = "id"
                     }
+                    .ApplyDirective("length", "min", 2, "max", 5)
                 ));
             Field<Dog>("dog");
             Field<Cat>("cat");
@@ -315,7 +316,9 @@ namespace GraphQL.Tests.Validation
                 new DirectiveGraphType("onEnum", DirectiveLocation.Enum),
                 new DirectiveGraphType("onEnumValue", DirectiveLocation.EnumValue),
                 new DirectiveGraphType("onInputObject", DirectiveLocation.InputObject),
-                new DirectiveGraphType("onInputFieldDefinition", DirectiveLocation.InputFieldDefinition)
+                new DirectiveGraphType("onInputFieldDefinition", DirectiveLocation.InputFieldDefinition),
+
+                new LengthDirective()
             );
         }
     }

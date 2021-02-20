@@ -14,7 +14,7 @@ namespace GraphQL
         /// <summary>
         /// Indicates if the operation included execution. If an error was encountered BEFORE execution begins,
         /// the data entry SHOULD NOT be present in the result. If an error was encountered DURING the execution
-        /// that prevented a valid response, the data entry in the response SHOULD BE null.
+        /// that prevented a valid response, the data entry in the response SHOULD BE <see langword="null"/>.
         /// </summary>
         public bool Executed { get; set; }
 

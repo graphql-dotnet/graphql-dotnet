@@ -20,7 +20,7 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
-        /// Asynchronously returns an object or null for the specified field.
+        /// Asynchronously returns an object or <see langword="null"/> for the specified field.
         /// </summary>
         public Task<TReturnType> Resolve(IResolveFieldContext context) => _resolver(context);
 

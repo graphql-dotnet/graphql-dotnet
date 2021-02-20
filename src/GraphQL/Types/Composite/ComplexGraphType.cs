@@ -401,7 +401,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of this field.</param>
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-        /// <param name="type">The graph type of the field; in <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
@@ -444,7 +444,7 @@ namespace GraphQL.Types
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-        /// <param name="type">The graph type of the field; in <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,

@@ -57,7 +57,8 @@ namespace GraphQL.Tests.Validation
                   booleanArgField(booleanArg: $nonNullBooleanArg)
                 }
               }
-            ");
+            ",
+            "{ \"nonNullBooleanArg\": true }");
         }
 
         [Fact]
@@ -73,7 +74,8 @@ namespace GraphQL.Tests.Validation
                   ...booleanArgFrag
                 }
               }
-            ");
+            ",
+            "{ \"nonNullBooleanArg\": true }");
         }
 
         [Fact]
@@ -138,7 +140,8 @@ namespace GraphQL.Tests.Validation
                   stringListArgField(stringListArg: [$stringVar])
                 }
               }
-            ");
+            ",
+            "{ \"stringVar\": \"\" }");
         }
 
         [Fact]
@@ -175,7 +178,8 @@ namespace GraphQL.Tests.Validation
               {
                 dog @include(if: $boolVar)
               }
-            ");
+            ",
+            "{ \"boolVar\": true }");
         }
 
         [Fact]

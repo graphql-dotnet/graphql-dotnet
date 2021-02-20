@@ -15,12 +15,10 @@ namespace GraphQL
         /// Adds the specified visitor type to the schema. When initializing a schema, all
         /// registered visitors will be executed on each schema element when it is traversed.
         /// </summary>
-        public static TSchema RegisterVisitor<TSchema, TVisitor>(this TSchema schema)
-            where TSchema : ISchema
+        public static void RegisterVisitor<TVisitor>(this ISchema schema)
             where TVisitor : ISchemaNodeVisitor
         {
             schema.RegisterVisitor(typeof(TVisitor));
-            return schema;
         }
 
         /// <summary>
@@ -142,6 +140,8 @@ namespace GraphQL
                 throw new InvalidOperationException("Schema is already initialized");
 
             schema.Features.AppliedDirectives = true;
+            schema.Features.RepeatableDirectives = true;
+
             if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
                 schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();
 
@@ -172,15 +172,10 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Runs the specified visitor on the specified schema.
-        /// </summary>
-        public static void Run(this ISchemaNodeVisitor visitor, ISchema schema) => schema.Run(visitor);
-
-        /// <summary>
         /// Runs the specified visitor on the specified schema. This method traverses
         /// all the schema elements and calls the appropriate visitor methods.
         /// </summary>
-        public static void Run(this ISchema schema, ISchemaNodeVisitor visitor)
+        public static void Run(this ISchemaNodeVisitor visitor, ISchema schema)
         {
             visitor.VisitSchema(schema);
 
@@ -248,11 +243,11 @@ namespace GraphQL
         /// <summary>
         /// Allow experimental features only for client queries but not for standard introspection
         /// request. This means that the client, in response to a standard introspection request,
-        /// receives a standard response without all the new fields and types. However, client CAN
+        /// receives a standard response without any new fields and types. However, client CAN
         /// make requests to the server using the new fields and types. This mode is needed in order
         /// to bypass the problem of tools such as GraphQL Playground, Voyager, GraphiQL that require
-        /// a standard response to an introspection request and refuse to work correctly if receive
-        /// unknown fields or types in the response.
+        /// a standard response to an introspection request and refuse to work correctly if there are
+        /// any unknown fields or types in the response.
         /// </summary>
         ExecutionOnly,
 

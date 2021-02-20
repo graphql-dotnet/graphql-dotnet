@@ -16,8 +16,6 @@ namespace GraphQL.Utilities
     /// </summary>
     public class SchemaBuilder
     {
-        private List<Type> _visitorTypes;
-        private List<ISchemaNodeVisitor> _visitors;
         protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private GraphQLSchemaDefinition _schemaDef;
 
@@ -35,41 +33,6 @@ namespace GraphQL.Utilities
         public bool IgnoreComments { get; set; } = true;
 
         public TypeSettings Types { get; } = new TypeSettings();
-
-        public SchemaBuilder RegisterType(IGraphType type)
-        {
-            _types[type.Name] = type ?? throw new ArgumentNullException(nameof(type));
-            return this;
-        }
-
-        public void RegisterTypes(IEnumerable<IGraphType> types)
-        {
-            foreach (var type in types)
-                _types[type.Name] = type ?? throw new ArgumentNullException(nameof(type));
-        }
-
-        public void RegisterVisitor(ISchemaNodeVisitor visitor)
-        {
-            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
-        }
-
-        public void RegisterVisitor(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
-            }
-
-            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
-                _visitorTypes.Add(type);
-        }
-
-        public void RegisterVisitor<TVisitor>()
-           where TVisitor : ISchemaNodeVisitor
-           => RegisterVisitor(typeof(TVisitor));
 
         /// <summary>
         /// Builds schema from string.
@@ -207,18 +170,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             foreach (var directive in directives)
                 schema.Directives.Register(directive);
-
-            if (_visitors != null)
-            {
-                foreach (var visitor in _visitors)
-                    schema.RegisterVisitor(visitor);
-            }
-
-            if (_visitorTypes != null)
-            {
-                foreach (var type in _visitorTypes)
-                    schema.RegisterVisitor(type);
-            }
 
             Debug.Assert(schema.Initialized == false);
             return schema;
