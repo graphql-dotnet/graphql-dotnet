@@ -781,7 +781,7 @@ namespace GraphQL.Execution
         public virtual bool PropagateNull() { }
         public abstract object ToValue();
     }
-    public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy, GraphQL.Language.AST.IFieldCollectionStrategy
+    public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
     {
         protected ExecutionStrategy() { }
         protected GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
@@ -794,6 +794,7 @@ namespace GraphQL.Execution
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
         protected void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
+        public virtual bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.IHaveDirectives directives) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
     }
@@ -847,6 +848,7 @@ namespace GraphQL.Execution
     public interface IExecutionStrategy
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context);
+        bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.IHaveDirectives directives);
     }
     public interface IParentExecutionNode
     {
@@ -1287,7 +1289,7 @@ namespace GraphQL.Language.AST
     {
         public Fields() { }
         public void Add(GraphQL.Language.AST.Field field) { }
-        public GraphQL.Language.AST.Fields CollectFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, GraphQL.Language.AST.IFieldCollectionStrategy fieldCollectionStrategy = null) { }
+        public GraphQL.Language.AST.Fields CollectFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
     }
     public class FloatValue : GraphQL.Language.AST.ValueNode<double>
     {
@@ -1328,10 +1330,6 @@ namespace GraphQL.Language.AST
         public GuidValue(System.Guid value) { }
     }
     public interface IDefinition : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode { }
-    public interface IFieldCollectionStrategy
-    {
-        bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.IHaveDirectives directives);
-    }
     public interface IFragment : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection { }
     public interface IHaveDirectives : GraphQL.Language.AST.INode
     {

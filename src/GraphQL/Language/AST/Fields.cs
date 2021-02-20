@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
 
@@ -9,9 +11,11 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Fields : Dictionary<string, Field>
     {
-        private sealed class DefaultFieldCollectionStrategy : IFieldCollectionStrategy
+        private sealed class DefaultExecutionStrategy : IExecutionStrategy
         {
-            public static readonly DefaultFieldCollectionStrategy Instance = new DefaultFieldCollectionStrategy();
+            public static readonly DefaultExecutionStrategy Instance = new DefaultExecutionStrategy();
+
+            public Task<ExecutionResult> ExecuteAsync(ExecutionContext context) => throw new NotImplementedException();
 
             public bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives) => ExecutionHelper.ShouldIncludeNode(context, directives.Directives);
         }
@@ -24,23 +28,14 @@ namespace GraphQL.Language.AST
         /// <br/><br/>
         /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="specificType"></param>
-        /// <param name="selectionSet"></param>
-        /// <param name="fieldCollectionStrategy">
-        /// If set to <see langword="null"/>, <see cref="ExecutionHelper.ShouldIncludeNode"/> will be used to work
-        /// as required by the specification. Set this parameter if you understand exactly what you are doing,
-        /// because your actions may lead to the fact that the server's behavior ceases to comply with the
-        /// specification requirements.
-        /// </param>
-        public Fields CollectFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, IFieldCollectionStrategy fieldCollectionStrategy = null)
+        public Fields CollectFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet)
         {
             List<string> visitedFragmentNames = null;
-            CollectFields(context, specificType, selectionSet, fieldCollectionStrategy ?? DefaultFieldCollectionStrategy.Instance, ref visitedFragmentNames);
+            CollectFields(context, specificType, selectionSet, context.ExecutionStrategy ?? DefaultExecutionStrategy.Instance, ref visitedFragmentNames);
             return this;
         }
 
-        private void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, IFieldCollectionStrategy fieldCollectionStrategy, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+        private void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, IExecutionStrategy strategy, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
         {
             if (selectionSet != null)
             {
@@ -48,7 +43,7 @@ namespace GraphQL.Language.AST
                 {
                     if (selection is Field field)
                     {
-                        if (!fieldCollectionStrategy.ShouldIncludeNode(context, field))
+                        if (!strategy.ShouldIncludeNode(context, field))
                         {
                             continue;
                         }
@@ -58,7 +53,7 @@ namespace GraphQL.Language.AST
                     else if (selection is FragmentSpread spread)
                     {
                         if ((visitedFragmentNames != null && visitedFragmentNames.Contains(spread.Name))
-                            || !fieldCollectionStrategy.ShouldIncludeNode(context, spread))
+                            || !strategy.ShouldIncludeNode(context, spread))
                         {
                             continue;
                         }
@@ -67,25 +62,25 @@ namespace GraphQL.Language.AST
 
                         var fragment = context.Fragments.FindDefinition(spread.Name);
                         if (fragment == null
-                            || !fieldCollectionStrategy.ShouldIncludeNode(context, fragment)
+                            || !strategy.ShouldIncludeNode(context, fragment)
                             || !ExecutionHelper.DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
                         {
                             continue;
                         }
 
-                        CollectFields(context, specificType, fragment.SelectionSet, fieldCollectionStrategy, ref visitedFragmentNames);
+                        CollectFields(context, specificType, fragment.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                     else if (selection is InlineFragment inline)
                     {
                         var name = inline.Type != null ? inline.Type.Name : specificType.Name;
 
-                        if (!fieldCollectionStrategy.ShouldIncludeNode(context, inline)
+                        if (!strategy.ShouldIncludeNode(context, inline)
                           || !ExecutionHelper.DoesFragmentConditionMatch(context, name, specificType))
                         {
                             continue;
                         }
 
-                        CollectFields(context, specificType, inline.SelectionSet, fieldCollectionStrategy, ref visitedFragmentNames);
+                        CollectFields(context, specificType, inline.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                 }
             }
@@ -114,16 +109,6 @@ namespace GraphQL.Language.AST
                 this[name] = field;
             }
         }
-    }
-
-    /// <summary>
-    /// This strategy allows you to control the set of fields that <see cref="Fields.CollectFrom(ExecutionContext, IGraphType, SelectionSet, IFieldCollectionStrategy)"/>
-    /// method collects. It is assumed that this interface can be implemented by <see cref="IExecutionStrategy"/> descendants.
-    /// </summary>
-    public interface IFieldCollectionStrategy
-    {
-        /// <inheritdoc cref="IFieldCollectionStrategy"/>
-        bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives);
     }
 }
 

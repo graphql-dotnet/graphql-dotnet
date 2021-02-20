@@ -12,7 +12,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// The base class for the included serial and parallel execution strategies.
     /// </summary>
-    public abstract class ExecutionStrategy : IExecutionStrategy, IFieldCollectionStrategy
+    public abstract class ExecutionStrategy : IExecutionStrategy
     {
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
@@ -59,7 +59,7 @@ namespace GraphQL.Execution
 
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
-            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet, this));
+            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
 
             fields.Clear();
             System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
@@ -67,7 +67,15 @@ namespace GraphQL.Execution
             return root;
         }
 
-        bool IFieldCollectionStrategy.ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives) => ExecutionHelper.ShouldIncludeNode(context, directives.Directives);
+        /// <summary>
+        /// This method allows you to control the set of fields that the strategy will execute.
+        /// <br/><br/>
+        /// By default calls <see cref="ExecutionHelper.ShouldIncludeNode"/> to work as required
+        /// by the specification. Override this method if you understand exactly what you are doing,
+        /// because your actions may lead to the fact that the server's behavior ceases to comply
+        /// with the specification requirements.
+        /// </summary>
+        public virtual bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives) => ExecutionHelper.ShouldIncludeNode(context, directives.Directives);
 
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
@@ -77,7 +85,7 @@ namespace GraphQL.Execution
         {
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
-            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet, this));
+            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
 
             fields.Clear();
             System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
