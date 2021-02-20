@@ -96,10 +96,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_long_to_timespan()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                _type.ParseValue(12345678L).ShouldBe(new TimeSpan(0, 3, 25, 45, 678));
-            });
+            CultureTestHelper.UseCultures(() => _type.ParseValue(12345678L).ShouldBe(new TimeSpan(0, 3, 25, 45, 678)));
         }
     }
 }

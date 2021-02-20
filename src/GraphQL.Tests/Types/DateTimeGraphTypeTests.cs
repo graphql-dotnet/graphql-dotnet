@@ -29,7 +29,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                ((DateTime) _type.ParseValue("2015-11-21T19:59:32.987+0200")).Kind.ShouldBe(
+                ((DateTime)_type.ParseValue("2015-11-21T19:59:32.987+0200")).Kind.ShouldBe(
                     DateTimeKind.Utc);
             });
         }
@@ -37,19 +37,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<FormatException>(() => _type.ParseValue("some unknown date"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("some unknown date")));
         }
 
         [Fact]
         public void coerces_invalidly_formatted_date_to_exception()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<FormatException>(() => _type.ParseValue("Dec 32 2012"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("Dec 32 2012")));
         }
 
         [Fact]

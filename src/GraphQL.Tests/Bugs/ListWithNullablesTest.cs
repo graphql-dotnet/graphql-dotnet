@@ -38,7 +38,7 @@ namespace GraphQL.Tests.Bugs
 
             Field<ListGraphType<ListEntityGraphType>>(
                 "list",
-                resolve: context => new[] {new ListEntity {Value = "one"}, null, new ListEntity {Value = "three"}});
+                resolve: context => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
         }
     }
 

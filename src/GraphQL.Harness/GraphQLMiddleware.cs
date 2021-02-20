@@ -28,6 +28,7 @@ namespace Example
             _writer = writer;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
         public async Task Invoke(HttpContext context, ISchema schema)
         {
             if (!IsGraphQLRequest(context))
@@ -64,12 +65,6 @@ namespace Example
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
-                if (_settings.EnableMetrics)
-                {
-                    options.FieldMiddleware
-                        .Use<CountFieldMiddleware>()
-                        .Use<InstrumentFieldsMiddleware>();
-                }
             });
 
             if (_settings.EnableMetrics)

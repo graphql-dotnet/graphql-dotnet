@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
@@ -26,7 +25,7 @@ namespace GraphQL.Tests.Errors
             var error = result.Errors.First();
             error.Code.ShouldBe("SYNTAX_ERROR");
             error.Locations.ShouldNotBeNull();
-            error.Locations.Count().ShouldBe(1);
+            error.Locations.Count.ShouldBe(1);
             error.Locations.First().Line.ShouldBe(errorLine);
             error.Locations.First().Column.ShouldBe(errorColumn);
             error.Message.ShouldStartWith("Error parsing query:");

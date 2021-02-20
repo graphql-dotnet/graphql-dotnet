@@ -1,9 +1,15 @@
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The Short scalar graph type represents a signed 16-bit integer value.
+    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="short"/> .NET values to this scalar graph type.
+    /// </summary>
     public class ShortGraphType : ScalarGraphType
     {
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             ShortValue shortValue => shortValue.Value,
@@ -11,6 +17,7 @@ namespace GraphQL.Types
             _ => null
         };
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(short));
     }
 }

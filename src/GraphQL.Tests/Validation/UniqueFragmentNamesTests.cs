@@ -4,22 +4,22 @@ using Xunit;
 
 namespace GraphQL.Tests.Validation
 {
-  public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, ValidationSchema>
-  {
-    [Fact]
-    public void no_fragments()
+    public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, ValidationSchema>
     {
-      ShouldPassRule(@"
+        [Fact]
+        public void no_fragments()
+        {
+            ShouldPassRule(@"
         {
           field
         }
       ");
-    }
+        }
 
-    [Fact]
-    public void one_fragment()
-    {
-      ShouldPassRule(@"
+        [Fact]
+        public void one_fragment()
+        {
+            ShouldPassRule(@"
         {
           ...fragA
         }
@@ -27,12 +27,12 @@ namespace GraphQL.Tests.Validation
           field
         }
       ");
-    }
+        }
 
-    [Fact]
-    public void many_fragments()
-    {
-      ShouldPassRule(@"
+        [Fact]
+        public void many_fragments()
+        {
+            ShouldPassRule(@"
         {
           ...fragA
           ...fragB
@@ -48,12 +48,12 @@ namespace GraphQL.Tests.Validation
           fieldC
         }
       ");
-    }
+        }
 
-    [Fact]
-    public void inline_fragments_are_always_unique()
-    {
-      ShouldPassRule(@"
+        [Fact]
+        public void inline_fragments_are_always_unique()
+        {
+            ShouldPassRule(@"
         {
           ...on Type {
             fieldA
@@ -63,12 +63,12 @@ namespace GraphQL.Tests.Validation
           }
         }
       ");
-    }
+        }
 
-    [Fact]
-    public void fragment_and_operation_named_the_same()
-    {
-      ShouldPassRule(@"
+        [Fact]
+        public void fragment_and_operation_named_the_same()
+        {
+            ShouldPassRule(@"
         query Foo {
           ...Foo
         }
@@ -76,14 +76,14 @@ namespace GraphQL.Tests.Validation
           field
         }
       ");
-    }
+        }
 
-    [Fact]
-    public void fragments_named_the_same()
-    {
-      ShouldFailRule(_ =>
-      {
-        _.Query = @"
+        [Fact]
+        public void fragments_named_the_same()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"
           {
             ...fragA
           }
@@ -94,17 +94,17 @@ namespace GraphQL.Tests.Validation
             fieldB
           }
         ";
-        // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-        duplicateFrag(_, "fragA", 5, 11, 8, 11);
-      });
-    }
+                // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
+                duplicateFrag(_, "fragA", 5, 11, 8, 11);
+            });
+        }
 
-    [Fact]
-    public void fragments_named_the_same_without_being_referenced()
-    {
-      ShouldFailRule(_ =>
-      {
-        _.Query = @"
+        [Fact]
+        public void fragments_named_the_same_without_being_referenced()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"
           fragment fragA on Type {
             fieldA
           }
@@ -112,26 +112,26 @@ namespace GraphQL.Tests.Validation
             fieldB
           }
         ";
-        // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-        duplicateFrag(_, "fragA", 2, 11, 5, 11);
-      });
-    }
+                // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
+                duplicateFrag(_, "fragA", 2, 11, 5, 11);
+            });
+        }
 
 
-    private void duplicateFrag(
-      ValidationTestConfig _,
-      string fragName,
-      int line1,
-      int column1,
-      int line2,
-      int column2)
-    {
-      _.Error(err =>
-      {
-        err.Message = UniqueFragmentNamesError.DuplicateFragmentNameMessage(fragName);
-        err.Loc(line1, column1);
-        err.Loc(line2, column2);
-      });
+        private void duplicateFrag(
+          ValidationTestConfig _,
+          string fragName,
+          int line1,
+          int column1,
+          int line2,
+          int column2)
+        {
+            _.Error(err =>
+            {
+                err.Message = UniqueFragmentNamesError.DuplicateFragmentNameMessage(fragName);
+                err.Loc(line1, column1);
+                err.Loc(line2, column2);
+            });
+        }
     }
-  }
 }

@@ -3,13 +3,17 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.NoFragmentCycles"/>
     [Serializable]
     public class NoFragmentCyclesError : ValidationError
     {
         internal const string NUMBER = "5.5.2.2";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public NoFragmentCyclesError(ValidationContext context, string fragName, string[] spreadNames, params INode[] nodes)
-            : base(context.OriginalQuery, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
+            : base(context.Document.OriginalQuery, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
         {
         }
 

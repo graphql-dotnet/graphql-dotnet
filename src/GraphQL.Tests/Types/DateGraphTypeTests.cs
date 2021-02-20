@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() =>
             {
                 var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Local);
-                Should.Throw<FormatException>(()=> _type.Serialize(date));
+                Should.Throw<FormatException>(() => _type.Serialize(date));
             });
         }
 
@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() =>
             {
                 var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Utc);
-                Should.Throw<FormatException>(()=> _type.Serialize(date));
+                Should.Throw<FormatException>(() => _type.Serialize(date));
             });
         }
 
@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Types
             {
                 var expected = DateTime.UtcNow;
                 var input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
-                Should.Throw<FormatException>(()=> _type.ParseValue(input));
+                Should.Throw<FormatException>(() => _type.ParseValue(input));
             });
         }
 
@@ -56,7 +56,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                ((DateTime) _type.ParseValue("2015-11-21")).Kind.ShouldBe(
+                ((DateTime)_type.ParseValue("2015-11-21")).Kind.ShouldBe(
                     DateTimeKind.Utc);
             });
         }
@@ -64,19 +64,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<FormatException>(() => _type.ParseValue("some unknown date"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("some unknown date")));
         }
 
         [Fact]
         public void coerces_invalidly_formatted_date_to_exception()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<FormatException>(() => _type.ParseValue("Dec 32 2012"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("Dec 32 2012")));
         }
 
         [Fact]
@@ -92,10 +86,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_iso8601_string_with_tzone_to_date()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<FormatException>(() => _type.ParseValue("2015-11-21T19:59:32.987+0200"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("2015-11-21T19:59:32.987+0200")));
         }
     }
 }

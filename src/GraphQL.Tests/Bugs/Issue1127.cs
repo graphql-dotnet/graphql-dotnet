@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -48,17 +49,18 @@ query {
                 ),
                 resolve: ctx =>
                 {
-                    ctx.Arguments["s1"].ShouldBe("def1");
-                    ctx.Arguments["s2"].ShouldBe("def2");
-                    ctx.Arguments["s3"].ShouldBe("aaa");
+                    ctx.Arguments["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
+                    ctx.Arguments["s2"].ShouldBe(ArgumentValue.NullLiteral);
+                    ctx.Arguments["s3"].ShouldBe(new ArgumentValue("aaa", ArgumentSource.Literal));
 
-                    ctx.Arguments["input1"].ShouldBe(1);
-                    ctx.Arguments["input2"].ShouldBe(2);
-                    ctx.Arguments["input3"].ShouldNotBeNull();
+                    ctx.Arguments["input1"].ShouldBe(new ArgumentValue(1, ArgumentSource.FieldDefault));
+                    ctx.Arguments["input2"].ShouldBe(ArgumentValue.NullLiteral);
+                    ctx.Arguments["input3"].Value.ShouldNotBeNull();
+                    ctx.Arguments["input3"].Source.ShouldBe(ArgumentSource.Literal);
 
-                    (ctx.Arguments["input3"] as Dictionary<string, object>)["name"].ShouldBe("struct");
-                    (ctx.Arguments["input3"] as Dictionary<string, object>)["created"].ShouldBe(new DateTime(2000, 1, 1));
-                    (ctx.Arguments["input3"] as Dictionary<string, object>)["lastModified"].ShouldBe(new DateTime(2001, 1, 1));
+                    (ctx.Arguments["input3"].Value as Dictionary<string, object>)["name"].ShouldBe("struct");
+                    (ctx.Arguments["input3"].Value as Dictionary<string, object>)["created"].ShouldBe(new DateTime(2000, 1, 1));
+                    (ctx.Arguments["input3"].Value as Dictionary<string, object>)["lastModified"].ShouldBe(new DateTime(2001, 1, 1));
 
                     return "completed";
                 });

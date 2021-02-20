@@ -1,0 +1,17 @@
+schema {
+  query: CustomQuery
+  mutation: CustomMutation
+  subscription: CustomSubscription
+}
+
+type CustomQuery {
+  age: Int
+}
+
+type CustomMutation {
+  flag: Boolean
+}
+
+type CustomSubscription {
+  name: String
+}

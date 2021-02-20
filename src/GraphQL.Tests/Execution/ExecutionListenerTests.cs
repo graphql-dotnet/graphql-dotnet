@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void BeforeExecutionAwaited_Called_Correctly()
         {
-            var schema = new Schema {Query = new AsyncGraphType()};
+            var schema = new Schema { Query = new AsyncGraphType() };
 
             var userContext = new TestContext();
 
@@ -36,7 +37,7 @@ namespace GraphQL.Tests.Execution
                 Name = "Query";
                 Field<StringGraphType>("foo", resolve: context =>
                 {
-                    var uc = context.UserContext.As<TestContext>();
+                    var uc = context.UserContext as TestContext;
                     return uc.ResolveAsync();
                 });
             }
@@ -44,6 +45,7 @@ namespace GraphQL.Tests.Execution
 
         public class TestExecutionListener : DocumentExecutionListenerBase
         {
+            [Obsolete]
             public override Task BeforeExecutionAwaitedAsync(IExecutionContext context)
             {
                 var testContext = context.UserContext as TestContext;

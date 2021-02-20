@@ -1,10 +1,18 @@
 using System;
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The DateTime scalar graph type represents a date and time in accordance with the ISO-8601 standard.
+    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="DateTime"/> .NET values to this scalar graph type.
+    /// </summary>
     public class DateTimeGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateTimeGraphType"/> class.
+        /// </summary>
         public DateTimeGraphType()
         {
             Description =
@@ -12,8 +20,7 @@ namespace GraphQL.Types
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
-
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
         {
             if (value is DateTimeValue timeValue)
@@ -28,5 +35,8 @@ namespace GraphQL.Types
 
             return null;
         }
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
     }
 }

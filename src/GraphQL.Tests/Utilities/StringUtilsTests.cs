@@ -1,4 +1,4 @@
-﻿using GraphQL.Utilities;
+using GraphQL.Utilities;
 using Shouldly;
 using Xunit;
 
@@ -9,19 +9,19 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void quoted_or_list_one()
         {
-            StringUtils.QuotedOrList(new[] {"A"}).ShouldBe("\"A\"");
+            StringUtils.QuotedOrList(new[] { "A" }).ShouldBe("\"A\"");
         }
 
         [Fact]
         public void quoted_or_list_two()
         {
-            StringUtils.QuotedOrList(new[] {"A", "B"}).ShouldBe("\"A\" or \"B\"");
+            StringUtils.QuotedOrList(new[] { "A", "B" }).ShouldBe("\"A\" or \"B\"");
         }
 
         [Fact]
         public void quoted_or_list_three()
         {
-            StringUtils.QuotedOrList(new[] {"A", "B", "C"}).ShouldBe("\"A\", \"B\", or \"C\"");
+            StringUtils.QuotedOrList(new[] { "A", "B", "C" }).ShouldBe("\"A\", \"B\", or \"C\"");
         }
     }
 }

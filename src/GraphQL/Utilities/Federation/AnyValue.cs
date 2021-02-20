@@ -8,7 +8,5 @@ namespace GraphQL.Utilities.Federation
         {
             Value = value;
         }
-
-        protected override bool Equals(ValueNode<object> node) => false;
     }
 }

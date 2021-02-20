@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Execution;
 using Shouldly;
 using Xunit;
 
@@ -6,7 +7,8 @@ namespace GraphQL.Tests.Bugs
 {
     public class Bug256NullableEnumTests
     {
-        public enum EnumType {
+        public enum EnumType
+        {
             A,
             B
         }
@@ -16,7 +18,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object> {{"value", EnumType.B}}
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } }
             };
 
             var result = ctx.GetArgument<EnumType?>("value");
@@ -28,7 +30,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object> {{"value", null}}
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
             };
 
             var result = ctx.GetArgument<EnumType?>("value");
@@ -40,7 +42,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object> {{"value", null}}
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
             };
 
             var result = ctx.GetArgument<EnumType>("value");
@@ -56,7 +58,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object> {{"value", EnumType.B}}
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } }
             };
 
             var result = ctx.GetArgument<EnumType>("value");

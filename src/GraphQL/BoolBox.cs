@@ -3,7 +3,14 @@ namespace GraphQL
     /// <summary> Boolean values to avoid boxing. </summary>
     public static class BoolBox
     {
+        /// <summary>
+        /// Shared field for 'true' value.
+        /// </summary>
         public static readonly object True = true;
+
+        /// <summary>
+        /// Shared field for 'false' value.
+        /// </summary>
         public static readonly object False = false;
 
         /// <summary> This method avoids boxing boolean values. </summary>

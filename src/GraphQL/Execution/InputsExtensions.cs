@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for converting a dictionary into <see cref="Inputs"/>.
+    /// </summary>
     public static class InputsExtensions
     {
         /// <summary>

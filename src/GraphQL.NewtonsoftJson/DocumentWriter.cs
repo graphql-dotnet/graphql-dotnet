@@ -147,7 +147,7 @@ namespace GraphQL.NewtonsoftJson
                 CloseOutput = false,
                 AutoCompleteOnClose = false
             };
-            
+
             _serializer.Serialize(jsonWriter, value);
             await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }

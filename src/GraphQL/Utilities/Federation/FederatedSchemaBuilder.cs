@@ -36,10 +36,10 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public override ISchema Build(string typeDefinitions)
+        public override Schema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
-            schema.RegisterType(BuildEntityGraphType(schema));
+            schema.RegisterType(BuildEntityGraphType());
             AddRootEntityFields(schema);
             return schema;
         }
@@ -60,13 +60,13 @@ namespace GraphQL.Utilities.Federation
                 schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
-            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new {});
+            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new { });
 
             var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
             query.FieldAsync(
                 "_entities",
                 new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations"}),
+                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
                 resolve: async context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);
@@ -78,8 +78,8 @@ namespace GraphQL.Utilities.Federation
                     foreach (var rep in reps)
                     {
                         var typeName = rep["__typename"].ToString();
-                        var type = context.Schema.FindType(typeName);
-                        if(type != null)
+                        var type = context.Schema.AllTypes[typeName];
+                        if (type != null)
                         {
                             // execute resolver
                             var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
@@ -111,24 +111,38 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            foreach (var selection in field.SelectionSet.SelectionsList)
+            if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
             {
-                // TODO: check to see if the SelectionSet already has the __typename field?
+                setToAlter.Prepend(new Field(default, new NameNode("__typename")));
+            }
+        }
+
+        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
+        {
+            foreach (var selection in selectionSet.SelectionsList)
+            {
+                if (selection is Field childField && childField.Name == "__typename")
+                {
+                    setToAlter = null;
+                    return false;
+                }
 
                 if (selection is InlineFragment frag)
                 {
-                    frag.SelectionSet.Prepend(new Field(null, new NameNode("__typename")));
+                    return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
                 }
 
                 if (selection is FragmentSpread spread)
                 {
                     var def = document.Fragments.FindDefinition(spread.Name);
-                    def.SelectionSet.Prepend(new Field(null, new NameNode("__typename")));
+                    return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }
+            setToAlter = selectionSet;
+            return true;
         }
 
-        private UnionGraphType BuildEntityGraphType(ISchema schema)
+        private UnionGraphType BuildEntityGraphType()
         {
             var union = new UnionGraphType
             {
@@ -166,14 +180,21 @@ namespace GraphQL.Utilities.Federation
                 return false;
             }
 
-            var directive = type.GetExtensionDirectives<ASTNode>().Directive("key");
-            if (directive != null) return true;
+            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
+            if (directive != null)
+                return true;
 
             var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return false;
+            if (ast == null)
+                return false;
 
-            var keyDir = ast.Directives.Directive("key");
+            var keyDir = Directive(ast.Directives, "key");
             return keyDir != null;
+        }
+
+        private static GraphQLDirective Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
+        {
+            return directives?.FirstOrDefault(x => x.Name.Value == name);
         }
     }
 }

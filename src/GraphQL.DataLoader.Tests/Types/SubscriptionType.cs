@@ -7,7 +7,7 @@ using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Tests.Types
 {
-    public class SubscriptionType: ObjectGraphType
+    public class SubscriptionType : ObjectGraphType
     {
         private readonly IOrdersStore ordersStore;
         public SubscriptionType(IOrdersStore ordersStore)

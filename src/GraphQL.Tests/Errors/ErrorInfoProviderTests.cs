@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Execution;
 using Shouldly;
 using Xunit;
@@ -266,7 +265,8 @@ namespace GraphQL.Tests.Errors
                 Code = "code"
             };
             error.Data["test"] = "abc";
-            var info = new ErrorInfoProvider(opts => {
+            var info = new ErrorInfoProvider(opts =>
+            {
                 opts.ExposeExtensions = false;
                 opts.ExposeCode = exposeCode;
                 opts.ExposeCodes = exposeCodes;

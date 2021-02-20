@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Errors
             var expectedError = new ExecutionError("Test error message");
             expectedError.AddLocation(1, 3);
             expectedError.Path = new[] { "hello2" };
-            
+
             AssertQuery(options =>
             {
                 options.Schema = Builder.Build(def);
@@ -57,7 +57,7 @@ namespace GraphQL.Tests.Errors
                         ctx.Exception = new ExecutionError("Test error message");
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
 
         }
 
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Errors
                         ctx.ErrorMessage = "Test error message";
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
 
         }
 
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Errors
                         ctx.ErrorMessage = "Test error message";
                     }
                 };
-            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError } });
+            }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Executed = true });
         }
 
         public class DocListener : DocumentExecutionListenerBase

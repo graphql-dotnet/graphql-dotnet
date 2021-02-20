@@ -2,51 +2,69 @@ using System;
 
 namespace GraphQL.Types
 {
-    public class NonNullGraphType<T> : NonNullGraphType
-        where T : GraphType
-    {
-        public NonNullGraphType()
-            : base(typeof(T))
-        {
-        }
-    }
-
+    /// <summary>
+    /// Represents a graph type that, for output graphs, is never <see langword="null"/>, or for input graphs, is not optional.
+    /// In other words the NonNull type wraps another type, and denotes that the resulting value will never be <see langword="null"/>.
+    /// </summary>
     public class NonNullGraphType : GraphType, IProvideResolvedType
     {
+        /// <summary>
+        /// Initializes a new instance for the specified inner graph type.
+        /// </summary>
         public NonNullGraphType(IGraphType type)
         {
-            if (type is NonNullGraphType)
-            {
-                // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
-                throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
-            }
-
             ResolvedType = type;
         }
 
-        protected NonNullGraphType(Type type)
+        /// <summary>
+        /// Returns the .NET type of the inner (wrapped) graph type.
+        /// </summary>
+        public virtual Type Type => null;
+
+        private IGraphType _resolvedType;
+
+        /// <summary>
+        /// Gets or sets the instance of the inner (wrapped) graph type.
+        /// </summary>
+        public IGraphType ResolvedType
         {
-            if (type == typeof(NonNullGraphType))
+            get => _resolvedType;
+            set
             {
-                throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
+                if (value is NonNullGraphType) //TODO: null check here or in ctor
+                {
+                    // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
+                    throw new ArgumentOutOfRangeException("ResolvedType", "Cannot nest NonNull inside NonNull.");
+                }
+
+                if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
+                    throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
+
+                _resolvedType = value;
             }
-
-            Type = type;
         }
 
-        public Type Type { get; private set; }
-
-        public IGraphType ResolvedType { get; set; }
-
-        public override string CollectTypes(TypeCollectionContext context)
-        {
-            var innerType = context.ResolveType(Type);
-            ResolvedType = innerType;
-            var name = innerType.CollectTypes(context);
-            context.AddType(name, innerType, context);
-            return "{0}!".ToFormat(name);
-        }
-
+        /// <inheritdoc/>
         public override string ToString() => $"{ResolvedType}!";
+    }
+
+    /// <inheritdoc cref="NonNullGraphType"/>
+    public sealed class NonNullGraphType<T> : NonNullGraphType
+        where T : GraphType
+    {
+        /// <summary>
+        /// Initializes a new instance for the specified inner graph type.
+        /// </summary>
+        public NonNullGraphType()
+            : base(null)
+        {
+            if (typeof(NonNullGraphType).IsAssignableFrom(typeof(T)))
+            {
+                throw new ArgumentOutOfRangeException("type", "Cannot nest NonNull inside NonNull.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public override Type Type => typeof(T);
     }
 }

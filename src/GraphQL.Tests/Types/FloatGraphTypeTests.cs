@@ -1,4 +1,6 @@
 using System;
+using System.Numerics;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -12,7 +14,8 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_null_to_null()
         {
-            type.ParseValue(null).ShouldBe(null);
+            type.ParseValue(null).ShouldBeNull();
+            type.ParseLiteral(null).ShouldBeNull();
         }
 
         [Fact]
@@ -30,7 +33,36 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_double_to_value()
         {
-            type.ParseValue(1.79769313486231e308).ShouldBe(1.79769313486231e308);
+            type.ParseValue(1.79769313486231e308d).ShouldBeOfType<double>().ShouldBe(1.79769313486231e308d);
+            type.ParseLiteral(new FloatValue(1.79769313486231e308d)).ShouldBeOfType<double>().ShouldBe(1.79769313486231e308d);
+        }
+
+        [Fact]
+        public void coerces_int_to_value()
+        {
+            type.ParseValue(1234567).ShouldBeOfType<double>().ShouldBe(1234567d);
+            type.ParseLiteral(new IntValue(1234567)).ShouldBeOfType<double>().ShouldBe(1234567d);
+        }
+
+        [Fact]
+        public void coerces_long_to_value()
+        {
+            type.ParseValue(12345678901234).ShouldBeOfType<double>().ShouldBe(12345678901234d);
+            type.ParseLiteral(new LongValue(12345678901234)).ShouldBeOfType<double>().ShouldBe(12345678901234d);
+        }
+
+        [Fact]
+        public void coerces_decimal_to_value()
+        {
+            type.ParseValue(9223372036854775808m).ShouldBeOfType<double>().ShouldBe(9223372036854775808d);
+            type.ParseLiteral(new DecimalValue(9223372036854775808m)).ShouldBeOfType<double>().ShouldBe(9223372036854775808d);
+        }
+
+        [Fact]
+        public void coerces_bigint_to_value()
+        {
+            type.ParseValue(new BigInteger(9999999999)).ShouldBeOfType<double>().ShouldBe(9999999999d);
+            type.ParseLiteral(new BigIntValue(9999999999)).ShouldBeOfType<double>().ShouldBe(9999999999d);
         }
     }
 }

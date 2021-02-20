@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Locations.Count().ShouldBe(1);
+            error.Locations.Count.ShouldBe(1);
             var location = error.Locations.First();
             location.Line.ShouldBe(line);
             location.Column.ShouldBe(column);
@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Locations.Count().ShouldBe(1);
+            error.Locations.Count.ShouldBe(1);
             var location = error.Locations.First();
             location.Line.ShouldBe(line);
             location.Column.ShouldBe(column);

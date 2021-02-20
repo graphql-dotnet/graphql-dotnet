@@ -1,6 +1,6 @@
-using GraphQL.Types;
 using System;
 using System.Numerics;
+using GraphQL.Types;
 
 namespace GraphQL.Benchmarks
 {
@@ -147,8 +147,36 @@ namespace GraphQL.Benchmarks
                     var arg20 = ctx.GetArgument<Uri>("arg20");
                     var arg21 = ctx.GetArgument<ushort>("arg21");
 
+                    SuppressNoUsageWarning(arg01);
+                    SuppressNoUsageWarning(arg02);
+                    SuppressNoUsageWarning(arg03);
+                    SuppressNoUsageWarning(arg04);
+                    SuppressNoUsageWarning(arg05);
+                    SuppressNoUsageWarning(arg06);
+                    SuppressNoUsageWarning(arg07);
+                    SuppressNoUsageWarning(arg08);
+                    SuppressNoUsageWarning(arg09);
+                    SuppressNoUsageWarning(arg10);
+                    SuppressNoUsageWarning(arg11);
+                    SuppressNoUsageWarning(arg12);
+                    SuppressNoUsageWarning(arg13);
+                    SuppressNoUsageWarning(arg14);
+                    SuppressNoUsageWarning(arg15);
+                    SuppressNoUsageWarning(arg16);
+                    SuppressNoUsageWarning(arg17);
+                    SuppressNoUsageWarning(arg18);
+                    SuppressNoUsageWarning(arg19);
+                    SuppressNoUsageWarning(arg20);
+                    SuppressNoUsageWarning(arg21);
+
                     return "";
                 });
+        }
+
+        private static void SuppressNoUsageWarning<T>(T value)
+        {
+            if (value == null)
+                throw new InvalidOperationException();
         }
     }
 }

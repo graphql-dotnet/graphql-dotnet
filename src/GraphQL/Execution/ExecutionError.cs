@@ -13,8 +13,6 @@ namespace GraphQL
     [Serializable]
     public class ExecutionError : Exception
     {
-        private List<ErrorLocation> _errorLocations;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message.
         /// </summary>
@@ -47,7 +45,7 @@ namespace GraphQL
         /// <summary>
         /// Returns a list of locations within the document that this error applies to.
         /// </summary>
-        public IEnumerable<ErrorLocation> Locations => _errorLocations;
+        public List<ErrorLocation> Locations { get; private set; }
 
         /// <summary>
         /// Gets or sets a code for this error.
@@ -64,12 +62,7 @@ namespace GraphQL
         /// </summary>
         public void AddLocation(int line, int column)
         {
-            if (_errorLocations == null)
-            {
-                _errorLocations = new List<ErrorLocation>();
-            }
-
-            _errorLocations.Add(new ErrorLocation { Line = line, Column = column });
+            (Locations ??= new List<ErrorLocation>()).Add(new ErrorLocation(line, column));
         }
 
         private void SetCode(Exception exception)
@@ -96,42 +89,67 @@ namespace GraphQL
         }
     }
 
-    public struct ErrorLocation : IEquatable<ErrorLocation>
+    /// <summary>
+    /// Represents a location within a document where a parsing or execution error occurred.
+    /// </summary>
+    public readonly struct ErrorLocation : IEquatable<ErrorLocation>
     {
-        public int Line { get; set; }
+        /// <summary>
+        /// Initializes a new instance with the specified line and column.
+        /// </summary>
+        public ErrorLocation(int line, int column)
+        {
+            Line = line;
+            Column = column;
+        }
 
-        public int Column { get; set; }
+        /// <summary>
+        /// The line number of the document where the error occurred, where 1 is the first line.
+        /// </summary>
+        public int Line { get; }
 
+        /// <summary>
+        /// The column number of the document where the error occurred, where 1 is the first column.
+        /// </summary>
+        public int Column { get; }
+
+        /// <inheritdoc/>
         public bool Equals(ErrorLocation other) => Line == other.Line && Column == other.Column;
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is Location loc && Equals(loc);
 
+        /// <inheritdoc/>
         public override int GetHashCode() => (Line, Column).GetHashCode();
 
+        /// <summary>
+        /// Indicates whether two <see cref="ErrorLocation"/> instances are the same.
+        /// </summary>
         public static bool operator ==(ErrorLocation left, ErrorLocation right) => left.Equals(right);
 
+        /// <summary>
+        /// Indicates whether two <see cref="ErrorLocation"/> instances are not the same.
+        /// </summary>
         public static bool operator !=(ErrorLocation left, ErrorLocation right) => !(left == right);
     }
 
+    /// <summary>
+    /// Provides extension methods for <see cref="ExecutionError"/> instances.
+    /// </summary>
     public static class ExecutionErrorExtensions
     {
         /// <summary>
         /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
         /// </summary>
-        public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
+        public static TError AddLocation<TError>(this TError error, AbstractNode abstractNode, Document document)
+            where TError: ExecutionError
         {
-            if (abstractNode == null)
-                return;
+            if (abstractNode == null || document == null)
+                return error;
 
-            if (document != null)
-            {
-                var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
-                error.AddLocation(location.Line, location.Column);
-            }
-            else if (abstractNode.SourceLocation.Line > 0 && abstractNode.SourceLocation.Column > 0)
-            {
-                error.AddLocation(abstractNode.SourceLocation.Line, abstractNode.SourceLocation.Column);
-            }
+            var location = new Location(document.OriginalQuery, abstractNode.SourceLocation.Start);
+            error.AddLocation(location.Line, location.Column);
+            return error;
         }
     }
 }

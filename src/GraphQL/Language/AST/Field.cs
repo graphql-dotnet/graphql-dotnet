@@ -3,31 +3,57 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
-    public class Field : AbstractNode, ISelection, IHaveSelectionSet
+    /// <summary>
+    /// Represents a field selection node of a document.
+    /// </summary>
+    public class Field : AbstractNode, ISelection, IHaveSelectionSet, IHaveName
     {
-        public Field()
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of a field selection node with the specified parameters.
+        /// </summary>
         public Field(NameNode alias, NameNode name)
         {
-            Alias = alias?.Name;
+            Alias = alias.Name;
             AliasNode = alias;
             NameNode = name;
         }
 
-        public string Name => NameNode?.Name;
+        /// <summary>
+        /// Returns the name of the field.
+        /// </summary>
+        public string Name => NameNode.Name;
+
+        /// <summary>
+        /// Returns the <see cref="NameNode"/> containing the name of this field.
+        /// </summary>
         public NameNode NameNode { get; }
 
+        /// <summary>
+        /// Returns the alias for this field, if any.
+        /// </summary>
         public string Alias { get; set; }
+
+        /// <summary>
+        /// Returns the <see cref="NameNode"/> containing the alias of this field, if any.
+        /// </summary>
         public NameNode AliasNode { get; }
 
+        /// <summary>
+        /// Gets or sets a list of directive nodes for this field selection node.
+        /// </summary>
         public Directives Directives { get; set; }
 
+        /// <summary>
+        /// Gets or sets a list of argument nodes for this field selection node.
+        /// </summary>
         public Arguments Arguments { get; set; }
 
+        /// <inheritdoc/>
         public SelectionSet SelectionSet { get; set; }
 
+        /// <summary>
+        /// Returns the argument nodes, directive nodes, and child fields selection nodes contained within this field selection node.
+        /// </summary>
         public override IEnumerable<INode> Children
         {
             get
@@ -49,41 +75,15 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
         {
-            return "Field{{name='{0}', alias='{1}', arguments={2}, directives={3}, selectionSet={4}}}"
-                .ToFormat(Name, Alias, Arguments, Directives, SelectionSet);
+            action(Arguments, state);
+            action(Directives, state);
+            action(SelectionSet, state);
         }
 
-        protected bool Equals(Field other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && string.Equals(Alias, other.Alias, StringComparison.InvariantCulture);
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Field)obj);
-        }
-
-        public Field MergeSelectionSet(Field other)
-        {
-            if (Equals(other))
-            {
-                return new Field(AliasNode, NameNode)
-                {
-                    Arguments = Arguments,
-                    SelectionSet = SelectionSet.Merge(other.SelectionSet),
-                    Directives = Directives,
-                    SourceLocation = SourceLocation,
-                };
-            }
-            return this;
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Field{{name='{Name}', alias='{Alias}', arguments={Arguments}, directives={Directives}, selectionSet={SelectionSet}}}";
     }
 }
-
-
-

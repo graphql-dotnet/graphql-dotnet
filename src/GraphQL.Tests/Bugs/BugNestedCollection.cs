@@ -51,8 +51,7 @@ namespace GraphQL.Tests.Bugs
         {
             Name = "mutation";
             Field<BooleanGraphType>("createProgram",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<ProgramInputType>>
-                { Name = "program" }),
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<ProgramInputType>> { Name = "program" }),
                 resolve: context =>
                 {
                     var program = context.GetArgument<Program>("program");

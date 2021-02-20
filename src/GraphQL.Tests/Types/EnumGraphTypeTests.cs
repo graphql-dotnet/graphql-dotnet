@@ -13,7 +13,8 @@ namespace GraphQL.Tests.Types
     {
         [Description("The best colors ever!")]
         [Obsolete("Just some reason")]
-        private enum Colors {
+        private enum Colors
+        {
             Red = 1,
             Blue,
             Green,
@@ -51,14 +52,14 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void adds_values_from_enum()
         {
-            type.Values.Count().ShouldBe(5);
+            type.Values.Count.ShouldBe(5);
             type.Values.First().Name.ShouldBe("RED");
         }
 
         [Fact]
         public void adds_values_from_enum_no_description_attribute()
         {
-            type.Values.Count().ShouldBe(5);
+            type.Values.Count.ShouldBe(5);
             type.Values.First().Description.ShouldBeNull();
         }
 
@@ -66,14 +67,14 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void adds_values_from_enum_with_description_attribute()
         {
-            type.Values.Count().ShouldBe(5);
+            type.Values.Count.ShouldBe(5);
             type.Values.Last().Description.ShouldBe("A pale purple color named after the mallow flower.");
         }
 
         [Fact]
         public void adds_values_from_enum_with_obsolete_attribute()
         {
-            type.Values.Count().ShouldBe(5);
+            type.Values.Count.ShouldBe(5);
             type.Values["YELLOW"].DeprecationReason.ShouldBe("No more yellow");
         }
 
@@ -102,7 +103,7 @@ namespace GraphQL.Tests.Types
             var otherType = new ColorEnum();
 
             otherType.Name.ShouldBe("ColorsEnum");
-            otherType.Values.Count().ShouldBe(5);
+            otherType.Values.Count.ShouldBe(5);
         }
 
         [Fact]

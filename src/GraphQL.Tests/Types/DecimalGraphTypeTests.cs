@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_integer_to_decimal()
         {
-            _type.ParseValue(0).ShouldBe((decimal) 0);
+            _type.ParseValue(0).ShouldBe((decimal)0);
         }
 
         [Fact]
@@ -51,6 +51,18 @@ namespace GraphQL.Tests.Types
         {
             _type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe(12345.6579m);
             _type.ParseLiteral(new DecimalValue(39614081257132168796771975168m)).ShouldBe(39614081257132168796771975168m);
+        }
+
+        [Fact]
+        public void Unsafe_As_Does_Not_Allocate_Memory()
+        {
+            var allocated = GC.GetAllocatedBytesForCurrentThread();
+
+            var number = 12.10m;
+            for (int i = 0; i < 1000; i++)
+                _ = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref number);
+
+            GC.GetAllocatedBytesForCurrentThread().ShouldBe(allocated);
         }
     }
 }

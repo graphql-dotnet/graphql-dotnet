@@ -344,5 +344,49 @@ mutation {
 
             result.Errors.ShouldBeNull();
         }
+
+        [Fact]
+        public void EnumerableDataLoaderResult_Works()
+        {
+            var users = Fake.Users.Generate(2);
+
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
+
+            usersMock.Setup(store => store.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default))
+                .ReturnsAsync(users.ToDictionary(x => x.UserId));
+
+            AssertQuerySuccess<DataLoaderTestSchema>(
+                query: "{ specifiedUsers(ids:[1, 2, 3]) { userId firstName } }",
+                expected: @"
+{ ""specifiedUsers"": [
+    {
+        ""userId"": 1,
+        ""firstName"": """ + users[0].FirstName + @"""
+    },
+    {
+        ""userId"": 2,
+        ""firstName"": """ + users[1].FirstName + @"""
+    },
+    null
+] }
+");
+
+            usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
+        }
+
+        /// <summary>
+        /// Exercises Execution.ExecutionNode.ResolvedType for children of children, verifying that
+        /// <see cref="Execution.ExecutionNode.GraphType"/> is returning proper values. Without a dataloader,
+        /// Execution.ExecutionStrategy.SetArrayItemNodes(Execution.ExecutionContext, Execution.ArrayExecutionNode)
+        /// skips execution of <see cref="Execution.ExecutionStrategy.ValidateNodeResult(Execution.ExecutionContext, Execution.ExecutionNode)"/>
+        /// because it is not relevant, and that method is the only one that calls Execution.ExecutionNode.ResolvedType.
+        /// </summary>
+        [Fact]
+        public void ExerciseListsOfLists()
+        {
+            AssertQuerySuccess<DataLoaderTestSchema>(
+                query: "{ exerciseListsOfLists (values:[[1, 2], [3, 4, 5]]) }",
+                expected: @"{ ""exerciseListsOfLists"": [[1, 2], [3, 4, 5]] }");
+        }
     }
 }

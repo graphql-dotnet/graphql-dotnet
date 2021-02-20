@@ -1,5 +1,5 @@
-using GraphQL.Types;
 using System.Collections.Generic;
+using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
@@ -38,7 +38,8 @@ namespace GraphQL.Tests.Bugs
                 .Argument<MyEntityInputType>("singleEntity")
                 .Argument<ListGraphType<MyEntityInputType>>("multipleEntities")
                 .Resolve(
-                    context => {
+                    context =>
+                    {
                         var singleEntity = context.GetArgument<MyEntity>("singleEntity");
                         singleEntity.AField.ShouldBe(1); // <<<<<< This is OK
                         singleEntity.BField.ShouldBe(2); // <<<<<< This is OK

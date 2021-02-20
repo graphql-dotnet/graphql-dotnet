@@ -3,43 +3,45 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
-    public class Argument : AbstractNode
+    /// <summary>
+    /// Represents an argument node within a document.
+    /// </summary>
+    public class Argument : AbstractNode, IHaveName, IHaveValue
     {
-        public Argument()
-        {
-        }
-
-        public Argument(NameNode name)
+        /// <summary>
+        /// Initializes a new instance of an argument node with the specified properties.
+        /// </summary>
+        public Argument(NameNode name, IValue value)
         {
             NameNode = name;
+            Value = value;
         }
 
-        public string Name => NameNode?.Name;
+        /// <summary>
+        /// Returns the name of this argument.
+        /// </summary>
+        public string Name => NameNode.Name;
+
+        /// <summary>
+        /// Returns a <see cref="NameNode"/> containing the name of this argument.
+        /// </summary>
         public NameNode NameNode { get; }
 
-        public IValue Value { get; set; }
+        /// <summary>
+        /// Returns the value node for this argument.
+        /// </summary>
+        public IValue Value { get; }
 
+        /// <inheritdoc/>
         public override IEnumerable<INode> Children
         {
             get { yield return Value; }
         }
 
-        public override string ToString()
-        {
-            return $"Argument{{name={Name},value={Value}}}";
-        }
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Value, state);
 
-        protected bool Equals(Argument other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Argument)obj);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Argument{{name={Name},value={Value}}}";
     }
 }

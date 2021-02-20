@@ -57,56 +57,58 @@ namespace GraphQL
             Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
             Register<TimeSpan, long>(value => (long)value.TotalSeconds);
 
-            Register<int, sbyte>(value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
-            Register<int, byte>(value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
-            Register<int, short>(value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
-            Register<int, ushort>(value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
+            Register<int, sbyte>(value => checked((sbyte)value));
+            Register<int, byte>(value => checked((byte)value));
+            Register<int, short>(value => checked((short)value));
+            Register<int, ushort>(value => checked((ushort)value));
             Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed());
-            Register<int, uint>(value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
+            Register<int, uint>(value => checked((uint)value));
             Register<int, long>(value => value);
-            Register<int, ulong>(value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
+            Register<int, ulong>(value => checked((ulong)value));
             Register<int, BigInteger>(value => new BigInteger(value));
-            Register<int, double>(value => Convert.ToDouble(value, NumberFormatInfo.InvariantInfo));
-            Register<int, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<int, double>(value => value);
+            Register<int, float>(value => value);
+            Register<int, decimal>(value => value);
             Register<int, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register<long, sbyte>(value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
-            Register<long, byte>(value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
-            Register<long, short>(value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
-            Register<long, ushort>(value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
-            Register<long, int>(value => Convert.ToInt32(value, NumberFormatInfo.InvariantInfo));
-            Register<long, uint>(value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
-            Register<long, ulong>(value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
+            Register<long, sbyte>(value => checked((sbyte)value));
+            Register<long, byte>(value => checked((byte)value));
+            Register<long, short>(value => checked((short)value));
+            Register<long, ushort>(value => checked((ushort)value));
+            Register<long, int>(value => checked((int)value));
+            Register<long, uint>(value => checked((uint)value));
+            Register<long, ulong>(value => checked((ulong)value));
             Register<long, BigInteger>(value => new BigInteger(value));
             Register<long, double>(value => value);
+            Register<long, float>(value => value);
             Register<long, decimal>(value => value);
             Register<long, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register<BigInteger, sbyte>(value => (sbyte)value);
-            Register<BigInteger, byte>(value => (byte)value);
-            Register<BigInteger, decimal>(value => (decimal)value);
-            Register<BigInteger, double>(value => (double)value);
-            Register<BigInteger, short>(value => (short)value);
-            Register<BigInteger, long>(value => (long)value);
-            Register<BigInteger, sbyte>(value => (sbyte)value);
-            Register<BigInteger, ushort>(value => (ushort)value);
-            Register<BigInteger, uint>(value => (uint)value);
-            Register<BigInteger, ulong>(value => (ulong)value);
-            Register<BigInteger, int>(value => (int)value);
-            Register<BigInteger, float>(value => (float)value);
+            Register<BigInteger, sbyte>(value => checked((sbyte)value));
+            Register<BigInteger, byte>(value => checked((byte)value));
+            Register<BigInteger, decimal>(value => checked((decimal)value));
+            Register<BigInteger, double>(value => checked((double)value));
+            Register<BigInteger, short>(value => checked((short)value));
+            Register<BigInteger, long>(value => checked((long)value));
+            Register<BigInteger, sbyte>(value => checked((sbyte)value));
+            Register<BigInteger, ushort>(value => checked((ushort)value));
+            Register<BigInteger, uint>(value => checked((uint)value));
+            Register<BigInteger, ulong>(value => checked((ulong)value));
+            Register<BigInteger, int>(value => checked((int)value));
+            Register<BigInteger, float>(value => checked((float)value));
 
-            Register<uint, sbyte>(value => (sbyte)value);
-            Register<uint, byte>(value => (byte)value);
-            Register<uint, int>(value => (int)value);
+            Register<uint, sbyte>(value => checked((sbyte)value));
+            Register<uint, byte>(value => checked((byte)value));
+            Register<uint, int>(value => checked((int)value));
             Register<uint, long>(value => value);
             Register<uint, ulong>(value => value);
-            Register<uint, short>(value => (short)value);
-            Register<uint, ushort>(value => (ushort)value);
+            Register<uint, short>(value => checked((short)value));
+            Register<uint, ushort>(value => checked((ushort)value));
             Register<uint, BigInteger>(value => new BigInteger(value));
 
             Register<ulong, BigInteger>(value => new BigInteger(value));
 
-            Register<byte, sbyte>(value => (sbyte)value);
+            Register<byte, sbyte>(value => checked((sbyte)value));
             Register<byte, int>(value => value);
             Register<byte, long>(value => value);
             Register<byte, ulong>(value => value);
@@ -114,24 +116,31 @@ namespace GraphQL
             Register<byte, ushort>(value => value);
             Register<byte, BigInteger>(value => new BigInteger(value));
 
-            Register<sbyte, byte>(value => (byte)value);
+            Register<sbyte, byte>(value => checked((byte)value));
             Register<sbyte, int>(value => value);
             Register<sbyte, long>(value => value);
-            Register<sbyte, ulong>(value => (ulong)value);
+            Register<sbyte, ulong>(value => checked((ulong)value));
             Register<sbyte, short>(value => value);
-            Register<sbyte, ushort>(value => (ushort)value);
+            Register<sbyte, ushort>(value => checked((ushort)value));
             Register<sbyte, BigInteger>(value => new BigInteger(value));
 
-            Register<float, double>(value => (double)value);
-            Register<float, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<float, double>(value => value);
+            Register<float, decimal>(value => checked((decimal)value));
             Register<float, BigInteger>(value => new BigInteger(value));
 
-            Register<double, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<double, float>(value => checked((float)value));
+            Register<double, decimal>(value => checked((decimal)value));
 
-            Register<char, byte>(value => Convert.ToByte(value));
-            Register<char, int>(value => Convert.ToInt32(value));
+            Register<char, byte>(value => checked((byte)value));
+            Register<char, int>(value => value);
+
+            Register<decimal, double>(value => checked((double)value));
         }
 
+        /// <summary>
+        /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
+        /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
+        /// </summary>
         public static T ConvertTo<T>(object value)
         {
             object v = ConvertTo(value, typeof(T));
@@ -139,6 +148,10 @@ namespace GraphQL
             return v == null ? default : (T)v;
         }
 
+        /// <summary>
+        /// <para>Returns an object of the specified type and whose value is equivalent to the specified object.</para>
+        /// <para>Throws a <see cref="InvalidOperationException"/> if there is no conversion registered; conversion functions may throw other exceptions</para>
+        /// </summary>
         public static object ConvertTo(object value, Type targetType)
         {
             if (!TryConvertTo(value, targetType, out object result))
@@ -147,6 +160,10 @@ namespace GraphQL
             return result;
         }
 
+        /// <summary>
+        /// <para>If a conversion delegate was registered, converts an object to the specified type and returns <c>true</c>; returns <c>false</c> if no conversion delegate is registered.</para>
+        /// <para>Conversion delegates may throw exceptions if the conversion was unsuccessful</para>
+        /// </summary>
         internal static bool TryConvertTo(object value, Type targetType, out object result, Type sourceType = null)
         {
             if (value == null || targetType.IsInstanceOfType(value))
@@ -218,6 +235,6 @@ namespace GraphQL
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
             where TTarget : class
-            => Register<IDictionary<string, object>, TTarget>(conversion == null ? (Func<IDictionary<string, object>, TTarget>)null : v => conversion(v));
+            => Register<IDictionary<string, object>, TTarget>(conversion);
     }
 }

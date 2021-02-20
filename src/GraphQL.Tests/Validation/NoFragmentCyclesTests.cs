@@ -111,7 +111,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
@@ -129,7 +129,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragB", new[] {"fragA"});
+                    e.Message = CycleErrorMessage("fragB", new[] { "fragA" });
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
@@ -155,7 +155,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
                     e.Loc(4, 23);
                     e.Loc(9, 23);
                 });
@@ -179,7 +179,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragB", "fragC", "fragO", "fragP"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC", "fragO", "fragP" });
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                     e.Loc(4, 43);
@@ -188,7 +188,7 @@ namespace GraphQL.Tests.Validation
                 });
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragO", new[] {"fragP", "fragX", "fragY", "fragZ"});
+                    e.Message = CycleErrorMessage("fragO", new[] { "fragP", "fragX", "fragY", "fragZ" });
                     e.Loc(8, 43);
                     e.Loc(9, 53);
                     e.Loc(5, 43);
@@ -210,13 +210,13 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragC"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
                     e.Loc(2, 53);
                     e.Loc(4, 43);
                 });
@@ -235,13 +235,13 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragA", new[] {"fragC"});
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
                     e.Loc(2, 43);
                     e.Loc(4, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = CycleErrorMessage("fragC", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragC", new[] { "fragB" });
                     e.Loc(4, 53);
                     e.Loc(3, 43);
                 });

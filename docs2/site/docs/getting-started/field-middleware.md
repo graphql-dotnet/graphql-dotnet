@@ -31,20 +31,18 @@ public class InstrumentFieldsMiddleware : IFieldMiddleware
 }
 ```
 
-Then register your Field Middleware in `ExecutionOptions`.
+Then register your Field Middleware on the schema.
 
 ```csharp
-await schema.ExecuteAsync(options =>
-{
-  options.Query = "...";
-  options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-});
+var schema = new Schema();
+schema.Query = new MyQuery();
+schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
 ```
 
 Or, you can register a middleware delegate directly:
 
 ```csharp
-_.FieldMiddleware.Use((schema, next) =>
+schema.FieldMiddleware.Use(next =>
 {
   return context =>
   {
@@ -75,16 +73,54 @@ public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext contex
 
 First, you are advised to read the article about [Dependency Injection](Dependency-Injection).
 
-If you use `IFieldMiddlewareBuilder.Use` overloads which accept type parameter (that is,
-those that do not accept a `IFieldMiddleware` instance or a middleware delegate) then your
-middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
+Typically you will want to set the middleware within the schema constructor.
+
+```csharp
+public MySchema : Schema
+{
+  public MySchema(
+    IServiceProvider services,
+    MyQuery query,
+    InstrumentFieldsMiddleware middleware)
+    : base(services)
+  {
+    Query = query;
+    FieldMiddleware.Use(middleware);
+  }
+}
+```
+
+Then your middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
 the Field Middleware constructor, provided that you have registered them correctly in DI.
-Note that it is required to have a schema that inherits from `Schema` or implements `IServiceProvider`.
 
 Also, the middleware itself should be registered in DI:
 
 ```csharp
 services.AddSingleton<InstrumentFieldsMiddleware>();
+```
+
+Alternatively, you can use an enumerable in your constructor to add all DI-registered middlewares:
+
+```csharp
+public MySchema : Schema
+{
+  public MySchema(
+    IServiceProvider services,
+    MyQuery query,
+    IEnumerable<IFieldMiddleware> middlewares)
+    : base(services)
+  {
+    Query = query;
+    foreach (var middleware in middlewares)
+      FieldMiddleware.Use(middleware);
+  }
+}
+
+// within Startup.cs
+services.AddSingleton<ISchema, MySchema>();
+services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
+services.AddSingleton<IFieldMiddleware, MyMiddleware>();
+...
 ```
 
 ## Known issues
@@ -141,7 +177,7 @@ Options are also possible using transient lifetime, but are not given here (not 
 
 ## Field Middleware vs Directive
 
-If we consider Field Middleware as a way to globally affect the method of calculating all fields
-of all types in the Schema, then the directive can be considered as a way to locally affect only
-specific fields. The mechanism of their work is similar. For more information about directives
-see [Directives](Directives).
+You can think of a Field Middleware as something global that controls how all fields of all types
+in the schema are resolved. A directive, at the same time, would only affect specific schema elements
+and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
+For more information about directives see [Directives](directives).

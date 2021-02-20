@@ -1,115 +1,190 @@
 using System;
-using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
-    public class __Type : ObjectGraphType
+    /// <summary>
+    /// <c>__Type</c> is at the core of the type introspection system.
+    /// It represents scalars, interfaces, object types, unions, enums in the system.
+    /// </summary>
+    public class __Type : ObjectGraphType<IGraphType>
     {
-        public __Type()
+        /// <summary>
+        /// Initializes a new instance of the <c>__Type</c> introspection type.
+        /// </summary>
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __Type(bool allowAppliedDirectives = false)
         {
             Name = nameof(__Type);
+
             Description =
                 "The fundamental unit of any GraphQL Schema is the type. There are " +
                 "many kinds of types in GraphQL as represented by the `__TypeKind` enum." +
-                $"{Environment.NewLine}{Environment.NewLine}Depending on the kind of a type, certain fields describe " +
+               @"
+
+" +
+                "Depending on the kind of a type, certain fields describe " +
                 "information about that type. Scalar types provide no information " +
                 "beyond a name and description, while Enum types provide their values. " +
                 "Object and Interface types provide the fields they describe. Abstract " +
                 "types, Union and Interface, provide the Object types possible " +
                 "at runtime. List and NonNull types compose other types.";
-            Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
-            {
-                if (context.Source is IGraphType type)
-                {
-                    return KindForInstance(type);
-                }
 
-                throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
+            Field<NonNullGraphType<__TypeKind>>("kind", resolve: context =>
+            {
+                return context.Source is IGraphType type
+                    ? KindForInstance(type)
+                    : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
-            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
+
+            Field<StringGraphType>("name", resolve: context => context.Source.Name);
+
             Field<StringGraphType>("description");
+
             FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
-                        DefaultValue = false
+                        DefaultValue = BoolBox.False
                     }),
                 async context =>
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
-                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
-                        var type = context.Source as IComplexGraphType;
-                        var fields = !includeDeprecated
-                            ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
-                            : type?.Fields;
+                        var type = (IComplexGraphType)context.Source;
+                        var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
-                        fields ??= Enumerable.Empty<FieldType>();
-                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f)).ConfigureAwait(false);
+                        bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
 
-                        return fields.OrderBy(f => f.Name);
+                        int index = 0;
+                        foreach (var field in type.Fields.List)
+                        {
+                            if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                                fields[index++] = field;
+                        }
+
+                        var comparer = context.Schema.Comparer.FieldComparer(type);
+                        if (comparer != null)
+                            Array.Sort(fields, 0, index, comparer);
+
+                        return fields.Constrained(index);
                     }
                     return null;
                 });
+
             FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
             {
-                return context.Source is IImplementInterfaces type
-                    ? await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false)
-                    : null;
+                if (context.Source is IImplementInterfaces type)
+                {
+                    var interfaces = context.ArrayPool.Rent<IInterfaceGraphType>(type.ResolvedInterfaces.Count);
+
+                    int index = 0;
+                    foreach (var resolved in type.ResolvedInterfaces.List)
+                    {
+                        if (await context.Schema.Filter.AllowType(resolved).ConfigureAwait(false))
+                            interfaces[index++] = resolved;
+                    }
+
+                    var comparer = context.Schema.Comparer.TypeComparer;
+                    if (comparer != null)
+                        Array.Sort(interfaces, 0, index, comparer);
+
+                    return interfaces.Constrained(index);
+                }
+
+                return null;
             });
+
             FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
-                    return await type.PossibleTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
+                    var possibleTypes = context.ArrayPool.Rent<IObjectGraphType>(type.PossibleTypes.Count);
+
+                    int index = 0;
+                    foreach (var possible in type.PossibleTypes.List)
+                    {
+                        if (await context.Schema.Filter.AllowType(possible))
+                            possibleTypes[index++] = possible;
+                    }
+
+                    var comparer = context.Schema.Comparer.TypeComparer;
+                    if (comparer != null)
+                        Array.Sort(possibleTypes, 0, index, comparer);
+
+                    return possibleTypes.Constrained(index);
                 }
 
                 return null;
             });
-            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
-                new QueryArguments(new QueryArgument<BooleanGraphType>
+
+            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues",
+                arguments: new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
-                    DefaultValue = false
+                    DefaultValue = BoolBox.False
                 }),
-                async context =>
+                resolve: async context =>
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
-                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
-                        var values = !includeDeprecated
-                            ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
-                            : type.Values.ToList();
+                        var enumValueDefinitions = context.ArrayPool.Rent<EnumValueDefinition>(type.Values.Count);
 
-                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v)).ConfigureAwait(false);
+                        bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+
+                        int index = 0;
+                        foreach (var def in type.Values.List)
+                        {
+                            if ((includeDeprecated || string.IsNullOrWhiteSpace(def.DeprecationReason)) && await context.Schema.Filter.AllowEnumValue(type, def).ConfigureAwait(false))
+                                enumValueDefinitions[index++] = def;
+                        }
+
+                        var comparer = context.Schema.Comparer.EnumValueComparer(type);
+                        if (comparer != null)
+                            Array.Sort(enumValueDefinitions, 0, index, comparer);
+
+                        return enumValueDefinitions.Constrained(index);
                     }
 
                     return null;
                 });
+
             FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
             {
-                return context.Source is IInputObjectGraphType type
-                    ? await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f)).ConfigureAwait(false)
-                    : null;
-            });
-            Field<__Type>("ofType", resolve: context =>
-            {
-                if (context.Source == null) return null;
-
-                if (context.Source is NonNullGraphType type)
+                if (context.Source is IInputObjectGraphType type)
                 {
-                    return type.ResolvedType;
-                }
+                    var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
-                if (context.Source is ListGraphType graphType)
-                {
-                    return graphType.ResolvedType;
+                    int index = 0;
+                    foreach (var field in type.Fields.List)
+                    {
+                        if (await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                            inputFields[index++] = field;
+                    }
+
+                    var comparer = context.Schema.Comparer.FieldComparer(type);
+                    if (comparer != null)
+                        Array.Sort(inputFields, 0, index, comparer);
+
+                    return inputFields.Constrained(index);
                 }
 
                 return null;
             });
+
+            Field<__Type>("ofType", resolve: context =>
+            {
+                return context.Source switch
+                {
+                    NonNullGraphType nonNull => nonNull.ResolvedType,
+                    ListGraphType list => list.ResolvedType,
+                    _ => null
+                };
+            });
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("type");
         }
 
         private static object KindForInstance(IGraphType type) => type switch

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -11,56 +12,84 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext
+    public class ResolveFieldContext : IResolveFieldContext<object>
     {
+        /// <inheritdoc/>
         public string FieldName { get; set; }
 
+        /// <inheritdoc/>
         public Field FieldAst { get; set; }
 
+        /// <inheritdoc/>
         public FieldType FieldDefinition { get; set; }
 
+        /// <inheritdoc/>
         public IGraphType ReturnType { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType ParentType { get; set; }
 
-        public IDictionary<string, object> Arguments { get; set; }
+        /// <inheritdoc/>
+        public IDictionary<string, ArgumentValue> Arguments { get; set; }
 
+        /// <inheritdoc/>
         public object RootValue { get; set; }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; }
 
+        /// <inheritdoc/>
         public object Source { get; set; }
 
+        /// <inheritdoc/>
         public ISchema Schema { get; set; }
 
+        /// <inheritdoc/>
         public Document Document { get; set; }
 
+        /// <inheritdoc/>
         public Operation Operation { get; set; }
 
+        /// <inheritdoc/>
         public Fragments Fragments { get; set; }
 
+        /// <inheritdoc/>
         public Variables Variables { get; set; }
 
+        /// <inheritdoc/>
         public CancellationToken CancellationToken { get; set; }
 
+        /// <inheritdoc/>
         public Metrics Metrics { get; set; }
 
+        /// <inheritdoc/>
         public ExecutionErrors Errors { get; set; }
 
+        /// <inheritdoc/>
         public IEnumerable<object> Path { get; set; }
 
+        /// <inheritdoc/>
         public IEnumerable<object> ResponsePath { get; set; }
 
-        public IDictionary<string, Field> SubFields { get; set; }
+        /// <inheritdoc/>
+        public Fields SubFields { get; set; }
 
+        /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> Extensions { get; set; }
 
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance with all fields set to their default values.
+        /// </summary>
         public ResolveFieldContext() { }
 
         /// <summary>
-        /// Clone the specified <see cref="IResolveFieldContext"/>
+        /// Clone the specified <see cref="IResolveFieldContext"/>.
         /// </summary>
         public ResolveFieldContext(IResolveFieldContext context)
         {
@@ -86,12 +115,14 @@ namespace GraphQL
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
             Extensions = context.Extensions;
+            ArrayPool = context.ArrayPool;
         }
     }
 
     /// <inheritdoc cref="ResolveFieldContext"/>
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
+        /// <inheritdoc cref="ResolveFieldContext()"/>
         public ResolveFieldContext()
         {
         }
@@ -106,6 +137,7 @@ namespace GraphQL
                 throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 
+        /// <inheritdoc cref="ResolveFieldContext.Source"/>
         public new TSource Source
         {
             get => (TSource)base.Source;

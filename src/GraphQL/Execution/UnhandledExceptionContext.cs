@@ -7,6 +7,9 @@ namespace GraphQL.Execution
     /// </summary>
     public class UnhandledExceptionContext
     {
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public UnhandledExceptionContext(ExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
         {
             Context = context;
@@ -15,6 +18,9 @@ namespace GraphQL.Execution
             Exception = originalException;
         }
 
+        /// <summary>
+        /// Returns the execution context.
+        /// </summary>
         public ExecutionContext Context { get; }
 
         /// <summary>

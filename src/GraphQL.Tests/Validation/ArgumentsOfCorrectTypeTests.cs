@@ -193,21 +193,21 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-//        [Test]
-//        public void big_int_into_int()
-//        {
-//            var query = @"{
-//              complicatedArgs {
-//                intArgField(intArg: 829384293849283498239482938)
-//              }
-//            }";
-//
-//            ShouldFailRule(_ =>
-//            {
-//                _.Query = query;
-//                Rule.badValue(_, "intArg", "Int", "829384293849283498239482938", 3, 29);
-//            });
-//        }
+        //        [Test]
+        //        public void big_int_into_int()
+        //        {
+        //            var query = @"{
+        //              complicatedArgs {
+        //                intArgField(intArg: 829384293849283498239482938)
+        //              }
+        //            }";
+        //
+        //            ShouldFailRule(_ =>
+        //            {
+        //                _.Query = query;
+        //                Rule.badValue(_, "intArg", "Int", "829384293849283498239482938", 3, 29);
+        //            });
+        //        }
 
         [Fact]
         public void unquoted_string_into_int()
@@ -504,21 +504,21 @@ namespace GraphQL.Tests.Validation
         }
 
         // this is currently allowed
-//        [Fact]
-//        public void different_case_enum_value_into_enum()
-//        {
-//            var query = @"{
-//              dog {
-//                doesKnowCommand(dogCommand: sit)
-//              }
-//            }";
-//
-//            ShouldFailRule(_ =>
-//            {
-//                _.Query = query;
-//                Rule.badValue(_, "dogCommand", "DogCommand", "sit", 3, 33);
-//            });
-//        }
+        //        [Fact]
+        //        public void different_case_enum_value_into_enum()
+        //        {
+        //            var query = @"{
+        //              dog {
+        //                doesKnowCommand(dogCommand: sit)
+        //              }
+        //            }";
+        //
+        //            ShouldFailRule(_ =>
+        //            {
+        //                _.Query = query;
+        //                Rule.badValue(_, "dogCommand", "DogCommand", "sit", 3, 33);
+        //            });
+        //        }
 
         [Fact]
         public void list_value_incorrect_item_type()
@@ -786,7 +786,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 Rule.badValue(_, "complexArg", "ComplexInput", "{intField: 4}", 3, 33,
-                    new []
+                    new[]
                     {
                         "In field \"requiredField\": Expected \"Boolean!\", found null."
                     });
@@ -809,7 +809,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 Rule.badValue(_, "complexArg", "ComplexInput", "{stringListField: [\"one\", 2], requiredField: true}", 3, 33,
-                    new []
+                    new[]
                     {
                         "In field \"stringListField\": In element #1: Expected type \"String\", found 2."
                     });
@@ -832,7 +832,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 Rule.badValue(_, "complexArg", "ComplexInput", "{requiredField: true, unknownField: \"value\"}", 3, 33,
-                    new []
+                    new[]
                     {
                         "In field \"unknownField\": Unknown field."
                     });
@@ -876,22 +876,20 @@ namespace GraphQL.Tests.Validation
 
     public static class ValidationExtensions
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "'rule' parameter works as 'this' anchor")]
         public static void badValue(
             this ArgumentsOfCorrectType rule,
-            ValidationTestConfig _,
+            ValidationTestConfig config,
             string argName,
             string typeName,
             string value,
-            int? line = null,
-            int? column = null,
+            int line,
+            int column,
             IEnumerable<string> errors = null)
         {
-            if (errors == null)
-            {
-                errors = new [] { $"Expected type \"{typeName}\", found {value}." };
-            }
+            errors ??= new[] { $"Expected type \"{typeName}\", found {value}." };
 
-            _.Error(
+            config.Error(
                 ArgumentsOfCorrectTypeError.BadValueMessage(argName, value, errors),
                 line,
                 column);

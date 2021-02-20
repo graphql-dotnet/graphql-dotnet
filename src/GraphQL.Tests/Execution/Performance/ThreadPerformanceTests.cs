@@ -118,15 +118,14 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var result = await Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
             });
 
-            var result = runResult2.Data as dynamic;
-            runResult2.Errors.ShouldBeNull();
-            ((string)result["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
+            result.Errors.ShouldBeNull();
+            ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
         }
     }
 }

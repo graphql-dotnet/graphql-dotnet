@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.StarWars.Types
 {
@@ -16,8 +16,8 @@ namespace GraphQL.StarWars.Types
 
     public enum Episodes
     {
-        NEWHOPE  = 4,
-        EMPIRE  = 5,
-        JEDI  = 6
+        NEWHOPE = 4,
+        EMPIRE = 5,
+        JEDI = 6
     }
 }

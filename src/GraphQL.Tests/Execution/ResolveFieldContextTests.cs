@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.SystemTextJson;
+using GraphQL.Execution;
 using Shouldly;
 using Xunit;
 
@@ -16,7 +14,7 @@ namespace GraphQL.Tests.Execution
         {
             _context = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>(),
+                Arguments = new Dictionary<string, ArgumentValue>(),
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>(),
             };
@@ -26,7 +24,7 @@ namespace GraphQL.Tests.Execution
         public void argument_converts_int_to_long()
         {
             int val = 1;
-            _context.Arguments["a"] = val;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<long>("a");
             result.ShouldBe(1);
         }
@@ -35,7 +33,7 @@ namespace GraphQL.Tests.Execution
         public void argument_converts_long_to_int()
         {
             long val = 1;
-            _context.Arguments["a"] = val;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<int>("a");
             result.ShouldBe(1);
         }
@@ -44,14 +42,15 @@ namespace GraphQL.Tests.Execution
         public void long_to_int_should_throw_for_out_of_range()
         {
             long val = 89429901947254093;
-            _context.Arguments["a"] = val;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
         }
 
         [Fact]
         public void argument_returns_boxed_string_uncast()
         {
-            _context.Arguments["a"] = "one";
+            var val = "one";
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<object>("a");
             result.ShouldBe("one");
         }
@@ -60,7 +59,7 @@ namespace GraphQL.Tests.Execution
         public void argument_returns_long()
         {
             long val = 1000000000000001;
-            _context.Arguments["a"] = val;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<long>("a");
             result.ShouldBe(1000000000000001);
         }
@@ -68,7 +67,8 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_enum()
         {
-            _context.Arguments["a"] = SomeEnum.Two;
+            var val = SomeEnum.Two;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<SomeEnum>("a");
             result.ShouldBe(SomeEnum.Two);
         }
@@ -76,7 +76,8 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_enum_from_string()
         {
-            _context.Arguments["a"] = "two";
+            var val = "two";
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<SomeEnum>("a");
             result.ShouldBe(SomeEnum.Two);
         }
@@ -84,7 +85,8 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_enum_from_number()
         {
-            _context.Arguments["a"] = 1;
+            var val = 1;
+            _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
             var result = _context.GetArgument<SomeEnum>("a");
             result.ShouldBe(SomeEnum.Two);
         }
@@ -104,7 +106,10 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_list_from_array()
         {
-            _context.Arguments = @"{ ""a"": [""one"", ""two""]}".ToInputs();
+            _context.Arguments = new Dictionary<string, ArgumentValue>
+            {
+                { "a", new ArgumentValue(new string[] { "one", "two"}, ArgumentSource.Literal) }
+            };
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
             result.Count.ShouldBe(2);

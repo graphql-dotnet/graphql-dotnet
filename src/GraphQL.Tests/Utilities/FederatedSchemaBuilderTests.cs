@@ -89,6 +89,54 @@ type User @key(fields: ""id"") {
             });
         }
 
+        [Theory]
+        [InlineData("...on User { id }", false)]
+        [InlineData("__typename ...on User { id }", false)]
+        [InlineData("...on User { __typename id }", false)]
+        [InlineData("...on User { ...TypeAndId }", true)]
+        public void result_includes_typename(string selectionSet, bool includeFragment)
+        {
+            var definitions = @"
+                extend type Query {
+                    me: User
+                }
+
+                type User @key(fields: ""id"") {
+                    id: ID!
+                    username: String!
+                }
+            ";
+
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
+
+            var query = @$"
+                query ($_representations: [_Any!]!) {{
+                    _entities(representations: $_representations) {{
+                        {selectionSet}
+                    }}
+                }}";
+            if (includeFragment)
+            {
+                query += @"
+                fragment TypeAndId on User {
+                    __typename
+                    id
+                }
+                ";
+            }
+
+            var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123""}] }";
+
+            AssertQuery(_ =>
+            {
+                _.Definitions = definitions;
+                _.Query = query;
+                _.Variables = variables;
+                _.ExpectedResult = expected;
+            });
+        }
+
         [Fact]
         public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
         {
@@ -115,14 +163,14 @@ type User @key(fields: ""id"") {
                 _.Query = query;
             }).GetAwaiter().GetResult();
 
-            var data = (Dictionary<string, object>)executionResult.Data;
-            var schema = (Dictionary<string, object>)data["__schema"];
-            var types = (List<object>)schema["types"];
-            var entityType = (Dictionary<string, object>)types.Single(t => (string)((Dictionary<string, object>)t)["name"] == "_Entity");
-            var possibleTypes = (List<object>)entityType["possibleTypes"];
-            var possibleType = (Dictionary<string, object>)possibleTypes[0];
+            var data = executionResult.Data.ToDict();
+            var schema = data["__schema"].ToDict();
+            var types = (IEnumerable<object>)schema["types"];
+            var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
+            var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
+            var possibleType = possibleTypes.First().ToDict();
             var name = (string)possibleType["name"];
-            
+
             Assert.Equal("User", name);
         }
 
@@ -151,10 +199,12 @@ type User @key(fields: ""id"") {
             };
             var listener = new DataLoaderDocumentListener(accessor);
 
-            Builder.Types.For("User").ResolveReferenceAsync(ctx => {
+            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
+            {
                 var id = ctx.Arguments["id"].ToString();
                 // return Task.FromResult(users.FirstOrDefault(user => user.Id == id));
-                var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids => {
+                var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids =>
+                {
                     var results = users.Where(user => ids.Contains(user.Id));
                     return Task.FromResult((IDictionary<string, User>)results.ToDictionary(c => c.Id));
                 });

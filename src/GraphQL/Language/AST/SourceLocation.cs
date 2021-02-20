@@ -1,47 +1,57 @@
+using System;
+using System.Diagnostics;
+
 namespace GraphQL.Language.AST
 {
-    public class SourceLocation
+    /// <summary>
+    /// Provides information regarding the location of a node within a document's original query text.
+    /// </summary>
+    [DebuggerDisplay("(Start={Start}, End={End})")]
+    public readonly struct SourceLocation : IEquatable<SourceLocation>
     {
-        public SourceLocation(int line, int column, int start = -1, int end = -1)
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        public SourceLocation(int start, int end)
         {
-            Line = line;
-            Column = column;
             Start = start;
             End = end;
         }
 
+        /// <summary>
+        /// The index for the start of the node in the source (i.e. it's inclusive).
+        /// <br/>
+        /// For example:
+        /// <code>
+        /// { field { subfield } }
+        /// <br/>
+        /// --^ field.Location.Start = 2
+        /// </code>
+        /// </summary>
         public int Start { get; }
 
+        /// <summary>
+        /// The index for the character immediately after the node in the source (i.e. it's exclusive).
+        /// <br/>
+        /// For example:
+        /// <code>
+        /// { field { subfield } }
+        /// <br/>
+        /// --------------------^ field.Location.End = 20
+        /// </code>
+        /// </summary>
         public int End { get; }
 
-        public int Line { get; }
+        /// <inheritdoc/>
+        public bool Equals(SourceLocation other) => Start == other.Start && End == other.End;
 
-        public int Column { get; }
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => obj is SourceLocation l && Equals(l);
 
-        public override string ToString()
-        {
-            return $"line={Line}, column={Column}, start={Start}, end={End}";
-        }
+        /// <inheritdoc/>
+        public override int GetHashCode() => (Start, End).GetHashCode();
 
-        protected bool Equals(SourceLocation other)
-        {
-            return Line == other.Line && Column == other.Column;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((SourceLocation)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Line*397) ^ Column;
-            }
-        }
+        /// <inheritdoc/>
+        public override string ToString() => $"({Start},{End})";
     }
 }

@@ -4,18 +4,25 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.ProvidedNonNullArguments"/>
     [Serializable]
     public class ProvidedNonNullArgumentsError : ValidationError
     {
         internal const string NUMBER = "5.4.2.1";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, Field node, QueryArgument arg)
-            : base(context.OriginalQuery, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, Directive node, QueryArgument arg)
-            : base(context.OriginalQuery, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
         {
         }
 

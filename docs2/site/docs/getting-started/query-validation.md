@@ -11,6 +11,6 @@ await schema.ExecuteAsync(_ =>
     {
       new RequiresAuthValidationRule()
     }
-    .Concat(DocumentValidator.CoreRules());
+    .Concat(DocumentValidator.CoreRules);
 });
 ```

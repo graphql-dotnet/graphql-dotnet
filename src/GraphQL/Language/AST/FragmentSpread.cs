@@ -3,37 +3,41 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
-    public class FragmentSpread : AbstractNode, IFragment
+    /// <summary>
+    /// Represents a fragment spread node within a document.
+    /// </summary>
+    public class FragmentSpread : AbstractNode, IFragment, IHaveName
     {
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="NameNode"/> containing the name of this fragment spread node.
+        /// </summary>
         public FragmentSpread(NameNode node)
         {
             NameNode = node;
         }
 
-        public string Name => NameNode?.Name;
+        /// <summary>
+        /// Returns the name of this fragment spread.
+        /// </summary>
+        public string Name => NameNode.Name;
 
+        /// <summary>
+        /// Returns the <see cref="NameNode"/> containing the name of this fragment spread.
+        /// </summary>
         public NameNode NameNode { get; }
 
+        /// <summary>
+        /// Gets or sets a list of directive nodes that apply to this fragment spread node.
+        /// </summary>
         public Directives Directives { get; set; }
 
+        /// <inheritdoc/>
         public override IEnumerable<INode> Children => Directives;
 
-        public override string ToString()
-        {
-            return "FragmentSpread{{name='{0}', directives={1}}}".ToFormat(Name, Directives);
-        }
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Directives, state);
 
-        protected bool Equals(FragmentSpread other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((FragmentSpread)obj);
-        }
+        /// <inheritdoc/>
+        public override string ToString() => $"FragmentSpread{{name='{Name}', directives={Directives}}}";
     }
 }

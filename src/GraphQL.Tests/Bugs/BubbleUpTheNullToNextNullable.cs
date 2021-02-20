@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {NonNullable = null};
+            var data = new Data { NonNullable = null };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Bugs
                 }
             };
 
-            AssertResult(QUERY,EXPECTED, data, errors);
+            AssertResult(QUERY, EXPECTED, data, errors);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nullableNest { nonNullable } } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": { ""nullableNest"": null } }";
-            var data = new Data {NullableNest = new Data {NonNullable = null}};
+            var data = new Data { NullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableNest { nonNullable } } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {NonNullableNest = new Data {NonNullable = null}};
+            var data = new Data { NonNullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
@@ -89,7 +89,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { nonNullableNest { nonNullable } } }";
             const string EXPECTED = null;
-            var data = new Data {NonNullableNest = new Data {NonNullable = null}};
+            var data = new Data { NonNullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
             const string EXPECTED = @"{ ""nonNullableDataGraph"": { ""listOfNonNullable"": null } }";
-            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
+            var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
@@ -125,7 +125,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableList } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
@@ -143,7 +143,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { nonNullableList } }";
             const string EXPECTED = null;
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
@@ -161,7 +161,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
+            var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
@@ -179,7 +179,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
@@ -210,14 +210,15 @@ namespace GraphQL.Tests.Bugs
             AssertResult(QUERY, EXPECTED, data, errors);
         }
 
-        private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors)
+        private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors, bool executed = true)
         {
             ExecutionResult result =
                 AssertQueryWithErrors(
                     query,
                     expected,
                     root: data,
-                    expectedErrorCount: errors.Count);
+                    expectedErrorCount: errors.Count,
+                    executed: executed);
 
             ExecutionErrors actualErrors = result.Errors;
 

@@ -8,10 +8,11 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1773
     public class Bug1773 : QueryTestBase<Bug1773Schema>
     {
-        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
+        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, string localizedMessage = null)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0) error.AddLocation(line, column);
+            if (line != 0)
+                error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;
@@ -20,6 +21,10 @@ namespace GraphQL.Tests.Bugs
             if (exception != null)
             {
                 Assert.Equal(exception.GetType(), actualResult.Errors[0].InnerException.GetType());
+
+                if (localizedMessage != null && actualResult.Errors[0].InnerException.Message == localizedMessage)
+                    return;
+
                 Assert.Equal(exception.Message, actualResult.Errors[0].InnerException.Message);
             }
         }
@@ -55,7 +60,7 @@ namespace GraphQL.Tests.Bugs
         {
             // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
-                new FormatException("Input string was not in a correct format."));
+                new FormatException("Input string was not in a correct format."), localizedMessage: "Входная строка имела неверный формат.");
         }
 
         [Fact]
@@ -71,7 +76,7 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the conversion threw a FormatException
             AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
-                new FormatException("Input string was not in a correct format."));
+                new FormatException("Input string was not in a correct format."), localizedMessage: "Входная строка имела неверный формат.");
         }
 
         [Fact]

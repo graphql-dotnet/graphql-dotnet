@@ -136,7 +136,8 @@ namespace GraphQL.Utilities
         /// <param name="member">The reflected member.</param>
         /// <param name="xml">XML documentation.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member, XDocument xml) => xml?.XPathEvaluate(string.Format("string(/doc/members/member[@name='{0}']/summary)", GetMemberElementName(member))).ToString().Trim().NullIfEmpty();
+        public static string GetXmlDocumentation(this MemberInfo member, XDocument xml) => xml?.XPathEvaluate(
+            $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString().Trim().NullIfEmpty();
 
         /// <summary>
         /// Returns the XML documentation (returns/param tag) for the specified parameter.
@@ -161,7 +162,9 @@ namespace GraphQL.Utilities
         /// <returns>The contents of the returns/param tag for the parameter.</returns>
         public static string GetXmlDocumentation(this ParameterInfo parameter, XDocument xml) =>
             parameter.IsRetval || string.IsNullOrEmpty(parameter.Name)
-                ? xml?.XPathEvaluate(string.Format("string(/doc/members/member[@name='{0}']/returns)", GetMemberElementName(parameter.Member))).ToString().Trim().NullIfEmpty()
-                : xml?.XPathEvaluate(string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", GetMemberElementName(parameter.Member), parameter.Name)).ToString().Trim().NullIfEmpty();
+                ? xml?.XPathEvaluate(
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString().Trim().NullIfEmpty()
+                : xml?.XPathEvaluate(
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString().Trim().NullIfEmpty();
     }
 }

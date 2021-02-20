@@ -8,23 +8,23 @@ namespace GraphQL.StarWars.IoC
     {
         object Get(Type serviceType);
         T Get<T>();
-        void Register<TService>();
-        void Register<TService>(Func<TService> instanceCreator);
-        void Register<TService, TImpl>() where TImpl : TService;
-        void Singleton<TService>(TService instance);
-        void Singleton<TService>(Func<TService> instanceCreator);
+        void Register<TService>() where TService : class;
+        void Register<TService>(Func<TService> instanceCreator) where TService : class;
+        void Register<TService, TImpl>() where TService : class where TImpl : class, TService;
+        void Singleton<TService>(TService instance) where TService : class;
+        void Singleton<TService>(Func<TService> instanceCreator) where TService : class;
     }
 
     public class SimpleContainer : ISimpleContainer
     {
         private readonly Dictionary<Type, Func<object>> _registrations = new Dictionary<Type, Func<object>>();
 
-        public void Register<TService>()
+        public void Register<TService>() where TService : class
         {
             Register<TService, TService>();
         }
 
-        public void Register<TService, TImpl>() where TImpl : TService
+        public void Register<TService, TImpl>() where TService : class where TImpl : class, TService
         {
             _registrations.Add(typeof(TService),
                 () =>
@@ -36,17 +36,17 @@ namespace GraphQL.StarWars.IoC
                 });
         }
 
-        public void Register<TService>(Func<TService> instanceCreator)
+        public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             _registrations.Add(typeof(TService), () => instanceCreator());
         }
 
-        public void Singleton<TService>(TService instance)
+        public void Singleton<TService>(TService instance) where TService : class
         {
             _registrations.Add(typeof(TService), () => instance);
         }
 
-        public void Singleton<TService>(Func<TService> instanceCreator)
+        public void Singleton<TService>(Func<TService> instanceCreator) where TService : class
         {
             var lazy = new Lazy<TService>(instanceCreator);
             Register(() => lazy.Value);

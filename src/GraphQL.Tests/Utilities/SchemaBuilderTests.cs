@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Utilities
             var query = schema.Query;
             query.ShouldNotBeNull();
             query.Name.ShouldBe("Query");
-            query.Fields.Count().ShouldBe(1);
+            query.Fields.Count.ShouldBe(1);
 
             query.Fields.Single().Name.ShouldBe("id");
         }
@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Utilities
             var mutation = schema.Mutation;
             mutation.ShouldNotBeNull();
             mutation.Name.ShouldBe("Mutation");
-            mutation.Fields.Count().ShouldBe(1);
+            mutation.Fields.Count.ShouldBe(1);
 
             mutation.Fields.Single().Name.ShouldBe("mutate");
         }
@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Utilities
             var subscription = schema.Subscription;
             subscription.ShouldNotBeNull();
             subscription.Name.ShouldBe("Subscription");
-            subscription.Fields.Count().ShouldBe(1);
+            subscription.Fields.Count.ShouldBe(1);
 
             subscription.Fields.Single().Name.ShouldBe("subscribe");
         }
@@ -109,6 +109,88 @@ namespace GraphQL.Tests.Utilities
             subscription.Name.ShouldBe("MySubscription");
         }
 
+        private enum TestEnum
+        {
+            ASC,
+            DESC
+        }
+
+        [Fact]
+        public void configures_schema_from_schema_type_and_directives()
+        {
+            var definitions = @"
+                type MyQuery  {
+                    id: String
+                }
+
+                type MyMutation @requireAuth(role: ""Admin"") {
+                    mutate: String
+                }
+
+                type MySubscription @requireAuth {
+                    subscribe: String @traits(volatile: true, documented: false, enumerated: DESC) @some
+                }
+
+                schema @public {
+                  query: MyQuery
+                  mutation: MyMutation
+                  subscription: MySubscription
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Directives.Register(new DirectiveGraphType("public", DirectiveLocation.Schema));
+            schema.Directives.Register(new DirectiveGraphType("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
+            schema.Directives.Register(new DirectiveGraphType("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
+            schema.Directives.Register(new DirectiveGraphType("some", DirectiveLocation.FieldDefinition));
+            schema.Initialized.ShouldBe(false);
+            schema.Initialize();
+
+            schema.HasAppliedDirectives().ShouldBeTrue();
+            schema.GetAppliedDirectives().Count.ShouldBe(1);
+            schema.GetAppliedDirectives().Find("public").ShouldNotBeNull();
+            schema.GetAppliedDirectives().Find("public").ArgumentsCount.ShouldBe(0);
+            schema.GetAppliedDirectives().Find("public").Arguments.ShouldBeNull();
+
+            var query = schema.Query;
+            query.ShouldNotBeNull();
+            query.Name.ShouldBe("MyQuery");
+            query.HasAppliedDirectives().ShouldBeFalse();
+            query.GetAppliedDirectives().ShouldBeNull();
+
+            var mutation = schema.Mutation;
+            mutation.ShouldNotBeNull();
+            mutation.Name.ShouldBe("MyMutation");
+            mutation.HasAppliedDirectives().ShouldBeTrue();
+            mutation.GetAppliedDirectives().Count.ShouldBe(1);
+            mutation.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
+            mutation.GetAppliedDirectives().Find("requireAuth").Arguments.Count.ShouldBe(1);
+            mutation.GetAppliedDirectives().Find("requireAuth").Arguments[0].Name.ShouldBe("role");
+            mutation.GetAppliedDirectives().Find("requireAuth").Arguments[0].Value.ShouldBe("Admin");
+
+            var subscription = schema.Subscription;
+            subscription.ShouldNotBeNull();
+            subscription.Name.ShouldBe("MySubscription");
+            subscription.GetAppliedDirectives().Count.ShouldBe(1);
+            subscription.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
+            subscription.GetAppliedDirectives().Find("requireAuth").ArgumentsCount.ShouldBe(0);
+            subscription.GetAppliedDirectives().Find("requireAuth").Arguments.ShouldBeNull();
+
+            var field = subscription.Fields.Find("subscribe");
+            field.ShouldNotBeNull();
+            field.GetAppliedDirectives().Count.ShouldBe(2);
+            field.GetAppliedDirectives().Find("traits").ShouldNotBeNull();
+            field.GetAppliedDirectives().Find("traits").Arguments.Count.ShouldBe(3);
+            field.GetAppliedDirectives().Find("traits").Arguments[0].Name.ShouldBe("volatile");
+            field.GetAppliedDirectives().Find("traits").Arguments[0].Value.ShouldBe(true);
+            field.GetAppliedDirectives().Find("traits").Arguments[1].Name.ShouldBe("documented");
+            field.GetAppliedDirectives().Find("traits").Arguments[1].Value.ShouldBe(false);
+            field.GetAppliedDirectives().Find("traits").Arguments[2].Name.ShouldBe("enumerated");
+            field.GetAppliedDirectives().Find("traits").Arguments[2].Value.ShouldBe("DESC");
+            field.GetAppliedDirectives().Find("some").ShouldNotBeNull();
+            field.GetAppliedDirectives().Find("some").ArgumentsCount.ShouldBe(0);
+        }
+
         [Fact]
         public void builds_type_with_arguments()
         {
@@ -122,7 +204,7 @@ namespace GraphQL.Tests.Utilities
             schema.Initialize();
 
             var query = schema.Query;
-            query.Fields.Count().ShouldBe(1);
+            query.Fields.Count.ShouldBe(1);
 
             var field = query.Fields.Single();
             field.Name.ShouldBe("post");
@@ -147,9 +229,9 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var type = schema.FindType("Pet") as InterfaceGraphType;
+            var type = schema.AllTypes["Pet"] as InterfaceGraphType;
             type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
+            type.Fields.Count.ShouldBe(1);
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("id");
@@ -169,10 +251,10 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var type = schema.FindType("PetKind") as EnumerationGraphType;
+            var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
             type.ShouldNotBeNull();
 
-            type.Values.Select(x => x.Value.ToString()).ShouldBe(new [] {"CAT", "DOG"});
+            type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
         }
 
         [Fact]
@@ -188,11 +270,11 @@ namespace GraphQL.Tests.Utilities
 
             var customScalar = new CustomScalarType();
 
-            var schema = Schema.For(definitions, _ => _.RegisterType(customScalar));
-
+            var schema = Schema.For(definitions);
+            schema.RegisterType(customScalar);
             schema.Initialize();
 
-            var type = schema.FindType("CustomScalar") as ScalarGraphType;
+            var type = schema.AllTypes["CustomScalar"] as ScalarGraphType;
             type.ShouldNotBeNull();
 
             var query = schema.Query;
@@ -225,16 +307,16 @@ namespace GraphQL.Tests.Utilities
 
             query.ShouldNotBeNull();
             query.Name.ShouldBe("Query");
-            query.Fields.Count().ShouldBe(2);
+            query.Fields.Count.ShouldBe(2);
 
             var posts = query.Fields.First();
             posts.Name.ShouldBe("posts");
             SchemaPrinter.ResolveName(posts.ResolvedType).ShouldBe("[Post]");
             query.Fields.Last().ResolvedType.Name.ShouldBe("Post");
 
-            var post = schema.FindType("Post") as IObjectGraphType;
+            var post = schema.AllTypes["Post"] as IObjectGraphType;
             post.ShouldNotBeNull();
-            post.Fields.Count().ShouldBe(3);
+            post.Fields.Count.ShouldBe(3);
         }
 
         [Fact]
@@ -259,8 +341,8 @@ namespace GraphQL.Tests.Utilities
 
             schema.Initialize();
 
-            var searchResult = schema.FindType("SearchResult") as UnionGraphType;
-            searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] {"Human", "Droid"});
+            var searchResult = schema.AllTypes["SearchResult"] as UnionGraphType;
+            searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] { "Human", "Droid" });
         }
 
         [Fact]
@@ -276,9 +358,9 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var input = schema.FindType("ReviewInput") as InputObjectGraphType;
+            var input = schema.AllTypes["ReviewInput"] as InputObjectGraphType;
             input.ShouldNotBeNull();
-            input.Fields.Count().ShouldBe(2);
+            input.Fields.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -293,10 +375,10 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var directive = schema.FindDirective("myDirective");
+            var directive = schema.Directives.Find("myDirective");
             directive.ShouldNotBeNull();
 
-            directive.Arguments.Count().ShouldBe(1);
+            directive.Arguments.Count.ShouldBe(1);
             var argument = directive.Arguments.Find("if");
             SchemaPrinter.ResolveName(argument.ResolvedType).ShouldBe("Boolean!");
 
@@ -320,9 +402,9 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var type = schema.FindType("Query") as IObjectGraphType;
+            var type = schema.AllTypes["Query"] as IObjectGraphType;
             type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
+            type.Fields.Count.ShouldBe(1);
             type.Fields.Single().DeprecationReason.ShouldBe("a reason");
         }
 
@@ -338,9 +420,9 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var type = schema.FindType("Query") as IObjectGraphType;
+            var type = schema.AllTypes["Query"] as IObjectGraphType;
             type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
+            type.Fields.Count.ShouldBe(1);
             type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
         }
 
@@ -357,7 +439,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions);
             schema.Initialize();
 
-            var type = schema.FindType("PetKind") as EnumerationGraphType;
+            var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
             type.ShouldNotBeNull();
 
             var cat = type.Values.Single(x => x.Name == "CAT");
@@ -376,9 +458,9 @@ namespace GraphQL.Tests.Utilities
             var schema = Schema.For(definitions, _ => _.Types.Include<Movie>());
             schema.Initialize();
 
-            var type = schema.FindType("Movie") as IObjectGraphType;
+            var type = schema.AllTypes["Movie"] as IObjectGraphType;
             type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
+            type.Fields.Count.ShouldBe(1);
             type.Fields.Single().DeprecationReason.ShouldBe("my reason");
         }
 
@@ -397,8 +479,8 @@ namespace GraphQL.Tests.Utilities
 
             var schema = Schema.For(definitions);
             schema.Initialize();
-            var type = schema.FindType("Query") as IObjectGraphType;
-            type.Fields.Count().ShouldBe(2);
+            var type = schema.AllTypes["Query"] as IObjectGraphType;
+            type.Fields.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -416,8 +498,8 @@ namespace GraphQL.Tests.Utilities
 
             var schema = Schema.For(definitions);
             schema.Initialize();
-            var type = schema.FindType("Query") as IObjectGraphType;
-            type.Fields.Count().ShouldBe(2);
+            var type = schema.AllTypes["Query"] as IObjectGraphType;
+            type.Fields.Count.ShouldBe(2);
         }
 
         internal class Movie

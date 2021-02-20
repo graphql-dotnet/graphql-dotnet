@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
@@ -6,33 +5,28 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Lone anonymous operation
+    /// Lone anonymous operation:
     ///
     /// A GraphQL document is only valid if when it contains an anonymous operation
     /// (the query short-hand) that it contains only that one operation definition.
     /// </summary>
     public class LoneAnonymousOperation : IValidationRule
     {
-        public Func<string> AnonOperationNotAloneMessage => () =>
-            "This anonymous operation must be the only defined operation.";
-
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var operationCount = context.Document.Operations.Count;
+        /// <inheritdoc/>
+        /// <exception cref="LoneAnonymousOperationError"/>
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
+        {
+            if (string.IsNullOrWhiteSpace(op.Name) && context.Document.Operations.Count > 1)
             {
-                _.Match<Operation>(op =>
-                {
-                    if (string.IsNullOrWhiteSpace(op.Name)
-                        && operationCount > 1)
-                    {
-                        context.ReportError(new LoneAnonymousOperationError(context, op));
-                    }
-                });
-            }).ToTask();
-        }
+                context.ReportError(new LoneAnonymousOperationError(context, op));
+            }
+        }).ToTask();
     }
 }

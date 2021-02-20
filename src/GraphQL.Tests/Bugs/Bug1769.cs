@@ -12,14 +12,15 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1769
     public class Bug1769 : QueryTestBase<Bug1769Schema>
     {
-        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
+        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, bool executed = true)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0) error.AddLocation(line, column);
+            if (line != 0)
+                error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;
-            var expected = CreateQueryResult(result, new ExecutionErrors { error });
+            var expected = CreateQueryResult(result, new ExecutionErrors { error }, executed);
             AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
         }
 
@@ -48,22 +49,13 @@ namespace GraphQL.Tests.Bugs
                     Schema = null,
                 });
             });
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await de.ExecuteAsync(new ExecutionOptions()
-                {
-                    Query = "{test}",
-                    Schema = Schema,
-                    FieldMiddleware = null,
-                });
-            });
         }
 
         [Fact]
-        public void query_is_empty1() => AssertQueryWithError("", null, "Document does not contain any operations.", 0, 0, (object[])null, code: "NO_OPERATION");
+        public void query_is_empty1() => AssertQueryWithError("", null, "Document does not contain any operations.", 0, 0, null, code: "NO_OPERATION", executed: false);
 
         [Fact]
-        public void query_is_whitespace2() => AssertQueryWithError("\t \t \r\n", null, "Document does not contain any operations.", 0, 0, (object[])null, code: "NO_OPERATION");
+        public void query_is_whitespace2() => AssertQueryWithError("\t \t \r\n", null, "Document does not contain any operations.", 0, 0, null, code: "NO_OPERATION", executed: false);
 
         [Fact]
         public void DocumentExecuter_cannot_have_null_constructor_parameters()

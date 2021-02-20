@@ -3,11 +3,21 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Provides helper methods for locating a graph type within a schema from the AST type.
+    /// </summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Searches a schema for a graph type specified by an AST type. If the type
+        /// cannot be found, returns <see langword="null"/>.
+        /// </summary>
+        /// <param name="type">The AST type to search for.</param>
+        /// <param name="schema">The schema to search within.</param>
         public static IGraphType GraphTypeFromType(this IType type, ISchema schema)
         {
-            if (type == null) return null;
+            if (type == null)
+                return null;
 
             if (type is NonNullType nonnull)
             {
@@ -37,31 +47,30 @@ namespace GraphQL.Types
 
             if (type is NamedType named)
             {
-                return schema.FindType(named.Name);
+                return schema.AllTypes[named.Name];
             }
 
             return null;
         }
 
-        public static string Name(this IType type)
+        /// <summary>
+        /// Returns the name of an AST type after unwrapping any <see cref="NonNullType"/> or <see cref="ListType"/> layers.
+        /// </summary>
+        public static string Name(this IType type) => type switch
         {
-            if (type is NonNullType nonnull)
-            {
-                return Name(nonnull.Type);
-            }
+            NonNullType nonnull => Name(nonnull.Type),
+            ListType list => Name(list.Type),
+            _ => ((NamedType)type).Name,
+        };
 
-            if (type is ListType list)
-            {
-                return Name(list.Type);
-            }
-
-            return ((NamedType)type).Name;
-        }
-
+        /// <summary>
+        /// Returns the formatted GraphQL type name of the AST type, using brackets and exclamation points as necessary to
+        /// indicate lists or non-null types, respectively.
+        /// </summary>
         public static string FullName(this IType type) => type switch
         {
-            NonNullType nonnull => "{0}!".ToFormat(FullName(nonnull.Type)),
-            ListType list => "[{0}]".ToFormat(FullName(list.Type)),
+            NonNullType nonnull => $"{FullName(nonnull.Type)}!",
+            ListType list => $"[{FullName(list.Type)}]",
             _ => ((NamedType)type).Name
         };
     }

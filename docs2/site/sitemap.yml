@@ -1,4 +1,4 @@
-- title: GraphQL .NET
+- title: GraphQL.NET
   dir: ./
   url: /
   file: pages/landing.js
@@ -75,11 +75,22 @@
             file: dataloader.md
           - title: Schema Generation
             file: schema-generation.md
-          - title: Migration Guide [v0.17.x -> v2]
-            file: migration.md
-          - title: Migration Guide [v2 -> v3]
-            file: migration3.md
           - title: Known Issues & FAQ
             file: known-issues.md
           - title: Links
             file: links.md
+          - title: Document Caching
+            file: document-caching.md
+      - title: Migration Guides
+        dir: migrations
+        items:
+          - title: Migration Guide [v3 -> v4]
+            file: migration4.md
+          - title: Migration Guide [v2 -> v3]
+            file: migration3.md
+          - title: Migration Guide [v0.17.x -> v2]
+            file: migration2.md
+          - title: Migration Guide [v0.11.0]
+            file: v0_11_0.md
+          - title: Migration Guide [v0.8.0]
+            file: v0_8_0.md

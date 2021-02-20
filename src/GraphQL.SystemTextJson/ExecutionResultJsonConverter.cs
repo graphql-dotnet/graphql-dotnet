@@ -7,15 +7,22 @@ using GraphQL.Execution;
 
 namespace GraphQL.SystemTextJson
 {
+    /// <summary>
+    /// Converts an instance of <see cref="ExecutionResult"/> to JSON. Doesn't support read from JSON.
+    /// </summary>
     public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
     {
         private readonly IErrorInfoProvider _errorInfoProvider;
 
+        /// <summary>
+        /// Creates an instance of <see cref="ExecutionResultJsonConverter"/> with the specified <see cref="IErrorInfoProvider"/>.
+        /// </summary>
         public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
 
+        /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, ExecutionResult value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
@@ -31,14 +38,68 @@ namespace GraphQL.SystemTextJson
 
         private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
-            var data = result.Data;
-
-            if (result.Errors?.Count > 0 && data == null)
+            if (result.Executed)
             {
-                return;
+                writer.WritePropertyName("data");
+                if (result.Data is ExecutionNode executionNode)
+                {
+                    WriteExecutionNode(writer, executionNode, options);
+                }
+                else
+                {
+                    WriteValue(writer, result.Data, options);
+                }
             }
+        }
 
-            WriteProperty(writer, "data", data, options);
+        private static void WriteExecutionNode(Utf8JsonWriter writer, ExecutionNode node, JsonSerializerOptions options)
+        {
+            if (node is ValueExecutionNode valueExecutionNode)
+            {
+                WriteValue(writer, valueExecutionNode.ToValue(), options);
+            }
+            else if (node is ObjectExecutionNode objectExecutionNode)
+            {
+                if (objectExecutionNode.SubFields == null)
+                {
+                    writer.WriteNullValue();
+                }
+                else
+                {
+                    writer.WriteStartObject();
+                    foreach (var childNode in objectExecutionNode.SubFields)
+                    {
+                        writer.WritePropertyName(childNode.Name);
+                        WriteExecutionNode(writer, childNode, options);
+                    }
+                    writer.WriteEndObject();
+                }
+            }
+            else if (node is ArrayExecutionNode arrayExecutionNode)
+            {
+                var items = arrayExecutionNode.Items;
+                if (items == null)
+                {
+                    writer.WriteNullValue();
+                }
+                else
+                {
+                    writer.WriteStartArray();
+                    foreach (var childNode in items)
+                    {
+                        WriteExecutionNode(writer, childNode, options);
+                    }
+                    writer.WriteEndArray();
+                }
+            }
+            else if (node == null || node is NullExecutionNode)
+            {
+                writer.WriteNullValue();
+            }
+            else
+            {
+                WriteValue(writer, node.ToValue(), options);
+            }
         }
 
         private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
@@ -101,6 +162,26 @@ namespace GraphQL.SystemTextJson
                     writer.WriteNumberValue(ul);
                     break;
                 }
+                case short sh:
+                {
+                    writer.WriteNumberValue(sh);
+                    break;
+                }
+                case ushort ush:
+                {
+                    writer.WriteNumberValue(ush);
+                    break;
+                }
+                case byte bt:
+                {
+                    writer.WriteNumberValue(bt);
+                    break;
+                }
+                case sbyte sbt:
+                {
+                    writer.WriteNumberValue(sbt);
+                    break;
+                }
                 case Dictionary<string, object> dictionary:
                 {
                     writer.WriteStartObject();
@@ -123,8 +204,20 @@ namespace GraphQL.SystemTextJson
 
                     break;
                 }
+                case object[] list:
+                {
+                    writer.WriteStartArray();
+
+                    foreach (object item in list)
+                        WriteValue(writer, item, options);
+
+                    writer.WriteEndArray();
+
+                    break;
+                }
                 default:
                 {
+                    // TODO: Guid, BigInteger, DateTime, <Anonymous Type> fall here
                     // Need to avoid this call by all means! The question remains open - why this API so expensive?
                     JsonSerializer.Serialize(writer, value, options);
                     break;
@@ -157,7 +250,7 @@ namespace GraphQL.SystemTextJson
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    foreach (var location in error.Locations)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -165,7 +258,7 @@ namespace GraphQL.SystemTextJson
                         writer.WritePropertyName("column");
                         JsonSerializer.Serialize(writer, location.Column, options);
                         writer.WriteEndObject();
-                    });
+                    }
                     writer.WriteEndArray();
                 }
 
@@ -196,7 +289,8 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        public override ExecutionResult Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotImplementedException();
+        public override ExecutionResult Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => throw new NotImplementedException();
+
+        public override bool CanConvert(Type typeToConvert) => typeof(ExecutionResult).IsAssignableFrom(typeToConvert);
     }
 }

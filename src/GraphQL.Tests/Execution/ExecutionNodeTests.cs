@@ -11,6 +11,31 @@ namespace GraphQL.Tests.Execution
     public class ExecutionNodeTests
     {
         [Fact]
+        public void RootExecutionNode_Should_Not_Throw_Exceptions()
+        {
+            var type = new ObjectGraphType();
+            var root = new RootExecutionNode(type);
+
+            root.Field.ShouldBeNull();
+            root.FieldDefinition.ShouldBeNull();
+            root.GetHashCode().ShouldNotBe(0);
+            root.GetObjectGraphType(null).ShouldBe(type);
+            root.GetParentType(null).ShouldBeNull();
+            root.GraphType.ShouldBe(type);
+            root.IndexInParentNode.ShouldBeNull();
+            root.Name.ShouldBeNull();
+            root.Parent.ShouldBeNull();
+            root.Path.ToArray().Length.ShouldBe(0);
+            root.ResolvedType.ShouldBeNull();
+            root.ResponsePath.ToArray().Length.ShouldBe(0);
+            root.Result.ShouldBeNull();
+            root.Source.ShouldBeNull();
+            root.SubFields.ShouldBeNull();
+            root.ToString().ShouldNotBeNull();
+            root.ToValue().ShouldBeNull();
+        }
+
+        [Fact]
         public void Path_Alias()
         {
             var objectGraphType = new AliasedFieldTestObject();
@@ -34,7 +59,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -66,7 +91,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
+                new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 

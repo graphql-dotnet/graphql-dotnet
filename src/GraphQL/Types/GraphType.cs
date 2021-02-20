@@ -1,14 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents a graph type.
+    /// </summary>
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the graph type.
+        /// </summary>
         protected GraphType()
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
@@ -20,7 +25,7 @@ namespace GraphQL.Types
             }
         }
 
-        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
@@ -46,7 +51,7 @@ namespace GraphQL.Types
             {
                 if (validate)
                 {
-                    NameValidator.ValidateName(name, "type");
+                    NameValidator.ValidateName(name, NamedElement.Type);
 
                     if (IsTypeModifier)
                         throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
@@ -56,63 +61,44 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Type name that must conform to the specification: https://graphql.github.io/graphql-spec/June2018/#sec-Names
-        /// </summary>
+        /// <inheritdoc/>
         public string Name
         {
             get => _name;
             set => SetName(value, validate: true);
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public string DeprecationReason { get; set; }
 
-        public virtual string CollectTypes(TypeCollectionContext context)
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                Name = GetType().Name;
-            }
+        /// <inheritdoc />
+        public override string ToString() => Name;
 
-            return Name;
-        }
-
-        public override string ToString() =>
-            string.IsNullOrWhiteSpace(Name)
-                ? GetType().Name
-                : Name;
-
+        /// <summary>
+        /// Determines if the name of the specified graph type is equal to the name of this graph type.
+        /// </summary>
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
+        /// <summary>
+        /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
+        /// is equal to the name of this graph type.
+        /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
 
             return Equals((IGraphType)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
-    }
-
-    /// <summary>
-    /// TODO: This sucks, find a better way
-    /// </summary>
-    public class TypeCollectionContext
-    {
-        public TypeCollectionContext(
-            Func<Type, IGraphType> resolver,
-            Action<string, IGraphType, TypeCollectionContext> addType)
-        {
-            ResolveType = resolver;
-            AddType = addType;
-        }
-
-        public Func<Type, IGraphType> ResolveType { get; private set; }
-        public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
-        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }

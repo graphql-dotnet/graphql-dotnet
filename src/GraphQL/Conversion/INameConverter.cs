@@ -5,7 +5,7 @@ namespace GraphQL.Conversion
     /// <summary>
     /// Sanitizes graph field and argument names to a particular case convention, such as camelСase or PascalCase.<br/>
     /// <br/>
-    /// Set <see cref="ExecutionOptions.NameConverter"/> to an instance of a derived class to select a converter to use.
+    /// Set <see cref="Schema.NameConverter"/> to an instance of a derived class to select a converter to use.
     /// The default converter is <see cref="CamelCaseNameConverter"/>.<br/>
     /// <br/>
     /// Introspection fields always use <see cref="CamelCaseNameConverter"/> regardless of the selected <see cref="INameConverter"/>.

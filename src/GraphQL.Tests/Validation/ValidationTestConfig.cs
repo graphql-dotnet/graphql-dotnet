@@ -11,20 +11,22 @@ namespace GraphQL.Tests.Validation
         private readonly List<ValidationErrorAssertion> _assertions = new List<ValidationErrorAssertion>();
 
         public ISchema Schema { get; set; }
+
         public string Query { get; set; }
+
+        public Inputs Inputs { get; set; }
+
         public IList<IValidationRule> Rules => _rules;
+
         public IList<ValidationErrorAssertion> Assertions => _assertions;
 
-        public void Error(string message, int? line = null, int? column = null)
+        public void Error(string message, int line, int column)
         {
             var assertion = new ValidationErrorAssertion
             {
                 Message = message,
             };
-            if (line.HasValue)
-            {
-                assertion.Loc(line.Value, column.Value);
-            }
+            assertion.Loc(line, column);
             _assertions.Add(assertion);
         }
 

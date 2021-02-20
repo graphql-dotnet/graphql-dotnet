@@ -38,7 +38,7 @@ insert_final_newline = false
 
 # Code files
 [*.{cs,vb}]
- 
+
 # .NET code style settings - "This." and "Me." qualifiers
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#this-and-me
 dotnet_style_qualification_for_field = false:warning
@@ -94,8 +94,8 @@ csharp_style_var_elsewhere = true:suggestion
 
 # C# code style settings - Expression-bodied members
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#expression-bodied-members
-csharp_style_expression_bodied_methods = when_on_single_line:warning
-csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:warning
 csharp_style_expression_bodied_operators = when_on_single_line:warning
 csharp_style_expression_bodied_properties = when_on_single_line:warning
 csharp_style_expression_bodied_indexers = when_on_single_line:warning
@@ -132,8 +132,8 @@ csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 
 # C# code style - Index and range preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#index-and-range-preferences
-csharp_style_prefer_index_operator = true:warning
-csharp_style_prefer_range_operator = true:warning
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
 
 # C# code style - Miscellaneous preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#miscellaneous-preferences
@@ -201,18 +201,18 @@ csharp_preserve_single_line_statements = false
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2019
 # dotnet_naming_rule.<namingRuleTitle>.symbols = <symbolTitle>
 dotnet_naming_rule.private_fields_with_underscore.symbols = private_fields
- 
+
 # dotnet_naming_symbols.<symbolTitle>.<property> = <value>
 dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
- 
+
 # dotnet_naming_rule.<namingRuleTitle>.style = <styleTitle>
 dotnet_naming_rule.private_fields_with_underscore.style = prefix_underscore
- 
+
 # dotnet_naming_style.<styleTitle>.<property> = <value>
 dotnet_naming_style.prefix_underscore.capitalization = camel_case
 dotnet_naming_style.prefix_underscore.required_prefix = _
- 
+
 # dotnet_naming_rule.<namingRuleTitle>.severity = <value>
 dotnet_naming_rule.private_fields_with_underscore.severity = warning
 
@@ -251,9 +251,12 @@ dotnet_naming_rule.async_methods_end_in_async.style = end_in_async_style
 
 # dotnet_naming_style.<styleTitle>.<property> = <value>
 dotnet_naming_style.end_in_async_style.capitalization = pascal_case
-dotnet_naming_style.end_in_async_style.word_separator = 
-dotnet_naming_style.end_in_async_style.required_prefix = 
+dotnet_naming_style.end_in_async_style.word_separator =
+dotnet_naming_style.end_in_async_style.required_prefix =
 dotnet_naming_style.end_in_async_style.required_suffix = Async
 
 # dotnet_naming_rule.<namingRuleTitle>.severity = <value>
 dotnet_naming_rule.async_methods_end_in_async.severity = warning
+
+# Remove unnecessary import https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0005
+dotnet_diagnostic.IDE0005.severity = warning

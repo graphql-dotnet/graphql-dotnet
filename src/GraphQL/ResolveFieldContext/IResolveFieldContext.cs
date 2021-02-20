@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
@@ -6,29 +7,33 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using System;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
     /// <summary>
-    /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>
+    /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>.
+    /// This object is only valid during the execution of the field; it is re-used once the field
+    /// has resolved. Use <see cref="ResolveFieldContextExtensions.Copy(IResolveFieldContext)"/>
+    /// if you need to preserve a copy of the context for later use or copy required properties from the context.
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>The name of the field being resolved</summary>
+        /// <summary>The name of the field being resolved.</summary>
+        [Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldAst.Name instead.")]
         string FieldName { get; }
 
-        /// <summary>The <see cref="Field"/> AST as derived from the query request</summary>
+        /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
         Field FieldAst { get; }
 
-        /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type</summary>
+        /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type.</summary>
         FieldType FieldDefinition { get; }
 
-        /// <summary>The return value's graph type</summary>
+        /// <summary>The return value's graph type.</summary>
+        [Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldDefinition.ResolvedType instead.")]
         IGraphType ReturnType { get; }
 
-        /// <summary>The field's parent graph type</summary>
+        /// <summary>The field's parent graph type.</summary>
         IObjectGraphType ParentType { get; }
 
         /// <summary>
@@ -37,46 +42,46 @@ namespace GraphQL
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, object> Arguments { get; }
+        IDictionary<string, ArgumentValue> Arguments { get; }
 
-        /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/></summary>
+        /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object RootValue { get; }
 
-        /// <summary>The value of the parent object in the graph</summary>
+        /// <summary>The value of the parent object in the graph.</summary>
         object Source { get; }
 
-        /// <summary>The graph schema</summary>
+        /// <summary>The graph schema.</summary>
         ISchema Schema { get; }
 
-        /// <summary>The current GraphQL request, parsed into an AST document</summary>
+        /// <summary>The current GraphQL request, parsed into an AST document.</summary>
         Document Document { get; }
 
-        /// <summary>The operation type (i.e. query, mutation, or subscription) of the current GraphQL request</summary>
+        /// <summary>The operation type (i.e. query, mutation, or subscription) of the current GraphQL request.</summary>
         Operation Operation { get; }
 
-        /// <summary>Returns the query fragments associated with the current GraphQL request</summary>
+        /// <summary>Returns the query fragments associated with the current GraphQL request.</summary>
         Fragments Fragments { get; }
 
-        /// <summary>The input variables of the current GraphQL request</summary>
+        /// <summary>The input variables of the current GraphQL request.</summary>
         Variables Variables { get; }
 
-        /// <summary>A <see cref="System.Threading.CancellationToken">CancellationToken</see> to indicate if and when the request has been canceled</summary>
+        /// <summary>A <see cref="System.Threading.CancellationToken">CancellationToken</see> to indicate if and when the request has been canceled.</summary>
         CancellationToken CancellationToken { get; }
 
-        /// <summary>Allows logging of performance metrics</summary>
+        /// <summary>Allows logging of performance metrics.</summary>
         Metrics Metrics { get; }
 
-        /// <summary>Can be used to return specific errors back to the GraphQL request caller</summary>
+        /// <summary>Can be used to return specific errors back to the GraphQL request caller.</summary>
         ExecutionErrors Errors { get; }
 
-        /// <summary>The path to the current executing field from the request root as it would appear in the query</summary>
+        /// <summary>The path to the current executing field from the request root as it would appear in the query.</summary>
         IEnumerable<object> Path { get; }
 
-        /// <summary>The path to the current executing field from the request root as it would appear in the response</summary>
+        /// <summary>The path to the current executing field from the request root as it would appear in the response.</summary>
         IEnumerable<object> ResponsePath { get; }
 
-        /// <summary>Returns a list of child fields requested for the current field</summary>
-        IDictionary<string, Field> SubFields { get; }
+        /// <summary>Returns a list of child fields requested for the current field.</summary>
+        Fields SubFields { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
@@ -87,8 +92,14 @@ namespace GraphQL
         /// </summary>
         IDictionary<string, object> Extensions { get; }
 
-        /// <summary>The service provider for the executing request</summary>
+        /// <summary>The service provider for the executing request.</summary>
         IServiceProvider RequestServices { get; }
+
+        /// <summary>
+        /// Returns a resource pool from which arrays can be rented during the current execution.
+        /// Can be used to return lists of data from field resolvers.
+        /// </summary>
+        IExecutionArrayPool ArrayPool { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

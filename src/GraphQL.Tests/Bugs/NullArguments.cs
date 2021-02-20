@@ -1,6 +1,6 @@
+using System.Linq;
 using GraphQL.Types;
 using Shouldly;
-using System.Linq;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -30,7 +30,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -47,7 +47,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -64,7 +64,7 @@ mutation {
 }
 ";
 
-            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -92,7 +92,7 @@ mutation {
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<NullInputClass>("input");
-                    var r= (arg.Id == null ? "id" : string.Empty) +
+                    var r = (arg.Id == null ? "id" : string.Empty) +
                           (arg.Foo == null ? "foo" : string.Empty) +
                           (arg.Bar == null ? "bar" : string.Empty);
                     return r;

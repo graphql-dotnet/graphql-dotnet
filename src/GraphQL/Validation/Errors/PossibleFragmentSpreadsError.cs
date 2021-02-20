@@ -4,18 +4,25 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.PossibleFragmentSpreads"/>
     [Serializable]
     public class PossibleFragmentSpreadsError : ValidationError
     {
         internal const string NUMBER = "5.5.2.3";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, InlineFragment node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery, NUMBER, TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)), node)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, FragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery, NUMBER, TypeIncompatibleSpreadMessage(node.Name, context.Print(parentType), context.Print(fragType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, TypeIncompatibleSpreadMessage(node.Name, context.Print(parentType), context.Print(fragType)), node)
         {
         }
 

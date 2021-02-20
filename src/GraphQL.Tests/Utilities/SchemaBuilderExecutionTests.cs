@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -10,29 +11,184 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
+        public class Query
+        {
+            public virtual Test Test() => new Test();
+
+            public string Method() => throw new OverflowException("just test");
+
+            public int Property => throw new DivideByZeroException("test too");
+        }
+
+        public class Test
+        {
+            public string Id => "foo";
+        }
+
+        public class TestEx : Test
+        {
+            public string Name => "bar";
+        }
+
+        public class QueryEx : Query
+        {
+            public override Test Test() => new TestEx();
+        }
+
+        [Fact]
+        public async Task schema_first_generate_exception_with_normal_stack_trace_for_method()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                    method: String!
+                    property: Int!
+                }
+                ", builder => builder.Types.Include<Query>());
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ method }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("OVERFLOW");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
+        }
+
+        [Fact]
+        public async Task schema_first_generate_exception_with_normal_stack_trace_for_property()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                    method: String!
+                    property: Int!
+                }
+                ", builder => builder.Types.Include<Query>());
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ property }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
+
+            var stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
+            if (stack.StartsWith("   в "))
+                stack = stack.Remove(0, 5);
+            if (stack.StartsWith("   at "))
+                stack = stack.Remove(0, 6);
+
+            stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
+        }
+
+        [Fact]
+        public async Task issue_1155_throws()
+        {
+            var schema = Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder => builder.Types.Include<Query>());
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ test { id name } }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'name'.");
+            result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Expected to find property or method 'name' on type 'Test' but it does not exist.");
+        }
+
+        [Fact]
+        public async Task issue_1155_with_custom_root_does_not_throw()
+        {
+            var schema = Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder => builder.Types.Include<Query>());
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ test { id name } }";
+                options.Root = new QueryEx();
+            }).ConfigureAwait(false);
+
+            result.Errors.ShouldBeNull();
+            var data = result.Data.ShouldBeAssignableTo<RootExecutionNode>();
+            var t = data.ToDict()["test"].ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>().ToDict();
+            t["id"].ShouldBe("foo");
+            t["name"].ShouldBe("bar");
+        }
+
+        [Fact]
+        public void can_read_schema_with_custom_root_names()
+        {
+            var schema = Schema.For("CustomSubscription".ReadGraphQLRequest());
+
+            schema.Query.Name.ShouldBe("CustomQuery");
+            schema.Mutation.Name.ShouldBe("CustomMutation");
+            schema.Subscription.Name.ShouldBe("CustomSubscription");
+            schema.Subscription.Fields.All(f => f is EventStreamFieldType).ShouldBeTrue();
+        }
+
         [Theory]
-        [InlineData("PetAfterAll.graphql", 15)]
-        [InlineData("PetBeforeAll.graphql", 15)]
+        [InlineData("PetAfterAll", 15)]
+        [InlineData("PetBeforeAll", 15)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
-                ReadSchema(fileName),
+                fileName.ReadGraphQLRequest(),
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
-            schema.AllTypes.Count().ShouldBe(expectedCount);
+            schema.AllTypes.Count.ShouldBe(expectedCount);
         }
 
         [Fact]
         public void can_read_complex_schema()
         {
             var schema = Schema.For(
-                ReadSchema("PetComplex.graphql"),
-                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+                "PetComplex".ReadGraphQLRequest(),
+                builder =>
+                {
+                    builder.Types.ForAll(config => config.ResolveType = _ => null);
+                    builder.IgnoreComments = false;
+                }
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(16);
+            schema.AllTypes.Count.ShouldBe(16);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
@@ -46,7 +202,7 @@ namespace GraphQL.Tests.Utilities
 
             var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
             pet.Description.ShouldBe("Cats with dogs");
-            pet.PossibleTypes.Count().ShouldBe(2);
+            pet.PossibleTypes.Count.ShouldBe(2);
 
             var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
             query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
@@ -245,7 +401,7 @@ namespace GraphQL.Tests.Utilities
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ source }";
-                _.Root = new { Hello =  "World" };
+                _.Root = new { Hello = "World" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""source"": true }");
@@ -263,10 +419,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
-            {
-                _.Query = "{ resolve }";
-            });
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = "{ resolve }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
@@ -502,7 +655,7 @@ namespace GraphQL.Tests.Utilities
                 type Cat {
                     name: String!
                 }
-            ", _=>
+            ", _ =>
             {
                 _.Types.For("Dog").IsTypeOf<Dog>();
                 _.Types.For("Cat").IsTypeOf<Cat>();
@@ -560,6 +713,8 @@ namespace GraphQL.Tests.Utilities
     public class Blog
     {
         public string Title { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Post Post(string id, long unused)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
@@ -569,6 +724,7 @@ namespace GraphQL.Tests.Utilities
     [GraphQLMetadata("Query")]
     public class BlogQueryType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Blog Blog(string id)
         {
             return new Blog
@@ -637,8 +793,10 @@ namespace GraphQL.Tests.Utilities
     {
         public bool Source(object source) => source != null;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string Resolve(IResolveFieldContext context) => "Resolved";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
         public string UserContext(MyUserContext context) => context.Name;
@@ -656,11 +814,11 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    internal class MyUserContext: Dictionary<string, object>
+    internal class MyUserContext : Dictionary<string, object>
     {
         public string Name { get; set; }
     }
-    internal class ChildMyUserContext: MyUserContext
+    internal class ChildMyUserContext : MyUserContext
     {
     }
 }

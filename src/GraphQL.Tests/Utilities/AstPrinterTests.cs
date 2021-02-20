@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void prints_ast()
         {
-var query = @"{
+            var query = @"{
   complicatedArgs {
     intArgField(intArg: 2)
   }
@@ -31,7 +31,7 @@ var query = @"{
         [Fact]
         public void prints_variables()
         {
-var query = @"mutation createUser($userInput: UserInput!) {
+            var query = @"mutation createUser($userInput: UserInput!) {
   createUser(userInput: $userInput) {
     id
     gender

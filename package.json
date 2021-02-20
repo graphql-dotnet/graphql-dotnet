@@ -1,6 +1,6 @@
 {
   "name": "graphql-dotnet",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "release": "set CONFIGURATION=Release&& babel-node tools/build.js ci",
     "restore": "babel-node tools/build.js restore",
     "setVersion": "babel-node tools/build.js setVersion",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "postinstall": "opencollective-postinstall"
   },
   "repository": "https://github.com/graphql-dotnet/graphql-dotnet.git",
   "author": "Joe McBride",
@@ -26,11 +27,13 @@
   },
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "graphiql": "^0.11.11",
     "graphql": "^0.13.2",
+    "opencollective-postinstall": "^2.0.1",
     "react": "^16.2.0",
-    "react-dom": "^16.4.2"
+    "react-dom": "^16.4.2",
+    "opencollective": "^1.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -58,5 +61,9 @@
     "webpack": "^3.10.0",
     "xml-reader": "^2.4.3",
     "xmlbuilder": "^8.2.2"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/graphql-net"
   }
 }

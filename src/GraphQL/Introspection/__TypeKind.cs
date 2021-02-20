@@ -2,8 +2,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// An enumeration representing a kind of GraphQL type.
+    /// </summary>
     public class __TypeKind : EnumerationGraphType<TypeKind>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__TypeKind</c> introspection type.
+        /// </summary>
         public __TypeKind()
         {
             SetName(nameof(__TypeKind), validate: false);

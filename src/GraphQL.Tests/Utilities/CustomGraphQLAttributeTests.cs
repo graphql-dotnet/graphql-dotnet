@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var query = schema.FindType("Query") as IObjectGraphType;
+            var query = schema.AllTypes["Query"] as IObjectGraphType;
             var field = query.Fields.Single(x => x.Name == "post");
             field.GetMetadata<string>("Authorize").ShouldBe("SomePolicy");
         }
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var blog = schema.FindType("ABlog") as IObjectGraphType;
+            var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
             blog.IsTypeOf.ShouldNotBeNull();
             blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
@@ -90,7 +90,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var blog = schema.FindType("ABlog") as IObjectGraphType;
+            var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
             blog.IsTypeOf.ShouldNotBeNull();
             blog.IsTypeOf(new ABlog()).ShouldBeTrue();
@@ -121,6 +121,7 @@ namespace GraphQL.Tests.Utilities
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public ResolvingClassForABlog Blog(string id)
         {
             return new ResolvingClassForABlog();
@@ -132,7 +133,7 @@ namespace GraphQL.Tests.Utilities
         public abstract string Id { get; }
     }
 
-    [GraphQLMetadata(Name="ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
+    [GraphQLMetadata(Name = "ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
     public class ResolvingClassForABlog : UniqueElement
     {
         public ResolvingClassForABlog()

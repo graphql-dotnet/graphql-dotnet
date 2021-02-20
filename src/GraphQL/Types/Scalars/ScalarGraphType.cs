@@ -23,19 +23,19 @@ namespace GraphQL.Types
         /// The returned value of a the result coercion is part of the overall execution result.
         /// Normally this value is a primitive value like String or Integer to make it easy for
         /// the serialization layer. For complex types like a Date or Money Scalar this involves
-        /// formatting the value. Returning null indicates a failed conversion.
+        /// formatting the value. Returning <see langword="null"/> indicates a failed conversion.
         /// </returns>
         public virtual object Serialize(object value) => ParseValue(value);
 
         /// <summary>
         /// Literal input coercion. It takes an abstract syntax tree (AST) element from a schema
-        /// definition or query and converts it into an appropriate intenal value. In other words
+        /// definition or query and converts it into an appropriate internal value. In other words
         /// it transforms a scalar from its client-side representation as an argument to its
         /// server-side representation. Input coercion may not only return primitive values like
         /// String but rather complex ones when appropriate.
         /// </summary>
         /// <param name="value"> AST value node. </param>
-        /// <returns> Internal scalar representation. Returning null indicates a failed conversion. </returns>
+        /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
         public abstract object ParseLiteral(IValue value);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace GraphQL.Types
         /// always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
         /// </summary>
         /// <param name="value"> Runtime object from variables. </param>
-        /// <returns> Internal scalar representation. Returning null indicates a failed conversion. </returns>
+        /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
         public abstract object ParseValue(object value);
     }
 }

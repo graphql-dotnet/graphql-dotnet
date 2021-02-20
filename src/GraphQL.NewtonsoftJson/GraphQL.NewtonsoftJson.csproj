@@ -8,11 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,50 +6,50 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Known argument names
+    /// Known argument names:
     ///
     /// A GraphQL field is only valid if all supplied arguments are defined by
     /// that field.
     /// </summary>
     public class KnownArgumentNames : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        /// <inheritdoc/>
+        /// <exception cref="KnownArgumentNamesError"/>
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Argument>((node, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var argumentOf = context.TypeInfo.GetAncestor(2);
+            if (argumentOf is Field)
             {
-                _.Match<Argument>(node =>
+                var fieldDef = context.TypeInfo.GetFieldDef();
+                if (fieldDef != null)
                 {
-                    var ancestors = context.TypeInfo.GetAncestors();
-                    var argumentOf = ancestors[ancestors.Length - 2];
-                    if (argumentOf is Field)
+                    var fieldArgDef = fieldDef.Arguments?.Find(node.Name);
+                    if (fieldArgDef == null)
                     {
-                        var fieldDef = context.TypeInfo.GetFieldDef();
-                        if (fieldDef != null)
-                        {
-                            var fieldArgDef = fieldDef.Arguments?.Find(node.Name);
-                            if (fieldArgDef == null)
-                            {
-                                var parentType = context.TypeInfo.GetParentType() ?? throw new InvalidOperationException("Parent type must not be null.");
-                                context.ReportError(new KnownArgumentNamesError(context, node, fieldDef, parentType));
-                            }
-                        }
+                        var parentType = context.TypeInfo.GetParentType() ?? throw new InvalidOperationException("Parent type must not be null.");
+                        context.ReportError(new KnownArgumentNamesError(context, node, fieldDef, parentType));
                     }
-                    else if (argumentOf is Directive)
+                }
+            }
+            else if (argumentOf is Directive)
+            {
+                var directive = context.TypeInfo.GetDirective();
+                if (directive != null)
+                {
+                    var directiveArgDef = directive.Arguments?.Find(node.Name);
+                    if (directiveArgDef == null)
                     {
-                        var directive = context.TypeInfo.GetDirective();
-                        if (directive != null)
-                        {
-                            var directiveArgDef = directive.Arguments?.Find(node.Name);
-                            if (directiveArgDef == null)
-                            {
-                                context.ReportError(new KnownArgumentNamesError(context, node, directive));
-                            }
-                        }
+                        context.ReportError(new KnownArgumentNamesError(context, node, directive));
                     }
-                });
-            }).ToTask();
-        }
+                }
+            }
+        }).ToTask();
     }
 }

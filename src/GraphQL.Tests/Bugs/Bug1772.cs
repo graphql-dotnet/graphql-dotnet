@@ -36,11 +36,11 @@ namespace GraphQL.Tests.Bugs
         {
             var de = new DocumentExecuter();
             var result = await de.ExecuteAsync(new ExecutionOptions()
-                {
-                    Query = "query firstQuery {test} query secondQuery {test}",
-                    Schema = Schema,
-                    OperationName = operationName
-                });
+            {
+                Query = "query firstQuery {test} query secondQuery {test}",
+                Schema = Schema,
+                OperationName = operationName
+            });
             result.ShouldNotBeNull();
             result.Data.ShouldBeNull();
             result.Errors.ShouldNotBeNull();

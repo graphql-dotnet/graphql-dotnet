@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Utilities.Federation;
 using Shouldly;
 using Xunit;
 
@@ -12,7 +14,6 @@ namespace GraphQL.Tests.Types
         public void registers_interfaces_when_not_used_in_fields()
         {
             var schema = new AnInterfaceSchema();
-            schema.FindType("a");
             var result = schema.AllTypes.SingleOrDefault(x => x.Name == "AnInterfaceType");
             result.ShouldNotBeNull("Interface type should be registered");
         }
@@ -21,7 +22,6 @@ namespace GraphQL.Tests.Types
         public void recursively_registers_children()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -36,7 +36,6 @@ namespace GraphQL.Tests.Types
         public void registers_argument_input_objects()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -47,7 +46,6 @@ namespace GraphQL.Tests.Types
         public void registers_argument_input_objects_when_argument_resolved_type_is_set()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -59,7 +57,6 @@ namespace GraphQL.Tests.Types
         public void registers_type_when_list()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -70,7 +67,6 @@ namespace GraphQL.Tests.Types
         public void registers_union_types()
         {
             var schema = new ARootSchema();
-            schema.FindType("a");
 
             ContainsTypeNames(
                 schema,
@@ -83,8 +79,7 @@ namespace GraphQL.Tests.Types
         public void throw_error_on_missing_istypeof()
         {
             var schema = new InvalidUnionSchema();
-            //note: The exception occurs during Schema.CreateTypesLookup(), not during Schema.FindType()
-            Should.Throw<InvalidOperationException>(() => schema.FindType("a"));
+            Should.Throw<InvalidOperationException>(() => schema.AllTypes["a"]);
         }
 
         [Fact]
@@ -106,8 +101,7 @@ namespace GraphQL.Tests.Types
         public void registers_additional_types()
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
-            schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -115,8 +109,7 @@ namespace GraphQL.Tests.Types
         public void registers_additional_duplicated_types()
         {
             var schema = new SchemaWithDuplicates();
-            schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -124,7 +117,6 @@ namespace GraphQL.Tests.Types
         public void registers_only_root_types()
         {
             var schema = new ARootSchema();
-            schema.FindType("abcd");
 
             DoesNotContainTypeNames(schema, "ASchemaType!");
         }
@@ -133,32 +125,79 @@ namespace GraphQL.Tests.Types
         public void handles_cycle_field_type()
         {
             var schema = new SimpleCycleSchema();
-            schema.FindType("CycleType").ShouldNotBeNull();
+            schema.AllTypes["CycleType"].ShouldNotBeNull();
         }
 
         [Fact]
         public void handles_stackoverflow_exception_for_cycle_field_type()
         {
             var schema = new ACyclingDerivingSchema(new FuncServiceProvider(t => t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null));
-            Should.Throw<InvalidOperationException>(() => schema.FindType("abcd"));
+            Should.Throw<InvalidOperationException>(() => schema.AllTypes["abcd"]);
         }
 
         private void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
-            typeNames.Apply(typeName =>
+            foreach (var typeName in typeNames)
             {
-                var type = schema.FindType(typeName);
-                type.ShouldNotBeNull("Did not find {0} in type lookup.".ToFormat(typeName));
-            });
+                var type = schema.AllTypes[typeName];
+                type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
+            }
         }
 
         private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
         {
-            typeNames.Apply(typeName =>
+            foreach (var typeName in typeNames)
             {
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
-                type.ShouldBe(null, "Found {0} in type lookup.".ToFormat(typeName));
+                type.ShouldBe(null, $"Found {typeName} in type lookup.");
+            }
+        }
+
+        [Fact]
+        public void middleware_can_reference_SchemaTypes()
+        {
+            var schema = new Schema { Query = new SomeQuery() };
+            schema.FieldMiddleware.Use(next =>
+            {
+                schema.AllTypes.Count.ShouldNotBe(0);
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "One " + res.ToString();
+                };
             });
+            schema.Initialize();
+        }
+
+        [Fact]
+        public void disposed_schema_throws_errors()
+        {
+            var schema = new Schema();
+
+            schema.Initialized.ShouldBeFalse();
+            schema.Dispose();
+            schema.Dispose();
+            schema.Initialized.ShouldBeFalse();
+
+            Should.Throw<ObjectDisposedException>(() => schema.Initialize());
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
+            Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
+        }
+
+        [Fact]
+        public void initialized_schema_should_throw_error_when_register_type_or_directive()
+        {
+            var schema = new Schema();
+
+            schema.Initialized.ShouldBeFalse();
+            schema.Initialize();
+            schema.Initialized.ShouldBeTrue();
+
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
+            Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
         }
     }
 
@@ -172,7 +211,7 @@ namespace GraphQL.Tests.Types
         {
             Query = new SomeQuery();
 
-            RegisterType<SomeObject>();
+            this.RegisterType<SomeObject>();
         }
     }
 
@@ -182,14 +221,14 @@ namespace GraphQL.Tests.Types
         {
             Query = new SomeQuery();
 
-            RegisterType<SomeObject>();
-            RegisterType<SomeObject>();
-            RegisterType<SomeQuery>();
-            RegisterType<SomeQuery>();
-            RegisterType<SomeInterface>();
-            RegisterType<SomeInterface>();
-            RegisterType<StringGraphType>();
-            RegisterType<StringGraphType>();
+            this.RegisterType<SomeObject>();
+            this.RegisterType<SomeObject>();
+            this.RegisterType<SomeQuery>();
+            this.RegisterType<SomeQuery>();
+            this.RegisterType<SomeInterface>();
+            this.RegisterType<SomeInterface>();
+            this.RegisterType<StringGraphType>();
+            this.RegisterType<StringGraphType>();
         }
     }
 
@@ -313,11 +352,11 @@ namespace GraphQL.Tests.Types
     {
         public DSchemaType()
         {
-            Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
+            Field<StringGraphType>("id", resolve: ctx => new { id = "id" });
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()}),
-                resolve: ctx => new {id = "id"});
+                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> { Name = "input2", ResolvedType = new DInputType2() }),
+                resolve: ctx => new { id = "id" });
             Field<ListGraphType<DListType>>("alist");
         }
     }
@@ -371,10 +410,18 @@ namespace GraphQL.Tests.Types
 
     public class WithoutIsTypeOf1Type : ObjectGraphType
     {
+        public WithoutIsTypeOf1Type()
+        {
+            Field<StringGraphType>("unused");
+        }
     }
 
     public class WithoutIsTypeOf2Type : ObjectGraphType
     {
+        public WithoutIsTypeOf2Type()
+        {
+            Field<StringGraphType>("unused");
+        }
     }
 
     public class SimpleCycleSchema : Schema

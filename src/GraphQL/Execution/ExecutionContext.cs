@@ -7,38 +7,135 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public class ExecutionContext : IExecutionContext
+    /// <summary>
+    /// Provides a mutable instance of <see cref="IExecutionContext"/>.
+    /// </summary>
+    public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
+        /// <inheritdoc/>
         public Document Document { get; set; }
 
+        /// <inheritdoc/>
         public ISchema Schema { get; set; }
 
+        /// <inheritdoc/>
         public object RootValue { get; set; }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; }
 
+        /// <inheritdoc/>
         public Operation Operation { get; set; }
 
-        public Fragments Fragments { get; set; } = new Fragments();
+        /// <inheritdoc/>
+        public Fragments Fragments { get; set; }
 
+        /// <inheritdoc/>
         public Variables Variables { get; set; }
 
-        public ExecutionErrors Errors { get; set; } = new ExecutionErrors();
+        /// <inheritdoc/>
+        public ExecutionErrors Errors { get; set; }
 
+        /// <inheritdoc/>
         public CancellationToken CancellationToken { get; set; }
 
+        /// <inheritdoc/>
         public Metrics Metrics { get; set; }
 
+        /// <inheritdoc/>
         public List<IDocumentExecutionListener> Listeners { get; set; }
 
+        /// <inheritdoc/>
         public bool ThrowOnUnhandledException { get; set; }
 
+        /// <inheritdoc/>
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
 
+        /// <inheritdoc/>
         public int? MaxParallelExecutionCount { get; set; }
 
-        public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+        /// <inheritdoc/>
+        public Dictionary<string, object> Extensions { get; set; }
 
+        /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
+
+        /// <inheritdoc/>
+        public TElement[] Rent<TElement>(int minimumLength)
+        {
+            var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
+            lock (_trackedArrays)
+                _trackedArrays.Add(array);
+            return array;
+        }
+
+        private readonly List<Array> _trackedArrays = new List<Array>();
+
+        /// <summary>
+        /// Clears all state in this context.
+        /// Releases any rented arrays back to the backing memory pool.
+        /// </summary>
+        public void Dispose()
+        {
+            ClearContext();
+        }
+
+        /// <summary>
+        /// Clears all state in this context including any rented arrays.
+        /// </summary>
+        protected virtual void ClearContext()
+        {
+            // clearing or re-using the context will break any instances of ReadonlyResolveFieldContext from being
+            // able to access many of their properties. This is not typically a problem since the context is re-used
+            // once a field resolver finishes executing. However, a ReadonlyResolveFieldContext instance is not re-used
+            // when an exception within a field resolver is thrown, and the FAQ says that calls to UnhandledExceptionDelegate
+            // will be provided with a context that is not re-used. If we clear or re-use execution contexts, we should
+            // at least provide UnhandledExceptionDelegate with a copy (e.g. create one with ReadonlyResolveFieldContext
+            // and then Copy it) so that it is unaffected by clearing the execution context. Also note that subscription
+            // execution will be affected by clearing the execution context.
+
+            //TODO:
+            //Document = null;
+            //Schema = null;
+            //RootValue = null;
+            //UserContext = null;
+            //Operation = null;
+            //Fragments = null;
+            //Variables = null;
+            //Errors = null;
+            //CancellationToken = default;
+            //Metrics = null;
+            //Listeners = null;
+            //ThrowOnUnhandledException = false;
+            //UnhandledExceptionDelegate = null;
+            //MaxParallelExecutionCount = null;
+            //Extensions = null;
+            //RequestServices = null;
+
+            // arrays rented after the execution context has been 'disposed' will still rent just fine, but will
+            // not be returned to the pool (since Dispose has already been run) and will be garbage collected.
+            lock (_trackedArrays)
+            {
+                foreach (var array in _trackedArrays)
+                    array.Return();
+                _trackedArrays.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Allows for an execution strategy to reuse an instance of <see cref="ReadonlyResolveFieldContext"/>.
+        /// This field may be accessed by multiple threads at the same time, so
+        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// </summary>
+        internal ReadonlyResolveFieldContext ReusableReadonlyResolveFieldContext;
+
+        /// <summary>
+        /// Allows for an execution strategy to reuse an instance of <see cref="Fields"/>.
+        /// This field may be accessed by multiple threads at the same time, so
+        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// </summary>
+        internal Fields ReusableFields;
     }
 }

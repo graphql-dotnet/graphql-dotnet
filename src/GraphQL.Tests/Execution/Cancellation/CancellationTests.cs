@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -60,35 +59,29 @@ namespace GraphQL.Tests.Execution.Cancellation
         [Fact]
         public void cancellation_token_in_context()
         {
-            using (var tokenSource = new CancellationTokenSource())
-            {
-                AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
-            }
+            using var tokenSource = new CancellationTokenSource();
+            AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
         }
 
         [Fact]
         public void cancellation_is_propagated()
         {
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            tokenSource.Cancel();
+            Should.Throw<OperationCanceledException>(() =>
             {
-                tokenSource.Cancel();
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
-                });
-            }
+                var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
+            });
         }
 
         [Fact]
         public void cancellation_is_propagated_async()
         {
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            Should.Throw<OperationCanceledException>(() =>
             {
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
-                });
-            }
+                var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
+            });
         }
 
         [Fact]

@@ -1,6 +1,9 @@
-﻿namespace GraphQL.Language.AST
+namespace GraphQL.Language.AST
 {
-    public interface IDefinition : INode
+    /// <summary>
+    /// Represents a fragment definition node or an operation node.
+    /// </summary>
+    public interface IDefinition : INode, IHaveName
     {
     }
 }

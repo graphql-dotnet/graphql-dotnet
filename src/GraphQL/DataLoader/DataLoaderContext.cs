@@ -9,7 +9,6 @@ namespace GraphQL.DataLoader
     public class DataLoaderContext
     {
         private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
-        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
@@ -36,7 +35,6 @@ namespace GraphQL.DataLoader
                     loader = dataLoaderFactory();
 
                     _loaders.Add(loaderKey, loader);
-                    _queue.Enqueue(loader);
                 }
             }
 

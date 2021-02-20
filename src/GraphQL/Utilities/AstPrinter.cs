@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Utilities
@@ -171,7 +170,7 @@ namespace GraphQL.Utilities
                     var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
                     var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
 
-                    var result = Join(new[] {ops, frags}, "\n\n") + "\n";
+                    var result = Join(new[] { ops, frags }, "\n\n") + "\n";
                     return result;
                 });
             });
@@ -195,7 +194,7 @@ namespace GraphQL.Utilities
                            && string.IsNullOrWhiteSpace(directives)
                            && string.IsNullOrWhiteSpace(variables)
                         ? selectionSet
-                        : Join(new[] {op, Join(new[] {name, variables}, ""), directives, selectionSet}, " ");
+                        : Join(new[] { op, Join(new[] { name, variables }, ""), directives, selectionSet }, " ");
                 });
             });
 
@@ -263,7 +262,7 @@ namespace GraphQL.Utilities
                     var directives = Join(n.ArgArray(x => x.Directives), " ");
                     var selectionSet = n.Arg(x => x.SelectionSet);
 
-                    var result = Join(new []
+                    var result = Join(new[]
                     {
                         Wrap("", alias, ": ") + name + Wrap("(", args, ")"),
                         directives,
@@ -356,7 +355,7 @@ namespace GraphQL.Utilities
             Config<ObjectValue>(c =>
             {
                 c.Field(x => x.ObjectFields);
-                c.Print(p => $"{{{Join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
+                c.Print(p => $"{{{Join(p.ArgArray(x => x.ObjectFields), ", ")}}}");
             });
 
             Config<ObjectField>(c =>
@@ -447,7 +446,7 @@ namespace GraphQL.Utilities
 
         private string Indent(string str)
         {
-            return Regex.Replace(str, "\n", "\n  ");
+            return str.Replace("\n", "\n  ");
         }
 
         public object Visit(INode node)
@@ -463,7 +462,7 @@ namespace GraphQL.Utilities
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.FieldsList.Apply(f =>
+                foreach (var f in config.FieldsList)
                 {
                     var ctx = new ResolveValueContext(node);
 
@@ -478,7 +477,7 @@ namespace GraphQL.Utilities
                     }
 
                     vals[f.Name] = result;
-                });
+                }
 
                 return config.PrintAst(vals);
             }
@@ -490,8 +489,10 @@ namespace GraphQL.Utilities
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var c in _configs)
+            {
                 if (c.Matches(node))
                     return c;
+            }
 
             return null;
         }
