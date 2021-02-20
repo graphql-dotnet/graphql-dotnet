@@ -159,6 +159,7 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 
 * New method `IParentExecutionNode.ApplyToChildren`
 * New property `IResolveFieldContext.Parent`
+* `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy will execute
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
