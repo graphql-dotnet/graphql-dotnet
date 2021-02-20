@@ -32,7 +32,9 @@ namespace GraphQL
             "deprecated"
         };
 
-        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__") ?? false;
+        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__", StringComparison.InvariantCulture) ?? false;
+
+        internal static bool IsIntrospectionType(this string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
 
         internal static bool IsBuiltInScalar(this string typeName) => _builtInScalars.Contains(typeName);
 

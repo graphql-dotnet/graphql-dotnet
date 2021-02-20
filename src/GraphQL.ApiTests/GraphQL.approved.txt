@@ -2584,8 +2584,8 @@ namespace GraphQL.Utilities
         public string[] BreakLine(string line, int len) { }
         public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
         protected string FormatDescription(string description, string indentation = "") { }
-        public virtual bool IsDefinedType(string typeName) { }
-        public bool IsIntrospectionType(string typeName) { }
+        protected virtual bool IsDefinedDirective(string directiveName) { }
+        protected virtual bool IsDefinedType(string typeName) { }
         public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
         public string Print() { }
         public string PrintArgs(GraphQL.Types.FieldType field) { }
