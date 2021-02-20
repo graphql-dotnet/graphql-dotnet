@@ -37,13 +37,9 @@ namespace GraphQL.MicrosoftDI
 
         public TSource Source { get; }
 
-        public string FieldName => _baseContext.FieldName;
-
         public Field FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
-
-        public IGraphType ReturnType => _baseContext.ReturnType;
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 

@@ -50,16 +50,10 @@ namespace GraphQL
         public object Source => _executionNode.Source;
 
         /// <inheritdoc/>
-        public string FieldName => _executionNode.Field.Name;
-
-        /// <inheritdoc/>
         public Field FieldAst => _executionNode.Field;
 
         /// <inheritdoc/>
         public FieldType FieldDefinition => _executionNode.FieldDefinition;
-
-        /// <inheritdoc/>
-        public IGraphType ReturnType => _executionNode.FieldDefinition.ResolvedType;
 
         /// <inheritdoc/>
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
