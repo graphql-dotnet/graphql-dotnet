@@ -316,6 +316,8 @@ lock (field)
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 * `SchemaBuilder.RegisterType` and `SchemaBuilder.RegisterTypes` methods have been removed, use `ISchema.RegisterType` on the builded schema instead.
 * `SchemaBuilder.Directives` and `SchemaBuilder.RegisterDirectiveVisitor` have been removed, use `ISchema.RegisterVisitor` on the builded schema instead.
+* `SchemaPrinter.IsBuiltInScalar` and `SchemaPrinter.IsSpecDirective` methods have been removed
+* `SchemaPrinterOptions.CustomScalars` property has been removed
 
 ### Other Breaking Changes (including but not limited to)
 
