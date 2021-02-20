@@ -10,17 +10,19 @@ using GraphQL.Types;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Enables printing schema as SDL (Schema Definition Language) document - http://spec.graphql.org/June2018/#sec-Type-System
+    /// Enables printing schema as SDL (Schema Definition Language) document.
+    /// <br/>
+    /// See <see href="http://spec.graphql.org/June2018/#sec-Type-System"/> for more information.
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
         protected SchemaPrinterOptions Options { get; }
 
         /// <summary>
-        /// Creates printer with specified options.
+        /// Creates printer with the specified options.
         /// </summary>
-        /// <param name="schema"> Schema to print. </param>
-        /// <param name="options"> Printer options. </param>
+        /// <param name="schema">Schema to print.</param>
+        /// <param name="options">Printer options.</param>
         public SchemaPrinter(
             ISchema schema,
             SchemaPrinterOptions options = null)
@@ -32,9 +34,9 @@ namespace GraphQL.Utilities
         private ISchema Schema { get; set; }
 
         /// <summary>
-        /// Print schema.
+        /// Prints schema.
         /// </summary>
-        /// <returns> SDL document. </returns>
+        /// <returns>SDL document.</returns>
         public string Print()
         {
             return PrintFilteredSchema(n => !n.IsBuiltInDirective(), IsDefinedType);
@@ -73,7 +75,7 @@ namespace GraphQL.Utilities
         {
             // From spec:
             // When representing a GraphQL schema using the type system definition language, all built‐in scalars must be omitted for brevity.
-            return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar() && Schema.Supports(typeName);
+            return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar();
         }
 
         public bool IsIntrospectionType(string typeName)

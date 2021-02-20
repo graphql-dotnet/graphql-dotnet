@@ -16,11 +16,6 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        /// <summary>
-        /// Determines if this graph type is an introspection type.
-        /// </summary>
-        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__") ?? false;
-
         private static readonly List<string> _builtInScalars = new List<string>
         {
             "String",
@@ -37,15 +32,11 @@ namespace GraphQL
             "deprecated"
         };
 
-        public static bool IsBuiltInScalar(this string typeName)
-        {
-            return _builtInScalars.Contains(typeName);
-        }
+        internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__") ?? false;
 
-        public static bool IsBuiltInDirective(this string directiveName)
-        {
-            return _builtInDirectives.Contains(directiveName);
-        }
+        internal static bool IsBuiltInScalar(this string typeName) => _builtInScalars.Contains(typeName);
+
+        internal static bool IsBuiltInDirective(this string directiveName) => _builtInDirectives.Contains(directiveName);
 
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
@@ -573,76 +564,6 @@ namespace GraphQL
                     ? converter.Convert(serialized, type)
                     : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
             }
-        }
-
-        /// <summary>
-        /// From http://spec.graphql.org/June2018/#sec-Schema:
-        ///
-        /// A schema is defined in terms of the types and directives it supports as well as the root operation
-        /// types for each kind of operation
-        /// 
-        /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="typeName"></param>
-        /// <returns> <c>true</c> if the provided schema supports <paramref name="typeName"/>, otherwise <c>false</c>. </returns>
-        public static bool Supports(this ISchema schema, string typeName)
-        {
-            if (string.IsNullOrEmpty(typeName))
-                return false;
-
-            if (!schema.Initialized)
-                schema.Initialize();
-        
-            if (schema.Query?.Name == typeName || schema.Mutation?.Name == typeName || schema.Subscription?.Name == typeName)
-                return true;
-
-            foreach (var directive in schema.Directives)
-            {
-                if (directive.Name == typeName)
-                    return true;
-
-                if (directive.Arguments != null)
-                    foreach (var arg in directive.Arguments)
-                    {
-                        if (arg.ResolvedType.GetNamedType().Name == typeName)
-                            return true;
-                    }
-            }
-
-            foreach (var type in schema.AllTypes.OfType<IComplexGraphType>())
-            {
-                if (type is UnionGraphType union)
-                {
-                    foreach (var possible in union.PossibleTypes)
-                        if (possible.Name == typeName)
-                            return true;
-                }
-
-                if (type is IImplementInterfaces ifaces)
-                {
-                    foreach (var iface in ifaces.ResolvedInterfaces)
-                        if (iface.Name == typeName)
-                            return true;
-                }
-                
-                if (type is IComplexGraphType complex)
-                {
-                    foreach (var field in complex.Fields)
-                    {
-                        if (field.ResolvedType.GetNamedType().Name == typeName)
-                            return true;
-
-                        if (field.Arguments != null)
-                            foreach (var arg in field.Arguments)
-                            {
-                                if (arg.ResolvedType.GetNamedType().Name == typeName)
-                                    return true;
-                            }
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

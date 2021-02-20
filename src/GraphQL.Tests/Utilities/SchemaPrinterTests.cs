@@ -39,12 +39,12 @@ namespace GraphQL.Tests.Utilities
 
         private string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true }, true);
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true });
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options, bool printAllTypes = false)
+        private string print(ISchema schema, SchemaPrinterOptions options)
         {
-            var printer = printAllTypes ? new AllTypesSchemaPrinter(schema, options) : new SchemaPrinter(schema, options);
+            var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
         }
 
@@ -209,7 +209,7 @@ type Foo {
 }"
                 },
             };
-            AssertEqual(print(schema, options, true), expected);
+            AssertEqual(print(schema, options), expected);
         }
 
         [Fact]
@@ -245,7 +245,7 @@ type Foo {
 }"
                 },
             };
-            var result = print(schema, options, true);
+            var result = print(schema, options);
             AssertEqual(result, expected);
         }
 
@@ -1335,18 +1335,6 @@ enum __TypeKind {
                 AddValue("RED", "Red!", 0, "Use green!");
                 AddValue("GREEN", "Green!", 1);
                 AddValue("BLUE", "Blue!", 2);
-            }
-        }
-
-        private class AllTypesSchemaPrinter : SchemaPrinter
-        {
-            public AllTypesSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null) : base(schema, options)
-            {
-            }
-
-            public override bool IsDefinedType(string typeName)
-            {
-                return !IsIntrospectionType(typeName);
             }
         }
     }
