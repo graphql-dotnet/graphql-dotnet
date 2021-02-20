@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
+using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
 
@@ -25,6 +26,7 @@ namespace GraphQL.Tests.Utilities
             configure(config);
 
             var schema = Builder.Build(config.Definitions);
+            config.ConfigureBuildedSchema?.Invoke(schema);
             schema.Initialize();
 
             var queryResult = CreateQueryResult(config.ExpectedResult);
@@ -75,5 +77,6 @@ namespace GraphQL.Tests.Utilities
         public object Root { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public List<IDocumentExecutionListener> Listeners { get; set; } = new List<IDocumentExecutionListener>();
+        public Action<ISchema> ConfigureBuildedSchema { get; set; }
     }
 }

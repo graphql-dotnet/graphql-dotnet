@@ -144,7 +144,7 @@ namespace GraphQL
 
                 if (found.ResolvedType != null && field.ResolvedType != null)
                 {
-                    if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType, null))
+                    if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType))
                         return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. Field '{field.Name}' must be of type '{field.ResolvedType}' or covariant from it, but in fact it is of type '{found.ResolvedType}'.") : false;
                 }
             }
@@ -374,11 +374,10 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Provided a type and a super type, return true if the first type is either
+        /// Provided a type and a super type, return <see langword="true"/> if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]
-        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema) // TODO: remove unused schema parameter in v4.0.0
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType)
         {
             if (maybeSubType.Equals(superType))
             {
@@ -390,14 +389,14 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, null);
+                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType, superType, null);
+                return IsSubtypeOf(sub.ResolvedType, superType);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -405,7 +404,7 @@ namespace GraphQL
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, null);
+                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType);
                 }
 
                 return false;

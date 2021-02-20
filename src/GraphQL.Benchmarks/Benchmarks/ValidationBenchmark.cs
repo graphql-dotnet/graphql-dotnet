@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
@@ -63,7 +64,7 @@ namespace GraphQL.Benchmarks
             _ = Validate(_heroDocument);
         }
 
-        private IValidationResult Validate(Document document) => _validator.ValidateAsync(null, _schema, document).GetAwaiter().GetResult();
+        private IValidationResult Validate(Document document) => _validator.ValidateAsync(_schema, document, document.Operations.First().Variables).GetAwaiter().GetResult().validationResult;
 
         void IBenchmark.RunProfiler() => Introspection();
     }

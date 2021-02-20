@@ -25,7 +25,7 @@ namespace GraphQL.Reflection
         Type DeclaringType { get; }
 
         /// <summary>
-        /// For methods, returns a list of parameters defined for the method, otherwise null.
+        /// For methods, returns a list of parameters defined for the method, otherwise <see langword="null"/>.
         /// </summary>
         ParameterInfo[] Parameters { get; }
 

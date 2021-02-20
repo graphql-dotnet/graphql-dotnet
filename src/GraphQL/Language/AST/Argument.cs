@@ -6,21 +6,15 @@ namespace GraphQL.Language.AST
     /// <summary>
     /// Represents an argument node within a document.
     /// </summary>
-    public class Argument : AbstractNode
+    public class Argument : AbstractNode, IHaveName, IHaveValue
     {
-        /// <summary>
-        /// Initializes a new instance of an argument node.
-        /// </summary>
-        public Argument()
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of an argument node with the specified properties.
         /// </summary>
-        public Argument(NameNode name)
+        public Argument(NameNode name, IValue value)
         {
             NameNode = name;
+            Value = value;
         }
 
         /// <summary>
@@ -36,7 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the value node for this argument.
         /// </summary>
-        public IValue Value { get; set; }
+        public IValue Value { get; }
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children

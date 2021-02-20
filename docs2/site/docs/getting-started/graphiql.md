@@ -7,7 +7,7 @@ This is a fantastic developer tool to help you form queries and explore your Sch
 
 The easiest way to add GraphiQL into your ASP.NET Core app is to use the [GraphQL.Server.Ui.GraphiQL](https://www.nuget.org/packages/GraphQL.Server.Ui.GraphiQL) package.
 All you need to do after installing nuget is to append one extra line in your `Startup.cs`:
-```c#
+```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
     app.UseGraphiQLServer();

@@ -233,19 +233,18 @@ namespace GraphQL.Benchmarks
 
             public Language.AST.Variables ParseVariables()
             {
-                return Inputs == null ? null : ExecutionHelper.GetVariableValues(Document, Schema, Operation.Variables, Inputs);
+                return Inputs == null ? null : new ValidationContext().GetVariableValues(Schema, Operation.Variables, Inputs);
             }
 
             private static readonly DocumentValidator _documentValidator = new DocumentValidator();
             public IValidationResult Validate()
             {
                 return _documentValidator.ValidateAsync(
-                    Query,
                     Schema,
                     Document,
                     null,
                     null,
-                    Inputs).Result;
+                    Inputs).Result.validationResult;
             }
 
             private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();

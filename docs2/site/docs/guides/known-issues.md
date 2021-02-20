@@ -190,7 +190,7 @@ You should instead use [GQL_CONNECTION_INIT](https://github.com/apollographql/su
 message to send additional data to the server. If you are using [server project](https://github.com/graphql-dotnet/server)
 then you can write your `IOperationMessageListener` and add the listener as a transient service:
 
-```c#
+```csharp
 public class AuthListener : IOperationMessageListener
 {
     private readonly IHttpContextAccessor _accessor;
