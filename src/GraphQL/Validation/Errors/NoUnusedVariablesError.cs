@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoUnusedVariablesError(ValidationContext context, VariableDefinition node, Operation op)
-            : base(context.OriginalQuery, NUMBER, UnusedVariableMessage(node.Name, op.Name), node)
+            : base(context.Document.OriginalQuery, NUMBER, UnusedVariableMessage(node.Name, op.Name), node)
         {
         }
 

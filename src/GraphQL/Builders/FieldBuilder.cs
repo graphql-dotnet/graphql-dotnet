@@ -154,6 +154,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
+            where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
                 arg.Description = description;
@@ -171,6 +172,7 @@ namespace GraphQL.Builders
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default, Action<QueryArgument> configure = null)
+            where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
                 arg.Description = description;
@@ -185,6 +187,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
+            where TArgumentGraphType : IGraphType
         {
             var arg = new QueryArgument(typeof(TArgumentGraphType))
             {

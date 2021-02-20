@@ -6,7 +6,7 @@ namespace GraphQL.Language.AST
     /// <summary>
     /// Represents the child field node of an object value node within a document.
     /// </summary>
-    public class ObjectField : AbstractNode
+    public class ObjectField : AbstractNode, IHaveName, IHaveValue
     {
         /// <summary>
         /// Initializes a new instance for the specified field name and value.

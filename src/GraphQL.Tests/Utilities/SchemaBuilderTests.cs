@@ -109,6 +109,12 @@ namespace GraphQL.Tests.Utilities
             subscription.Name.ShouldBe("MySubscription");
         }
 
+        private enum TestEnum
+        {
+            ASC,
+            DESC
+        }
+
         [Fact]
         public void configures_schema_from_schema_type_and_directives()
         {
@@ -133,6 +139,10 @@ namespace GraphQL.Tests.Utilities
             ";
 
             var schema = Schema.For(definitions);
+            schema.Directives.Register(new DirectiveGraphType("public", DirectiveLocation.Schema));
+            schema.Directives.Register(new DirectiveGraphType("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
+            schema.Directives.Register(new DirectiveGraphType("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
+            schema.Directives.Register(new DirectiveGraphType("some", DirectiveLocation.FieldDefinition));
             schema.Initialized.ShouldBe(false);
             schema.Initialize();
 
@@ -260,8 +270,8 @@ namespace GraphQL.Tests.Utilities
 
             var customScalar = new CustomScalarType();
 
-            var schema = Schema.For(definitions, _ => _.RegisterType(customScalar));
-
+            var schema = Schema.For(definitions);
+            schema.RegisterType(customScalar);
             schema.Initialize();
 
             var type = schema.AllTypes["CustomScalar"] as ScalarGraphType;

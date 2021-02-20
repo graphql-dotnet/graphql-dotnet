@@ -35,8 +35,14 @@ namespace GraphQL.Tests.Bugs
                 Code = "KNOWN_TYPE_NAMES"
             };
             error2.AddLocation(1, 13);
-            var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 }, executed: false);
-            AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, inputs: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 2, renderErrors: true);
+            var error3 = new ValidationError(null, "5.8",
+               "Variable \u0027$arg\u0027 is invalid. Variable has unknown type \u0027abcdefg\u0027")
+            {
+                Code = "INVALID_VALUE"
+            };
+            error3.AddLocation(1, 7);
+            var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2, error3 }, executed: false);
+            AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, inputs: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 3, renderErrors: true);
         }
     }
 

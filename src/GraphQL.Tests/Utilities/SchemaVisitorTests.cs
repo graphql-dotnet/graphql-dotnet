@@ -12,8 +12,6 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_basic_custom_directive()
         {
-            Builder.RegisterVisitor<UppercaseDirectiveVisitor>();
-
             AssertQuery(_ =>
             {
                 _.Definitions = @"
@@ -21,7 +19,7 @@ namespace GraphQL.Tests.Utilities
                         hello: String @upper
                     }
                 ";
-
+                _.ConfigureBuildedSchema = schema => { schema.Directives.Register(new UpperDirective()); schema.RegisterVisitor<UppercaseDirectiveVisitor>(); };
                 _.Query = "{ hello }";
                 _.Root = new { Hello = "Hello World!" };
                 _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
@@ -31,7 +29,6 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_with_tasks()
         {
-            Builder.RegisterVisitor<AsyncUppercaseDirectiveVisitor>();
             Builder.Types.Include<Query>();
 
             AssertQuery(_ =>
@@ -41,7 +38,7 @@ namespace GraphQL.Tests.Utilities
                         hello: String @upper
                     }
                 ";
-
+                _.ConfigureBuildedSchema = schema => { schema.Directives.Register(new UpperDirective()); schema.RegisterVisitor<AsyncUppercaseDirectiveVisitor>(); };
                 _.Query = "{ hello }";
                 _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD2!"" }";
             });
@@ -67,7 +64,6 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_for_all_locations()
         {
-            Builder.RegisterVisitor<DescriptionDirectiveVisitor>();
             Builder.Types.For("TestType").IsTypeOf<TestType>();
             Builder.Types.For("TestTypeForUnion").IsTypeOf<TestTypeForUnion>();
 
@@ -103,13 +99,22 @@ namespace GraphQL.Tests.Utilities
 
                     scalar TestScalar @description(text: ""scalar"")
 
-                    schema @registerType {
+                    schema @description(text: ""schema description"") {
                       query: Query
                     }
             ");
+            schema.Directives.Register(new DirectiveGraphType("description",
+                DirectiveLocation.Schema, DirectiveLocation.Union, DirectiveLocation.Interface, DirectiveLocation.Object,
+                DirectiveLocation.InputObject, DirectiveLocation.FieldDefinition, DirectiveLocation.InputFieldDefinition,
+                DirectiveLocation.ArgumentDefinition, DirectiveLocation.Enum, DirectiveLocation.EnumValue)
+            {
+                Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "text" })
+            });
+            schema.RegisterVisitor<DescriptionDirectiveVisitor>();
             schema.Initialize();
 
-            // object type
+            schema.Description.ShouldBe("schema description");
+
             var type = schema.AllTypes["TestType"];
             type.ShouldNotBeNull();
             var objType = type.ShouldBeOfType<ObjectGraphType>();
