@@ -177,7 +177,7 @@ Options are also possible using transient lifetime, but are not given here (not 
 
 ## Field Middleware vs Directive
 
-If we consider Field Middleware as a way to globally affect the method of calculating all fields
-of all types in the Schema, then the directive can be considered as a way to locally affect only
-specific fields. The mechanism of their work is similar. For more information about directives
-see [Directives](Directives).
+You can think of a Field Middleware as something global that controls how all fields of all types
+in the schema are resolved. A directive, at the same time, would only affect specific schema elements
+and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
+For more information about directives see [Directives](directives).

@@ -37,7 +37,7 @@ public class RequiresAuthValidationRule : IValidationRule
         if (op.OperationType == OperationType.Mutation && !authenticated)
         {
           context.ReportError(new ValidationError(
-              context.OriginalQuery,
+              context.Document.OriginalQuery,
               "6.1.1", // the rule number of this validation error corresponding to the paragraph number from the official specification
               $"Authorization is required to access {op.Name}.",
               op) { Code = "auth-required" });
@@ -55,7 +55,7 @@ public class RequiresAuthValidationRule : IValidationRule
             (!authenticated || !fieldDef.CanAccess(userContext.User.Claims)))
         {
           context.ReportError(new ValidationError(
-              context.OriginalQuery,
+              context.Document.OriginalQuery,
               "6.1.1", // the rule number of this validation error corresponding to the paragraph number from the official specification
               $"You are not authorized to run this query.",
               fieldAst) { Code = "auth-required" });

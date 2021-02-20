@@ -42,6 +42,7 @@ namespace GraphQL.Tests
         public TSchema Schema => Services.Get<TSchema>();
 
         public IDocumentExecuter Executer { get; private set; }
+
         public IDocumentWriter Writer { get; private set; }
 
         public ExecutionResult AssertQuerySuccess(

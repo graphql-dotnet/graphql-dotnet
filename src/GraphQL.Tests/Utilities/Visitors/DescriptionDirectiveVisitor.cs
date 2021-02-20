@@ -11,9 +11,9 @@ namespace GraphQL.Tests.Utilities.Visitors
         private static void SetDescription<T>(T element) where T: IProvideMetadata, IProvideDescription
         {
             // if a value has already been set, prefer that
-            if (element.Description == null && element.HasAppliedDirectives())
+            if (element.Description == null)
             {
-                var descr = element.GetAppliedDirectives().Find("description");
+                var descr = element.FindAppliedDirective("description");
                 if (descr != null && descr.FindArgument("text")?.Value is string str)
                 {
                     element.Description = str;

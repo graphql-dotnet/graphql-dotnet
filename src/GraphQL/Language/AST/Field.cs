@@ -6,15 +6,8 @@ namespace GraphQL.Language.AST
     /// <summary>
     /// Represents a field selection node of a document.
     /// </summary>
-    public class Field : AbstractNode, ISelection, IHaveSelectionSet
+    public class Field : AbstractNode, ISelection, IHaveSelectionSet, IHaveName
     {
-        /// <summary>
-        /// Initializes a new instance of a field selection node.
-        /// </summary>
-        public Field()
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of a field selection node with the specified parameters.
         /// </summary>

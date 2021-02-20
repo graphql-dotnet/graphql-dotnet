@@ -122,6 +122,11 @@
               "args": []
             },
             {
+              "name": "isRepeatable",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
               "name": "appliedDirectives",
               "appliedDirectives": [],
               "args": []
