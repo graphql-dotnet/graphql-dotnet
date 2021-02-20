@@ -17,6 +17,7 @@ namespace GraphQL
     public interface IResolveFieldContext : IProvideUserContext
     {
         /// <summary>The name of the field being resolved.</summary>
+        [Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldAst.Name instead.")]
         string FieldName { get; }
 
         /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
@@ -26,6 +27,7 @@ namespace GraphQL
         FieldType FieldDefinition { get; }
 
         /// <summary>The return value's graph type.</summary>
+        [Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldDefinition.ResolvedType instead.")]
         IGraphType ReturnType { get; }
 
         /// <summary>The field's parent graph type.</summary>

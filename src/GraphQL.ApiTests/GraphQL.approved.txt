@@ -171,6 +171,7 @@ namespace GraphQL
         System.Collections.Generic.IDictionary<string, object> Extensions { get; }
         GraphQL.Language.AST.Field FieldAst { get; }
         GraphQL.Types.FieldType FieldDefinition { get; }
+        [System.Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldAst.Name instead.")]
         string FieldName { get; }
         GraphQL.Language.AST.Fragments Fragments { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
@@ -179,6 +180,8 @@ namespace GraphQL
         System.Collections.Generic.IEnumerable<object> Path { get; }
         System.IServiceProvider RequestServices { get; }
         System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
+        [System.Obsolete("Will be removed in v4. Use IResolveFieldContext.FieldDefinition.ResolvedType inst" +
+            "ead.")]
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
