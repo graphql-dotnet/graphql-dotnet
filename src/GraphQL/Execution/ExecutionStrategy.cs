@@ -50,7 +50,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        protected RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        protected virtual RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
             {
@@ -65,6 +65,24 @@ namespace GraphQL.Execution
             System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
 
             return root;
+        }
+
+        /// <summary>
+        /// Builds an execution node with the specified parameters.
+        /// </summary>
+        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        {
+            if (graphType is NonNullGraphType nonNullFieldType)
+                graphType = nonNullFieldType.ResolvedType;
+
+            return graphType switch
+            {
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
         }
 
         /// <summary>
@@ -94,7 +112,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        private static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Fields fields)
+        private void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Fields fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
@@ -193,24 +211,6 @@ namespace GraphQL.Execution
 
                 index++;
             }
-        }
-
-        /// <summary>
-        /// Builds an execution node with the specified parameters.
-        /// </summary>
-        protected static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
-        {
-            if (graphType is NonNullGraphType nonNullFieldType)
-                graphType = nonNullFieldType.ResolvedType;
-
-            return graphType switch
-            {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
-                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
-            };
         }
 
         /// <summary>
