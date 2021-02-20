@@ -36,6 +36,6 @@ namespace GraphQL.Types
         /// </summary>
         public object Value { get; set; }
 
-        internal IGraphType ResolvedType { get; set; }
+        internal IGraphType ResolvedType { get; set; } //TODO: possible remove after AstFromValue and AstPrinter rework
     }
 }

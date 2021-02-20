@@ -232,11 +232,10 @@ namespace GraphQL.Language
 
                 foreach (var a in source)
                 {
-                    var arg = new Argument(Name(a.Name))
+                    var arg = new Argument(Name(a.Name), Value(a.Value))
                     {
                         SourceLocation = Convert(a.Name.Location),
                         CommentNode = Comment(a.Comment),
-                        Value = Value(a.Value)
                     };
                     target.Add(arg);
                 }

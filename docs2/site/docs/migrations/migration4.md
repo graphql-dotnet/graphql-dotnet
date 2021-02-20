@@ -62,20 +62,19 @@ requested type via `ObjectExtensions.ToObject` as it did before.
 
 ### Experimental Features / Applied Directives
 
-> Ability to apply directives to the schema elements and expose user-defined meta-information
-  via introspection - `schema.EnableExperimentalIntrospectionFeatures()`.
-> See https://github.com/graphql/graphql-spec/issues/300 for more information.
-
-(sungam3r todo: write separate page on these features, write a simple summary and reasoning here, and add link to new page)
+In v4 we added ability to apply directives to the schema elements and expose user-defined meta-information
+via introspection. This was one of the most requested features not only in GraphQL.NET, but in the entire
+GraphQL ecosystem as a whole. See the [Directives](https://graphql-dotnet.github.io/docs/getting-started/directives)
+documentation page which describes the new features in detail.
 
 ### Microsoft-specific Dependency Injection Extensions
 
 If you are using the `Microsoft.Extensions.DependencyInjection` package, extension methods are provided within
-the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI) for creating a service provider scope
-during a field resolver's execution. This is useful when accessing a scoped service with a parallel execution strategy, as
-typically scoped services are not multi-threaded compatible. The library also provides a builder to assist constructing
-a field resolver that relies on scoped services. Below is a sample of a field resolver that relies on a scoped
-service and can run concurrently with other field resolvers:
+the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI) for creating a service
+provider scope during a field resolver's execution. This is useful when accessing a scoped service with a parallel
+execution strategy, as typically scoped services are not multi-threaded compatible. The library also provides a
+builder to assist constructing a field resolver that relies on scoped services. Below is a sample of a field resolver
+that relies on a scoped service and can run concurrently with other field resolvers:
 
 ```csharp
 public class MyGraphType : ObjectGraphType<Category>
@@ -96,9 +95,9 @@ See [Dependency Injection](https://graphql-dotnet.github.io/docs/getting-started
 
 ### Ability to Sort Introspection Results
 
-Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer by setting
-`ISchema.Comparer` to an implementation of `ISchemaComparer`. By default, introspection results are returned in the order they
-were defined.
+Introspection results are now sorted based on a configured 'comparer' for a schema. You can configure the comparer
+by setting `ISchema.Comparer` to an implementation of `ISchemaComparer`. By default, introspection results are
+returned in the order they were defined.
 
 See [Default Sort Order of Introspection Query Results](#Default-Sort-Order-of-Introspection-Query-Results) below for a sample
 of how this can be used to return introspection results that are sorted alphabetically.
@@ -110,7 +109,7 @@ populating it with your results and returning the array. The array will be relea
 limited uses, since the rented array is not guaranteed to be exactly the requested length, so the array would need to be
 wrapped in order to only return the correct number of entries, triggering a memory allocation (albeit a smaller one):
 
-```c#
+```csharp
  resolve: context =>
 {
     var ints = context.ArrayPool.Rent<int>(1000); // ints.Length >= 1000
@@ -133,21 +132,33 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
   when the configured `INameConverter` fixes up invalid names. See `ISchema.NameConverter`.
 - `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
-  Disabling this validator is unlikley to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
+  Disabling this validator is unlikely to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
 It is recommended to configure these options once when your application starts, such as within your `void Main()` method, a static
 constructor of your schema, or a similar location.
 
 ### Authorization Extension Methods
 
-> Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
+Historically, there are two repositories in [graphql-dotnet](https://github.com/graphql-dotnet) org that provide APIs for configuring
+authorization requirements.
 
-(sungam3r todo: write more description about how it interacts with the other libraries, add simple sample)
+| Name | Package | Description |
+|------|---------|-------------| 
+| [server](https://github.com/graphql-dotnet/server) | [GraphQL.Server.Authorization.AspNetCore](https://www.nuget.org/packages/GraphQL.Server.Authorization.AspNetCore) | Integration of GraphQL.NET validation subsystem into ASP.NET Core |
+| [authorization](https://github.com/graphql-dotnet/authorization) | [GraphQL.Authorization](https://www.nuget.org/packages/GraphQL.Authorization) | A toolset for authorizing access to graph types for GraphQL.NET |
+
+Authorization itself is not a specific part of the GraphQL.NET repository, so it was quite natural to keep this functionality
+in separate repositories. However, this resulted in some code duplication between repositories. In addition, there was constant
+confusion about which of the two projects to use. In v4, we began the process of converging the two projects to a common denominator.
+Extension methods (see `AuthorizationExtensions`) to configure authorization requirements for GraphQL elements (types, fields, schema)
+were moved to GraphQL.NET repository. These methods will be removed from their respective projects after v4 release.
+
+GraphQL.NET will not receive new dependencies, since all methods just read or write meta information. Calling code changes not required.
 
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
-* Support for repeatable directives and ability to expose `isRepeatable` field via introspection - `schema.ExperimentalFeatures.RepeatableDirectives`.
+* New property `IResolveFieldContext.Parent`
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
@@ -177,7 +188,7 @@ Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` N
 
 By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
 
-```c#
+```csharp
 /// <summary>
 /// Default schema comparer for GraphQL.NET v3.x.x.
 /// By default only fields are ordered by their names within enclosing type.
@@ -225,6 +236,47 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 }
 ```
 
+### `ExecutionOptions.EnableMetrics` is disabled by default
+
+To enable metrics, please set the option to `true` before executing the query.
+
+```csharp
+var result = await schema.ExecuteAsync(options =>
+{
+    options.Query = "{ hero { id name } }";
+    options.EnableMetrics = true;
+});
+```
+
+### GraphQL Member Descriptions
+
+To improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from XML comments as it
+did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
+
+### Changes to `IResolveFieldContext.Arguments`
+
+`IResolveFieldContext.Arguments` now returns an `IDictionary<string, ArgumentValue>` instead of `IDictionary<string, object>` so that it
+can be determined if the value returned is a default value or if it is a specified literal or variable.
+
+`IResolveFieldContext.HasArgument` now returns `false` when `GetArgument` returns a field default value. Note that if a variable is specified,
+and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument has successfully resolved to a variable
+specified by the query).
+
+### Metadata is Not Thread Safe
+
+`IProvideMetadata.Metadata` is now a `Dictionary<string, object>` instead of `ConcurrentDictionary<string, object>`, and is not thread safe anymore.
+If you need to write metadata during execution of field resolvers, lock on the graph type before accessing the dictionary. Do not lock on the
+`Metadata` property because there can be concurrency issues accessing the field.
+
+```csharp
+lock (field)
+{
+    int value;
+    if (field.Metadata.TryGetValue("counter", out var valueObject)) value = (int)valueObject;
+    field.Metadata["counter"] = value + 1;
+}
+```
+
 ### API Cleanup
 
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
@@ -262,49 +314,10 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
   `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `Interfaces` and `ResolvedInterfaces`
 * `INode.IsEqualTo` and related methods have been removed.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
+* `SchemaBuilder.RegisterType` and `SchemaBuilder.RegisterTypes` methods have been removed, use `ISchema.RegisterType` on the builded schema instead.
+* `SchemaBuilder.Directives` and `SchemaBuilder.RegisterDirectiveVisitor` have been removed, use `ISchema.RegisterVisitor` on the builded schema instead.
 
-### `ExecutionOptions.EnableMetrics` is disabled by default
-
-To enable metrics, please set the option to `true` before executing the query.
-
-```cs
-var result = await schema.ExecuteAsync(options =>
-{
-    options.Query = "{ hero { id name } }";
-    options.EnableMetrics = true;
-});
-```
-
-### GraphQL Member Descriptions
-
-To improve performance, by default GraphQL.NET 4.0 does not pull descriptions for types/fields/etc from xml comments as it
-did in 3.x. To re-enable that functionality, see [Global Switches](#Global-Switches) above.
-
-### Changes to `IResolveFieldContext.Arguments`
-
-`IResolveFieldContext.Arguments` now returns an `IDictionary<string, ArgumentValue>` instead of `IDictionary<string, object>` so that it
-can be determined if the value returned is a default value or if it is a specified literal or variable.
-
-`IResolveFieldContext.HasArgument` now returns `false` when `GetArgument` returns a field default value. Note that if a variable is specified,
-and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument has successfully resolved to a variable
-specified by the query).
-
-### Metadata is Not Thread Safe
-
-`IProvideMetadata.Metadata` is now a `Dictionary<string, object>` instead of `ConcurrentDictionary<string, object>`, and is not thread safe anymore.
-If you need to write metadata during execution of field resolvers, lock on the graph type before accessing the dictionary. Do not lock on the
-`Metadata` property because there can be concurrency issues accessing the field.
-
-```csharp
-lock (field)
-{
-    int value;
-    if (field.Metadata.TryGetValue("counter", out var valueObject)) value = (int)valueObject;
-    field.Metadata["counter"] = value + 1;
-}
-```
-
-### Other Breaking Changes
+### Other Breaking Changes (including but not limited to)
 
 * GraphQL.NET now uses GraphQL-Parser v7 with new memory model taking advantage of `System.Memory` APIs.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
@@ -322,3 +335,5 @@ lock (field)
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
 * `NameValidator.ValidateName` and `NameValidator.ValidateNameOnSchemaInitialize` accept an enum instead of a string for their second argument
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
+* `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
+* `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before

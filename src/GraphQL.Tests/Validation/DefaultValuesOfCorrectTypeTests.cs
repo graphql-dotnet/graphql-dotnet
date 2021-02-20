@@ -23,7 +23,8 @@ namespace GraphQL.Tests.Validation
               query RequiredValues($a: Int!, $b: String!) {
                 dog { name }
               }
-            ");
+            ",
+            "{ \"a\": 1, \"b\": \"\" }");
         }
 
         [Fact]
@@ -66,6 +67,9 @@ namespace GraphQL.Tests.Validation
                 _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new[] { "Expected type \"Int\", found \"one\"." }), 3, 35);
                 _.Error(BadValueForDefaultArgMessage("b", "String", "4", new[] { "Expected type \"String\", found 4." }), 4, 38);
                 _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new[] { "Expected \"ComplexInput\", found not an object." }), 5, 44);
+                _.Error("Variable '$a' is invalid. Error coercing default value.", 3, 25);
+                _.Error("Variable '$b' is invalid. Error coercing default value.", 4, 25);
+                _.Error("Variable '$c' is invalid. Error coercing default value.", 5, 25);
             });
         }
 
@@ -93,6 +97,7 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
                 _.Error(BadValueForDefaultArgMessage("a", "[String]", "[\"one\", 2]", new[] { "In element #1: Expected type \"String\", found 2." }), 2, 54);
+                _.Error("Variable '$a' is invalid. Error coercing default value.", 2, 39);
             });
         }
 

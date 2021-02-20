@@ -3,7 +3,7 @@ namespace GraphQL.Language.AST
     /// <summary>
     /// Represents a named type node within a document.
     /// </summary>
-    public class NamedType : AbstractNode, IType
+    public class NamedType : AbstractNode, IType, IHaveName
     {
         /// <summary>
         /// Initializes a new named type node containing the specified <see cref="NameNode"/>.

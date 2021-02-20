@@ -226,8 +226,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
             }
 
-            if (_additionalTypes == null)
-                _additionalTypes = new List<Type>();
+            _additionalTypes ??= new List<Type>();
 
             if (!_additionalTypes.Contains(type))
                 _additionalTypes.Add(type);
@@ -287,6 +286,8 @@ namespace GraphQL.Types
                     _additionalTypes?.Clear();
                     Directives.List.Clear();
                     _converters.Clear();
+                    _visitors?.Clear();
+                    _visitorTypes?.Clear();
 
                     _allTypes?.Dictionary.Clear();
                     _allTypes = null;
@@ -371,8 +372,7 @@ namespace GraphQL.Types
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
             SchemaValidationVisitor.Instance.Run(this);
-            if (Features.AppliedDirectives)
-                AppliedDirectivesValidationVisitor.Instance.Run(this);
+            AppliedDirectivesValidationVisitor.Instance.Run(this);
         }
     }
 }

@@ -101,5 +101,12 @@ namespace GraphQL.Types
         /// Returns a list of locations where the directive can be applied.
         /// </summary>
         public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
+
+        /// <summary>
+        /// Validates given <paramref name="applied"/> directive against this directive graph type.
+        /// </summary>
+        public virtual void Validate(AppliedDirective applied)
+        {
+        }
     }
 }
