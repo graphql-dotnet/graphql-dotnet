@@ -37,11 +37,6 @@ namespace GraphQL
             "deprecated"
         };
 
-        public static string TrimGraphQLTypes(this string name)
-        {
-            return _trimPattern.Replace(name, string.Empty).Trim();
-        }
-
         public static bool IsBuiltInScalar(this string typeName)
         {
             return _builtInScalars.Contains(typeName);

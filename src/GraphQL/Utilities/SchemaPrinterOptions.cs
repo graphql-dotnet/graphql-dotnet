@@ -16,7 +16,7 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
 
         /// <summary>
-        /// Indicates whether to use ',' instead of '&' when inheriting a type from multiple interfaces.
+        /// Indicates whether to use ',' instead of '&amp;' when inheriting a type from multiple interfaces.
         /// </summary>
         public bool OldImplementsSyntax { get; set; }
     }
