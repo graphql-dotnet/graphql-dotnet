@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
 
@@ -11,15 +9,6 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Fields : Dictionary<string, Field>
     {
-        private sealed class DefaultExecutionStrategy : IExecutionStrategy
-        {
-            public static readonly DefaultExecutionStrategy Instance = new DefaultExecutionStrategy();
-
-            public Task<ExecutionResult> ExecuteAsync(ExecutionContext context) => throw new NotImplementedException();
-
-            public bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives) => ExecutionHelper.ShouldIncludeNode(context, directives.Directives);
-        }
-
         /// <summary>
         /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
         /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
@@ -31,7 +20,7 @@ namespace GraphQL.Language.AST
         public Fields CollectFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet)
         {
             List<string> visitedFragmentNames = null;
-            CollectFields(context, specificType, selectionSet, context.ExecutionStrategy ?? DefaultExecutionStrategy.Instance, ref visitedFragmentNames);
+            CollectFields(context, specificType, selectionSet, context.ExecutionStrategy ?? ParallelExecutionStrategy.Instance, ref visitedFragmentNames);
             return this;
         }
 
