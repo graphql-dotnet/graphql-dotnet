@@ -15,7 +15,7 @@
     <DebugType>embedded</DebugType>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <NoWarn>$(NoWarn);1591</NoWarn> <!--TODO: temporary solution-->
+    <NoWarn>$(NoWarn);1591;0618</NoWarn> <!--TODO: temporary solution-->
   </PropertyGroup>
 
   <ItemGroup>
