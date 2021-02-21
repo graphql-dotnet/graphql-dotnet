@@ -13,6 +13,11 @@ namespace GraphQL.Execution
     public interface IExecutionContext : IProvideUserContext
     {
         /// <summary>
+        /// Execution strategy for the currently executing document.
+        /// </summary>
+        IExecutionStrategy ExecutionStrategy { get; }
+
+        /// <summary>
         /// Propagates notification that the GraphQL request should be canceled
         /// </summary>
         CancellationToken CancellationToken { get; }

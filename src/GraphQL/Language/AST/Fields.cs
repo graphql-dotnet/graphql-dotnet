@@ -20,11 +20,11 @@ namespace GraphQL.Language.AST
         public Fields CollectFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet)
         {
             List<string> visitedFragmentNames = null;
-            CollectFields(context, specificType, selectionSet, ref visitedFragmentNames);
+            CollectFields(context, specificType, selectionSet, context.ExecutionStrategy ?? ParallelExecutionStrategy.Instance, ref visitedFragmentNames);
             return this;
         }
 
-        private void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+        private void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, IExecutionStrategy strategy, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
         {
             if (selectionSet != null)
             {
@@ -32,7 +32,7 @@ namespace GraphQL.Language.AST
                 {
                     if (selection is Field field)
                     {
-                        if (!ExecutionHelper.ShouldIncludeNode(context, field.Directives))
+                        if (!strategy.ShouldIncludeNode(context, field))
                         {
                             continue;
                         }
@@ -42,7 +42,7 @@ namespace GraphQL.Language.AST
                     else if (selection is FragmentSpread spread)
                     {
                         if ((visitedFragmentNames != null && visitedFragmentNames.Contains(spread.Name))
-                            || !ExecutionHelper.ShouldIncludeNode(context, spread.Directives))
+                            || !strategy.ShouldIncludeNode(context, spread))
                         {
                             continue;
                         }
@@ -51,25 +51,25 @@ namespace GraphQL.Language.AST
 
                         var fragment = context.Fragments.FindDefinition(spread.Name);
                         if (fragment == null
-                            || !ExecutionHelper.ShouldIncludeNode(context, fragment.Directives)
+                            || !strategy.ShouldIncludeNode(context, fragment)
                             || !ExecutionHelper.DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
                         {
                             continue;
                         }
 
-                        CollectFields(context, specificType, fragment.SelectionSet, ref visitedFragmentNames);
+                        CollectFields(context, specificType, fragment.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                     else if (selection is InlineFragment inline)
                     {
                         var name = inline.Type != null ? inline.Type.Name : specificType.Name;
 
-                        if (!ExecutionHelper.ShouldIncludeNode(context, inline.Directives)
+                        if (!strategy.ShouldIncludeNode(context, inline)
                           || !ExecutionHelper.DoesFragmentConditionMatch(context, name, specificType))
                         {
                             continue;
                         }
 
-                        CollectFields(context, specificType, inline.SelectionSet, ref visitedFragmentNames);
+                        CollectFields(context, specificType, inline.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                 }
             }

@@ -6,7 +6,6 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
-using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Tests.Instrumentation
 {
