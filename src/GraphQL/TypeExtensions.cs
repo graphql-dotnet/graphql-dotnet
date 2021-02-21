@@ -314,19 +314,22 @@ namespace GraphQL
     }
 
     /// <summary>
-    /// Mode to use when mapping CLR type to GraphType.
+    /// Mode used when mapping CLR type to GraphType in <see cref="TypeExtensions.GetGraphTypeFromType"/>.
     /// </summary>
     public enum TypeMappingMode
     {
+        /// <summary>
+        /// This mode is left for backward compatibility in cases where you call <see cref="TypeExtensions.GetGraphTypeFromType"/> directly.
+        /// </summary>
         UseBuiltInScalarMappings,
 
         /// <summary>
-        /// Map type as input type.
+        /// Map CLR type as input type.
         /// </summary>
         InputType,
 
         /// <summary>
-        /// Map type as output type.
+        /// Map CLR type as output type.
         /// </summary>
         OutputType
     }
