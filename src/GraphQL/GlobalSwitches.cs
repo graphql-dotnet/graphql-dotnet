@@ -57,7 +57,7 @@ namespace GraphQL
         public static Action<string, NamedElement> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
 
         /// <summary>
-        /// This setting improves performance if your schema uses only scalar types or types marked with
+        /// This setting by default improves performance if your schema uses only scalar types or types marked with
         /// <see cref="GraphQLMetadataAttribute"/> attribute with configured <see cref="GraphQLMetadataAttribute.InputType"/>
         /// or <see cref="GraphQLMetadataAttribute.OutputType"/> properties when constructing fields using expressions:
         /// <br/>
@@ -65,8 +65,12 @@ namespace GraphQL
         /// Field(x => x.Filter);
         /// </c>
         /// <br/>
-        /// If you are registering your own mappings in run time via <see cref="ISchema.RegisterTypeMapping(Type, Type)"/>,
-        /// then set to <see langword="true"/>. Otherwise, you will most likely see an error message when you try to add a field:
+        /// If you are using a scoped schema with many field expressions, then this setting will help speed up the
+        /// initialization of your schema.
+        /// <br/>
+        /// If you are registering your own mappings via <see cref="ISchema.RegisterTypeMapping(Type, Type)"/>,
+        /// then be sure to set to <see langword="true"/>. Otherwise, you will most likely see an error message when
+        /// you try to add a field:
         /// <br/>
         /// <c>
         /// The GraphQL type for field 'ParentObject.Filter' could not be derived implicitly from expression 'Field(x => x.Filter)'.
