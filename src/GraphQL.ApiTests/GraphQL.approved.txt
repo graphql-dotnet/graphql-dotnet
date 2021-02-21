@@ -2078,6 +2078,10 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false);
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
@@ -2266,6 +2270,10 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false) { }
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public void Initialize() { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }

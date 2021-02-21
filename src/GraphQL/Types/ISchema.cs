@@ -124,6 +124,12 @@ namespace GraphQL.Types
         void RegisterTypeMapping(Type clrType, Type graphType);
 
         /// <summary>
+        /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.
+        /// </summary>
+        /// <param name="includeBuiltInScalarMappings">Is it required to return built-in mappings for scalars.</param>
+        IEnumerable<(Type clrType, Type graphType)> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false);
+
+        /// <summary>
         /// Register a custom value converter to the schema.
         /// </summary>
         void RegisterValueConverter(IAstFromValueConverter converter);
