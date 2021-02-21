@@ -43,6 +43,8 @@ namespace GraphQL.MicrosoftDI
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
+        public IResolveFieldContext Parent => _baseContext.Parent;
+
         public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 
         public object RootValue => _baseContext.RootValue;
