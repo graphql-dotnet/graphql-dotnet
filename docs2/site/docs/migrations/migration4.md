@@ -325,7 +325,7 @@ CLR types (`int`, `string`, `DateTime`, `Guid`, etc.) that match built-in scalar
 Type registration is used for the hint:
 
 ```csharp
-GraphTypeTypeRegistry.Register<Money, MoneyType>(); // static API before v4
+GraphTypeTypeRegistry.Register<Money, MoneyType>(); // static method before v4
 schema.RegisterTypeMapping<Money, MoneyType>();     // instance method on `ISchema` after v4
 ```
 
@@ -364,7 +364,7 @@ schema.RegisterTypeMapping<Money, MoneyInputType>();
 An alternative way to define the mapping is to use the new properties in the `GraphQLMetadata` attribute.
 Consider the following example:
 
-```c#
+```csharp
 [GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
 public class Filter
 {
@@ -404,11 +404,12 @@ public class MyInputType : InputObjectGraphType<ContainerRequest>
 In this case, a call to the registration method is not required, since the schema
 will use information from the provided attribute.
 
-> Keep in mind that you can register type mappings even for built-in/primitive types if you want to change their behavior:
-> <br/><br/>
-> schema.RegisterTypeMapping<int, MyIntGraphType>()
-> <br/>
-> schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>()
+Keep in mind that you can register type mappings even for built-in/primitive types if you want to change their behavior:
+
+```csharp
+schema.RegisterTypeMapping<int, MyIntGraphType>();
+schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
+```
 
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
