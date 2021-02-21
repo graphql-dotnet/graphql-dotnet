@@ -414,16 +414,35 @@ schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
 In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
-classes by default use all properties from the provided `TSourceType` to generate GraphType's fields. If no matching
-is found for some of the properties, then an exception will be thrown during schema initialization. You need to register
-the type mapping with `ISchema.RegisterTypeMapping` method. Alternatively, you can inherit from these classes and
-override the `GetRegisteredProperties` method. Consider the following example:
+classes by default use all properties from the provided `TSourceType` to generate GraphType's fields (previously they
+may skip unmatched properties). If no matching is found for some of the properties, then an exception will be thrown
+during schema initialization.
+
+You have three options to fix this.
+
+1. Add all necessary type mappings with `ISchema.RegisterTypeMapping` method.
+2. Or pass the unwanted properties into the `excludedProperties` parameter of the constructor if you create a type via `new` operator.
+
+```csharp
+myField.ResolvedType = new AutoRegisteringObjectGraphType<SomeClassWithManyProperties>(x => x.Address, x => x.SecretCode);
+```
+
+3. Alternatively, you can inherit from these classes and override the `GetRegisteredProperties` method.
 
 ```csharp
 public class MyAutoType : AutoRegisteringObjectGraphType<SomeClassWithManyProperties>
 {
     protected override IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(SomeClassWithManyProperties)
         .GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => Attribute.IsDefined(p, typeof(ForExportAttribute)));
+}
+```
+
+4. Or even compose 2 and 3 approaches.
+
+```csharp
+public class MyAutoType : AutoRegisteringObjectGraphType<SomeClassWithManyProperties>
+{
+    public MyAutoType() : base(x => x.Address, x => x.SecretCode) { }
 }
 ```
 
