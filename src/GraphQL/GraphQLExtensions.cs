@@ -279,32 +279,23 @@ namespace GraphQL
                 return errors.ToArray();
             }
 
-            var scalar = (ScalarGraphType)type;
-
-            object parseResult = null;
-            try
+            if (type is ScalarGraphType scalar)
             {
-                if (scalar is ICanParseScalar parseable)
+                try
                 {
-                    if (parseable.CanParseLiteral(valueAst)) // it still can throw
+                    if (scalar.CanParseLiteral(valueAst)) // it still can throw
                         return Array.Empty<string>();
                 }
-                else
+                catch (Exception)
                 {
-                    parseResult = scalar.ParseLiteral(valueAst);
+                    // do nothing, just do not throw from IsValidLiteralValue
                 }
-            }
-            catch (Exception)
-            {
-                // do nothing, just do not throw from IsValidLiteralValue
-            }
 
-            if (parseResult == null)
-            {
                 return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            return Array.Empty<string>();
+            // the code shouldn't go here
+            return new[] { $"Value {AstPrinter.Print(valueAst)} of unknown type {type?.Name}." };
         }
 
         /// <summary>

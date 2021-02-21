@@ -9,10 +9,10 @@ namespace GraphQL.Types
     /// The Decimal scalar graph type represents a decimal value.
     /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="decimal"/> .NET values to this scalar graph type.
     /// </summary>
-    public class DecimalGraphType : ScalarGraphType, ICanParseScalar
+    public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public bool CanParseLiteral(IValue value)
+        public override bool CanParseLiteral(IValue value)
         {
             return value switch
             {
@@ -29,7 +29,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public bool CanParseValue(object value)
+        public override bool CanParseValue(object value)
         {
             return value switch
             {

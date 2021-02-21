@@ -6,10 +6,10 @@ namespace GraphQL.Types
     /// <summary>
     /// The Guid scalar graph type represents a 128-bit globally unique identifier (GUID).
     /// </summary>
-    public class GuidGraphType : ScalarGraphType, ICanParseScalar
+    public class GuidGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(IValue value) => value switch
         {
             GuidValue _ => true,
             StringValue s => Guid.TryParse(s.Value, out _),
@@ -17,7 +17,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public bool CanParseValue(object value) => value switch
+        public override bool CanParseValue(object value) => value switch
         {
             Guid _ => true,
             string s => Guid.TryParse(s, out _),
