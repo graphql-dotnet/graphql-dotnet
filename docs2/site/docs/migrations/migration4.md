@@ -60,53 +60,6 @@ For untyped `InputObjectGraphType` classes, like shown above, the default behavi
 will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the
 requested type via `ObjectExtensions.ToObject` as it did before.
 
-### Ability to map CLR types to GraphTypes
-
-Strictly speaking, this feature was available before via `GraphTypeTypeRegistry`, but it had a significant
-drawbacks, since the mapping was static and did not allow registering the same CLR type both as input and output.
-In v4 `GraphTypeTypeRegistry` was completely removed and the `ISchema.RegisterTypeMapping(Type, Type)` method was added
-instead (also there are several extension methods). An alternative way to define the mapping is to use the new properties in
-the `GraphQLMetadata` attribute.
-
-Consider the following example:
-
-```c#
-[GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
-public class Filter
-{
-    public string Key { get; set; }
-    public int Value { get; set; }
-}
-
-public class ContainerRequest
-{
-    public IList<Filter> Filters { get; set; }
-    public int ClientId { get; set; }
-    public int AppId { get; set; }
-}
-
-public class FilterInputGraphType : InputObjectGraphType<Filter>
-{
-    public FilterInputGraphType()
-    {
-        Name = "FilterInput";
-        Field(x => x.Key);
-        Field(x => x.Value);
-    }
-}
-
-public class MyInputType : InputObjectGraphType<ContainerRequest>
-{
-    public MyInputType()
-    {
-        Name = "Input";
-        Field(x => x.Filters); // when building this field, its type is implicitly inferred to list of FilterInputGraphType
-        Field(x => x.ClientId);
-        Field(x => x.AppId, nullable: true);
-    }
-}
-```
-
 ### Experimental Features / Applied Directives
 
 In v4 we added ability to apply directives to the schema elements and expose user-defined meta-information
@@ -324,6 +277,138 @@ lock (field)
     field.Metadata["counter"] = value + 1;
 }
 ```
+
+### Ability to map CLR types to GraphTypes
+
+Strictly speaking, this feature was available before via `GraphTypeTypeRegistry`, but it had a significant
+drawbacks, since the mapping was static and did not allow registering the same CLR type both as input and output.
+In v4 `GraphTypeTypeRegistry` was completely removed and the `ISchema.RegisterTypeMapping(Type, Type)`
+method was added instead (also there are several extension methods).
+
+Consider the following example:
+
+```csharp
+public class Money
+{
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+}
+
+public class Account
+{
+    public Money Saldo { get; set; }
+}
+
+public class MoneyType : ObjectGraphType<Money>
+{
+    public MoneyType()
+    {
+        Field(x => x.Amount);
+        Field(x => x.Currency);
+    }
+}
+
+public class AccountType : ObjectGraphType<Account>
+{
+    public MoneyType()
+    {
+        Field(x => x.Saldo);
+    }
+}
+```
+
+On the `Field(x => x.Saldo)` line when parsing an expression GraphQL.NET should somehow infer
+that the `Money` CLR type corresponds to the `MoneyType` GraphType. In fact, this cannot be done
+without specifying additional information from the caller. GraphQL.NET can only infer some primitive
+CLR types (`int`, `string`, `DateTime`, `Guid`, etc.) that match built-in scalars.
+
+Type registration is used for the hint:
+
+```csharp
+GraphTypeTypeRegistry.Register<Money, MoneyType>(); // static API before v4
+schema.RegisterTypeMapping<Money, MoneyType>();     // instance method on `ISchema` after v4
+```
+
+Note that since v4 it's possible to register both input and output GraphType for the same CLR type.
+In this case, GraphQL.NET will choose the desired GraphType depending on the context.
+
+```csharp
+public class Money
+{
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+}
+
+public class MoneyType : ObjectGraphType<Money>
+{
+    public MoneyType()
+    {
+        Field(x => x.Amount);
+        Field(x => x.Currency);
+    }
+}
+
+public class MoneyInputType : InputObjectGraphType<Money>
+{
+    public MoneyInputType()
+    {
+        Field(x => x.Amount).Description("Total amount").DefaultValue(100m);
+        Field(x => x.Currency).DefaultValue("USD");
+    }
+}
+
+schema.RegisterTypeMapping<Money, MoneyType>();
+schema.RegisterTypeMapping<Money, MoneyInputType>();
+```
+
+An alternative way to define the mapping is to use the new properties in the `GraphQLMetadata` attribute.
+Consider the following example:
+
+```c#
+[GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
+public class Filter
+{
+    public string Key { get; set; }
+    public int Value { get; set; }
+}
+
+public class ContainerRequest
+{
+    public IList<Filter> Filters { get; set; }
+    public int ClientId { get; set; }
+    public int AppId { get; set; }
+}
+
+public class FilterInputGraphType : InputObjectGraphType<Filter>
+{
+    public FilterInputGraphType()
+    {
+        Name = "FilterInput";
+        Field(x => x.Key);
+        Field(x => x.Value);
+    }
+}
+
+public class MyInputType : InputObjectGraphType<ContainerRequest>
+{
+    public MyInputType()
+    {
+        Name = "Input";
+        Field(x => x.Filters); // when building this field, its type is implicitly inferred to list of FilterInputGraphType
+        Field(x => x.ClientId);
+        Field(x => x.AppId, nullable: true);
+    }
+}
+```
+
+In this case, a call to the registration method is not required, since the schema
+will use information from the provided attribute.
+
+> Keep in mind that you can register type mappings even for built-in/primitive types if you want to change their behavior:
+> <br/><br/>
+> schema.RegisterTypeMapping<int, MyIntGraphType>()
+> <br/>
+> schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>()
 
 ### API Cleanup
 

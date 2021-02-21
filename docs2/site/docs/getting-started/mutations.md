@@ -1,10 +1,13 @@
 # Mutations
 
-To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.  Mutations are executed serially.
+To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.
+Mutations make modifications to data and return a result. You can only have a single root
+Mutation object. By default according to specification mutations are executed serially.
 
 > See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
 
-Instead of using the `query` keyword, you are required to use `mutation`.  Similar to a `query`, you can omit the `Operation` name if there is only a single operation in the request.
+Instead of using the `query` keyword, you are required to use `mutation`. Similar to a
+`query`, you can omit the `Operation` name if there is only a single operation in the request.
 
 ```graphql
 mutation ($human:HumanInput!) {
@@ -53,7 +56,7 @@ public class StarWarsSchema : Schema
 }
 ```
 
-A `mutation` `GraphType` looks identical to a `query` `GraphType`.  The difference is you are allowed to mutate data.
+A `mutation` `GraphType` looks identical to a `query` `GraphType`. The difference is you are allowed to mutate data.
 
 ```csharp
 public class StarWarsMutation : ObjectGraphType

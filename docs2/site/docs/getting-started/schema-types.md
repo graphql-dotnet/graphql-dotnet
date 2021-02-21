@@ -2,7 +2,8 @@
 
 ## Scalars
 
-A GraphQL object type has a name and fields, but at some point those fields have to resolve to some concrete data. That's where the scalar types come in: they represent the leaves of the query.
+A GraphQL object type has a name and fields, but at some point those fields have to resolve
+to some concrete data. That's where the scalar types come in: they represent the leaves of the query.
 
 These are the scalars provided by the [GraphQL Specification](https://graphql.github.io/graphql-spec/June2018/#sec-Scalars).
 
@@ -14,7 +15,8 @@ These are the scalars provided by the [GraphQL Specification](https://graphql.gi
 | `Boolean`   | `BooleanGraphType`  | `bool`                  |
 | `ID`        | `IdGraphType`       | `int`, `long`, `string` |
 
-> Note that you can use a `Guid` with `ID`.  It will just be serialized to a `string` and should be sent to your GraphQL Server as a `string`.
+> Note that you can use a `Guid` with `ID`.  It will just be serialized to a `string` and
+> should be sent to your GraphQL Server as a `string`.
 
 These are additional scalars provided by this project.
 
@@ -111,13 +113,21 @@ public enum Episodes
 }
 ```
 
-Compare the two implementations. GraphQL does not specify backing values for members of its enums. The name of each member _is_ the value.
+Compare the two implementations. GraphQL does not specify backing values for members of its enums.
+The name of each member _is_ the value.
 
 **GraphQL.NET**
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE. Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL `DeprecationReason`.
+You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET
+`enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in
+the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute`
+applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute`
+applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE.
+Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member
+to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL
+`DeprecationReason`.
 
 ```csharp
 [Description("The Star Wars movies.")]
@@ -163,13 +173,21 @@ public class EpisodeEnum : EnumerationGraphType
 }
 ```
 
-Note that although GraphQL has no use for backing values for enum members, GraphQL.NET uses them anyway. This allows for a more natural mapping to .NET `enum`s or other collections of constants, and avoids coupling your business logic to GraphQL semantics. The backing values are strictly for use on the back end - the client will never see them.
+Note that although GraphQL has no use for backing values for enum members, GraphQL.NET uses
+them anyway. This allows for a more natural mapping to .NET `enum`s or other collections of
+constants, and avoids coupling your business logic to GraphQL semantics. The backing values
+are strictly for use on the back end - the client will never see them.
 
 **Resolving Enumerations**
 
-Fields typed as enumerations are resolved by returning either the name or backing value of one of the enum members. Lists of enumerations are resolved by returning collections of enum members. In the below examples, notice the identical implementations of the `appearsIn` field for both human graph types. In both implementations, the client receives the GraphQL enum member names in response to queries on the `appearsIn` field.
+Fields typed as enumerations are resolved by returning either the name or backing value of
+one of the enum members. Lists of enumerations are resolved by returning collections of enum
+members. In the below examples, notice the identical implementations of the `appearsIn` field
+for both human graph types. In both implementations, the client receives the GraphQL enum member
+names in response to queries on the `appearsIn` field.
 
-If the field resolves a value which cannot be mapped to one of the enum's legal values, GraphQL.NET will return `null` to the client in the data for the field.
+If the field resolves a value which cannot be mapped to one of the enum's legal values,
+GraphQL.NET will return `null` to the client in the data for the field.
 
 ```csharp
 public class HumanString
@@ -222,7 +240,10 @@ query HumansAppearingIn($episode: Episode!){
 # }
 ```
 
-When GraphQL.NET receives an enum member name as a query argument, the queried field's `ResolveFieldContext` stores the backing value associated with the enum member name in its arguments list. The GraphQL.NET query type which handles the example query may be implemented as:
+When GraphQL.NET receives an enum member name as a query argument, the queried field's
+`ResolveFieldContext` stores the backing value associated with the enum member name
+in its arguments list. The GraphQL.NET query type which handles the example query may
+be implemented as:
 
 ```csharp
     public class StarWarsQuery : ObjectGraphType<object>
