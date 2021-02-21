@@ -381,7 +381,7 @@ namespace GraphQL.Types
 
             _allTypes = SchemaTypes.Create(
                 GetTypes(),
-                 _clrToGraphTypeMappings,
+                _clrToGraphTypeMappings,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 this);
