@@ -279,6 +279,6 @@ namespace GraphQL
         /// <summary>
         /// Register both input and output type mappings.
         /// </summary>
-        Both = Input | Output
+        Both = Input | Output,
     }
 }
