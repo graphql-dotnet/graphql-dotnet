@@ -418,7 +418,7 @@ classes by default use all properties from the provided `TSourceType` to generat
 may skip unmatched properties). If no matching is found for some of the properties, then an exception will be thrown
 during schema initialization.
 
-You have three options to fix this.
+You have multiple options to fix this.
 
 1. Add all necessary type mappings with `ISchema.RegisterTypeMapping` method.
 2. Or pass the unwanted properties into the `excludedProperties` parameter of the constructor if you create a type via `new` operator.
