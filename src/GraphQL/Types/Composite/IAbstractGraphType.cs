@@ -3,7 +3,7 @@ using System;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// An interface for such graph types that do not represent concrete graph types, that is, for interfaces and unions. 
+    /// An interface for such graph types that do not represent concrete graph types, that is, for interfaces and unions.
     /// </summary>
     public interface IAbstractGraphType : IGraphType
     {
@@ -42,7 +42,7 @@ namespace GraphQL.Types
             return result;
         }
 
-        public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value)
+        public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value) //TODO: possible merge this into method above
         {
             foreach (var possible in abstractType.PossibleTypes.List)
             {
