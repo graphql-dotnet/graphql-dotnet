@@ -19,7 +19,7 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>The resolved <see cref="Field"/> AST as derived from the query request.</summary>
+        /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
         Field FieldAst { get; }
 
         /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type.</summary>
