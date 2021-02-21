@@ -16,6 +16,22 @@ namespace GraphQL.Utilities
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
+        private static readonly List<string> _builtInScalars = new List<string>
+        {
+            "String",
+            "Boolean",
+            "Int",
+            "Float",
+            "ID"
+        };
+
+        private static readonly List<string> _builtInDirectives = new List<string>
+        {
+            "skip",
+            "include",
+            "deprecated"
+        };
+
         /// <summary>
         /// Creates printer with the specified options.
         /// </summary>
@@ -26,6 +42,12 @@ namespace GraphQL.Utilities
             Schema = schema;
             Options = options ?? new SchemaPrinterOptions();
         }
+
+        protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
+
+        protected static bool IsBuiltInScalar(string typeName) => _builtInScalars.Contains(typeName);
+
+        protected static bool IsBuiltInDirective(string directiveName) => _builtInDirectives.Contains(directiveName);
 
         private ISchema Schema { get; set; }
 
@@ -43,7 +65,7 @@ namespace GraphQL.Utilities
         /// Prints only introspection types.
         /// </summary>
         /// <returns>SDL document.</returns>
-        public string PrintIntrospectionSchema() => PrintFilteredSchema(n => n.IsBuiltInDirective(), GraphQLExtensions.IsIntrospectionType);
+        public string PrintIntrospectionSchema() => PrintFilteredSchema(IsBuiltInDirective, IsIntrospectionType);
 
         /// <summary>
         /// Prints schema according to the specified filters.
@@ -79,13 +101,13 @@ namespace GraphQL.Utilities
         /// Determines that the specified directive is defined in the schema and should be printed.
         /// By default, all directives are defined (printed) except for built-in directives.
         /// </summary>
-        protected virtual bool IsDefinedDirective(string directiveName) => !directiveName.IsBuiltInDirective();
+        protected virtual bool IsDefinedDirective(string directiveName) => !IsBuiltInDirective(directiveName);
 
         /// <summary>
         /// Determines that the specified type is defined in the schema and should be printed.
         /// By default, all types are defined (printed) except for introspection types and built-in scalars.
         /// </summary>
-        protected virtual bool IsDefinedType(string typeName) => !typeName.IsIntrospectionType() && !typeName.IsBuiltInScalar();
+        protected virtual bool IsDefinedType(string typeName) => !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
 
         public string PrintSchemaDefinition(ISchema schema)
         {

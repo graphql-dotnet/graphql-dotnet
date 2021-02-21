@@ -16,29 +16,7 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        private static readonly List<string> _builtInScalars = new List<string>
-        {
-            "String",
-            "Boolean",
-            "Int",
-            "Float",
-            "ID"
-        };
-
-        private static readonly List<string> _builtInDirectives = new List<string>
-        {
-            "skip",
-            "include",
-            "deprecated"
-        };
-
         internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__", StringComparison.InvariantCulture) ?? false;
-
-        internal static bool IsIntrospectionType(this string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
-
-        internal static bool IsBuiltInScalar(this string typeName) => _builtInScalars.Contains(typeName);
-
-        internal static bool IsBuiltInDirective(this string directiveName) => _builtInDirectives.Contains(directiveName);
 
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.

@@ -2607,6 +2607,9 @@ namespace GraphQL.Utilities
         public string PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
         public string PrintType(GraphQL.Types.IGraphType type) { }
         public string PrintUnion(GraphQL.Types.UnionGraphType type) { }
+        protected static bool IsBuiltInDirective(string directiveName) { }
+        protected static bool IsBuiltInScalar(string typeName) { }
+        protected static bool IsIntrospectionType(string typeName) { }
         public static string ResolveName(GraphQL.Types.IGraphType type) { }
     }
     public class SchemaPrinterOptions
