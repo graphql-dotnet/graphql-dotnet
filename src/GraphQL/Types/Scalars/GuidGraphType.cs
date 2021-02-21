@@ -9,7 +9,7 @@ namespace GraphQL.Types
     public class GuidGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        protected override bool CanParseLiteralCore(IValue value) => value switch
         {
             GuidValue _ => true,
             StringValue s => Guid.TryParse(s.Value, out _),
@@ -17,7 +17,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value) => value switch
+        protected override bool CanParseValueCore(object value) => value switch
         {
             Guid _ => true,
             string s => Guid.TryParse(s, out _),

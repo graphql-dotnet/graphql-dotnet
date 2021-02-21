@@ -281,17 +281,9 @@ namespace GraphQL
 
             if (type is ScalarGraphType scalar)
             {
-                try
-                {
-                    if (scalar.CanParseLiteral(valueAst)) // it still can throw
-                        return Array.Empty<string>();
-                }
-                catch (Exception)
-                {
-                    // do nothing, just do not throw from IsValidLiteralValue
-                }
-
-                return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
+                return scalar.CanParseLiteral(valueAst)
+                    ? Array.Empty<string>()
+                    : new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
             // the code shouldn't go here

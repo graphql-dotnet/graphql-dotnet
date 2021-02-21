@@ -1831,8 +1831,8 @@ namespace GraphQL.Types
     public class DecimalGraphType : GraphQL.Types.ScalarGraphType
     {
         public DecimalGraphType() { }
-        public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
-        public override bool CanParseValue(object value) { }
+        protected override bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        protected override bool CanParseValueCore(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -1973,8 +1973,8 @@ namespace GraphQL.Types
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
         public GuidGraphType() { }
-        public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
-        public override bool CanParseValue(object value) { }
+        protected override bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        protected override bool CanParseValueCore(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -2223,8 +2223,10 @@ namespace GraphQL.Types
     public abstract class ScalarGraphType : GraphQL.Types.GraphType
     {
         protected ScalarGraphType() { }
-        public virtual bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
-        public virtual bool CanParseValue(object value) { }
+        public bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        protected virtual bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        public bool CanParseValue(object value) { }
+        protected virtual bool CanParseValueCore(object value) { }
         public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }

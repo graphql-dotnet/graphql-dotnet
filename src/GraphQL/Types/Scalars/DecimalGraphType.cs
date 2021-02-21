@@ -12,7 +12,7 @@ namespace GraphQL.Types
     public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value)
+        protected override bool CanParseLiteralCore(IValue value)
         {
             return value switch
             {
@@ -29,7 +29,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value)
+        protected override bool CanParseValueCore(object value)
         {
             return value switch
             {
