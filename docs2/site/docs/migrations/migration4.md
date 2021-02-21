@@ -410,6 +410,17 @@ will use information from the provided attribute.
 > <br/>
 > schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>()
 
+### `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType`
+
+These properties have been removed. Use `IResolveFieldContext.FieldAst.Name` and
+`IResolveFieldContext.FieldDefinition.ResolvedType` instead.
+
+### `GraphQLMetadataAttribute.Type` -> `GraphQLMetadataAttribute.ResolverType`
+
+This property was renamed. If you have explicitly set this property in an attribute or used it
+directly anywhere, then just change its name. If you did not explicitly set this property, the
+default continues to be `ResolverType.Resolver`.
+
 ### API Cleanup
 
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
@@ -470,5 +481,3 @@ will use information from the provided attribute.
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
-* `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType` properties have been removed, use `IResolveFieldContext.FieldAst.Name` and `IResolveFieldContext.FieldDefinition.ResolvedType` instead
-* `GraphQLMetadataAttribute.Type` property was renamed to `ResolverType`
