@@ -331,6 +331,6 @@ namespace GraphQL
         /// <summary>
         /// Map CLR type as output type.
         /// </summary>
-        OutputType
+        OutputType,
     }
 }
