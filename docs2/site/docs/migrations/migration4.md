@@ -338,3 +338,4 @@ lock (field)
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
+* `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType` properties have been removed, use `IResolveFieldContext.FieldAst.Name` and `IResolveFieldContext.FieldDefinition.ResolvedType` instead
