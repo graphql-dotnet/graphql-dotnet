@@ -2065,6 +2065,10 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         GraphQL.Types.SchemaTypes AllTypes { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
         GraphQL.ExperimentalFeatures Features { get; set; }
@@ -2076,12 +2080,12 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
-        GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
-        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false);
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
+        GraphQL.Types.FieldType TypeMetaFieldType { get; }
+        GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
@@ -2254,6 +2258,10 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public GraphQL.Types.SchemaTypes AllTypes { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
@@ -2266,14 +2274,14 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "clrType",
-                "graphType"})]
-        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false) { }
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public void Initialize() { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }

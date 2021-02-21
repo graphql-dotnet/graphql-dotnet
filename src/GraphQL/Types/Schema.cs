@@ -258,15 +258,22 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<(Type clrType, Type graphType)> EnumerateTypeMappings(bool includeBuiltInScalarMappings = false)
+        public IEnumerable<(Type clrType, Type graphType)> TypeMappings
         {
-            if (_clrToGraphTypeMappings != null)
+            get
             {
-                foreach (var (clrType, graphType) in _clrToGraphTypeMappings)
-                    yield return (clrType, graphType);
+                if (_clrToGraphTypeMappings != null)
+                {
+                    foreach (var (clrType, graphType) in _clrToGraphTypeMappings)
+                        yield return (clrType, graphType);
+                }
             }
+        }
 
-            if (includeBuiltInScalarMappings)
+        /// <inheritdoc/>
+        public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
+        {
+            get
             {
                 foreach (var pair in SchemaTypes.BuiltInScalarMappings)
                     yield return (pair.Key, pair.Value);
