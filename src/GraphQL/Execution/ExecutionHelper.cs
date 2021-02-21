@@ -217,24 +217,18 @@ namespace GraphQL.Execution
                 var directive = directives.Find(DirectiveGraphType.Skip.Name);
                 if (directive != null)
                 {
-                    var values = GetArgumentValues(
-                        DirectiveGraphType.Skip.Arguments,
-                        directive.Arguments,
-                        context.Variables);
+                    var arg = DirectiveGraphType.Skip.Arguments.Find("if");
 
-                    if (values.TryGetValue("if", out ArgumentValue ifObj) && bool.TryParse(ifObj.Value?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
+                    if ((bool)CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
                         return false;
                 }
 
                 directive = directives.Find(DirectiveGraphType.Include.Name);
                 if (directive != null)
                 {
-                    var values = GetArgumentValues(
-                        DirectiveGraphType.Include.Arguments,
-                        directive.Arguments,
-                        context.Variables);
+                    var arg = DirectiveGraphType.Include.Arguments.Find("if");
 
-                    return values.TryGetValue("if", out ArgumentValue ifObj) && bool.TryParse(ifObj.Value?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
+                    return (bool)CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
                 }
             }
 

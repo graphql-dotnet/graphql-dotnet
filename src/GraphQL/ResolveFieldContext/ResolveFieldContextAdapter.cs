@@ -53,15 +53,13 @@ namespace GraphQL
 
         public T Source { get; private set; }
 
-        public string FieldName => _baseContext.FieldName;
-
-        public Language.AST.Field FieldAst => _baseContext.FieldAst;
+        public Field FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
 
-        public IGraphType ReturnType => _baseContext.ReturnType;
-
         public IObjectGraphType ParentType => _baseContext.ParentType;
+
+        public IResolveFieldContext Parent => _baseContext.Parent;
 
         public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 

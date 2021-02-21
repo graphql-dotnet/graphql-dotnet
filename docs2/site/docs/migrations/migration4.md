@@ -159,6 +159,7 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 
 * New method `IParentExecutionNode.ApplyToChildren`
 * New property `IResolveFieldContext.Parent`
+* `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
@@ -337,3 +338,4 @@ lock (field)
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
+* `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType` properties have been removed, use `IResolveFieldContext.FieldAst.Name` and `IResolveFieldContext.FieldDefinition.ResolvedType` instead
