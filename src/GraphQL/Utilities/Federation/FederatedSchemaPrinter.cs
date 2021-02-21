@@ -9,7 +9,6 @@ namespace GraphQL.Utilities.Federation
 {
     public class FederatedSchemaPrinter : SchemaPrinter
     {
-
         private readonly List<string> _federatedDirectives = new List<string>
         {
             "external",
@@ -98,7 +97,7 @@ namespace GraphQL.Utilities.Federation
         public string PrintFederatedSchema()
         {
             return PrintFilteredSchema(
-                directiveName => !IsSpecDirective(directiveName) && !IsFederatedDirective(directiveName),
+                directiveName => !IsBuiltInDirective(directiveName) && !IsFederatedDirective(directiveName),
                 typeName => !IsFederatedType(typeName) && IsDefinedType(typeName));
         }
 

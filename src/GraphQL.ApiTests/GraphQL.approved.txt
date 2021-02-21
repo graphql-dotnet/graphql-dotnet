@@ -2586,11 +2586,9 @@ namespace GraphQL.Utilities
         public string[] BreakLine(string line, int len) { }
         public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
         protected string FormatDescription(string description, string indentation = "") { }
-        public bool IsBuiltInScalar(string typeName) { }
-        public virtual bool IsDefinedType(string typeName) { }
-        public bool IsIntrospectionType(string typeName) { }
+        protected virtual bool IsDefinedDirective(string directiveName) { }
+        protected virtual bool IsDefinedType(string typeName) { }
         public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
-        public bool IsSpecDirective(string directiveName) { }
         public string Print() { }
         public string PrintArgs(GraphQL.Types.FieldType field) { }
         public string PrintDeprecation(string reason) { }
@@ -2609,12 +2607,14 @@ namespace GraphQL.Utilities
         public string PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
         public string PrintType(GraphQL.Types.IGraphType type) { }
         public string PrintUnion(GraphQL.Types.UnionGraphType type) { }
+        protected static bool IsBuiltInDirective(string directiveName) { }
+        protected static bool IsBuiltInScalar(string typeName) { }
+        protected static bool IsIntrospectionType(string typeName) { }
         public static string ResolveName(GraphQL.Types.IGraphType type) { }
     }
     public class SchemaPrinterOptions
     {
         public SchemaPrinterOptions() { }
-        public System.Collections.Generic.List<string> CustomScalars { get; set; }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }

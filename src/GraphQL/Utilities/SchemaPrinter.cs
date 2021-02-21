@@ -9,45 +9,70 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Enables printing schema as SDL (Schema Definition Language) document.
+    /// <br/>
+    /// See <see href="http://spec.graphql.org/June2018/#sec-Type-System"/> for more information.
+    /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
-        protected SchemaPrinterOptions Options { get; }
+        private static readonly List<string> _builtInScalars = new List<string>
+        {
+            "String",
+            "Boolean",
+            "Int",
+            "Float",
+            "ID"
+        };
 
-        private readonly List<string> _scalars = new List<string>(
-            new[]
-            {
-                "String",
-                "Boolean",
-                "Int",
-                "Float",
-                "ID"
-            });
+        private static readonly List<string> _builtInDirectives = new List<string>
+        {
+            "skip",
+            "include",
+            "deprecated"
+        };
 
-        public SchemaPrinter(
-            ISchema schema,
-            SchemaPrinterOptions options = null)
+        /// <summary>
+        /// Creates printer with the specified options.
+        /// </summary>
+        /// <param name="schema">Schema to print.</param>
+        /// <param name="options">Printer options.</param>
+        public SchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
         {
             Schema = schema;
             Options = options ?? new SchemaPrinterOptions();
-
-            if (Options.CustomScalars?.Count > 0)
-            {
-                _scalars.AddRange(Options.CustomScalars);
-            }
         }
+
+        protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
+
+        protected static bool IsBuiltInScalar(string typeName) => _builtInScalars.Contains(typeName);
+
+        protected static bool IsBuiltInDirective(string directiveName) => _builtInDirectives.Contains(directiveName);
 
         private ISchema Schema { get; set; }
 
-        public string Print()
-        {
-            return PrintFilteredSchema(n => !IsSpecDirective(n), IsDefinedType);
-        }
+        protected SchemaPrinterOptions Options { get; }
 
-        public string PrintIntrospectionSchema()
-        {
-            return PrintFilteredSchema(IsSpecDirective, IsIntrospectionType);
-        }
+        /// <summary>
+        /// Prints only 'defined' types and directives.
+        /// <br/>
+        /// See <see cref="IsDefinedType(string)"/> and <see cref="IsDefinedDirective(string)"/> for more information about what 'defined' means.
+        /// </summary>
+        /// <returns>SDL document.</returns>
+        public string Print() => PrintFilteredSchema(IsDefinedDirective, IsDefinedType);
 
+        /// <summary>
+        /// Prints only introspection types.
+        /// </summary>
+        /// <returns>SDL document.</returns>
+        public string PrintIntrospectionSchema() => PrintFilteredSchema(IsBuiltInDirective, IsIntrospectionType);
+
+        /// <summary>
+        /// Prints schema according to the specified filters.
+        /// </summary>
+        /// <param name="directiveFilter">Filter for directives.</param>
+        /// <param name="typeFilter">Filter for types.</param>
+        /// <returns>SDL document.</returns>
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
         {
             Schema.Initialize();
@@ -72,31 +97,17 @@ namespace GraphQL.Utilities
             return string.Join(Environment.NewLine + Environment.NewLine, result) + Environment.NewLine;
         }
 
-        public virtual bool IsDefinedType(string typeName)
-        {
-            return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
-        }
+        /// <summary>
+        /// Determines that the specified directive is defined in the schema and should be printed.
+        /// By default, all directives are defined (printed) except for built-in directives.
+        /// </summary>
+        protected virtual bool IsDefinedDirective(string directiveName) => !IsBuiltInDirective(directiveName);
 
-        public bool IsIntrospectionType(string typeName)
-        {
-            return typeName.StartsWith("__", StringComparison.InvariantCulture);
-        }
-
-        public bool IsBuiltInScalar(string typeName)
-        {
-            return _scalars.Contains(typeName);
-        }
-
-        public bool IsSpecDirective(string directiveName)
-        {
-            var names = new[]
-            {
-                "skip",
-                "include",
-                "deprecated"
-            };
-            return names.Contains(directiveName);
-        }
+        /// <summary>
+        /// Determines that the specified type is defined in the schema and should be printed.
+        /// By default, all types are defined (printed) except for introspection types and built-in scalars.
+        /// </summary>
+        protected virtual bool IsDefinedType(string typeName) => !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
 
         public string PrintSchemaDefinition(ISchema schema)
         {
@@ -263,10 +274,7 @@ namespace GraphQL.Utilities
         public string PrintDirective(DirectiveGraphType directive)
         {
             var builder = new StringBuilder();
-            if (Options.IncludeDescriptions)
-            {
-                builder.Append(PrintDescription(directive.Description));
-            }
+            builder.Append(FormatDescription(directive.Description));
             builder.AppendLine($"directive @{directive.Name}(");
             builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
             builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
