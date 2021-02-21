@@ -260,11 +260,25 @@ namespace GraphQL
         IntrospectionAndExecution
     }
 
+    /// <summary>
+    /// Mode used for <see cref="SchemaExtensions.AutoRegister"/> method.
+    /// </summary>
     [Flags]
     public enum AutoRegisteringMode
     {
+        /// <summary>
+        /// Register only input type mapping.
+        /// </summary>
         Input = 1,
+
+        /// <summary>
+        /// Register only output type mapping.
+        /// </summary>
         Output = 2,
+
+        /// <summary>
+        /// Register both input and output type mappings.
+        /// </summary>
         Both = Input | Output
     }
 }
