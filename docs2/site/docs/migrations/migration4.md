@@ -158,7 +158,7 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
-* New methods `ScalarGraphType.CanParseLiteral` and `ScalarGraphType.CanParseValue`
+* New methods `ScalarGraphType.CanParseLiteral[Core]` and `ScalarGraphType.CanParseValue[Core]`
 * New property `IResolveFieldContext.Parent`
 * `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
