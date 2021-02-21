@@ -16,6 +16,9 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
+        /// <summary>
+        /// Determines if this graph type is an introspection type.
+        /// </summary>
         internal static bool IsIntrospectionType(this IGraphType type) => type?.Name?.StartsWith("__", StringComparison.InvariantCulture) ?? false;
 
         /// <summary>
