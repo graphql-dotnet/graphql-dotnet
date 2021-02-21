@@ -161,6 +161,8 @@ namespace GraphQL
                     RequestServices = options.RequestServices
                 };
 
+                context.ExecutionStrategy = SelectExecutionStrategy(context);
+
                 foreach (var listener in options.Listeners)
                 {
                     await listener.AfterValidationAsync(context, validationResult) // TODO: remove ExecutionContext or make different type ?
@@ -198,12 +200,7 @@ namespace GraphQL
                         }
                     }
 
-                    IExecutionStrategy executionStrategy = SelectExecutionStrategy(context);
-
-                    if (executionStrategy == null)
-                        throw new InvalidOperationException("Invalid ExecutionStrategy!");
-
-                    var task = executionStrategy.ExecuteAsync(context)
+                    var task = (context.ExecutionStrategy ?? throw new InvalidOperationException("Execution strategy not specified")).ExecuteAsync(context)
                         .ConfigureAwait(false);
 
                     if (context.Listeners != null)

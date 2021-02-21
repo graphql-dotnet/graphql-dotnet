@@ -13,6 +13,9 @@ namespace GraphQL.Execution
     public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
         /// <inheritdoc/>
+        public IExecutionStrategy ExecutionStrategy { get; set; }
+
+        /// <inheritdoc/>
         public Document Document { get; set; }
 
         /// <inheritdoc/>
