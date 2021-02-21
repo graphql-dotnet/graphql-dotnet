@@ -410,6 +410,22 @@ will use information from the provided attribute.
 > <br/>
 > schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>()
 
+### Classes for automatic GraphType registration by default use all properties of the CLR type
+
+In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
+classes by default use all properties from the provided `TSourceType` to generate GraphType's fields. If no matching
+is found for some of the properties, then an exception will be thrown during schema initialization. You need to register
+the type mapping with `ISchema.RegisterTypeMapping` method. Alternatively, you can inherit from these classes and
+override the `GetRegisteredProperties` method. Consider the following example:
+
+```csharp
+public class MyAutoType : AutoRegisteringObjectGraphType<SomeClassWithManyProperties>
+{
+    protected override IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(SomeClassWithManyProperties)
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => Attribute.IsDefined(p, typeof(ForExportAttribute)));
+}
+```
+
 ### `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType`
 
 These properties have been removed. Use `IResolveFieldContext.FieldAst.Name` and
