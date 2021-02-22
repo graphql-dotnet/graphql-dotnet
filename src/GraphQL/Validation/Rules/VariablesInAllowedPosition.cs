@@ -48,8 +48,7 @@ namespace GraphQL.Validation.Rules
                         if (varDef != null && usage.Type != null)
                         {
                             var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                            if (varType != null &&
-                                !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
+                            if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
                             {
                                 context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
                             }

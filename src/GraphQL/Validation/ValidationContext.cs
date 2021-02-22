@@ -336,7 +336,7 @@ namespace GraphQL.Validation
 
                 try
                 {
-                    ret = scalarGraphType.ParseValue(value); //TODO: change to TryParseValue after #2293
+                    ret = scalarGraphType.ParseValue(value);
                 }
                 catch (Exception ex)
                 {

@@ -155,10 +155,24 @@ were moved to GraphQL.NET repository. These methods will be removed from their r
 
 GraphQL.NET will not receive new dependencies, since all methods just read or write meta information. Calling code changes not required.
 
+### New parsing methods for scalars
+
+4 new methods for `ScalarGraphType` have been added in v4:
+
+- `public bool CanParseLiteral/CanParseValue`
+- `protected virtual bool CanParseLiteralCore/CanParseValueCore`
+
+These methods checks for input coercion possibility. The last two can be overridden for custom scalars
+to validate input values without directly getting those values, i.e. without boxing.
+
+### Ability to get parent resolve context of any level
+
+New property `IResolveFieldContext.Parent` provides access to the parent context (up to the root).
+This may be needed to get the parameters of parent nodes.
+
 ### Other Features
 
 * New method `IParentExecutionNode.ApplyToChildren`
-* New property `IResolveFieldContext.Parent`
 * `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 

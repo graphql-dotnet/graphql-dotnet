@@ -174,7 +174,7 @@ namespace GraphQL
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
-        public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
+        public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string[] IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -1831,6 +1831,8 @@ namespace GraphQL.Types
     public class DecimalGraphType : GraphQL.Types.ScalarGraphType
     {
         public DecimalGraphType() { }
+        protected override bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        protected override bool CanParseValueCore(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -1971,6 +1973,8 @@ namespace GraphQL.Types
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
         public GuidGraphType() { }
+        protected override bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        protected override bool CanParseValueCore(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -2219,6 +2223,10 @@ namespace GraphQL.Types
     public abstract class ScalarGraphType : GraphQL.Types.GraphType
     {
         protected ScalarGraphType() { }
+        public bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        protected virtual bool CanParseLiteralCore(GraphQL.Language.AST.IValue value) { }
+        public bool CanParseValue(object value) { }
+        protected virtual bool CanParseValueCore(object value) { }
         public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }

@@ -9,14 +9,35 @@ namespace GraphQL.Types
     public class GuidGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
+        protected override bool CanParseLiteralCore(IValue value) => value switch
+        {
+            GuidValue _ => true,
+            StringValue s => Guid.TryParse(s.Value, out _),
+            _ => false
+        };
+
+        /// <inheritdoc/>
+        protected override bool CanParseValueCore(object value) => value switch
+        {
+            Guid _ => true,
+            string s => Guid.TryParse(s, out _),
+            _ => false
+        };
+
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            GuidValue guidValue => guidValue.Value,
-            StringValue stringValue => ParseValue(stringValue.Value),
+            GuidValue g => g.Value,
+            StringValue s => Guid.Parse(s.Value),
             _ => null
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Guid));
+        public override object ParseValue(object value) => value switch
+        {
+            Guid _ => value, // no boxing
+            string s => Guid.Parse(s),
+            _ => null
+        };
     }
 }
