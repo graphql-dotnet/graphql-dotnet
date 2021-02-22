@@ -286,8 +286,7 @@ namespace GraphQL
                     : new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            // the code shouldn't go here
-            return new[] { $"Value {AstPrinter.Print(valueAst)} of unknown type {type?.Name}." };
+            throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");
         }
 
         /// <summary>
