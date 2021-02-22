@@ -258,20 +258,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<(Type clrType, Type graphType)> TypeMappings
-        {
-            get
-            {
-                if (_clrToGraphTypeMappings != null)
-                {
-                    return _clrToGraphTypeMappings;
-                }
-                else
-                {
-                    return Enumerable.Empty<(Type, Type)>();
-                }
-            }
-        }
+        public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _clrToGraphTypeMappings ?? Enumerable.Empty<(Type, Type)>();
 
         /// <inheritdoc/>
         public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
