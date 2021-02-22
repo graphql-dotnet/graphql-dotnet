@@ -220,8 +220,8 @@ Here is a full list of validation errors produced by GraphQL.NET:
 
 Rule                              | Code                               | Number
 ----------------------------------|------------------------------------|-----------
-UniqueOperationNames              | `UNIQUE_OPERATION_NAMES`          | 5.2.1.1
-LoneAnonymousOperation            | `LONE_ANONYMOUS_OPERATION`        | 5.2.2.1
+UniqueOperationNames              | `UNIQUE_OPERATION_NAMES`           | 5.2.1.1
+LoneAnonymousOperation            | `LONE_ANONYMOUS_OPERATION`         | 5.2.2.1
 SingleRootFieldSubscriptions      | `SINGLE_ROOT_FIELD_SUBSCRIPTIONS`  | 5.2.3.1
 FieldsOnCorrectType               | `FIELDS_ON_CORRECT_TYPE`           | 5.3.1
 OverlappingFieldsCanBeMerged      | `OVERLAPPING_FIELDS_CAN_BE_MERGED` | 5.3.2
