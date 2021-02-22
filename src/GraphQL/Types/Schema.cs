@@ -264,8 +264,11 @@ namespace GraphQL.Types
             {
                 if (_clrToGraphTypeMappings != null)
                 {
-                    foreach (var (clrType, graphType) in _clrToGraphTypeMappings)
-                        yield return (clrType, graphType);
+                    return _clrToGraphTypeMappings;
+                }
+                else
+                {
+                    return Enumerable.Empty<(Type, Type)>();
                 }
             }
         }
