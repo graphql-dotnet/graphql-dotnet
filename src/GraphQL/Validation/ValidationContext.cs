@@ -5,7 +5,6 @@ using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Validation
 {
@@ -190,11 +189,6 @@ namespace GraphQL.Validation
 
             return fragments;
         }
-
-        /// <summary>
-        /// Returns a string representation of the specified node.
-        /// </summary>
-        public string Print(INode node) => AstPrinter.Print(node);
 
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Inputs"/> object.

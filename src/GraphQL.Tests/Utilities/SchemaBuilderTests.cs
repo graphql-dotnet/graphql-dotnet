@@ -2,7 +2,6 @@ using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using Shouldly;
 using Xunit;
 

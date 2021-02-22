@@ -16,6 +16,9 @@ namespace GraphQL.Utilities
         // so we cache one copy of it here - it's not changed ever anyway
         private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
+        /// <summary>
+        /// Returns a string representation of the specified node.
+        /// </summary>
         public static string Print(INode node)
         {
             var result = _visitor.Visit(node);
