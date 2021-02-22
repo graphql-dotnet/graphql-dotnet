@@ -17,6 +17,13 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void List_Name_Should_Be_Null()
+        {
+            new ListGraphType<StringGraphType>().Name.ShouldBeNull();
+            new ListGraphType(new StringGraphType()).Name.ShouldBeNull();
+        }
+
+        [Fact]
         public void List_Should_Work()
         {
             AssertQuerySuccess(

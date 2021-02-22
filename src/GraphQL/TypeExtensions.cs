@@ -265,7 +265,7 @@ namespace GraphQL
         /// <summary>
         /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
         /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
-        /// returns xml documentation on the specified member, if any. Note that behavior of this
+        /// returns XML documentation on the specified member, if any. Note that behavior of this
         /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
         /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
         /// </summary>

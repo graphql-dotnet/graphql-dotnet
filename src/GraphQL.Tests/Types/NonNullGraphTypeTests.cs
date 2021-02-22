@@ -66,6 +66,13 @@ namespace GraphQL.Tests.Types
             var type = new NonNullGraphType<StringGraphType>();
             Should.Throw<ArgumentOutOfRangeException>(() => type.ResolvedType = new IntGraphType()).Message.ShouldStartWith("Type 'StringGraphType' should be assignable from ResolvedType 'IntGraphType'.");
         }
+
+        [Fact]
+        public void NonNull_Name_Should_Be_Null()
+        {
+            new NonNullGraphType<StringGraphType>().Name.ShouldBeNull();
+            new NonNullGraphType(new StringGraphType()).Name.ShouldBeNull();
+        }
     }
 
     public class ExampleContext

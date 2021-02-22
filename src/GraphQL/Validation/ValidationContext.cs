@@ -197,11 +197,6 @@ namespace GraphQL.Validation
         public string Print(INode node) => AstPrinter.Print(node);
 
         /// <summary>
-        /// Returns the name of the specified graph type.
-        /// </summary>
-        public string Print(IGraphType type) => SchemaPrinter.ResolveName(type);
-
-        /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Inputs"/> object.
         /// </summary>
         public Variables GetVariableValues(ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs, IVariableVisitor visitor = null)

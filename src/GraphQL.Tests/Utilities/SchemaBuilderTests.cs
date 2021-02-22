@@ -311,7 +311,7 @@ namespace GraphQL.Tests.Utilities
 
             var posts = query.Fields.First();
             posts.Name.ShouldBe("posts");
-            SchemaPrinter.ResolveName(posts.ResolvedType).ShouldBe("[Post]");
+            posts.ResolvedType.ToString().ShouldBe("[Post]");
             query.Fields.Last().ResolvedType.Name.ShouldBe("Post");
 
             var post = schema.AllTypes["Post"] as IObjectGraphType;
@@ -380,7 +380,7 @@ namespace GraphQL.Tests.Utilities
 
             directive.Arguments.Count.ShouldBe(1);
             var argument = directive.Arguments.Find("if");
-            SchemaPrinter.ResolveName(argument.ResolvedType).ShouldBe("Boolean!");
+            argument.ResolvedType.ToString().ShouldBe("Boolean!");
 
             directive.Locations.ShouldBe(new[]
             {

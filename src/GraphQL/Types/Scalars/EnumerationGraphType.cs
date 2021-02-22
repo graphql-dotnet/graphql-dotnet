@@ -94,7 +94,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Allows you to automatically register the necessary enumeration members for the specified enum.
     /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
-    /// Also it can get descriptions for enum fields from the xml comments.
+    /// Also it can get descriptions for enum fields from the XML comments.
     /// </summary>
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
     public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
