@@ -278,8 +278,7 @@ namespace GraphQL.Types
         {
             get
             {
-                foreach (var pair in SchemaTypes.BuiltInScalarMappings)
-                    yield return (pair.Key, pair.Value);
+                return SchemaTypes.BuiltInScalarMappings;
             }
         }
 
