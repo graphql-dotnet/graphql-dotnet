@@ -72,6 +72,60 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Registers type mapping from CLR type to GraphType.
+        /// <br/>
+        /// These mappings are used for type inference when constructing fields using expressions:
+        /// <br/>
+        /// <c>
+        /// Field(x => x.Filters);
+        /// </c>
+        /// </summary>
+        /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
+        /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
+        public static void RegisterTypeMapping<TClrType, TGraphType>(this ISchema schema)
+            where TGraphType : IGraphType
+        {
+            schema.RegisterTypeMapping(typeof(TClrType), typeof(TGraphType));
+        }
+
+        /// <summary>
+        /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.
+        /// <br/>
+        /// These mappings are used for type inference when constructing fields using expressions:
+        /// <br/>
+        /// <c>
+        /// Field(x => x.Filters);
+        /// </c>
+        /// </summary>
+        /// <param name="schema">The schema for which the mapping is registered.</param>
+        /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
+        /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
+        public static void AutoRegister(this ISchema schema, Type clrType, AutoRegisteringMode mode = AutoRegisteringMode.Both)
+        {
+            if (mode.HasFlag(AutoRegisteringMode.Output))
+                schema.RegisterTypeMapping(clrType, typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(clrType));
+            if (mode.HasFlag(AutoRegisteringMode.Input))
+                schema.RegisterTypeMapping(clrType, typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(clrType));
+        }
+
+        /// <summary>
+        /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.
+        /// <br/>
+        /// These mappings are used for type inference when constructing fields using expressions:
+        /// <br/>
+        /// <c>
+        /// Field(x => x.Filters);
+        /// </c>
+        /// </summary>
+        /// <param name="schema">The schema for which the mapping is registered.</param>
+        /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
+        /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
+        public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
+        {
+            schema.AutoRegister(typeof(TClrType), mode);
+        }
+
+        /// <summary>
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
         /// for more information.
@@ -204,5 +258,27 @@ namespace GraphQL
         /// server using the new fields and types.
         /// </summary>
         IntrospectionAndExecution
+    }
+
+    /// <summary>
+    /// Mode used for <see cref="SchemaExtensions.AutoRegister"/> method.
+    /// </summary>
+    [Flags]
+    public enum AutoRegisteringMode
+    {
+        /// <summary>
+        /// Register only input type mapping.
+        /// </summary>
+        Input = 1,
+
+        /// <summary>
+        /// Register only output type mapping.
+        /// </summary>
+        Output = 2,
+
+        /// <summary>
+        /// Register both input and output type mappings.
+        /// </summary>
+        Both = Input | Output,
     }
 }

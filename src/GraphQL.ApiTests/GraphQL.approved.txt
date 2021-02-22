@@ -10,6 +10,13 @@ namespace GraphQL
         public static System.Collections.Generic.List<string> GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
     }
+    [System.Flags]
+    public enum AutoRegisteringMode
+    {
+        Input = 1,
+        Output = 2,
+        Both = 3,
+    }
     public static class BoolBox
     {
         public static readonly object False;
@@ -149,6 +156,7 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        public static bool UseRuntimeTypeMappings { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
@@ -188,9 +196,11 @@ namespace GraphQL
         public GraphQLMetadataAttribute(string name) { }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
+        public System.Type InputType { get; set; }
         public System.Type IsTypeOf { get; set; }
         public string Name { get; set; }
-        public GraphQL.ResolverType Type { get; set; }
+        public System.Type OutputType { get; set; }
+        public GraphQL.ResolverType ResolverType { get; set; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
@@ -354,11 +364,15 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
+        public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
+        public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
+        public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
+            where TGraphType : GraphQL.Types.IGraphType { }
         public static void RegisterTypes<TSchema>(this TSchema schema, params GraphQL.Types.IGraphType[] types)
             where TSchema : GraphQL.Types.ISchema { }
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
@@ -379,7 +393,7 @@ namespace GraphQL
         public static object DefaultValue(this System.Reflection.MemberInfo memberInfo) { }
         public static string Description(this System.Reflection.MemberInfo memberInfo) { }
         public static System.Type GetEnumerableElementType(this System.Type type) { }
-        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false) { }
+        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsConcrete(this System.Type type) { }
@@ -387,6 +401,12 @@ namespace GraphQL
         public static bool IsNullable(this System.Type type) { }
         public static bool IsPrimitive(this System.Type type) { }
         public static string ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
+    }
+    public enum TypeMappingMode
+    {
+        UseBuiltInScalarMappings = 0,
+        InputType = 1,
+        OutputType = 2,
     }
     public static class ValueConverter
     {
@@ -2049,6 +2069,10 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         GraphQL.Types.SchemaTypes AllTypes { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
         GraphQL.ExperimentalFeatures Features { get; set; }
@@ -2060,12 +2084,17 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
         void RegisterType(System.Type type);
+        void RegisterTypeMapping(System.Type clrType, System.Type graphType);
         void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
@@ -2237,6 +2266,10 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public GraphQL.Types.SchemaTypes AllTypes { get; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
@@ -2249,6 +2282,10 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})]
+        public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void Dispose() { }
@@ -2257,6 +2294,7 @@ namespace GraphQL.Types
         public void Initialize() { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType(System.Type type) { }
+        public void RegisterTypeMapping(System.Type clrType, System.Type graphType) { }
         public void RegisterTypes(params System.Type[] types) { }
         public void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
@@ -2282,7 +2320,9 @@ namespace GraphQL.Types
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Types.ISchema schema) { }
+        public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "clrType",
+                "graphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Types.ISchema schema) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2494,15 +2534,6 @@ namespace GraphQL.Utilities
         public GraphQL.Reflection.IAccessor ResolverAccessor { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
         public GraphQL.Reflection.IAccessor SubscriberAccessor { get; set; }
-    }
-    public static class GraphTypeTypeRegistry
-    {
-        public static bool Contains(System.Type clrType) { }
-        public static System.Type Get(System.Type clrType) { }
-        public static System.Type Get<TClrType>() { }
-        public static void Register(System.Type clrType, System.Type graphType) { }
-        public static void Register<T, TGraph>()
-            where TGraph : GraphQL.Types.GraphType { }
     }
     public interface ISchemaNodeVisitor
     {

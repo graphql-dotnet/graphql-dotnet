@@ -292,6 +292,185 @@ lock (field)
 }
 ```
 
+### Ability to map CLR types to GraphTypes
+
+Strictly speaking, this feature was available before via `GraphTypeTypeRegistry`, but it had a significant
+drawbacks, since the mapping was static and did not allow registering the same CLR type both as input and output.
+In v4 `GraphTypeTypeRegistry` was completely removed and the `ISchema.RegisterTypeMapping(Type, Type)`
+method was added instead (also there are several extension methods).
+
+Consider the following example:
+
+```csharp
+public class Money
+{
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+}
+
+public class Account
+{
+    public Money Saldo { get; set; }
+}
+
+public class MoneyType : ObjectGraphType<Money>
+{
+    public MoneyType()
+    {
+        Field(x => x.Amount);
+        Field(x => x.Currency);
+    }
+}
+
+public class AccountType : ObjectGraphType<Account>
+{
+    public MoneyType()
+    {
+        Field(x => x.Saldo);
+    }
+}
+```
+
+On the `Field(x => x.Saldo)` line when parsing an expression GraphQL.NET should somehow infer
+that the `Money` CLR type corresponds to the `MoneyType` GraphType. In fact, this cannot be done
+without specifying additional information from the caller. GraphQL.NET can only infer some primitive
+CLR types (`int`, `string`, `DateTime`, `Guid`, etc.) that match built-in scalars.
+
+Type registration is used for the hint:
+
+```csharp
+GraphTypeTypeRegistry.Register<Money, MoneyType>(); // static method before v4
+schema.RegisterTypeMapping<Money, MoneyType>();     // instance method on `ISchema` after v4
+```
+
+Note that since v4 it's possible to register both input and output GraphType for the same CLR type.
+In this case, GraphQL.NET will choose the desired GraphType depending on the context.
+
+```csharp
+public class Money
+{
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+}
+
+public class MoneyType : ObjectGraphType<Money>
+{
+    public MoneyType()
+    {
+        Field(x => x.Amount);
+        Field(x => x.Currency);
+    }
+}
+
+public class MoneyInputType : InputObjectGraphType<Money>
+{
+    public MoneyInputType()
+    {
+        Field(x => x.Amount).Description("Total amount").DefaultValue(100m);
+        Field(x => x.Currency).DefaultValue("USD");
+    }
+}
+
+schema.RegisterTypeMapping<Money, MoneyType>();
+schema.RegisterTypeMapping<Money, MoneyInputType>();
+```
+
+An alternative way to define the mapping is to use the new properties in the `GraphQLMetadata` attribute.
+Consider the following example:
+
+```csharp
+[GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
+public class Filter
+{
+    public string Key { get; set; }
+    public int Value { get; set; }
+}
+
+public class ContainerRequest
+{
+    public IList<Filter> Filters { get; set; }
+    public int ClientId { get; set; }
+    public int AppId { get; set; }
+}
+
+public class FilterInputGraphType : InputObjectGraphType<Filter>
+{
+    public FilterInputGraphType()
+    {
+        Name = "FilterInput";
+        Field(x => x.Key);
+        Field(x => x.Value);
+    }
+}
+
+public class MyInputType : InputObjectGraphType<ContainerRequest>
+{
+    public MyInputType()
+    {
+        Name = "Input";
+        Field(x => x.Filters); // when building this field, its type is implicitly inferred to list of FilterInputGraphType
+        Field(x => x.ClientId);
+        Field(x => x.AppId, nullable: true);
+    }
+}
+```
+
+In this case, a call to the registration method is not required, since the schema
+will use information from the provided attribute.
+
+Keep in mind that you can register type mappings even for built-in/primitive types if you want to change their behavior:
+
+```csharp
+schema.RegisterTypeMapping<int, MyIntGraphType>();
+schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
+```
+
+### Classes for automatic GraphType registration by default use all properties of the CLR type
+
+In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
+classes by default use all properties from the provided `TSourceType` to generate GraphType's fields (previously they
+may skip unmatched properties). If no matching is found for some of the properties, then an exception will be thrown
+during schema initialization.
+
+You have multiple options to fix this.
+
+1. Add all necessary type mappings with `ISchema.RegisterTypeMapping` method.
+2. Or pass the unwanted properties into the `excludedProperties` parameter of the constructor if you create a type via `new` operator.
+
+```csharp
+myField.ResolvedType = new AutoRegisteringObjectGraphType<SomeClassWithManyProperties>(x => x.Address, x => x.SecretCode);
+```
+
+3. Alternatively, you can inherit from these classes and override the `GetRegisteredProperties` method.
+
+```csharp
+public class MyAutoType : AutoRegisteringObjectGraphType<SomeClassWithManyProperties>
+{
+    protected override IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(SomeClassWithManyProperties)
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => Attribute.IsDefined(p, typeof(ForExportAttribute)));
+}
+```
+
+4. Or even compose 2 and 3 approaches.
+
+```csharp
+public class MyAutoType : AutoRegisteringObjectGraphType<SomeClassWithManyProperties>
+{
+    public MyAutoType() : base(x => x.Address, x => x.SecretCode) { }
+}
+```
+
+### `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType`
+
+These properties have been removed. Use `IResolveFieldContext.FieldAst.Name` and
+`IResolveFieldContext.FieldDefinition.ResolvedType` instead.
+
+### `GraphQLMetadataAttribute.Type` -> `GraphQLMetadataAttribute.ResolverType`
+
+This property was renamed. If you have explicitly set this property in an attribute or used it
+directly anywhere, then just change its name. If you did not explicitly set this property, the
+default continues to be `ResolverType.Resolver`.
+
 ### API Cleanup
 
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
@@ -354,4 +533,3 @@ lock (field)
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
-* `IResolveFieldContext.FieldName` and `IResolveFieldContext.ReturnType` properties have been removed, use `IResolveFieldContext.FieldAst.Name` and `IResolveFieldContext.FieldDefinition.ResolvedType` instead

@@ -1,12 +1,11 @@
 using System;
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// The Seconds scalar graph type represents a period of time represented as an integer value of the total number of seconds.
-    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="TimeSpan"/> .NET values to this scalar graph type.
+    /// By default <see cref="SchemaTypes"/> maps all <see cref="TimeSpan"/> .NET values to this scalar graph type.
     /// </summary>
     public class TimeSpanSecondsGraphType : ScalarGraphType
     {

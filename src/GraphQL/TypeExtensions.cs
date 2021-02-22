@@ -93,9 +93,10 @@ namespace GraphQL
         /// </summary>
         /// <param name="type">The type for which a graph type is desired.</param>
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
+        /// <param name="mode">Mode to use when mapping CLR type to GraphType.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
-        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
+        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
@@ -108,27 +109,48 @@ namespace GraphQL
                 if (isNullable == false)
                 {
                     throw new ArgumentOutOfRangeException(nameof(isNullable),
-                        $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type. \n");
+                        $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
                 }
             }
 
-            Type graphType;
+            Type graphType = null;
 
             if (type.IsArray)
             {
                 var clrElementType = type.GetElementType();
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else if (IsAnIEnumerable(type))
             {
                 var clrElementType = GetEnumerableElementType(type);
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else
             {
-                graphType = GraphTypeTypeRegistry.Get(type);
+                var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+                if (attr != null)
+                {
+                    if (mode == TypeMappingMode.InputType)
+                        graphType = attr.InputType;
+                    else if (mode == TypeMappingMode.OutputType)
+                        graphType = attr.OutputType;
+                    else if (attr.InputType == attr.OutputType) // scalar
+                        graphType = attr.InputType;
+                }
+
+                if (graphType == null)
+                {
+                    if (mode == TypeMappingMode.UseBuiltInScalarMappings || !GlobalSwitches.UseRuntimeTypeMappings)
+                    {
+                        SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType);
+                    }
+                    else if (!type.IsEnum)
+                    {
+                        graphType = (mode == TypeMappingMode.OutputType ? typeof(GraphQLClrOutputTypeReference<>) : typeof(GraphQLClrInputTypeReference<>)).MakeGenericType(type);
+                    }
+                }
             }
 
             if (graphType == null)
@@ -139,7 +161,7 @@ namespace GraphQL
                 }
                 else
                 {
-                    throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                    throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
                 }
             }
 
@@ -289,5 +311,26 @@ namespace GraphQL
                 ? (memberInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
                 : null;
         }
+    }
+
+    /// <summary>
+    /// Mode used when mapping CLR type to GraphType in <see cref="TypeExtensions.GetGraphTypeFromType"/>.
+    /// </summary>
+    public enum TypeMappingMode
+    {
+        /// <summary>
+        /// This mode is left for backward compatibility in cases where you call <see cref="TypeExtensions.GetGraphTypeFromType"/> directly.
+        /// </summary>
+        UseBuiltInScalarMappings,
+
+        /// <summary>
+        /// Map CLR type as input type.
+        /// </summary>
+        InputType,
+
+        /// <summary>
+        /// Map CLR type as output type.
+        /// </summary>
+        OutputType,
     }
 }

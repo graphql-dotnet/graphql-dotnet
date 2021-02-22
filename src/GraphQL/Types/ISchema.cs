@@ -111,6 +111,29 @@ namespace GraphQL.Types
         void RegisterType(Type type);
 
         /// <summary>
+        /// Registers type mapping from CLR type to GraphType.
+        /// <br/>
+        /// These mappings are used for type inference when constructing fields using expressions:
+        /// <br/>
+        /// <c>
+        /// Field(x => x.Filters);
+        /// </c>
+        /// </summary>
+        /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
+        /// <param name="graphType">Inferred GraphType.</param>
+        void RegisterTypeMapping(Type clrType, Type graphType);
+
+        /// <summary>
+        /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.
+        /// </summary>
+        IEnumerable<(Type clrType, Type graphType)> TypeMappings { get; }
+
+        /// <summary>
+        /// Returns all built-in type mappings for scalars.
+        /// </summary>
+        IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings { get; }
+
+        /// <summary>
         /// Register a custom value converter to the schema.
         /// </summary>
         void RegisterValueConverter(IAstFromValueConverter converter);

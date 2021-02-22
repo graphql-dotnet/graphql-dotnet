@@ -212,6 +212,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (!isExtensionType)
             {
                 type.Description = typeConfig.Description ?? astType.Comment?.Text.ToString();
+                type.DeprecationReason = typeConfig.DeprecationReason;
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
@@ -261,6 +262,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
+                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver
             };
@@ -268,7 +270,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             fieldConfig.CopyMetadataTo(field);
 
             field.Arguments = ToQueryArguments(fieldDef.Arguments);
-            field.DeprecationReason = fieldConfig.DeprecationReason;
 
             field.SetAstType(fieldDef);
 
@@ -285,11 +286,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
+                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
                 AsyncSubscriber = fieldConfig.AsyncSubscriber,
-                DeprecationReason = fieldConfig.DeprecationReason
             };
 
             fieldConfig.CopyMetadataTo(field);
@@ -311,6 +312,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
+                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
             }.SetAstType(inputDef);
@@ -327,7 +329,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text.ToString(),
-                ResolveType = typeConfig.ResolveType
+                DeprecationReason = typeConfig.DeprecationReason,
+                ResolveType = typeConfig.ResolveType,
             }.SetAstType(interfaceDef);
 
             typeConfig.CopyMetadataTo(type);
@@ -350,7 +353,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? unionDef.Comment?.Text.ToString(),
-                ResolveType = typeConfig.ResolveType
+                DeprecationReason = typeConfig.DeprecationReason,
+                ResolveType = typeConfig.ResolveType,
             }.SetAstType(unionDef);
 
             typeConfig.CopyMetadataTo(type);
@@ -375,7 +379,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InputObjectGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? inputDef.Comment?.Text.ToString()
+                Description = typeConfig.Description ?? inputDef.Comment?.Text.ToString(),
+                DeprecationReason = typeConfig.DeprecationReason,
             }.SetAstType(inputDef);
 
             typeConfig.CopyMetadataTo(type);
@@ -397,7 +402,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new EnumerationGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? enumDef.Comment?.Text.ToString()
+                Description = typeConfig.Description ?? enumDef.Comment?.Text.ToString(),
+                DeprecationReason = typeConfig.DeprecationReason,
             }.SetAstType(enumDef);
 
             if (enumDef.Values?.Count > 0) // just in case

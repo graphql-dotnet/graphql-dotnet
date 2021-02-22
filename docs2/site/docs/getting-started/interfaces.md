@@ -1,6 +1,7 @@
 # Interfaces
 
-A GraphQL Interface is an abstract type that includes a certain set of fields that a type must include to implement the interface.
+A GraphQL Interface is an abstract type that includes a certain set of fields that a type
+must include to implement the interface.
 
 Here is an interface that represents a `Character` in the StarWars universe.
 
@@ -59,7 +60,14 @@ public class DroidType : ObjectGraphType<Droid>
 ```
 
 ## RegisterType
-When the Schema is built, it looks at the "root" types (Query, Mutation, Subscription) and gathers all of the GraphTypes they expose. Often when you are working with an interface type the concrete types are not exposed on the root types (or any of their children). Since those concrete types are never exposed in the type graph the Schema doesn't know they exist. This is what the `RegisterType<>` method on the Schema is for.  By using `RegisterType<>`, it tells the Schema about the specific type and it will properly add it to the `PossibleTypes` collection on the interface type when the Schema is initialized.
+
+When the Schema is built, it looks at the "root" types (Query, Mutation, Subscription) and
+gathers all of the GraphTypes they expose. Often when you are working with an interface type
+the concrete types are not exposed on the root types (or any of their children). Since those
+concrete types are never exposed in the type graph the Schema doesn't know they exist. This
+is what the `RegisterType<>` method on the Schema is for.  By using `RegisterType<>`, it
+tells the Schema about the specific type and it will properly add it to the `PossibleTypes`
+collection on the interface type when the Schema is initialized.
 
 ```csharp
 public class StarWarsSchema : Schema
@@ -74,7 +82,11 @@ public class StarWarsSchema : Schema
 
 ## IsTypeOf
 
-`IsTypeOf` is a function which helps resolve the implementing GraphQL type during execution.  For example, when you have a field that returns a GraphQL Interface the engine needs to know which concrete Graph Type to use.  So if you have a `Character` interface that is implemented by both `Human` and `Droid` types, the engine needs to know which graph type to choose.  The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
+`IsTypeOf` is a function which helps resolve the implementing GraphQL type during execution.
+For example, when you have a field that returns a GraphQL Interface the engine needs to know
+which concrete Graph Type to use.  So if you have a `Character` interface that is implemented
+by both `Human` and `Droid` types, the engine needs to know which graph type to choose.
+The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
 
 ```csharp
 public class DroidType : ObjectGraphType
@@ -94,11 +106,14 @@ public class DroidType : ObjectGraphType
 
 > `ObjectGraphType<T>` provides a default implementation of `IsTypeOf` for you.
 
-An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface or Union.  See the `ResolveType` section for more details.
+An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface
+or Union. See the `ResolveType` section for more details.
 
 ## ResolveType
 
-An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhaustive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
+An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.
+The major difference is `ResolveType` is required to be exhaustive.  If you add another type
+that implements an Interface you are required to alter the Interface for that new type to be resolved.
 
 > If a type implements `ResolveType` then any `IsTypeOf` implementation is ignored.
 

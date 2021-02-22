@@ -1,11 +1,10 @@
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// The SByte scalar graph type represents a signed 8-bit integer value.
-    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="sbyte"/> .NET values to this scalar graph type.
+    /// By default <see cref="SchemaTypes"/> maps all <see cref="sbyte"/> .NET values to this scalar graph type.
     /// </summary>
     public class SByteGraphType : ScalarGraphType
     {

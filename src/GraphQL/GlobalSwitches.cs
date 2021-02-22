@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using GraphQL.Conversion;
+using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -54,5 +55,27 @@ namespace GraphQL
         /// member will be unusable.
         /// </summary>
         public static Action<string, NamedElement> ValidationOnSchemaInitialize = NameValidator.ValidateDefault;
+
+        /// <summary>
+        /// This setting by default improves performance if your schema uses only scalar types or types marked with
+        /// <see cref="GraphQLMetadataAttribute"/> attribute with configured <see cref="GraphQLMetadataAttribute.InputType"/>
+        /// or <see cref="GraphQLMetadataAttribute.OutputType"/> properties when constructing fields using expressions:
+        /// <br/>
+        /// <c>
+        /// Field(x => x.Filter);
+        /// </c>
+        /// <br/>
+        /// If you are using a scoped schema with many field expressions, then this setting will help speed up the
+        /// initialization of your schema.
+        /// <br/>
+        /// If you are registering your own mappings via <see cref="ISchema.RegisterTypeMapping(Type, Type)"/>,
+        /// then be sure to set to <see langword="true"/>. Otherwise, you will most likely see an error message when
+        /// you try to add a field:
+        /// <br/>
+        /// <c>
+        /// The GraphQL type for field 'ParentObject.Filter' could not be derived implicitly from expression 'Field(x => x.Filter)'.
+        /// </c>
+        /// </summary>
+        public static bool UseRuntimeTypeMappings { get; set; } = false;
     }
 }

@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Types
 
     public class ComplexGraphTypeTests
     {
-        internal class ComplexType<T> : ComplexGraphType<T>
+        internal class ComplexType<T> : ObjectGraphType<T>
         {
             public ComplexType()
             {
@@ -62,6 +62,7 @@ namespace GraphQL.Tests.Types
             public Money someMoney { get; set; }
         }
 
+        [GraphQLMetadata(InputType = typeof(AutoRegisteringInputObjectGraphType<Money>), OutputType = typeof(AutoRegisteringObjectGraphType<Money>))]
         internal class Money
         {
             public decimal Amount { get; set; }
@@ -82,9 +83,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void auto_register_object_graph_type()
         {
-            GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
-
+            var schema = new Schema();
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            schema.Query = type;
+            schema.Initialize();
+
             type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
@@ -116,9 +119,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void auto_register_input_object_graph_type()
         {
-            GraphTypeTypeRegistry.Register<Money, AutoRegisteringInputObjectGraphType<Money>>();
-
+            var schema = new Schema();
             var type = new AutoRegisteringInputObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            var query = new ObjectGraphType();
+            query.Field<StringGraphType>("test", arguments: new QueryArguments(new QueryArgument(type) { Name = "input" }));
+            schema.Query = query;
+            schema.Initialize();
+
             type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
@@ -150,10 +157,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void accepts_property_expressions()
         {
+            var schema = new Schema();
             var type = new ComplexType<Droid>();
             var field = type.Field(d => d.Name);
+            schema.Query = type;
+            schema.Initialize();
 
-            type.Fields.Last().Name.ShouldBe("Name");
+            type.Fields.Last().Name.ShouldBe("name");
             type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
         }
 
@@ -170,9 +180,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void allows_nullable_types()
         {
+            var schema = new Schema();
             var type = new ComplexType<Droid>();
-
             type.Field("appearsIn", d => d.AppearsIn.First(), nullable: true);
+            schema.Query = type;
+            schema.Initialize();
 
             type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
         }
@@ -180,9 +192,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void infers_from_nullable_types()
         {
+            var schema = new Schema();
             var type = new ComplexType<TestObject>();
-
             type.Field(d => d.someInt, nullable: true);
+            schema.Query = type;
+            schema.Initialize();
 
             type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
         }
@@ -190,9 +204,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void infers_from_list_types()
         {
+            var schema = new Schema();
             var type = new ComplexType<TestObject>();
-
             type.Field(d => d.someList, nullable: true);
+            schema.Query = type;
+            schema.Initialize();
 
             type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
         }
@@ -229,11 +245,9 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<Droid>();
 
-            var exp = Should.Throw<ArgumentException>(() =>
-                type.Field(d => d.AppearsIn.First())
-            );
-            exp.Message.ShouldBe(
-                "Cannot infer a Field name from the expression: 'd.AppearsIn.First()' on parent GraphQL type: 'Droid'.");
+            var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.AppearsIn.First()));
+
+            exp.Message.ShouldBe("Cannot infer a Field name from the expression: 'd.AppearsIn.First()' on parent GraphQL type: 'Droid'.");
         }
 
         [Fact]
@@ -241,11 +255,9 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<TestObject>();
 
-            var exp = Should.Throw<ArgumentException>(() =>
-                type.Field(d => d.valuePair)
-            );
-            exp.Message.ShouldStartWith(
-                "The GraphQL type for Field: 'valuePair' on parent type: 'TestObject' could not be derived implicitly.");
+            var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.valuePair));
+
+            exp.Message.ShouldStartWith("The GraphQL type for field 'TestObject.valuePair' could not be derived implicitly from expression 'd => d.valuePair'.");
         }
 
         [Fact]
@@ -253,21 +265,16 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<TestObject>();
 
-            var exp = Should.Throw<ArgumentException>(() =>
-                type.Field(d => d.someInt)
-            );
+            var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.someInt));
 
-            exp.InnerException.Message.ShouldStartWith(
-                "Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
+            exp.InnerException.Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
         }
 
         [Fact]
         public void create_field_with_func_resolver()
         {
             var type = new ComplexType<Droid>();
-            var field = type.Field<StringGraphType>("name",
-                resolve: context => context.Source.Name
-            );
+            var field = type.Field<StringGraphType>("name", resolve: context => context.Source.Name);
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
         }
