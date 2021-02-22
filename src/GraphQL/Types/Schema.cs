@@ -22,7 +22,7 @@ namespace GraphQL.Types
         private List<Type> _visitorTypes;
         private List<ISchemaNodeVisitor> _visitors;
 
-        private readonly List<IAstFromValueConverter> _converters;
+        private List<IAstFromValueConverter> _converters;
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
@@ -40,8 +40,6 @@ namespace GraphQL.Types
         public Schema(IServiceProvider services)
         {
             _services = services;
-
-            _converters = new List<IAstFromValueConverter>();
 
             Directives = new SchemaDirectives();
             Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
@@ -275,13 +273,25 @@ namespace GraphQL.Types
         {
             CheckDisposed();
 
-            _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
+            (_converters ??= new List<IAstFromValueConverter>()).Add(converter ?? throw new ArgumentNullException(nameof(converter)));
         }
+
+        /// <inheritdoc/>
+        public IEnumerable<IAstFromValueConverter> ValueConverters => _converters ?? Enumerable.Empty<IAstFromValueConverter>();
 
         /// <inheritdoc/>
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
-            return _converters.FirstOrDefault(x => x.Matches(value, type));
+            if (_converters != null)
+            {
+                foreach (var converter in _converters)
+                {
+                    if (converter.Matches(value, type))
+                        return converter;
+                }
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
@@ -306,7 +316,7 @@ namespace GraphQL.Types
                     _additionalInstances?.Clear();
                     _additionalTypes?.Clear();
                     Directives.List.Clear();
-                    _converters.Clear();
+                    _converters?.Clear();
                     _visitors?.Clear();
                     _visitorTypes?.Clear();
 

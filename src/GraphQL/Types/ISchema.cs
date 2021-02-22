@@ -139,6 +139,11 @@ namespace GraphQL.Types
         void RegisterValueConverter(IAstFromValueConverter converter);
 
         /// <summary>
+        /// Returns all registered by <see cref="RegisterValueConverter"/> converters.
+        /// </summary>
+        IEnumerable<IAstFromValueConverter> ValueConverters { get; }
+
+        /// <summary>
         /// Search the schema for a <see cref="IAstFromValueConverter"/> that matches the provided object and graph type, and return the converter.
         /// </summary>
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
