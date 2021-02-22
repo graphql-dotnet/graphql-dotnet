@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Types
             [DefaultValue(typeof(DateTime), "2019/03/14")]
             public DateTime someDate { get; set; }
             /// <summary>
-            /// Description from xml comment
+            /// Description from XML comment
             /// </summary>
             public short someShort { get; set; }
             public ushort someUShort { get; set; }
@@ -100,7 +100,7 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
             // disabled to make tests stable without touch GlobalSwitches
-            //type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from xml comment");
+            //type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from XML comment");
             type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
@@ -138,7 +138,7 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
             // disabled to make tests stable without touch GlobalSwitches
-            //type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from xml comment");
+            //type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from XML comment");
             type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));

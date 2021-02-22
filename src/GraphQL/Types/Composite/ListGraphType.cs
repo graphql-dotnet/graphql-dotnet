@@ -35,11 +35,14 @@ namespace GraphQL.Types
                     throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
 
                 _resolvedType = value;
+                _cachedString = null;
             }
         }
 
+        private string _cachedString; // note, than Name always null for type wrappers
+
         /// <inheritdoc/>
-        public override string ToString() => $"[{ResolvedType}]";
+        public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
     }
 
     /// <inheritdoc cref="ListGraphType"/>

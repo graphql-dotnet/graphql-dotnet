@@ -24,20 +24,12 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
         {
-            var type = GetNamedGraphTypeFromType(varDef.Type, context.Schema);
+            var type = varDef.Type.NamedGraphTypeFromType(context.Schema);
 
             if (!type.IsInputType())
             {
                 context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
             }
         }).ToTask();
-
-        private static IGraphType GetNamedGraphTypeFromType(IType type, ISchema schema) => type switch
-        {
-            NonNullType nonnull => GetNamedGraphTypeFromType(nonnull.Type, schema),
-            ListType list => GetNamedGraphTypeFromType(list.Type, schema),
-            NamedType named => schema.AllTypes[named.Name],
-            _ => null
-        };
     }
 }

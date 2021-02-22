@@ -20,7 +20,7 @@ namespace GraphQL.Validation.Errors
                 UnknownArgMessage(
                     node.Name,
                     fieldDef.Name,
-                    context.Print(parentType),
+                    parentType.ToString(),
                     StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))),
                 node)
         {

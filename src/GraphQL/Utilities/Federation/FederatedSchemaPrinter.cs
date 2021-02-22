@@ -83,7 +83,7 @@ namespace GraphQL.Utilities.Federation
                 new
                 {
                     x.Name,
-                    Type = ResolveName(x.ResolvedType),
+                    Type = x.ResolvedType,
                     Args = PrintArgs(x),
                     Description = FormatDescription(x.Description, "  "),
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,

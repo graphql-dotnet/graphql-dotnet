@@ -70,6 +70,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public string Name { get; set; }
 
+        /// <inheritdoc />
+        public override string ToString() => Name;
+
         /// <summary>
         /// Gets or sets the description of the directive.
         /// </summary>

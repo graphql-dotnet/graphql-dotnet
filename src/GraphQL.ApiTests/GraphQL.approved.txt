@@ -1880,6 +1880,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.List<GraphQL.Types.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
         public bool Repeatable { get; set; }
+        public override string ToString() { }
         public virtual void Validate(GraphQL.Types.AppliedDirective applied) { }
     }
     public enum DirectiveLocation
@@ -2359,6 +2360,7 @@ namespace GraphQL.Types
         public static string FullName(this GraphQL.Language.AST.IType type) { }
         public static GraphQL.Types.IGraphType GraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
         public static string Name(this GraphQL.Language.AST.IType type) { }
+        public static GraphQL.Types.IGraphType NamedGraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
     }
     public class TypeFields : System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType>, System.Collections.IEnumerable
     {
@@ -2649,7 +2651,6 @@ namespace GraphQL.Utilities
         protected static bool IsBuiltInDirective(string directiveName) { }
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
-        public static string ResolveName(GraphQL.Types.IGraphType type) { }
     }
     public class SchemaPrinterOptions
     {
@@ -2884,8 +2885,6 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
         public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions variableDefinitions, GraphQL.Inputs inputs, GraphQL.Validation.IVariableVisitor visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQL.Language.AST.IHaveSelectionSet node) { }
-        public string Print(GraphQL.Language.AST.INode node) { }
-        public string Print(GraphQL.Types.IGraphType type) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
     [System.Serializable]

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation
 {
@@ -16,7 +15,7 @@ namespace GraphQL.Instrumentation
             {
                 { "typeName", context.ParentType.Name },
                 { "fieldName", context.FieldAst.Name },
-                { "returnTypeName", SchemaPrinter.ResolveName(context.FieldDefinition.ResolvedType) },
+                { "returnTypeName", context.FieldDefinition.ResolvedType.ToString() },
                 { "path", context.Path },
             };
 

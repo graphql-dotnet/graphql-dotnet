@@ -118,17 +118,17 @@ namespace GraphQL.Utilities
 
             if (schema.Query != null)
             {
-                operationTypes.Add($"  query: {ResolveName(schema.Query)}");
+                operationTypes.Add($"  query: {schema.Query}");
             }
 
             if (schema.Mutation != null)
             {
-                operationTypes.Add($"  mutation: {ResolveName(schema.Mutation)}");
+                operationTypes.Add($"  mutation: {schema.Mutation}");
             }
 
             if (schema.Subscription != null)
             {
-                operationTypes.Add($"  subscription: {ResolveName(schema.Subscription)}");
+                operationTypes.Add($"  subscription: {schema.Subscription}");
             }
 
             return $"schema {{{Environment.NewLine}{string.Join(Environment.NewLine, operationTypes)}{Environment.NewLine}}}";
@@ -225,7 +225,7 @@ namespace GraphQL.Utilities
                 new
                 {
                     x.Name,
-                    Type = ResolveName(x.ResolvedType),
+                    Type = x.ResolvedType,
                     Args = PrintArgs(x),
                     Description = FormatDescription(x.Description, "  "),
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "",
@@ -248,7 +248,7 @@ namespace GraphQL.Utilities
         public string PrintInputValue(FieldType field)
         {
             var argumentType = field.ResolvedType;
-            var description = $"{FormatDescription(field.Description, "  ")}  {field.Name}: {ResolveName(argumentType)}";
+            var description = $"{FormatDescription(field.Description, "  ")}  {field.Name}: {argumentType}";
 
             if (field.DefaultValue != null)
             {
@@ -261,7 +261,7 @@ namespace GraphQL.Utilities
         public string PrintInputValue(QueryArgument argument)
         {
             var argumentType = argument.ResolvedType;
-            var desc = "{0}: {1}".ToFormat(argument.Name, ResolveName(argumentType));
+            var desc = "{0}: {1}".ToFormat(argument.Name, argumentType);
 
             if (argument.DefaultValue != null)
             {
@@ -345,16 +345,6 @@ namespace GraphQL.Utilities
             sb.Length -= 2;
             sb.Append(" }");
             return sb.ToString();
-        }
-
-        public static string ResolveName(IGraphType type)
-        {
-            return type switch
-            {
-                NonNullGraphType nonNull => $"{ResolveName(nonNull.ResolvedType)}!",
-                ListGraphType list => $"[{ResolveName(list.ResolvedType)}]",
-                _ => type?.Name
-            };
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)

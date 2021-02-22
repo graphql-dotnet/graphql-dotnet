@@ -6,8 +6,9 @@ namespace GraphQL.Types
     public interface INamedType
     {
         /// <summary>
-        /// Gets or sets a type name within the GraphQL schema.
-        /// Type names are case sensitive and consist of alphanumeric characters and underscores only. Type names cannot start with a digit.
+        /// Gets or sets a type name within the GraphQL schema. Type names are case sensitive and
+        /// consist of alphanumeric characters and underscores only. Type names cannot start with
+        /// a digit. For List and NonNull type modifiers returns <see langword="null"/>.
         /// </summary>
         string Name { get; set; }
     }
@@ -24,8 +25,9 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// A schema element that can be deprecated. Now implemented by <see cref="IFieldType"/> and <see cref="EnumValueDefinition"/>
-    /// but in case of fields only applicable to fields of output graph types.
+    /// A schema element that can be deprecated. Now implemented by <see cref="IFieldType"/> and
+    /// <see cref="EnumValueDefinition"/> but in case of fields only applicable to fields of output
+    /// graph types.
     /// </summary>
     public interface IProvideDeprecationReason
     {

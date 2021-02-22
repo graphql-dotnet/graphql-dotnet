@@ -512,6 +512,7 @@ default continues to be `ResolverType.Resolver`.
 * `SchemaBuilder.Directives` and `SchemaBuilder.RegisterDirectiveVisitor` have been removed, use `ISchema.RegisterVisitor` on the builded schema instead.
 * `SchemaPrinter.IsBuiltInScalar`, `SchemaPrinter.IsSpecDirective`, `SchemaPrinter.IsIntrospectionType`, `SchemaPrinter.IsDefinedType` methods have been removed from public API
 * `SchemaPrinterOptions.CustomScalars` property has been removed
+* `ValidationContext.Print(INode node)` and `ValidationContext.Print(IGraphType type)` methods have been removed
 
 ### Other Breaking Changes (including but not limited to)
 
