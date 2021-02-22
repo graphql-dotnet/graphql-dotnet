@@ -127,7 +127,7 @@ namespace GraphQL.Tests.Utilities
                 }
 
                 type MySubscription @requireAuth {
-                    subscribe: String @traits(volatile: true, documented: false, enumerated: DESC) @some
+                    subscribe: String @traits(volatile: true, documented: false, enumerated: DESC) @some @some
                 }
 
                 schema @public {
@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Utilities
             schema.Directives.Register(new DirectiveGraphType("public", DirectiveLocation.Schema));
             schema.Directives.Register(new DirectiveGraphType("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
             schema.Directives.Register(new DirectiveGraphType("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
-            schema.Directives.Register(new DirectiveGraphType("some", DirectiveLocation.FieldDefinition));
+            schema.Directives.Register(new DirectiveGraphType("some", DirectiveLocation.FieldDefinition) { Repeatable = true });
             schema.Initialized.ShouldBe(false);
             schema.Initialize();
 
@@ -177,7 +177,7 @@ namespace GraphQL.Tests.Utilities
 
             var field = subscription.Fields.Find("subscribe");
             field.ShouldNotBeNull();
-            field.GetAppliedDirectives().Count.ShouldBe(2);
+            field.GetAppliedDirectives().Count.ShouldBe(3);
             field.GetAppliedDirectives().Find("traits").ShouldNotBeNull();
             field.GetAppliedDirectives().Find("traits").Arguments.Count.ShouldBe(3);
             field.GetAppliedDirectives().Find("traits").Arguments[0].Name.ShouldBe("volatile");

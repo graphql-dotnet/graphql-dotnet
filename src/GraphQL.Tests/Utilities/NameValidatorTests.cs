@@ -12,8 +12,19 @@ namespace GraphQL.Tests.Utilities
            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(null, NamedElement.Field));
 
         [Fact]
-        public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange() =>
-            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(string.Empty, NamedElement.Field));
+        public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange()
+        {
+            // race condition with does_not_throw_with_filtering_nameconverter test
+            try
+            {
+                Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(string.Empty, NamedElement.Field));
+            }
+            catch (ShouldAssertException)
+            {
+                System.Threading.Thread.Sleep(100); // wait a bit and retry
+                Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(string.Empty, NamedElement.Field));
+            }
+        }
 
         [Fact]
         public void ValidateName_whenNameIsWhitespace_throwsArgumentOutOfRange() =>

@@ -93,6 +93,36 @@ directive @skip(
         }
 
         [Fact]
+        public void prints_directive_without_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query);
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe("directive @my on FIELD | QUERY");
+        }
+
+        [Fact]
+        public void prints_repeatable_directive_without_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe("directive @my repeatable on FIELD | QUERY");
+        }
+
+        [Fact]
+        public void prints_repeatable_directive_with_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query)
+            {
+                Repeatable = true,
+                Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
+            };
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe(@"directive @my(
+  max: Int
+) repeatable on FIELD | QUERY");
+        }
+
+        [Fact]
         public void prints_string_field()
         {
             var result = printSingleFieldSchema<StringGraphType>();

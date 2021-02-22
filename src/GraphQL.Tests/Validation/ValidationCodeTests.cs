@@ -18,6 +18,7 @@ namespace GraphQL.Tests.Validation
         [InlineData(typeof(FragmentsOnCompositeTypesError), "FRAGMENTS_ON_COMPOSITE_TYPES")]
         [InlineData(typeof(KnownArgumentNamesError), "KNOWN_ARGUMENT_NAMES")]
         [InlineData(typeof(KnownDirectivesError), "KNOWN_DIRECTIVES")]
+        [InlineData(typeof(DirectivesInAllowedLocationsError), "DIRECTIVES_IN_ALLOWED_LOCATIONS")]
         [InlineData(typeof(KnownFragmentNamesError), "KNOWN_FRAGMENT_NAMES")]
         [InlineData(typeof(KnownTypeNamesError), "KNOWN_TYPE_NAMES")]
         [InlineData(typeof(LoneAnonymousOperationError), "LONE_ANONYMOUS_OPERATION")]

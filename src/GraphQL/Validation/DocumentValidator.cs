@@ -49,7 +49,7 @@ namespace GraphQL.Validation
             NoUndefinedVariables.Instance,
             NoUnusedVariables.Instance,
             UniqueVariableNames.Instance,
-            KnownDirectives.Instance,
+            KnownDirectivesInAllowedLocations.Instance,
             UniqueDirectivesPerLocation.Instance,
             KnownArgumentNames.Instance,
             UniqueArgumentNames.Instance,
