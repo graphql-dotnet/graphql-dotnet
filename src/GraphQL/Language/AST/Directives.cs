@@ -10,7 +10,6 @@ namespace GraphQL.Language.AST
     public class Directives : AbstractNode, ICollection<Directive>
     {
         private List<Directive> _directives;
-        private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
 
         internal Directives(int capacity)
         {
@@ -43,27 +42,29 @@ namespace GraphQL.Language.AST
         public void Add(Directive directive)
         {
             (_directives ??= new List<Directive>()).Add(directive ?? throw new ArgumentNullException(nameof(directive)));
-
-            if (!_unique.ContainsKey(directive.Name))
-            {
-                _unique.Add(directive.Name, directive);
-            }
         }
 
         /// <summary>
-        /// Searches the list for a directive node specified by name and returns it.
+        /// Searches the list for a directive node specified by name and returns first match.
         /// </summary>
-        public Directive Find(string name) => _unique.TryGetValue(name, out Directive value) ? value : null;
+        public Directive Find(string name)
+        {
+            if (_directives != null)
+            {
+                foreach (var directive in _directives)
+                {
+                    if (directive.Name == name)
+                        return directive;
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Returns the number of directive nodes in this list.
         /// </summary>
         public int Count => _directives?.Count ?? 0;
-
-        /// <summary>
-        /// Returns <see langword="true"/> if there are any duplicate directive nodes in this list when compared by name.
-        /// </summary>
-        public bool HasDuplicates => _directives?.Count != _unique.Count;
 
         /// <inheritdoc/>
         public bool IsReadOnly => false;
@@ -77,7 +78,6 @@ namespace GraphQL.Language.AST
         public void Clear()
         {
             _directives.Clear();
-            _unique.Clear();
         }
 
         /// <inheritdoc/>
@@ -87,7 +87,7 @@ namespace GraphQL.Language.AST
         public void CopyTo(Directive[] array, int arrayIndex) => _directives.CopyTo(array, arrayIndex);
 
         /// <inheritdoc/>
-        public bool Remove(Directive item) => _directives.Remove(item) && _unique.Remove(item.Name);
+        public bool Remove(Directive item) => _directives.Remove(item);
 
         /// <inheritdoc />
         public override string ToString() => _directives?.Count > 0 ? $"Directives{{{string.Join(", ", _directives)}}}" : "Directives(Empty)";

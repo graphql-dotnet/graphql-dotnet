@@ -1263,7 +1263,6 @@ namespace GraphQL.Language.AST
         public Directives() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public int Count { get; }
-        public bool HasDuplicates { get; }
         public bool IsReadOnly { get; }
         public void Add(GraphQL.Language.AST.Directive directive) { }
         public void Clear() { }
@@ -2952,6 +2951,11 @@ namespace GraphQL.Validation.Errors
         public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
     }
     [System.Serializable]
+    public class DirectivesInAllowedLocationsError : GraphQL.Validation.ValidationError
+    {
+        public DirectivesInAllowedLocationsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Types.DirectiveLocation candidateLocation) { }
+    }
+    [System.Serializable]
     public class FieldsOnCorrectTypeError : GraphQL.Validation.ValidationError
     {
         public FieldsOnCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Field node, GraphQL.Types.IGraphType type, System.Collections.Generic.IEnumerable<string> suggestedTypeNames, System.Collections.Generic.IEnumerable<string> suggestedFieldNames) { }
@@ -2978,7 +2982,6 @@ namespace GraphQL.Validation.Errors
     public class KnownDirectivesError : GraphQL.Validation.ValidationError
     {
         public KnownDirectivesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node) { }
-        public KnownDirectivesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Types.DirectiveLocation candidateLocation) { }
     }
     [System.Serializable]
     public class KnownFragmentNamesError : GraphQL.Validation.ValidationError
@@ -3051,7 +3054,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class UniqueDirectivesPerLocationError : GraphQL.Validation.ValidationError
     {
-        public UniqueDirectivesPerLocationError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Language.AST.Directive altNode) { }
+        public UniqueDirectivesPerLocationError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node) { }
     }
     [System.Serializable]
     public class UniqueFragmentNamesError : GraphQL.Validation.ValidationError
@@ -3123,10 +3126,10 @@ namespace GraphQL.Validation.Rules
         public KnownArgumentNames() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class KnownDirectives : GraphQL.Validation.IValidationRule
+    public class KnownDirectivesInAllowedLocations : GraphQL.Validation.IValidationRule
     {
-        public static readonly GraphQL.Validation.Rules.KnownDirectives Instance;
-        public KnownDirectives() { }
+        public static readonly GraphQL.Validation.Rules.KnownDirectivesInAllowedLocations Instance;
+        public KnownDirectivesInAllowedLocations() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class KnownFragmentNames : GraphQL.Validation.IValidationRule

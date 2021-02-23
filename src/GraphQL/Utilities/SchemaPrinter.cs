@@ -275,9 +275,19 @@ namespace GraphQL.Utilities
         {
             var builder = new StringBuilder();
             builder.Append(FormatDescription(directive.Description));
-            builder.AppendLine($"directive @{directive.Name}(");
-            builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
-            builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
+            builder.Append($"directive @{directive.Name}");
+
+            if (directive.Arguments?.Count > 0)
+            {
+                builder.AppendLine("(");
+                builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
+                builder.Append(')');
+            }
+
+            if (directive.Repeatable)
+                builder.Append(" repeatable");
+
+            builder.Append($" on {FormatDirectiveLocationList(directive.Locations)}");
             return builder.ToString().TrimStart();
         }
 

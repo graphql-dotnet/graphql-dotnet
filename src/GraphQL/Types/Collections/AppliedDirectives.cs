@@ -33,7 +33,8 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Finds a directive by its name from the list.
+        /// Finds a directive by its name from the list. If the list contains several
+        /// directives with the given name, then the first one is returned.
         /// </summary>
         public AppliedDirective Find(string name)
         {

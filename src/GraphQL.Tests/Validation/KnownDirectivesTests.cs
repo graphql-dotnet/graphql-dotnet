@@ -1,20 +1,19 @@
 using GraphQL.Types;
-using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
 {
-    public class KnownDirectivesTests : ValidationTestBase<KnownDirectives, ValidationSchema>
+    public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedLocations, ValidationSchema>
     {
         private void unknownDirective(ValidationTestConfig _, string name, int line, int column)
         {
-            _.Error(KnownDirectivesError.UnknownDirectiveMessage(name), line, column);
+            _.Error($"Unknown directive '{name}'.", line, column);
         }
 
         private void misplacedDirective(ValidationTestConfig _, string name, DirectiveLocation placement, int line, int column)
         {
-            _.Error(KnownDirectivesError.MisplacedDirectiveMessage(name, placement.ToString()), line, column);
+            _.Error($"Directive '{name}' may not be used on {placement}.", line, column);
         }
 
         [Fact]
@@ -154,53 +153,6 @@ namespace GraphQL.Tests.Validation
                 query: MyQuery
               }
             ");
-        }
-
-        [Fact(Skip = "This is not yet supported")]
-        public void within_schema_language_with_misplaced_directives()
-        {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
-                type MyObj implements MyInterface @onInterface {
-                  myField(myArg: Int @onInputFieldDefinition): String @onInputFieldDefinition
-                }
-
-                scalar MyScalar @onEnum
-
-                interface MyInterface @onObject {
-                  myField(myArg: Int @onInputFieldDefinition): String @onInputFieldDefinition
-                }
-
-                union MyUnion @onEnumValue = MyObj | Other
-
-                enum MyEnum @onScalar {
-                  MY_VALUE @onUnion
-                }
-
-                input MyInput @onEnum {
-                  myField: Int @onArgumentDefinition
-                }
-
-                schema @onObject {
-                  query: MyQuery
-                }
-                ";
-
-                misplacedDirective(_, "onInterface", DirectiveLocation.Object, 2, 29);
-                misplacedDirective(_, "onInputFieldDefinition", DirectiveLocation.ArgumentDefinition, 3, 26);
-                misplacedDirective(_, "onInputFieldDefinition", DirectiveLocation.FieldDefinition, 3, 29);
-                misplacedDirective(_, "onEnum", DirectiveLocation.Scalar, 6, 32);
-                misplacedDirective(_, "onObject", DirectiveLocation.Interface, 8, 32);
-                misplacedDirective(_, "onInputFieldDefinition", DirectiveLocation.ArgumentDefinition, 9, 32);
-                misplacedDirective(_, "onInputFieldDefinition", DirectiveLocation.FieldDefinition, 9, 32);
-                misplacedDirective(_, "onEnumValue", DirectiveLocation.Union, 12, 32);
-                misplacedDirective(_, "onScalar", DirectiveLocation.Enum, 14, 32);
-                misplacedDirective(_, "onUnion", DirectiveLocation.EnumValue, 15, 32);
-                misplacedDirective(_, "onEnum", DirectiveLocation.InputObject, 18, 32);
-                misplacedDirective(_, "onArgumentDefinition", DirectiveLocation.InputFieldDefinition, 19, 32);
-                misplacedDirective(_, "onObject", DirectiveLocation.Schema, 22, 32);
-            });
         }
     }
 }

@@ -301,22 +301,10 @@ namespace GraphQL.Tests.Validation
             Directives.Register(
                 new DirectiveGraphType("onQuery", DirectiveLocation.Query),
                 new DirectiveGraphType("onMutation", DirectiveLocation.Mutation),
-                new DirectiveGraphType("onSubscription", DirectiveLocation.Subscription),
-                new DirectiveGraphType("onField", DirectiveLocation.Field),
-                new DirectiveGraphType("onFragmentDefinition", DirectiveLocation.FragmentDefinition),
-                new DirectiveGraphType("onFragmentSpread", DirectiveLocation.FragmentSpread),
-                new DirectiveGraphType("onInlineFragment", DirectiveLocation.InlineFragment),
-                new DirectiveGraphType("onSchema", DirectiveLocation.Schema),
-                new DirectiveGraphType("onScalar", DirectiveLocation.Scalar),
-                new DirectiveGraphType("onObject", DirectiveLocation.Object),
-                new DirectiveGraphType("onFieldDefinition", DirectiveLocation.FieldDefinition),
-                new DirectiveGraphType("onArgumentDefinition", DirectiveLocation.ArgumentDefinition),
-                new DirectiveGraphType("onInterface", DirectiveLocation.Interface),
-                new DirectiveGraphType("onUnion", DirectiveLocation.Union),
-                new DirectiveGraphType("onEnum", DirectiveLocation.Enum),
-                new DirectiveGraphType("onEnumValue", DirectiveLocation.EnumValue),
-                new DirectiveGraphType("onInputObject", DirectiveLocation.InputObject),
-                new DirectiveGraphType("onInputFieldDefinition", DirectiveLocation.InputFieldDefinition),
+                new DirectiveGraphType("directiveA", DirectiveLocation.Field),
+                new DirectiveGraphType("directiveB", DirectiveLocation.Field),
+                new DirectiveGraphType("directive", DirectiveLocation.Field),
+                new DirectiveGraphType("rep", DirectiveLocation.Field) { Repeatable = true },
 
                 new LengthDirective()
             );
