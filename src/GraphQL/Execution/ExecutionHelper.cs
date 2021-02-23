@@ -234,38 +234,5 @@ namespace GraphQL.Execution
 
             return true;
         }
-
-        /// <summary>
-        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
-        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
-        /// <br/><br/>
-        /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
-        /// </summary>
-        public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
-        {
-            if (string.IsNullOrWhiteSpace(fragmentName))
-            {
-                return true;
-            }
-
-            var conditionalType = context.Schema.AllTypes[fragmentName];
-
-            if (conditionalType == null)
-            {
-                return false;
-            }
-
-            if (conditionalType.Equals(type))
-            {
-                return true;
-            }
-
-            if (conditionalType is IAbstractGraphType abstractType)
-            {
-                return abstractType.IsPossibleType(type);
-            }
-
-            return false;
-        }
     }
 }
