@@ -13,8 +13,9 @@ namespace GraphQL.Tests.Bugs
         {
             var s = new Bug2279Schema();
             var e = Should.Throw<InvalidOperationException>(() => s.Initialize());
-            e.Message.ShouldBe(@"Unable to register GraphType 'GraphQL.Tests.Bugs.Bug2279GraphType`1[[System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]' with the name 'Bug2279GraphType_1';
-the name 'Bug2279GraphType_1' is already registered to 'GraphQL.Tests.Bugs.Bug2279GraphType`1[[System.String, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.");
+            var t1 = typeof(Bug2279GraphType<int>).FullName;
+            var t2 = typeof(Bug2279GraphType<string>).FullName;
+            e.Message.ShouldBe($"Unable to register GraphType '{t1}' with the name 'Bug2279GraphType_1';\r\nthe name 'Bug2279GraphType_1' is already registered to '{t2}'.");
         }
     }
 
