@@ -153,9 +153,9 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
 
-            CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema), parent.SelectionSet, fields);
+            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema), parent.SelectionSet, fields);
 
             var parentType = parent.GetObjectGraphType(context.Schema);
 
@@ -225,42 +225,47 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
         /// </summary>
+        /// <param name="context">The execution context.</param>
+        /// <param name="specificType">The graph type to compare the selection set against.</param>
+        /// <param name="selectionSet">The selection set from the document.</param>
+        /// <param name="fields">A list to append the collected list of fields to; if null, a new list will be created.</param>
+        /// <returns>A list of collected fields</returns>
         protected virtual Fields CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields = null)
         {
             fields ??= new Fields();
             List<string> visitedFragmentNames = null;
             CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
             return fields;
-        }
 
-        private void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
-        {
-            if (selectionSet != null)
+            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
             {
-                foreach (var selection in selectionSet.SelectionsList)
+                if (selectionSet != null)
                 {
-                    if (selection is Field field)
+                    foreach (var selection in selectionSet.SelectionsList)
                     {
-                        if (ShouldIncludeNode(context, field))
-                            fields.Add(field);
-                    }
-                    else if (selection is FragmentSpread spread)
-                    {
-                        if (visitedFragmentNames?.Contains(spread.Name) != true && ShouldIncludeNode(context, spread))
+                        if (selection is Field field)
                         {
-                            (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
-
-                            var fragment = context.Fragments.FindDefinition(spread.Name);
-                            if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                                CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
+                            if (ShouldIncludeNode(context, field))
+                                fields.Add(field);
                         }
-                    }
-                    else if (selection is InlineFragment inline)
-                    {
-                        // inline.Type may be null
-                        // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
-                        if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.Type?.Name ?? specificType.Name, specificType))
-                            CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
+                        else if (selection is FragmentSpread spread)
+                        {
+                            if (visitedFragmentNames?.Contains(spread.Name) != true && ShouldIncludeNode(context, spread))
+                            {
+                                (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
+
+                                var fragment = context.Fragments.FindDefinition(spread.Name);
+                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
+                                    CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
+                            }
+                        }
+                        else if (selection is InlineFragment inline)
+                        {
+                            // inline.Type may be null
+                            // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
+                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.Type?.Name ?? specificType.Name, specificType))
+                                CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
+                        }
                     }
                 }
             }

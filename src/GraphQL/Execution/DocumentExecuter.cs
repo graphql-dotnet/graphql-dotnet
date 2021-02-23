@@ -265,7 +265,7 @@ namespace GraphQL
                 ThrowOnUnhandledException = options.ThrowOnUnhandledException,
                 UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
                 MaxParallelExecutionCount = options.MaxParallelExecutionCount,
-                RequestServices = options.RequestServices
+                RequestServices = options.RequestServices,
             };
 
             context.ExecutionStrategy = SelectExecutionStrategy(context);
