@@ -272,7 +272,7 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
         /// </summary>
-        private static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
+        protected virtual bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
         {
             if (fragmentName == null)
                 throw new ArgumentNullException(nameof(fragmentName));
