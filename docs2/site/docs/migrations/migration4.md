@@ -172,6 +172,7 @@ This may be needed to get the parameters of parent nodes.
 
 ### Other Features
 
+* New property `ISchema.ValueConverters`
 * New method `IParentExecutionNode.ApplyToChildren`
 * `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
