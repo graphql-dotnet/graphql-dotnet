@@ -177,5 +177,156 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
+        [Fact]
+        public void subfields_contains_keys_from_fragment_spread_on_non_null_fields()
+        {
+            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
+            {
+                context.SubFields.ShouldNotBeNull();
+                context.SubFields.Keys.ShouldContain("id");
+                context.SubFields.Keys.ShouldContain("name");
+                return new Human { Id = "1", Name = "Luke" };
+            });
+
+            var query = @"
+                query Luke {
+                    luke {
+                        ...HumanData
+                    }
+                }
+
+                fragment HumanData on Human {
+                    id
+                    name
+                }
+            ";
+
+            var expected = @"
+                {
+                    ""luke"": {
+                        ""id"": ""1"",
+                        ""name"": ""Luke""
+                    }
+                }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void subfields_contains_keys_from_inline_fragment_on_non_null_fields()
+        {
+            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
+            {
+                context.SubFields.ShouldNotBeNull();
+                context.SubFields.Keys.ShouldContain("id");
+                context.SubFields.Keys.ShouldContain("name");
+                return new Human { Id = "1", Name = "Luke" };
+            });
+
+            var query = @"
+                query Luke {
+                    luke {
+                        ...on Human
+                        {
+                            id
+                            name
+                        }
+                    }
+                }
+            ";
+
+            var expected = @"
+                {
+                    ""luke"": {
+                        ""id"": ""1"",
+                        ""name"": ""Luke""
+                    }
+                }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void subfields_contains_keys_from_fragment_spread_on_list_fields()
+        {
+            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
+            {
+                context.SubFields.ShouldNotBeNull();
+                context.SubFields.Keys.ShouldContain("id");
+                context.SubFields.Keys.ShouldContain("name");
+                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+            });
+
+            var query = @"
+                query Luke {
+                    lukes {
+                        ...HumanData
+                    }
+                }
+
+                fragment HumanData on Human {
+                    id
+                    name
+                }
+            ";
+
+            var expected = @"
+                {
+                    ""lukes"": [
+                    {
+                        ""id"": ""1"",
+                        ""name"": ""Luke""
+                    },
+                    {
+                        ""id"": ""2"",
+                        ""name"": ""Luke Copy""
+                    }
+                ]}
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void subfields_contains_keys_from_inline_fragment_on_list_fields()
+        {
+            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
+            {
+                context.SubFields.ShouldNotBeNull();
+                context.SubFields.Keys.ShouldContain("id");
+                context.SubFields.Keys.ShouldContain("name");
+                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+            });
+
+            var query = @"
+                query Luke {
+                    lukes {
+                        ... on Human
+                        {
+                            id
+                            name
+                        }
+                    }
+                }
+            ";
+
+            var expected = @"
+                {
+                    ""lukes"": [
+                    {
+                        ""id"": ""1"",
+                        ""name"": ""Luke""
+                    },
+                    {
+                        ""id"": ""2"",
+                        ""name"": ""Luke Copy""
+                    }
+                ]}
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
     }
 }

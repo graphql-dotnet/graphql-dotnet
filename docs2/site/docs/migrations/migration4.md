@@ -477,7 +477,10 @@ default continues to be `ResolverType.Resolver`.
   your project if you require these classes.
 * `LightweightCache.First` method has been removed.
 * `IGraphType.CollectTypes` method has been removed.
-* `ExecutionHelper.SubFieldsFor` method has been removed.
+* `TypeExtensions.As` method has been removed
+* `ExecutionHelper.SubFieldsFor` and `ExecutionHelper.DoesFragmentConditionMatch` methods have been removed.
+* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
+* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
@@ -495,9 +498,6 @@ default continues to be `ResolverType.Resolver`.
   changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
-* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
-* Removed `TypeExtensions.As`
-* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
 * `ISchema.FindDirective`, `ISchema.RegisterDirective`, `ISchema.RegisterDirectives` methods were moved into `SchemaDirectives` class
 * `ISchema.FindType` method was moved into `SchemaTypes[string typeName]` indexer
 * Some of the `ISchemaNodeVisitor` methods have been changes to better support schema traversal

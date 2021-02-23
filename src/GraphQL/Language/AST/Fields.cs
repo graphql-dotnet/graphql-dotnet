@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -15,12 +16,12 @@ namespace GraphQL.Language.AST
         /// otherwise the field name). This ensures all fields with the same response key included via referenced
         /// fragments are executed at the same time.
         /// <br/><br/>
-        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
+        /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
         /// </summary>
         public Fields CollectFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet)
         {
             List<string> visitedFragmentNames = null;
-            CollectFields(context, specificType, selectionSet, context.ExecutionStrategy ?? ParallelExecutionStrategy.Instance, ref visitedFragmentNames);
+            CollectFields(context, specificType.GetNamedType(), selectionSet, context.ExecutionStrategy ?? ParallelExecutionStrategy.Instance, ref visitedFragmentNames);
             return this;
         }
 
@@ -32,47 +33,60 @@ namespace GraphQL.Language.AST
                 {
                     if (selection is Field field)
                     {
-                        if (!strategy.ShouldIncludeNode(context, field))
-                        {
-                            continue;
-                        }
-
-                        Add(field);
+                        if (strategy.ShouldIncludeNode(context, field))
+                            Add(field);
                     }
                     else if (selection is FragmentSpread spread)
                     {
-                        if ((visitedFragmentNames != null && visitedFragmentNames.Contains(spread.Name))
-                            || !strategy.ShouldIncludeNode(context, spread))
+                        if (visitedFragmentNames?.Contains(spread.Name) != true && strategy.ShouldIncludeNode(context, spread))
                         {
-                            continue;
+                            (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
+
+                            var fragment = context.Fragments.FindDefinition(spread.Name);
+                            if (fragment != null && strategy.ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
+                                CollectFields(context, specificType, fragment.SelectionSet, strategy, ref visitedFragmentNames);
                         }
-
-                        (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
-
-                        var fragment = context.Fragments.FindDefinition(spread.Name);
-                        if (fragment == null
-                            || !strategy.ShouldIncludeNode(context, fragment)
-                            || !ExecutionHelper.DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, fragment.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                     else if (selection is InlineFragment inline)
                     {
-                        var name = inline.Type != null ? inline.Type.Name : specificType.Name;
-
-                        if (!strategy.ShouldIncludeNode(context, inline)
-                          || !ExecutionHelper.DoesFragmentConditionMatch(context, name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, inline.SelectionSet, strategy, ref visitedFragmentNames);
+                        // inline.Type may be null
+                        // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
+                        if (strategy.ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.Type?.Name ?? specificType.Name, specificType))
+                            CollectFields(context, specificType, inline.SelectionSet, strategy, ref visitedFragmentNames);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
+        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
+        /// <br/><br/>
+        /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
+        /// </summary>
+        private static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
+        {
+            if (fragmentName == null)
+                throw new ArgumentNullException(nameof(fragmentName));
+
+            var conditionalType = context.Schema.AllTypes[fragmentName];
+
+            if (conditionalType == null)
+            {
+                return false;
+            }
+
+            if (conditionalType.Equals(type))
+            {
+                return true;
+            }
+
+            if (conditionalType is IAbstractGraphType abstractType)
+            {
+                return abstractType.IsPossibleType(type);
+            }
+
+            return false;
         }
 
         /// <summary>
