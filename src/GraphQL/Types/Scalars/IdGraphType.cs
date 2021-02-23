@@ -37,5 +37,14 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            StringValue _ => true,
+            IntValue _ => true,
+            LongValue _ => true,
+            _ => false
+        };
     }
 }

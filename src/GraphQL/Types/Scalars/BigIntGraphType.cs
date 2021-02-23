@@ -20,5 +20,14 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            BigIntValue _ => true,
+            LongValue _ => true,
+            IntValue _ => true,
+            _ => false
+        };
     }
 }

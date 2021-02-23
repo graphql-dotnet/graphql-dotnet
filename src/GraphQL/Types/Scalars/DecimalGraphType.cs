@@ -11,36 +11,50 @@ namespace GraphQL.Types
     public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        protected override bool CanParseLiteralCore(IValue value)
+        public override bool CanParseLiteral(IValue value)
         {
-            return value switch
+            try
             {
-                DecimalValue _ => true,
-                IntValue _ => true,
-                LongValue _ => true,
-                StringValue s => decimal.TryParse(s.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
-                FloatValue f => Ret(checked((decimal)f.Value)),
-                BigIntValue b => Ret(checked((decimal)b.Value)),
-                _ => false
-            };
+                return value switch
+                {
+                    DecimalValue _ => true,
+                    IntValue _ => true,
+                    LongValue _ => true,
+                    StringValue s => decimal.TryParse(s.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
+                    FloatValue f => Ret(checked((decimal)f.Value)),
+                    BigIntValue b => Ret(checked((decimal)b.Value)),
+                    _ => false
+                };
+            }
+            catch
+            {
+                return false;
+            }
 
             static bool Ret(decimal _) => true;
         }
 
         /// <inheritdoc/>
-        protected override bool CanParseValueCore(object value)
+        public override bool CanParseValue(object value)
         {
-            return value switch
+            try
             {
-                decimal _ => true,
-                int _ => true,
-                long _ => true,
-                string s => decimal.TryParse(s, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
-                float f => Ret(checked((decimal)f)),
-                BigInteger b => Ret(checked((decimal)b)),
-                double d => Ret(checked((decimal)d)),
-                _ => false
-            };
+                return value switch
+                {
+                    decimal _ => true,
+                    int _ => true,
+                    long _ => true,
+                    string s => decimal.TryParse(s, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
+                    float f => Ret(checked((decimal)f)),
+                    BigInteger b => Ret(checked((decimal)b)),
+                    double d => Ret(checked((decimal)d)),
+                    _ => false
+                };
+            }
+            catch
+            {
+                return false;
+            }
 
             static bool Ret(decimal _) => true;
         }

@@ -157,12 +157,11 @@ GraphQL.NET will not receive new dependencies, since all methods just read or wr
 
 ### New parsing methods for scalars
 
-4 new methods for `ScalarGraphType` have been added in v4:
+2 new methods for `ScalarGraphType` have been added in v4:
 
 - `public bool CanParseLiteral/CanParseValue`
-- `protected virtual bool CanParseLiteralCore/CanParseValueCore`
 
-These methods checks for input coercion possibility. The last two can be overridden for custom scalars
+These methods checks for input coercion possibility. They can be overridden for custom scalars
 to validate input values without directly getting those values, i.e. without boxing.
 
 ### Ability to get parent resolve context of any level

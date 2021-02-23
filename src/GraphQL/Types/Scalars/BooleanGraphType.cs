@@ -13,5 +13,8 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(bool));
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value is BooleanValue;
     }
 }

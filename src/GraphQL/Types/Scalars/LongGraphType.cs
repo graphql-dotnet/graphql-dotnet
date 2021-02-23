@@ -18,5 +18,8 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(long));
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value is IntValue || value is LongValue;
     }
 }
