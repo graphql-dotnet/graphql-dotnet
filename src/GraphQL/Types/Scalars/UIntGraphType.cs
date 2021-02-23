@@ -19,5 +19,14 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(uint));
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            UIntValue _ => true,
+            IntValue intValue => intValue.Value >= 0,
+            LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue,
+            _ => false
+        };
     }
 }

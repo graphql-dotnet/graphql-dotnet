@@ -12,8 +12,8 @@ namespace GraphQL.Types
         public override object ParseLiteral(IValue value) => value switch
         {
             FloatValue floatVal => floatVal.Value,
-            IntValue intVal => checked((double)intVal.Value),
-            LongValue longVal => checked((double)longVal.Value),
+            IntValue intVal => (double)intVal.Value,
+            LongValue longVal => (double)longVal.Value,
             DecimalValue decVal => checked((double)decVal.Value),
             BigIntValue bigIntVal => checked((double)bigIntVal.Value),
             _ => null
@@ -21,5 +21,28 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(double));
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value)
+        {
+            try
+            {
+                return value switch
+                {
+                    FloatValue _ => true,
+                    IntValue _ => true,
+                    LongValue _ => true,
+                    DecimalValue decVal => Ret(checked((double)decVal.Value)),
+                    BigIntValue bigIntVal => Ret(checked((double)bigIntVal.Value)),
+                    _ => false
+                };
+            }
+            catch
+            {
+                return false;
+            }
+
+            static bool Ret(double _) => true;
+        }
     }
 }
