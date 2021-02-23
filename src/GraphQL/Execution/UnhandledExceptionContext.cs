@@ -10,7 +10,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UnhandledExceptionContext(ExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
+        public UnhandledExceptionContext(IExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
         {
             Context = context;
             FieldContext = fieldContext;
@@ -21,7 +21,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the execution context.
         /// </summary>
-        public ExecutionContext Context { get; }
+        public IExecutionContext Context { get; }
 
         /// <summary>
         /// Field context whose resolver generated an error. Will be <c>null</c> if the error came from

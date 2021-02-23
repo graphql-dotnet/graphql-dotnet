@@ -86,6 +86,11 @@ namespace GraphQL.Execution
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields ?? Enumerable.Empty<ExecutionNode>();
 
+        /// <summary>
+        /// Returns the selected fields.
+        /// </summary>
+        public virtual SelectionSet SelectionSet => Field?.SelectionSet;
+
         /// <inheritdoc/>
         public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)
         {

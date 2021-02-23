@@ -26,7 +26,7 @@ namespace GraphQL.Tests
 
         public static RootExecutionNode ToExecutionTree(this IReadOnlyDictionary<string, object> dictionary)
         {
-            var root = new RootExecutionNode(null)
+            var root = new RootExecutionNode(null, null)
             {
                 SubFields = dictionary.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray()
             };
