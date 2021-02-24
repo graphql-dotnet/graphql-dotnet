@@ -368,12 +368,6 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<ValueNode<Uri>>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
-            });
-
             // Directive
             Config<Directive>(c =>
             {
