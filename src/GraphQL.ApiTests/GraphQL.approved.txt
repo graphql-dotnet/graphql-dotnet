@@ -1511,7 +1511,6 @@ namespace GraphQL.Language.AST
     public abstract class ValueNode<T> : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<T>
     {
         protected ValueNode() { }
-        protected ValueNode(T value) { }
         public T Value { get; set; }
         public override string ToString() { }
     }

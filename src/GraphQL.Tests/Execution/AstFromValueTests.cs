@@ -74,5 +74,34 @@ namespace GraphQL.Tests.Execution
             result.ShouldNotBeNull();
             result.ShouldBeOfType<FloatValue>();
         }
+
+        [Fact]
+        public void converts_byte_to_int_value()
+        {
+            var schema = new Schema();
+
+            byte value = 12;
+            var result = value.AstFromValue(new ByteGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<IntValue>();
+        }
+
+        [Fact]
+        public void converts_sbyte_to_int_value()
+        {
+            sbyte val = -12;
+            var result = val.AstFromValue(new SByteGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<IntValue>();
+        }
+
+        [Fact]
+        public void converts_uri_to_string_value()
+        {
+            var val = new Uri("http://www.wp.pl");
+            var result = val.AstFromValue(new UriGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<StringValue>();
+        }
     }
 }

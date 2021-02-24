@@ -8,8 +8,9 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public IntValue(int value) : base(value)
+        public IntValue(int value)
         {
+            Value = value;
         }
     }
 }

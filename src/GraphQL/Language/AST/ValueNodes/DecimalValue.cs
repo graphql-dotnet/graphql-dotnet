@@ -8,8 +8,9 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public DecimalValue(decimal value) : base(value)
+        public DecimalValue(decimal value)
         {
+            Value = value;
         }
     }
 }
