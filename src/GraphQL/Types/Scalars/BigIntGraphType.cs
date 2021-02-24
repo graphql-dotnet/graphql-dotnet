@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using GraphQL.Language.AST;
 
@@ -29,5 +30,8 @@ namespace GraphQL.Types
             IntValue _ => true,
             _ => false
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
     }
 }

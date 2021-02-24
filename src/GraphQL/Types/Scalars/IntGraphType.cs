@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -24,5 +25,8 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value is IntValue;
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new IntValue(Convert.ToInt32(value));
     }
 }

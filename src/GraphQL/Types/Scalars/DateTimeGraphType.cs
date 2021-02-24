@@ -21,21 +21,12 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
-        {
-            if (value is DateTimeValue timeValue)
-            {
-                return timeValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
-        }
+            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new StringValue(((DateTime)value).ToString("O"));
     }
 }

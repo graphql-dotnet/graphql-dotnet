@@ -34,8 +34,9 @@ namespace GraphQL.Introspection
                     }
                     else
                     {
-                        string result = AstPrinter.Print(ast);
-                        return string.IsNullOrWhiteSpace(result) ? null : result;
+                        throw new System.NotSupportedException();
+                        //string result = AstPrinter.Print(ast);
+                        //return string.IsNullOrWhiteSpace(result) ? null : result;
                     }
                 });
         }

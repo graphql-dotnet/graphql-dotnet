@@ -1,3 +1,5 @@
+using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -91,6 +93,49 @@ namespace GraphQL.Types
             catch
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks that the provided value is a valid default value.
+        /// This method should not throw an exception.
+        /// </summary>
+        public virtual bool IsValidDefault(object value)
+        {
+            try
+            {
+                return ToAST(value) != null;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Converts a value to an AST representation. This is necessary for introspection queries
+        /// to return the default value for fields of this scalar type. This method may throw an exception
+        /// or return null for a failed conversion.
+        /// </summary>
+        public virtual IValue ToAST(object value)
+        {
+            try
+            {
+                var serialized = Serialize(value);
+                return serialized switch
+                {
+                    bool b => new BooleanValue(b),
+                    int i => new IntValue(i),
+                    BigInteger bi => new BigIntValue(bi),
+                    long l => new LongValue(l),
+                    decimal @decimal => new DecimalValue(@decimal),
+                    double d => new FloatValue(d),
+                    _ => null
+                };
+            }
+            catch
+            {
+                return null;
             }
         }
     }

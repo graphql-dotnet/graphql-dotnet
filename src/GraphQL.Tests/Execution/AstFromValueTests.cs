@@ -86,35 +86,6 @@ namespace GraphQL.Tests.Execution
             result.ShouldNotBeNull("AST from value converter should be registered");
             result.ShouldBeOfType<ByteValueConverter>();
         }
-
-        [Fact]
-        public void converts_byte_to_byte_value()
-        {
-            var schema = new Schema();
-
-            byte value = 12;
-            var result = value.AstFromValue(schema, new ByteGraphType());
-            result.ShouldNotBeNull();
-            result.ShouldBeOfType<ByteValue>();
-        }
-
-        [Fact]
-        public void converts_sbyte_to_sbyte_value()
-        {
-            sbyte val = -12;
-            var result = val.AstFromValue(null, new SByteGraphType());
-            result.ShouldNotBeNull();
-            result.ShouldBeOfType<SByteValue>();
-        }
-
-        [Fact]
-        public void converts_uri_to_uri_value()
-        {
-            var val = new Uri("http://www.wp.pl");
-            var result = val.AstFromValue(null, new UriGraphType());
-            result.ShouldNotBeNull();
-            result.ShouldBeOfType<UriValue>();
-        }
     }
 
     internal class ByteValueConverter : IAstFromValueConverter
@@ -126,7 +97,7 @@ namespace GraphQL.Tests.Execution
 
         public IValue Convert(object value, IGraphType type)
         {
-            return new ByteValue((byte)value);
+            return new IntValue((byte)value);
         }
     }
 }

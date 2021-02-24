@@ -297,9 +297,17 @@ namespace GraphQL
                 foreach (var field in fields)
                 {
                     var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value ?? field.GetDefaultValueAST(schema), schema);
 
-                    errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                    if (fieldAst != null)
+                    {
+                        var result = IsValidLiteralValue(field.ResolvedType, fieldAst.Value, schema);
+
+                        errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                    }
+                    else if (field.ResolvedType is NonNullGraphType && field.DefaultValue == null)
+                    {
+                        errors.Add($"Missing field '{field.Name}'.");
+                    } 
                 }
 
                 return errors.ToArray();
@@ -479,6 +487,50 @@ namespace GraphQL
         private static readonly NullValue _null = new NullValue();
 
         /// <summary>
+        /// Returns a value indicating whether the provided value is a valid default value
+        /// for the specified input graph type.
+        /// </summary>
+        public static bool IsValidDefaultForGraph(object value, IGraphType type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type is NonNullGraphType nonNullGraphType)
+            {
+                return value == null ? false : IsValidDefaultForGraph(value, nonNullGraphType.ResolvedType);
+            }
+
+            if (value == null)
+            {
+                return true;
+            }
+
+            if (type is ListGraphType listGraphType)
+            {
+                if (!(value is IEnumerable list))
+                    return false;
+
+                foreach (var item in list)
+                {
+                    if (!IsValidDefaultForGraph(item, listGraphType.ResolvedType))
+                        return false;
+                }
+
+                return true;
+            }
+
+            if (type is IInputObjectGraphType inputObjectGraphType)
+            {
+                return inputObjectGraphType.IsValidDefault(value);
+            }
+
+            if (!(type is ScalarGraphType scalar))
+                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
+
+            return scalar.IsValidDefault(value);
+        }
+
+        /// <summary>
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
@@ -533,35 +585,10 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            if (!(type is ScalarGraphType inputType))
+            if (!(type is ScalarGraphType scalar))
                 throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
-            // Since value is an internally represented value, it must be serialized
-            // to an externally represented value before converting into an AST.
-            var serialized = inputType.Serialize(value) ?? throw new InvalidOperationException($"Unable to serialize '{value}' to '{inputType.Name}'.");
-
-            return serialized switch
-            {
-                bool b => new BooleanValue(b),
-                int i => new IntValue(i),
-                BigInteger bi => new BigIntValue(bi),
-                long l => new LongValue(l),
-                decimal @decimal => new DecimalValue(@decimal),
-                double d => new FloatValue(d),
-                DateTime time => new ValueNode<DateTime>(time),
-                Uri uri => new ValueNode<Uri>(uri),
-                DateTimeOffset offset => new ValueNode<DateTimeOffset>(offset),
-                TimeSpan span => new ValueNode<TimeSpan>(span),
-                Guid guid => new ValueNode<Guid>(guid),
-                sbyte @sbyte => new ValueNode<sbyte>(@sbyte),
-                byte @byte => new ValueNode<byte>(@byte),
-                short @short => new ValueNode<short>(@short),
-                ushort uint16 => new ValueNode<ushort>(uint16),
-                uint uint32 => new ValueNode<uint>(uint32),
-                ulong uint64 => new ValueNode<ulong>(uint64),
-                string str => type is EnumerationGraphType ? (IValue)new EnumValue(str) : new StringValue(str),
-                _ => new UnknownValue(serialized)
-            };
+            return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
         }
     }
 }

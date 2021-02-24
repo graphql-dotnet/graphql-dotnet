@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -29,8 +28,6 @@ namespace GraphQL.Types
     {
         private Type _type;
         private IGraphType _resolvedType;
-        private object _defaultValue;
-        private IValue _defaultValueAST;
 
         /// <summary>
         /// Initializes a new instance of the argument.
@@ -80,20 +77,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the default value of the argument.
         /// </summary>
-        public object DefaultValue
-        {
-            get => _defaultValue;
-            set
-            {
-                if (!(ResolvedType?.GetNamedType() is GraphQLTypeReference))
-                    _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
+        public object DefaultValue { get; set; }
 
-                _defaultValue = value;
-                _defaultValueAST = null;
-            }
-        }
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns the graph type of this argument.
+        /// </summary>
         public IGraphType ResolvedType
         {
             get => _resolvedType;
@@ -125,13 +113,5 @@ namespace GraphQL.Types
 
         private ArgumentOutOfRangeException Create(string paramName, Type value) => new ArgumentOutOfRangeException(paramName,
             $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
-
-        internal IValue GetDefaultValueAST(ISchema schema)
-        {
-            if (_defaultValueAST == null && _defaultValue != null)
-                _defaultValueAST = _defaultValue.AstFromValue(schema, ResolvedType);
-
-            return _defaultValueAST;
-        }
     }
 }

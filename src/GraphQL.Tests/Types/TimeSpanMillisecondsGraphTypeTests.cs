@@ -54,19 +54,6 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void coerces_TimeSpanValue_to_timespan()
-        {
-            CultureTestHelper.UseCultures(() =>
-            {
-                var expected = new TimeSpan(1, 2, 3, 4, 5);
-
-                var actual = _type.ParseLiteral(new TimeSpanValue(expected));
-
-                actual.ShouldBe(expected);
-            });
-        }
-
-        [Fact]
         public void coerces_TimeSpan_to_timespan()
         {
             CultureTestHelper.UseCultures(() =>

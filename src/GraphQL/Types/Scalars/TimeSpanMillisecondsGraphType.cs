@@ -30,7 +30,6 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            TimeSpanValue spanValue => spanValue.Value,
             IntValue intValue => TimeSpan.FromMilliseconds(intValue.Value),
             LongValue longValue => TimeSpan.FromMilliseconds(longValue.Value),
             _ => null
@@ -44,5 +43,8 @@ namespace GraphQL.Types
             long l => TimeSpan.FromMilliseconds(l),
             _ => null
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new LongValue(Convert.ToInt64(Serialize(value)));
     }
 }

@@ -364,7 +364,11 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.For("Cat").IsTypeOf<Cat>();
             Builder.Types.Include<PetQueryType>();
 
-            Should.Throw<InvalidOperationException>(() => Builder.Build(defs));
+            Should.Throw<InvalidOperationException>(() =>
+            {
+                var schema = Builder.Build(defs);
+                schema.Initialize();
+            });
         }
 
         [Fact]

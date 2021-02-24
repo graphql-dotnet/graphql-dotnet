@@ -14,6 +14,12 @@ namespace GraphQL.Types
         /// properties for your input object which were not passed in the GraphQL request.
         /// </summary>
         object ParseDictionary(IDictionary<string, object> value);
+
+        /// <summary>
+        /// Returns a boolean indicating if the provided value is valid as a default value for a
+        /// for a field of this type.
+        /// </summary>
+        bool IsValidDefault(object value);
     }
 
     /// <inheritdoc/>
@@ -44,5 +50,8 @@ namespace GraphQL.Types
             // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
             return value.ToObject(typeof(TSourceType), this);
         }
+
+        /// <inheritdoc/>
+        public virtual bool IsValidDefault(object value) => value is TSourceType;
     }
 }
