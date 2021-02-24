@@ -26,6 +26,6 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) => true;
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new AnyValue(value);
+        public override IValue ToAst(object value) => new AnyValue(value);
     }
 }

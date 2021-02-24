@@ -18,6 +18,6 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value is StringValue;
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(value.ToString());
+        public override IValue ToAst(object value) => new StringValue(value.ToString());
     }
 }

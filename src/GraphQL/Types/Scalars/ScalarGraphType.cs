@@ -104,7 +104,7 @@ namespace GraphQL.Types
         {
             try
             {
-                return ToAST(value) != null;
+                return ToAst(value) != null;
             }
             catch
             {
@@ -117,7 +117,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return null for a failed conversion.
         /// </summary>
-        public virtual IValue ToAST(object value)
+        public virtual IValue ToAst(object value)
         {
             try
             {

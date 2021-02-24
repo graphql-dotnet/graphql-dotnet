@@ -21,6 +21,6 @@ namespace GraphQL.Types
             => value is IntValue intValue && byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue;
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new IntValue(Convert.ToByte(value));
+        public override IValue ToAst(object value) => new IntValue(Convert.ToByte(value));
     }
 }

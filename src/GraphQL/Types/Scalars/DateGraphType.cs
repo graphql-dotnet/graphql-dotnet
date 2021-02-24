@@ -60,6 +60,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue((string)Serialize((DateTime)value));
+        public override IValue ToAst(object value) => new StringValue((string)Serialize((DateTime)value));
     }
 }

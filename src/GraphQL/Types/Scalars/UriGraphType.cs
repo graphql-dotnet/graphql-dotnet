@@ -17,6 +17,6 @@ namespace GraphQL.Types
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(ParseValue(value).ToString());
+        public override IValue ToAst(object value) => new StringValue(ParseValue(value).ToString());
     }
 }

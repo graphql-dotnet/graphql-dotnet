@@ -569,13 +569,13 @@ namespace GraphQL
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the object type '{input.Name}' to an AST representation.");
+                return input.ToAst(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the object type '{input.Name}' to an AST representation.");
             }
 
             if (!(type is ScalarGraphType scalar))
                 throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
-            return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+            return scalar.ToAst(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
         }
     }
 }

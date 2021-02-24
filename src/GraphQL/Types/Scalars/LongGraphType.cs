@@ -24,6 +24,6 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value is IntValue || value is LongValue;
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new LongValue(Convert.ToInt64(value));
+        public override IValue ToAst(object value) => new LongValue(Convert.ToInt64(value));
     }
 }

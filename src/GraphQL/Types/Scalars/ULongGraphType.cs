@@ -31,7 +31,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => value switch
+        public override IValue ToAst(object value) => value switch
         {
             ulong ulongValue => new BigIntValue(ulongValue),
             _ => new LongValue(Convert.ToInt64(value))

@@ -28,7 +28,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return null for a failed conversion.
         /// </summary>
-        IValue ToAST(object value);
+        IValue ToAst(object value);
     }
 
     /// <inheritdoc/>
@@ -72,10 +72,10 @@ namespace GraphQL.Types
         /// overridden to support introspection of fields of this type that have default values. This method
         /// is not otherwise needed to be implemented.
         /// </summary>
-        public virtual IValue ToAST(object value)
+        public virtual IValue ToAst(object value)
         {
             //TODO: use reflection to reverse-engineer TSourceType and provide a default implementation
-            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of '{Name}' to support this operation.");
+            throw new System.NotImplementedException($"Please override the '{nameof(ToAst)}' method of '{Name}' to support this operation.");
         }
     }
 }
