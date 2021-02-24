@@ -9,7 +9,9 @@ namespace GraphQL.Tests.Complexity
     {
         // For our heuristics in these tests it is assumed that each Field returns on average of two results.
         public ComplexityAnalyzer Analyzer { get; } = new ComplexityAnalyzer();
+
         public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder();
+
         public StarWarsTestBase StarWarsTestBase { get; } = new StarWarsBasicQueryTests();
 
         protected ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
