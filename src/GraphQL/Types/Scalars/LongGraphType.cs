@@ -11,15 +11,31 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            LongValue longValue => longValue.Value,
-            IntValue intValue => (long)intValue.Value,
+            LongValue l => l.Value,
+            IntValue i => (long)i.Value,
             _ => null
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(long));
+        public override object ParseValue(object value) => value switch
+        {
+            long _ => value, // no boxing
+            int i => (long)i,
+            _ => null
+        };
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value is IntValue || value is LongValue;
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object value)
+        {
+            return value switch
+            {
+                long _ => true,
+                int _ => true,
+                _ => false
+            };
+        }
     }
 }

@@ -125,8 +125,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var val = context.GetArgument<int>("input");
-                    var result = JsonSerializer.Serialize(val);
+                    var result = context.GetArgument<int>("input");
                     return result;
                 });
 

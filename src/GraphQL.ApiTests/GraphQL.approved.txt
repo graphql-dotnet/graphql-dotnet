@@ -2128,6 +2128,7 @@ namespace GraphQL.Types
     {
         public IntGraphType() { }
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -2175,6 +2176,7 @@ namespace GraphQL.Types
     {
         public LongGraphType() { }
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
