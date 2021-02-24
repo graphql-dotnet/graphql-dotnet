@@ -534,11 +534,11 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
+        public static IValue AstFromValue(this object value, IGraphType type)
         {
             if (type is NonNullGraphType nonnull)
             {
-                return AstFromValue(value, schema, nonnull.ResolvedType);
+                return AstFromValue(value, nonnull.ResolvedType);
             }
 
             if (value == null || type == null)
@@ -556,33 +556,20 @@ namespace GraphQL
                 {
                     var values = list
                         .Cast<object>()
-                        .Select(item => AstFromValue(item, schema, itemType))
+                        .Select(item => AstFromValue(item, itemType))
                         .ToList();
 
                     return new ListValue(values);
                 }
 
-                return AstFromValue(value, schema, itemType);
+                return AstFromValue(value, itemType);
             }
 
             // Populate the fields of the input object by creating ASTs from each value
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                if (!(value is Dictionary<string, object> dict))
-                {
-                    return null;
-                }
-
-                var fields = dict
-                    .Select(pair =>
-                    {
-                        var fieldType = input.GetField(pair.Key)?.ResolvedType;
-                        return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
-                    })
-                    .ToList();
-
-                return new ObjectValue(fields);
+                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the object type '{input.Name}' to an AST representation.");
             }
 
             if (!(type is ScalarGraphType scalar))

@@ -167,7 +167,7 @@ namespace GraphQL
     }
     public static class GraphQLExtensions
     {
-        public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type) { }
+        public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
         public static object DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -1975,11 +1975,6 @@ namespace GraphQL.Types
         System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
         void AddPossibleType(GraphQL.Types.IObjectGraphType type);
     }
-    public interface IAstFromValueConverter
-    {
-        GraphQL.Language.AST.IValue Convert(object value, GraphQL.Types.IGraphType type);
-        bool Matches(object value, GraphQL.Types.IGraphType type);
-    }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.TypeFields Fields { get; }
@@ -2006,6 +2001,7 @@ namespace GraphQL.Types
     {
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value);
+        GraphQL.Language.AST.IValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
@@ -2062,13 +2058,10 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        System.Collections.Generic.IEnumerable<GraphQL.Types.IAstFromValueConverter> ValueConverters { get; }
-        GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
         void RegisterType(System.Type type);
         void RegisterTypeMapping(System.Type clrType, System.Type graphType);
-        void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
     }
@@ -2094,6 +2087,7 @@ namespace GraphQL.Types
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value) { }
+        public virtual GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2270,16 +2264,13 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.IAstFromValueConverter> ValueConverters { get; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
-        public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public void Initialize() { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType(System.Type type) { }
         public void RegisterTypeMapping(System.Type clrType, System.Type graphType) { }
         public void RegisterTypes(params System.Type[] types) { }
-        public void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter) { }
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
         protected virtual void Validate() { }
@@ -2723,18 +2714,16 @@ namespace GraphQL.Utilities.Federation
     public class AnyScalarGraphType : GraphQL.Types.ScalarGraphType
     {
         public AnyScalarGraphType() { }
+        public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override bool CanParseValue(object value) { }
+        public override bool IsValidDefault(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class AnyValue : GraphQL.Language.AST.ValueNode<object>
     {
         public AnyValue(object value) { }
-    }
-    public class AnyValueConverter : GraphQL.Types.IAstFromValueConverter
-    {
-        public AnyValueConverter() { }
-        public GraphQL.Language.AST.IValue Convert(object value, GraphQL.Types.IGraphType type) { }
-        public bool Matches(object value, GraphQL.Types.IGraphType type) { }
     }
     public class FederatedResolveContext
     {
