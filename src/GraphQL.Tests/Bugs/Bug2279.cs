@@ -15,10 +15,8 @@ namespace GraphQL.Tests.Bugs
             var e = Should.Throw<InvalidOperationException>(() => s.Initialize());
             var t1 = typeof(Bug2279GraphType<int>).FullName;
             var t2 = typeof(Bug2279GraphType<string>).FullName;
-            //nl will be determined at compile time dictated by how git is configured to handle line endings, not what environment the code was ran in
-            var nl = @"
-";
-            e.Message.ShouldBe($"Unable to register GraphType '{t1}' with the name 'Bug2279GraphType_1';{nl}the name 'Bug2279GraphType_1' is already registered to '{t2}'.");
+            e.Message.ShouldBe(@$"Unable to register GraphType '{t1}' with the name 'Bug2279GraphType_1'.
+The name 'Bug2279GraphType_1' is already registered to '{t2}'. Check your schema configuration.");
         }
     }
 
