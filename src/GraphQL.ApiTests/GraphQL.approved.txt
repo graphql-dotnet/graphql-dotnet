@@ -2186,7 +2186,7 @@ namespace GraphQL.Types
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
-        where T : GraphQL.Types.GraphType
+        where T : GraphQL.Types.IGraphType
     {
         public NonNullGraphType() { }
         public override System.Type Type { get; }
