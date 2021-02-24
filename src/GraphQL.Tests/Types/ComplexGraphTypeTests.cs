@@ -359,7 +359,7 @@ namespace GraphQL.Tests.Types
         [InlineData("id$")]
         public void does_not_throw_with_filtering_nameconverter(string fieldName)
         {
-            GlobalSwitches.Validation = (n, t) => { }; // disable "before" checks
+            GlobalSwitches.NameValidation = (n, t) => { }; // disable "before" checks
 
             try
             {
@@ -374,7 +374,7 @@ namespace GraphQL.Tests.Types
             }
             finally
             {
-                GlobalSwitches.Validation = NameValidator.ValidateDefault; // restore defaults
+                GlobalSwitches.NameValidation = NameValidator.ValidateDefault; // restore defaults
             }
         }
 
