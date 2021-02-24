@@ -1508,7 +1508,7 @@ namespace GraphQL.Language.AST
     {
         public StringValue(string value) { }
     }
-    public class ValueNode<T> : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<T>
+    public abstract class ValueNode<T> : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<T>
     {
         public ValueNode() { }
         public ValueNode(T value) { }

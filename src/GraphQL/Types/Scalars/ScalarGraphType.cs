@@ -125,12 +125,20 @@ namespace GraphQL.Types
                 return serialized switch
                 {
                     bool b => new BooleanValue(b),
+                    byte b => new IntValue(b),
+                    sbyte sb => new IntValue(sb),
+                    short s => new IntValue(s),
+                    ushort us => new IntValue(us),
                     int i => new IntValue(i),
-                    BigInteger bi => new BigIntValue(bi),
+                    uint ui => new LongValue(ui),
                     long l => new LongValue(l),
-                    decimal @decimal => new DecimalValue(@decimal),
+                    ulong ul => new BigIntValue(ul),
+                    BigInteger bi => new BigIntValue(bi),
+                    decimal d => new DecimalValue(d),
+                    float f => new FloatValue(f),
                     double d => new FloatValue(d),
-                    _ => null
+                    string s => new StringValue(s),
+                    _ => new StringValue(value.ToString())
                 };
             }
             catch
