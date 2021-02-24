@@ -74,30 +74,5 @@ namespace GraphQL.Tests.Execution
             result.ShouldNotBeNull();
             result.ShouldBeOfType<FloatValue>();
         }
-
-        [Fact]
-        public void registers_ast_from_value_converters()
-        {
-            var schema = new Schema();
-            schema.RegisterValueConverter(new ByteValueConverter());
-
-            byte value = 12;
-            var result = schema.FindValueConverter(value, null);
-            result.ShouldNotBeNull("AST from value converter should be registered");
-            result.ShouldBeOfType<ByteValueConverter>();
-        }
-    }
-
-    internal class ByteValueConverter : IAstFromValueConverter
-    {
-        public bool Matches(object value, IGraphType type)
-        {
-            return value is byte;
-        }
-
-        public IValue Convert(object value, IGraphType type)
-        {
-            return new IntValue((byte)value);
-        }
     }
 }

@@ -183,7 +183,6 @@ namespace GraphQL.Tests.Types
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType<DroidType>());
-            Should.Throw<ObjectDisposedException>(() => schema.RegisterValueConverter(new AnyValueConverter()));
         }
 
         [Fact]
