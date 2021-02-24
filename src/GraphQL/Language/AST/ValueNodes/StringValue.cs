@@ -8,9 +8,8 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public StringValue(string value)
+        public StringValue(string value) : base(value)
         {
-            Value = value;
         }
     }
 }

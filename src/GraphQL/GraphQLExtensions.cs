@@ -548,28 +548,20 @@ namespace GraphQL
                 long l => new LongValue(l),
                 decimal @decimal => new DecimalValue(@decimal),
                 double d => new FloatValue(d),
-                DateTime time => new DateTimeValue(time),
-                Uri uri => new UriValue(uri),
-                DateTimeOffset offset => new DateTimeOffsetValue(offset),
-                TimeSpan span => new TimeSpanValue(span),
-                Guid guid => new GuidValue(guid),
-                sbyte @sbyte => new SByteValue(@sbyte),
-                byte @byte => new ByteValue(@byte),
-                short @short => new ShortValue(@short),
-                ushort uint16 => new UShortValue(uint16),
-                uint uint32 => new UIntValue(uint32),
-                ulong uint64 => new ULongValue(uint64),
+                DateTime time => new ValueNode<DateTime>(time),
+                Uri uri => new ValueNode<Uri>(uri),
+                DateTimeOffset offset => new ValueNode<DateTimeOffset>(offset),
+                TimeSpan span => new ValueNode<TimeSpan>(span),
+                Guid guid => new ValueNode<Guid>(guid),
+                sbyte @sbyte => new ValueNode<sbyte>(@sbyte),
+                byte @byte => new ValueNode<byte>(@byte),
+                short @short => new ValueNode<short>(@short),
+                ushort uint16 => new ValueNode<ushort>(uint16),
+                uint uint32 => new ValueNode<uint>(uint32),
+                ulong uint64 => new ValueNode<ulong>(uint64),
                 string str => type is EnumerationGraphType ? (IValue)new EnumValue(str) : new StringValue(str),
-                _ => Convert()
+                _ => new UnknownValue(serialized)
             };
-
-            IValue Convert()
-            {
-                var converter = schema.FindValueConverter(serialized, type);
-                return converter != null
-                    ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
-            }
         }
     }
 }

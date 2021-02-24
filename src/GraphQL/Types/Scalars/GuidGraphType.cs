@@ -11,7 +11,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            GuidValue _ => true,
+            ValueNode<Guid> _ => true,
             StringValue s => Guid.TryParse(s.Value, out _),
             _ => false
         };
@@ -27,7 +27,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            GuidValue g => g.Value,
+            ValueNode<Guid> g => g.Value,
             StringValue s => Guid.Parse(s.Value),
             _ => null
         };

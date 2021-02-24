@@ -10,9 +10,8 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public BigIntValue(BigInteger value)
+        public BigIntValue(BigInteger value) : base(value)
         {
-            Value = value;
         }
     }
 }

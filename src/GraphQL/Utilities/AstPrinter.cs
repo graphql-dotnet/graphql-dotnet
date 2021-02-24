@@ -368,7 +368,7 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<UriValue>(c =>
+            Config<ValueNode<Uri>>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
@@ -406,6 +406,19 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Type)}!");
             });
 
+            Config<UnknownValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f =>
+                {
+                    var val = f.Arg(x => x.Value);
+                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
+                    {
+                        val = $"\"{val}\"";
+                    }
+                    return val;
+                });
+            });
             // Type System Definitions
         }
 
