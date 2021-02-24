@@ -102,7 +102,7 @@ to parse and serialize json data. The [GraphQL.SystemTextJson](https://www.nuget
 [GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson/) nuget packages include the necessary
 components to assist in this regard. Below are examples of the changes required:
 
-Version 3.0 sample, using the Newtonsoft.Json package:
+Version 3.0 sample, using the `Newtonsoft.Json` package:
 ```csharp
 using Newtonsoft.Json;
 
@@ -140,7 +140,7 @@ public class GraphQLRequest
 }
 ```
 
-Version 3.0 sample, using the System.Text.Json converter:
+Version 3.0 sample, using the `System.Text.Json` package:
 ```csharp
 using System.Text.Json;
 
