@@ -36,8 +36,9 @@ namespace GraphQL
         /// </summary>
         public static bool IsLeafType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
-            return namedType is ScalarGraphType;
+            var (namedType, namedType2) = type.GetNamedTypes();
+            return namedType is ScalarGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -70,9 +71,11 @@ namespace GraphQL
         /// </summary>
         public static bool IsInputType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
             return namedType is ScalarGraphType ||
-                   namedType is IInputObjectGraphType;
+                   namedType is IInputObjectGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -107,11 +110,16 @@ namespace GraphQL
         /// </summary>
         public static bool IsOutputType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
             return namedType is ScalarGraphType ||
                    namedType is IObjectGraphType ||
                    namedType is IInterfaceGraphType ||
-                   namedType is UnionGraphType;
+                   namedType is UnionGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IObjectGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IInterfaceGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(UnionGraphType).IsAssignableFrom(namedType2);
+            ;
         }
 
         /// <summary>
@@ -119,8 +127,25 @@ namespace GraphQL
         /// </summary>
         public static bool IsInputObjectType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
-            return namedType is IInputObjectGraphType;
+            var (namedType, namedType2) = type.GetNamedTypes();
+            return namedType is IInputObjectGraphType ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
+        }
+
+        internal static bool IsGraphQLTypeReference(this IGraphType type)
+        {
+            var (namedType, _) = type.GetNamedTypes();
+            return namedType is GraphQLTypeReference;
+        }
+
+        internal static (IGraphType resolvedType, Type type) GetNamedTypes(this IGraphType type)
+        {
+            return type switch
+            {
+                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type)),
+                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type)),
+                _ => (type, null)
+            };
         }
 
         /// <summary>
@@ -128,12 +153,11 @@ namespace GraphQL
         /// </summary>
         public static IGraphType GetNamedType(this IGraphType type)
         {
-            return type switch
-            {
-                NonNullGraphType nonNull => GetNamedType(nonNull.ResolvedType),
-                ListGraphType list => GetNamedType(list.ResolvedType),
-                _ => type
-            };
+            if (type == null)
+                return null;
+
+            var (namedType, _) = type.GetNamedTypes();
+            return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
         }
 
         /// <summary>
