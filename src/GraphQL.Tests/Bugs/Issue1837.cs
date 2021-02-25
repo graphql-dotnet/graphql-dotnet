@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Bugs
                     Name = "abc"
                 });
             });
-            ex.Message.ShouldBe("Input type 'Issue1837ArrayInputType' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type. (Parameter 'fieldType')");
+            ex.Message.ShouldStartWith("Input type 'Issue1837ArrayInputType' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type.");
 
             AddField(new FieldType
             {
