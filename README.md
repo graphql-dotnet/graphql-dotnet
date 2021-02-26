@@ -2,10 +2,12 @@
 
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Build+artifacts%22%22)
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Publish+code%22%22)
-[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/workflows/CodeQL%20analysis/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22CodeQL+analysis%22%22)
+[![Test code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml)
+[![Build artifacts](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml)
+[![Publish code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml)
+[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml)
 
+[![codecov](https://codecov.io/gh/graphql-dotnet/graphql-dotnet/branch/master/graph/badge.svg?token=iXZo1jZvFo)](https://codecov.io/gh/graphql-dotnet/graphql-dotnet)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/alerts/)
 [![Language grade: C#](https://img.shields.io/lgtm/grade/csharp/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/context:csharp)
 
