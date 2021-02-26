@@ -85,7 +85,7 @@ namespace GraphQL.Types
             get => _defaultValue;
             set
             {
-                if (!(ResolvedType?.GetNamedType() is GraphQLTypeReference))
+                if (!ResolvedType.IsGraphQLTypeReference())
                     _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
 
                 _defaultValue = value;
@@ -117,7 +117,7 @@ namespace GraphQL.Types
 
         private IGraphType CheckResolvedType(IGraphType type)
         {
-            if (!(type.GetNamedType() is GraphQLTypeReference) && type?.IsInputType() == false)
+            if (type != null && !type.IsGraphQLTypeReference() && type.IsInputType() == false)
                 throw Create(nameof(ResolvedType), type.GetType());
 
             return type;

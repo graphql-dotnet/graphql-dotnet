@@ -527,7 +527,9 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
+            namedType ??= context.ResolveType(namedType2);
+
             var foundType = this[namedType.Name];
             if (foundType == null)
             {
