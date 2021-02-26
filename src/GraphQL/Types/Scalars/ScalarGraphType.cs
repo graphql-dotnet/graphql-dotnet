@@ -113,7 +113,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Converts a value to an AST representation. This is necessary for introspection queries
-        /// to return the default value for fields of this scalar type. This method may throw an exception
+        /// to return the default values of this scalar type when used on input fields or field and directive arguments. This method may throw an exception
         /// or return null for a failed conversion.
         /// </summary>
         public virtual IValue ToAst(object value)
