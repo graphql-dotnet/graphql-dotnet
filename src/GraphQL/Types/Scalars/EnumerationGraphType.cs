@@ -91,7 +91,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value)
+        public override IValue ToAST(object value)
         {
             var serialized = (string)Serialize(value);
             return serialized != null ? new EnumValue(serialized) : null;

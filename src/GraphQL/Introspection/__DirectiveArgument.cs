@@ -27,7 +27,7 @@ namespace GraphQL.Introspection
                     var argument = context.Source;
                     if (argument.Value == null) return null;
 
-                    var ast = argument.Value.AstFromValue(argument.ResolvedType);
+                    var ast = argument.ResolvedType.ToAST(argument.Value);
                     if (ast is StringValue value) //TODO: ???
                     {
                         return value.Value;

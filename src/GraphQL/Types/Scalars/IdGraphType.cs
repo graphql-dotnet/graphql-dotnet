@@ -48,6 +48,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new StringValue(value.ToString());
+        public override IValue ToAST(object value) => new StringValue(value.ToString());
     }
 }

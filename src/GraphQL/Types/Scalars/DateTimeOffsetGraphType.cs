@@ -27,6 +27,6 @@ namespace GraphQL.Types
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new StringValue(((DateTimeOffset)value).ToString("O"));
+        public override IValue ToAST(object value) => new StringValue(((DateTimeOffset)value).ToString("O"));
     }
 }

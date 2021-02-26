@@ -36,7 +36,7 @@ namespace GraphQL.Introspection
                     if (hasDefault?.DefaultValue == null)
                         return null;
 
-                    var ast = hasDefault.DefaultValue.AstFromValue(hasDefault.ResolvedType);
+                    var ast = hasDefault.ResolvedType.ToAST(hasDefault.DefaultValue);
                     var result = AstPrinter.Print(ast);
                     return string.IsNullOrWhiteSpace(result) ? null : result;
                 });

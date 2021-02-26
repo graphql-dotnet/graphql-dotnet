@@ -46,6 +46,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new LongValue(Convert.ToInt64(Serialize(value)));
+        public override IValue ToAST(object value) => new LongValue(Convert.ToInt64(Serialize(value)));
     }
 }

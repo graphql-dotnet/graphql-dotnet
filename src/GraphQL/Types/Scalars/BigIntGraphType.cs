@@ -31,6 +31,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
+        public override IValue ToAST(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
     }
 }

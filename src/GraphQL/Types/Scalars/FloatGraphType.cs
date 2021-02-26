@@ -47,6 +47,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new FloatValue(Convert.ToDouble(value));
+        public override IValue ToAST(object value) => new FloatValue(Convert.ToDouble(value));
     }
 }

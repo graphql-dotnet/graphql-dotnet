@@ -27,6 +27,6 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value is IntValue;
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new IntValue(Convert.ToInt32(value));
+        public override IValue ToAST(object value) => new IntValue(Convert.ToInt32(value));
     }
 }

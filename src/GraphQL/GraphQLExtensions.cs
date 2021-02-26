@@ -557,11 +557,11 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue AstFromValue(this object value, IGraphType type)
+        public static IValue ToAST(this IGraphType type, object value)
         {
             if (type is NonNullGraphType nonnull)
             {
-                return AstFromValue(value, nonnull.ResolvedType);
+                return ToAST(nonnull.ResolvedType, value);
             }
 
             if (value == null || type == null)
@@ -579,13 +579,13 @@ namespace GraphQL
                 {
                     var values = list
                         .Cast<object>()
-                        .Select(item => AstFromValue(item, itemType))
+                        .Select(item => ToAST(itemType, item))
                         .ToList();
 
                     return new ListValue(values);
                 }
 
-                return AstFromValue(value, itemType);
+                return ToAST(itemType, value);
             }
 
             // Populate the fields of the input object by creating ASTs from each value
@@ -598,7 +598,7 @@ namespace GraphQL
             if (!(type is ScalarGraphType scalar))
                 throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
-            return scalar.ToAst(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+            return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
         }
     }
 }

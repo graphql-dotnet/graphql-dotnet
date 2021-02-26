@@ -86,6 +86,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAst(object value) => new DecimalValue(Convert.ToDecimal(value));
+        public override IValue ToAST(object value) => new DecimalValue(Convert.ToDecimal(value));
     }
 }
