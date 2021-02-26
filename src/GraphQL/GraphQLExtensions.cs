@@ -513,14 +513,14 @@ namespace GraphQL
         /// Returns a value indicating whether the provided value is a valid default value
         /// for the specified input graph type.
         /// </summary>
-        public static bool IsValidDefaultForGraph(object value, IGraphType type)
+        public static bool IsValidDefault(this IGraphType type, object value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : IsValidDefaultForGraph(value, nonNullGraphType.ResolvedType);
+                return value == null ? false : nonNullGraphType.ResolvedType.IsValidDefault(value);
             }
 
             if (value == null)
@@ -535,7 +535,7 @@ namespace GraphQL
 
                 foreach (var item in list)
                 {
-                    if (!IsValidDefaultForGraph(item, listGraphType.ResolvedType))
+                    if (!IsValidDefault(listGraphType.ResolvedType, item))
                         return false;
                 }
 
@@ -544,7 +544,7 @@ namespace GraphQL
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                return inputObjectGraphType.IsValidDefault(value);
+                return IsValidDefault(inputObjectGraphType, value);
             }
 
             if (!(type is ScalarGraphType scalar))

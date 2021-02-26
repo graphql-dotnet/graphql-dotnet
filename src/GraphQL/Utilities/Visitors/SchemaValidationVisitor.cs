@@ -165,7 +165,7 @@ namespace GraphQL.Utilities
             // validate default value
             if (field.DefaultValue != null && field.ResolvedType != null)
             {
-                if (!GraphQLExtensions.IsValidDefaultForGraph(field.DefaultValue, field.ResolvedType))
+                if (!GraphQLExtensions.IsValidDefault(field.ResolvedType, field.DefaultValue))
                 {
                     throw new InvalidOperationException($"The default value of field '{field.Name}' of type '{type.Name}' is invalid.");
                 }
@@ -209,7 +209,7 @@ namespace GraphQL.Utilities
         {
             if (argument.DefaultValue != null && argument.ResolvedType != null)
             {
-                if (!GraphQLExtensions.IsValidDefaultForGraph(argument.DefaultValue, argument.ResolvedType))
+                if (!GraphQLExtensions.IsValidDefault(argument.ResolvedType, argument.DefaultValue))
                 {
                     throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{field.Name}' is invalid.");
                 }
