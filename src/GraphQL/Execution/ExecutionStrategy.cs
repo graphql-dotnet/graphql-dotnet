@@ -230,7 +230,7 @@ namespace GraphQL.Execution
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A list to append the collected list of fields to; if null, a new list will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Fields CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields = null)
+        protected virtual Fields CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields)
         {
             fields ??= new Fields();
             List<string> visitedFragmentNames = null;
