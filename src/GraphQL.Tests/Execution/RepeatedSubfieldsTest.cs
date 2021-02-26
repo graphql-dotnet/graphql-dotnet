@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Execution
         private class MyExecutionStrategy : ParallelExecutionStrategy
         {
             public Fields MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
-                => CollectFieldsFrom(executionContext, graphType, selectionSet);
+                => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
         }
 
         [Fact]
