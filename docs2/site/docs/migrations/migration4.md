@@ -129,10 +129,8 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `EnableReadDeprecationReasonFromAttributes` enables or disables setting default values for 'deprecationReason' from `ObsoleteAttribute`. Enabled by default.
 - `EnableReadDescriptionFromAttributes` enables or disables setting default values for 'description' from `DescriptionAttribute`. Enabled by default.
 - `EnableReadDescriptionFromXmlDocumentation` enables or disables setting default values for 'description' from XML documentation. Disabled by default.
-- `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
+- `NameValidation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
   when the configured `INameConverter` fixes up invalid names. See `ISchema.NameConverter`.
-- `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
-  Disabling this validator is unlikely to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
 It is recommended to configure these options once when your application starts, such as within your `void Main()` method, a static
 constructor of your schema, or a similar location.
@@ -532,7 +530,8 @@ default continues to be `ResolverType.Resolver`.
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
 * `ExecutionNode.IsResultSet` has been removed
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
-* `NameValidator.ValidateName` and `NameValidator.ValidateNameOnSchemaInitialize` accept an enum instead of a string for their second argument
+* `NameValidator.ValidateName` accepts an enum instead of a string for its second argument
+* `NameValidator.ValidateNameOnSchemaInitialize` has been made internal and `ValidationOnSchemaInitialize` has been removed
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before

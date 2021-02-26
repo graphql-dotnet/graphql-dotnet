@@ -53,7 +53,7 @@ namespace GraphQL.Types
 
     /// <inheritdoc cref="NonNullGraphType"/>
     public sealed class NonNullGraphType<T> : NonNullGraphType
-        where T : GraphType
+        where T : IGraphType
     {
         /// <summary>
         /// Initializes a new instance for the specified inner graph type.

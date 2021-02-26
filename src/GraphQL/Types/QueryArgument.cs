@@ -105,7 +105,7 @@ namespace GraphQL.Types
 
         private IGraphType CheckResolvedType(IGraphType type)
         {
-            if (!(type.GetNamedType() is GraphQLTypeReference) && type?.IsInputType() == false)
+            if (type != null && !type.IsGraphQLTypeReference() && type.IsInputType() == false)
                 throw Create(nameof(ResolvedType), type.GetType());
 
             return type;

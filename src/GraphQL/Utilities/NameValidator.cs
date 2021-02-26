@@ -12,14 +12,14 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateName(string name, NamedElement type) => GlobalSwitches.Validation(name, type);
+        public static void ValidateName(string name, NamedElement type) => GlobalSwitches.NameValidation(name, type);
 
         /// <summary>
         /// Validates a specified name during schema initialization.
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateNameOnSchemaInitialize(string name, NamedElement type) => GlobalSwitches.ValidationOnSchemaInitialize(name, type);
+        internal static void ValidateNameOnSchemaInitialize(string name, NamedElement type) => ValidateDefault(name, type);
 
         /// <summary>
         /// Validates a specified name according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
