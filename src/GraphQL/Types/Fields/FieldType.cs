@@ -50,7 +50,7 @@ namespace GraphQL.Types
             get => _defaultValue;
             set
             {
-                if (!(ResolvedType?.GetNamedType() is GraphQLTypeReference))
+                if (!ResolvedType.IsGraphQLTypeReference())
                     _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
 
                 _defaultValue = value;

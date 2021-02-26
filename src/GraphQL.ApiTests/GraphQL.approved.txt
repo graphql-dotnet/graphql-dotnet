@@ -151,8 +151,7 @@ namespace GraphQL
     }
     public static class GlobalSwitches
     {
-        public static System.Action<string, GraphQL.Utilities.NamedElement> Validation;
-        public static System.Action<string, GraphQL.Utilities.NamedElement> ValidationOnSchemaInitialize;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -2192,7 +2191,7 @@ namespace GraphQL.Types
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
-        where T : GraphQL.Types.GraphType
+        where T : GraphQL.Types.IGraphType
     {
         public NonNullGraphType() { }
         public override System.Type Type { get; }
@@ -2591,7 +2590,6 @@ namespace GraphQL.Utilities
     {
         public static void ValidateDefault(string name, GraphQL.Utilities.NamedElement type) { }
         public static void ValidateName(string name, GraphQL.Utilities.NamedElement type) { }
-        public static void ValidateNameOnSchemaInitialize(string name, GraphQL.Utilities.NamedElement type) { }
     }
     public enum NamedElement
     {

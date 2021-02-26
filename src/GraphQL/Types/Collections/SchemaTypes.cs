@@ -527,7 +527,9 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
+            namedType ??= context.ResolveType(namedType2);
+
             var foundType = this[namedType.Name];
             if (foundType == null)
             {
@@ -697,18 +699,18 @@ Make sure that your ServiceProvider is configured correctly.");
 
             if (Dictionary.TryGetValue(typeName, out var existingGraphType))
             {
-                if (ReferenceEquals(existingGraphType, type))
+                if (ReferenceEquals(existingGraphType, type) || existingGraphType.GetType() == type.GetType())
                 {
-                    // nothing to do
-                }
-                else if (existingGraphType.GetType() == type.GetType())
-                {
-                    Dictionary[typeName] = type; // this case worked before overwriting the old value
+                    // Soft schema configuration error.
+                    // Intentionally or inadvertently, a situation may arise when the same GraphType is registered more that one time.
+                    // This may be due to the simultaneous registration of GraphType instances and the GraphType types. In this case
+                    // the duplicate MUST be ignored, otherwise errors will occur.
                 }
                 else
                 {
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetType().FullName}' with the name '{typeName}';
-the name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'.");
+                    // Fatal schema configuration error.
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetType().FullName}' with the name '{typeName}'.
+The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
                 }
             }
             else

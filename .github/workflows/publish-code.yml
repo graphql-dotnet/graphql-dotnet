@@ -25,9 +25,9 @@ jobs:
         env:
           github_ref: ${{ github.ref }}
         run: |
-          ref="${github_ref:10}"
-          echo $ref
-          echo "ref=$ref" >> $GITHUB_ENV
+          version="${github_ref:10}"
+          echo version=$version
+          echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v1
         with:
@@ -58,10 +58,10 @@ jobs:
         run: dotnet restore
       - name: Build solution [Release]
         working-directory: src
-        run: dotnet build --no-restore -c Release -p:Version=$ref
+        run: dotnet build --no-restore -c Release -p:Version=$version
       - name: Pack solution [Release]
         working-directory: src
-        run: dotnet pack --no-restore -c Release -p:Version=$ref -o out
+        run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o out
       - name: Upload Nuget packages as workflow artifacts
         uses: actions/upload-artifact@v2
         with:
