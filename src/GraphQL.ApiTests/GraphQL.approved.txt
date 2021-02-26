@@ -2584,7 +2584,6 @@ namespace GraphQL.Utilities
     {
         public static void ValidateDefault(string name, GraphQL.Utilities.NamedElement type) { }
         public static void ValidateName(string name, GraphQL.Utilities.NamedElement type) { }
-        public static void ValidateNameOnSchemaInitialize(string name, GraphQL.Utilities.NamedElement type) { }
     }
     public enum NamedElement
     {
