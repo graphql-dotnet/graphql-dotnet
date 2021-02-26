@@ -228,7 +228,7 @@ namespace GraphQL.Execution
         /// <param name="context">The execution context.</param>
         /// <param name="specificType">The graph type to compare the selection set against.</param>
         /// <param name="selectionSet">The selection set from the document.</param>
-        /// <param name="fields">A list to append the collected list of fields to; if null, a new list will be created.</param>
+        /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
         protected virtual Fields CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields)
         {
