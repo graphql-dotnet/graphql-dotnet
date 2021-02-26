@@ -530,7 +530,7 @@ default continues to be `ResolverType.Resolver`.
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
 * `ExecutionNode.IsResultSet` has been removed
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
-* `NameValidator.ValidateName` accept an enum instead of a string for their second argument
+* `NameValidator.ValidateName` accepts an enum instead of a string for its second argument
 * `NameValidator.ValidateNameOnSchemaInitialize` has been made internal and `ValidationOnSchemaInitialize` has been removed
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
