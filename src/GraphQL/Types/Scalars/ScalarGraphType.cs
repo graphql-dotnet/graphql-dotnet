@@ -137,6 +137,7 @@ namespace GraphQL.Types
                     float f => new FloatValue(f),
                     double d => new FloatValue(d),
                     string s => new StringValue(s),
+                    null => null,
                     _ => new StringValue(value.ToString())
                 };
             }
