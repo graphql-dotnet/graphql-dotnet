@@ -805,7 +805,7 @@ namespace GraphQL.Execution
         protected ExecutionStrategy() { }
         protected virtual GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
         protected virtual GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
-        protected virtual GraphQL.Language.AST.Fields CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, GraphQL.Language.AST.Fields fields = null) { }
+        protected virtual GraphQL.Language.AST.Fields CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, GraphQL.Language.AST.Fields fields) { }
         protected virtual System.Threading.Tasks.Task CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual void CompleteNode(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }

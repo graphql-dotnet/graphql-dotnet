@@ -213,7 +213,7 @@ namespace GraphQL.Execution
         public virtual Fields GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
-                ? CollectFieldsFrom(context, node.FieldDefinition.ResolvedType, node.Field.SelectionSet)
+                ? CollectFieldsFrom(context, node.FieldDefinition.ResolvedType, node.Field.SelectionSet, null)
                 : null;
         }
 
