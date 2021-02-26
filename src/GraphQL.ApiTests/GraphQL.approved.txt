@@ -166,7 +166,6 @@ namespace GraphQL
     }
     public static class GraphQLExtensions
     {
-        public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
         public static object DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -186,6 +185,7 @@ namespace GraphQL
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string[] IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
+        public static GraphQL.Language.AST.IValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
@@ -1736,7 +1736,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class BooleanGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1744,7 +1744,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class ByteGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1752,7 +1752,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public abstract class ComplexGraphType<TSourceType> : GraphQL.Types.GraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -1795,21 +1795,21 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class DateTimeGraphType : GraphQL.Types.ScalarGraphType
     {
         public DateTimeGraphType() { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class DateTimeOffsetGraphType : GraphQL.Types.ScalarGraphType
     {
         public DateTimeOffsetGraphType() { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class DecimalGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1818,7 +1818,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class DeprecatedDirective : GraphQL.Types.DirectiveGraphType
     {
@@ -1913,7 +1913,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class EnumerationGraphType<TEnum> : GraphQL.Types.EnumerationGraphType
         where TEnum : System.Enum
@@ -1945,7 +1945,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -1965,7 +1965,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public interface IAbstractGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2070,7 +2070,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class IncludeDirective : GraphQL.Types.DirectiveGraphType
     {
@@ -2093,7 +2093,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class InterfaceGraphType : GraphQL.Types.InterfaceGraphType<object>
     {
@@ -2141,7 +2141,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
@@ -2221,7 +2221,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public abstract class ScalarGraphType : GraphQL.Types.GraphType
     {
@@ -2232,7 +2232,7 @@ namespace GraphQL.Types
         public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }
-        public virtual GraphQL.Language.AST.IValue ToAst(object value) { }
+        public virtual GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
@@ -2302,7 +2302,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class SkipDirective : GraphQL.Types.DirectiveGraphType
     {
@@ -2314,7 +2314,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2322,7 +2322,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class TimeSpanSecondsGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2330,7 +2330,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public static class TypeExtensions
     {
@@ -2354,7 +2354,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class ULongGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2362,7 +2362,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class UShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2370,7 +2370,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class UnionGraphType : GraphQL.Types.GraphType, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2388,7 +2388,7 @@ namespace GraphQL.Types
         public UriGraphType() { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
 }
 namespace GraphQL.Types.Relay
@@ -2716,7 +2716,7 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
-        public override GraphQL.Language.AST.IValue ToAst(object value) { }
+        public override GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class AnyValue : GraphQL.Language.AST.ValueNode<object>
     {
