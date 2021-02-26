@@ -65,6 +65,35 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+To avoid having to register all of the individual graph types in your project, you can
+import the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI)
+package and utilize the `AutoCreatingServiceProvider` wrapper as follows:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<ISchema, StarWarsSchema>(services => new MySchema(new AutoCreatingServiceProvider(services)));
+}
+```
+
+If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you will need
+to manually pull in those dependencies from the `AutoCreatingServiceProvider` via `GetRequiredService` as follows:
+
+```csharp
+public class StarWarsSchema : Schema
+{
+    public StarWarsSchema(IServiceProvider serviceProvider)
+        : base(serviceProvider)
+    {
+        Query = serviceProvider.GetRequiredService<StarWarsQuery>();
+        Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
+    }
+}
+```
+
+No other graph types will need to be registered. Graph types will only be instantiated once, during schema initialization
+as usual. Graph types can also pull in any services registered with dependency injection as usual.
+
 ## Nancy TinyIoCContainer
 
 ```csharp
