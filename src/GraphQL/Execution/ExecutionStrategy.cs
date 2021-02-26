@@ -22,7 +22,7 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootType = GetOperationRootType(context);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode).ConfigureAwait(false);
@@ -50,30 +50,30 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the root graph type for the execution -- for a specified schema and operation type.
         /// </summary>
-        protected virtual IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
+        protected virtual IObjectGraphType GetOperationRootType(ExecutionContext context)
         {
             IObjectGraphType type;
 
-            switch (operation.OperationType)
+            switch (context.Operation.OperationType)
             {
                 case OperationType.Query:
-                    type = schema.Query;
+                    type = context.Schema.Query;
                     break;
 
                 case OperationType.Mutation:
-                    type = schema.Mutation;
+                    type = context.Schema.Mutation;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(operation, document);
+                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document);
                     break;
 
                 case OperationType.Subscription:
-                    type = schema.Subscription;
+                    type = context.Schema.Subscription;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(operation, document);
+                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document);
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
+                    throw new ArgumentOutOfRangeException($"{nameof(context)}.{nameof(ExecutionContext.Operation)}", "Can only execute queries, mutations and subscriptions.");
             }
 
             return type;
