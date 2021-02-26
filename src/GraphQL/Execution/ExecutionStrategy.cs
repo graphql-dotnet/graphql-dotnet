@@ -186,7 +186,7 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected virtual FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        protected FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -277,7 +277,7 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
         /// </summary>
-        protected virtual bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
+        protected bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
         {
             if (fragmentName == null)
                 throw new ArgumentNullException(nameof(fragmentName));
