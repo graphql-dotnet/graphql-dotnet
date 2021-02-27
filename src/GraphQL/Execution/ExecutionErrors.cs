@@ -6,10 +6,11 @@ using System.Linq;
 namespace GraphQL
 {
     /// <summary>
-    /// Contains a list of execution errors.
+    /// Contains a list of execution errors. Thread safe except <see cref="IEnumerable{T}"/> methods.
     /// </summary>
     public class ExecutionErrors : IEnumerable<ExecutionError>
     {
+        private readonly object _lock = new object();
         internal List<ExecutionError> List;
 
         internal ExecutionErrors(int capacity)
@@ -29,7 +30,8 @@ namespace GraphQL
         /// </summary>
         public virtual void Add(ExecutionError error)
         {
-            (List ??= new List<ExecutionError>()).Add(error ?? throw new ArgumentNullException(nameof(error)));
+            lock (_lock)
+                (List ??= new List<ExecutionError>()).Add(error ?? throw new ArgumentNullException(nameof(error)));
         }
 
         /// <summary>

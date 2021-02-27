@@ -96,8 +96,8 @@ namespace GraphQL
         {
             if (errors?.Count > 0)
             {
-                if (Errors == null)
-                    Errors = new ExecutionErrors(errors.Count);
+                Errors ??= new ExecutionErrors(errors.Count);
+
                 foreach (var error in errors.List)
                     Errors.Add(error);
             }
