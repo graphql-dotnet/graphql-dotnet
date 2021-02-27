@@ -171,7 +171,12 @@ This may be needed to get the parameters of parent nodes.
 
 * New property `ISchema.ValueConverters`
 * New method `IParentExecutionNode.ApplyToChildren`
-* `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
+* `ExecutionStrategy` exposes a number of `protected virtual` methods that can be used to alter the execution
+  of a document without rewriting the entire class. For instance, overriding `ShouldIncludeNode` provides
+  the ability to control the set of fields that the strategy executes; overriding `ProcessNodeUnhandledException`
+  provides a way to customize exception handling, and so on.
+* With the addition of `ExecutionContext.ExecutionStrategy` and `IExecutionStrategy.GetSubFields`, the
+  execution strategy now controls the fields that are returned when requested from `IResolveFieldContext.SubFields`.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
@@ -478,7 +483,11 @@ default continues to be `ResolverType.Resolver`.
 * `TypeExtensions.As` method has been removed
 * `ExecutionHelper.SubFieldsFor` and `ExecutionHelper.DoesFragmentConditionMatch` methods have been removed.
 * `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
-* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
+* All methods inside `ExecutionHelper` except `CoerceValue` and `GetArgumentValues` have been moved into protected
+  methods within `ExecutionStrategy`. Method signatures may have changed a very little.
+* `RootExecutionNode`'s constructor requires the root field's selection set, but `null` can be provided if this value
+  is not needed by the execution strategy.
+* `UnhandledExceptionContext.Context` is now of type `IExecutionContext`, returning a read-only view of the execution context.
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.

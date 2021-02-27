@@ -17,8 +17,8 @@ namespace GraphQL.Execution
         Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
 
         /// <summary>
-        /// This methods allows you to control the set of fields that the strategy will execute.
+        /// Returns the children fields for a specified node.
         /// </summary>
-        bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives directives);
+        Fields GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
 }
