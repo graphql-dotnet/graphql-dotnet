@@ -544,7 +544,7 @@ namespace GraphQL
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                return IsValidDefault(inputObjectGraphType, value);
+                return inputObjectGraphType.IsValidDefault(value);
             }
 
             if (type is ScalarGraphType scalar)
