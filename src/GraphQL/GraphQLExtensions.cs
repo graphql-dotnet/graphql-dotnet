@@ -547,10 +547,10 @@ namespace GraphQL
                 return IsValidDefault(inputObjectGraphType, value);
             }
 
-            if (!(type is ScalarGraphType scalar))
-                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
+            if (type is ScalarGraphType scalar)
+                return scalar.IsValidDefault(value);
 
-            return scalar.IsValidDefault(value);
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
         }
 
         /// <summary>
