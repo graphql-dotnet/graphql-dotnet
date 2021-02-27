@@ -165,7 +165,7 @@ namespace GraphQL.Utilities
             // validate default value
             if (field.DefaultValue != null && field.ResolvedType != null)
             {
-                if (!GraphQLExtensions.IsValidDefault(field.ResolvedType, field.DefaultValue))
+                if (!field.ResolvedType.IsValidDefault(field.DefaultValue))
                 {
                     throw new InvalidOperationException($"The default value of field '{field.Name}' of type '{type.Name}' is invalid.");
                 }
