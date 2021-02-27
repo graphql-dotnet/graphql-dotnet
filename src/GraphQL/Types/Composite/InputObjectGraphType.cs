@@ -18,7 +18,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Returns a boolean indicating if the provided value is valid as a default value for a
-        /// for a field of this type.
+        /// field of this type.
         /// </summary>
         bool IsValidDefault(object value);
 
