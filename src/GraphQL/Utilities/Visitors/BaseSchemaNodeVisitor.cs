@@ -47,6 +47,7 @@ namespace GraphQL.Utilities
         public virtual void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType objectGraphType, ISchema schema)
         {
         }
+
         /// <inheritdoc />
         public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema)
         {
