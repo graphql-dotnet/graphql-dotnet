@@ -209,7 +209,7 @@ namespace GraphQL.Utilities
         {
             if (argument.DefaultValue != null && argument.ResolvedType != null)
             {
-                if (!GraphQLExtensions.IsValidDefault(argument.ResolvedType, argument.DefaultValue))
+                if (!argument.ResolvedType.IsValidDefault(argument.DefaultValue))
                 {
                     throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{field.Name}' is invalid.");
                 }
