@@ -596,7 +596,7 @@ namespace GraphQL
             }
 
             if (!(type is ScalarGraphType scalar))
-                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
+                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
 
             return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
         }
