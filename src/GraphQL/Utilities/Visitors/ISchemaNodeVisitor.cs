@@ -42,7 +42,7 @@ namespace GraphQL.Utilities
         void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits field of registered within the schema output graph type.
+        /// Visits field of registered within the schema output interface graph type.
         /// </summary>
         void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
 
