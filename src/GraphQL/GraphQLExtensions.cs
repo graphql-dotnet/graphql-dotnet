@@ -595,10 +595,12 @@ namespace GraphQL
                 return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the input object type '{input.Name}' to an AST representation.");
             }
 
-            if (!(type is ScalarGraphType scalar))
-                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
+            if (type is ScalarGraphType scalar)
+            {
+                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+            }
 
-            return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
         }
     }
 }
