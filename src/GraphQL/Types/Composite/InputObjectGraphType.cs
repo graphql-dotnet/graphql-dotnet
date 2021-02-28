@@ -74,7 +74,7 @@ namespace GraphQL.Types
         public virtual IValue ToAST(object value)
         {
             //TODO: use reflection to reverse-engineer TSourceType and provide a default implementation
-            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of '{GetType().Name}' to support this operation.");
+            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.");
         }
     }
 }

@@ -144,7 +144,7 @@ namespace GraphQL.Types
                     double d => new FloatValue(d),
                     string s => new StringValue(s),
                     null => null,
-                    _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of '{GetType().Name}' to support this operation.")
+                    _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
                 };
             }
             catch
