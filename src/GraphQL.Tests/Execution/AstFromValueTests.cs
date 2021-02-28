@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = new StringGraphType().ToAST("test");
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<StringValue>();
+            result.ShouldBeOfType<StringValue>().Value.ShouldBe("test");
         }
 
         [Fact]
