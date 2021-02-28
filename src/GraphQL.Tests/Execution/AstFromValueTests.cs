@@ -45,8 +45,7 @@ namespace GraphQL.Tests.Execution
         public void converts_long_to_int_value()
         {
             long val = 12345678910111213;
-            Should.Throw<OverflowException>(() => new IntGraphType().ToAST(val))
-                .Message.ShouldBe("Unable to serialize '12345678910111213' to 'Int'.");
+            Should.Throw<OverflowException>(() => new IntGraphType().ToAST(val));
         }
 
         [Fact]
