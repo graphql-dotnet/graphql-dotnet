@@ -210,6 +210,15 @@ namespace GraphQL
 
                     case InterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
+                        foreach (var field in iface.Fields.List)
+                        {
+                            visitor.VisitFieldDefinition(field, iface, schema);
+                            if (field.Arguments?.Count > 0)
+                            {
+                                foreach (var argument in field.Arguments.List)
+                                    visitor.VisitFieldArgumentDefinition(argument, field, iface, schema);
+                            }
+                        }
                         break;
 
                     case IObjectGraphType output:

@@ -42,6 +42,11 @@ namespace GraphQL.Utilities
         void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
+        /// Visits field of registered within the schema output graph type.
+        /// </summary>
+        void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
+
+        /// <summary>
         /// Visits field of registered within the schema input graph type.
         /// </summary>
         void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
@@ -50,6 +55,11 @@ namespace GraphQL.Utilities
         /// Visits field argument of registered within the schema graph type.
         /// </summary>
         void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
+
+        /// <summary>
+        /// Visits field argument of registered within the schema graph type.
+        /// </summary>
+        void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits directive argument.

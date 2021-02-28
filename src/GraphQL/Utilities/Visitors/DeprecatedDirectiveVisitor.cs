@@ -33,6 +33,9 @@ namespace GraphQL.Utilities
         public override void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => SetDeprecationReason(field);
 
         /// <inheritdoc />
+        public override void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => SetDeprecationReason(field);
+
+        /// <inheritdoc />
         public override void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema) => SetDeprecationReason(value);
     }
 }

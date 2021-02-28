@@ -39,12 +39,22 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
+        public virtual void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema)
+        {
+        }
+
+        /// <inheritdoc />
         public virtual void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
         public virtual void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType objectGraphType, ISchema schema)
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType objectGraphType, ISchema schema)
         {
         }
 

@@ -17,6 +17,8 @@ namespace GraphQL.Utilities
 
         public void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
+        public void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
+
         public void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
         public void VisitEnum(EnumerationGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Enum);
@@ -26,6 +28,8 @@ namespace GraphQL.Utilities
         public void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema) => ValidateAppliedDirectives(value, schema, DirectiveLocation.EnumValue);
 
         public void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
+
+        public void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
 
         public void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.InputFieldDefinition);
 
