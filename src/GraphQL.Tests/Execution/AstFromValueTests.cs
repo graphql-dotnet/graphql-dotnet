@@ -78,7 +78,6 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void converts_byte_to_int_value()
         {
-
             byte value = 12;
             var result = new ByteGraphType().ToAST(value);
             result.ShouldNotBeNull();
