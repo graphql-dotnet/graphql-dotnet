@@ -19,8 +19,11 @@ namespace GraphQL.Utilities
             var exists = _typeConfigurations.Has(typeName);
             var typeConfig = _typeConfigurations[typeName];
             if (!exists)
+            {
                 foreach (var a in _forAllTypesConfigurationDelegates)
                     a.Invoke(typeConfig);
+            }
+
             return typeConfig;
         }
 
