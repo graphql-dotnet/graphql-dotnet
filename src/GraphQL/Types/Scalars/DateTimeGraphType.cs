@@ -27,6 +27,6 @@ namespace GraphQL.Types
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(((DateTime)value).ToString("O"));
+        public override IValue ToAST(object value) => new StringValue(((DateTime)value).ToString("O")); //"O" is the proper ISO 8601 format required
     }
 }

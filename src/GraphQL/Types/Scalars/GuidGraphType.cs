@@ -20,9 +20,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
-            Guid g => g,
+            Guid _ => value, // no boxing
             string s => Guid.Parse(s),
-            _ => (Guid?)null
+            _ => null
         };
 
         /// <inheritdoc/>

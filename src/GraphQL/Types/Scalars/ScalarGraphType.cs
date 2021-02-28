@@ -19,7 +19,7 @@ namespace GraphQL.Types
         /// responsible for preparing the scalar for transport to the client. It is only responsible
         /// for generating an object which can eventually be serialized by some transport-focused API.
         /// </summary>
-        /// <param name="value"> Resolved value. </param>
+        /// <param name="value">Resolved value. Must not be <see langword="null"/>.</param>
         /// <returns>
         /// The returned value of a the result coercion is part of the overall execution result.
         /// Normally this value is a primitive value like String or Integer to make it easy for
@@ -35,7 +35,7 @@ namespace GraphQL.Types
         /// server-side representation. Input coercion may not only return primitive values like
         /// String but rather complex ones when appropriate.
         /// </summary>
-        /// <param name="value"> AST value node. </param>
+        /// <param name="value">AST value node. Must not be <see langword="null"/>.</param>
         /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
         public abstract object ParseLiteral(IValue value);
 
@@ -47,7 +47,7 @@ namespace GraphQL.Types
         /// Parsing for arguments and variables are handled separately because while arguments must
         /// always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
         /// </summary>
-        /// <param name="value"> Runtime object from variables. </param>
+        /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
         /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
         public abstract object ParseValue(object value);
 
@@ -59,7 +59,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
         /// </summary>
-        /// <param name="value"> AST value node. </param>
+        /// <param name="value">AST value node. Must not be <see langword="null"/>.</param>
         public virtual bool CanParseLiteral(IValue value)
         {
             try
@@ -82,7 +82,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
         /// </summary>
-        /// <param name="value"> Runtime object from variables. </param>
+        /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
         public virtual bool CanParseValue(object value)
         {
             try
@@ -99,6 +99,7 @@ namespace GraphQL.Types
         /// Checks that the provided value is a valid default value.
         /// This method should not throw an exception.
         /// </summary>
+        /// <param name="value">The value to examine. Must not be <see langword="null"/>.</param>
         public virtual bool IsValidDefault(object value)
         {
             try
@@ -116,8 +117,13 @@ namespace GraphQL.Types
         /// to return the default values of this scalar type when used on input fields or field and directive arguments. This method may throw an exception
         /// or return <see langword="null"/> for a failed conversion.
         /// </summary>
+        /// <param name="value">The value to convert. Must not be <see langword="null"/>.</param>
+        /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion.</returns>
         public virtual IValue ToAST(object value)
         {
+            if (value == null)
+                return null;
+
             try
             {
                 var serialized = Serialize(value);
@@ -138,7 +144,7 @@ namespace GraphQL.Types
                     double d => new FloatValue(d),
                     string s => new StringValue(s),
                     null => null,
-                    _ => new StringValue(value.ToString())
+                    _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of '{Name}' to support this operation.")
                 };
             }
             catch

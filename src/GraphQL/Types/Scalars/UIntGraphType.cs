@@ -12,8 +12,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => intValue.Value >= 0 ? (uint?)intValue.Value : null,
+            IntValue intValue => uint.MinValue <= intValue.Value ? (uint?)intValue.Value : null,
             LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue ? (uint?)longValue.Value : null,
+            BigIntValue bigIntValue => uint.MinValue <= bigIntValue.Value && bigIntValue.Value <= uint.MaxValue ? (uint?)bigIntValue.Value : null,
             _ => null
         };
 
@@ -23,8 +24,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => intValue.Value >= 0,
+            IntValue intValue => uint.MinValue <= intValue.Value,
             LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue,
+            BigIntValue bigIntValue => uint.MinValue <= bigIntValue.Value && bigIntValue.Value <= uint.MaxValue,
             _ => false
         };
 

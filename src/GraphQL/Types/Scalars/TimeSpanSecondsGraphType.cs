@@ -23,8 +23,8 @@ namespace GraphQL.Types
         public override object Serialize(object value) => value switch
         {
             TimeSpan timeSpan => (long)timeSpan.TotalSeconds,
-            int i => i,
-            long l => l,
+            int _ => value,
+            long _ => value,
             _ => null
         };
 
@@ -39,7 +39,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
-            TimeSpan t => t,
+            TimeSpan _ => value,
             int i => TimeSpan.FromSeconds(i),
             long l => TimeSpan.FromSeconds(l),
             _ => null
