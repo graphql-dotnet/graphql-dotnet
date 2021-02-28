@@ -12,7 +12,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => (long?)intValue.Value,
+            IntValue intValue => (long)intValue.Value,
             LongValue longValue => longValue.Value,
             BigIntValue bigIntValue => long.MinValue <= bigIntValue.Value && bigIntValue.Value <= long.MaxValue ? (long?)bigIntValue.Value : null,
             _ => null
