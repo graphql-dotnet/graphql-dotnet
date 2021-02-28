@@ -16,5 +16,8 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value is BooleanValue;
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new BooleanValue((bool)value);
     }
 }

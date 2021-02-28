@@ -22,8 +22,6 @@ namespace GraphQL.Types
         private List<Type> _visitorTypes;
         private List<ISchemaNodeVisitor> _visitors;
 
-        private List<IAstFromValueConverter> _converters;
-
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
         /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects.
@@ -269,32 +267,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterValueConverter(IAstFromValueConverter converter)
-        {
-            CheckDisposed();
-
-            (_converters ??= new List<IAstFromValueConverter>()).Add(converter ?? throw new ArgumentNullException(nameof(converter)));
-        }
-
-        /// <inheritdoc/>
-        public IEnumerable<IAstFromValueConverter> ValueConverters => _converters ?? Enumerable.Empty<IAstFromValueConverter>();
-
-        /// <inheritdoc/>
-        public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
-        {
-            if (_converters != null)
-            {
-                foreach (var converter in _converters)
-                {
-                    if (converter.Matches(value, type))
-                        return converter;
-                }
-            }
-
-            return null;
-        }
-
-        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
@@ -316,7 +288,6 @@ namespace GraphQL.Types
                     _additionalInstances?.Clear();
                     _additionalTypes?.Clear();
                     Directives.List.Clear();
-                    _converters?.Clear();
                     _visitors?.Clear();
                     _visitorTypes?.Clear();
 

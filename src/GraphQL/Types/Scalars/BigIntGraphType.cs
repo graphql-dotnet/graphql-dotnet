@@ -12,9 +12,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            BigIntValue bigIntValue => bigIntValue.Value,
-            LongValue longValue => new BigInteger(longValue.Value),
             IntValue intValue => new BigInteger(intValue.Value),
+            LongValue longValue => new BigInteger(longValue.Value),
+            BigIntValue bigIntValue => bigIntValue.Value,
             _ => null
         };
 
@@ -24,10 +24,13 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            BigIntValue _ => true,
-            LongValue _ => true,
             IntValue _ => true,
+            LongValue _ => true,
+            BigIntValue _ => true,
             _ => false
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
     }
 }

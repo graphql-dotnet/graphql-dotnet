@@ -34,21 +34,32 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitFieldDefinition(FieldType field, ISchema schema)
+        public virtual void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitInputFieldDefinition(FieldType field, ISchema schema)
+        public virtual void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitFieldArgumentDefinition(QueryArgument argument, ISchema schema)
+        public virtual void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
         {
         }
+
         /// <inheritdoc />
-        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, ISchema schema)
+        public virtual void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType objectGraphType, ISchema schema)
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType objectGraphType, ISchema schema)
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema)
         {
         }
 
@@ -68,7 +79,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitEnumValue(EnumValueDefinition value, ISchema schema)
+        public virtual void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema)
         {
         }
     }

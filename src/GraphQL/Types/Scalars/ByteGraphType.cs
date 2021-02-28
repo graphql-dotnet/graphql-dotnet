@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -11,8 +12,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            ByteValue byteValue => byteValue.Value,
             IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue ? (byte?)intValue.Value : null,
+            LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue ? (byte?)longValue.Value : null,
+            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue ? (byte?)bigIntValue.Value : null,
             _ => null
         };
 
@@ -22,9 +24,13 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            ByteValue _ => true,
             IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue,
+            LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue,
+            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue,
             _ => false
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new IntValue(Convert.ToByte(value));
     }
 }

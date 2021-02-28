@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -321,9 +320,17 @@ namespace GraphQL
                 foreach (var field in fields)
                 {
                     var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value ?? field.GetDefaultValueAST(schema), schema);
 
-                    errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                    if (fieldAst != null)
+                    {
+                        var result = IsValidLiteralValue(field.ResolvedType, fieldAst.Value, schema);
+
+                        errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                    }
+                    else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
+                    {
+                        errors.Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                    } 
                 }
 
                 return errors.ToArray();
@@ -503,14 +510,58 @@ namespace GraphQL
         private static readonly NullValue _null = new NullValue();
 
         /// <summary>
+        /// Returns a value indicating whether the provided value is a valid default value
+        /// for the specified input graph type.
+        /// </summary>
+        public static bool IsValidDefault(this IGraphType type, object value)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type is NonNullGraphType nonNullGraphType)
+            {
+                return value == null ? false : nonNullGraphType.ResolvedType.IsValidDefault(value);
+            }
+
+            if (value == null)
+            {
+                return true;
+            }
+
+            if (type is ListGraphType listGraphType)
+            {
+                if (!(value is IEnumerable list))
+                    return false;
+
+                foreach (var item in list)
+                {
+                    if (!IsValidDefault(listGraphType.ResolvedType, item))
+                        return false;
+                }
+
+                return true;
+            }
+
+            if (type is IInputObjectGraphType inputObjectGraphType)
+            {
+                return inputObjectGraphType.IsValidDefault(value);
+            }
+
+            if (type is ScalarGraphType scalar)
+                return scalar.IsValidDefault(value);
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
+        }
+
+        /// <summary>
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
+        public static IValue ToAST(this IGraphType type, object value)
         {
             if (type is NonNullGraphType nonnull)
             {
-                return AstFromValue(value, schema, nonnull.ResolvedType);
+                return ToAST(nonnull.ResolvedType, value);
             }
 
             if (value == null || type == null)
@@ -528,72 +579,28 @@ namespace GraphQL
                 {
                     var values = list
                         .Cast<object>()
-                        .Select(item => AstFromValue(item, schema, itemType))
+                        .Select(item => ToAST(itemType, item))
                         .ToList();
 
                     return new ListValue(values);
                 }
 
-                return AstFromValue(value, schema, itemType);
+                return ToAST(itemType, value);
             }
 
             // Populate the fields of the input object by creating ASTs from each value
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                if (!(value is Dictionary<string, object> dict))
-                {
-                    return null;
-                }
-
-                var fields = dict
-                    .Select(pair =>
-                    {
-                        var fieldType = input.GetField(pair.Key)?.ResolvedType;
-                        return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
-                    })
-                    .ToList();
-
-                return new ObjectValue(fields);
+                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the input object type '{input.Name}' to an AST representation.");
             }
 
-            if (!(type is ScalarGraphType inputType))
-                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
-
-            // Since value is an internally represented value, it must be serialized
-            // to an externally represented value before converting into an AST.
-            var serialized = inputType.Serialize(value) ?? throw new InvalidOperationException($"Unable to serialize '{value}' to '{inputType.Name}'.");
-
-            return serialized switch
+            if (type is ScalarGraphType scalar)
             {
-                bool b => new BooleanValue(b),
-                int i => new IntValue(i),
-                BigInteger bi => new BigIntValue(bi),
-                long l => new LongValue(l),
-                decimal @decimal => new DecimalValue(@decimal),
-                double d => new FloatValue(d),
-                DateTime time => new DateTimeValue(time),
-                Uri uri => new UriValue(uri),
-                DateTimeOffset offset => new DateTimeOffsetValue(offset),
-                TimeSpan span => new TimeSpanValue(span),
-                Guid guid => new GuidValue(guid),
-                sbyte @sbyte => new SByteValue(@sbyte),
-                byte @byte => new ByteValue(@byte),
-                short @short => new ShortValue(@short),
-                ushort uint16 => new UShortValue(uint16),
-                uint uint32 => new UIntValue(uint32),
-                ulong uint64 => new ULongValue(uint64),
-                string str => type is EnumerationGraphType ? (IValue)new EnumValue(str) : new StringValue(str),
-                _ => Convert()
-            };
-
-            IValue Convert()
-            {
-                var converter = schema.FindValueConverter(serialized, type);
-                return converter != null
-                    ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
+                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
             }
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
         }
     }
 }

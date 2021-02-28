@@ -31,13 +31,13 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitInputObject(IInputObjectGraphType type, ISchema schema) => SetDescription(type);
 
-        public override void VisitFieldDefinition(FieldType field, ISchema schema) => SetDescription(field);
+        public override void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => SetDescription(field);
 
-        public override void VisitInputFieldDefinition(FieldType field, ISchema schema) => SetDescription(field);
+        public override void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => SetDescription(field);
 
-        public override void VisitFieldArgumentDefinition(QueryArgument argument, ISchema schema) => SetDescription(argument);
+        public override void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => SetDescription(argument);
 
-        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, ISchema schema) => SetDescription(argument);
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema) => SetDescription(argument);
 
         public override void VisitInterface(IInterfaceGraphType iface, ISchema schema) => SetDescription(iface);
 
@@ -45,6 +45,6 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitEnum(EnumerationGraphType type, ISchema schema) => SetDescription(type);
 
-        public override void VisitEnumValue(EnumValueDefinition value, ISchema schema) => SetDescription(value);
+        public override void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema) => SetDescription(value);
     }
 }
