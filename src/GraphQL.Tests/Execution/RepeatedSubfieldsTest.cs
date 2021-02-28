@@ -33,6 +33,17 @@ namespace GraphQL.Tests.Execution
         private Field SecondTestField { get; }
         private Field AliasedTestField { get; }
 
+        private Fields CollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+        {
+            return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
+        }
+
+        private class MyExecutionStrategy : ParallelExecutionStrategy
+        {
+            public Fields MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+                => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
+        }
+
         [Fact]
         public void BeMergedCorrectlyInCaseOfFields()
         {
@@ -40,7 +51,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(SecondTestField);
 
-            var fields = new Fields().CollectFrom(new ExecutionContext(), null, outerSelection);
+            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
@@ -54,7 +65,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(AliasedTestField);
 
-            var fields = new Fields().CollectFrom(new ExecutionContext(), null, outerSelection);
+            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
@@ -88,7 +99,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(fragSpread);
             outerSelection.Add(SecondTestField);
 
-            var fields = new Fields().CollectFrom(context, new PersonType(), outerSelection);
+            var fields = CollectFrom(context, new PersonType(), outerSelection);
 
             fields.ShouldHaveSingleItem();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);

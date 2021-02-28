@@ -186,7 +186,7 @@ namespace GraphQL
                 if (directive.Arguments?.Count > 0)
                 {
                     foreach (var argument in directive.Arguments.List)
-                        visitor.VisitDirectiveArgumentDefinition(argument, schema);
+                        visitor.VisitDirectiveArgumentDefinition(argument, directive, schema);
                 }
             }
 
@@ -197,7 +197,7 @@ namespace GraphQL
                     case EnumerationGraphType e:
                         visitor.VisitEnum(e, schema);
                         foreach (var value in e.Values.List)
-                            visitor.VisitEnumValue(value, schema);
+                            visitor.VisitEnumValue(value, e, schema);
                         break;
 
                     case ScalarGraphType scalar:
@@ -210,17 +210,26 @@ namespace GraphQL
 
                     case InterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
+                        foreach (var field in iface.Fields.List)
+                        {
+                            visitor.VisitFieldDefinition(field, iface, schema);
+                            if (field.Arguments?.Count > 0)
+                            {
+                                foreach (var argument in field.Arguments.List)
+                                    visitor.VisitFieldArgumentDefinition(argument, field, iface, schema);
+                            }
+                        }
                         break;
 
                     case IObjectGraphType output:
                         visitor.VisitObject(output, schema);
                         foreach (var field in output.Fields.List)
                         {
-                            visitor.VisitFieldDefinition(field, schema);
+                            visitor.VisitFieldDefinition(field, output, schema);
                             if (field.Arguments?.Count > 0)
                             {
                                 foreach (var argument in field.Arguments.List)
-                                    visitor.VisitFieldArgumentDefinition(argument, schema);
+                                    visitor.VisitFieldArgumentDefinition(argument, field, output, schema);
                             }
                         }
                         break;
@@ -228,7 +237,7 @@ namespace GraphQL
                     case IInputObjectGraphType input:
                         visitor.VisitInputObject(input, schema);
                         foreach (var field in input.Fields.List)
-                            visitor.VisitInputFieldDefinition(field, schema);
+                            visitor.VisitInputFieldDefinition(field, input, schema);
                         break;
                 }
             }

@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Execution
         public void RootExecutionNode_Should_Not_Throw_Exceptions()
         {
             var type = new ObjectGraphType();
-            var root = new RootExecutionNode(type);
+            var root = new RootExecutionNode(type, null);
 
             root.Field.ShouldBeNull();
             root.FieldDefinition.ShouldBeNull();
@@ -33,6 +33,7 @@ namespace GraphQL.Tests.Execution
             root.SubFields.ShouldBeNull();
             root.ToString().ShouldNotBeNull();
             root.ToValue().ShouldBeNull();
+            root.SelectionSet.ShouldBeNull();
         }
 
         [Fact]
@@ -41,7 +42,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
-                new RootExecutionNode(objectGraphType),
+                new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
@@ -57,7 +58,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
-                new RootExecutionNode(objectGraphType),
+                new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
@@ -73,7 +74,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
-                new RootExecutionNode(objectGraphType),
+                new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
                 objectGraphType.GetField("value"),
@@ -89,7 +90,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
-                new RootExecutionNode(objectGraphType),
+                new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new AST.Field(default, new AST.NameNode("name")),
                 objectGraphType.GetField("value"),

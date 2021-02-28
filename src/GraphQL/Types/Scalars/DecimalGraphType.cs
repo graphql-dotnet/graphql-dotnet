@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Numerics;
 using GraphQL.Language.AST;
@@ -83,5 +84,8 @@ namespace GraphQL.Types
             double d => checked((decimal)d),
             _ => null
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new DecimalValue(Convert.ToDecimal(value));
     }
 }

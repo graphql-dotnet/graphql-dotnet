@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Utilities;
 
@@ -12,9 +11,6 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class FieldType : MetadataProvider, IFieldType
     {
-        private object _defaultValue;
-        private IValue _defaultValueAST;
-
         private string _name;
         /// <inheritdoc/>
         public string Name
@@ -45,18 +41,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the default value of the field. Only applies to fields of input object graph types.
         /// </summary>
-        public object DefaultValue
-        {
-            get => _defaultValue;
-            set
-            {
-                if (!ResolvedType.IsGraphQLTypeReference())
-                    _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
-
-                _defaultValue = value;
-                _defaultValueAST = null;
-            }
-        }
+        public object DefaultValue { get; set; }
 
         private Type _type;
         /// <summary>
@@ -85,13 +70,5 @@ namespace GraphQL.Types
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
         /// </summary>
         public IFieldResolver Resolver { get; set; }
-
-        internal IValue GetDefaultValueAST(ISchema schema)
-        {
-            if (_defaultValueAST == null && _defaultValue != null)
-                _defaultValueAST = _defaultValue.AstFromValue(schema, ResolvedType);
-
-            return _defaultValueAST;
-        }
     }
 }

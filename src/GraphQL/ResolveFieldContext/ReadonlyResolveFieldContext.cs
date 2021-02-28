@@ -40,13 +40,6 @@ namespace GraphQL
             return this;
         }
 
-        private Fields GetSubFields()
-        {
-            return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
-                ? new Fields().CollectFrom(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
-                : null;
-        }
-
         private IDictionary<string, ArgumentValue> GetArguments()
             => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
 
@@ -118,7 +111,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Fields SubFields => _subFields ??= GetSubFields();
+        public Fields SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext => _executionContext.UserContext;

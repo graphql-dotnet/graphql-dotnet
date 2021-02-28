@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using Shouldly;
 using Xunit;
@@ -191,6 +193,31 @@ namespace GraphQL.Tests.Execution
 
             _context.SetExtension("a.b.c", "override");
             _context.GetExtension("a.b.c.d").ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task ExecutionError_Should_Be_Thread_Safe()
+        {
+            var e = new CountdownEvent(2);
+
+            var t1 = Task.Run(() =>
+            {
+                e.Signal();
+                e.Wait();
+                for (int i = 0; i < 5; ++i)
+                    _context.Errors.Add(new ExecutionError("test"));
+            });
+            var t2 = Task.Run(() =>
+            {
+                e.Signal();
+                e.Wait();
+                for (int i = 0; i < 5; ++i)
+                    _context.Errors.Add(new ExecutionError("test"));
+            });
+
+            await Task.WhenAll(t1, t2);
+
+            _context.Errors.Count.ShouldBe(10);
         }
 
         private enum SomeEnum

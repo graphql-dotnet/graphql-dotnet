@@ -9,11 +9,19 @@ namespace GraphQL.Utilities
     /// </summary>
     public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
-        internal static readonly SchemaValidationVisitor Instance = new SchemaValidationVisitor();
+        /// <summary>
+        /// Returns a static instance of the <see cref="SchemaValidationVisitor"/> class.
+        /// </summary>
+        public static readonly SchemaValidationVisitor Instance = new SchemaValidationVisitor();
+
+        private SchemaValidationVisitor()
+        {
+        }
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Objects
         // Object types have the potential to be invalid if incorrectly defined.
         // This set of rules must be adhered to by every Object type in a GraphQL schema.
+        /// <inheritdoc/>
         public override void VisitObject(IObjectGraphType type, ISchema schema)
         {
             // 1
@@ -61,6 +69,7 @@ namespace GraphQL.Utilities
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Interfaces
         // Interface types have the potential to be invalid if incorrectly defined.
+        /// <inheritdoc/>
         public override void VisitInterface(IInterfaceGraphType iface, ISchema schema)
         {
             // 1
@@ -102,6 +111,7 @@ namespace GraphQL.Utilities
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Unions
         // Union types have the potential to be invalid if incorrectly defined.
+        /// <inheritdoc/>
         public override void VisitUnion(UnionGraphType union, ISchema schema)
         {
             // 1
@@ -116,6 +126,7 @@ namespace GraphQL.Utilities
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Enums
         // Enum types have the potential to be invalid if incorrectly defined.
+        /// <inheritdoc/>
         public override void VisitEnum(EnumerationGraphType type, ISchema schema)
         {
             // 1
@@ -125,6 +136,7 @@ namespace GraphQL.Utilities
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Input-Objects
         // Input Object types have the potential to be invalid if incorrectly defined.
+        /// <inheritdoc/>
         public override void VisitInputObject(IInputObjectGraphType type, ISchema schema)
         {
             // 1
@@ -137,24 +149,32 @@ namespace GraphQL.Utilities
                 if (item.Count() > 1)
                     throw new InvalidOperationException($"The inpit field '{item.Key}' must have a unique name within Input Object type '{type.Name}'; no two fields may share the same name.");
             }
+        }
 
-            if (type.Fields?.Count > 0)
+        /// <inheritdoc/>
+        public override void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
+        {
+            // 2.2
+            if (field.Name.StartsWith("__"))
+                throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores).");
+
+            // 2.3
+            if (field.ResolvedType != null ? field.ResolvedType.IsInputType() == false : field.Type?.IsInputType() == false)
+                throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
+
+            // validate default value
+            if (field.DefaultValue != null && field.ResolvedType != null)
             {
-                foreach (var field in type.Fields.List)
+                if (!field.ResolvedType.IsValidDefault(field.DefaultValue))
                 {
-                    // 2.2
-                    if (field.Name.StartsWith("__"))
-                        throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores).");
-
-                    // 2.3
-                    if (field.ResolvedType != null ? field.ResolvedType.IsInputType() == false : field.Type?.IsInputType() == false)
-                        throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
+                    throw new InvalidOperationException($"The default value of field '{field.Name}' of type '{type.Name}' is invalid.");
                 }
             }
         }
 
         // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Type-System.Directives
         // Directive types have the potential to be invalid if incorrectly defined.
+        /// <inheritdoc/>
         public override void VisitDirective(DirectiveGraphType directive, ISchema schema)
         {
             if (directive.Locations.Count == 0)
@@ -170,18 +190,28 @@ namespace GraphQL.Utilities
             // 3
             if (directive.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+        }
 
-            if (directive.Arguments?.Count > 0)
+        /// <inheritdoc/>
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema)
+        {
+            // 4.1
+            if (argument.Name.StartsWith("__"))
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+
+            // 4.2
+            if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type.");
+        }
+
+        /// <inheritdoc/>
+        public override void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
+        {
+            if (argument.DefaultValue != null && argument.ResolvedType != null)
             {
-                foreach (var argument in directive.Arguments.List)
+                if (!argument.ResolvedType.IsValidDefault(argument.DefaultValue))
                 {
-                    // 4.1
-                    if (argument.Name.StartsWith("__"))
-                        throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
-
-                    // 4.2
-                    if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
-                        throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type.");
+                    throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{field.Name}' is invalid.");
                 }
             }
         }
