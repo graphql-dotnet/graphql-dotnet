@@ -1999,7 +1999,7 @@ namespace GraphQL.Types
     {
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value);
-        GraphQL.Language.AST.IValue ToAst(object value);
+        GraphQL.Language.AST.IValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
@@ -2085,7 +2085,7 @@ namespace GraphQL.Types
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value) { }
-        public virtual GraphQL.Language.AST.IValue ToAst(object value) { }
+        public virtual GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
