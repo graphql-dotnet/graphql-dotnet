@@ -788,7 +788,7 @@ namespace GraphQL.Tests.Validation
                 Rule.badValue(_, "complexArg", "ComplexInput", "{intField: 4}", 3, 33,
                     new[]
                     {
-                        "In field \"requiredField\": Expected \"Boolean!\", found null."
+                        "Missing required field 'requiredField' of type 'Boolean'."
                     });
             });
         }

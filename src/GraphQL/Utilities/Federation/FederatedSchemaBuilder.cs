@@ -48,7 +48,6 @@ namespace GraphQL.Utilities.Federation
         {
             schema.RegisterType<AnyScalarGraphType>();
             schema.RegisterType<ServiceGraphType>();
-            schema.RegisterValueConverter(new AnyValueConverter());
         }
 
         private void AddRootEntityFields(ISchema schema)

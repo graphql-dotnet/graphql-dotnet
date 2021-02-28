@@ -134,21 +134,6 @@ namespace GraphQL.Types
         IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings { get; }
 
         /// <summary>
-        /// Register a custom value converter to the schema.
-        /// </summary>
-        void RegisterValueConverter(IAstFromValueConverter converter);
-
-        /// <summary>
-        /// Returns all registered by <see cref="RegisterValueConverter"/> converters.
-        /// </summary>
-        IEnumerable<IAstFromValueConverter> ValueConverters { get; }
-
-        /// <summary>
-        /// Search the schema for a <see cref="IAstFromValueConverter"/> that matches the provided object and graph type, and return the converter.
-        /// </summary>
-        IAstFromValueConverter FindValueConverter(object value, IGraphType type);
-
-        /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
         /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
         /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.

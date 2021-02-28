@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -44,5 +45,8 @@ namespace GraphQL.Types
 
             static bool Ret(double _) => true;
         }
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new FloatValue(Convert.ToDouble(value));
     }
 }

@@ -24,7 +24,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value?.ToString();
+        public override object Serialize(object value) => value.ToString();
 
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
@@ -36,7 +36,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
+        public override object ParseValue(object value) => value.ToString().Trim(' ', '"');
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -46,5 +46,8 @@ namespace GraphQL.Types
             LongValue _ => true,
             _ => false
         };
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new StringValue(value.ToString());
     }
 }
