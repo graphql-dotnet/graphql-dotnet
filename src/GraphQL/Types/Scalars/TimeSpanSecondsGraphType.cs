@@ -39,7 +39,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
-            TimeSpan _ => value,
+            TimeSpan _ => value, // no boxing
             int i => TimeSpan.FromSeconds(i),
             long l => TimeSpan.FromSeconds(l),
             _ => null
