@@ -83,7 +83,7 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new[] { "Missing field 'requiredField'." }), 2, 67);
+                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new[] { "Missing required field 'requiredField' of type 'Boolean'." }), 2, 67);
             });
         }
 

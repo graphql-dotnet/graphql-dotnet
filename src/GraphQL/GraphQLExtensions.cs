@@ -327,9 +327,9 @@ namespace GraphQL
 
                         errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
                     }
-                    else if (field.ResolvedType is NonNullGraphType nonNull && field.DefaultValue == null)
+                    else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
                     {
-                        errors.Add($"Missing required field '{field.Name}' of type '{nonNull.ResolvedType}'.");
+                        errors.Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
                     } 
                 }
 
