@@ -57,7 +57,7 @@ namespace GraphQL.Utilities
         void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits field argument of registered within the schema graph type.
+        /// Visits field argument of registered within the schema interface graph type.
         /// </summary>
         void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
 
