@@ -22,7 +22,7 @@ namespace GraphQL.Types
         public override object Serialize(object value) => value switch
         {
             TimeSpan timeSpan => (long)timeSpan.TotalMilliseconds,
-            int _ => value,
+            int i => (long)i,
             long _ => value,
             _ => null
         };
