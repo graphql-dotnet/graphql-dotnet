@@ -47,7 +47,7 @@ namespace GraphQL.Utilities
         void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits field of registered within the schema input graph type.
+        /// Visits field of registered within the schema input object graph type.
         /// </summary>
         void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
 
