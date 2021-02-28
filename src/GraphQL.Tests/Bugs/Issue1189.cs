@@ -30,6 +30,7 @@ namespace GraphQL.Tests.Bugs
         public void Issue1189_Should_Work(Type resolverType, string errorMessage, string code)
         {
             Builder.Types.Include<Issue1189_Query>();
+            Builder.Types.For("Character").Type = typeof(Issue1189_Character);
             Builder.Types.Include(resolverType);
 
             var schema = Builder.Build(_typeDefinitions);
