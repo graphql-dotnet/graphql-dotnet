@@ -32,7 +32,7 @@ namespace GraphQL.Utilities
         void VisitObject(IObjectGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits registered within the schema input graph type.
+        /// Visits registered within the schema input object graph type.
         /// </summary>
         void VisitInputObject(IInputObjectGraphType type, ISchema schema);
 
