@@ -23,6 +23,7 @@ namespace GraphQL.Tests.Utilities
             ";
 
             Builder.Types.Include<PostWithExtraAttributesType>();
+            Builder.Types.Include<Post>();
 
             var schema = Builder.Build(defs);
             schema.Initialize();

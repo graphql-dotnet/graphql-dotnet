@@ -2615,6 +2615,8 @@ namespace GraphQL.Utilities
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
+        public bool AllowUnknownFields { get; set; }
+        public bool AllowUnknownTypes { get; set; }
         public bool IgnoreComments { get; set; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
