@@ -24,6 +24,7 @@ namespace GraphQL.Types
             IntValue intValue => TimeSpan.FromMilliseconds(intValue.Value),
             LongValue longValue => TimeSpan.FromMilliseconds(longValue.Value),
             BigIntValue bigIntValue => TimeSpan.FromMilliseconds((double)bigIntValue.Value),
+            NullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -33,6 +34,7 @@ namespace GraphQL.Types
             TimeSpan _ => value, // no boxing
             int i => TimeSpan.FromMilliseconds(i),
             long l => TimeSpan.FromMilliseconds(l),
+            null => null,
             _ => ThrowValueConversionError(value)
         };
 
