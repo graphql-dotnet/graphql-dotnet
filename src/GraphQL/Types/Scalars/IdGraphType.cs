@@ -24,7 +24,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value.ToString();
+        public override object Serialize(object value) => value?.ToString();
 
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
@@ -48,6 +48,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(value.ToString());
+        public override IValue ToAST(object value)
+            => value == null ? (IValue)new NullValue() : new StringValue(value.ToString());
     }
 }

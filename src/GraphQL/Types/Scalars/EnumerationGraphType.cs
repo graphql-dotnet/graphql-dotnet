@@ -72,11 +72,19 @@ namespace GraphQL.Types
             }
 
             var foundByValue = Values.FindByValue(value);
-            return foundByValue?.Name;
+            if (foundByValue == null)
+                ThrowSerializationError(value);
+
+            return foundByValue.Name;
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value is EnumValue enumValue ? ParseValue(enumValue.Name) : null;
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            NullValue _ => null,
+            EnumValue enumValue => ParseValue(enumValue.Name),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
         public override object ParseValue(object value)
@@ -87,14 +95,20 @@ namespace GraphQL.Types
             }
 
             var found = Values.FindByName(value.ToString());
-            return found?.Value;
+            if (found == null)
+                ThrowValueConversionError(value);
+
+            return found.Value;
         }
 
         /// <inheritdoc/>
         public override IValue ToAST(object value)
         {
+            if (value == null)
+                return new NullValue();
+
             var serialized = (string)Serialize(value);
-            return serialized != null ? new EnumValue(serialized) : null;
+            return serialized != null ? new EnumValue(serialized) : ThrowASTConversionError(value);
         }
     }
 

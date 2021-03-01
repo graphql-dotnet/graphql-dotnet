@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using GraphQL.Language.AST;
 
@@ -15,11 +16,12 @@ namespace GraphQL.Types
             IntValue intValue => new BigInteger(intValue.Value),
             LongValue longValue => new BigInteger(longValue.Value),
             BigIntValue bigIntValue => bigIntValue.Value,
-            _ => null
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
+        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(BigInteger));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -31,6 +33,10 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
+        public override IValue ToAST(object value) => value switch
+        {
+            null => new NullValue(),
+            _ => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)))
+        };
     }
 }

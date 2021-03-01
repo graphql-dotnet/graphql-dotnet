@@ -21,6 +21,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object Serialize(object value)
         {
+            if (value == null)
+                return null;
+
             var date = ParseValue(value);
 
             if (date is DateTime dateTime)
@@ -32,12 +35,19 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            NullValue _ => null,
+            StringValue stringValue => ParseValue(stringValue.Value),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
         public override object ParseValue(object value)
         {
+            if (value == null)
+                return null;
+
             if (value is DateTime dateTime)
             {
                 if (dateTime.TimeOfDay == TimeSpan.Zero)
@@ -60,6 +70,10 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue((string)Serialize((DateTime)value));
+        public override IValue ToAST(object value) => value switch {
+            null => new NullValue(),
+            DateTime dt => new StringValue((string)Serialize(dt)),
+            _ => null
+        };
     }
 }

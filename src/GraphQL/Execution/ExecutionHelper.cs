@@ -55,11 +55,6 @@ namespace GraphQL.Execution
                 return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
-            if (input is NullValue)
-            {
-                return ArgumentValue.NullLiteral;
-            }
-
             if (input is VariableReference variable)
             {
                 if (variables == null)
@@ -67,6 +62,16 @@ namespace GraphQL.Execution
 
                 var found = variables.ValueFor(variable.Name, out var ret);
                 return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+            }
+
+            if (type is ScalarGraphType scalarType)
+            {
+                return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
+            }
+
+            if (input is NullValue)
+            {
+                return ArgumentValue.NullLiteral;
             }
 
             if (type is ListGraphType listType)
@@ -133,11 +138,6 @@ namespace GraphQL.Execution
                 }
 
                 return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
-            }
-
-            if (type is ScalarGraphType scalarType)
-            {
-                return new ArgumentValue(scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'"), ArgumentSource.Literal);
             }
 
             throw new ArgumentOutOfRangeException(nameof(input), $"Unknown type of input object '{type.GetType()}'");

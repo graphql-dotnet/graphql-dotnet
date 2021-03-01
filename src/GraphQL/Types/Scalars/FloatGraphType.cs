@@ -17,11 +17,12 @@ namespace GraphQL.Types
             LongValue longVal => (double)longVal.Value,
             DecimalValue decVal => checked((double)decVal.Value),
             BigIntValue bigIntVal => checked((double)bigIntVal.Value),
+            NullValue _ => null,
             _ => null
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(double));
+        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(double));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value)
@@ -47,6 +48,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new FloatValue(Convert.ToDouble(value));
+        public override IValue ToAST(object value)
+            => value == null ? (IValue)new NullValue() : new FloatValue(Convert.ToDouble(value));
     }
 }

@@ -15,11 +15,12 @@ namespace GraphQL.Types
             IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue ? (byte?)intValue.Value : null,
             LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue ? (byte?)longValue.Value : null,
             BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue ? (byte?)bigIntValue.Value : null,
+            NullValue _ => null,
             _ => null
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(byte));
+        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(byte));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -31,6 +32,10 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new IntValue(Convert.ToByte(value));
+        public override IValue ToAST(object value) => value switch
+        {
+            null => new NullValue(),
+            _ => new IntValue(Convert.ToByte(value))
+        };
     }
 }

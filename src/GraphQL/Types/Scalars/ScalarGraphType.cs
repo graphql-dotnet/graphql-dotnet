@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using GraphQL.Language.AST;
 
@@ -18,13 +19,15 @@ namespace GraphQL.Types
         /// Since GraphQL specifies no response format, Serialize is not
         /// responsible for preparing the scalar for transport to the client. It is only responsible
         /// for generating an object which can eventually be serialized by some transport-focused API.
+        /// <br/><br/>
+        /// This method must handle a value of <see langword="null"/>.
         /// </summary>
-        /// <param name="value">Resolved value. Must not be <see langword="null"/>.</param>
+        /// <param name="value">Resolved value. May be <see langword="null"/>.</param>
         /// <returns>
         /// The returned value of a the result coercion is part of the overall execution result.
         /// Normally this value is a primitive value like String or Integer to make it easy for
         /// the serialization layer. For complex types like a Date or Money Scalar this involves
-        /// formatting the value. Returning <see langword="null"/> indicates a failed conversion.
+        /// formatting the value. Returning <see langword="null"/> is valid for nullable types.
         /// </returns>
         public virtual object Serialize(object value) => ParseValue(value);
 
@@ -34,9 +37,11 @@ namespace GraphQL.Types
         /// it transforms a scalar from its client-side representation as an argument to its
         /// server-side representation. Input coercion may not only return primitive values like
         /// String but rather complex ones when appropriate.
+        /// <br/><br/>
+        /// This method must handle a value of <see cref="NullValue"/>.
         /// </summary>
-        /// <param name="value">AST value node. Must not be <see langword="null"/>.</param>
-        /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
+        /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
+        /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
         public abstract object ParseLiteral(IValue value);
 
         /// <summary>
@@ -46,9 +51,11 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// Parsing for arguments and variables are handled separately because while arguments must
         /// always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
+        /// <br/><br/>
+        /// This method must handle a value of <see langword="null"/>.
         /// </summary>
-        /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
-        /// <returns> Internal scalar representation. Returning <see langword="null"/> indicates a failed conversion. </returns>
+        /// <param name="value">Runtime object from variables. May be <see langword="null"/>.</param>
+        /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
         public abstract object ParseValue(object value);
 
         /// <summary>
@@ -58,8 +65,12 @@ namespace GraphQL.Types
         /// server-side representation.
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
+        /// <br/><br/>
+        /// This method must not be called for <see cref="NullValue"/> nodes as it is assumed that all scalars handle
+        /// <see cref="NullValue"/>. It is not necessary to provide a <see langword="true"/> response for
+        /// <see cref="NullValue"/> nodes. Use a non-null graph type to indicate that a scalar value does not support null.
         /// </summary>
-        /// <param name="value">AST value node. Must not be <see langword="null"/>.</param>
+        /// <param name="value">AST value node. Must not be <see langword="null"/> or <see cref="NullValue"/>.</param>
         public virtual bool CanParseLiteral(IValue value)
         {
             try
@@ -81,6 +92,10 @@ namespace GraphQL.Types
         /// always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
+        /// <br/><br/>
+        /// This method must not be called for <see langword="null"/> values as it is assumed that all scalars handle
+        /// <see langword="null"/>. It is not necessary to provide a <see langword="true"/> response for
+        /// <see langword="null"/> values. Use a non-null graph type to indicate that a scalar value does not support null.
         /// </summary>
         /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
         public virtual bool CanParseValue(object value)
@@ -99,7 +114,7 @@ namespace GraphQL.Types
         /// Checks that the provided value is a valid default value.
         /// This method should not throw an exception.
         /// </summary>
-        /// <param name="value">The value to examine. Must not be <see langword="null"/>.</param>
+        /// <param name="value">The value to examine. Must not be <see langword="null"/>, as that indicates the lack of a default value.</param>
         public virtual bool IsValidDefault(object value)
         {
             try
@@ -116,14 +131,12 @@ namespace GraphQL.Types
         /// Converts a value to an AST representation. This is necessary for introspection queries
         /// to return the default values of this scalar type when used on input fields or field and directive arguments.
         /// This method may throw an exception or return <see langword="null"/> for a failed conversion.
+        /// May return <see cref="NullValue"/>.
         /// </summary>
-        /// <param name="value">The value to convert. Must not be <see langword="null"/>.</param>
-        /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion.</returns>
+        /// <param name="value">The value to convert. May be <see langword="null"/>.</param>
+        /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion. Returning <see cref="NullValue"/> is valid.</returns>
         public virtual IValue ToAST(object value)
         {
-            if (value == null)
-                return null;
-
             try
             {
                 var serialized = Serialize(value);
@@ -143,7 +156,7 @@ namespace GraphQL.Types
                     float f => new FloatValue(f),
                     double d => new FloatValue(d),
                     string s => new StringValue(s),
-                    null => null,
+                    null => new NullValue(),
                     _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
                 };
             }
@@ -151,6 +164,26 @@ namespace GraphQL.Types
             {
                 return null;
             }
+        }
+
+        protected internal object ThrowLiteralConversionError(IValue input)
+        {
+            throw new ArgumentException($"Unable to convert '{input}' to '{Name}'");
+        }
+
+        protected internal IValue ThrowASTConversionError(object value)
+        {
+            throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{Name}' to an AST representation.");
+        }
+
+        protected internal object ThrowValueConversionError(object value)
+        {
+            throw new ArgumentException($"Unable to convert '{value}' to '{Name}'");
+        }
+
+        protected internal object ThrowSerializationError(object value)
+        {
+            throw new InvalidOperationException($"Unable to serialize '{value}' to '{Name}'.");
         }
     }
 }

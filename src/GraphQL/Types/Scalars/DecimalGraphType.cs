@@ -69,7 +69,8 @@ namespace GraphQL.Types
             StringValue s => decimal.Parse(s.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo),
             FloatValue f => checked((decimal)f.Value),
             BigIntValue b => checked((decimal)b.Value),
-            _ => null
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
@@ -82,7 +83,8 @@ namespace GraphQL.Types
             float f => checked((decimal)f),
             BigInteger b => checked((decimal)b),
             double d => checked((decimal)d),
-            _ => null
+            null => null,
+            _ => ThrowValueConversionError(value)
         };
 
         /// <inheritdoc/>

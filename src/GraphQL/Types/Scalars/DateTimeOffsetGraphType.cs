@@ -20,13 +20,22 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            NullValue _ => null,
+            StringValue s => ParseValue(s.Value),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
+        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(((DateTimeOffset)value).ToString("O")); // "O" is the proper ISO 8601 format required
+        public override IValue ToAST(object value) => value switch
+        {
+            null => new NullValue(),
+            DateTimeOffset d => new StringValue(d.ToString("O")), // "O" is the proper ISO 8601 format required
+            _ => null
+        };
     }
 }
