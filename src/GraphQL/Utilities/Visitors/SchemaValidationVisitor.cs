@@ -152,7 +152,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc/>
-        public override void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
+        public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
         {
             // 2.2
             if (field.Name.StartsWith("__"))
@@ -205,7 +205,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc/>
-        public override void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
+        public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
         {
             if (argument.DefaultValue != null && argument.ResolvedType != null)
             {

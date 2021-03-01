@@ -212,11 +212,11 @@ namespace GraphQL
                         visitor.VisitInterface(iface, schema);
                         foreach (var field in iface.Fields.List)
                         {
-                            visitor.VisitFieldDefinition(field, iface, schema);
+                            visitor.VisitInterfaceFieldDefinition(field, iface, schema);
                             if (field.Arguments?.Count > 0)
                             {
                                 foreach (var argument in field.Arguments.List)
-                                    visitor.VisitFieldArgumentDefinition(argument, field, iface, schema);
+                                    visitor.VisitInterfaceFieldArgumentDefinition(argument, field, iface, schema);
                             }
                         }
                         break;
@@ -225,11 +225,11 @@ namespace GraphQL
                         visitor.VisitObject(output, schema);
                         foreach (var field in output.Fields.List)
                         {
-                            visitor.VisitFieldDefinition(field, output, schema);
+                            visitor.VisitObjectFieldDefinition(field, output, schema);
                             if (field.Arguments?.Count > 0)
                             {
                                 foreach (var argument in field.Arguments.List)
-                                    visitor.VisitFieldArgumentDefinition(argument, field, output, schema);
+                                    visitor.VisitObjectFieldArgumentDefinition(argument, field, output, schema);
                             }
                         }
                         break;
@@ -237,7 +237,7 @@ namespace GraphQL
                     case IInputObjectGraphType input:
                         visitor.VisitInputObject(input, schema);
                         foreach (var field in input.Fields.List)
-                            visitor.VisitInputFieldDefinition(field, input, schema);
+                            visitor.VisitInputObjectFieldDefinition(field, input, schema);
                         break;
                 }
             }
