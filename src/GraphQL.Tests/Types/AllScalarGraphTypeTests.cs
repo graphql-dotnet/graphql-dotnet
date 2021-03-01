@@ -9,8 +9,29 @@ namespace GraphQL.Tests.Types
 {
     public class AllScalarGraphTypeTests
     {
-        // this class mostly tests the scalars for native .NET numeric types
-        // it also tests all the scalars handling of null
+        /*  This class tests the following scalar types:
+         *    ByteGraphType
+         *    SByteGraphType
+         *    ShortGraphType
+         *    UShortGraphType
+         *    IntGraphType
+         *    UIntGraphType
+         *    LongGraphType
+         *    ULongGraphType
+         *    
+         *    BooleanGraphType
+         *    FloatGraphType
+         *    StringGraphType
+         *    
+         *  Does not test:
+         *    DecimalGraphType
+         *    UriGraphType
+         *    date/time graph types
+         *    enumeration graph types
+         *    
+         *  Does test ALL scalars' handling of null
+         *  
+         */
 
         [Theory]
         [InlineData(typeof(BooleanGraphType))]
@@ -34,6 +55,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(GuidGraphType))]
         [InlineData(typeof(FloatGraphType))]
         [InlineData(typeof(DecimalGraphType))]
+        [InlineData(typeof(EnumerationGraphType))]
         public void allow_null(Type graphType)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -53,6 +75,8 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType))]
         [InlineData(typeof(ULongGraphType))]
         [InlineData(typeof(BigIntGraphType))]
+        [InlineData(typeof(FloatGraphType))]
+        [InlineData(typeof(DecimalGraphType))]
         public void does_not_coerce_string(Type graphType)
         {
             // if string to coercion were possible, all would pass, as the string is "0"
@@ -86,8 +110,8 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), long.MaxValue)]
         [InlineData(typeof(ULongGraphType), ulong.MinValue)]
         [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
-        [InlineData(typeof(BigIntGraphType), long.MinValue)] // integer constants cannot represent a smaller number
-        [InlineData(typeof(BigIntGraphType), ulong.MaxValue)] // integer constants cannot represent a larger number
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
         public void parseValue_ok(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -144,30 +168,29 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), long.MaxValue)]
         [InlineData(typeof(ULongGraphType), ulong.MinValue)]
         [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
-        [InlineData(typeof(BigIntGraphType), long.MinValue)] // integer constants cannot represent a smaller number
-        [InlineData(typeof(BigIntGraphType), ulong.MaxValue)] // integer constants cannot represent a larger number
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
         public void parseLiteral_ok(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
-            var types = new (Type, Func<object, IValue>)[]
+            var valueCasts = new Func<object, IValue>[]
             {
-                (typeof(int), n => new IntValue((int)n)),
-                (typeof(long), n => new LongValue((long)n)),
-                (typeof(BigInteger), n => new BigIntValue((BigInteger)n))
+                n => new IntValue(Convert.ToInt32(n)),
+                n => new LongValue(Convert.ToInt64(n)),
+                n => n is ulong ul ? new BigIntValue(ul) : new BigIntValue(Convert.ToInt64(n))
             };
 
-            foreach (var type in types)
+            foreach (var getValue in valueCasts)
             {
-                object converted;
+                IValue astValue;
                 try
                 {
-                    converted = Convert.ChangeType(value, type.Item1);
+                    astValue = getValue(value);
                 }
                 catch
                 {
                     continue;
                 }
-                IValue astValue = type.Item2(converted);
 
                 g.CanParseLiteral(astValue).ShouldBeTrue();
                 var parsed = g.ParseLiteral(astValue);
@@ -198,8 +221,8 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), long.MaxValue)]
         [InlineData(typeof(ULongGraphType), ulong.MinValue)]
         [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
-        [InlineData(typeof(BigIntGraphType), long.MinValue)] // integer constants cannot represent a smaller number
-        [InlineData(typeof(BigIntGraphType), ulong.MaxValue)] // integer constants cannot represent a larger number
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
         public void serialize_ok(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -239,6 +262,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(StringGraphType), "abc", "abc")]
         [InlineData(typeof(IdGraphType), 2, 2)]
         [InlineData(typeof(IdGraphType), "3", "3")]
+        [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void parseValue_other_ok(Type graphType, object value, object parsed)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -254,6 +278,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(StringGraphType), "abc", "abc")]
         [InlineData(typeof(IdGraphType), 2, 2)]
         [InlineData(typeof(IdGraphType), "3", "3")]
+        [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void parseLiteral_other_ok(Type graphType, object value, object parsed)
         {
             IValue astValue = value switch
@@ -261,6 +286,7 @@ namespace GraphQL.Tests.Types
                 int i => new IntValue(i),
                 long l => new LongValue(l),
                 bool b => new BooleanValue(b),
+                double f => new FloatValue(f),
                 string s => new StringValue(s),
                 _ => null
             };
@@ -278,6 +304,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(StringGraphType), "abc", "abc")]
         [InlineData(typeof(IdGraphType), 2, "2")]
         [InlineData(typeof(IdGraphType), "3", "3")]
+        [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void serialize_other_ok(Type graphType, object value, object serialized)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -285,6 +312,120 @@ namespace GraphQL.Tests.Types
             ret.ShouldBeOfType(serialized.GetType());
             ret.ShouldBe(serialized);
             g.CanParseValue(value).ShouldBeTrue();
+        }
+
+        [Theory]
+        [InlineData(typeof(BooleanGraphType), 0)]
+        [InlineData(typeof(BooleanGraphType), 1)]
+        [InlineData(typeof(BooleanGraphType), "false")]
+        [InlineData(typeof(BooleanGraphType), "False")]
+        [InlineData(typeof(BooleanGraphType), "true")]
+        [InlineData(typeof(BooleanGraphType), "True")]
+        [InlineData(typeof(StringGraphType), 0)]
+        [InlineData(typeof(StringGraphType), false)]
+        [InlineData(typeof(ByteGraphType), false)]
+        [InlineData(typeof(SByteGraphType), false)]
+        [InlineData(typeof(ShortGraphType), false)]
+        [InlineData(typeof(UShortGraphType), false)]
+        [InlineData(typeof(IntGraphType), false)]
+        [InlineData(typeof(UIntGraphType), false)]
+        [InlineData(typeof(LongGraphType), false)]
+        [InlineData(typeof(ULongGraphType), false)]
+        [InlineData(typeof(BigIntGraphType), false)]
+        [InlineData(typeof(StringGraphType), 1.5)]
+        [InlineData(typeof(ByteGraphType), 1.5)]
+        [InlineData(typeof(SByteGraphType), 1.5)]
+        [InlineData(typeof(ShortGraphType), 1.5)]
+        [InlineData(typeof(UShortGraphType), 1.5)]
+        [InlineData(typeof(IntGraphType), 1.5)]
+        [InlineData(typeof(UIntGraphType), 1.5)]
+        [InlineData(typeof(LongGraphType), 1.5)]
+        [InlineData(typeof(ULongGraphType), 1.5)]
+        [InlineData(typeof(BigIntGraphType), 1.5)]
+        public void parseValue_other_fail(Type graphType, object value)
+        {
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            Should.Throw<Exception>(() => g.ParseValue(value));
+            g.CanParseValue(value).ShouldBeFalse();
+        }
+
+        [Theory]
+        [InlineData(typeof(BooleanGraphType), 0)]
+        [InlineData(typeof(BooleanGraphType), 1)]
+        [InlineData(typeof(BooleanGraphType), "false")]
+        [InlineData(typeof(BooleanGraphType), "False")]
+        [InlineData(typeof(BooleanGraphType), "true")]
+        [InlineData(typeof(BooleanGraphType), "True")]
+        [InlineData(typeof(StringGraphType), 0)]
+        [InlineData(typeof(StringGraphType), false)]
+        [InlineData(typeof(ByteGraphType), false)]
+        [InlineData(typeof(SByteGraphType), false)]
+        [InlineData(typeof(ShortGraphType), false)]
+        [InlineData(typeof(UShortGraphType), false)]
+        [InlineData(typeof(IntGraphType), false)]
+        [InlineData(typeof(UIntGraphType), false)]
+        [InlineData(typeof(LongGraphType), false)]
+        [InlineData(typeof(ULongGraphType), false)]
+        [InlineData(typeof(BigIntGraphType), false)]
+        [InlineData(typeof(StringGraphType), 1.5)]
+        [InlineData(typeof(ByteGraphType), 1.5)]
+        [InlineData(typeof(SByteGraphType), 1.5)]
+        [InlineData(typeof(ShortGraphType), 1.5)]
+        [InlineData(typeof(UShortGraphType), 1.5)]
+        [InlineData(typeof(IntGraphType), 1.5)]
+        [InlineData(typeof(UIntGraphType), 1.5)]
+        [InlineData(typeof(LongGraphType), 1.5)]
+        [InlineData(typeof(ULongGraphType), 1.5)]
+        [InlineData(typeof(BigIntGraphType), 1.5)]
+        public void parseLiteral_other_fail(Type graphType, object value)
+        {
+            IValue astValue = value switch
+            {
+                int i => new IntValue(i),
+                long l => new LongValue(l),
+                bool b => new BooleanValue(b),
+                double d => new FloatValue(d),
+                string s => new StringValue(s),
+                _ => null
+            };
+
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            Should.Throw<Exception>(() => g.ParseLiteral(astValue));
+            g.CanParseLiteral(astValue).ShouldBeFalse();
+        }
+
+        [Theory]
+        [InlineData(typeof(BooleanGraphType), 0)]
+        [InlineData(typeof(BooleanGraphType), 1)]
+        [InlineData(typeof(BooleanGraphType), "false")]
+        [InlineData(typeof(BooleanGraphType), "False")]
+        [InlineData(typeof(BooleanGraphType), "true")]
+        [InlineData(typeof(BooleanGraphType), "True")]
+        [InlineData(typeof(StringGraphType), 0)]
+        [InlineData(typeof(StringGraphType), false)]
+        [InlineData(typeof(ByteGraphType), false)]
+        [InlineData(typeof(SByteGraphType), false)]
+        [InlineData(typeof(ShortGraphType), false)]
+        [InlineData(typeof(UShortGraphType), false)]
+        [InlineData(typeof(IntGraphType), false)]
+        [InlineData(typeof(UIntGraphType), false)]
+        [InlineData(typeof(LongGraphType), false)]
+        [InlineData(typeof(ULongGraphType), false)]
+        [InlineData(typeof(BigIntGraphType), false)]
+        [InlineData(typeof(StringGraphType), 1.5)]
+        [InlineData(typeof(ByteGraphType), 1.5)]
+        [InlineData(typeof(SByteGraphType), 1.5)]
+        [InlineData(typeof(ShortGraphType), 1.5)]
+        [InlineData(typeof(UShortGraphType), 1.5)]
+        [InlineData(typeof(IntGraphType), 1.5)]
+        [InlineData(typeof(UIntGraphType), 1.5)]
+        [InlineData(typeof(LongGraphType), 1.5)]
+        [InlineData(typeof(ULongGraphType), 1.5)]
+        [InlineData(typeof(BigIntGraphType), 1.5)]
+        public void serialize_other_fail(Type graphType, object value)
+        {
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            Should.Throw<Exception>(() => g.Serialize(value));
         }
 
         [Theory]
@@ -362,25 +503,24 @@ namespace GraphQL.Tests.Types
         public void parseLiteral_out_of_range(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
-            var types = new (Type, Func<object, IValue>)[]
+            var valueCasts = new Func<object, IValue>[]
             {
-                (typeof(int), n => new IntValue((int)n)),
-                (typeof(long), n => new LongValue((long)n)),
-                (typeof(BigInteger), n => new BigIntValue((BigInteger)n))
+                n => new IntValue(Convert.ToInt32(n)),
+                n => new LongValue(Convert.ToInt64(n)),
+                n => n is ulong ul ? new BigIntValue(ul) : new BigIntValue(Convert.ToInt64(n))
             };
 
-            foreach (var type in types)
+            foreach (var getValue in valueCasts)
             {
-                object converted;
+                IValue astValue;
                 try
                 {
-                    converted = Convert.ChangeType(value, type.Item1);
+                    astValue = getValue(value);
                 }
                 catch
                 {
                     continue;
                 }
-                IValue astValue = type.Item2(converted);
 
                 if (graphType == typeof(BooleanGraphType))
                 {

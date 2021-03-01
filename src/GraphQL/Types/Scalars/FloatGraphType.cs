@@ -18,7 +18,7 @@ namespace GraphQL.Types
             DecimalValue decVal => checked((double)decVal.Value),
             BigIntValue bigIntVal => checked((double)bigIntVal.Value),
             NullValue _ => null,
-            _ => null
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>

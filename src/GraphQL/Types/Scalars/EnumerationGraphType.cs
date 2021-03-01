@@ -94,6 +94,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object Serialize(object value)
         {
+            if (value == null)
+                return null;
+
             var foundByValue = Values.FindByValue(value);
             if (foundByValue == null)
                 ThrowSerializationError(value);
