@@ -12,22 +12,22 @@ namespace GraphQL.Utilities
     public interface ISchemaNodeVisitor
     {
         /// <summary>
-        /// Visits <see cref="Schema"/> object.
+        /// Visits <see cref="Schema"/>.
         /// </summary>
         void VisitSchema(ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="DirectiveGraphType"/>.
         /// </summary>
-        void VisitDirective(DirectiveGraphType directive, ISchema schema);
+        void VisitDirective(DirectiveGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="ScalarGraphType"/>.
         /// </summary>
-        void VisitScalar(ScalarGraphType scalar, ISchema schema);
+        void VisitScalar(ScalarGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits registered within the schema output graph type.
+        /// Visits registered within the schema object graph type.
         /// </summary>
         void VisitObject(IObjectGraphType type, ISchema schema);
 
@@ -37,44 +37,44 @@ namespace GraphQL.Utilities
         void VisitInputObject(IInputObjectGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits field of registered within the schema output object graph type.
+        /// Visits field of registered within the schema object graph type.
         /// </summary>
-        void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
+        void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
-        /// Visits field of registered within the schema output interface graph type.
+        /// Visits field of registered within the schema interface graph type.
         /// </summary>
-        void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
+        void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field of registered within the schema input object graph type.
         /// </summary>
-        void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
+        void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field argument of registered within the schema object graph type.
         /// </summary>
-        void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
+        void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field argument of registered within the schema interface graph type.
         /// </summary>
-        void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
+        void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits directive argument.
         /// </summary>
-        void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema);
+        void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="IInterfaceGraphType"/>.
         /// </summary>
-        void VisitInterface(IInterfaceGraphType iface, ISchema schema);
+        void VisitInterface(IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="UnionGraphType"/>.
         /// </summary>
-        void VisitUnion(UnionGraphType union, ISchema schema);
+        void VisitUnion(UnionGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="EnumerationGraphType"/>.

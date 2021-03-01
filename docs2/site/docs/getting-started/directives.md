@@ -184,7 +184,7 @@ one method - `VisitFieldDefinition`. This method wraps the original field resolv
 ```csharp
 public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
 {
-    public override void VisitFieldDefinition(FieldType field, ISchema schema)
+    public override void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
     {
         var applied = field.FindAppliedDirective("upper");
         if (applied != null)
