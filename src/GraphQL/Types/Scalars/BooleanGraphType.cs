@@ -13,7 +13,7 @@ namespace GraphQL.Types
         {
             BooleanValue b => b.Value.Boxed(),
             NullValue _ => null,
-            _ => null
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>

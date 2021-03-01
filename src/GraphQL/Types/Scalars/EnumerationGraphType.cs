@@ -62,53 +62,43 @@ namespace GraphQL.Types
         public EnumValues Values { get; }
 
         /// <inheritdoc/>
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            EnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            EnumValue enumValue => Values.FindByName(enumValue.Name) != null,
+            _ => false
+        };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            string s => Values.FindByName(s)?.Value ?? ThrowValueConversionError(value),
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object value) => value switch
+        {
+            string s => Values.FindByName(s) != null,
+            _ => false
+        };
+
+        /// <inheritdoc/>
         public override object Serialize(object value)
         {
-            var valueString = value.ToString(); //TODO: find only by value?
-            var foundByName = Values.FindByName(valueString);
-            if (foundByName != null)
-            {
-                return foundByName.Name;
-            }
-
             var foundByValue = Values.FindByValue(value);
             if (foundByValue == null)
                 ThrowSerializationError(value);
 
             return foundByValue.Name;
-        }
-
-        /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
-        {
-            NullValue _ => null,
-            EnumValue enumValue => ParseValue(enumValue.Name),
-            _ => ThrowLiteralConversionError(value)
-        };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            var found = Values.FindByName(value.ToString());
-            if (found == null)
-                ThrowValueConversionError(value);
-
-            return found.Value;
-        }
-
-        /// <inheritdoc/>
-        public override IValue ToAST(object value)
-        {
-            if (value == null)
-                return new NullValue();
-
-            var serialized = (string)Serialize(value);
-            return serialized != null ? new EnumValue(serialized) : ThrowASTConversionError(value);
         }
     }
 

@@ -137,33 +137,26 @@ namespace GraphQL.Types
         /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion. Returning <see cref="NullValue"/> is valid.</returns>
         public virtual IValue ToAST(object value)
         {
-            try
+            var serialized = Serialize(value);
+            return serialized switch
             {
-                var serialized = Serialize(value);
-                return serialized switch
-                {
-                    bool b => new BooleanValue(b),
-                    byte b => new IntValue(b),
-                    sbyte sb => new IntValue(sb),
-                    short s => new IntValue(s),
-                    ushort us => new IntValue(us),
-                    int i => new IntValue(i),
-                    uint ui => new LongValue(ui),
-                    long l => new LongValue(l),
-                    ulong ul => new BigIntValue(ul),
-                    BigInteger bi => new BigIntValue(bi),
-                    decimal d => new DecimalValue(d),
-                    float f => new FloatValue(f),
-                    double d => new FloatValue(d),
-                    string s => new StringValue(s),
-                    null => new NullValue(),
-                    _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
-                };
-            }
-            catch
-            {
-                return null;
-            }
+                bool b => new BooleanValue(b),
+                byte b => new IntValue(b),
+                sbyte sb => new IntValue(sb),
+                short s => new IntValue(s),
+                ushort us => new IntValue(us),
+                int i => new IntValue(i),
+                uint ui => new LongValue(ui),
+                long l => new LongValue(l),
+                ulong ul => new BigIntValue(ul),
+                BigInteger bi => new BigIntValue(bi),
+                decimal d => new DecimalValue(d),
+                float f => new FloatValue(f),
+                double d => new FloatValue(d),
+                string s => new StringValue(s),
+                null => new NullValue(),
+                _ => throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
+            };
         }
 
         protected internal object ThrowLiteralConversionError(IValue input)
@@ -176,6 +169,8 @@ namespace GraphQL.Types
             throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{Name}' to an AST representation.");
         }
 
+        // this is often called for serialization errors, since Serialize calls ParseValue by default
+        // also may be called for serialization errors during ToAST, 
         protected internal object ThrowValueConversionError(object value)
         {
             throw new ArgumentException($"Unable to convert '{value}' to '{Name}'");

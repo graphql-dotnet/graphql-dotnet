@@ -798,7 +798,7 @@ scalar Uri"
                 Arguments = new QueryArguments(new QueryArgument<RgbEnum>
                 {
                     Name = "color",
-                    DefaultValue = "RED"
+                    DefaultValue = 0 // 0 = red --- must be internal representation of enumeration value or validation will fail
                 }),
                 Type = typeof(RgbEnum)
             };

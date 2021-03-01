@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -20,9 +20,6 @@ namespace GraphQL.Types
             NullValue _ => null,
             _ => null
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(double));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value)
@@ -48,7 +45,22 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value)
-            => value == null ? (IValue)new NullValue() : new FloatValue(Convert.ToDouble(value));
+        public override object ParseValue(object value) => value switch
+        {
+            double _ => value,
+            int i => checked((double)i),
+            null => null,
+            float f => checked((double)f),
+            decimal d => checked((double)d),
+            sbyte sb => checked((double)sb),
+            byte b => checked((double)b),
+            short s => checked((double)s),
+            ushort us => checked((double)us),
+            uint ui => checked((double)ui),
+            long l => checked((double)l),
+            ulong ul => checked((double)ul),
+            BigInteger bi => (double)bi,
+            _ => ThrowValueConversionError(value)
+        };
     }
 }

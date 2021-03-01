@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -22,20 +23,37 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
+            StringValue stringValue => ParseDate(stringValue.Value),
             NullValue _ => null,
-            StringValue s => ParseValue(s.Value),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
+        public override object ParseValue(object value) => value switch
+        {
+            DateTimeOffset _ => value,
+            string s => ParseDate(s),
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
+
+        private static DateTimeOffset ParseDate(string stringValue)
+        {
+            // ISO-8601 format
+            if (DateTimeOffset.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
+            {
+                return date;
+            }
+
+            throw new FormatException($"Could not parse date. Expected ISO-8601 format. Value: {stringValue}");
+        }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => value switch
+        public override object Serialize(object value) => value switch
         {
-            null => new NullValue(),
-            DateTimeOffset d => new StringValue(d.ToString("O")), // "O" is the proper ISO 8601 format required
-            _ => null
+            DateTimeOffset d => d.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo), // ISO-8601 format (without unnecessary decimal places, allowed by ISO-8601)
+            null => null,
+            _ => ThrowSerializationError(value)
         };
     }
 }

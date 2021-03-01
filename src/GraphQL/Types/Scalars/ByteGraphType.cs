@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -12,15 +12,12 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue ? (byte?)intValue.Value : null,
-            LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue ? (byte?)longValue.Value : null,
-            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue ? (byte?)bigIntValue.Value : null,
+            IntValue intValue => checked((byte)intValue.Value),
+            LongValue longValue => checked((byte)longValue.Value),
+            BigIntValue bigIntValue => checked((byte)bigIntValue.Value),
             NullValue _ => null,
-            _ => null
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => value == null ? null : ValueConverter.ConvertTo(value, typeof(byte));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -32,10 +29,19 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => value switch
+        public override object ParseValue(object value) => value switch
         {
-            null => new NullValue(),
-            _ => new IntValue(Convert.ToByte(value))
+            byte _ => value,
+            null => null,
+            int i => checked((byte)i),
+            sbyte sb => checked((byte)sb),
+            short s => checked((byte)s),
+            ushort us => checked((byte)us),
+            uint ui => checked((byte)ui),
+            long l => checked((byte)l),
+            ulong ul => checked((byte)ul),
+            BigInteger bi => (byte)bi,
+            _ => ThrowValueConversionError(value)
         };
     }
 }

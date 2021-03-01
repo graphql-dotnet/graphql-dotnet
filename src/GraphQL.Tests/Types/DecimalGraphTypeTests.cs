@@ -25,19 +25,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            Should.Throw<FormatException>(() => _type.ParseValue("abcd"));
+            Should.Throw<ArgumentException>(() => _type.ParseValue("abcd"));
         }
 
         [Fact]
-        public void coerces_numeric_string_to_decimal_using_cultures()
+        public void coerces_numeric_string_to_decimal_throws()
         {
-            CultureTestHelper.UseCultures(coerces_numeric_string_to_decimal);
-        }
-
-        [Fact]
-        public void coerces_numeric_string_to_decimal()
-        {
-            _type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
+            Should.Throw<ArgumentException>(() => _type.ParseValue("12345.6579"));
         }
 
         [Fact]

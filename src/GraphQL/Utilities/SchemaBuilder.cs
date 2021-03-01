@@ -308,13 +308,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var name = (string)inputDef.Name.Value;
             var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
 
+            var graphType = ToGraphType(inputDef.Type);
             var field = new FieldType
             {
                 Name = name,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
-                ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = inputDef.DefaultValue.ToValue()
+                ResolvedType = graphType,
+                DefaultValue = inputDef.DefaultValue == null ? null : Execution.ExecutionHelper.CoerceValue(graphType, Language.CoreToVanillaConverter.Value(inputDef.DefaultValue)).Value
             }.SetAstType(inputDef);
 
             return field;
@@ -450,11 +451,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual QueryArgument ToArgument(GraphQLInputValueDefinition inputDef)
         {
-            return new QueryArgument(ToGraphType(inputDef.Type))
+            var graphType = ToGraphType(inputDef.Type);
+            return new QueryArgument(graphType)
             {
                 Name = (string)inputDef.Name.Value,
-                DefaultValue = inputDef.DefaultValue.ToValue(),
-                ResolvedType = ToGraphType(inputDef.Type),
+                DefaultValue = inputDef.DefaultValue == null ? null : Execution.ExecutionHelper.CoerceValue(graphType, Language.CoreToVanillaConverter.Value(inputDef.DefaultValue)).Value,
+                ResolvedType = graphType,
                 Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
         }

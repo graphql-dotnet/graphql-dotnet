@@ -64,6 +64,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_for_all_locations()
         {
+            // TEST BROKEN: CoerceValue for default value cannot execute on a GraphQLTypeReference graph type
             Builder.Types.For("TestType").IsTypeOf<TestType>();
             Builder.Types.For("TestTypeForUnion").IsTypeOf<TestTypeForUnion>();
 

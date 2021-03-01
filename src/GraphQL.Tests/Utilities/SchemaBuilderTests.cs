@@ -193,6 +193,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void builds_type_with_arguments()
         {
+            // TEST BROKEN: CoerceValue for default value cannot execute on a GraphQLTypeReference graph type
             var definitions = @"
                 type Query {
                   post(id: ID = 1): String
@@ -286,6 +287,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void references_other_types()
         {
+            // TEST BROKEN: CoerceValue for default value cannot execute on a GraphQLTypeReference graph type
             var definitions = @"
                 type Post {
                   id: ID!

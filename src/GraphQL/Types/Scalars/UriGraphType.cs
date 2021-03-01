@@ -10,13 +10,31 @@ namespace GraphQL.Types
     public class UriGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            StringValue s => new Uri(s.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        public override bool CanParseLiteral(IValue value) => value is StringValue;
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
+        public override object ParseValue(object value) => value switch
+        {
+            string s => new Uri(s),
+            Uri _ => value,
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(ParseValue(value).ToString());
+        public override object Serialize(object value) => value switch
+        {
+            string s => new Uri(s).ToString(), //validate uri
+            Uri u => u.ToString(),
+            null => null,
+            _ => ThrowSerializationError(value)
+        };
     }
 }

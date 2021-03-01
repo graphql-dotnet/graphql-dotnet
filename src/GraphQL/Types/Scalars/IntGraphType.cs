@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -12,14 +12,12 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => intValue.Value,
-            LongValue longValue => int.MinValue <= longValue.Value && longValue.Value <= int.MaxValue ? (int?)longValue.Value : null,
-            BigIntValue bigIntValue => int.MinValue <= bigIntValue.Value && bigIntValue.Value <= int.MaxValue ? (int?)bigIntValue.Value : null,
-            _ => null
+            IntValue intValue => BoxValue(intValue.Value),
+            LongValue longValue => checked((int)longValue.Value),
+            BigIntValue bigIntValue => checked((int)bigIntValue.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(int));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -31,6 +29,38 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new IntValue(Convert.ToInt32(value));
+        public override object ParseValue(object value) => value switch
+        {
+            int _ => value,
+            null => null,
+            sbyte sb => checked((int)sb),
+            byte b => checked((int)b),
+            short s => checked((int)s),
+            ushort us => checked((int)us),
+            uint ui => checked((int)ui),
+            long l => checked((int)l),
+            ulong ul => checked((int)ul),
+            BigInteger bi => (int)bi,
+            _ => ThrowValueConversionError(value)
+        };
+
+        private static readonly object _boxedNeg1 = -1;
+        private static readonly object _boxed0 = 0;
+        private static readonly object _boxed1 = 1;
+        private static readonly object _boxed2 = 2;
+        private static readonly object _boxed3 = 3;
+        private static readonly object _boxed4 = 4;
+        private static readonly object _boxed5 = 5;
+        private static object BoxValue(int value) => value switch
+        {
+            0 => _boxed0,
+            1 => _boxed1,
+            2 => _boxed2,
+            3 => _boxed3,
+            4 => _boxed4,
+            5 => _boxed5,
+            -1 => _boxedNeg1,
+            _ => value
+        };
     }
 }

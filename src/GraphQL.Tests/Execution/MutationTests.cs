@@ -380,19 +380,19 @@ namespace GraphQL.Tests.Execution
         {
             var query = @"
                 mutation M {
-                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
+                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.1230000Z"") {
                     theDateTime
                   }
-                  second: immediatelyChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
+                  second: immediatelyChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.1230000Z"") {
                     theDateTime
                   }
-                  third: immediatelyChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
+                  third: immediatelyChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.1230000Z"") {
                     theDateTime
                   }
-                  fourth: immediatelyChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
+                  fourth: immediatelyChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.1230000-5:00"") {
                     theDateTime
                   }
-                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
+                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.1230000+2:00"") {
                     theDateTime
                   }
                 }

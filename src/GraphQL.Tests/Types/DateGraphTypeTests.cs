@@ -11,12 +11,11 @@ namespace GraphQL.Tests.Types
         private readonly DateGraphType _type = new DateGraphType();
 
         [Fact]
-        public void serialize_string_to_date()
+        public void serialize_string_to_date_throws()
         {
             CultureTestHelper.UseCultures(() =>
             {
-                var actual = _type.Serialize("2018-07-24");
-                actual.ShouldBe("2018-07-24");
+                Should.Throw<InvalidOperationException>(() => _type.Serialize("2018-07-24"));
             });
         }
 

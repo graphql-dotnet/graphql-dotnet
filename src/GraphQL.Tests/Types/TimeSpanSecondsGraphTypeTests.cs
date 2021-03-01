@@ -10,12 +10,11 @@ namespace GraphQL.Tests.Types
         private readonly TimeSpanSecondsGraphType _type = new TimeSpanSecondsGraphType();
 
         [Fact]
-        public void serialize_string_returns_null()
+        public void serialize_string_throws()
         {
             CultureTestHelper.UseCultures(() =>
             {
-                var actual = _type.Serialize("foo");
-                actual.ShouldBeNull();
+                Should.Throw<InvalidOperationException>(() => _type.Serialize("foo"));
             });
         }
 

@@ -182,11 +182,11 @@ mutation {
 
         // TODO: rework to throw exception
         [Fact]
-        public void Should_Accept_String_As_Long_In_Variable()
+        public void Should_Not_Accept_String_As_Long_In_Variable()
         {
             var query = @"mutation AAA($val : Long!) { long(number: $val) }";
             var expected = @"{ ""long"": 100 }";
-            AssertQuerySuccess(query, expected, @"{ ""val"": ""100"" }".ToInputs(), null);
+            AssertQueryWithErrors(query, expected, @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
         }
     }
 

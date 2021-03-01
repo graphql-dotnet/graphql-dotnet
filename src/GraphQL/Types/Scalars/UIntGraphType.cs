@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -12,14 +12,12 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => uint.MinValue <= intValue.Value ? (uint?)intValue.Value : null,
-            LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue ? (uint?)longValue.Value : null,
-            BigIntValue bigIntValue => uint.MinValue <= bigIntValue.Value && bigIntValue.Value <= uint.MaxValue ? (uint?)bigIntValue.Value : null,
-            _ => null
+            IntValue intValue => checked((uint)intValue.Value),
+            LongValue longValue => checked((uint)longValue.Value),
+            BigIntValue bigIntValue => checked((uint)bigIntValue.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(uint));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -31,6 +29,19 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new LongValue(Convert.ToUInt32(value));
+        public override object ParseValue(object value) => value switch
+        {
+            uint _ => value,
+            null => null,
+            int i => checked((uint)i),
+            long l => checked((uint)l),
+            sbyte sb => checked((uint)sb),
+            byte b => checked((uint)b),
+            short s => checked((uint)s),
+            ushort us => checked((uint)us),
+            ulong ul => checked((uint)ul),
+            BigInteger bi => (uint)bi,
+            _ => ThrowValueConversionError(value)
+        };
     }
 }
