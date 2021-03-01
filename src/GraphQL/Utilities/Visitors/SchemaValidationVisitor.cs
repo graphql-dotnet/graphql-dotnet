@@ -51,8 +51,11 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (field.ResolvedType == null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 2.3
-            if (field.ResolvedType != null ? field.ResolvedType.IsOutputType() == false : field.Type?.IsOutputType() == false)
+            if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
         }
 
@@ -63,18 +66,16 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (argument.ResolvedType == null)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 2.4.2
-            if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
+            if (!argument.ResolvedType.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
 
             // validate default value
-            if (argument.DefaultValue != null && argument.ResolvedType != null)
-            {
-                if (!argument.ResolvedType.IsValidDefault(argument.DefaultValue))
-                {
-                    throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{field.Name}' is invalid.");
-                }
-            }
+            if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
         }
 
         #endregion
@@ -105,8 +106,11 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (field.ResolvedType == null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 2.3
-            if (field.ResolvedType != null ? field.ResolvedType.IsOutputType() == false : field.Type?.IsOutputType() == false)
+            if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
         }
 
@@ -117,9 +121,16 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (argument.ResolvedType == null)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 2.4.2
-            if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
+            if (!argument.ResolvedType.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
+
+            // validate default value
+            if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
         }
 
         #endregion
@@ -150,18 +161,16 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (field.ResolvedType == null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 2.3
-            if (field.ResolvedType != null ? field.ResolvedType.IsInputType() == false : field.Type?.IsInputType() == false)
+            if (!field.ResolvedType.IsInputType())
                 throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
 
             // validate default value
-            if (field.DefaultValue != null && field.ResolvedType != null)
-            {
-                if (!field.ResolvedType.IsValidDefault(field.DefaultValue))
-                {
-                    throw new InvalidOperationException($"The default value of field '{field.Name}' of type '{type.Name}' is invalid.");
-                }
-            }
+            if (field.DefaultValue != null && !field.ResolvedType.IsValidDefault(field.DefaultValue))
+                throw new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid.");
         }
 
         #endregion
@@ -218,8 +227,11 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
+            if (argument.ResolvedType == null)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
             // 4.2
-            if (argument.ResolvedType != null ? argument.ResolvedType.IsInputType() == false : argument.Type?.IsInputType() == false)
+            if (!argument.ResolvedType.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must be an input type.");
         }
     }
