@@ -17,6 +17,17 @@ namespace GraphQL.Tests.Validation
             }");
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void good_int_null_value()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                intArgField(intArg: null)
+              }
+            }");
+        }
+
         [Fact]
         public void good_boolean_value()
         {
@@ -629,6 +640,28 @@ namespace GraphQL.Tests.Validation
             }");
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void one_null_arg_on_multiple_optional()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                multipleOpts(opt1: null)
+              }
+            }");
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void both_null_arg_on_multiple_optional()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                multipleOpts(opt2: null, opt1: null)
+              }
+            }");
+        }
+
         [Fact]
         public void multiple_reqs_on_mixed()
         {
@@ -692,6 +725,58 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 Rule.badValue(_, "req1", "Int", "\"one\"", 3, 30);
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_one_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req1: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req1", "Int", "null", 3, 30, new[] { "Expected \"Int!\", found null." });
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_second_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req2: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req2", "Int", "null", 3, 30, new[] { "Expected \"Int!\", found null." });
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_both_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req2: null, req1: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req2", "Int", "null", 3, 30, new[] { "Expected \"Int!\", found null." });
+                Rule.badValue(_, "req1", "Int", "null", 3, 42, new[] { "Expected \"Int!\", found null." });
             });
         }
     }
@@ -839,7 +924,6 @@ namespace GraphQL.Tests.Validation
             });
         }
     }
-
 
     public class ArgumentsOfCorrectType_directive_arguments : ValidationTestBase<ArgumentsOfCorrectType, ValidationSchema>
     {
