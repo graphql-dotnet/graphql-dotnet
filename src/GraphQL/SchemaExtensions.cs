@@ -129,6 +129,9 @@ namespace GraphQL
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
         /// for more information.
+        /// <br/><br/>
+        /// Keep in mind that the implementation of experimental features can change over time, up to their complete
+        /// removal, if the official specification is supplemented with all the missing features.
         /// </summary>
         /// <param name="schema">The schema for which the features are enabled.</param>
         /// <param name="mode">Experimental features mode.</param>
