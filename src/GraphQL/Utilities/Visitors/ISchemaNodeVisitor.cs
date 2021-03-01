@@ -19,12 +19,12 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Visits registered within the schema <see cref="DirectiveGraphType"/>.
         /// </summary>
-        void VisitDirective(DirectiveGraphType directive, ISchema schema);
+        void VisitDirective(DirectiveGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="ScalarGraphType"/>.
         /// </summary>
-        void VisitScalar(ScalarGraphType scalar, ISchema schema);
+        void VisitScalar(ScalarGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema object graph type.
@@ -64,17 +64,17 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Visits directive argument.
         /// </summary>
-        void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema);
+        void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="IInterfaceGraphType"/>.
         /// </summary>
-        void VisitInterface(IInterfaceGraphType iface, ISchema schema);
+        void VisitInterface(IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="UnionGraphType"/>.
         /// </summary>
-        void VisitUnion(UnionGraphType union, ISchema schema);
+        void VisitUnion(UnionGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="EnumerationGraphType"/>.

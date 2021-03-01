@@ -14,12 +14,12 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitDirective(DirectiveGraphType directive, ISchema schema)
+        public virtual void VisitDirective(DirectiveGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitScalar(ScalarGraphType scalar, ISchema schema)
+        public virtual void VisitScalar(ScalarGraphType type, ISchema schema)
         {
         }
 
@@ -49,27 +49,27 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType objectGraphType, ISchema schema)
+        public virtual void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType objectGraphType, ISchema schema)
+        public virtual void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType directive, ISchema schema)
+        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitInterface(IInterfaceGraphType iface, ISchema schema)
+        public virtual void VisitInterface(IInterfaceGraphType type, ISchema schema)
         {
         }
 
         /// <inheritdoc />
-        public virtual void VisitUnion(UnionGraphType union, ISchema schema)
+        public virtual void VisitUnion(UnionGraphType type, ISchema schema)
         {
         }
 

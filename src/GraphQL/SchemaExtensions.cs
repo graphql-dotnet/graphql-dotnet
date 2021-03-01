@@ -196,7 +196,7 @@ namespace GraphQL
                 {
                     case EnumerationGraphType e:
                         visitor.VisitEnum(e, schema);
-                        foreach (var value in e.Values.List)
+                        foreach (var value in e.Values.List) // List is always non-null
                             visitor.VisitEnumValue(value, e, schema);
                         break;
 
@@ -210,7 +210,7 @@ namespace GraphQL
 
                     case InterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
-                        foreach (var field in iface.Fields.List)
+                        foreach (var field in iface.Fields.List) // List is always non-null
                         {
                             visitor.VisitInterfaceFieldDefinition(field, iface, schema);
                             if (field.Arguments?.Count > 0)
@@ -223,7 +223,7 @@ namespace GraphQL
 
                     case IObjectGraphType output:
                         visitor.VisitObject(output, schema);
-                        foreach (var field in output.Fields.List)
+                        foreach (var field in output.Fields.List) // List is always non-null
                         {
                             visitor.VisitObjectFieldDefinition(field, output, schema);
                             if (field.Arguments?.Count > 0)
@@ -236,7 +236,7 @@ namespace GraphQL
 
                     case IInputObjectGraphType input:
                         visitor.VisitInputObject(input, schema);
-                        foreach (var field in input.Fields.List)
+                        foreach (var field in input.Fields.List) // List is always non-null
                             visitor.VisitInputObjectFieldDefinition(field, input, schema);
                         break;
                 }
