@@ -95,7 +95,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method must not be called for <see langword="null"/> values as it is assumed that all scalars handle
         /// <see langword="null"/>. It is not necessary to provide a <see langword="true"/> response for
-        /// <see langword="null"/> values. Use a non-null graph type to indicate that a scalar value does not support null.
+        /// <see langword="null"/> values. Use a non-null graph type to indicate that a scalar value does not support <see langword="null"/>.
         /// </summary>
         /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
         public virtual bool CanParseValue(object value)
