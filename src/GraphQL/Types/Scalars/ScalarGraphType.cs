@@ -159,24 +159,19 @@ namespace GraphQL.Types
             };
         }
 
-        protected internal object ThrowLiteralConversionError(IValue input)
+        internal object ThrowLiteralConversionError(IValue input)
         {
             throw new ArgumentException($"Unable to convert '{input}' to '{Name}'");
         }
 
-        protected internal IValue ThrowASTConversionError(object value)
-        {
-            throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{Name}' to an AST representation.");
-        }
-
         // this is often called for serialization errors, since Serialize calls ParseValue by default
         // also may be called for serialization errors during ToAST, 
-        protected internal object ThrowValueConversionError(object value)
+        internal object ThrowValueConversionError(object value)
         {
             throw new ArgumentException($"Unable to convert '{value}' to '{Name}'");
         }
 
-        protected internal object ThrowSerializationError(object value)
+        internal object ThrowSerializationError(object value)
         {
             throw new InvalidOperationException($"Unable to serialize '{value}' to '{Name}'.");
         }
