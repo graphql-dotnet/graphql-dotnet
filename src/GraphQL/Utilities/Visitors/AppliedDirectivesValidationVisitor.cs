@@ -9,42 +9,61 @@ namespace GraphQL.Utilities
     /// </summary>
     public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
     {
+        /// <summary>
+        /// Returns a static instance of the <see cref="AppliedDirectivesValidationVisitor"/> class.
+        /// </summary>
         public static readonly AppliedDirectivesValidationVisitor Instance = new AppliedDirectivesValidationVisitor();
 
         private AppliedDirectivesValidationVisitor()
         {
         }
 
-        public void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
+        /// <inheritdoc/>
+        public void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
-        public void VisitFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
+        /// <inheritdoc/>
+        public void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
+        /// <inheritdoc/>
         public void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => ValidateAppliedDirectives(argument, schema, DirectiveLocation.ArgumentDefinition);
 
+        /// <inheritdoc/>
         public void VisitEnum(EnumerationGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Enum);
 
-        public void VisitDirective(DirectiveGraphType directive, ISchema schema) => ValidateAppliedDirectives(directive, schema, null); // no location for directives (yet), see https://github.com/graphql/graphql-spec/issues/818
+        /// <inheritdoc/>
+        public void VisitDirective(DirectiveGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, null); // no location for directives (yet), see https://github.com/graphql/graphql-spec/issues/818
 
+        /// <inheritdoc/>
         public void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema) => ValidateAppliedDirectives(value, schema, DirectiveLocation.EnumValue);
 
-        public void VisitFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
+        /// <inheritdoc/>
+        public void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
 
-        public void VisitFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
+        /// <inheritdoc/>
+        public void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.FieldDefinition);
 
-        public void VisitInputFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.InputFieldDefinition);
+        /// <inheritdoc/>
+        public void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(field, schema, DirectiveLocation.InputFieldDefinition);
 
+        /// <inheritdoc/>
         public void VisitInputObject(IInputObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.InputObject);
 
-        public void VisitInterface(IInterfaceGraphType iface, ISchema schema) => ValidateAppliedDirectives(iface, schema, DirectiveLocation.Interface);
+        /// <inheritdoc/>
+        public void VisitInterface(IInterfaceGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Interface);
 
+        /// <inheritdoc/>
         public void VisitObject(IObjectGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Object);
 
-        public void VisitScalar(ScalarGraphType scalar, ISchema schema) => ValidateAppliedDirectives(scalar, schema, DirectiveLocation.Scalar);
+        /// <inheritdoc/>
+        public void VisitScalar(ScalarGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Scalar);
 
+        /// <inheritdoc/>
         public void VisitSchema(ISchema schema) => ValidateAppliedDirectives(schema, schema, DirectiveLocation.Schema);
 
-        public void VisitUnion(UnionGraphType union, ISchema schema) => ValidateAppliedDirectives(union, schema, DirectiveLocation.Union);
+        /// <inheritdoc/>
+        public void VisitUnion(UnionGraphType type, ISchema schema) => ValidateAppliedDirectives(type, schema, DirectiveLocation.Union);
 
+        /// <inheritdoc/>
         private void ValidateAppliedDirectives(IProvideMetadata provider, ISchema schema, DirectiveLocation? location)
         {
             if (provider.HasAppliedDirectives())

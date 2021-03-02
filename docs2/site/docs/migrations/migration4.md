@@ -1,5 +1,7 @@
 # Migrating from v3.x to v4.x
 
+See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A4.0+is%3Aissue+is%3Aclosed) and [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A4.0+is%3Aclosed) done in v4.
+
 ## New Features
 
 ### Improved Performance
