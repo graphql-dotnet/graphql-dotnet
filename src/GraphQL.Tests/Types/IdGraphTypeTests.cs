@@ -22,18 +22,6 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void parse_value_quoted_string_to_identifier()
-        {
-            _type.ParseValue("\"12345\"").ShouldBe("12345");
-        }
-
-        [Fact]
-        public void parse_literal_string_value_quoted_string_to_identifier()
-        {
-            _type.ParseLiteral(new StringValue("\"12345\"")).ShouldBe("12345");
-        }
-
-        [Fact]
         public void parse_literal_int_value_to_identifier()
         {
             int val = 12345;

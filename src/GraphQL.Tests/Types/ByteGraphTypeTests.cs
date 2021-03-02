@@ -13,6 +13,8 @@ namespace GraphQL.Tests.Types
 
         [Theory]
         [InlineData(-1)]
+        [InlineData(3335)]
+        [InlineData(333.0)]
         public void Coerces_given_inputs_to_overflow_exception(object input) =>
             AssertException<OverflowException>(input);
 
@@ -24,15 +26,12 @@ namespace GraphQL.Tests.Types
         [InlineData("12")]
         [InlineData("125")]
         public void Coerces_given_inputs_to_argument_exception(object input) =>
-            AssertException<ArgumentException>(input);
-
-        [Fact]
-        public void Coerces_double_to_argument_exception()
-            => AssertException<ArgumentException>(999999.99);
+            AssertException<InvalidOperationException>(input);
 
         [Theory]
         [InlineData(0, 0)]
         [InlineData(255, 255)]
+        [InlineData(123.0, 123)]
         public void Coerces_input_to_valid_byte(object input, byte expected)
             => type.ParseValue(input).ShouldBe(expected);
     }

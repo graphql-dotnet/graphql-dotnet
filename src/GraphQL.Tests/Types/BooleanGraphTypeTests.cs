@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Types
         [InlineData("21")]
         public void parse_throws(object value)
         {
-            Should.Throw<ArgumentException>(() => type.ParseValue(value));
+            Should.Throw<InvalidOperationException>(() => type.ParseValue(value));
             type.CanParseValue(value).ShouldBeFalse();
         }
 
@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Types
         [InlineData("21")]
         public void serialize_throws(object value)
         {
-            Should.Throw<ArgumentException>(() => type.Serialize(value));
+            Should.Throw<InvalidOperationException>(() => type.Serialize(value));
         }
 
         [Fact]

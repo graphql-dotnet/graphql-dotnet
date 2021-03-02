@@ -42,7 +42,26 @@ namespace GraphQL.Types
             long l => checked((sbyte)l),
             ulong ul => checked((sbyte)ul),
             BigInteger bi => (sbyte)bi,
+            float f => checked((sbyte)f),
+            double d => checked((sbyte)d),
+            decimal d => checked((sbyte)d),
             _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override object Serialize(object value) => value switch
+        {
+            sbyte _ => value,
+            null => null,
+            int i => checked((sbyte)i),
+            byte b => checked((sbyte)b),
+            short s => checked((sbyte)s),
+            ushort us => checked((sbyte)us),
+            uint ui => checked((sbyte)ui),
+            long l => checked((sbyte)l),
+            ulong ul => checked((sbyte)ul),
+            BigInteger bi => (sbyte)bi,
+            _ => ThrowSerializationError(value)
         };
     }
 }

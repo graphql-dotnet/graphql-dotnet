@@ -50,9 +50,9 @@ namespace GraphQL.Types
         {
             decimal _ => value,
             int i => checked((decimal)i),
+            double d => checked((decimal)d),
             null => null,
             float f => checked((decimal)f),
-            double d => checked((decimal)value),
             sbyte sb => checked((decimal)sb),
             byte b => checked((decimal)b),
             short s => checked((decimal)s),

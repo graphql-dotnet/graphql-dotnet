@@ -23,13 +23,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void serializes_int_to_string_throws()
         {
-            Should.Throw<ArgumentException>(() => _type.Serialize(1));
+            Should.Throw<InvalidOperationException>(() => _type.Serialize(1));
         }
 
         [Fact]
         public void serializes_long_to_string_throws()
         {
-            Should.Throw<ArgumentException>(() => _type.Serialize(long.MaxValue));
+            Should.Throw<InvalidOperationException>(() => _type.Serialize(long.MaxValue));
         }
 
         [Fact]

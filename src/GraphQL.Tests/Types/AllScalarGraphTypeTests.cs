@@ -84,10 +84,10 @@ namespace GraphQL.Tests.Types
             // if string to coercion were possible, all would pass, as the string is "0"
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
             g.CanParseLiteral(new StringValue("0")).ShouldBeFalse();
-            Should.Throw<ArgumentException>(() => g.ParseLiteral(new StringValue("0")));
+            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new StringValue("0")));
             g.CanParseValue("0").ShouldBeFalse();
-            Should.Throw<ArgumentException>(() => g.ParseValue("0"));
-            Should.Throw<ArgumentException>(() => g.Serialize("0"));
+            Should.Throw<InvalidOperationException>(() => g.ParseValue("0"));
+            Should.Throw<InvalidOperationException>(() => g.Serialize("0"));
         }
 
         [Theory]
@@ -102,16 +102,16 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ShortGraphType), short.MaxValue)]
         [InlineData(typeof(UShortGraphType), ushort.MinValue)]
         [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
-        [InlineData(typeof(IntGraphType), int.MinValue)]
-        [InlineData(typeof(IntGraphType), (int)default)]
-        [InlineData(typeof(IntGraphType), int.MaxValue)]
-        [InlineData(typeof(UIntGraphType), uint.MinValue)]
-        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
-        [InlineData(typeof(LongGraphType), long.MinValue)]
-        [InlineData(typeof(LongGraphType), (long)default)]
-        [InlineData(typeof(LongGraphType), long.MaxValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MinValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
+        [InlineData(typeof(IntGraphType), -2000000000)] //float cannot hold the full precision of int
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), 2000000000)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), 4000000000u)]
+        [InlineData(typeof(LongGraphType), -9223300018843156480L)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), 9223300018843156480L)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
         public void parseValue_ok(Type graphType, object value)
@@ -127,7 +127,10 @@ namespace GraphQL.Tests.Types
                 typeof(uint),
                 typeof(long),
                 typeof(ulong),
-                typeof(BigInteger)
+                typeof(BigInteger),
+                typeof(float),
+                typeof(double),
+                typeof(decimal)
             };
 
             foreach (var type in types)
@@ -135,7 +138,14 @@ namespace GraphQL.Tests.Types
                 object converted;
                 try
                 {
-                    converted = Convert.ChangeType(value, type);
+                    if (type == typeof(BigInteger))
+                    {
+                        converted = new BigInteger((decimal)Convert.ChangeType(value, typeof(decimal)));
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(value, type);
+                    }
                 }
                 catch
                 {
@@ -160,16 +170,16 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ShortGraphType), short.MaxValue)]
         [InlineData(typeof(UShortGraphType), ushort.MinValue)]
         [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
-        [InlineData(typeof(IntGraphType), int.MinValue)]
-        [InlineData(typeof(IntGraphType), (int)default)]
-        [InlineData(typeof(IntGraphType), int.MaxValue)]
-        [InlineData(typeof(UIntGraphType), uint.MinValue)]
-        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
-        [InlineData(typeof(LongGraphType), long.MinValue)]
-        [InlineData(typeof(LongGraphType), (long)default)]
-        [InlineData(typeof(LongGraphType), long.MaxValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MinValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
+        [InlineData(typeof(IntGraphType), -2000000000)] //float cannot hold the full precision of int
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), 2000000000)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), 4000000000u)]
+        [InlineData(typeof(LongGraphType), -9223300018843156480L)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), 9223300018843156480L)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
         public void parseLiteral_ok(Type graphType, object value)
@@ -213,16 +223,16 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ShortGraphType), short.MaxValue)]
         [InlineData(typeof(UShortGraphType), ushort.MinValue)]
         [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
-        [InlineData(typeof(IntGraphType), int.MinValue)]
-        [InlineData(typeof(IntGraphType), (int)default)]
-        [InlineData(typeof(IntGraphType), int.MaxValue)]
-        [InlineData(typeof(UIntGraphType), uint.MinValue)]
-        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
-        [InlineData(typeof(LongGraphType), long.MinValue)]
-        [InlineData(typeof(LongGraphType), (long)default)]
-        [InlineData(typeof(LongGraphType), long.MaxValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MinValue)]
-        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
+        [InlineData(typeof(IntGraphType), -2000000000)] //float cannot hold the full precision of int
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), 2000000000)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), 4000000000u)]
+        [InlineData(typeof(LongGraphType), -9223300018843156480L)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), 9223300018843156480L)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
         public void serialize_ok(Type graphType, object value)
@@ -246,7 +256,14 @@ namespace GraphQL.Tests.Types
                 object converted;
                 try
                 {
-                    converted = Convert.ChangeType(value, type);
+                    if (type == typeof(BigInteger))
+                    {
+                        converted = new BigInteger((decimal)Convert.ChangeType(value, typeof(decimal)));
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(value, type);
+                    }
                 }
                 catch
                 {
@@ -335,15 +352,6 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), false)]
         [InlineData(typeof(BigIntGraphType), false)]
         [InlineData(typeof(StringGraphType), 1.5)]
-        [InlineData(typeof(ByteGraphType), 1.5)]
-        [InlineData(typeof(SByteGraphType), 1.5)]
-        [InlineData(typeof(ShortGraphType), 1.5)]
-        [InlineData(typeof(UShortGraphType), 1.5)]
-        [InlineData(typeof(IntGraphType), 1.5)]
-        [InlineData(typeof(UIntGraphType), 1.5)]
-        [InlineData(typeof(LongGraphType), 1.5)]
-        [InlineData(typeof(ULongGraphType), 1.5)]
-        [InlineData(typeof(BigIntGraphType), 1.5)]
         public void parseValue_other_fail(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
@@ -467,7 +475,14 @@ namespace GraphQL.Tests.Types
                 object converted;
                 try
                 {
-                    converted = Convert.ChangeType(value, type);
+                    if (type == typeof(BigInteger))
+                    {
+                        converted = new BigInteger((decimal)Convert.ChangeType(value, typeof(decimal)));
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(value, type);
+                    }
                 }
                 catch
                 {
@@ -476,7 +491,7 @@ namespace GraphQL.Tests.Types
 
                 if (graphType == typeof(BooleanGraphType))
                 {
-                    Should.Throw<ArgumentException>(() => g.ParseValue(converted));
+                    Should.Throw<InvalidOperationException>(() => g.ParseValue(converted));
                 }
                 else
                 {
@@ -526,7 +541,7 @@ namespace GraphQL.Tests.Types
 
                 if (graphType == typeof(BooleanGraphType))
                 {
-                    Should.Throw<ArgumentException>(() => g.ParseLiteral(astValue));
+                    Should.Throw<InvalidOperationException>(() => g.ParseLiteral(astValue));
                 }
                 else
                 {
@@ -573,7 +588,14 @@ namespace GraphQL.Tests.Types
                 object converted;
                 try
                 {
-                    converted = Convert.ChangeType(value, type);
+                    if (type == typeof(BigInteger))
+                    {
+                        converted = new BigInteger((decimal)Convert.ChangeType(value, typeof(decimal)));
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(value, type);
+                    }
                 }
                 catch
                 {
@@ -582,22 +604,12 @@ namespace GraphQL.Tests.Types
 
                 if (graphType == typeof(BooleanGraphType))
                 {
-                    Should.Throw<ArgumentException>(() => g.Serialize(converted));
+                    Should.Throw<InvalidOperationException>(() => g.Serialize(converted));
                 }
                 else
                 {
                     Should.Throw<OverflowException>(() => g.Serialize(converted));
                 }
-            }
-        }
-
-        [Fact]
-        public void verify_integer_boxing()
-        {
-            var g = new IntGraphType();
-            for (int i = -100; i < 100; ++i)
-            {
-                g.ParseLiteral(new IntValue(i)).ShouldBe(i);
             }
         }
     }

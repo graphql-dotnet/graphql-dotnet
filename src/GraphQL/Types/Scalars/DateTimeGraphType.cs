@@ -40,6 +40,8 @@ namespace GraphQL.Types
         private static DateTime ParseDate(string stringValue)
         {
             // ISO-8601 format
+            // Note that the "O" format is similar but always prints the fractional parts
+            // of the second, which is not required by ISO-8601.
             if (DateTime.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
             {
                 return date;
@@ -51,6 +53,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object Serialize(object value) => value switch
         {
+            // ISO-8601 format
+            // Note that the "O" format is similar but always prints the fractional parts
+            // of the second, which is not required by ISO-8601.
             DateTime d => d.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo), // ISO-8601 format (without unnecessary decimal places, allowed by ISO-8601)
             null => null,
             _ => ThrowSerializationError(value)

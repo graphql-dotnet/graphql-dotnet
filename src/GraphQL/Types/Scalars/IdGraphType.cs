@@ -49,7 +49,7 @@ namespace GraphQL.Types
         {
             int _ => value,
             long _ => value,
-            _ => value?.ToString().Trim(' ', '"')
+            _ => value?.ToString()
         };
 
         /// <inheritdoc/>
