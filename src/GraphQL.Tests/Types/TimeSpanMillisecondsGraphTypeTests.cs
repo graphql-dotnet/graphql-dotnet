@@ -12,10 +12,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void serialize_string_throws()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<InvalidOperationException>(() => _type.Serialize("foo"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.Serialize("foo")));
         }
 
         [Fact]

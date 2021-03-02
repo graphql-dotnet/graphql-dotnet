@@ -13,10 +13,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void serialize_string_to_date_throws()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                Should.Throw<InvalidOperationException>(() => _type.Serialize("2018-07-24"));
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.Serialize("2018-07-24")));
         }
 
         [Fact]
