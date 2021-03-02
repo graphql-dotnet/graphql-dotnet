@@ -568,6 +568,9 @@ namespace GraphQL
         {
             if (type is NonNullGraphType nonnull)
             {
+                if (value == null)
+                    throw new InvalidOperationException($"Unable to get an AST representation of type '{nonnull}' for null value.");
+
                 return ToAST(nonnull.ResolvedType, value);
             }
 
@@ -599,12 +602,12 @@ namespace GraphQL
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the input object type '{input.Name}' to an AST representation.");
+                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the input object type '{input.Name}' for '{value}'.");
             }
 
             if (type is ScalarGraphType scalar)
             {
-                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the scalar type '{scalar.Name}' for '{value}'.");
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
