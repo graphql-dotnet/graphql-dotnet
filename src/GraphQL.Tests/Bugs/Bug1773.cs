@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Bugs
         {
             // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
-                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "Входная строка имела неверный формат.");
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "??????? ?????? ????? ???????? ??????.");
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the conversion threw a FormatException
             AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
-                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "Входная строка имела неверный формат.");
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "??????? ?????? ????? ???????? ??????.");
         }
 
         [Fact]

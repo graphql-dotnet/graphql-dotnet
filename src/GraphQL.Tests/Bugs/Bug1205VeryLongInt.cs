@@ -3,6 +3,7 @@ using System.Numerics;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
