@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Types
         [InlineData("-999999.99")]
         [InlineData("429496")]
         [InlineData("4294967295")]
-        public void Coerces_given_inputs_to_out_of_bound_exception(object input) =>
+        public void Coerces_given_inputs_to_invalid_operation_exception(object input) =>
             AssertException<InvalidOperationException>(input);
 
         [Theory]

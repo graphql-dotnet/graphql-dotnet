@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
         [InlineData("-129")]
         [InlineData("abc")]
         [InlineData("-999999.99")]
-        public void Coerces_invalid_to_exception(object input) =>
+        public void Coerces_to_invalid_operation_exception(object input) =>
             AssertException<InvalidOperationException>(input);
 
         [Theory]

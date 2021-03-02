@@ -347,13 +347,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var name = (string)inputDef.Name.Value;
             var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
 
-            var graphType = ToGraphType(inputDef.Type);
             var field = new FieldType
             {
                 Name = name,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
-                ResolvedType = graphType,
+                ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue
             }.SetAstType(inputDef);
 
