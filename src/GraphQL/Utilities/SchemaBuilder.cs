@@ -488,10 +488,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
         {
+            var name = (string)valDef.Name.Value;
             return new EnumValueDefinition
             {
-                Value = valDef.Name.Value,
-                Name = (string)valDef.Name.Value,
+                Value = name,
+                Name = name,
                 Description = valDef.Comment?.Text.ToString()
             }.SetAstType(valDef);
         }

@@ -330,7 +330,7 @@ namespace GraphQL
                     else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
                     {
                         errors.Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
-                    } 
+                    }
                 }
 
                 return errors.ToArray();
@@ -528,18 +528,25 @@ namespace GraphQL
                 return true;
             }
 
-            if (type is ListGraphType listGraphType)
+            // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
+            // the value is not an IEnumerable, convert the value using the list's item type.
+            if (type is ListGraphType listType)
             {
-                if (!(value is IEnumerable list))
-                    return false;
+                var itemType = listType.ResolvedType;
 
-                foreach (var item in list)
+                if (!(value is string) && value is IEnumerable list)
                 {
-                    if (!IsValidDefault(listGraphType.ResolvedType, item))
-                        return false;
+                    foreach (var item in list)
+                    {
+                        if (!IsValidDefault(itemType, item))
+                            return false;
+                    }
+                    return true;
                 }
-
-                return true;
+                else
+                {
+                    return IsValidDefault(itemType, value);
+                }
             }
 
             if (type is IInputObjectGraphType inputObjectGraphType)
@@ -550,7 +557,7 @@ namespace GraphQL
             if (type is ScalarGraphType scalar)
                 return scalar.IsValidDefault(value);
 
-            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
         }
 
         /// <summary>
@@ -561,6 +568,9 @@ namespace GraphQL
         {
             if (type is NonNullGraphType nonnull)
             {
+                if (value == null)
+                    throw new InvalidOperationException($"Unable to get an AST representation of type '{nonnull}' for null value.");
+
                 return ToAST(nonnull.ResolvedType, value);
             }
 
@@ -592,15 +602,15 @@ namespace GraphQL
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert the '{value}' of the input object type '{input.Name}' to an AST representation.");
+                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the input object type '{input.Name}' for '{value}'.");
             }
 
             if (type is ScalarGraphType scalar)
             {
-                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' of the scalar type '{scalar.Name}' to an AST representation.");
+                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the scalar type '{scalar.Name}' for '{value}'.");
             }
 
-            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use '{type}'");
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
         }
     }
 }
