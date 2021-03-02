@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Bugs
         {
             // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
-                new ArgumentException("Unable to convert 'test' to 'Int'"), localizedMessage: "Входная строка имела неверный формат.");
+                new ArgumentException("Unable to convert 'test' to the scalar type 'Int'"), localizedMessage: "Входная строка имела неверный формат.");
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace GraphQL.Tests.Bugs
         {
             // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new[] { "testListInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'."));
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the conversion threw a FormatException
             AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
-                new ArgumentException("Unable to convert 'test' to 'Int'"), localizedMessage: "Входная строка имела неверный формат.");
+                new ArgumentException("Unable to convert 'test' to the scalar type 'Int'"), localizedMessage: "Входная строка имела неверный формат.");
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the converstion returned null, and GraphQL threw an InvalidOperationException
             AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'."));
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
     }
 
