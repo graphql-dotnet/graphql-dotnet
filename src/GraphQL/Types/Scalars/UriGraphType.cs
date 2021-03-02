@@ -17,8 +17,6 @@ namespace GraphQL.Types
             _ => ThrowLiteralConversionError(value)
         };
 
-        public override bool CanParseLiteral(IValue value) => value is StringValue;
-
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {

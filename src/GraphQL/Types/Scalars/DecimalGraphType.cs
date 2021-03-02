@@ -33,6 +33,7 @@ namespace GraphQL.Types
                     FloatValue f => Ret(checked((decimal)f.Value)),
                     DecimalValue _ => true,
                     BigIntValue b => Ret(checked((decimal)b.Value)),
+                    NullValue _ => true,
                     _ => false
                 };
             }

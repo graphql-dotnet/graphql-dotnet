@@ -20,6 +20,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value switch
         {
             StringValue s => Guid.TryParse(s.Value, out _),
+            NullValue _ => true,
             _ => false
         };
 
@@ -37,6 +38,7 @@ namespace GraphQL.Types
         {
             Guid _ => true,
             string s => Guid.TryParse(s, out _),
+            null => true,
             _ => false
         };
 

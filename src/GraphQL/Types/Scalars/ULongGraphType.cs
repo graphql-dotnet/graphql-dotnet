@@ -25,6 +25,7 @@ namespace GraphQL.Types
             IntValue _ => true,
             LongValue _ => true,
             BigIntValue bigIntValue => ulong.MinValue <= bigIntValue.Value && bigIntValue.Value <= ulong.MaxValue,
+            NullValue _ => true,
             _ => false
         };
 

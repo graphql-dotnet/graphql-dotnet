@@ -60,7 +60,9 @@ namespace GraphQL.Tests.Types
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
             g.ParseValue(null).ShouldBeNull();
+            g.CanParseValue(null).ShouldBeTrue();
             g.ParseLiteral(new NullValue()).ShouldBeNull();
+            g.CanParseLiteral(new NullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
         }
 
@@ -586,6 +588,16 @@ namespace GraphQL.Tests.Types
                 {
                     Should.Throw<OverflowException>(() => g.Serialize(converted));
                 }
+            }
+        }
+
+        [Fact]
+        public void verify_integer_boxing()
+        {
+            var g = new IntGraphType();
+            for (int i = -100; i < 100; ++i)
+            {
+                g.ParseLiteral(new IntValue(i)).ShouldBe(i);
             }
         }
     }

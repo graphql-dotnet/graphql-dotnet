@@ -73,6 +73,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value switch
         {
             EnumValue enumValue => Values.FindByName(enumValue.Name) != null,
+            NullValue _ => true,
             _ => false
         };
 
@@ -88,6 +89,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object value) => value switch
         {
             string s => Values.FindByName(s) != null,
+            null => true,
             _ => false
         };
 

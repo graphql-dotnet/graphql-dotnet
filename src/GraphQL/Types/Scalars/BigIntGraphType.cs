@@ -25,6 +25,7 @@ namespace GraphQL.Types
             IntValue _ => true,
             LongValue _ => true,
             BigIntValue _ => true,
+            NullValue _ => true,
             _ => false
         };
 

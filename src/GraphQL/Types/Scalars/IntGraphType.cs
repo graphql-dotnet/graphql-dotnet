@@ -25,6 +25,7 @@ namespace GraphQL.Types
             IntValue _ => true,
             LongValue longValue => int.MinValue <= longValue.Value && longValue.Value <= int.MaxValue,
             BigIntValue bigIntValue => int.MinValue <= bigIntValue.Value && bigIntValue.Value <= int.MaxValue,
+            NullValue _ => true,
             _ => false
         };
 

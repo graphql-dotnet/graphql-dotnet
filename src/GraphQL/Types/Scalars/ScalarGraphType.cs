@@ -66,16 +66,15 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
         /// <br/><br/>
-        /// This method must not be called for <see cref="NullValue"/> nodes as it is assumed that all scalars handle
-        /// <see cref="NullValue"/>. It is not necessary to provide a <see langword="true"/> response for
-        /// <see cref="NullValue"/> nodes. Use a non-null graph type to indicate that a scalar value does not support <see langword="null"/>.
+        /// This method must return <see langword="true"/> when passed a <see cref="NullValue"/> node.
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/> or <see cref="NullValue"/>.</param>
         public virtual bool CanParseLiteral(IValue value)
         {
             try
             {
-                return ParseLiteral(value) != null;
+                _ = ParseLiteral(value);
+                return true;
             }
             catch
             {
@@ -93,16 +92,15 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method can be overridden to validate input values without directly getting those values, i.e. without boxing.
         /// <br/><br/>
-        /// This method must not be called for <see langword="null"/> values as it is assumed that all scalars handle
-        /// <see langword="null"/>. It is not necessary to provide a <see langword="true"/> response for
-        /// <see langword="null"/> values. Use a non-null graph type to indicate that a scalar value does not support <see langword="null"/>.
+        /// This method must return <see langword="true"/> when passed a <see langword="null"/> value.
         /// </summary>
         /// <param name="value">Runtime object from variables. Must not be <see langword="null"/>.</param>
         public virtual bool CanParseValue(object value)
         {
             try
             {
-                return ParseValue(value) != null;
+                _ = ParseValue(value);
+                return true;
             }
             catch
             {
