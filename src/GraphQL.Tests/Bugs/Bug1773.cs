@@ -58,17 +58,21 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void list_throws_for_invalid_type()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
+            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [null]}", "Unable to serialize 'test' to 'Int'.", 1, 2, new object[] { "testListInvalidType", 0 },
                 new FormatException("Input string was not in a correct format."), localizedMessage: "Входная строка имела неверный формат.");
+        }
+
+        [Fact]
+        public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
+        {
+            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [null, \"HELLO\"]}", "Cannot return a null member within a non-null list.", 1, 2, new object[] { "testListInvalidType2", 0 });
         }
 
         [Fact]
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new[] { "testListInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum' for list index 0."));
+            AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": null}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new[] { "testListInvalidType3" },
+                new InvalidOperationException("Cannot return a null member within a non-null list for list index 0."));
         }
 
         [Fact]
@@ -103,7 +107,8 @@ namespace GraphQL.Tests.Bugs
             Field<ListGraphType<IntGraphType>>("testListValid", resolve: context => new object[] { 123 });
             Field<ListGraphType<IntGraphType>>("testListInvalid", resolve: context => 123);
             Field<ListGraphType<IntGraphType>>("testListInvalidType", resolve: context => new object[] { "test" });
-            Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2", resolve: context => new object[] { "test" });
+            Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2", resolve: context => new object[] { "test", Bug1773Enum.Hello });
+            Field<ListGraphType<NonNullGraphType<EnumerationGraphType<Bug1773Enum>>>>("testListInvalidType3", resolve: context => new object[] { "test" });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullValid", resolve: context => new object[] { 123 });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullInvalid", resolve: context => new object[] { null });
             Field<IntGraphType>("testNullValid", resolve: context => null);

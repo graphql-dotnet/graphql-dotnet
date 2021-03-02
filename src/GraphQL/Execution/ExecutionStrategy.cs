@@ -357,8 +357,41 @@ namespace GraphQL.Execution
                         }
                         else if (node is ValueExecutionNode valueNode)
                         {
-                            node.Result = valueNode.GraphType.Serialize(d)
-                                ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                            object serializedResult = null;
+
+                            try
+                            {
+                                serializedResult = valueNode.GraphType.Serialize(d);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
+                                if (listType.ResolvedType is NonNullGraphType)
+                                {
+                                    throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.", ex);
+                                }
+                                else
+                                {
+                                    SetNodeError(context, node, new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'.", ex));
+                                    arrayItems.Add(node);
+                                    return;
+                                }
+                            }
+
+                            node.Result = serializedResult;
+
+                            if (serializedResult == null)
+                            {
+                                // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
+                                if (listType.ResolvedType is NonNullGraphType)
+                                {
+                                    throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
+                                }
+                                else
+                                {
+                                    SetNodeError(context, node, new ExecutionError("Cannot return a null member within a non-null list."));
+                                }
+                            }
                         }
                     }
 
@@ -366,6 +399,7 @@ namespace GraphQL.Execution
                 }
                 else
                 {
+                    // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
                     if (listType.ResolvedType is NonNullGraphType)
                     {
                         throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
@@ -487,6 +521,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ValueExecutionNode valueNode)
                     {
+                        //TODO: need test here as for https://github.com/graphql-dotnet/graphql-dotnet/issues/2348 , exception not always should prevents execution
                         node.Result = valueNode.GraphType.Serialize(node.Result)
                             ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'.");
                     }
@@ -498,7 +533,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (ProcessNodeUnhandledException(context, node, ex)) //TODO: change? No exception from user resolver here
                     throw;
             }
         }

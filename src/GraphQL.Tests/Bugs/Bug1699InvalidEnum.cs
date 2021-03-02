@@ -47,9 +47,8 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Error trying to resolve field 'invalidEnum'.", 1, 3, "invalidEnum", exception: new InvalidOperationException());
 
-        // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
         [Fact]
-        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": null }", "Error trying to resolve field 'invalidEnumWithinList'.", 1, 3, "invalidEnumWithinList", exception: new InvalidOperationException());
+        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": [""HAPPY"", ""SLEEPY"", null] }", "Cannot return a null member within a non-null list.", 1, 3, new object[] { "invalidEnumWithinList", 2 });
 
         [Fact]
         public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", @"{ ""invalidEnumWithinNonNullList"": null }", "Error trying to resolve field 'invalidEnumWithinNonNullList'.", 1, 3, "invalidEnumWithinNonNullList", exception: new InvalidOperationException());
