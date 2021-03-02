@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Utilities
 {
@@ -74,8 +75,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
 
             // validate default value
-            if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
-                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
+            ValidateQueryArgumentDefaultValue(argument, field, type);
         }
 
         #endregion
@@ -129,8 +129,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
 
             // validate default value
-            if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
-                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
+            ValidateQueryArgumentDefaultValue(argument, field, type);
         }
 
         #endregion
@@ -169,8 +168,14 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
 
             // validate default value
-            if (field.DefaultValue != null && !field.ResolvedType.IsValidDefault(field.DefaultValue))
+            if (field.DefaultValue is GraphQLValue value)
+            {
+                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+            }
+            else if (field.DefaultValue != null && !field.ResolvedType.IsValidDefault(field.DefaultValue))
+            {
                 throw new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid.");
+            }
         }
 
         #endregion
@@ -233,6 +238,28 @@ namespace GraphQL.Utilities
             // 4.2
             if (!argument.ResolvedType.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must be an input type.");
+
+            // validate default
+            if (argument.DefaultValue is GraphQLValue value)
+            {
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+            }
+            else if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+            {
+                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{type.Name}' is invalid.");
+            }
+        }
+
+        private void ValidateQueryArgumentDefaultValue(QueryArgument argument, FieldType field, INamedType type)
+        {
+            if (argument.DefaultValue is GraphQLValue value)
+            {
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+            }
+            else if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+            {
+                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
+            }
         }
     }
 }

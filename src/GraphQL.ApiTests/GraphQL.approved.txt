@@ -2310,6 +2310,7 @@ namespace GraphQL.Types
     {
         public StringGraphType() { }
         public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override bool CanParseValue(object value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
@@ -2378,7 +2379,6 @@ namespace GraphQL.Types
     public class UriGraphType : GraphQL.Types.ScalarGraphType
     {
         public UriGraphType() { }
-        public override bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
