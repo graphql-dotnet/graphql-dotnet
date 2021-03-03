@@ -340,6 +340,8 @@ namespace GraphQL.Execution
             // local function uses 'struct closure' without heap allocation
             void SetArrayItemNode(object d)
             {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 if (d != null)
                 {
                     var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
@@ -357,55 +359,31 @@ namespace GraphQL.Execution
                         }
                         else if (node is ValueExecutionNode valueNode)
                         {
-                            object serializedResult = null;
-
+                            bool defaultException = false;
                             try
                             {
-                                serializedResult = valueNode.GraphType.Serialize(d)
-                                    ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                                object result = valueNode.GraphType.Serialize(d);
+                                if (result == null)
+                                {
+                                    defaultException = true;
+                                    if (listType.ResolvedType is NonNullGraphType)
+                                        throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                                    else
+                                        throw new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'.");
+                                }
+                                node.Result = result;
                             }
-            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch (Exception ex) when (listType.ResolvedType is NonNullGraphType)
-            {
-                // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
-                throw;
-            }
-            catch (ExecutionError error)
-            {
-                SetNodeError(context, node, error);
-                arrayItems.Add(node);
-            }
-            catch (Exception ex)
+                            catch (Exception error) when (listType.ResolvedType is NonNullGraphType)
                             {
                                 // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
-                                if (listType.ResolvedType is NonNullGraphType)
-                                {
-                                    throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.", ex);
-                                }
+                                if (error is ExecutionError || defaultException)
+                                    throw;
                                 else
-                                {
-                                    SetNodeError(context, node, new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'.", ex));
-                                    arrayItems.Add(node);
-                                    return;
-                                }
+                                    throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.", error);
                             }
-
-                            node.Result = serializedResult;
-
-                            if (serializedResult == null)
+                            catch (Exception error) // listType.ResolvedType allows null
                             {
-                                // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
-                                if (listType.ResolvedType is NonNullGraphType)
-                                {
-                                    throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
-                                }
-                                else
-                                {
-                                    SetNodeError(context, node, new ExecutionError("Cannot return a null member within a non-null list."));
-                                }
+                                SetNodeError(context, node, error is ExecutionError e ? e : new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'.", error));
                             }
                         }
                     }
@@ -536,7 +514,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ValueExecutionNode valueNode)
                     {
-                        //TODO: need test here as for https://github.com/graphql-dotnet/graphql-dotnet/issues/2348 , exception not always should prevents execution
+                        //TODO: need test here as for https://github.com/graphql-dotnet/graphql-dotnet/issues/2348 ?
                         node.Result = valueNode.GraphType.Serialize(node.Result)
                             ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'.");
                     }
@@ -548,7 +526,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex)) //TODO: change? No exception from user resolver here
+                if (ProcessNodeUnhandledException(context, node, ex))
                     throw;
             }
         }
@@ -566,7 +544,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Processes unhandled field resolver exceptions.
+        /// Processes unhandled field resolver exceptions as well as any other exceptions when serialized value is invalid for the graph type.
         /// </summary>
         /// <returns>A value that indicates when the exception should be rethrown.</returns>
         protected virtual bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)

@@ -65,14 +65,14 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
         {
-            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [null, \"HELLO\"]}", "Cannot return a null member within a non-null list.", 1, 2, new object[] { "testListInvalidType2", 0 });
+            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [null, \"HELLO\"]}", "Unable to serialize 'test' to 'Bug1773Enum'.", 1, 2, new object[] { "testListInvalidType2", 0 });
         }
 
         [Fact]
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
             AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": null}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new[] { "testListInvalidType3" },
-                new InvalidOperationException("Cannot return a null member within a non-null list for list index 0."));
+                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum' for list index 0."));
         }
 
         [Fact]
