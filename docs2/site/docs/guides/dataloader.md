@@ -1,7 +1,7 @@
 # DataLoader
 
 GraphQL.NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader) within the
-[`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader/) NuGet package.
+[`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader) NuGet package.
 
 Consider a GraphQL query like this:
 
