@@ -16,19 +16,17 @@ namespace Example
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
-        private readonly IHttpContextAccessor _accessor;
+  
         public GraphQLMiddleware(
             RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IDocumentWriter writer,
-            IHttpContextAccessor accessor)
+            IDocumentWriter writer)
         {
             _next = next;
             _settings = options.Value;
             _executer = executer;
             _writer = writer;
-            _accessor = accessor;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
@@ -58,7 +56,7 @@ namespace Example
                 context.Request.Body,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
-
+            
             var result = await _executer.ExecuteAsync(options =>
             {
                 options.Schema = schema;
@@ -74,13 +72,13 @@ namespace Example
                         .Use<CountFieldMiddleware>()
                         .Use<InstrumentFieldsMiddleware>();
                 }
-                if (_accessor.HttpContext.Request.IsFederatedTracingEnabled())
+                if (context.Request.IsFederatedTracingEnabled())
                 {
                     options.FieldMiddleware.Use<FederatedInstrumentFieldMiddleware>();
                 }
             });
 
-            if (_accessor.HttpContext.Request.IsFederatedTracingEnabled())
+            if (context.Request.IsFederatedTracingEnabled())
             {
                 result.EnrichWithFederatedTracing(start);
             }
