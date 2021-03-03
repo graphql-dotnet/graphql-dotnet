@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>GraphQL data loader implementation</Description>
-    <PackageTags>GraphQL;data loader</PackageTags>
+    <Description>GraphQL DataLoader implementation</Description>
+    <PackageTags>GraphQL;dataloader</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
