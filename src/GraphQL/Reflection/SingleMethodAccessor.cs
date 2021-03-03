@@ -13,10 +13,15 @@ namespace GraphQL.Reflection
         }
 
         public string FieldName => MethodInfo.Name;
+
         public Type ReturnType => MethodInfo.ReturnType;
+
         public Type DeclaringType => MethodInfo.DeclaringType;
+
         public ParameterInfo[] Parameters => MethodInfo.GetParameters();
+
         public MethodInfo MethodInfo { get; }
+
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => MethodInfo.GetCustomAttributes<T>();
 
         public object GetValue(object target, object[] arguments)

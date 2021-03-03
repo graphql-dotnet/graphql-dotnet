@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
@@ -10,9 +11,9 @@ namespace GraphQL.Tests.Types
         private readonly IdGraphType _type = new IdGraphType();
 
         [Fact]
-        public void parse_value_null_to_null()
+        public void parse_value_null_throws()
         {
-            _type.ParseValue(null).ShouldBe(null);
+            Should.Throw<NullReferenceException>(() => _type.ParseValue(null));
         }
 
         [Fact]

@@ -30,6 +30,7 @@ namespace GraphQL.Tests.Bugs
         public void Issue1189_Should_Work(Type resolverType, string errorMessage, string code)
         {
             Builder.Types.Include<Issue1189_Query>();
+            Builder.Types.For("Character").Type = typeof(Issue1189_Character);
             Builder.Types.Include(resolverType);
 
             var schema = Builder.Build(_typeDefinitions);
@@ -40,8 +41,9 @@ namespace GraphQL.Tests.Bugs
             error.Path = new string[] { "hero", "friend" };
             error.Code = code;
 
-            var queryResult = new ExecutionResult()
+            var queryResult = new ExecutionResult
             {
+                Executed = true,
                 Data = new { hero = new { id = "1", name = "R2-D2", friend = default(Issue1189_Character) } },
                 Errors = new ExecutionErrors { error }
             };

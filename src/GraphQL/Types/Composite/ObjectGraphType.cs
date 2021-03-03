@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
@@ -9,6 +8,7 @@ namespace GraphQL.Types
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
         Func<object, bool> IsTypeOf { get; set; }
+
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 
@@ -18,9 +18,6 @@ namespace GraphQL.Types
     /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .NET type of the source property within field resolvers for this graph.</typeparam>
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
-        private readonly List<Type> _interfaces = new List<Type>();
-        private readonly List<IInterfaceGraphType> _resolvedInterfaces = new List<IInterfaceGraphType>();
-
         /// <inheritdoc/>
         public Func<object, bool> IsTypeOf { get; set; }
 
@@ -37,71 +34,27 @@ namespace GraphQL.Types
             if (graphType == null)
                 throw new ArgumentNullException(nameof(graphType));
 
-            if (!_resolvedInterfaces.Contains(graphType))
-            {
-                _ = graphType.IsValidInterfaceFor(this, throwError: true);
-                _resolvedInterfaces.Add(graphType);
-            }
+            _ = graphType.IsValidInterfaceFor(this, throwError: true);
+            ResolvedInterfaces.Add(graphType);
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
-        {
-            get => _resolvedInterfaces;
-            set
-            {
-                _resolvedInterfaces.Clear();
-
-                if (value != null)
-                {
-                    foreach (var item in value)
-                        _resolvedInterfaces.Add(item ?? throw new ArgumentNullException(nameof(value), "value contains null item"));
-                }
-            }
-        }
+        public Interfaces Interfaces { get; } = new Interfaces();
 
         /// <inheritdoc/>
-        public IEnumerable<Type> Interfaces
-        {
-            get => _interfaces;
-            set
-            {
-                _interfaces.Clear();
-
-                if (value != null)
-                {
-                    foreach (var item in value)
-                        _interfaces.Add(item ?? throw new ArgumentNullException(nameof(value), "value contains null item"));
-                }
-            }
-        }
+        public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
 
         /// <summary>
         /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.
         /// </summary>
         public void Interface<TInterface>()
             where TInterface : IInterfaceGraphType
-        {
-            if (!_interfaces.Contains(typeof(TInterface)))
-                _interfaces.Add(typeof(TInterface));
-        }
+            => Interfaces.Add<TInterface>();
 
-        /// <inheritdoc cref="Interface{TInterface}"/>
-        public void Interface(Type type)
-        {
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
-            if (!typeof(IInterfaceGraphType).IsAssignableFrom(type))
-            {
-                throw new ArgumentException($"Interface '{type.Name}' must implement {nameof(IInterfaceGraphType)}", nameof(type));
-            }
-
-            if (!_interfaces.Contains(type))
-                _interfaces.Add(type);
-        }
+        /// <summary>
+        /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.
+        /// </summary>
+        public void Interface(Type type) => Interfaces.Add(type);
     }
 
     /// <summary>

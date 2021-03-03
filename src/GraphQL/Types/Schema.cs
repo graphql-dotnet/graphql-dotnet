@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
 
@@ -10,16 +11,20 @@ namespace GraphQL.Types
     /// <inheritdoc cref="ISchema"/>
     public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
+        private bool _disposed;
         private IServiceProvider _services;
-        private Lazy<GraphTypesLookup> _lookup;
-        private readonly List<Type> _additionalTypes;
-        private readonly List<IGraphType> _additionalInstances;
-        private readonly List<DirectiveGraphType> _directives;
-        private readonly List<IAstFromValueConverter> _converters;
+        private SchemaTypes _allTypes;
+        private readonly object _allTypesInitializationLock = new object();
+
+        private List<Type> _additionalTypes;
+        private List<IGraphType> _additionalInstances;
+
+        private List<Type> _visitorTypes;
+        private List<ISchemaNodeVisitor> _visitors;
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
-        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects.
         /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
@@ -28,48 +33,58 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
-        /// to create required objects
+        /// to create required objects.
         /// </summary>
         public Schema(IServiceProvider services)
         {
             _services = services;
 
-            _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
-            _additionalTypes = new List<Type>();
-            _additionalInstances = new List<IGraphType>();
-            _directives = new List<DirectiveGraphType>
-            {
-                DirectiveGraphType.Include,
-                DirectiveGraphType.Skip,
-                DirectiveGraphType.Deprecated
-            };
-            _converters = new List<IAstFromValueConverter>();
+            Directives = new SchemaDirectives();
+            Directives.Register(DirectiveGraphType.Include, DirectiveGraphType.Skip, DirectiveGraphType.Deprecated);
+            RegisterVisitor(DeprecatedDirectiveVisitor.Instance);
         }
 
-        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
-        {
-            var defs = string.Join("\n", typeDefinitions);
-            return For(defs, configure);
-        }
+        /// <summary>
+        /// Builds schema from the specified string and configuration delegate.
+        /// </summary>
+        /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
+        /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
+        /// <returns>Created schema.</returns>
+        public static Schema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+            => For<SchemaBuilder>(typeDefinitions, configure);
 
-        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        /// <summary>
+        /// Builds schema from the specified string and configuration delegate.
+        /// </summary>
+        /// <typeparam name="TSchemaBuilder">The type of <see cref="SchemaBuilder"/> that will create the schema.</typeparam>
+        /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
+        /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
+        /// <returns>Created schema.</returns>
+        public static Schema For<TSchemaBuilder>(string typeDefinitions, Action<TSchemaBuilder> configure = null)
+            where TSchemaBuilder : SchemaBuilder, new()
         {
-            var builder = new SchemaBuilder();
+            var builder = new TSchemaBuilder();
             configure?.Invoke(builder);
             return builder.Build(typeDefinitions);
         }
 
         /// <inheritdoc/>
+        public ExperimentalFeatures Features { get; set; } = new ExperimentalFeatures();
+
+        /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         /// <inheritdoc/>
-        public bool Initialized => _lookup?.IsValueCreated == true;
+        public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
+
+        /// <inheritdoc/>
+        public bool Initialized { get; private set; }
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
-        private void CheckInitialized()
+        private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
         {
             if (Initialized)
-                throw new InvalidOperationException("Schema is already initialized and sealed for modifications. You should call RegisterXXX methods only when Schema.Initialized = false.");
+                throw new InvalidOperationException($"Schema is already initialized and sealed for modifications. You should call '{name}' only when Schema.Initialized = false.");
         }
 
         /// <inheritdoc/>
@@ -77,7 +92,18 @@ namespace GraphQL.Types
         {
             CheckDisposed();
 
-            FindType("____");
+            if (Initialized)
+                return;
+
+            lock (_allTypesInitializationLock)
+            {
+                if (Initialized)
+                    return;
+
+                CreateSchemaTypes();
+
+                Initialized = true;
+            }
         }
 
         /// <inheritdoc/>
@@ -117,39 +143,61 @@ namespace GraphQL.Types
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         /// <inheritdoc/>
-        public IEnumerable<DirectiveGraphType> Directives
+        public ISchemaComparer Comparer { get; set; } = new DefaultSchemaComparer();
+
+        /// <inheritdoc/>
+        public SchemaDirectives Directives { get; }
+
+        /// <inheritdoc/>
+        public SchemaTypes AllTypes
         {
-            get => _directives;
-            set
+            get
             {
-                CheckDisposed();
-                CheckInitialized();
+                if (_allTypes == null)
+                    Initialize();
 
-                _directives.Clear();
-
-                if (value != null)
-                    _directives.AddRange(value);
+                return _allTypes;
             }
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IGraphType> AllTypes =>
-            _lookup?
-                .Value
-                .All()
-                .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
+        public IEnumerable<Type> AdditionalTypes => _additionalTypes ?? Enumerable.Empty<Type>();
 
         /// <inheritdoc/>
-        public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+        public FieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+        public FieldType TypeMetaFieldType => AllTypes.TypeMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+        public FieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
+        public void RegisterVisitor(ISchemaNodeVisitor visitor)
+        {
+            CheckDisposed();
+            CheckInitialized();
+
+            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+        }
+
+        /// <inheritdoc/>
+        public void RegisterVisitor(Type type)
+        {
+            CheckDisposed();
+            CheckInitialized();
+
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+            }
+
+            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
+                _visitorTypes.Add(type);
+        }
 
         /// <inheritdoc/>
         public void RegisterType(IGraphType type)
@@ -157,17 +205,27 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
+            (_additionalInstances ??= new List<IGraphType>()).Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         /// <inheritdoc/>
-        public void RegisterTypes(params IGraphType[] types)
+        public void RegisterType(Type type)
         {
             CheckDisposed();
             CheckInitialized();
 
-            foreach (var type in types)
-                RegisterType(type);
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!typeof(IGraphType).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
+            }
+
+            _additionalTypes ??= new List<Type>();
+
+            if (!_additionalTypes.Contains(type))
+                _additionalTypes.Add(type);
         }
 
         /// <inheritdoc/>
@@ -187,72 +245,25 @@ namespace GraphQL.Types
             }
         }
 
-        /// <inheritdoc/>
-        public void RegisterType<T>() where T : IGraphType
-        {
-            CheckDisposed();
-            CheckInitialized();
+        private List<(Type clrType, Type graphType)> _clrToGraphTypeMappings;
 
-            RegisterType(typeof(T));
+        /// <inheritdoc/>
+        public void RegisterTypeMapping(Type clrType, Type graphType)
+        {
+            (_clrToGraphTypeMappings ??= new List<(Type, Type)>()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
         }
 
         /// <inheritdoc/>
-        public void RegisterDirective(DirectiveGraphType directive)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
-        }
-
-        public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
-        {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
+        public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _clrToGraphTypeMappings ?? Enumerable.Empty<(Type, Type)>();
 
         /// <inheritdoc/>
-        public void RegisterDirectives(params DirectiveGraphType[] directives)
+        public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings
         {
-            CheckDisposed();
-            CheckInitialized();
-
-            foreach (var directive in directives)
-                RegisterDirective(directive);
-        }
-
-        /// <inheritdoc/>
-        public DirectiveGraphType FindDirective(string name)
-        {
-            return _directives.FirstOrDefault(x => x.Name == name);
-        }
-
-        /// <inheritdoc/>
-        public void RegisterValueConverter(IAstFromValueConverter converter)
-        {
-            CheckDisposed();
-
-            _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
-        }
-
-        /// <inheritdoc/>
-        public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
-        {
-            return _converters.FirstOrDefault(x => x.Matches(value, type));
-        }
-
-        /// <inheritdoc/>
-        public IGraphType FindType(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
+            get
             {
-                throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
+                foreach (var pair in SchemaTypes.BuiltInScalarMappings)
+                    yield return (pair.Key, pair.Value);
             }
-
-            return _lookup?.Value[name];
         }
 
         /// <inheritdoc/>
@@ -266,7 +277,7 @@ namespace GraphQL.Types
         {
             if (disposing)
             {
-                if (_lookup != null)
+                if (!_disposed)
                 {
                     _services = null;
                     Query = null;
@@ -274,71 +285,97 @@ namespace GraphQL.Types
                     Subscription = null;
                     Filter = null;
 
-                    _additionalInstances.Clear();
-                    _additionalTypes.Clear();
-                    _directives.Clear();
-                    _converters.Clear();
+                    _additionalInstances?.Clear();
+                    _additionalTypes?.Clear();
+                    Directives.List.Clear();
+                    _visitors?.Clear();
+                    _visitorTypes?.Clear();
 
-                    if (_lookup.IsValueCreated)
-                    {
-                        _lookup.Value.Clear(true);
-                    }
+                    _allTypes?.Dictionary.Clear();
+                    _allTypes = null;
 
-                    _lookup = null;
+                    _disposed = true;
                 }
             }
         }
 
         private void CheckDisposed()
         {
-            if (_lookup == null)
+            if (_disposed)
                 throw new ObjectDisposedException(nameof(Schema));
         }
 
-        private void RegisterType(Type type)
+        private void CreateSchemaTypes()
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            if (!typeof(IGraphType).IsAssignableFrom(type))
+            IEnumerable<IGraphType> GetTypes()
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
+                if (_additionalInstances != null)
+                {
+                    foreach (var instance in _additionalInstances)
+                        yield return instance;
+                }
+
+                //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
+                // if (Query == null)
+                //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+
+                if (Query != null)
+                    yield return Query;
+
+                if (Mutation != null)
+                    yield return Mutation;
+
+                if (Subscription != null)
+                    yield return Subscription;
+
+                if (_additionalTypes != null)
+                {
+                    foreach (var type in _additionalTypes)
+                        yield return (IGraphType)_services.GetRequiredService(type.GetNamedType());
+                }
             }
 
-            if (!_additionalTypes.Contains(type))
+            IEnumerable<ISchemaNodeVisitor> GetVisitors()
             {
-                _additionalTypes.Add(type);
+                if (_visitors != null)
+                {
+                    foreach (var visitor in _visitors)
+                        yield return visitor;
+                }
+
+                if (_visitorTypes != null)
+                {
+                    foreach (var type in _visitorTypes)
+                        yield return (ISchemaNodeVisitor)_services.GetRequiredService(type);
+                }
             }
-        }
 
-        private IEnumerable<IGraphType> GetRootTypes()
-        {
-            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
-            // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
-
-            if (Query != null)
-                yield return Query;
-
-            if (Mutation != null)
-                yield return Mutation;
-
-            if (Subscription != null)
-                yield return Subscription;
-        }
-
-        private GraphTypesLookup CreateTypesLookup()
-        {
-            var types = _additionalInstances
-                .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
-
-            return GraphTypesLookup.Create(
-                types,
-                _directives,
+            _allTypes = SchemaTypes.Create(
+                GetTypes(),
+                _clrToGraphTypeMappings,
+                Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter,
-                seal: true);
+                this);
+
+            // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
+            // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
+            _allTypes.ApplyMiddleware(FieldMiddleware);
+
+            foreach (var visitor in GetVisitors())
+                visitor.Run(this);
+
+            Validate();
+        }
+
+        /// <summary>
+        /// Validates correctness of the created schema. This method is called only once - during schema initialization.
+        /// </summary>
+        protected virtual void Validate()
+        {
+            //TODO: add different validations, also see SchemaBuilder.Validate
+            //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
+            SchemaValidationVisitor.Instance.Run(this);
+            AppliedDirectivesValidationVisitor.Instance.Run(this);
         }
     }
 }

@@ -2,10 +2,18 @@ name: Test code
 
 on:
   pull_request:
-    branches: 
+    branches:
       - master
       - develop
-    paths: 
+    paths:
+      - src/**
+      - .github/workflows/**
+  # Upload code coverage results when PRs are merged
+  push:
+    branches:
+      - master
+      - develop
+    paths:
       - src/**
       - .github/workflows/**
 
@@ -23,10 +31,24 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Use .NET Core 3.1 LTS SDK
+      - name: Setup .NET Core 2.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '2.1.x'
+          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Setup .NET Core 3.1 SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
+          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Setup .NET Core 5.0 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -37,7 +59,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: |
-          dotnet tool install -g dotnet-format --version 5.0.205101 --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+          dotnet tool install -g dotnet-format --version 6.0.* --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
           dotnet format --check -v diag --fix-style warn --fix-analyzers warn || (echo "Run 'dotnet format' to fix formatting issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
@@ -48,7 +70,12 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore
+        run: dotnet test --no-restore -p:CollectCoverage=true
+      - name: Upload coverage to codecov
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        uses: codecov/codecov-action@v1.2.1
+        with:
+          files: .coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net5.opencover.xml
 
   buildcheck:
     needs:

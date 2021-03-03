@@ -3,7 +3,7 @@ using GraphQL.Types;
 namespace GraphQL.Conversion
 {
     /// <summary>
-    /// Camel case name converter; set as the default <see cref="INameConverter"/> within <see cref="ExecutionOptions.NameConverter"/>.
+    /// Camel case name converter; set as the default <see cref="INameConverter"/> within <see cref="Schema.NameConverter"/>.
     /// Always used by all introspection fields regardless of the selected <see cref="INameConverter"/>.
     /// </summary>
     public class CamelCaseNameConverter : INameConverter

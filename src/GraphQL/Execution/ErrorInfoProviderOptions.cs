@@ -20,17 +20,17 @@ namespace GraphQL.Execution
         /// <summary>
         /// Specifies whether the code of this error should be returned.
         /// For validation errors, also returns the <see cref="ValidationError.Number"/>.
-        /// Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// Not applicable when <see cref="ExposeExtensions"/> is <see langword="false"/>.
         /// </summary>
         public bool ExposeCode { get; set; } = true;
 
         /// <summary>
-        /// Specifies whether the codes of this error and inner exceptions should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// Specifies whether the codes of this error and inner exceptions should be returned. Not applicable when <see cref="ExposeExtensions"/> is <see langword="false"/>.
         /// </summary>
         public bool ExposeCodes { get; set; } = true;
 
         /// <summary>
-        /// Specifies whether data (typically from inner exceptions) should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// Specifies whether data (typically from inner exceptions) should be returned. Not applicable when <see cref="ExposeExtensions"/> is <see langword="false"/>.
         /// </summary>
         public bool ExposeData { get; set; } = true;
     }

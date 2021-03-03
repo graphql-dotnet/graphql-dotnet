@@ -24,37 +24,33 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="FieldsOnCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Field>((node, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var type = context.TypeInfo.GetParentType().GetNamedType();
+
+            if (type != null)
             {
-                _.Match<Field>(node =>
+                var fieldDef = context.TypeInfo.GetFieldDef();
+                if (fieldDef == null)
                 {
-                    var type = context.TypeInfo.GetParentType().GetNamedType();
+                    // This field doesn't exist, lets look for suggestions.
+                    var fieldName = node.Name;
 
-                    if (type != null)
-                    {
-                        var fieldDef = context.TypeInfo.GetFieldDef();
-                        if (fieldDef == null)
-                        {
-                            // This field doesn't exist, lets look for suggestions.
-                            var fieldName = node.Name;
+                    // First determine if there are any suggested types to condition on.
+                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
 
-                            // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
+                    // If there are no suggested types, then perhaps this was a typo?
+                    var suggestedFieldNames = suggestedTypeNames.Count > 0
+                        ? Array.Empty<string>()
+                        : GetSuggestedFieldNames(type, fieldName);
 
-                            // If there are no suggested types, then perhaps this was a typo?
-                            var suggestedFieldNames = suggestedTypeNames.Count > 0
-                                ? Array.Empty<string>()
-                                : GetSuggestedFieldNames(type, fieldName);
-
-                            // Report an error, including helpful suggestions.
-                            context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
-                        }
-                    }
-                });
-            }).ToTask();
-        }
+                    // Report an error, including helpful suggestions.
+                    context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
+                }
+            }
+        }).ToTask();
 
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces
@@ -62,32 +58,30 @@ namespace GraphQL.Validation.Rules
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
+        private static IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
         {
             if (type is IAbstractGraphType absType)
             {
                 var suggestedObjectTypes = new List<string>();
-                var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
+                var interfaceUsageCount = new Dictionary<string, int>();
 
-                absType.PossibleTypes.Apply(possibleType =>
+                foreach (var possibleType in absType.PossibleTypes.List)
                 {
-                    if (!possibleType.HasField(fieldName))
+                    if (possibleType.HasField(fieldName))
                     {
-                        return;
-                    }
+                        // This object defines this field.
+                        suggestedObjectTypes.Add(possibleType.Name);
 
-                    // This object defines this field.
-                    suggestedObjectTypes.Add(possibleType.Name);
-
-                    possibleType.ResolvedInterfaces.Apply(possibleInterface =>
-                    {
-                        if (possibleInterface.HasField(fieldName))
+                        foreach (var possibleInterface in possibleType.ResolvedInterfaces.List)
                         {
-                            // This interface type defines this field.
-                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
+                            if (possibleInterface.HasField(fieldName))
+                            {
+                                // This interface type defines this field.
+                                interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
+                            }
                         }
-                    });
-                });
+                    }
+                }
 
                 var suggestedInterfaceTypes = interfaceUsageCount.Keys.OrderBy(x => interfaceUsageCount[x]);
                 return suggestedInterfaceTypes.Concat(suggestedObjectTypes);
@@ -100,9 +94,7 @@ namespace GraphQL.Validation.Rules
         /// For the field name provided, determine if there are any similar field names
         /// that may be the result of a typo.
         /// </summary>
-        private IEnumerable<string> GetSuggestedFieldNames(
-          IGraphType type,
-          string fieldName)
+        private static IEnumerable<string> GetSuggestedFieldNames(IGraphType type, string fieldName)
         {
             if (type is IComplexGraphType complexType)
             {

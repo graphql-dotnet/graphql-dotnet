@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -11,11 +8,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets a list of .NET types of supported GraphQL interface types.
         /// </summary>
-        IEnumerable<Type> Interfaces { get; set; }
+        Interfaces Interfaces { get; }
 
         /// <summary>
         /// Gets or sets a list of instances of supported GraphQL interface types.
         /// </summary>
-        IEnumerable<IInterfaceGraphType> ResolvedInterfaces { get; set; }
+        ResolvedInterfaces ResolvedInterfaces { get; }
     }
 }

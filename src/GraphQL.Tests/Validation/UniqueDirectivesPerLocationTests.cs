@@ -1,4 +1,3 @@
-using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -12,6 +11,16 @@ namespace GraphQL.Tests.Validation
             ShouldPassRule(@"
                 fragment Test on Type {
                     field
+                }
+            ");
+        }
+
+        [Fact]
+        public void repeatable_directives_in_same_locations()
+        {
+            ShouldPassRule(@"
+                fragment Test on Type @rep @rep {
+                    field @rep @rep
                 }
             ");
         }
@@ -67,7 +76,8 @@ namespace GraphQL.Tests.Validation
                     field @directive @directive
                 }
                 ";
-                duplicateDirective(_, "directive", 3, 27, 3, 38);
+                duplicateDirective(_, "directive", 3, 27);
+                duplicateDirective(_, "directive", 3, 38);
             });
         }
 
@@ -81,8 +91,9 @@ namespace GraphQL.Tests.Validation
                     field @directive @directive @directive
                 }
                 ";
-                duplicateDirective(_, "directive", 3, 27, 3, 38);
-                duplicateDirective(_, "directive", 3, 27, 3, 49);
+                duplicateDirective(_, "directive", 3, 27);
+                duplicateDirective(_, "directive", 3, 38);
+                duplicateDirective(_, "directive", 3, 49);
             });
         }
 
@@ -96,8 +107,10 @@ namespace GraphQL.Tests.Validation
                     field @directiveA @directiveB @directiveA @directiveB
                 }
                 ";
-                duplicateDirective(_, "directiveA", 3, 27, 3, 51);
-                duplicateDirective(_, "directiveB", 3, 39, 3, 63);
+                duplicateDirective(_, "directiveA", 3, 27);
+                duplicateDirective(_, "directiveB", 3, 39);
+                duplicateDirective(_, "directiveA", 3, 51);
+                duplicateDirective(_, "directiveB", 3, 63);
             });
         }
 
@@ -111,24 +124,19 @@ namespace GraphQL.Tests.Validation
                     field @directive @directive
                 }
                 ";
-                duplicateDirective(_, "directive", 2, 39, 2, 50);
-                duplicateDirective(_, "directive", 3, 27, 3, 38);
+                duplicateDirective(_, "directive", 2, 39);
+                duplicateDirective(_, "directive", 2, 50);
+                duplicateDirective(_, "directive", 3, 27);
+                duplicateDirective(_, "directive", 3, 38);
             });
         }
 
-        private void duplicateDirective(
-            ValidationTestConfig _,
-            string directiveName,
-            int line1,
-            int column1,
-            int line2,
-            int column2)
+        private void duplicateDirective(ValidationTestConfig _, string directiveName, int line, int column)
         {
             _.Error(err =>
             {
-                err.Message = UniqueDirectivesPerLocationError.DuplicateDirectiveMessage(directiveName);
-                err.Loc(line1, column1);
-                err.Loc(line2, column2);
+                err.Message = $"The directive '{directiveName}' can only be used once at this location.";
+                err.Loc(line, column);
             });
         }
     }

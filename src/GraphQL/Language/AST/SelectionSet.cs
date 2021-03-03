@@ -28,11 +28,21 @@ namespace GraphQL.Language.AST
         /// </summary>
         public IList<ISelection> Selections => SelectionsList;
 
-        // avoids List+Enumerator<ISelection> boxing on hot path
-        internal List<ISelection> SelectionsList { get; }
+        // avoids List+Enumerator<ISelection> boxing
+        internal List<ISelection> SelectionsList { get; private set; }
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => SelectionsList;
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            if (SelectionsList != null)
+            {
+                foreach (var selection in SelectionsList)
+                    action(selection, state);
+            }
+        }
 
         /// <summary>
         /// Adds a node to the start of the list.
@@ -58,9 +68,6 @@ namespace GraphQL.Language.AST
             var newSelection = SelectionsList.Union(otherSelection.SelectionsList).ToList();
             return new SelectionSet(newSelection);
         }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
 
         /// <inheritdoc/>
         public override string ToString()

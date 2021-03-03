@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
@@ -13,10 +12,8 @@ namespace GraphQL.Types
     /// <inheritdoc cref="InterfaceGraphType"/>
     public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
     {
-        private readonly List<IObjectGraphType> _possibleTypes = new List<IObjectGraphType>();
-
         /// <inheritdoc/>
-        public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
+        public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 
         /// <inheritdoc/>
         public Func<object, IObjectGraphType> ResolveType { get; set; }
@@ -24,11 +21,11 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void AddPossibleType(IObjectGraphType type)
         {
-            if (!_possibleTypes.Contains(type))
-            {
-                this.IsValidInterfaceFor(type, throwError: true);
-                _possibleTypes.Add(type ?? throw new ArgumentNullException(nameof(type)));
-            }
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            this.IsValidInterfaceFor(type, throwError: true);
+            PossibleTypes.Add(type);
         }
     }
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Utilities;
 
@@ -52,7 +51,7 @@ namespace GraphQL.Types
             {
                 if (validate)
                 {
-                    NameValidator.ValidateName(name, "type");
+                    NameValidator.ValidateName(name, NamedElement.Type);
 
                     if (IsTypeModifier)
                         throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
@@ -75,22 +74,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public string DeprecationReason { get; set; }
 
-        /// <inheritdoc/>
-        public virtual string CollectTypes(TypeCollectionContext context)
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                Name = GetType().Name;
-            }
-
-            return Name;
-        }
-
         /// <inheritdoc />
-        public override string ToString() =>
-            string.IsNullOrWhiteSpace(Name)
-                ? GetType().Name
-                : Name;
+        public override string ToString() => Name;
 
         /// <summary>
         /// Determines if the name of the specified graph type is equal to the name of this graph type.
@@ -115,36 +100,5 @@ namespace GraphQL.Types
 
         /// <inheritdoc />
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
-    }
-
-    /// <summary>
-    /// Provides a mechanism to resolve graph type instances from their .NET types,
-    /// and also to register new graph type instances with their name in the graph type lookup table.
-    /// (See <see cref="GraphTypesLookup"/>.)
-    /// </summary>
-    public class TypeCollectionContext
-    {
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="resolver">A delegate which returns an instance of a graph type from its .NET type.</param>
-        /// <param name="addType">A delegate which adds a graph type instance to the list of named graph types for the schema.</param>
-        public TypeCollectionContext(
-            Func<Type, IGraphType> resolver,
-            Action<string, IGraphType, TypeCollectionContext> addType)
-        {
-            ResolveType = resolver;
-            AddType = addType;
-        }
-
-        /// <summary>
-        /// Returns a delegate which returns an instance of a graph type from its .NET type.
-        /// </summary>
-        public Func<Type, IGraphType> ResolveType { get; }
-        /// <summary>
-        /// Returns a delegate which adds a graph type instance to the list of named graph types for the schema.
-        /// </summary>
-        public Action<string, IGraphType, TypeCollectionContext> AddType { get; }
-        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }

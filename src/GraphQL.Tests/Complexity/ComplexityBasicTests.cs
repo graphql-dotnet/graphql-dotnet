@@ -17,15 +17,23 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void zero_depth_query()
         {
-            var res = AnalyzeComplexity("query { A }");
+            var res = AnalyzeComplexity(@"
+query {
+  A
+}");
             res.TotalQueryDepth.ShouldBe(0);
-            res.Complexity.ShouldBe(1d);
+            res.Complexity.ShouldBe(1);
         }
 
         [Fact]
         public void one_depth_query_A()
         {
-            var res = AnalyzeComplexity("query { A { B } }");
+            var res = AnalyzeComplexity(@"
+query {
+  A {
+    B
+  }
+}");
             res.TotalQueryDepth.ShouldBe(1);
             res.Complexity.ShouldBe(4);
         }
@@ -33,7 +41,14 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void one_depth_query_B()
         {
-            var res = AnalyzeComplexity("query { A { B C D } }");
+            var res = AnalyzeComplexity(@"
+query {
+  A {
+    B
+    C
+    D
+  }
+}");
             res.TotalQueryDepth.ShouldBe(1);
             res.Complexity.ShouldBe(8);
         }
@@ -41,7 +56,14 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void two_depth_query_A()
         {
-            var res = AnalyzeComplexity("query { A { B { C } } }");
+            var res = AnalyzeComplexity(@"
+query {
+  A {
+    B {
+      C
+    }
+  }
+}");
             res.TotalQueryDepth.ShouldBe(2);
             res.Complexity.ShouldBe(10);
         }
@@ -49,7 +71,17 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void two_depth_query_B()
         {
-            var res = AnalyzeComplexity("query { F A { B D { C E } } }");
+            var res = AnalyzeComplexity(@"
+query {
+  F
+  A {
+    B
+    D {
+      C
+      E
+    }
+  }
+}");
             res.TotalQueryDepth.ShouldBe(2);
             res.Complexity.ShouldBe(17);
         }
@@ -57,9 +89,37 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void three_depth_query()
         {
-            var res = AnalyzeComplexity("query { A { B { C { D } } } }");
+            var res = AnalyzeComplexity(@"
+query {
+  A {
+    B {
+      C {
+        D
+      }
+    }
+  }
+}");
             res.TotalQueryDepth.ShouldBe(3);
             res.Complexity.ShouldBe(22);
+        }
+
+        [Fact]
+        public void three_depth_query_wide()
+        {
+            var res = AnalyzeComplexity(@"
+query {
+  A {
+    B
+  }
+  C {
+    D
+  }
+  E {
+    F
+  }
+}");
+            res.TotalQueryDepth.ShouldBe(3);
+            res.Complexity.ShouldBe(12);
         }
     }
 }

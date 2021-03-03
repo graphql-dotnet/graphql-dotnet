@@ -391,7 +391,7 @@ usual, only queuing the data loader once the `IDataLoaderResult` has been return
 `await IDataLoaderResult.GetResultAsync()` may return another `IDataLoaderResult` which must again
 be queued to execute at the proper time.
 
-To accomodate these changes, the `ExecuteNodeAsync` method has been split into three methods; the new methods
+To accommodate these changes, the `ExecuteNodeAsync` method has been split into three methods; the new methods
 are `CompleteDataLoaderNodeAsync` and `CompleteNode`. Please refer to the reference implementation of
 `ParallelExecutionStrategy` for an example.
 

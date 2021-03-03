@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -40,18 +37,6 @@ namespace GraphQL
                     return task.GetType().GetProperty("Result").GetValue(task, null);
                 }
             }
-        }
-
-        internal static async Task<IEnumerable<T>> WhereAsync<T>(this IEnumerable<T> items, Func<T, Task<bool>> predicate)
-        {
-            if (items == null)
-            {
-                return Enumerable.Empty<T>();
-            }
-
-            var itemTaskList = items.Select(item => new { Item = item, PredTask = predicate.Invoke(item) }).ToList();
-            await Task.WhenAll(itemTaskList.Select(x => x.PredTask)).ConfigureAwait(false);
-            return itemTaskList.Where(x => x.PredTask.Result).Select(x => x.Item);
         }
     }
 }

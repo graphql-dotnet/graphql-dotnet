@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -27,19 +28,9 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"NonNullType{{type={Type}}}";
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Type, state);
 
         /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            if (node is null)
-                return false;
-            if (ReferenceEquals(this, node))
-                return true;
-            if (node.GetType() != GetType())
-                return false;
-
-            return true;
-        }
+        public override string ToString() => $"NonNullType{{type={Type}}}";
     }
 }

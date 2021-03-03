@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, InlineFragment node)
-            : base(context.OriginalQuery, NUMBER, InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)), node.Type)
+            : base(context.Document.OriginalQuery, NUMBER, InlineFragmentOnNonCompositeErrorMessage(AstPrinter.Print(node.Type)), node.Type)
         {
         }
 
@@ -21,7 +22,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, FragmentDefinition node)
-            : base(context.OriginalQuery, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)), node.Type)
+            : base(context.Document.OriginalQuery, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, AstPrinter.Print(node.Type)), node.Type)
         {
         }
 

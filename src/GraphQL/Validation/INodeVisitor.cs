@@ -10,11 +10,11 @@ namespace GraphQL.Validation
         /// <summary>
         /// Called when the node walker is entering a node.
         /// </summary>
-        void Enter(INode node);
+        void Enter(INode node, ValidationContext context);
 
         /// <summary>
         /// Called when the node walker is leaving a node.
         /// </summary>
-        void Leave(INode node);
+        void Leave(INode node, ValidationContext context);
     }
 }

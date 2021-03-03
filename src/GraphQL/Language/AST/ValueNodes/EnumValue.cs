@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -38,23 +36,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"EnumValue{{name={Name}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by comparing the string representation of the enumeration value.
-        /// </summary>
-        protected bool Equals(EnumValue other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-
-            return Equals((EnumValue)obj);
-        }
     }
 }

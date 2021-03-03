@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -11,11 +12,8 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext
+    public class ResolveFieldContext : IResolveFieldContext<object>
     {
-        /// <inheritdoc/>
-        public string FieldName { get; set; }
-
         /// <inheritdoc/>
         public Field FieldAst { get; set; }
 
@@ -23,13 +21,13 @@ namespace GraphQL
         public FieldType FieldDefinition { get; set; }
 
         /// <inheritdoc/>
-        public IGraphType ReturnType { get; set; }
-
-        /// <inheritdoc/>
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Arguments { get; set; }
+        public IResolveFieldContext Parent { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<string, ArgumentValue> Arguments { get; set; }
 
         /// <inheritdoc/>
         public object RootValue { get; set; }
@@ -71,13 +69,16 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields { get; set; }
+        public Fields SubFields { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
 
         /// <inheritdoc/>
         public IDictionary<string, object> Extensions { get; set; }
+
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
@@ -90,11 +91,10 @@ namespace GraphQL
         public ResolveFieldContext(IResolveFieldContext context)
         {
             Source = context.Source;
-            FieldName = context.FieldName;
             FieldAst = context.FieldAst;
             FieldDefinition = context.FieldDefinition;
-            ReturnType = context.ReturnType;
             ParentType = context.ParentType;
+            Parent = context.Parent;
             Arguments = context.Arguments;
             Schema = context.Schema;
             Document = context.Document;
@@ -111,13 +111,14 @@ namespace GraphQL
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
             Extensions = context.Extensions;
+            ArrayPool = context.ArrayPool;
         }
     }
 
     /// <inheritdoc cref="ResolveFieldContext"/>
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
-        /// <inheritdoc cref="ResolveFieldContext.ResolveFieldContext()"/>
+        /// <inheritdoc cref="ResolveFieldContext()"/>
         public ResolveFieldContext()
         {
         }

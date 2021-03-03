@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
-using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
@@ -12,74 +9,36 @@ namespace GraphQL.Instrumentation
     /// </summary>
     public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
     {
-        private Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleMiddleware;
-        private IList<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _middlewares;
+        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> _middleware;
 
         /// <inheritdoc/>
-        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
-            middleware = middleware ?? throw new ArgumentNullException(nameof(middleware));
+            if (middleware == null)
+                throw new ArgumentNullException(nameof(middleware));
 
-            if (_singleMiddleware == null)
+            if (_middleware == null)
             {
-                // allocation free optimization for single middleware (InstrumentFieldsMiddleware)
-                _singleMiddleware = middleware;
-            }
-            else if (_middlewares == null)
-            {
-                _middlewares = new List<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
-                {
-                    _singleMiddleware,
-                    middleware
-                };
+                _middleware = middleware;
             }
             else
             {
-                _middlewares.Add(middleware);
+                var firstMiddleware = _middleware;
+                _middleware = next => firstMiddleware(middleware(next));
             }
 
             return this;
         }
 
-        internal FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start, ISchema schema)
-        {
-            var middlewareDelegate = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
-
-            if (_middlewares != null)
-            {
-                foreach (var middleware in _middlewares.Reverse())
-                {
-                    middlewareDelegate = middleware(schema, middlewareDelegate);
-                }
-            }
-            else if (_singleMiddleware != null)
-            {
-                middlewareDelegate = _singleMiddleware(schema, middlewareDelegate);
-            }
-
-            return middlewareDelegate;
-        }
-
-        private bool Empty => _singleMiddleware == null;
+        private static readonly FieldMiddlewareDelegate _defaultDelegate = context => Task.FromResult(NameFieldResolver.Instance.Resolve(context));
 
         /// <inheritdoc/>
-        public void ApplyTo(ISchema schema)
+        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
         {
-            // allocation free optimization if no middlewares are defined
-            if (!Empty)
-            {
-                foreach (var complex in schema.AllTypes.OfType<IComplexGraphType>())
-                {
-                    foreach (var field in complex.Fields)
-                    {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+            if (_middleware == null)
+                return null;
 
-                        var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
-
-                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
-                    }
-                }
-            }
+            return start => _middleware(start ?? _defaultDelegate);
         }
     }
 }

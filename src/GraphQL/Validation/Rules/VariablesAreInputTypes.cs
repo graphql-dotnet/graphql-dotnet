@@ -20,28 +20,16 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="VariablesAreInputTypesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var type = varDef.Type.NamedGraphTypeFromType(context.Schema);
+
+            if (!type.IsInputType())
             {
-                _.Match<VariableDefinition>(varDef =>
-                {
-                    var type = GetNamedGraphTypeFromType(varDef.Type, context.Schema);
-
-                    if (!type.IsInputType())
-                    {
-                        context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
-                    }
-                });
-            }).ToTask();
-        }
-
-        private static IGraphType GetNamedGraphTypeFromType(IType type, ISchema schema) => type switch
-        {
-            NonNullType nonnull => GetNamedGraphTypeFromType(nonnull.Type, schema),
-            ListType list => GetNamedGraphTypeFromType(list.Type, schema),
-            NamedType named => schema.FindType(named.Name),
-            _ => null
-        };
+                context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
+            }
+        }).ToTask();
     }
 }

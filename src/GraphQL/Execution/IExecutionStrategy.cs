@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Execution
 {
@@ -14,5 +15,10 @@ namespace GraphQL.Execution
         /// </summary>
         /// <param name="context">The execution parameters</param>
         Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
+
+        /// <summary>
+        /// Returns the children fields for a specified node.
+        /// </summary>
+        Fields GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
 }

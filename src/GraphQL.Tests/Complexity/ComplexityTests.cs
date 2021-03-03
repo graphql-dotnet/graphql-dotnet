@@ -9,12 +9,26 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void inline_fragments_test()
         {
-            var withFrag =
-                AnalyzeComplexity(
-                    @"query withInlineFragment { profiles(handles: [""dnetguru""]) { handle ... on User { friends { count } } } }");
-            var woFrag =
-                AnalyzeComplexity(
-                    @"query withoutFragments { profiles(handles: [""dnetguru""]) { handle friends { count } } }");
+            var withFrag = AnalyzeComplexity(@"
+query withInlineFragment {
+  profiles(handles: [""dnetguru""]) {
+    handle
+    ... on User {
+      friends {
+        count
+      }
+    }
+  }
+}");
+            var woFrag = AnalyzeComplexity(@"
+query withoutFragments {
+  profiles(handles: [""dnetguru""]) {
+    handle
+    friends {
+      count
+    }
+  }
+}");
 
             withFrag.Complexity.ShouldBe(woFrag.Complexity);
             withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
@@ -23,12 +37,40 @@ namespace GraphQL.Tests.Complexity
         [Fact]
         public void fragments_test()
         {
-            var withFrag =
-                AnalyzeComplexity(
-                    @"{ leftComparison: hero(episode: EMPIRE) { ...comparisonFields } rightComparison: hero(episode: JEDI) { ...comparisonFields } } fragment comparisonFields on Character { name appearsIn friends { name } }");
-            var woFrag =
-                AnalyzeComplexity(
-                    @"{ leftComparison: hero(episode: EMPIRE) { name appearsIn friends { name } } rightComparison: hero(episode: JEDI) { name appearsIn friends { name } } }");
+            var withFrag = AnalyzeComplexity(@"
+{
+  leftComparison: hero(episode: EMPIRE) {
+    ...comparisonFields
+  }
+  rightComparison: hero(episode: JEDI) {
+    ...comparisonFields
+  }
+}
+
+fragment comparisonFields on Character {
+  name
+  appearsIn
+  friends {
+    name
+  }
+}");
+            var woFrag = AnalyzeComplexity(@"
+{
+  leftComparison: hero(episode: EMPIRE) {
+    name
+    appearsIn
+    friends {
+      name
+    }
+  }
+  rightComparison: hero(episode: JEDI) {
+    name
+    appearsIn
+    friends {
+      name
+    }
+  }
+}");
 
             withFrag.Complexity.ShouldBe(woFrag.Complexity);
             withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);

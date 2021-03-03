@@ -10,34 +10,31 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class VariableDefinitions : IEnumerable<VariableDefinition>
     {
-        private List<VariableDefinition> _variables;
+        internal List<VariableDefinition> List { get; private set; }
+
+        internal VariableDefinitions(int capacity)
+        {
+            List = new List<VariableDefinition>(capacity);
+        }
+
+        /// <summary>
+        /// Creates an instance of a list of variable definition nodes within a document.
+        /// </summary>
+        public VariableDefinitions()
+        {
+        }
 
         /// <summary>
         /// Adds a variable definition node to the list.
         /// </summary>
-        public void Add(VariableDefinition variable)
-        {
-            if (variable == null)
-                throw new ArgumentNullException(nameof(variable));
-
-            if (_variables == null)
-                _variables = new List<VariableDefinition>();
-
-            _variables.Add(variable);
-        }
+        public void Add(VariableDefinition variable) => (List ??= new List<VariableDefinition>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <inheritdoc/>
-        public IEnumerator<VariableDefinition> GetEnumerator()
-        {
-            if (_variables == null)
-                return Enumerable.Empty<VariableDefinition>().GetEnumerator();
-
-            return _variables.GetEnumerator();
-        }
+        public IEnumerator<VariableDefinition> GetEnumerator() => (List ?? Enumerable.Empty<VariableDefinition>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
-        public override string ToString() => _variables?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", _variables)}}}" : "VariableDefinitions(Empty)";
+        public override string ToString() => List?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", List)}}}" : "VariableDefinitions(Empty)";
     }
 }

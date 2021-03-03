@@ -1,12 +1,11 @@
 using System;
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// The DateTimeOffset scalar graph type represents a date, time and offset from UTC.
-    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="DateTimeOffset"/> .NET values to this scalar graph type.
+    /// By default <see cref="SchemaTypes"/> maps all <see cref="DateTimeOffset"/> .NET values to this scalar graph type.
     /// </summary>
     public class DateTimeOffsetGraphType : ScalarGraphType
     {
@@ -21,14 +20,13 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
-        {
-            DateTimeOffsetValue offsetValue => offsetValue.Value,
-            StringValue stringValue => ParseValue(stringValue.Value),
-            _ => null
-        };
+        public override object ParseLiteral(IValue value)
+            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value) => new StringValue(((DateTimeOffset)value).ToString("O")); // "O" is the proper ISO 8601 format required
     }
 }

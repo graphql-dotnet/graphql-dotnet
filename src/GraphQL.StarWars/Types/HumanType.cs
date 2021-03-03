@@ -9,13 +9,10 @@ namespace GraphQL.StarWars.Types
         {
             Name = "Human";
 
-            Field(h => h.Id).Description("The id of the human.");
-            Field(h => h.Name, nullable: true).Description("The name of the human.");
+            Field<NonNullGraphType<StringGraphType>>("id", "The id of the human.", resolve: context => context.Source.Id);
+            Field<StringGraphType>("name", "The name of the human.", resolve: context => context.Source.Name);
 
-            Field<ListGraphType<CharacterInterface>>(
-                "friends",
-                resolve: context => data.GetFriends(context.Source)
-            );
+            Field<ListGraphType<CharacterInterface>>("friends", resolve: context => data.GetFriends(context.Source));
 
             Connection<CharacterInterface>()
                 .Name("friendsConnection")
@@ -25,7 +22,7 @@ namespace GraphQL.StarWars.Types
 
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
 
-            Field(h => h.HomePlanet, nullable: true).Description("The home planet of the human.");
+            Field<StringGraphType>("homePlanet", "The home planet of the human.", resolve: context => context.Source.HomePlanet);
 
             Interface<CharacterInterface>();
         }

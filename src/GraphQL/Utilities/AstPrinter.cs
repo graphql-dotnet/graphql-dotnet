@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Utilities
@@ -17,6 +16,9 @@ namespace GraphQL.Utilities
         // so we cache one copy of it here - it's not changed ever anyway
         private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
+        /// <summary>
+        /// Returns a string representation of the specified node.
+        /// </summary>
         public static string Print(INode node)
         {
             var result = _visitor.Visit(node);
@@ -366,12 +368,6 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<UriValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
-            });
-
             // Directive
             Config<Directive>(c =>
             {
@@ -447,7 +443,7 @@ namespace GraphQL.Utilities
 
         private string Indent(string str)
         {
-            return Regex.Replace(str, "\n", "\n  ");
+            return str.Replace("\n", "\n  ");
         }
 
         public object Visit(INode node)
@@ -463,7 +459,7 @@ namespace GraphQL.Utilities
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.FieldsList.Apply(f =>
+                foreach (var f in config.FieldsList)
                 {
                     var ctx = new ResolveValueContext(node);
 
@@ -478,7 +474,7 @@ namespace GraphQL.Utilities
                     }
 
                     vals[f.Name] = result;
-                });
+                }
 
                 return config.PrintAst(vals);
             }
@@ -490,8 +486,10 @@ namespace GraphQL.Utilities
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var c in _configs)
+            {
                 if (c.Matches(node))
                     return c;
+            }
 
             return null;
         }

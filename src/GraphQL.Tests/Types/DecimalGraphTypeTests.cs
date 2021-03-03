@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Types
 
             var number = 12.10m;
             for (int i = 0; i < 1000; i++)
-                _ = System.Runtime.CompilerServices.Unsafe.As<decimal, GraphQL.Language.DecimalData>(ref number);
+                _ = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref number);
 
             GC.GetAllocatedBytesForCurrentThread().ShouldBe(allocated);
         }

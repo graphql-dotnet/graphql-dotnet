@@ -9,7 +9,6 @@ namespace GraphQL.Utilities.Federation
 {
     public class FederatedSchemaPrinter : SchemaPrinter
     {
-
         private readonly List<string> _federatedDirectives = new List<string>
         {
             "external",
@@ -26,20 +25,12 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private readonly CoreToVanillaConverter _converter;
-
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)
         {
-            _converter = new CoreToVanillaConverter("");
         }
 
-        public string PrintFederatedDirectives(IGraphType type)
-        {
-            if (type.IsInputObjectType())
-                return "";
-            return PrintFederatedDirectivesFromAst(type);
-        }
+        public string PrintFederatedDirectives(IGraphType type) => type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
@@ -50,24 +41,20 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective(x.Name.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name.Value))
                     .Select(PrintAstDirective)
             );
 
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive)
-        {
-            var ast = _converter.Directive(directive);
-            return AstPrinter.Print(ast);
-        }
+        public string PrintAstDirective(GraphQLDirective directive) => AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
 
         public override string PrintObject(IObjectGraphType type)
         {
             var isExtension = type.IsExtensionType();
 
-            var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
@@ -96,7 +83,7 @@ namespace GraphQL.Utilities.Federation
                 new
                 {
                     x.Name,
-                    Type = ResolveName(x.ResolvedType),
+                    Type = x.ResolvedType,
                     Args = PrintArgs(x),
                     Description = FormatDescription(x.Description, "  "),
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
@@ -110,7 +97,7 @@ namespace GraphQL.Utilities.Federation
         public string PrintFederatedSchema()
         {
             return PrintFilteredSchema(
-                directiveName => !IsSpecDirective(directiveName) && !IsFederatedDirective(directiveName),
+                directiveName => !IsBuiltInDirective(directiveName) && !IsFederatedDirective(directiveName),
                 typeName => !IsFederatedType(typeName) && IsDefinedType(typeName));
         }
 

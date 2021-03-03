@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -7,6 +7,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Provides information pertaining to the current state of the AST tree while being walked.
+    /// Thus, validation rules checking is designed for sequential execution.
     /// </summary>
     public class TypeInfo : INodeVisitor
     {
@@ -28,67 +29,74 @@ namespace GraphQL.Validation
             _schema = schema;
         }
 
+        private static T PeekElement<T>(Stack<T> from, int index)
+        {
+            if (index == 0)
+            {
+                return from.Count > 0 ? from.Peek() : default;
+            }
+            else
+            {
+                if (index >= from.Count)
+                    throw new InvalidOperationException($"Stack contains only {from.Count} items");
+
+                var e = from.GetEnumerator();
+
+                int i = index;
+                do
+                {
+                    _ = e.MoveNext();
+                }
+                while (i-- > 0);
+
+                return e.Current;
+            }
+        }
+
         /// <summary>
-        /// Returns a list of ancestors of the current node.
+        /// Returns an ancestor of the current node.
+        /// </summary>
+        /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
+        public INode GetAncestor(int index) => PeekElement(_ancestorStack, index);
+
+        /// <summary>
+        /// Returns the last graph type matched, or <see langword="null"/> if none.
+        /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
+        public IGraphType GetLastType(int index = 0) => PeekElement(_typeStack, index);
+
+        /// <summary>
+        /// Returns the last input graph type matched, or <see langword="null"/> if none.
+        /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
+        public IGraphType GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
+
+        /// <summary>
+        /// Returns the parent graph type of the current node, or <see langword="null"/> if none.
+        /// </summary>
+        /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
+        public IGraphType GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
+
+        /// <summary>
+        /// Returns the last field type matched, or <see langword="null"/> if none.
+        /// </summary>
+        /// <param name="index">Index of the field; 0 for the top-most field, 1 for the direct ancestor and so on.</param>
+        public FieldType GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
+
+        /// <summary>
+        /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
-        public INode[] GetAncestors()
-        {
-            return _ancestorStack.Skip(1).Reverse().ToArray();
-        }
+        public DirectiveGraphType GetDirective() => _directive;
 
         /// <summary>
-        /// Returns the last graph type matched, or null if none.
-        /// </summary>
-        public IGraphType GetLastType()
-        {
-            return _typeStack.Count > 0 ? _typeStack.Peek() : null;
-        }
-
-        /// <summary>
-        /// Returns the last input graph type matched, or null if none.
-        /// </summary>
-        public IGraphType GetInputType()
-        {
-            return _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
-        }
-
-        /// <summary>
-        /// Returns the parent graph type of the current node, or null if none.
-        /// </summary>
-        public IGraphType GetParentType()
-        {
-            return _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
-        }
-
-        /// <summary>
-        /// Returns the last field type matched, or null if none.
-        /// </summary>
-        public FieldType GetFieldDef()
-        {
-            return _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
-        }
-
-        /// <summary>
-        /// Returns the last directive specified, or null if none.
+        /// Returns the last query argument matched, or <see langword="null"/> if none.
         /// </summary>
         /// <returns></returns>
-        public DirectiveGraphType GetDirective()
-        {
-            return _directive;
-        }
-
-        /// <summary>
-        /// Returns the last query argument matched, or null if none.
-        /// </summary>
-        /// <returns></returns>
-        public QueryArgument GetArgument()
-        {
-            return _argument;
-        }
+        public QueryArgument GetArgument() => _argument;
 
         /// <inheritdoc/>
-        public void Enter(INode node)
+        public void Enter(INode node, ValidationContext context)
         {
             _ancestorStack.Push(node);
 
@@ -110,7 +118,7 @@ namespace GraphQL.Validation
 
             if (node is Directive directive)
             {
-                _directive = _schema.FindDirective(directive.Name);
+                _directive = _schema.Directives.Find(directive.Name);
             }
 
             if (node is Operation op)
@@ -134,14 +142,14 @@ namespace GraphQL.Validation
 
             if (node is FragmentDefinition def1)
             {
-                var type = _schema.FindType(def1.Type.Name);
+                var type = _schema.AllTypes[def1.Type.Name];
                 _typeStack.Push(type);
                 return;
             }
 
             if (node is InlineFragment def)
             {
-                var type = def.Type != null ? _schema.FindType(def.Type.Name) : GetLastType();
+                var type = def.Type != null ? _schema.AllTypes[def.Type.Name] : GetLastType();
                 _typeStack.Push(type);
                 return;
             }
@@ -193,54 +201,39 @@ namespace GraphQL.Validation
         }
 
         /// <inheritdoc/>
-        public void Leave(INode node)
+        public void Leave(INode node, ValidationContext context)
         {
             _ancestorStack.Pop();
 
             if (node is SelectionSet)
             {
                 _parentTypeStack.Pop();
-                return;
             }
-
-            if (node is Field)
+            else if (node is Field)
             {
                 _fieldDefStack.Pop();
                 _typeStack.Pop();
-                return;
             }
-
-            if (node is Directive)
+            else if (node is Directive)
             {
                 _directive = null;
-                return;
             }
-
-            if (node is Operation
-                || node is FragmentDefinition
-                || node is InlineFragment)
+            else if (node is Operation || node is FragmentDefinition || node is InlineFragment)
             {
                 _typeStack.Pop();
-                return;
             }
-
-            if (node is VariableDefinition)
+            else if (node is VariableDefinition)
             {
                 _inputTypeStack.Pop();
-                return;
             }
-
-            if (node is Argument)
+            else if (node is Argument)
             {
                 _argument = null;
                 _inputTypeStack.Pop();
-                return;
             }
-
-            if (node is ListValue || node is ObjectField)
+            else if (node is ListValue || node is ObjectField)
             {
                 _inputTypeStack.Pop();
-                return;
             }
         }
 
@@ -248,14 +241,12 @@ namespace GraphQL.Validation
         {
             var name = field.Name;
 
-            if (name == schema.SchemaMetaFieldType.Name
-                && Equals(schema.Query, parentType))
+            if (name == schema.SchemaMetaFieldType.Name && Equals(schema.Query, parentType))
             {
                 return schema.SchemaMetaFieldType;
             }
 
-            if (name == schema.TypeMetaFieldType.Name
-                && Equals(schema.Query, parentType))
+            if (name == schema.TypeMetaFieldType.Name && Equals(schema.Query, parentType))
             {
                 return schema.TypeMetaFieldType;
             }
@@ -274,5 +265,39 @@ namespace GraphQL.Validation
 
             return null;
         }
+
+        /// <summary>
+        /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
+        /// are not redundantly reported.
+        /// </summary>
+        internal HashSet<string> NoFragmentCycles_VisitedFrags;
+        /// <summary>
+        /// Array of AST nodes used to produce meaningful errors
+        /// </summary>
+        internal Stack<FragmentSpread> NoFragmentCycles_SpreadPath;
+        /// <summary>
+        /// Position in the spread path
+        /// </summary>
+        internal Dictionary<string, int> NoFragmentCycles_SpreadPathIndexByName;
+
+        internal HashSet<string> NoUndefinedVariables_VariableNameDefined;
+
+        internal List<Operation> NoUnusedFragments_OperationDefs;
+        internal List<FragmentDefinition> NoUnusedFragments_FragmentDefs;
+
+        internal List<VariableDefinition> NoUnusedVariables_VariableDefs;
+
+        internal Dictionary<string, Argument> UniqueArgumentNames_KnownArgs;
+
+        internal Dictionary<string, FragmentDefinition> UniqueFragmentNames_KnownFragments;
+
+        internal Stack<Dictionary<string, IValue>> UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<string, IValue> UniqueInputFieldNames_KnownNames;
+
+        internal HashSet<string> UniqueOperationNames_Frequency;
+
+        internal Dictionary<string, VariableDefinition> UniqueVariableNames_KnownVariables;
+
+        internal Dictionary<string, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
     }
 }

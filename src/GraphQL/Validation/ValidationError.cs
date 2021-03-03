@@ -39,15 +39,15 @@ namespace GraphQL.Validation
             Code = GetValidationErrorCode(GetType());
             Number = number;
 
-            nodes?.Apply(n =>
+            if (nodes != null)
             {
-                _nodes.Add(n);
-                if (n.SourceLocation != null)
+                foreach (var n in nodes)
                 {
-                    var location = new Location(new Source(originalQuery), n.SourceLocation.Start);
+                    _nodes.Add(n);
+                    var location = new Location(originalQuery, n.SourceLocation.Start);
                     AddLocation(location.Line, location.Column);
                 }
-            });
+            }
         }
 
         internal static string GetValidationErrorCode(Type type)

@@ -21,10 +21,10 @@ namespace GraphQL.Tests.Bugs
         field2B
     }
 }";
-            var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
             result.Errors[0].Message.ShouldBe("Error executing document.");
-            result.Errors[0].InnerException.Message.ShouldBe(@"Unable to register GraphType 'GraphQL.Tests.Bugs.Type2' with the name 'MyType';
-the name 'MyType' is already registered to 'GraphQL.Tests.Bugs.Type1'.");
+            result.Errors[0].InnerException.Message.ShouldBe(@"Unable to register GraphType 'GraphQL.Tests.Bugs.Type2' with the name 'MyType'.
+The name 'MyType' is already registered to 'GraphQL.Tests.Bugs.Type1'. Check your schema configuration.");
         }
     }
 

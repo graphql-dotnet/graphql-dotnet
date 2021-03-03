@@ -16,10 +16,13 @@ namespace GraphQL.NewtonsoftJson
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
 
-        protected override JsonConverter ResolveContractConverter(Type objectType) =>
-            typeof(ExecutionResult).IsAssignableFrom(objectType)
-                ? new ExecutionResultJsonConverter(_errorInfoProvider)
-                : base.ResolveContractConverter(objectType);
+        protected override JsonConverter ResolveContractConverter(Type objectType)
+        {
+            if (typeof(ExecutionResult).IsAssignableFrom(objectType))
+                return new ExecutionResultJsonConverter(_errorInfoProvider);
+
+            return base.ResolveContractConverter(objectType);
+        }
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {

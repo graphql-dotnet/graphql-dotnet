@@ -16,16 +16,6 @@ namespace GraphQL
     public static class TypeExtensions
     {
         /// <summary>
-        /// Conditionally casts the item into the indicated type using an "as" cast.
-        /// </summary>
-        /// <typeparam name="T">The desired type</typeparam>
-        /// <param name="item">The item.</param>
-        /// <returns><c>null</c> if the cast failed, otherwise item as T</returns>
-        public static T As<T>(this object item)
-            where T : class
-            => item as T;
-
-        /// <summary>
         /// Determines whether this instance is a concrete type.
         /// </summary>
         /// <param name="type">The type to check.</param>
@@ -48,7 +38,7 @@ namespace GraphQL
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsNullable(this Type type)
-            => type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+            => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
         public static bool IsPrimitive(this Type type)
         {
@@ -66,7 +56,7 @@ namespace GraphQL
         ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsGraphType(this Type type)
-            => type.GetInterfaces().Contains(typeof(IGraphType));
+            => typeof(IGraphType).IsAssignableFrom(type);
 
         /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
@@ -103,9 +93,10 @@ namespace GraphQL
         /// </summary>
         /// <param name="type">The type for which a graph type is desired.</param>
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
+        /// <param name="mode">Mode to use when mapping CLR type to GraphType.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
-        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
+        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
@@ -118,27 +109,48 @@ namespace GraphQL
                 if (isNullable == false)
                 {
                     throw new ArgumentOutOfRangeException(nameof(isNullable),
-                        $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type. \n");
+                        $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
                 }
             }
 
-            Type graphType;
+            Type graphType = null;
 
             if (type.IsArray)
             {
                 var clrElementType = type.GetElementType();
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else if (IsAnIEnumerable(type))
             {
                 var clrElementType = GetEnumerableElementType(type);
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else
             {
-                graphType = GraphTypeTypeRegistry.Get(type);
+                var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+                if (attr != null)
+                {
+                    if (mode == TypeMappingMode.InputType)
+                        graphType = attr.InputType;
+                    else if (mode == TypeMappingMode.OutputType)
+                        graphType = attr.OutputType;
+                    else if (attr.InputType == attr.OutputType) // scalar
+                        graphType = attr.InputType;
+                }
+
+                if (graphType == null)
+                {
+                    if (mode == TypeMappingMode.UseBuiltInScalarMappings || !GlobalSwitches.UseRuntimeTypeMappings)
+                    {
+                        SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType);
+                    }
+                    else if (!type.IsEnum)
+                    {
+                        graphType = (mode == TypeMappingMode.OutputType ? typeof(GraphQLClrOutputTypeReference<>) : typeof(GraphQLClrInputTypeReference<>)).MakeGenericType(type);
+                    }
+                }
             }
 
             if (graphType == null)
@@ -148,7 +160,9 @@ namespace GraphQL
                     graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
                 }
                 else
-                    throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
+                }
             }
 
             if (!isNullable)
@@ -245,20 +259,78 @@ namespace GraphQL
             }
 
             var baseType = type.BaseType;
-            return baseType == null ? false : ImplementsGenericType(baseType, genericType);
+            return baseType != null && ImplementsGenericType(baseType, genericType);
         }
 
         /// <summary>
         /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
-        /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
-        /// Otherwise returns xml documentation on the specified member, if any.
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
+        /// returns XML documentation on the specified member, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
+        /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
         /// </summary>
-        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
+        public static string Description(this MemberInfo memberInfo)
+        {
+            string description = null;
+
+            if (GlobalSwitches.EnableReadDescriptionFromAttributes)
+            {
+                description = (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+                if (description != null)
+                    return description;
+            }
+
+            if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+            {
+                description = memberInfo.GetXmlDocumentation();
+            }
+
+            return description;
+        }
 
         /// <summary>
         /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
-        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any.
+        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDeprecationReasonFromAttributes"/> setting.
         /// </summary>
-        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+        public static string ObsoleteMessage(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDeprecationReasonFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                : null;
+        }
+
+        /// <summary>
+        /// Looks for a <see cref="DefaultValueAttribute"/> on the specified member and returns
+        /// the <see cref="DefaultValueAttribute.Value">value</see>, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDefaultValueFromAttributes"/> setting.
+        /// </summary>
+        public static object DefaultValue(this MemberInfo memberInfo)
+        {
+            return GlobalSwitches.EnableReadDefaultValueFromAttributes
+                ? (memberInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
+                : null;
+        }
+    }
+
+    /// <summary>
+    /// Mode used when mapping CLR type to GraphType in <see cref="TypeExtensions.GetGraphTypeFromType"/>.
+    /// </summary>
+    public enum TypeMappingMode
+    {
+        /// <summary>
+        /// This mode is left for backward compatibility in cases where you call <see cref="TypeExtensions.GetGraphTypeFromType"/> directly.
+        /// </summary>
+        UseBuiltInScalarMappings,
+
+        /// <summary>
+        /// Map CLR type as input type.
+        /// </summary>
+        InputType,
+
+        /// <summary>
+        /// Map CLR type as output type.
+        /// </summary>
+        OutputType,
     }
 }

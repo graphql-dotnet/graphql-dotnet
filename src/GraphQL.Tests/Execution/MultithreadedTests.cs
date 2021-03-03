@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Tests.Introspection;
 using GraphQL.Tests.StarWars;
 using Shouldly;
 using Xunit;
@@ -17,7 +16,7 @@ namespace GraphQL.Tests.Execution
             // create a middleware that increments a variable when every field is resolved
             var middleware = new FieldMiddlewareBuilder();
             int count = 0;
-            middleware.Use((schema, d) => context => {
+            middleware.Use(d => context => {
                 Interlocked.Increment(ref count);
                 return d(context);
             });
@@ -28,20 +27,21 @@ namespace GraphQL.Tests.Execution
             {
                 var result = await starWarsTest.Executer.ExecuteAsync(new ExecutionOptions
                 {
-                    Query = SchemaIntrospection.IntrospectionQuery,
+                    Query = "IntrospectionQuery".ReadGraphQLRequest(),
                     Schema = starWarsTest.Schema,
-                    FieldMiddleware = middleware,
                 });
                 result.Errors.ShouldBeNull();
             };
 
             // run a single execution and record the number of times the resolver executed
             starWarsTest = new StarWarsTestBase();
+            starWarsTest.Schema.FieldMiddleware = middleware;
             await testExecution();
             var correctCount = count;
 
             // test initializing the schema first, followed by 3 simultaneous executions
             starWarsTest = new StarWarsTestBase();
+            starWarsTest.Schema.FieldMiddleware = middleware;
             await testExecution();
             count = 0;
             var t1 = Task.Run(testExecution);
@@ -53,6 +53,7 @@ namespace GraphQL.Tests.Execution
             // test three simultaneous executions on an uninitialized schema
             count = 0;
             starWarsTest = new StarWarsTestBase();
+            starWarsTest.Schema.FieldMiddleware = middleware;
             t1 = Task.Run(testExecution);
             t2 = Task.Run(testExecution);
             t3 = Task.Run(testExecution);

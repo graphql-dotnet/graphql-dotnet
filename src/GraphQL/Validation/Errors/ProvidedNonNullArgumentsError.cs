@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, Field node, QueryArgument arg)
-            : base(context.OriginalQuery, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, arg.ResolvedType.ToString()), node)
         {
         }
 
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, Directive node, QueryArgument arg)
-            : base(context.OriginalQuery, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)), node)
+            : base(context.Document.OriginalQuery, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, arg.ResolvedType.ToString()), node)
         {
         }
 

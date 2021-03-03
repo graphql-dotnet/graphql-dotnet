@@ -1,22 +1,37 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL
 {
     /// <summary>
-    /// Contains a list of execution errors.
+    /// Contains a list of execution errors. Thread safe except <see cref="IEnumerable{T}"/> methods.
     /// </summary>
     public class ExecutionErrors : IEnumerable<ExecutionError>
     {
-        private readonly List<ExecutionError> _errors = new List<ExecutionError>();
+        private readonly object _lock = new object();
+        internal List<ExecutionError> List;
+
+        internal ExecutionErrors(int capacity)
+        {
+            List = new List<ExecutionError>(capacity);
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="ExecutionErrors"/>.
+        /// </summary>
+        public ExecutionErrors()
+        {
+        }
 
         /// <summary>
         /// Adds an execution error to the list.
         /// </summary>
         public virtual void Add(ExecutionError error)
         {
-            _errors.Add(error ?? throw new ArgumentNullException(nameof(error)));
+            lock (_lock)
+                (List ??= new List<ExecutionError>()).Add(error ?? throw new ArgumentNullException(nameof(error)));
         }
 
         /// <summary>
@@ -31,15 +46,15 @@ namespace GraphQL
         /// <summary>
         /// Returns the number of execution errors in the list.
         /// </summary>
-        public int Count => _errors.Count;
+        public int Count => List?.Count ?? 0;
 
         /// <summary>
         /// Returns the execution error at the specified index.
         /// </summary>
-        public ExecutionError this[int index] => _errors[index];
+        public ExecutionError this[int index] => List != null ? List[index] : throw new IndexOutOfRangeException();
 
         /// <inheritdoc/>
-        public IEnumerator<ExecutionError> GetEnumerator() => _errors.GetEnumerator();
+        public IEnumerator<ExecutionError> GetEnumerator() => (List ?? Enumerable.Empty<ExecutionError>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

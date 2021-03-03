@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 namespace GraphQL.Instrumentation
 {
     /// <summary>
-    /// Interface for field middleware. It doesn’t have to be implemented on your middleware.
-    /// Then a search will be made for such a method with a suitable signature. Nevertheless,
-    /// to improve performance, it is recommended to implement this interface.
+    /// Interface for field middleware.
     /// </summary>
     public interface IFieldMiddleware
     {

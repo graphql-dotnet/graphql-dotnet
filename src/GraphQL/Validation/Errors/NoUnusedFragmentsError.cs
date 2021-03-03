@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoUnusedFragmentsError(ValidationContext context, FragmentDefinition node)
-            : base(context.OriginalQuery, NUMBER, UnusedFragMessage(node.Name), node)
+            : base(context.Document.OriginalQuery, NUMBER, UnusedFragMessage(node.Name), node)
         {
         }
 

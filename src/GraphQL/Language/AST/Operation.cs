@@ -20,7 +20,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the operation, if any.
         /// </summary>
-        public string Name => NameNode?.Name;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of the operation, if any.
@@ -60,10 +60,7 @@ namespace GraphQL.Language.AST
 
                 if (Directives != null)
                 {
-                    foreach (var directive in Directives)
-                    {
-                        yield return directive;
-                    }
+                    yield return Directives;
                 }
 
                 yield return SelectionSet;
@@ -71,26 +68,20 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"OperationDefinition{{name='{Name}', operation={OperationType}, variableDefinitions={Variables}, directives={Directives}, selectionSet={SelectionSet}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by name.
-        /// </summary>
-        protected bool Equals(Operation other)
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
         {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && OperationType == other.OperationType;
+            var variables = Variables?.List;
+            if (variables != null)
+            {
+                foreach (var variable in variables)
+                    action(variable, state);
+            }
+
+            action(Directives, state);
+            action(SelectionSet, state);
         }
 
         /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            if (node is null)
-                return false;
-            if (ReferenceEquals(this, node))
-                return true;
-            if (node.GetType() != GetType())
-                return false;
-            return Equals((Operation)node);
-        }
+        public override string ToString() => $"OperationDefinition{{name='{Name}', operation={OperationType}, variableDefinitions={Variables}, directives={Directives}, selectionSet={SelectionSet}}}";
     }
 }

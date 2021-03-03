@@ -19,20 +19,16 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownFragmentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentSpread>((node, context) =>
         {
-            return new EnterLeaveListener(_ =>
+            var fragmentName = node.Name;
+            var fragment = context.GetFragment(fragmentName);
+            if (fragment == null)
             {
-                _.Match<FragmentSpread>(node =>
-                {
-                    var fragmentName = node.Name;
-                    var fragment = context.GetFragment(fragmentName);
-                    if (fragment == null)
-                    {
-                        context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
-                    }
-                });
-            }).ToTask();
-        }
+                context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
+            }
+        }).ToTask();
     }
 }

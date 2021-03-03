@@ -13,7 +13,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Provides all meta information as a key-value dictionary.
         /// </summary>
-        IDictionary<string, object> Metadata { get; }
+        Dictionary<string, object> Metadata { get; }
 
         /// <summary>
         /// Gets a value by a given key. If there is no value for the given key, returns <paramref name="defaultValue"/>.

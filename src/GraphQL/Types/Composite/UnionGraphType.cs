@@ -10,20 +10,9 @@ namespace GraphQL.Types
     public class UnionGraphType : GraphType, IAbstractGraphType
     {
         private List<Type> _types;
-        private List<IObjectGraphType> _possibleTypes;
 
         /// <inheritdoc/>
-        public IEnumerable<IObjectGraphType> PossibleTypes
-        {
-            get => _possibleTypes ?? Enumerable.Empty<IObjectGraphType>();
-            set
-            {
-                EnsurePossibleTypes();
-
-                _possibleTypes.Clear();
-                _possibleTypes.AddRange(value);
-            }
-        }
+        public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 
         /// <inheritdoc/>
         public Func<object, IObjectGraphType> ResolveType { get; set; }
@@ -31,12 +20,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void AddPossibleType(IObjectGraphType type)
         {
-            EnsurePossibleTypes();
-
-            if (type != null && !_possibleTypes.Contains(type))
-            {
-                _possibleTypes.Add(type);
-            }
+            PossibleTypes.Add(type);
         }
 
         /// <summary>
@@ -83,16 +67,6 @@ namespace GraphQL.Types
                 _types.Add(type);
         }
 
-        private void EnsureTypes()
-        {
-            if (_types == null)
-                _types = new List<Type>();
-        }
-
-        private void EnsurePossibleTypes()
-        {
-            if (_possibleTypes == null)
-                _possibleTypes = new List<IObjectGraphType>();
-        }
+        private void EnsureTypes() => _types ??= new List<Type>();
     }
 }
