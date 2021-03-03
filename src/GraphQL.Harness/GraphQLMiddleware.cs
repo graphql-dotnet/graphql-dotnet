@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
@@ -15,17 +16,19 @@ namespace Example
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
-
+        private readonly IHttpContextAccessor _accessor;
         public GraphQLMiddleware(
             RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IDocumentWriter writer)
+            IDocumentWriter writer,
+            IHttpContextAccessor accessor)
         {
             _next = next;
             _settings = options.Value;
             _executer = executer;
             _writer = writer;
+            _accessor = accessor;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
@@ -71,7 +74,16 @@ namespace Example
                         .Use<CountFieldMiddleware>()
                         .Use<InstrumentFieldsMiddleware>();
                 }
+                if (_accessor.HttpContext.Request.IsFederatedTracingEnabled())
+                {
+                    options.FieldMiddleware.Use<FederatedInstrumentFieldMiddleware>();
+                }
             });
+
+            if (_accessor.HttpContext.Request.IsFederatedTracingEnabled())
+            {
+                result.EnrichWithFederatedTracing(start);
+            }
 
             if (_settings.EnableMetrics)
             {

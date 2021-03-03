@@ -1,5 +1,6 @@
 using Example;
 using GraphQL.Execution;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
@@ -62,6 +63,7 @@ namespace GraphQL.Harness
             // add Field Middlewares
             services.AddSingleton<CountFieldMiddleware>();
             services.AddSingleton<InstrumentFieldsMiddleware>();
+            services.AddSingleton<FederatedInstrumentFieldMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

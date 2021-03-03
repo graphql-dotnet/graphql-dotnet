@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
+    <Description>Apollo Federation for GraphQL.NET</Description>
+    <PackageTags>GraphQL;Federation</PackageTags>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+  </ItemGroup>
+</Project>

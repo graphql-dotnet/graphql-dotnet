@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		Tests.props = Tests.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
 EndProject
@@ -115,6 +115,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation", "GraphQL.Federation\GraphQL.Federation.csproj", "{53BE5BF1-DA8F-4534-8CC1-9BEDAE7C0C38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,10 @@ Global
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53BE5BF1-DA8F-4534-8CC1-9BEDAE7C0C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53BE5BF1-DA8F-4534-8CC1-9BEDAE7C0C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53BE5BF1-DA8F-4534-8CC1-9BEDAE7C0C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53BE5BF1-DA8F-4534-8CC1-9BEDAE7C0C38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

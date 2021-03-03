@@ -87,7 +87,16 @@ namespace GraphQL
                 {
                     if (document == null)
                     {
-                        document = _documentBuilder.Build(options.Query);
+                        var parseResult = _documentBuilder.Build(options.Query);
+                        if (!parseResult.IsValid)
+                        {
+                            return new ExecutionResult 
+                            {
+                                Errors = parseResult.Errors,
+                                Perf = metrics.Finish()
+                            };
+                        }
+                        document = parseResult.ParsedDocument;
                     }
                 }
 

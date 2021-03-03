@@ -25,7 +25,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public Document Build(string body)
+        public IParseResult Build(string body)
         {
             var source = new Source(body);
             GraphQLDocument result;
@@ -35,12 +35,12 @@ namespace GraphQL.Execution
             }
             catch (GraphQLSyntaxErrorException ex)
             {
-                throw new SyntaxError(ex);
+                return new ParseResult(new SyntaxError(ex));
             }
 
             var document = CoreToVanillaConverter.Convert(body, result);
             document.OriginalQuery = body;
-            return document;
+            return new SuccessfullyParsedResult(document);
         }
     }
 }
