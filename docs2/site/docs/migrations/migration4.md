@@ -254,6 +254,12 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
 }
 ```
 
+### DataLoader Moved to Separate Project
+
+The implementation for data loaders, contained within the `GraphQL.DataLoader` namespace, has been moved into the
+[`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader/) NuGet package. Please import the NuGet
+package if you use data loaders. No code changes are necessary.
+
 ### `ExecutionOptions.EnableMetrics` is disabled by default
 
 To enable metrics, please set the option to `true` before executing the query.

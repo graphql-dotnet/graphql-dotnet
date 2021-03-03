@@ -136,6 +136,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks.Merge", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI.Tests", "GraphQL.MicrosoftDI.Tests\GraphQL.MicrosoftDI.Tests.csproj", "{82BE75F5-9C90-427D-8268-1C640A90CE98}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "GraphQL.DataLoader\GraphQL.DataLoader.csproj", "{466AD883-96BD-458E-9872-3C14E49D18F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -206,6 +208,10 @@ Global
 		{82BE75F5-9C90-427D-8268-1C640A90CE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82BE75F5-9C90-427D-8268-1C640A90CE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82BE75F5-9C90-427D-8268-1C640A90CE98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{466AD883-96BD-458E-9872-3C14E49D18F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{466AD883-96BD-458E-9872-3C14E49D18F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{466AD883-96BD-458E-9872-3C14E49D18F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{466AD883-96BD-458E-9872-3C14E49D18F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
