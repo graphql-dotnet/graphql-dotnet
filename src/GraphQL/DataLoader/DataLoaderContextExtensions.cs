@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Types.Relay.DataObjects;
 
 namespace GraphQL.DataLoader
 {
@@ -258,6 +259,28 @@ namespace GraphQL.DataLoader
                 throw new ArgumentNullException(nameof(keySelector));
 
             return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer));
+        }
+
+        /// <summary>
+        /// Get or add a DataLoader instance for batching paginated data fetching operations.
+        /// </summary>
+        /// <typeparam name="TKey">The type of key used to load data</typeparam>
+        /// <typeparam name="T">The type of data to be loaded</typeparam>
+        /// <param name="context">The <seealso cref="DataLoaderContext"/> to get or add a DataLoader to</param>
+        /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
+        /// <param name="fetchFunc">A delegate to fetch paginated data for some keys asynchronously</param>
+        /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+        /// <returns>A new or existing DataLoader instance</returns>
+        public static IRelayDataLoader<TKey, T> GetOrAddRelayBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<PageRequest<TKey>>, CancellationToken, Task<IDictionary<TKey, Connection<T>>>> fetchFunc,
+            IEqualityComparer<PageRequest<TKey>> keyComparer = null)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (fetchFunc == null)
+                throw new ArgumentNullException(nameof(fetchFunc));
+
+            return context.GetOrAdd(loaderKey, () => new RelayBatchDataLoader<TKey, T>(fetchFunc, keyComparer));
         }
     }
 }
