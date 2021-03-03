@@ -364,7 +364,21 @@ namespace GraphQL.Execution
                                 serializedResult = valueNode.GraphType.Serialize(d)
                                     ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
                             }
-                            catch (Exception ex)
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex) when (listType.ResolvedType is NonNullGraphType)
+            {
+                // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
+                throw;
+            }
+            catch (ExecutionError error)
+            {
+                SetNodeError(context, node, error);
+                arrayItems.Add(node);
+            }
+            catch (Exception ex)
                             {
                                 // Stop execution as early as possible, it doesn't make sense to set the rest of the array elements and then execute nodes
                                 if (listType.ResolvedType is NonNullGraphType)
