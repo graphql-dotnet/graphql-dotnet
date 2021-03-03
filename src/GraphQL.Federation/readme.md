@@ -11,7 +11,7 @@ Register `FederatedInstrumentFieldMiddleware` in the DI
 ```
 services.AddSingleton<FederatedInstrumentFieldMiddleware>();
 ```
-
+Configure document executor and collect trace
 ```
 var result = await _executer.ExecuteAsync(options =>
 {
