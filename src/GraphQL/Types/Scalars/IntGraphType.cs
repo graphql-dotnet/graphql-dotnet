@@ -60,7 +60,7 @@ namespace GraphQL.Types
             uint ui => checked((int)ui),
             long l => checked((int)l),
             ulong ul => checked((int)ul),
-            BigInteger bi => (int)bi,
+            BigInteger bi => checked((int)bi),
             _ => ThrowSerializationError(value)
         };
     }
