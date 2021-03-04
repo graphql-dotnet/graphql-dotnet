@@ -115,6 +115,8 @@ namespace GraphQL.Types
         /// <param name="value">The value to examine. Must not be <see langword="null"/>, as that indicates the lack of a default value.</param>
         public virtual bool IsValidDefault(object value)
         {
+            if (value == null) return false;
+            
             try
             {
                 return ToAST(value) != null;
