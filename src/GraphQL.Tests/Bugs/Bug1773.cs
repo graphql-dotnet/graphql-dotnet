@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Bugs
         public void list_throws_for_invalid_type()
         {
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new object[] { "testListInvalidType", 0 },
-                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "??????? ?????? ????? ???????? ??????.");
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."));
         }
 
         [Fact]
