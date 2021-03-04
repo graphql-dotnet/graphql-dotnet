@@ -87,8 +87,6 @@ namespace GraphQL.Tests.Extensions
 
             public IEnumerator<object[]> GetEnumerator()
             {
-                yield return new object[] { null, true, new NullValue() };
-
                 yield return new object[] { new BooleanGraphType(), true, new BooleanValue(true) };
                 yield return new object[] { new BooleanGraphType(), false, new BooleanValue(false) };
                 yield return new object[] { new BooleanGraphType(), null, new NullValue() };
