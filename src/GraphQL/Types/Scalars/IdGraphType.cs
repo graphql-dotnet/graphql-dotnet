@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -47,15 +48,22 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
+            string _ => value,
             int _ => value,
             long _ => value,
-            _ => value?.ToString()
+            Guid _ => value,
+            null => null,
+            byte _ => value,
+            sbyte _ => value,
+            short _ => value,
+            ushort _ => value,
+            uint _ => value,
+            ulong _ => value,
+            BigInteger _ => value,
+            _ => ThrowValueConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value) => true;
-
-        /// <inheritdoc/>
-        public override object Serialize(object value) => value?.ToString();
+        public override object Serialize(object value) => ParseValue(value)?.ToString();
     }
 }
