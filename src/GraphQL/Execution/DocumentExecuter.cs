@@ -97,7 +97,21 @@ namespace GraphQL
                     }
                     if (document == null)
                     {
-                        document = _documentBuilder.Build(options.Query);
+                        try
+                        {
+                            document = _documentBuilder.Build(options.Query);
+                        }
+                        catch(SyntaxError ex)
+                        { 
+                            return new ExecutionResult
+                            {
+                                Errors = new ExecutionErrors
+                                {
+                                    ex
+                                },
+                                Perf = metrics.Finish()
+                            };
+                        }
                         saveInCache = true;
                     }
                 }

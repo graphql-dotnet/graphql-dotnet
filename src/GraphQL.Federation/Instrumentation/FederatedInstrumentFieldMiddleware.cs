@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Utilities;
 
 namespace GraphQL.Federation.Instrumentation
 {
@@ -16,8 +15,8 @@ namespace GraphQL.Federation.Instrumentation
             var metadata = new Dictionary<string, object>
             {
                 { "responseName", context.FieldDefinition.Name},
-                { "type", SchemaPrinter.ResolveName(context.FieldDefinition.ResolvedType) },
-                { "parentType", SchemaPrinter.ResolveName(context.ParentType) },                
+                { "type", context.FieldDefinition.ResolvedType.ToString() },
+                { "parentType", context.ParentType.Name },                
                 { "path", context.Path },
                 { "errors", context.Errors},
             };

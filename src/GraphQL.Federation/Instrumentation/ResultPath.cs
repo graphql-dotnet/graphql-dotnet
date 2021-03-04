@@ -9,30 +9,34 @@ namespace GraphQL.Federation.Instrumentation
     /// </summary>
     public class ResultPath
     {
-        private int _hash;
         /// <summary>
         /// Root path. All paths start from here.
         /// </summary>
         public static ResultPath ROOT_PATH { get; } = new ResultPath();
         private readonly ResultPath _parent;
         private readonly object _segment;
+        private int _hash;
+
         private ResultPath()
         {
             _parent = null;
             _segment = null;
         }
-        private  ResultPath(ResultPath parent, string segment)
+
+        private ResultPath(ResultPath parent, string segment)
         {
             _parent = parent ?? throw new ArgumentNullException(nameof(parent), "cannot be null");
             _segment = segment ?? throw new ArgumentNullException(nameof(segment), "cannot be null");
-
         }
+
         private ResultPath(ResultPath parent, int segment)
         {
             _parent = parent ?? throw new ArgumentNullException(nameof(parent), "cannot be null");
             _segment = segment;
         }
+
         public ResultPath Segment(string segment) => new ResultPath(this, segment);
+
         public ResultPath Segment(int segment) => new ResultPath(this, segment);
 
         /// <summary>
@@ -43,14 +47,14 @@ namespace GraphQL.Federation.Instrumentation
         {
             if (_parent == null)
             {
-                return Enumerable.Empty<object>().ToList();
+                return Enumerable.Empty<object>();
             }
 
             var list = new LinkedList<object>();
 
             var p = this;
 
-            while(p._segment != null)
+            while (p._segment != null)
             {
                 _ = list.AddFirst(p._segment);
                 p = p._parent;
@@ -64,7 +68,7 @@ namespace GraphQL.Federation.Instrumentation
         /// </summary>
         /// <param name="objects">path objects</param>
         /// <returns>A new execution path</returns>
-        public static ResultPath FromList( List<object> objects) 
+        public static ResultPath FromList(List<object> objects) 
         {
             if (objects == null)
                 throw new ArgumentNullException(nameof(objects));
@@ -76,7 +80,6 @@ namespace GraphQL.Federation.Instrumentation
                     path = path.Segment(@string);
                 else
                     path = path.Segment((int)obj);
-
             }
             return path;
         }
@@ -95,7 +98,7 @@ namespace GraphQL.Federation.Instrumentation
                 return false;
             var self = this;
             var that = (ResultPath)obj;
-            while(self._segment!=null && that._segment != null)
+            while (self._segment != null && that._segment != null)
             {
                 if (!Object.Equals(self._segment, that._segment))
                     return false;
@@ -104,6 +107,7 @@ namespace GraphQL.Federation.Instrumentation
             }
             return self.IsRootPath() && that.IsRootPath();
         }
+
         public override int GetHashCode()
         {
             int h = _hash;
@@ -113,7 +117,7 @@ namespace GraphQL.Federation.Instrumentation
             h = 1;
             var self = this;
 
-            while(self != null)
+            while (self != null)
             {
                 object value = self._segment;
                 h = 31 * h + (value == null ? 0 : value.GetHashCode());

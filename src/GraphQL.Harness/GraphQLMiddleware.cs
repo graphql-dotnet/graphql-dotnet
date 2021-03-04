@@ -2,8 +2,8 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -16,7 +16,7 @@ namespace Example
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
-  
+
         public GraphQLMiddleware(
             RequestDelegate next,
             IOptions<GraphQLSettings> options,
@@ -56,7 +56,7 @@ namespace Example
                 context.Request.Body,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
-            
+
             var result = await _executer.ExecuteAsync(options =>
             {
                 options.Schema = schema;
@@ -66,26 +66,12 @@ namespace Example
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
-                if (_settings.EnableMetrics)
-                {
-                    options.FieldMiddleware
-                        .Use<CountFieldMiddleware>()
-                        .Use<InstrumentFieldsMiddleware>();
-                }
-                if (context.Request.IsFederatedTracingEnabled())
-                {
-                    options.FieldMiddleware.Use<FederatedInstrumentFieldMiddleware>();
-                }
             });
-
-            if (context.Request.IsFederatedTracingEnabled())
-            {
-                result.EnrichWithFederatedTracing(start);
-            }
 
             if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
+                result.EnrichWithFederatedTracing(start);
             }
 
             await WriteResponseAsync(context, result);

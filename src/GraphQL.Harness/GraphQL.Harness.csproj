@@ -4,9 +4,7 @@
     <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'GraphiQL' " />
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Playground' " />
+  
   <ItemGroup>
     <PackageReference Include="GraphQL.Server.Ui.Altair" Version="4.2.0" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="4.2.0" />

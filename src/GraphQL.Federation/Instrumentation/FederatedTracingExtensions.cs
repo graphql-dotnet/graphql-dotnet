@@ -8,8 +8,8 @@ namespace GraphQL.Federation.Instrumentation
     /// </summary>
     public static class FederatedTracingExtensions
     {
-
         private const string EXTENSION_KEY = "ftv1";
+
         /// <summary>
         /// Adds Apollo federated tracing metrics to an <see cref="ExecutionResult"/> instance,
         /// stored within <see cref="ExecutionResult.Extensions"/>["tracing"].
@@ -19,7 +19,6 @@ namespace GraphQL.Federation.Instrumentation
         /// </summary>
         /// <param name="result">An <see cref="ExecutionResult"/> instance.</param>
         /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
-
         public static void EnrichWithFederatedTracing(this ExecutionResult executionResult, DateTime start)
         {
             var perf = executionResult?.Perf;

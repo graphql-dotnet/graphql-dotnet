@@ -15,21 +15,12 @@ Configure document executor and collect trace
 ```
 var result = await _executer.ExecuteAsync(options =>
 {
-    // check if the tracing is enabled through header
-    if (context.Request.IsFederatedTracingEnabled())
-    {
-        // enabled metrics collection
-        options.EnableMetrics = _settings.EnableMetrics
-        // use the middle to process field metrics
-        options.FieldMiddleware.Use<FederatedInstrumentFieldMiddleware>();
-    }
+    // enabled metrics collection
+    options.EnableMetrics = _settings.EnableMetrics
 });
 
 // add the tracing data to the result
-if (context.Request.IsFederatedTracingEnabled())
-{
-    result.EnrichWithFederatedTracing(start);
-}
+  result.EnrichWithFederatedTracing(start);
 ```
 
 ### Testing

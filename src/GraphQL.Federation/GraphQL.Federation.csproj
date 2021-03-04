@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Description>Apollo Federation for GraphQL.NET</Description>
     <PackageTags>GraphQL;Federation</PackageTags>
-    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
