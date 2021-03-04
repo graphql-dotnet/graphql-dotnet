@@ -502,7 +502,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = (string)inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue,
-                ResolvedType = graphType,
                 Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
         }
