@@ -535,7 +535,7 @@ namespace GraphQL.Execution
             {
                 if (result == null)
                 {
-                    throw new InvalidOperationException("Cannot return null for non-null type."
+                    throw new InvalidOperationException("Cannot return null for a non-null type."
                         + $" Field: {node.Name}, Type: {nonNullType}.");
                 }
 

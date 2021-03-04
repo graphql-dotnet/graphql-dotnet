@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Bugs
         public void nonnull_list_throws_when_null()
         {
             AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new object[] { "testListNullInvalid", 0 },
-                new InvalidOperationException("Cannot return null for non-null type. Field: testListNullInvalid, Type: Int!."));
+                new InvalidOperationException("Cannot return null for a non-null type. Field: testListNullInvalid, Type: Int!."));
         }
 
         [Fact]
