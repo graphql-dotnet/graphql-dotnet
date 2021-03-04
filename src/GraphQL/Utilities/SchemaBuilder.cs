@@ -498,8 +498,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual QueryArgument ToArgument(GraphQLInputValueDefinition inputDef)
         {
-            var graphType = ToGraphType(inputDef.Type);
-            return new QueryArgument(graphType)
+            return new QueryArgument(ToGraphType(inputDef.Type))
             {
                 Name = (string)inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue,
