@@ -68,7 +68,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method must return <see langword="true"/> when passed a <see cref="NullValue"/> node.
         /// </summary>
-        /// <param name="value">AST value node. Must not be <see langword="null"/> or <see cref="NullValue"/>.</param>
+        /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
         public virtual bool CanParseLiteral(IValue value)
         {
             try
