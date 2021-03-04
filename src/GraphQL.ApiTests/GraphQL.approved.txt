@@ -2236,6 +2236,9 @@ namespace GraphQL.Types
         public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }
+        protected object ThrowLiteralConversionError(GraphQL.Language.AST.IValue input) { }
+        protected object ThrowSerializationError(object value) { }
+        protected object ThrowValueConversionError(object value) { }
         public virtual GraphQL.Language.AST.IValue ToAST(object value) { }
     }
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
