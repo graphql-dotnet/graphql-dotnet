@@ -45,7 +45,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object Serialize(object value) => value switch
         {
-            Guid g => g.ToString(),
+            Guid g => g.ToString("D", CultureInfo.InvariantCulture),
             null => null,
             _ => ThrowSerializationError(value)
         };
