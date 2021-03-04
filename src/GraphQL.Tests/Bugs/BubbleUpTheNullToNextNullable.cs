@@ -111,9 +111,15 @@ namespace GraphQL.Tests.Bugs
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
-                    "Cannot return a null member within a non-null list for list index 1."))
+                    "Cannot return null for non-null type. Field: listOfNonNullable, Type: String!."))
                 {
-                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable"}
+                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 1}
+                },
+
+                new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: listOfNonNullable, Type: String!."))
+                {
+                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 2}
                 }
             };
 
@@ -165,9 +171,15 @@ namespace GraphQL.Tests.Bugs
             var errors = new[]
             {
                 new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
-                    "Cannot return a null member within a non-null list for list index 1."))
+                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: String!."))
                 {
-                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
+                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 1}
+                },
+
+                new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: String!."))
+                {
+                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 2}
                 }
             };
 

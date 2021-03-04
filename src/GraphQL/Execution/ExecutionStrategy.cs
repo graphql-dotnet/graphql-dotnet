@@ -340,42 +340,15 @@ namespace GraphQL.Execution
             // local function uses 'struct closure' without heap allocation
             void SetArrayItemNode(object d)
             {
-                if (d != null)
+                var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                node.Result = d;
+
+                if (!(d is IDataLoaderResult))
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
-                    node.Result = d;
-
-                    if (!(d is IDataLoaderResult))
-                    {
-                        if (node is ObjectExecutionNode objectNode)
-                        {
-                            SetSubFieldNodes(context, objectNode);
-                        }
-                        else if (node is ArrayExecutionNode arrayNode)
-                        {
-                            SetArrayItemNodes(context, arrayNode);
-                        }
-                        else if (node is ValueExecutionNode valueNode)
-                        {
-                            node.Result = valueNode.GraphType.Serialize(d)
-                                ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
-                        }
-                    }
-
-                    arrayItems.Add(node);
-                }
-                else
-                {
-                    if (listType.ResolvedType is NonNullGraphType)
-                    {
-                        throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
-                    }
-
-                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
-                    arrayItems.Add(nullExecutionNode);
+                    CompleteNode(context, node);
                 }
 
-                index++;
+                arrayItems.Add(node);
             }
         }
 
@@ -472,6 +445,11 @@ namespace GraphQL.Execution
         {
             try
             {
+                if (node is ValueExecutionNode valueNode)
+                {
+                    node.Result = valueNode.GraphType.Serialize(node.Result);
+                }
+
                 ValidateNodeResult(context, node);
 
                 // Build child nodes
@@ -485,12 +463,11 @@ namespace GraphQL.Execution
                     {
                         SetArrayItemNodes(context, arrayNode);
                     }
-                    else if (node is ValueExecutionNode valueNode)
-                    {
-                        node.Result = valueNode.GraphType.Serialize(node.Result)
-                            ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'.");
-                    }
                 }
+            }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (ExecutionError error)
             {

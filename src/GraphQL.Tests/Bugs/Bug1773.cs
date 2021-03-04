@@ -51,23 +51,21 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nonnull_list_throws_when_null()
         {
-            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new[] { "testListNullInvalid" },
-                new InvalidOperationException("Cannot return a null member within a non-null list for list index 0."));
+            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new object[] { "testListNullInvalid", 0 },
+                new InvalidOperationException("Cannot return null for non-null type. Field: testListNullInvalid, Type: Int!."));
         }
 
         [Fact]
         public void list_throws_for_invalid_type()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
+            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new object[] { "testListInvalidType", 0 },
                 new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."), localizedMessage: "??????? ?????? ????? ???????? ??????.");
         }
 
         [Fact]
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new[] { "testListInvalidType2" },
+            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [ null ]}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new object[] { "testListInvalidType2", 0 },
                 new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
 
