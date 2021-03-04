@@ -86,29 +86,16 @@ namespace GraphQL.SystemTextJson
                 return i;
             else if (reader.TryGetInt64(out long l))
                 return l;
+            else if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
+            {
+                return bi;
+            }
             else if (reader.TryGetDouble(out double d))
             {
-                // the idea is to see if there is a loss of accuracy of value
-
-                // example:
-                // value from json       : 636474637870330463636474637870330463636474637870330463
-                // successfully parsed d : 6.3647463787033043E+53
-                // new BigInteger(d)     : 636474637870330432588044308848152942336795574685138944
-                if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
-                {
-                    if (bi != new BigInteger(d))
-                        return bi;
-                }
                 return d;
             }
             else if (reader.TryGetDecimal(out decimal dm))
             {
-                // the same idea as for a double value above
-                if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
-                {
-                    if (bi != new BigInteger(dm))
-                        return bi;
-                }
                 return dm;
             }
 

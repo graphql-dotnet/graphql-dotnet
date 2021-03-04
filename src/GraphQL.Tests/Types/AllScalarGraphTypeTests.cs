@@ -114,8 +114,14 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
         public void parseValue_ok(Type graphType, object value)
         {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
             var types = new Type[]
             {
@@ -127,10 +133,7 @@ namespace GraphQL.Tests.Types
                 typeof(uint),
                 typeof(long),
                 typeof(ulong),
-                typeof(BigInteger),
-                typeof(float),
-                typeof(double),
-                typeof(decimal)
+                typeof(BigInteger)
             };
 
             foreach (var type in types)
@@ -170,20 +173,106 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ShortGraphType), short.MaxValue)]
         [InlineData(typeof(UShortGraphType), ushort.MinValue)]
         [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
-        [InlineData(typeof(IntGraphType), -2000000000)] //float cannot hold the full precision of int
+        [InlineData(typeof(IntGraphType), int.MinValue)]
         [InlineData(typeof(IntGraphType), 0)]
-        [InlineData(typeof(IntGraphType), 2000000000)]
+        [InlineData(typeof(IntGraphType), int.MaxValue)]
         [InlineData(typeof(UIntGraphType), 0u)]
-        [InlineData(typeof(UIntGraphType), 4000000000u)]
-        [InlineData(typeof(LongGraphType), -9223300018843156480L)]
+        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
+        [InlineData(typeof(LongGraphType), long.MinValue)]
         [InlineData(typeof(LongGraphType), 0L)]
-        [InlineData(typeof(LongGraphType), 9223300018843156480L)]
+        [InlineData(typeof(LongGraphType), long.MaxValue)]
         [InlineData(typeof(ULongGraphType), 0ul)]
-        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
+        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
+        public void parseValue_from_newtonsoft_ok(Type graphType, object value)
+        {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(value.ToString());
+            g.CanParseValue(converted).ShouldBeTrue();
+            var parsed = g.ParseValue(converted);
+            parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
+            parsed.ShouldBe(value);
+        }
+
+        [Theory]
+        [InlineData(typeof(ByteGraphType), (byte)0)]
+        [InlineData(typeof(ByteGraphType), (byte)1)]
+        [InlineData(typeof(ByteGraphType), (byte)255)]
+        [InlineData(typeof(SByteGraphType), (sbyte)-128)]
+        [InlineData(typeof(SByteGraphType), (sbyte)0)]
+        [InlineData(typeof(SByteGraphType), (sbyte)127)]
+        [InlineData(typeof(ShortGraphType), short.MinValue)]
+        [InlineData(typeof(ShortGraphType), (short)default)]
+        [InlineData(typeof(ShortGraphType), short.MaxValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MinValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
+        [InlineData(typeof(IntGraphType), int.MinValue)]
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), int.MaxValue)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
+        [InlineData(typeof(LongGraphType), long.MinValue)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), long.MaxValue)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
+        public void parseValue_from_system_text_json_ok(Type graphType, object value)
+        {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {value} }}")["arg"];
+            g.CanParseValue(converted).ShouldBeTrue();
+            var parsed = g.ParseValue(converted);
+            parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
+            parsed.ShouldBe(value);
+        }
+
+        [Theory]
+        [InlineData(typeof(ByteGraphType), (byte)0)]
+        [InlineData(typeof(ByteGraphType), (byte)1)]
+        [InlineData(typeof(ByteGraphType), (byte)255)]
+        [InlineData(typeof(SByteGraphType), (sbyte)-128)]
+        [InlineData(typeof(SByteGraphType), (sbyte)0)]
+        [InlineData(typeof(SByteGraphType), (sbyte)127)]
+        [InlineData(typeof(ShortGraphType), short.MinValue)]
+        [InlineData(typeof(ShortGraphType), (short)default)]
+        [InlineData(typeof(ShortGraphType), short.MaxValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MinValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
+        [InlineData(typeof(IntGraphType), int.MinValue)]
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), int.MaxValue)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), uint.MaxValue)]
+        [InlineData(typeof(LongGraphType), long.MinValue)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), long.MaxValue)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
         public void parseLiteral_ok(Type graphType, object value)
         {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
             var valueCasts = new Func<object, IValue>[]
             {
@@ -235,8 +324,14 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
         public void serialize_ok(Type graphType, object value)
         {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
             var types = new Type[]
             {
@@ -352,6 +447,15 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), false)]
         [InlineData(typeof(BigIntGraphType), false)]
         [InlineData(typeof(StringGraphType), 1.5)]
+        [InlineData(typeof(ByteGraphType), 1.5)]
+        [InlineData(typeof(SByteGraphType), 1.5)]
+        [InlineData(typeof(ShortGraphType), 1.5)]
+        [InlineData(typeof(UShortGraphType), 1.5)]
+        [InlineData(typeof(IntGraphType), 1.5)]
+        [InlineData(typeof(UIntGraphType), 1.5)]
+        [InlineData(typeof(LongGraphType), 1.5)]
+        [InlineData(typeof(ULongGraphType), 1.5)]
+        [InlineData(typeof(BigIntGraphType), 1.5)]
         public void parseValue_other_fail(Type graphType, object value)
         {
             var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);

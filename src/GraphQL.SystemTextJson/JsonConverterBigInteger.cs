@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.Json;
@@ -33,18 +34,19 @@ namespace GraphQL.SystemTextJson
         }
 #endif
 
+        private static readonly BigInteger _maxBigInteger = (BigInteger)decimal.MaxValue;
+        private static readonly BigInteger _minBigInteger = (BigInteger)decimal.MinValue;
         public override void Write(Utf8JsonWriter writer, BigInteger value, JsonSerializerOptions options)
         {
-            // TODO: in fact, there will be a loss of accuracy;
-            // TODO: there is no (yet) API on Utf8JsonReader that allows you to write JsonTokenType.Number tokens of arbitrary length
+            if (_minBigInteger <= value && value <= _maxBigInteger)
+            {
+                writer.WriteNumberValue((decimal)value);
+                return;
+            }
 
-            // example:
-            // BigInteger 636474637870330463636474637870330463636474637870330463 -> double 6.3647463787033043E+53
-
-            // see Very_Very_Long_Number_Should_Return_As_Is_For_BigInteger and Very__Very_Long_Number_In_Input_Should_Work_For_BigInteger tests
-            // tests succeed because the original (expected) string result first parsed to ExecutionResult and then converted back to string,
-            // so finally we compare 6.3647463787033043E+53 with 6.3647463787033043E+53, not with original number value 636474637870330463636474637870330463636474637870330463
-            writer.WriteNumberValue((double)value);
+            var s = value.ToString(NumberFormatInfo.InvariantInfo);
+            using var doc = JsonDocument.Parse(s);
+            doc.WriteTo(writer);
         }
     }
 }

@@ -42,9 +42,6 @@ namespace GraphQL.Types
             long l => checked((int)l),
             ulong ul => checked((int)ul),
             BigInteger bi => (int)bi,
-            float f => checked((int)f),
-            double d => checked((int)d),
-            decimal d => checked((int)d),
             _ => ThrowValueConversionError(value)
         };
 

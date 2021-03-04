@@ -42,9 +42,6 @@ namespace GraphQL.Types
             uint ui => new BigInteger(ui),
             long l => new BigInteger(l),
             ulong ul => new BigInteger(ul),
-            float f => new BigInteger(f),
-            double d => new BigInteger(d),
-            decimal d => new BigInteger(d),
             _ => ThrowValueConversionError(value)
         };
 
