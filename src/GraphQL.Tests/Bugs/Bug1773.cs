@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Bugs
         public void list_throws_for_invalid_type()
         {
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new object[] { "testListInvalidType", 0 },
-                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."));
+                new InvalidOperationException("Unable to convert 'test' to the scalar type 'Int'"));
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the conversion threw a FormatException
             AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
-                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Int'."));
+                new InvalidOperationException("Unable to convert 'test' to the scalar type 'Int'"));
         }
 
         [Fact]

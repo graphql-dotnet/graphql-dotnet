@@ -44,21 +44,5 @@ namespace GraphQL.Types
             BigInteger bi => (uint)bi,
             _ => ThrowValueConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object Serialize(object value) => value switch
-        {
-            uint _ => value,
-            null => null,
-            int i => checked((uint)i),
-            long l => checked((uint)l),
-            sbyte sb => checked((uint)sb),
-            byte b => checked((uint)b),
-            short s => checked((uint)s),
-            ushort us => checked((uint)us),
-            ulong ul => checked((uint)ul),
-            BigInteger bi => checked((uint)bi),
-            _ => ThrowSerializationError(value)
-        };
     }
 }
