@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -24,7 +25,7 @@ namespace GraphQL.Types
         {
             IntValue intValue => TimeSpan.FromSeconds(intValue.Value),
             LongValue longValue => TimeSpan.FromSeconds(longValue.Value),
-            BigIntValue bigIntValue => TimeSpan.FromSeconds((double)bigIntValue.Value),
+            BigIntValue bigIntValue => TimeSpan.FromSeconds(checked((double)bigIntValue.Value)),
             NullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -36,6 +37,13 @@ namespace GraphQL.Types
             int i => TimeSpan.FromSeconds(i),
             long l => TimeSpan.FromSeconds(l),
             null => null,
+            sbyte sb => TimeSpan.FromSeconds(sb),
+            byte b => TimeSpan.FromSeconds(b),
+            short s => TimeSpan.FromSeconds(s),
+            ushort us => TimeSpan.FromSeconds(us),
+            uint ui => TimeSpan.FromSeconds(ui),
+            ulong ul => TimeSpan.FromSeconds(ul),
+            BigInteger bi => TimeSpan.FromSeconds(checked((double)bi)),
             _ => ThrowValueConversionError(value)
         };
 
@@ -46,6 +54,13 @@ namespace GraphQL.Types
             int i => (long)i,
             long _ => value,
             null => null,
+            sbyte sb => checked((long)sb),
+            byte b => checked((long)b),
+            short s => checked((long)s),
+            ushort us => checked((long)us),
+            uint ui => checked((long)ui),
+            ulong ul => checked((long)ul),
+            BigInteger bi => checked((long)bi),
             _ => ThrowSerializationError(value)
         };
     }

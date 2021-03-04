@@ -36,7 +36,7 @@ namespace GraphQL.Types
             null => null,
             int i => checked((ulong)i),
             long l => checked((ulong)l),
-            BigInteger bi => (ulong)bi,
+            BigInteger bi => checked((ulong)bi),
             sbyte sb => checked((ulong)sb),
             byte b => checked((ulong)b),
             short s => checked((ulong)s),

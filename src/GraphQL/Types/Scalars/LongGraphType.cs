@@ -41,7 +41,7 @@ namespace GraphQL.Types
             ushort us => checked((long)us),
             uint ui => checked((long)ui),
             ulong ul => checked((long)ul),
-            BigInteger bi => (long)bi,
+            BigInteger bi => checked((long)bi),
             _ => ThrowValueConversionError(value)
         };
     }
