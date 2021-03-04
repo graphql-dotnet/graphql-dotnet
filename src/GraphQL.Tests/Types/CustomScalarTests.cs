@@ -206,6 +206,8 @@ namespace GraphQL.Tests.Types
         // "externalNull"     null
         // null               "internalNull"
         // "hello"            "hello"
+        //
+        // Attempting to parse or serialize "error" results in an exception
         
         public override object ParseValue(object value)
         {
