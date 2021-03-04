@@ -20,7 +20,7 @@ namespace GraphQL.Execution
         public bool IgnoreComments { get; set; } = true;
 
         /// <inheritdoc/>
-        public IParseResult Build(string body)
+        public Document Build(string body)
         {
             GraphQLDocument result;
             try
@@ -29,12 +29,12 @@ namespace GraphQL.Execution
             }
             catch (GraphQLSyntaxErrorException ex)
             {
-                return new ParseResult(new SyntaxError(ex));
+                throw new SyntaxError(ex);
             }
 
             var document = CoreToVanillaConverter.Convert(result);
             document.OriginalQuery = body;
-            return new SuccessfullyParsedResult(document);
+            return document;
         }
     }
 }

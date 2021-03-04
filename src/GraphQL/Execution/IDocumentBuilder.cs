@@ -8,8 +8,8 @@ namespace GraphQL.Execution
     public interface IDocumentBuilder
     {
         /// <summary>
-        /// Parse a GraphQL request and return a <see cref="IParseResult">IParseResult</see> representing the GraphQL request AST
+        /// Parse a GraphQL request and return a <see cref="Document">Document</see> representing the GraphQL request AST
         /// </summary>
-        IParseResult Build(string body);
+        Document Build(string body);
     }
 }
