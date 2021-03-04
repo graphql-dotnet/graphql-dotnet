@@ -84,6 +84,13 @@ namespace GraphQL.Tests.Bugs
             AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
                 new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
+
+        [Fact]
+        public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
+        {
+            AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": [null, \"HELLO\"]}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new object[] { "testListInvalidType3", 0 },
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
+        }
     }
 
     public class Bug1773Schema : Schema
@@ -102,6 +109,7 @@ namespace GraphQL.Tests.Bugs
             Field<ListGraphType<IntGraphType>>("testListInvalid", resolve: context => 123);
             Field<ListGraphType<IntGraphType>>("testListInvalidType", resolve: context => new object[] { "test" });
             Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2", resolve: context => new object[] { "test" });
+            Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType3", resolve: context => new object[] { "test", Bug1773Enum.Hello });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullValid", resolve: context => new object[] { 123 });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullInvalid", resolve: context => new object[] { null });
             Field<IntGraphType>("testNullValid", resolve: context => null);
