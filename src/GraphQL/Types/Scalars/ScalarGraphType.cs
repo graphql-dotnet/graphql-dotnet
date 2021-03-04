@@ -27,7 +27,7 @@ namespace GraphQL.Types
         /// The returned value of a the result coercion is part of the overall execution result.
         /// Normally this value is a primitive value like String or Integer to make it easy for
         /// the serialization layer. For complex types like a Date or Money Scalar this involves
-        /// formatting the value. Returning <see langword="null"/> is valid for nullable types.
+        /// formatting the value. Returning <see langword="null"/> is valid.
         /// </returns>
         public virtual object Serialize(object value) => ParseValue(value);
 
