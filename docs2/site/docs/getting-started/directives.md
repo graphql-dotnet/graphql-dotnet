@@ -305,12 +305,11 @@ type __Schema {
 }
 ```
 
-Since v4 Graph.NET provides the ability to apply directives to the
-schema elements and expose this user-defined meta-information via introspection. This is an experimental feature that
-is not in the official specification (yet). To enable it call `ISchema.EnableExperimentalIntrospectionFeatures()`.
-This method also makes it possible to expose directives' `isRepeatable` field via introspection (a feature from the
-GraphQL specification working draft). Note that you can also set the `mode` parameter in this method which by default
-equals to `ExecutionOnly`.
+Since v4 Graph.NET provides the ability to apply directives to the schema elements and expose this user-defined
+meta-information via introspection. This is an experimental feature that is not in the official specification (yet).
+To enable it call `ISchema.EnableExperimentalIntrospectionFeatures()`. This method also makes it possible to
+expose directives' `isRepeatable` field via introspection (a feature from the GraphQL specification working draft).
+Note that you can also set the `mode` parameter in this method which by default equals to `ExecutionOnly`.
 
 ```csharp
 /// <summary>
@@ -470,11 +469,22 @@ be present in the introspection response if and only if directive definition has
 of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
 (so called client-side directive).
 
-> See https://github.com/graphql/graphql-spec/issues/300 for more information.
-
 # Directive vs Field Middleware 
 
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
 For more information about field middlewares see [Field Middleware](field-middleware).
+
+# Existing implementations
+
+There has long been a need in the community for a specification to describe the possibility of
+getting _applied_ directives through introspection. An example is [issue-300](https://github.com/graphql/graphql-spec/issues/300)
+(almost 4 years old at the time of this writing). Obviously, some projects couldn't wait any
+longer and somehow added _applied_ directive support on their own. One such project is this one - GraphQL.NET.
+The [graphql-java](https://github.com/graphql-java/graphql-java) project followed a [similar](https://github.com/graphql-java/graphql-java/pull/2221)
+path. Perhaps there are others, the page will be updated.
+
+We hope that this consistency helps the GraphQL world in the absence of a proper GraphQL specification
+mechanism for getting _applied_ directives through introspection. If other projects on other platforms/languages
+support _applied_ directives in this form, it will become a de facto standard and speed up the specification process.
