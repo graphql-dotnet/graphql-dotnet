@@ -18,7 +18,7 @@ namespace GraphQL.Federation.Instrumentation
                 { "type", context.FieldDefinition.ResolvedType.ToString() },
                 { "parentType", context.ParentType.Name },                
                 { "path", context.Path },
-                { "errors", context.Errors},
+                { "errors", context.Errors },
             };
            
             using (context.Metrics.Subject("federatedfield", context.FieldAst.Name, metadata))

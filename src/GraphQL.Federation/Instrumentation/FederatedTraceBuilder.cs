@@ -20,6 +20,7 @@ namespace GraphQL.Federation.Instrumentation
         private readonly PerfRecord[] _records;
         private readonly ExecutionErrors _errors;
         private readonly DateTime _start;
+
         /// <summary>
         /// Instantiates trace builder
         /// </summary>
@@ -185,12 +186,13 @@ namespace GraphQL.Federation.Instrumentation
             }
 
             /// <summary>
-            /// Returns a <see cref="Node"/> represented by the given path from _nodesbyPath.
-            /// If the node doesn't exist then it will create the node and its parents and store them.
+            /// Returns a <see cref="Node"/> represented by the given path if it has been calculated before.
+            /// If  not then it will create the node and its parents and store them and return the node represented
+            ///  by the path.
             /// </summary>
             /// <param name="path">Given <see cref="ResultPath"/></param>
             /// <returns><see cref="Node"/> instance</returns>
-            private  Node GetOrCreateNode(ResultPath path)
+            private Node GetOrCreateNode(ResultPath path)
             {
                 if (_nodesByPath.TryGetValue(path, out var current))
                 {
@@ -210,13 +212,13 @@ namespace GraphQL.Federation.Instrumentation
                     current = _nodesByPath.TryGetValue(currentPath, out var tCurrent) ? tCurrent : null;
                 }
 
-                for(; currentSegmentIndex < pathSegments.Count(); currentSegmentIndex++)
+                for (; currentSegmentIndex < pathSegments.Count(); currentSegmentIndex++)
                 {
                     var parent = current;
                     var childPath = ResultPath.FromList(pathSegments.Take(currentSegmentIndex).ToList());
                     object childSegment = pathSegments.ElementAtOrDefault(currentSegmentIndex);
 
-                    var child = new  Node();
+                    var child = new Node();
                     if (childSegment is int)
                     {
                         child.Index = Convert.ToUInt32(childSegment);

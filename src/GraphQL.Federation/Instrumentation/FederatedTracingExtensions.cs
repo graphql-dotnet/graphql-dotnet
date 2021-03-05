@@ -19,11 +19,11 @@ namespace GraphQL.Federation.Instrumentation
         /// </summary>
         /// <param name="executionResult">An <see cref="ExecutionResult"/> instance.</param>
         /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
-        public static void EnrichWithFederatedTracing(this ExecutionResult executionResult, DateTime start)
+        public static void EnrichWithApolloFederatedTracing(this ExecutionResult executionResult, DateTime start)
         {
             var perf = executionResult?.Perf;
             var errors = executionResult?.Errors;
-            (executionResult.Extensions ??= new Dictionary<string, object>())[EXTENSION_KEY] = new FederatedTraceBuilder( perf, errors, start).ToProtoBase64();
+            (executionResult.Extensions ??= new Dictionary<string, object>())[EXTENSION_KEY] = new FederatedTraceBuilder(perf, errors, start).ToProtoBase64();
         }
     }
 }

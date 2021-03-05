@@ -25,13 +25,13 @@ namespace GraphQL.Federation.Instrumentation
 
         private ResultPath(ResultPath parent, string segment)
         {
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent), "cannot be null");
-            _segment = segment ?? throw new ArgumentNullException(nameof(segment), "cannot be null");
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _segment = segment ?? throw new ArgumentNullException(nameof(segment));
         }
 
         private ResultPath(ResultPath parent, int segment)
         {
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent), "cannot be null");
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _segment = segment;
         }
 
@@ -74,7 +74,7 @@ namespace GraphQL.Federation.Instrumentation
                 throw new ArgumentNullException(nameof(objects));
 
             var path = ResultPath.ROOT_PATH;
-            foreach(object obj in objects)
+            foreach (object obj in objects)
             {
                 if (obj is string @string)
                     path = path.Segment(@string);
