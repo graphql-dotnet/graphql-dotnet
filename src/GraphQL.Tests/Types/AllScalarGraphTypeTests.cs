@@ -143,7 +143,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), 0L)]
         [InlineData(typeof(LongGraphType), 9223300018843156480L)]
         [InlineData(typeof(ULongGraphType), 0ul)]
-        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
+        [InlineData(typeof(ULongGraphType), 18446700093244440576UL)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
         [InlineData(typeof(BigIntGraphType), -1E+25)]

@@ -86,17 +86,11 @@ namespace GraphQL.SystemTextJson
             else if (reader.TryGetInt64(out long l))
                 return l;
             else if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
-            {
                 return bi;
-            }
             else if (reader.TryGetDouble(out double d))
-            {
                 return d;
-            }
             else if (reader.TryGetDecimal(out decimal dm))
-            {
                 return dm;
-            }
 
             var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
 #if NETSTANDARD2_0
