@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -122,6 +123,39 @@ namespace GraphQL.Tests.Types
         public void does_not_allow_nulls_to_be_added()
         {
             Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
+        }
+
+        [Fact]
+        public void parse_literal_from_name()
+        {
+            type.ParseLiteral(new EnumValue("RED")).ShouldBe(Colors.Red);
+        }
+
+        [Fact]
+        public void serialize_by_value()
+        {
+            type.Serialize(Colors.Red).ShouldBe("RED");
+        }
+
+        [Fact]
+        public void serialize_by_underlying_value()
+        {
+            type.Serialize((int)Colors.Red).ShouldBe("RED");
+        }
+
+        [Fact]
+        public void serialize_by_name_throws()
+        {
+            Should.Throw<InvalidOperationException>(() => type.Serialize("RED"));
+        }
+
+        [Fact]
+        public void toAST_returns_enum_value()
+        {
+            type.ToAST(Colors.Red)
+                .ShouldNotBeNull()
+                .ShouldBeOfType<EnumValue>()
+                .Name.ShouldBe("RED");
         }
     }
 }

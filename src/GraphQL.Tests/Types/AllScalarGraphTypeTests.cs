@@ -24,6 +24,7 @@ namespace GraphQL.Tests.Types
          *    StringGraphType
          *    
          *  Does not test:
+         *    IdGraphType
          *    DecimalGraphType
          *    UriGraphType
          *    date/time graph types
@@ -64,6 +65,7 @@ namespace GraphQL.Tests.Types
             g.ParseLiteral(new NullValue()).ShouldBeNull();
             g.CanParseLiteral(new NullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
+            ((IValue)g.ToAST(null).ShouldBeOfType<NullValue>()).Value.ShouldBeNull();
         }
 
         [Theory]
@@ -367,6 +369,91 @@ namespace GraphQL.Tests.Types
                 var parsed = g.Serialize(converted);
                 parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
                 parsed.ShouldBe(value);
+            }
+        }
+
+        [Theory]
+        [InlineData(typeof(ByteGraphType), (byte)0)]
+        [InlineData(typeof(ByteGraphType), (byte)1)]
+        [InlineData(typeof(ByteGraphType), (byte)255)]
+        [InlineData(typeof(SByteGraphType), (sbyte)-128)]
+        [InlineData(typeof(SByteGraphType), (sbyte)0)]
+        [InlineData(typeof(SByteGraphType), (sbyte)127)]
+        [InlineData(typeof(ShortGraphType), short.MinValue)]
+        [InlineData(typeof(ShortGraphType), (short)default)]
+        [InlineData(typeof(ShortGraphType), short.MaxValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MinValue)]
+        [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
+        [InlineData(typeof(IntGraphType), -2000000000)] //float cannot hold the full precision of int
+        [InlineData(typeof(IntGraphType), 0)]
+        [InlineData(typeof(IntGraphType), 2000000000)]
+        [InlineData(typeof(UIntGraphType), 0u)]
+        [InlineData(typeof(UIntGraphType), 4000000000u)]
+        [InlineData(typeof(LongGraphType), -9223300018843156480L)]
+        [InlineData(typeof(LongGraphType), 0L)]
+        [InlineData(typeof(LongGraphType), 9223300018843156480L)]
+        [InlineData(typeof(ULongGraphType), 0ul)]
+        [InlineData(typeof(ULongGraphType), 18446700093244440576uL)]
+        [InlineData(typeof(FloatGraphType), -2.0)]
+        [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(BigIntGraphType), -1E+25)]
+        [InlineData(typeof(BigIntGraphType), 0)]
+        [InlineData(typeof(BigIntGraphType), 1E+25)]
+        public void toAST_ok(Type graphType, object value)
+        {
+            if (graphType == typeof(BigIntGraphType))
+                value = new BigInteger(Convert.ToDecimal(value));
+
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var types = new Type[]
+            {
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort),
+                typeof(int),
+                typeof(uint),
+                typeof(long),
+                typeof(ulong),
+                typeof(BigInteger)
+            };
+
+            foreach (var type in types)
+            {
+                object converted;
+                try
+                {
+                    if (type == typeof(BigInteger))
+                    {
+                        converted = new BigInteger((decimal)Convert.ChangeType(value, typeof(decimal)));
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(value, type);
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+                var astActual = g.ToAST(converted);
+                IValue astExpected = value switch
+                {
+                    sbyte sb => new IntValue(sb),
+                    byte b => new IntValue(b),
+                    short s => new IntValue(s),
+                    ushort us => new IntValue(us),
+                    int i => new IntValue(i),
+                    uint ui => new LongValue(ui),
+                    long l => new LongValue(l),
+                    ulong ul => new BigIntValue(ul),
+                    BigInteger bi => new BigIntValue(bi),
+                    float f => new FloatValue(f),
+                    double d => new FloatValue(d),
+                    _ => null
+                };
+                astActual.ShouldBeOfType(astExpected.GetType());
+                astActual.Value.ShouldBe(astExpected.Value);
             }
         }
 
