@@ -6,7 +6,9 @@ using GraphQLParser.AST;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Validates the schema as required by the official specification.
+    /// Validates the schema as required by the official specification. Also looks for
+    /// default values within arguments and inputs fields which are stored in AST nodes
+    /// and coerces them to their internally represented values.
     /// </summary>
     public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
