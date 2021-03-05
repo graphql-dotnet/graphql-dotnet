@@ -8,9 +8,15 @@ You can extend your schema with your own custom scalars. Conceptually, a scalar 
 
 - Literal Parsing: Transforms a scalar from its client-side representation as an argument to its server-side representation.
 
-Parsing for arguments and variables are handled separately because while arguments must always be expressed in GraphQL query syntax, variable format is transport-specific (usually JSON).
+Parsing for arguments and variables are handled separately because while arguments must always be expressed in GraphQL
+query syntax, variable format is transport-specific (usually JSON).
 
-The following example shows how to create a custom scalar in GraphQL.NET. You will create a 3D Vector which will be exchanged between server and client as a comma-separated string (ex. "34, 61, 12"). The example assumes the GraphQL schema is implemented in an ASP.NET Core project using the `Microsoft.Extensions.DependencyInjection` package, though only minor modifications would be required for other project types.
+## Vector3 sample with string parsing and serialization
+
+The following example shows how to create a custom scalar in GraphQL.NET. You will create a 3D Vector which will be exchanged
+between server and client as a comma-separated string (ex. "34, 61, 12"). The example assumes the GraphQL schema is implemented
+in an ASP.NET Core project using the `Microsoft.Extensions.DependencyInjection` package, though only minor modifications would
+be required for other project types.
 
 Assume the following schema
 
@@ -48,16 +54,12 @@ mutation AddVector($vector3: Vector3!) {
 }
 ```
 
-Vectors should be received in a more structured format:
+Vectors should be returned in the same format:
 
 ```json
 {
     "data": {
-        "getVector": {
-            "X":"23",
-            "Y":"43",
-            "Z":"66"
-        }
+        "getVector": "23, 43, 66"
     }
 }
 ```
@@ -126,14 +128,37 @@ public void ConfigureServices(IServiceCollection services)
 
 4. Prepare to accept `Vector3` inputs from query arguments. Implement `ScalarGraphType.ParseLiteral`.
 
+Keep in mind that AST parsing may present values as any of the following types:
+- `IntValue` - integers that can be represented within an `int`
+- `LongValue` - integers that can be represented within a `long`
+- `BigIntValue` - integers that can be represented within a `BigInteger`
+- `FloatValue` - floating-point values that can be represented within a `double`
+- `DecimalValue` - floating-point values that can be represented within a `decimal`
+- `StringValue` - string values
+- `EnumValue` - enumeration values
+- `NullValue` - representing `null` - must be handled by all scalars
+
+If your custom scalar accepts floating-point values, you must be sure to handle all 5 of the
+numeric types, since queries like `{ field(arg: 3) }` is parsed as an `IntValue` even though
+it is also a valid floating-point number.
+
+In the sample below, only `NullValue` and `StringValue` need to be handled.
+
+For any type that is not handled, or when the value cannot be parsed, you must throw an exception.
+`ThrowLiteralConversionError` is provided as a convenient method to facilitate throwing an exception
+when the type does not match.
+
 ```csharp
 //in Vector3Type
 
 public override object ParseLiteral(IValue value)
 {
-    return value is StringValue stringValue
-        ? ParseValue(stringValue.Value)
-        : null;
+    if (value is NullValue)
+        return null;
+
+    if (value is StringValue stringValue) return ParseValue(stringValue.Value);
+
+    return ThrowLiteralConversionError(value);
 }
 ```
 
@@ -141,34 +166,37 @@ Once the raw string is extracted from the value node, normal parsing can proceed
 
 5. Prepare to accept `Vector3` inputs from query variables. Implement `ScalarGraphType.ParseValue`.
 
+Similar to `ParseLiteral`, you must keep in mind the expected format of values that are likely
+to be presented to this method. For instance, if you are using a JSON deserializer, you may be
+presented with values of any of these types (or more, depending on your deserializer configuration):
+
+- `int`
+- `long`
+- `ulong`
+- `BigInteger`
+- `double`
+- `decimal`
+- `string`
+- `null` - must be handled by all scalars
+
+On top of that, if you are calling this method from `ParseLiteral`, you must handle the types
+passed from it. So if your scalar needs to handle floating-point values, you likely need to handle
+`int`, `long`, `ulong`, `BigInteger`, `double` and `decimal` types.
+
+For any type that is not handled, or when the value cannot be parsed, you must throw an exception.
+`ThrowValueConversionError` is provided as a convenient method to facilitate throwing an exception
+when the type does not match.
+
+In the sample below, only `null` and `string` types need to be handled.
+
 ```csharp
 // In Vector3Type
 public override object ParseValue(object value)
 {
-    return ValueConverter.ConvertTo(value, typeof(Vector3));
-}
-```
+    if (value == null)
+        return null;
 
-For this call to succeed, a type conversion from `string` to `Vector3` must be registered with the `ValueConverter` class. This can be done anywhere since the API is static. For this example, perform the registration in the schema's constructor.
-
-```csharp
-using GraphQL;
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using StarWars.Types;
-using System;
-
-public class ExampleSchema : Schema
-{
-    public ExampleSchema(IServiceProvider provider)
-        : base(provider)
-    {        
-        ValueConverter.Register<string, Vector3>(ParseVector3);
-
-        // Other schema assignments...
-    }
-
-    private Vector3 ParseVector3(string vector3InputString)
+    if (value is string vector3InputString)
     {
         try
         {
@@ -183,105 +211,216 @@ public class ExampleSchema : Schema
             throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputString}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
         }
     }
+
+    return ThrowValueConversionError(value);
 }
 ```
 
-6. Prepare to support conversion of `Vector3` to an AST node. This allows GraphQL.NET to treat values parsed from variables the same as arguments, which arrive for execution as AST nodes. 
+5. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
+Keep in mind that a null value also required to be handled.
 
-Implement `ValueNode<Vector3>`. Instances of `Vector3` parsed from variables will be wrapped in this type during execution.
-
-```csharp
-public class Vector3Value: ValueNode<Vector3>
-{
-    public Vector3Value(Vector3 value)
-    {
-        Value = value;
-    }
-
-    protected override bool Equals(ValueNode<Vector3> node)
-    {
-        return Value.Equals(node.Value);
-    }
-}
-```
-
-Implement `IAstFromValueConverter` for `Vector3`. This type is used to instruct GraphQL.NET how to wrap custom scalars in `IValue` instances during execution. The framework uses `Matches` to find the appropriate AST value converter after parsing a custom scalar, then uses `Convert` to perform the conversion.
-
-```csharp
-public class Vector3AstValueConverter : IAstFromValueConverter
-{
-    public IValue Convert(object value, IGraphType type)
-    {
-        return new Vector3Value((Vector3)value);
-    }
-
-    public bool Matches(object value, IGraphType type)
-    {
-        return value is Vector3;
-    }
-}
-```
-
-Register `Vector3AstValueConverter` with the schema. Don't conflate `ValueConverter.Register` used in step 4 with `Schema.RegisterValueConverter` - the latter is used for conversions to AST value nodes.
-
-```csharp
-// In ExampleSchema
-public ExampleSchema(IServiceProvider provider)
-    : base(provider)
-{        
-    ValueConverter.Register<string, Vector3>(ParseVector3);
-    RegisterValueConverter(new Vector3AstValueConverter());
-
-    // Other schema assignments...
-}
-``` 
-
-Update the implementation of `Vector3Type.ParseLiteral`:
-
-```csharp
-// In Vector3Type
-public override object ParseLiteral(IValue value)
-{
-    // new test
-    if (value is Vector3Value vector3Value)
-        return ParseValue(vector3Value.Value);
-
-    return value is StringValue stringValue
-        ? ParseValue(stringValue.Value)
-        : null;
-}
-
-```
-
-This is necessary since the query executor converts all arguments and variables to `IValue` instances before coercing them to their server-side representation using `ParseLiteral`. `Vector3` instances parsed from variables will be converted to the more specific `Vector3Value` type.
-
-7. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
+It is highly recommended that the type of data this method returns match the same type as
+is handled within `ParseValue`. In this case, serialization of `Vector3` is serialized as
+a string, which matches the expected data type within `ParseValue`.
 
 ```csharp
 // In Vector3Type
 
 public override object Serialize(object value)
 {
-    return ValueConverter.ConvertTo(value, typeof(Vector3));
+    if (value == null)
+        return null;
+
+    if (value is Vector3 vector3)
+    {
+        return $"{vector3.X},{vector3.Y},{vector3.Z}";
+    }
+
+    return ThrowSerializationError(value);
 }
 ```
 
-This implementation may surprise you. Why is `Serialize`, which is used for output, implemented identically to `ParseValue`, which is used for input? Why does `Serialize` return an object, rather than a string or byte array? It helps to understand a few internals of the library.
+6. Override `ScalarGraphType.ToAST` if necessary.
 
-- `Serialize` will be called during query execution, and should be passed an instance of `Vector3` from a field resolver.
-
-- `Serialize` is _also_ called when reading variables from the client so that variables can be converted to `IValue` instances. In the case of `Vector3Type`, `value` will be a string during this process.
-
-- `ValueConverter.ConvertTo` handles the case when `value` is an instance of the requested type by returning `value`. Therefore, `ValueConverter.ConvertTo` neatly handles both input and output representations of the scalar.
-
-- Since GraphQL specifies no response format, `Serialize` is not responsible for preparing the scalar for transport to the client. It is only responsible for generating an object which can eventually be serialized by `IDocumentWriter` or other transport-focused API.
+The infrastructure converts default field values to AST representations during initialization
+in order to verify that the default values are valid within an AST tree. The default implementation
+calls `Serialize` to convert the value to its client-side equivalent, then embeds it into an
+appropriate AST node based on the data type returned from `Serialize`. It is likely you will
+only need to override this method if you are creating a custom scalar that returns enumeration
+values, or if you are returning structured data.
 
 In this example, you created a custom scalar. In summary:
 
 - Create a class for the server-side representation of the scalar
-- Implement a `ScalarGraphType` which handles parsing, literal parsing, and serialization
+- Implement a `ScalarGraphType` which handles variable parsing, literal parsing, and serialization
 - Register the `ScalarGraphType with the DI container
-- Define how to parse the raw representation of the scalar to its server-side representation using `ValueConverter.Register`
-- Implement a `ValueNode<T>` class for the server-side representation
-- Implement an `IAstFromValueConverter` for wrapping the server-side representation in its `ValueNode<T>` implementation
-- Register the `IAstFromValueConverter` with the schema using `Schema.RegisterValueConverter`
+
+You can also choose to override `CanParseLiteral`, `CanParseValue` or `IsValidDefault` for
+enhanced performance. The default implementations call `ParseLiteral`, `ParseValue` and
+`ToAST` respectively, returning `false` if an exception is caught, or `true` otherwise.
+If you do choose to implement these methods, note that those methods must not throw an
+exception, and that they are not always called when executing a document.
+
+## Vector3 sample with combined string/structured parsing and serialization
+
+Now to extend our sample, let's assume that we want the Vector3 scalar to instead accept and
+return data in a more structured format, in addition to support the string format for variables.
+
+Here is a sample of a variable supporting a more structured format:
+
+```graphql
+mutation AddVector($vector3: Vector3!) {
+    addVector(vector3: $vector3)
+}
+
+//variables
+{
+    "vector3": {
+        "X":"23",
+        "Y":"43",
+        "Z":"66"
+    }
+}
+```
+
+And a sample of a response with a vector in a more structured format:
+
+```json
+{
+    "data": {
+        "getVector": {
+            "X":"23",
+            "Y":"43",
+            "Z":"66"
+        }
+    }
+}
+```
+
+1. Change `ParseValue` to accept strings or structured data:
+
+```csharp
+// In Vector3Type
+public override object ParseValue(object value)
+{
+    if (value == null)
+        return null;
+
+    if (value is string vector3InputString)
+    {
+        try
+        {
+            var vector3Parts = vector3InputString.Split(',');
+            var x = float.Parse(vector3Parts[0]);
+            var y = float.Parse(vector3Parts[1]);
+            var z = float.Parse(vector3Parts[2]);
+            return new Vector3(x, y, z);
+        }
+        catch
+        {
+            throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputString}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
+        }
+    }
+
+    if (value is IDictionary<string, object> dictionary)
+    {
+        try
+        {
+            var x = Convert.ToSingle(dictionary["x"]);
+            var y = Convert.ToSingle(dictionary["y"]);
+            var z = Convert.ToSingle(dictionary["z"]);
+            if (dictionary.Count > 3)
+                return ThrowValueConversionError(value);
+            return new Vector3(x, y, z);
+        }
+        catch
+        {
+            throw new FormatException($"Failed to parse {nameof(Vector3)} from object. Input should be an object of three floats named X Y and Z");
+        }
+    }
+
+    return ThrowValueConversionError(value);
+}
+```
+
+2. Change `Serialize` to return structured data.
+
+```csharp
+// In Vector3Type
+
+public override object Serialize(object value)
+{
+    if (value == null)
+        return null;
+
+    if (value is Vector3 vector3)
+        return vector3;
+
+    return ThrowSerializationError(value);
+}
+```
+
+3. Change `ToAST` to return an AST literal that represents the data.
+
+Since `Serialize` no longer returns a type that can be converted to an AST node, it is
+necessary to override this method.
+
+```csharp
+// In Vector3Type
+
+public override IValue ToAST(object value)
+{
+    if (value == null)
+        return new NullValue();
+
+    if (value is Vector3 vector3)
+    {
+        return new StringValue($"{vector3.X},{vector3.Y},{vector3.Z}");
+    }
+
+    return ThrowASTConversionError(value);
+}
+```
+
+With these changes, a variable can be parsed as a string or as a structured object, and is always returned as a structured object.
+
+## ValueConverter
+
+When `GetArgument<T>` is called, the argument value is coerced to the requested type via the `ValueConverter`.
+No conversion takes place when the requested type matches the type of the object or scalar (the type returned from
+`ParseLiteral` or `ParseValue`). But you can also use the value converter to assist with input deserialization.
+
+For instance, you may be using `IdGraphType` within your schema as unique identifiers for your data objects. Pursuant
+to the GraphQL specification, these identifiers should be passed as strings such as in the below example:
+
+```graphql
+{
+    widget (id: "3") {
+        name
+    }
+}
+```
+
+However, your code may use integer identifiers in the data access layer. So when you call `context.GetArgument<int>("id")`,
+GraphQL.NET calls the value converter to convert the string to an integer.
+
+The value converter can be extended globally by calling the static method `Register` as follows:
+
+```csharp
+ValueConverter.Register<Vector3, string>(v => $"{v.X},{v.Y},{v.Z}");
+```
+
+The above method registers a conversion from the `Vector3` format to a `string`. Since the registration is static,
+it should only be done once per application lifetime. For instance, in a static constructor of your schema.
+
+```csharp
+public class MySchema : Schema
+{
+    static MySchema()
+    {
+        ValueConverter.Register<Vector3, string>(v => $"{v.X},{v.Y},{v.Z}");
+    }
+
+    ...
+}
+```
