@@ -242,7 +242,7 @@ public override object Serialize(object value)
 }
 ```
 
-6. Override `ScalarGraphType.ToAST` if necessary.
+7. Override `ScalarGraphType.ToAST` if necessary.
 
 The infrastructure converts default field values to AST representations during initialization
 in order to verify that the default values are valid within an AST tree. The default implementation
