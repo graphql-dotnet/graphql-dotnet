@@ -35,19 +35,6 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        private class ColorEnumInverseCasing : EnumerationGraphType<Colors>
-        {
-            public ColorEnumInverseCasing()
-            {
-                Name = "ColorsEnum";
-            }
-
-            protected override string ChangeEnumCase(string val)
-            {
-                return new string(val.Select(c => char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c)).ToArray());
-            }
-        }
-
         private readonly EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
 
         [Fact]
