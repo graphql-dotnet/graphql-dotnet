@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(EnumerationGraphType))]
         public void allow_null(Type graphType)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             g.ParseValue(null).ShouldBeNull();
             g.CanParseValue(null).ShouldBeTrue();
             g.ParseLiteral(new NullValue()).ShouldBeNull();
@@ -93,7 +93,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(EnumerationGraphType))]
         public void no_parsevalue_null(Type graphType)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             g.CanParseLiteral(null).ShouldBeFalse();
             Should.Throw<InvalidOperationException>(() => g.ParseLiteral(null));
         }
@@ -114,7 +114,7 @@ namespace GraphQL.Tests.Types
         public void does_not_coerce_string(Type graphType)
         {
             // if string to coercion were possible, all would pass, as the string is "0"
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             g.CanParseLiteral(new StringValue("0")).ShouldBeFalse();
             Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new StringValue("0")));
             g.CanParseValue("0").ShouldBeFalse();
@@ -154,7 +154,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var types = new Type[]
             {
                 typeof(byte),
@@ -225,7 +225,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(value.ToString());
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
@@ -265,7 +265,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {value} }}")["arg"];
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
@@ -305,7 +305,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var valueCasts = new Func<object, IValue>[]
             {
                 n => new IntValue(Convert.ToInt32(n)),
@@ -364,7 +364,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var types = new Type[]
             {
                 typeof(byte),
@@ -434,7 +434,7 @@ namespace GraphQL.Tests.Types
             if (graphType == typeof(BigIntGraphType))
                 value = new BigInteger(Convert.ToDecimal(value));
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var types = new Type[]
             {
                 typeof(byte),
@@ -496,7 +496,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void parseValue_other_ok(Type graphType, object value, object parsed)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var ret = g.ParseValue(value);
             ret.ShouldBeOfType(parsed.GetType());
             ret.ShouldBe(parsed);
@@ -522,7 +522,7 @@ namespace GraphQL.Tests.Types
                 _ => null
             };
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var ret = g.ParseLiteral(astValue);
             ret.ShouldBeOfType(parsed.GetType());
             ret.ShouldBe(parsed);
@@ -538,7 +538,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void serialize_other_ok(Type graphType, object value, object serialized)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var ret = g.Serialize(value);
             ret.ShouldBeOfType(serialized.GetType());
             ret.ShouldBe(serialized);
@@ -575,7 +575,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(BigIntGraphType), 1.5)]
         public void parseValue_other_fail(Type graphType, object value)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             Should.Throw<Exception>(() => g.ParseValue(value));
             g.CanParseValue(value).ShouldBeFalse();
         }
@@ -620,7 +620,7 @@ namespace GraphQL.Tests.Types
                 _ => null
             };
 
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             Should.Throw<Exception>(() => g.ParseLiteral(astValue));
             g.CanParseLiteral(astValue).ShouldBeFalse();
         }
@@ -655,7 +655,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(BigIntGraphType), 1.5)]
         public void serialize_other_fail(Type graphType, object value)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             Should.Throw<Exception>(() => g.Serialize(value));
         }
 
@@ -677,7 +677,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), ulong.MaxValue)]
         public void parseValue_out_of_range(Type graphType, object value)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var types = new Type[]
             {
                 typeof(byte),
@@ -740,7 +740,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), ulong.MaxValue)]
         public void parseLiteral_out_of_range(Type graphType, object value)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var valueCasts = new Func<object, IValue>[]
             {
                 n => new IntValue(Convert.ToInt32(n)),
@@ -790,7 +790,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType), ulong.MaxValue)]
         public void serialize_out_of_range(Type graphType, object value)
         {
-            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            var g = Create(graphType);
             var types = new Type[]
             {
                 typeof(byte),
@@ -833,5 +833,7 @@ namespace GraphQL.Tests.Types
                 }
             }
         }
+
+        private static ScalarGraphType Create(Type graphType) => (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
     }
 }
