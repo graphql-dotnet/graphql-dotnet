@@ -71,7 +71,8 @@ namespace GraphQL.Caching
         /// <inheritdoc/>
         public virtual void Dispose()
         {
-            if (_memoryCacheIsOwned) _memoryCache.Dispose();
+            if (_memoryCacheIsOwned)
+                _memoryCache.Dispose();
         }
     }
 }

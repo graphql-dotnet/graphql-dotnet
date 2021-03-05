@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Language.AST
+namespace GraphQL.Language.AST
 {
     /// <summary>
     /// Represents a node that has name.

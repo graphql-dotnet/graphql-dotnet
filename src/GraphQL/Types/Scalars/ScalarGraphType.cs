@@ -117,7 +117,7 @@ namespace GraphQL.Types
         {
             if (value == null)
                 return false;
-            
+
             try
             {
                 return ToAST(value) != null;

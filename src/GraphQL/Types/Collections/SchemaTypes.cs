@@ -639,7 +639,7 @@ Make sure that your ServiceProvider is configured correctly.");
             if (type is UnionGraphType union)
             {
                 var list = union.PossibleTypes.List;
-                for (int i=0; i<list.Count; ++i)
+                for (int i = 0; i < list.Count; ++i)
                 {
                     var unionType = ConvertTypeReference(union, list[i]) as IObjectGraphType;
 
