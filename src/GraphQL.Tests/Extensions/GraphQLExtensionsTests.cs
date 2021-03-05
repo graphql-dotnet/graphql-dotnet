@@ -129,10 +129,10 @@ namespace GraphQL.Tests.Extensions
                 yield return new object[] { new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'") };
                 yield return new object[] { new InputObjectGraphType<Person>(), new Person(), new NotImplementedException("Please override the 'ToAST' method of the 'InputObjectGraphType`1' scalar to support this operation.") };
                 yield return new object[] { new BadPersonInputType(), new Person(), new InvalidOperationException("Unable to get an AST representation of the input object type 'BadPersonInputType' for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests+ToASTExceptionTestData+Person'.") };
-                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of type 'Boolean!' for null value.") };
-                yield return new object[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of type '[Boolean]!' for null value.") };
-                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, null }, new InvalidOperationException($"Unable to get an AST representation of type 'Boolean!' for null value.") };
-                yield return new object[] { new NonNullGraphType(new InputObjectGraphType<Person>()), null, new InvalidOperationException($"Unable to get an AST representation of type 'InputObjectGraphType_1!' for null value.") };
+                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
+                yield return new object[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of null value for type '[Boolean]!'.") };
+                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, null }, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
+                yield return new object[] { new NonNullGraphType(new InputObjectGraphType<Person>()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'InputObjectGraphType_1!'.") };
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
