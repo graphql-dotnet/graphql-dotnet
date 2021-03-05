@@ -52,12 +52,12 @@ namespace GraphQL.Federation.Instrumentation
 
             var list = new LinkedList<object>();
 
-            var p = this;
+            var currentPath = this;
 
-            while (p._segment != null)
+            while (currentPath._segment != null)
             {
-                _ = list.AddFirst(p._segment);
-                p = p._parent;
+                _ = list.AddFirst(currentPath._segment);
+                currentPath = currentPath._parent;
             }
 
             return list;
@@ -110,22 +110,22 @@ namespace GraphQL.Federation.Instrumentation
 
         public override int GetHashCode()
         {
-            int h = _hash;
-            if (h != 0)
-                return h;
+            int tempHash = _hash;
+            if (tempHash != 0)
+                return tempHash;
 
-            h = 1;
+            tempHash = 1;
             var self = this;
 
             while (self != null)
             {
                 object value = self._segment;
-                h = 31 * h + (value == null ? 0 : value.GetHashCode());
+                tempHash = 31 * tempHash + (value == null ? 0 : value.GetHashCode());
                 self = self._parent;
             }
-            _hash = h;
+            _hash = tempHash;
 
-            return h;
+            return tempHash;
         }
     }
 }

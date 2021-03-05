@@ -172,13 +172,13 @@ namespace GraphQL.Federation.Instrumentation
 
                     foreach (var location in error.Locations)
                     {
-                        var l = new Location
+                        var tempLocation = new Location
                         {
                             Column = (uint)location.Column,
                             Line = (uint)location.Line
                         };
 
-                        protoError.Location.Add(l);
+                        protoError.Location.Add(tempLocation);
                     }
 
                     node.Error.Add(protoError);
