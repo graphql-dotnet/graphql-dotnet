@@ -112,7 +112,7 @@ namespace GraphQL.Tests.Types
             var g = new Guid("12345678901234567890123456789012");
             var ret = _type.Serialize(g);
             ret.ShouldBeOfType(typeof(string));
-            ret.ShouldBe(g.ToString("D", CultureInfo.InvariantCulture));
+            ret.ShouldBe(g.ToString("D", System.Globalization.CultureInfo.InvariantCulture));
         }
     }
 }
