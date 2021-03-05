@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>GraphQL DataLoader implementation</Description>
-    <PackageTags>GraphQL;dataloader</PackageTags>
+    <PackageTags>GraphQL;DataLoader</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
