@@ -221,7 +221,7 @@ public override object ParseValue(object value)
 6. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
 Keep in mind that a `null` value also required to be handled.
 
-It is highly recommended that the type of data this method returns match the same type as
+It is recommended that the type of data this method returns match the same type as
 is handled within `ParseValue`. In this case, serialization of `Vector3` is serialized as
 a string, which matches the expected data type within `ParseValue`.
 
