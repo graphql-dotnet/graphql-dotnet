@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void throws_for_null_graphtype()
         {
-            Should.Throw<ArgumentNullException>(() => ((IGraphType)null).ToAST(null));
+            Should.Throw<ArgumentNullException>(() => ((IGraphType)null).ToAST(true));
         }
 
         [Fact]
