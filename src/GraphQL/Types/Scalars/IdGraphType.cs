@@ -27,7 +27,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            StringValue str => ParseValue(str.Value),
+            StringValue str => str.Value,
             IntValue num => num.Value,
             LongValue longVal => longVal.Value,
             BigIntValue bigIntValue => bigIntValue.Value,
