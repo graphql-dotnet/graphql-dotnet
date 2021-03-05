@@ -113,10 +113,9 @@ namespace GraphQL.Types
                 return new NullValue();
 
             var foundByValue = Values.FindByValue(value);
-            if (foundByValue == null)
-                ThrowASTConversionError(value);
-
-            return new EnumValue(foundByValue.Name);
+            return foundByValue == null
+                ? ThrowASTConversionError(value)
+                : new EnumValue(foundByValue.Name);
         }
     }
 
