@@ -430,7 +430,7 @@ public class MySchema : Schema
 ## Null values
 
 Custom scalars process and handle null values during serialization and deserialization. This allows
-for custom scalars that can, assist when you have database values such as 0 that should represent null
+for custom scalars that can assist when you have database values such as 0 that should represent null
 when exposed outside the schema. Below is an example of a scalar intended to represent a database
 autoincrementing numeric identifier internally, where null values are stored as 0.
 
