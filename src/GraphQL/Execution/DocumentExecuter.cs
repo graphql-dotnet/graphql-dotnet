@@ -97,22 +97,8 @@ namespace GraphQL
                     }
                     if (document == null)
                     {
-                        try
-                        {
-                            document = _documentBuilder.Build(options.Query);
-                        }
-                        catch(SyntaxError ex)
-                        { 
-                            return new ExecutionResult
-                            {
-                                Errors = new ExecutionErrors
-                                {
-                                    ex
-                                },
-                                Perf = metrics.Finish()
-                            };
-                        }
-                        saveInCache = true;
+                        document = _documentBuilder.Build(options.Query);
+                        ßsaveInCache = true;
                     }
                 }
 
