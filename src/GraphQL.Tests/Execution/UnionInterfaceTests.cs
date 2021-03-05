@@ -145,8 +145,8 @@ namespace GraphQL.Tests.Execution
             var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
             result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
-            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
-            result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
+            result.Errors[1].Message.ShouldBe("Error trying to resolve field 'pets'.");
+            result.Errors[1].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'meows' from type 'Dog'.");
         }
 
         [Fact]
