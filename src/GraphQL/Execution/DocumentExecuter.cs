@@ -98,7 +98,7 @@ namespace GraphQL
                     if (document == null)
                     {
                         document = _documentBuilder.Build(options.Query);
-                        ßsaveInCache = true;
+                        saveInCache = true;
                     }
                 }
 
