@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GraphQL.Federation.Instrumentation
 {
     /// <summary>
-    // Methods to add Apollo federated tracing metrics to an <see cref="ExecutionResult"/> instance.
+    /// Methods to add Apollo federated tracing metrics to an <see cref="ExecutionResult"/> instance.
     /// </summary>
     public static class FederatedTracingExtensions
     {
