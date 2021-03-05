@@ -156,7 +156,8 @@ public override object ParseLiteral(IValue value)
     if (value is NullValue)
         return null;
 
-    if (value is StringValue stringValue) return ParseValue(stringValue.Value);
+    if (value is StringValue stringValue)
+        return ParseValue(stringValue.Value);
 
     return ThrowLiteralConversionError(value);
 }
