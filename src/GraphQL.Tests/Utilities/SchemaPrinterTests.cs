@@ -715,7 +715,8 @@ scalar Guid
 
 scalar Long
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+# The `Milliseconds` scalar type represents a period of time represented as the
+# total number of milliseconds in range [-922337203685477, 922337203685477].
 scalar Milliseconds
 
 type Query {
@@ -739,7 +740,8 @@ type Query {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+# The `Seconds` scalar type represents a period of time represented as the total
+# number of seconds in range [-922337203685, 922337203685].
 scalar Seconds
 
 scalar Short
