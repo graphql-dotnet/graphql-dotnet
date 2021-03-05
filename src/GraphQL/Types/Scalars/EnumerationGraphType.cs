@@ -105,6 +105,19 @@ namespace GraphQL.Types
 
             return foundByValue.Name;
         }
+
+        /// <inheritdoc/>
+        public override IValue ToAST(object value)
+        {
+            if (value == null)
+                return new NullValue();
+
+            var foundByValue = Values.FindByValue(value);
+            if (foundByValue == null)
+                ThrowASTConversionError(value);
+
+            return new EnumValue(foundByValue.Name);
+        }
     }
 
     /// <summary>
