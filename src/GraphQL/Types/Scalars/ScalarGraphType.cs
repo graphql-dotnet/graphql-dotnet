@@ -156,8 +156,13 @@ namespace GraphQL.Types
                 double d => new FloatValue(d),
                 string s => new StringValue(s),
                 null => new NullValue(),
-                _ => throw new NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
+                _ => throw new NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.");
             };
+        }
+
+        protected IValue ThrowASTConversionError(object value)
+        {
+            throw new InvalidOperationException($"Unable to convert '{value}' to its AST representation for the scalar type '{Name}'.");
         }
 
         protected object ThrowLiteralConversionError(IValue input)

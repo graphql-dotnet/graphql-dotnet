@@ -35,7 +35,7 @@ namespace GraphQL.Types
         {
             bool b => new BooleanValue(b),
             null => new NullValue(),
-            _ => null
+            _ => ThrowASTConversionError(value)
         };
     }
 }

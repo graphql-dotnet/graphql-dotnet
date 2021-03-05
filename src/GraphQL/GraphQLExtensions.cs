@@ -581,7 +581,7 @@ namespace GraphQL
 
             if (type is ScalarGraphType scalar)
             {
-                return scalar.ToAST(value);
+                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to convert '{value}' to its AST representation for the scalar type '{scalar.Name}'.");
             }
 
             if (value == null)
