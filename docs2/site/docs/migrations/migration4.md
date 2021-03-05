@@ -62,6 +62,20 @@ For untyped `InputObjectGraphType` classes, like shown above, the default behavi
 will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the
 requested type via `ObjectExtensions.ToObject` as it did before.
 
+### Scalar null value handling
+
+Custom scalars can now handle serialization or deserialization of `null` values. This can be useful if
+you have a need to coerce certain internal values to null, such as serializing empty strings to null.
+It can also be used to control deserialization of external null values, such as deserializing null to
+the value zero.
+
+GraphQL nullability semantics are enforced on the external AST representation of the data. For instance,
+if a custom scalar converted empty strings to null during serialization, an error would occur if a field
+resolver tried to return an empty string for a non-null field.
+
+See the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars)
+documentation page which describes this in detail.
+
 ### Experimental Features / Applied Directives
 
 In v4 we added ability to apply directives to the schema elements and expose user-defined meta-information
@@ -182,6 +196,83 @@ This may be needed to get the parameters of parent nodes.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
+
+### Scalar Deserialization Type Enforcement
+
+Scalars do not coerce values if passed an incompatible type during deserialization from a variable. Previously, values would pass
+through the `ValueConverter` while being deserialized. Now the `ValueConverter` is ignored for deserialization of built-in fields.
+Calling `GetArgument<T>` within the field resolver will still call the `ValueConverter` to coerce the input data to the correct type,
+but if the document is unable to deserialize successfully, the field resolver will not run.
+
+Here are some of the situations that you may run into with version 4:
+
+- `StringGraphType` does not serialize integers to strings
+- Numeric scalars such as `IntGraphType` do not deserialize strings to their numeric type
+- Integer numeric scalars such as `IntGraphType` do not coerce floating-point values to their numeric type
+- `BooleanGraphType` does not deserialize/serialize strings or integers (e.g. "true", "false", 0, 1, etc)
+- `EnumGraphType` is stricter, requiring internal values for serialization, and external values for deserialization
+- `IdGraphType` (which allows any basic type) does not coerce variable values to trimmed strings during deserialization
+- `IdGraphType` does not trim serialized values (but does convert them to strings)
+
+For situations where it is necessary to revert scalars to previous behavior, you can override the built-in scalar by following the
+instructions within the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars) documentation page.
+
+Below is a sample replacement for the `BooleanGraphType` which will restore the previous behavior.
+
+```csharp
+public class MyBooleanGraphType : ScalarGraphType
+{
+    public MyBooleanGraphType()
+    {
+        Name = "Boolean";
+    }
+
+    public override object ParseLiteral(IValue value) => value switch
+    {
+        BooleanValue b => b.Value,
+        NullValue _ => null,
+        _ => ThrowLiteralConversionException(value)
+    };
+
+    public override object ParseValue(object value) => value switch
+    {
+        null => null,
+        _ => ValueConverter.ConvertTo(value, typeof(bool)) ?? ThrowValueConversionException(value)
+    };
+}
+```
+
+### Custom Scalar Cleanup
+
+All of the code necessary for a proper custom scalar implementation has been moved from the `ValueConverter` and `IAstNodeConverter`
+directly into the scalar itself. Some changes will be necessary for custom scalars as follows:
+
+`IAstNodeConverter` has been completely removed along with the properties relating to it on the `Schema`. Code that had been configured
+for a custom scalar may need to be moved into the new `ToAST` virtual member of the custom scalar. `ValueNode` implementations are not
+recommended; the `ToAST` member should return one of the base value node types present in the library, such as `StringValue` or `IntValue`.
+If the `Serialize` method returns a basic .NET type (such as `int` or `string`), the default `ToAST` implementation should suffice.
+
+Code within `ValueConverter` registrations should be moved directly into the `ParseLiteral` and/or `ParseValue` methods. Having a
+`ValueConverter` registration should no longer be necessary for custom scalars.
+
+`ParseLiteral` and `ParseValue` must handle null values (`NullValue` for `ParseLiteral` and `null` for `ParseValue`). Typically
+this involves returning `null` for each of these cases.
+
+`ParseLiteral`, `ParseValue` and `Serialize` must throw an exception if the value cannot be parsed. Previously, returning `null` would
+indicate a conversion failure. `ThrowLiteralConversionError`, `ThrowValueConversionError` and `ThrowSerializationError` convenience
+methods are provided for this purpose but any exception is valid to throw.
+
+`Serialize`'s default behavior still calls `ParseValue`. With the other changes, it should be verified if this is still valid
+for the custom scalar.
+
+If `ToAST` is overridden, it must process a value of `null` (typically by returning a new instance of `NullValue`) and throw an
+exception if there are serialization errors. The `ThrowASTConversionError` convenience method is provided for this purpose but
+any exception is valid to throw.
+
+You may wish to add implementations for the new `CanParseValue`, `CanParseLiteral` and `IsValidDefault` methods. This is not necessary
+as the default implementations will call `ParseValue`, `ParseLiteral` and `ToAST` respectively, returning `true` unless the method
+throws an exception. Adding a custom implementation of `CanParseLiteral` can improve performance if `ParseLiteral` causes boxing.
+`CanParseValue` is not used by the framework at this time, and `ToAST` is only called during schema initialization.
 
 ### Schema Configuration Options Moved
 

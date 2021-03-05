@@ -424,3 +424,90 @@ public class MySchema : Schema
     ...
 }
 ```
+
+## Null values
+
+Custom scalars process and handle null values during serialization and deserialization. This allows
+for custom scalars that can, assist when you have database values such as 0 that should represent null
+when exposed outside the schema. Below is an example of a scalar intended to represent a database
+autoincrementing numeric identifier internally, where null values are stored as 0.
+
+```csharp
+public class DbIdGraphType : ScalarGraphType
+{
+    public DbIdGraphType()
+    {
+        Name = "DbId";
+    }
+
+    public override object ParseLiteral(IValue value) => value switch
+    {
+        StringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
+        null => 0,
+        _ => ThrowLiteralConversionError(value)
+    };
+
+    public override object ParseValue(object value) => value switch
+    {
+        string s => int.TryParse(s, out int i) && i > 0 ? i : throw new FormatException($"'{s}' is not a valid identifier."),
+        null => 0,
+        _ => ThrowValueConversionError(value)
+    };
+
+    public override object Serialize(object value) => value switch
+    {
+        int i => i > 0 ? i.ToString() : i == 0 ? null : ThrowSerializationError(value),
+        _ => ThrowSerializationError(value)
+    };
+}
+```
+
+## Replacing built-in scalar types
+
+In some cases you may want or need to replace the functionality of the built-in graph types. This can
+be accomplished by running a schema node visitor on the schema after it has been initialized. Keep in
+mind that the node visitor will walk through the introspection portion of the schema, so replacing
+a built-in type may affect the operation of introspection queries.
+
+Below is a sample of how to replace the built-in `IdGraphType` with the `DbIdGraphType` shown above.
+
+1. Name the `DbIdGraphType` to be the same as the built-in type
+
+```csharp
+public class DbIdGraphType : ScalarGraphType
+{
+    public DbIdGraphType()
+    {
+        Name = "ID";
+    }
+
+    ...
+}
+```
+
+2. Create a node walker
+
+```csharp
+// sungam3r to provide sample
+// perhaps we should provide a node walker for this purpose, or provide a more convenient method to replace types
+// note: don't we need to fix up schematypes also so that if a type name is provided to a query variable argument, it gets a proper reference?
+// todo: add validation for sample
+```
+
+3. Execute the node walker on the schema after it builds, during the validation stage
+
+```csharp
+public class MySchema : Schema
+{
+    ...
+
+    private readonly MyNodeWalker _myNodeWalker = new MyNodeWalker();
+    protected override void Validate()
+    {
+        _myNodeWalker.Run(this);
+        base.Validate();
+    }
+}
+```
+
+With the above sample, all `IdGraphType` references will be replaced with `DbIdGraphType` instances.
