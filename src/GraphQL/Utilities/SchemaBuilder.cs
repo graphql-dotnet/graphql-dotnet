@@ -353,7 +353,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = inputDef.DefaultValue.ToValue()
+                DefaultValue = inputDef.DefaultValue
             }.SetAstType(inputDef);
 
             return field;
@@ -501,8 +501,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return new QueryArgument(ToGraphType(inputDef.Type))
             {
                 Name = (string)inputDef.Name.Value,
-                DefaultValue = inputDef.DefaultValue.ToValue(),
-                ResolvedType = ToGraphType(inputDef.Type),
+                DefaultValue = inputDef.DefaultValue,
                 Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
         }

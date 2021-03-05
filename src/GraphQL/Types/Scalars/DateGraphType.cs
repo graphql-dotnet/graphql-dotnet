@@ -19,47 +19,52 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            var date = ParseValue(value);
+            NullValue _ => null,
+            StringValue stringValue => ParseDate(stringValue.Value),
+            _ => ThrowLiteralConversionError(value)
+        };
 
-            if (date is DateTime dateTime)
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            DateTime d => ValidateDate(d, value), // no boxing
+            string stringValue => ParseDate(stringValue),
+            null => null,
+            _ => throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}")
+        };
+
+        /// <inheritdoc/>
+        public override object Serialize(object value) => value switch
+        {
+            DateTime d => ValidateDate(d).ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo),
+            null => null,
+            _ => ThrowSerializationError(value)
+        };
+
+        private static DateTime ParseDate(string stringValue)
+        {
+            if (DateTime.TryParseExact(stringValue, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
             {
-                return dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                return date;
             }
 
-            return null;
+            throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {stringValue}");
         }
 
-        /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-            => value is StringValue stringValue ? ParseValue(stringValue.Value) : null;
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value)
+        private static object ValidateDate(DateTime value, object date)
         {
-            if (value is DateTime dateTime)
-            {
-                if (dateTime.TimeOfDay == TimeSpan.Zero)
-                {
-                    return dateTime;
-                }
-                throw new FormatException($"Expected date to have no time component. Value: {value}");
-            }
-
-            if (value is string valueAsString)
-            {
-                if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
-                {
-                    return date;
-                }
-                throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
-            }
-
-            throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}");
+            ValidateDate(value);
+            return date; // no boxing
         }
 
-        /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue((string)Serialize((DateTime)value));
+        private static DateTime ValidateDate(DateTime value)
+        {
+            if (value.TimeOfDay == TimeSpan.Zero)
+                return value;
+            
+            throw new FormatException($"Expected date to have no time component. Value: {value}");
+        }
     }
 }

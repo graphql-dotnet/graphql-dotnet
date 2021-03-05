@@ -566,15 +566,25 @@ namespace GraphQL
         /// </summary>
         public static IValue ToAST(this IGraphType type, object value)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             if (type is NonNullGraphType nonnull)
             {
-                if (value == null)
-                    throw new InvalidOperationException($"Unable to get an AST representation of type '{nonnull}' for null value.");
+                var astValue = ToAST(nonnull.ResolvedType, value);
 
-                return ToAST(nonnull.ResolvedType, value);
+                if (astValue is NullValue)
+                    throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
+
+                return astValue;
             }
 
-            if (value == null || type == null)
+            if (type is ScalarGraphType scalar)
+            {
+                return scalar.ToAST(value) ?? scalar.ThrowASTConversionError(value);
+            }
+
+            if (value == null)
             {
                 return _null;
             }
@@ -603,11 +613,6 @@ namespace GraphQL
             if (type is IInputObjectGraphType input)
             {
                 return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the input object type '{input.Name}' for '{value}'.");
-            }
-
-            if (type is ScalarGraphType scalar)
-            {
-                return scalar.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the scalar type '{scalar.Name}' for '{value}'.");
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");

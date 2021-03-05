@@ -15,11 +15,9 @@ namespace GraphQL.Types
             IntValue intValue => new BigInteger(intValue.Value),
             LongValue longValue => new BigInteger(longValue.Value),
             BigIntValue bigIntValue => bigIntValue.Value,
-            _ => null
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -27,10 +25,24 @@ namespace GraphQL.Types
             IntValue _ => true,
             LongValue _ => true,
             BigIntValue _ => true,
+            NullValue _ => true,
             _ => false
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new BigIntValue((BigInteger)ValueConverter.ConvertTo(value, typeof(BigInteger)));
+        public override object ParseValue(object value) => value switch
+        {
+            BigInteger _ => value,
+            null => null,
+            int i => new BigInteger(i),
+            sbyte sb => new BigInteger(sb),
+            byte b => new BigInteger(b),
+            short s => new BigInteger(s),
+            ushort us => new BigInteger(us),
+            uint ui => new BigInteger(ui),
+            long l => new BigInteger(l),
+            ulong ul => new BigInteger(ul),
+            _ => ThrowValueConversionError(value)
+        };
     }
 }
