@@ -17,7 +17,7 @@ namespace GraphQL.Types
         {
             Name = "Seconds";
             Description =
-                "The `Seconds` scalar type represents a period of time represented as the total number of seconds.";
+                "The `Seconds` scalar type represents a period of time represented as the total number of seconds in range [-922337203685, 922337203685].";
         }
 
         /// <inheritdoc/>
