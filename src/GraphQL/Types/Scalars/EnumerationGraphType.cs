@@ -100,10 +100,9 @@ namespace GraphQL.Types
                 return null;
 
             var foundByValue = Values.FindByValue(value);
-            if (foundByValue == null)
-                ThrowSerializationError(value);
-
-            return foundByValue.Name;
+            return foundByValue == null
+                ? ThrowSerializationError(value)
+                : foundByValue.Name;
         }
 
         /// <inheritdoc/>
