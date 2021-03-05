@@ -16,7 +16,7 @@ namespace GraphQL.Types
         {
             Name = "Milliseconds";
             Description =
-                "The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.";
+                "The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds in range [-922337203685477, 922337203685477].";
         }
 
         /// <inheritdoc/>
