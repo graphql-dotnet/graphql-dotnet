@@ -79,6 +79,36 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(LongGraphType))]
         [InlineData(typeof(ULongGraphType))]
         [InlineData(typeof(BigIntGraphType))]
+        [InlineData(typeof(DateGraphType))]
+        [InlineData(typeof(DateTimeGraphType))]
+        [InlineData(typeof(DateTimeOffsetGraphType))]
+        [InlineData(typeof(TimeSpanSecondsGraphType))]
+        [InlineData(typeof(TimeSpanMillisecondsGraphType))]
+        [InlineData(typeof(IdGraphType))]
+        [InlineData(typeof(StringGraphType))]
+        [InlineData(typeof(UriGraphType))]
+        [InlineData(typeof(GuidGraphType))]
+        [InlineData(typeof(FloatGraphType))]
+        [InlineData(typeof(DecimalGraphType))]
+        [InlineData(typeof(EnumerationGraphType))]
+        public void no_parsevalue_null(Type graphType)
+        {
+            var g = (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+            g.CanParseLiteral(null).ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(null));
+        }
+
+        [Theory]
+        [InlineData(typeof(BooleanGraphType))]
+        [InlineData(typeof(ByteGraphType))]
+        [InlineData(typeof(SByteGraphType))]
+        [InlineData(typeof(ShortGraphType))]
+        [InlineData(typeof(UShortGraphType))]
+        [InlineData(typeof(IntGraphType))]
+        [InlineData(typeof(UIntGraphType))]
+        [InlineData(typeof(LongGraphType))]
+        [InlineData(typeof(ULongGraphType))]
+        [InlineData(typeof(BigIntGraphType))]
         [InlineData(typeof(FloatGraphType))]
         [InlineData(typeof(DecimalGraphType))]
         public void does_not_coerce_string(Type graphType)
