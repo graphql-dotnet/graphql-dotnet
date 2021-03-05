@@ -187,8 +187,8 @@ namespace GraphQL.Federation.Instrumentation
 
             /// <summary>
             /// Returns a <see cref="Node"/> represented by the given path if it has been calculated before.
-            /// If  not then it will create the node and its parents and store them and return the node represented
-            ///  by the path.
+            /// If not then it will create the node and its parents and store them and return the node represented
+            /// by the path.
             /// </summary>
             /// <param name="path">Given <see cref="ResultPath"/></param>
             /// <returns><see cref="Node"/> instance</returns>
