@@ -44,6 +44,7 @@ namespace GraphQL.SystemTextJson
                 return;
             }
 
+            // https://stackoverflow.com/questions/64788895/serialising-biginteger-using-system-text-json
             var s = value.ToString(NumberFormatInfo.InvariantInfo);
             using var doc = JsonDocument.Parse(s);
             doc.WriteTo(writer);

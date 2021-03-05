@@ -2230,6 +2230,7 @@ namespace GraphQL.Types
         public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }
+        protected GraphQL.Language.AST.IValue ThrowASTConversionError(object value) { }
         protected object ThrowLiteralConversionError(GraphQL.Language.AST.IValue input) { }
         protected object ThrowSerializationError(object value) { }
         protected object ThrowValueConversionError(object value) { }
