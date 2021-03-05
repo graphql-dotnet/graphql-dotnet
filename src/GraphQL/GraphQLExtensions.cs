@@ -574,7 +574,7 @@ namespace GraphQL
                 var astValue = ToAST(nonnull.ResolvedType, value);
 
                 if (astValue is NullValue)
-                    throw new InvalidOperationException($"Unable to get an AST representation of type '{nonnull}' for null value.");
+                    throw new InvalidOperationException($"Unable to get an AST representation of {value == null ? "null" : "'" + value.ToString() + "'"} value for type '{nonnull}'.");
 
                 return astValue;
             }
