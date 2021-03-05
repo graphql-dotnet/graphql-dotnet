@@ -31,7 +31,8 @@ namespace GraphQL.Types
             IntValue num => num.Value,
             LongValue longVal => longVal.Value,
             BigIntValue bigIntValue => bigIntValue.Value,
-            _ => null,
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value),
         };
 
         /// <inheritdoc/>
