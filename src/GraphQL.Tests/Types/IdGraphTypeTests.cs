@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Types
         [InlineData(1)]
         [InlineData(2L)]
         [InlineData("hello")]
-        public void parse_literal_int_value_to_identifier(object value)
+        public void parse_literal_value_to_identifier(object value)
         {
             IValue ast = value switch {
                 int i => new IntValue(i),
@@ -112,7 +112,7 @@ namespace GraphQL.Tests.Types
             var g = new Guid("12345678901234567890123456789012");
             var ret = _type.Serialize(g);
             ret.ShouldBeOfType(typeof(string));
-            ret.ShouldBe(g.ToString());
+            ret.ShouldBe(g.ToString("D", CultureInfo.InvariantCulture));
         }
     }
 }
