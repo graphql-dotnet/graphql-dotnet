@@ -14,7 +14,7 @@ namespace GraphQL.Federation.Instrumentation
         {
             var metadata = new Dictionary<string, object>
             {
-                { "responseName", context.FieldDefinition.Name},
+                { "responseName", context.FieldDefinition.Name },
                 { "type", context.FieldDefinition.ResolvedType.ToString() },
                 { "parentType", context.ParentType.Name },                
                 { "path", context.Path },
