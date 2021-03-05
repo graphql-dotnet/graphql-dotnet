@@ -9,7 +9,8 @@ You can extend your schema with your own custom scalars. Conceptually, a scalar 
 - Literal Parsing: Transforms a scalar from its client-side representation as an argument to its server-side representation.
 
 Parsing for arguments and variables are handled separately because while arguments must always be expressed in GraphQL
-query syntax, variable format is transport-specific (usually JSON).
+query syntax, variable format is transport-specific (usually JSON). You can find more information about
+these methods [here](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Types/Scalars/ScalarGraphType.cs).
 
 ## Vector3 sample with string parsing and serialization
 
