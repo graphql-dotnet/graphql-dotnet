@@ -71,7 +71,7 @@ namespace Example
             if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
-                result.EnrichWithFederatedTracing(start);
+                result.EnrichWithApolloFederatedTracing(start);
             }
 
             await WriteResponseAsync(context, result);
