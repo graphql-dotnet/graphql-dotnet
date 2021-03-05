@@ -160,7 +160,7 @@ namespace GraphQL.Types
             };
         }
 
-        protected IValue ThrowASTConversionError(object value)
+        protected internal IValue ThrowASTConversionError(object value)
         {
             throw new InvalidOperationException($"Unable to convert '{value}' to its AST representation for the scalar type '{Name}'.");
         }
