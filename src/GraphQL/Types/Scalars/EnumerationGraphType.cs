@@ -100,10 +100,9 @@ namespace GraphQL.Types
                 return null;
 
             var foundByValue = Values.FindByValue(value);
-            if (foundByValue == null)
-                ThrowSerializationError(value);
-
-            return foundByValue.Name;
+            return foundByValue == null
+                ? ThrowSerializationError(value)
+                : foundByValue.Name;
         }
 
         /// <inheritdoc/>
@@ -113,10 +112,9 @@ namespace GraphQL.Types
                 return new NullValue();
 
             var foundByValue = Values.FindByValue(value);
-            if (foundByValue == null)
-                ThrowASTConversionError(value);
-
-            return new EnumValue(foundByValue.Name);
+            return foundByValue == null
+                ? ThrowASTConversionError(value)
+                : new EnumValue(foundByValue.Name);
         }
     }
 
