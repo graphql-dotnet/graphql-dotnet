@@ -234,14 +234,12 @@ namespace GraphQL
                        $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
         }
 
-        private static readonly string[] _foundNull = new[] { "Expected non-null value, found null" };
-
         /// <summary>
         /// Validates that the specified AST value is valid for the specified scalar or input graph type.
         /// Graph types that are lists or non-null types are handled appropriately by this method.
-        /// Returns a list of strings representing the errors encountered while validating the value.
+        /// Returns a string representing the errors encountered while validating the value.
         /// </summary>
-        public static string[] IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
+        public static string IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
@@ -252,29 +250,29 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected \"{ofType.Name}!\", found null." };
+                        return $"Expected '{ofType.Name}!', found null.";
                     }
 
-                    return _foundNull;
+                    return "Expected non-null value, found null";
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
             else if (valueAst is NullValue)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             if (valueAst == null)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             if (type is ListGraphType list)
@@ -283,12 +281,18 @@ namespace GraphQL
 
                 if (valueAst is ListValue listValue)
                 {
-                    return listValue.Values
-                        .SelectMany(value =>
-                            IsValidLiteralValue(ofType, value, schema)
-                                .Select((err, index) => $"In element #{index + 1}: {err}")
-                        )
-                        .ToArray();
+                    List<string> errors = null;
+
+                    for (int index = 0; index < listValue.ValuesList.Count; ++index)
+                    {
+                        string error = IsValidLiteralValue(ofType, listValue.ValuesList[index], schema);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                    }
+
+                    return errors == null
+                        ? null
+                        : string.Join(" ", errors);
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -298,13 +302,13 @@ namespace GraphQL
             {
                 if (!(valueAst is ObjectValue objValue))
                 {
-                    return new[] { $"Expected \"{inputType.Name}\", found not an object." };
+                    return $"Expected '{inputType.Name}', found not an object.";
                 }
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = objValue.ObjectFields.ToList();
 
-                var errors = new List<string>();
+                List<string> errors = null;
 
                 // ensure every provided field is defined
                 foreach (var providedFieldAst in fieldAsts)
@@ -312,7 +316,7 @@ namespace GraphQL
                     var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
-                        errors.Add($"In field \"{providedFieldAst.Name}\": Unknown field.");
+                        (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
                     }
                 }
 
@@ -323,24 +327,26 @@ namespace GraphQL
 
                     if (fieldAst != null)
                     {
-                        var result = IsValidLiteralValue(field.ResolvedType, fieldAst.Value, schema);
-
-                        errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                        string error = IsValidLiteralValue(field.ResolvedType, fieldAst.Value, schema);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
                     }
                     else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
                     {
-                        errors.Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                        (errors ??= new List<string>()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
                     }
                 }
 
-                return errors.ToArray();
+                return errors == null
+                    ? null
+                    : string.Join(" ", errors);
             }
 
             if (type is ScalarGraphType scalar)
             {
                 return scalar.CanParseLiteral(valueAst)
-                    ? Array.Empty<string>()
-                    : new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
+                    ? null
+                    : $"Expected type '{type.Name}', found {AstPrinter.Print(valueAst)}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");

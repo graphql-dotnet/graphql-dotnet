@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (2). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (2). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
             });
@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (2). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (2). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
                 _.Inputs = new Dictionary<string, object> { ["value"] = "aa" }.ToInputs();
@@ -84,7 +84,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (8). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (8). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
             });
@@ -102,7 +102,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (8). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (8). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
                 _.Inputs = new Dictionary<string, object> { ["value"] = "aaaaaaaa" }.ToInputs();
@@ -121,7 +121,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (null). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
             });
@@ -139,7 +139,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "ObjectField \"stringField\" has invalid length (null). Length must be in range [3, 7].",
+                   message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
                    line: 4,
                    column: 72);
                 _.Inputs = new Dictionary<string, object> { ["value"] = null }.ToInputs();
@@ -175,7 +175,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Variable \"complex.stringField\" has invalid length (2). Length must be in range [3, 7].",
+                   message: "Variable 'complex.stringField' has invalid length (2). Length must be in range [3, 7].",
                    line: 1,
                    column: 9);
                 _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aa"" } }".ToInputs();
@@ -194,7 +194,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Variable \"complex.stringField\" has invalid length (8). Length must be in range [3, 7].",
+                   message: "Variable 'complex.stringField' has invalid length (8). Length must be in range [3, 7].",
                    line: 1,
                    column: 9);
                 _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aaaaaaaa"" } }".ToInputs();
@@ -213,7 +213,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Variable \"complex.stringField\" has invalid length (null). Length must be in range [3, 7].",
+                   message: "Variable 'complex.stringField' has invalid length (null). Length must be in range [3, 7].",
                    line: 1,
                    column: 9);
                 _.Inputs = @"{ ""complex"": { ""requiredField"": true, ""stringField"": null } }".ToInputs();
@@ -260,7 +260,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (1). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (1). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
             });
@@ -278,7 +278,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (1). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (1). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
                 _.Inputs = new Dictionary<string, object> { ["value"] = "a" }.ToInputs();
@@ -297,7 +297,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (6). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (6). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
             });
@@ -315,7 +315,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (6). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (6). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
                 _.Inputs = new Dictionary<string, object> { ["value"] = "aaaaaa" }.ToInputs();
@@ -334,7 +334,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (null). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
             });
@@ -352,7 +352,7 @@ namespace GraphQL.Tests.Validation
                   }
                 }";
                 _.Error(
-                   message: "Argument \"id\" has invalid length (null). Length must be in range [2, 5].",
+                   message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
                    line: 3,
                    column: 25);
                 _.Inputs = new Dictionary<string, object> { ["value"] = null }.ToInputs();

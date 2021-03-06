@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Bugs
         public void Input_Byte_Invalid_Variable() => AssertQueryWithError("query($arg: Byte!) { input(arg: $arg) }", null, "Variable '$arg' is invalid. Unable to convert '300' to 'Byte'", 1, 7, null, new OverflowException(), "INVALID_VALUE", "{\"arg\":300}", "5.8", executed: false);
 
         [Fact]
-        public void Input_Byte_Invalid_Argument() => AssertQueryWithError("query { input(arg: 300) }", null, "Argument \"arg\" has invalid value 300.\nExpected type \"Byte\", found 300.", 1, 15, null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER, executed: false);
+        public void Input_Byte_Invalid_Argument() => AssertQueryWithError("query { input(arg: 300) }", null, "Argument 'arg' has invalid value. Expected type 'Byte', found 300.", 1, 15, null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER, executed: false);
     }
 
     public class Bug1767Schema : Schema

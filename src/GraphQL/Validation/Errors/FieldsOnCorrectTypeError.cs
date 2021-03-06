@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Errors
             IEnumerable<string> suggestedTypeNames,
             IEnumerable<string> suggestedFieldNames)
         {
-            var message = $"Cannot query field \"{fieldName}\" on type \"{type}\".";
+            var message = $"Cannot query field '{fieldName}' on type '{type}'.";
 
             if (suggestedTypeNames != null)
             {
