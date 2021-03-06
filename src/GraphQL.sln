@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		Tests.props = Tests.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
 EndProject
