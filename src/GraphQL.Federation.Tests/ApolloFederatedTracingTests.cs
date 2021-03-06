@@ -41,7 +41,7 @@ query {
             trace.EndTime.ToDateTime().ShouldBeGreaterThan(trace.StartTime.ToDateTime());
             ((long)trace.DurationNs).ShouldBeGreaterThan(0);
             trace.Root.ShouldNotBeNull();
-            trace.Root.Child.Count.ShouldBe(2);
+            trace.Root.Child.Count.ShouldBe(1);
 
         }
 
