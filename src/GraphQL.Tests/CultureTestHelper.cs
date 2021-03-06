@@ -8,6 +8,7 @@ namespace GraphQL.Tests
     {
         public static IEnumerable<CultureInfo> Cultures => new[]
         {
+            new CultureInfo("ru-RU"),
             new CultureInfo("fi-FI"),
             new CultureInfo("en-US"),
             CultureInfo.InvariantCulture,
