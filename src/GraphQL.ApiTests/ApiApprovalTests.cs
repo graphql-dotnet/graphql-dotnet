@@ -17,6 +17,7 @@ namespace GraphQL.ApiTests
         [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]
         [InlineData(typeof(Caching.MemoryDocumentCache))]
         [InlineData(typeof(Federation.Instrumentation.FederatedInstrumentFieldMiddleware))]
+        [InlineData(typeof(DataLoader.DataLoaderContext))]
         public void PublicApi(Type type)
         {
             string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions

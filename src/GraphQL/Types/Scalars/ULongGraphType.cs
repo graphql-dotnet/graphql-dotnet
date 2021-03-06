@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -12,29 +12,37 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => intValue.Value >= 0 ? (ulong?)intValue.Value : null,
-            LongValue longValue => longValue.Value >= 0 ? (ulong?)longValue.Value : null,
-            BigIntValue bigIntValue => bigIntValue.Value >= 0 && bigIntValue.Value <= ulong.MaxValue ? (ulong?)bigIntValue.Value : null,
-            _ => null
+            IntValue intValue => checked((ulong)intValue.Value),
+            LongValue longValue => checked((ulong)longValue.Value),
+            BigIntValue bigIntValue => checked((ulong)bigIntValue.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(ulong));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            IntValue intValue => intValue.Value >= 0,
-            LongValue longValue => longValue.Value >= 0,
-            BigIntValue bigIntValue => bigIntValue.Value >= 0 && bigIntValue.Value <= ulong.MaxValue,
+            IntValue _ => true,
+            LongValue _ => true,
+            BigIntValue bigIntValue => ulong.MinValue <= bigIntValue.Value && bigIntValue.Value <= ulong.MaxValue,
+            NullValue _ => true,
             _ => false
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => value switch
+        public override object ParseValue(object value) => value switch
         {
-            ulong ulongValue => new BigIntValue(ulongValue),
-            _ => new LongValue(Convert.ToInt64(value))
+            ulong _ => value,
+            null => null,
+            int i => checked((ulong)i),
+            long l => checked((ulong)l),
+            BigInteger bi => checked((ulong)bi),
+            sbyte sb => checked((ulong)sb),
+            byte b => checked((ulong)b),
+            short s => checked((ulong)s),
+            ushort us => checked((ulong)us),
+            uint ui => checked((ulong)ui),
+            _ => ThrowValueConversionError(value)
         };
     }
 }

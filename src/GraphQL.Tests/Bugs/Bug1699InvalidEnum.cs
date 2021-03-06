@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Bugs
         {
             ExecutionError error;
             if (number != null)
-                error = new ValidationError(null, number, message);
+                error = exception == null ? new ValidationError(null, number, message) : new ValidationError(null, number, message, exception);
             else
                 error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
             if (line != 0)
@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Bugs
         public void Custom_Enum_Numbered_From_Name() => AssertQuerySuccess("{ customEnumSleepy }", @"{ ""customEnumSleepy"": ""ISSLEEPY"" }");
 
         [Fact]
-        public void String_Enum() => AssertQuerySuccess("{ sleepy }", @"{ ""sleepy"": ""SLEEPY"" }");
+        public void String_Enum() => AssertQueryWithError("{ sleepy }", @"{ ""sleepy"": null }", "Error trying to resolve field 'sleepy'.", 1, 3, "sleepy", exception: new InvalidOperationException());
 
         [Fact]
         public void Int_Enum() => AssertQuerySuccess("{ happy }", @"{ ""happy"": ""HAPPY"" }");
@@ -49,10 +49,10 @@ namespace GraphQL.Tests.Bugs
 
         // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
         [Fact]
-        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": null }", "Error trying to resolve field 'invalidEnumWithinList'.", 1, 3, "invalidEnumWithinList", exception: new InvalidOperationException());
+        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": [ ""HAPPY"", ""SLEEPY"", null ] }", "Error trying to resolve field 'invalidEnumWithinList'.", 1, 3, new object[] { "invalidEnumWithinList", 2 }, exception: new InvalidOperationException());
 
         [Fact]
-        public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", @"{ ""invalidEnumWithinNonNullList"": null }", "Error trying to resolve field 'invalidEnumWithinNonNullList'.", 1, 3, "invalidEnumWithinNonNullList", exception: new InvalidOperationException());
+        public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", @"{ ""invalidEnumWithinNonNullList"": null }", "Error trying to resolve field 'invalidEnumWithinNonNullList'.", 1, 3, new object[] { "invalidEnumWithinNonNullList", 2 }, exception: new InvalidOperationException());
 
         [Fact]
         public void Input_Enum_Valid() => AssertQuerySuccess("{ inputEnum(arg: SLEEPY) }", @"{ ""inputEnum"": ""SLEEPY"" }");
@@ -79,10 +79,10 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_Valid_Default_Required_Variable() => AssertQuerySuccess("query($arg: Bug1699Enum! = GRUMPY) { input(arg: $arg) }", @"{ ""input"": ""Grumpy"" }", null);
 
         [Fact]
-        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}", number: "5.8", executed: false);
+        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, exception: new InvalidOperationException(), code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}", number: "5.8", executed: false);
 
         [Fact]
-        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}", number: "5.8", executed: false);
+        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, exception: new InvalidOperationException(), code: "INVALID_VALUE", inputs: "{\"arg\":2}", number: "5.8", executed: false);
 
         [Fact]
         public void Input_Enum_UndefinedDefault() => AssertQuerySuccess("{ input }", @"{ ""input"": ""Grumpy"" }");

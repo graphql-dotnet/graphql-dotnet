@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -24,19 +25,15 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value.ToString();
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            StringValue str => ParseValue(str.Value),
+            StringValue str => str.Value,
             IntValue num => num.Value,
             LongValue longVal => longVal.Value,
-            _ => null,
+            BigIntValue bigIntValue => bigIntValue.Value,
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value),
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => value.ToString().Trim(' ', '"');
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
@@ -44,10 +41,30 @@ namespace GraphQL.Types
             StringValue _ => true,
             IntValue _ => true,
             LongValue _ => true,
+            BigIntValue _ => true,
+            NullValue _ => true,
             _ => false
         };
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => new StringValue(value.ToString());
+        public override object ParseValue(object value) => value switch
+        {
+            string _ => value,
+            int _ => value,
+            long _ => value,
+            Guid _ => value,
+            null => null,
+            byte _ => value,
+            sbyte _ => value,
+            short _ => value,
+            ushort _ => value,
+            uint _ => value,
+            ulong _ => value,
+            BigInteger _ => value,
+            _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override object Serialize(object value) => ParseValue(value)?.ToString();
     }
 }

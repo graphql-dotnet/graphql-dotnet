@@ -9,10 +9,16 @@ namespace GraphQL.Tests.Execution
     public class AstFromValueTests
     {
         [Fact]
+        public void throws_for_null_graphtype()
+        {
+            Should.Throw<ArgumentNullException>(() => ((IGraphType)null).ToAST(true));
+        }
+
+        [Fact]
         public void converts_null_to_null()
         {
             object value = null;
-            var result = ((IGraphType)null).ToAST(value);
+            var result = new StringGraphType().ToAST(value);
             result.ShouldBeOfType<NullValue>();
         }
 

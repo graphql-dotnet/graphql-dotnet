@@ -123,12 +123,7 @@ namespace GraphQL.Tests.Execution
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType> { Name = "input" }
                 ),
-                resolve: context =>
-                {
-                    var val = context.GetArgument<int>("input");
-                    var result = JsonSerializer.Serialize(val);
-                    return result;
-                });
+                resolve: context => context.GetArgument<int>("input"));
 
             Field<StringGraphType>(
                 "fieldWithNonNullableStringInput",
