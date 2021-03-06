@@ -353,7 +353,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = inputDef.DefaultValue
+                DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
 
             return field;
