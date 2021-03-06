@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -12,7 +13,13 @@ namespace GraphQL.Tests.Execution
     public class FuncFieldResolverTests
     {
         private readonly ResolveFieldContext _context;
-        private readonly SimpleDataLoader<string> _okDataLoader = new SimpleDataLoader<string>(c => Task.FromResult("ok"));
+        private readonly OkDataLoader _okDataLoader = new OkDataLoader();
+
+        private class OkDataLoader : IDataLoaderResult<string>
+        {
+            Task<string> IDataLoaderResult<string>.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult("ok");
+            Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult<object>("ok");
+        }
 
         public FuncFieldResolverTests()
         {
@@ -449,12 +456,12 @@ namespace GraphQL.Tests.Execution
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<SimpleDataLoader<string>>>(context =>
+            var ffr1 = new FuncFieldResolver<int?, Task<OkDataLoader>>(context =>
             {
                 rfc1 = context;
                 return Task.FromResult(_okDataLoader);
             });
-            var ffr2 = new FuncFieldResolver<int?, Task<SimpleDataLoader<string>>>(context =>
+            var ffr2 = new FuncFieldResolver<int?, Task<OkDataLoader>>(context =>
             {
                 rfc2 = context;
                 return Task.FromResult(_okDataLoader);

@@ -26,6 +26,7 @@
     <ProjectReference Include="..\GraphQL.SystemReactive\GraphQL.SystemReactive.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
+    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>
