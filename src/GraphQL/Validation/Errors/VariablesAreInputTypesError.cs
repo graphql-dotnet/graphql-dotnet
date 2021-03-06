@@ -19,6 +19,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string UndefinedVarMessage(string variableName, string typeName)
-            => $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
+            => $"Variable '{variableName}' cannot be non-input type '{typeName}'.";
     }
 }

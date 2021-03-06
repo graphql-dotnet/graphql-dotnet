@@ -561,13 +561,13 @@ namespace GraphQL.Execution
 
                 if (!abstractType.IsPossibleType(objectType))
                 {
-                    throw new InvalidOperationException($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\".");
+                    throw new InvalidOperationException($"Runtime Object type '{objectType}' is not a possible type for '{abstractType}'.");
                 }
             }
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new InvalidOperationException($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
+                throw new InvalidOperationException($"'{result}' value of type '{result.GetType()}' is not allowed for '{objectType.Name}'. Either change IsTypeOf method of '{objectType.Name}' to accept this value or return another value from your resolver.");
             }
         }
 

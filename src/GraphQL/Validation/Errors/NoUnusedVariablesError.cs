@@ -20,8 +20,8 @@ namespace GraphQL.Validation.Errors
         internal static string UnusedVariableMessage(string varName, string opName)
         {
             return !string.IsNullOrWhiteSpace(opName)
-              ? $"Variable \"${varName}\" is never used in operation \"${opName}\"."
-              : $"Variable \"${varName}\" is never used.";
+              ? $"Variable '${varName}' is never used in operation '${opName}'."
+              : $"Variable '${varName}' is never used.";
         }
     }
 }

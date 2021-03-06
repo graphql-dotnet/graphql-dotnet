@@ -18,6 +18,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string DuplicateArgMessage(string argName)
-            => $"There can be only one argument named \"{argName}\".";
+            => $"There can be only one argument named '{argName}'.";
     }
 }

@@ -20,7 +20,7 @@ namespace GraphQL.Validation.Errors
         internal static string CycleErrorMessage(string fragName, string[] spreadNames)
         {
             var via = spreadNames.Length > 0 ? " via " + string.Join(", ", spreadNames) : "";
-            return $"Cannot spread fragment \"{fragName}\" within itself{via}.";
+            return $"Cannot spread fragment '{fragName}' within itself{via}.";
         }
     }
 }

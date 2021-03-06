@@ -27,9 +27,9 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string TypeIncompatibleSpreadMessage(string fragName, string parentType, string fragType)
-            => $"Fragment \"{fragName}\" cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
+            => $"Fragment '{fragName}' cannot be spread here as objects of type '{parentType}' can never be of type '{fragType}'.";
 
         internal static string TypeIncompatibleAnonSpreadMessage(string parentType, string fragType)
-            => $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
+            => $"Fragment cannot be spread here as objects of type '{parentType}' can never be of type '{fragType}'.";
     }
 }

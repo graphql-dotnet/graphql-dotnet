@@ -186,7 +186,7 @@ mutation {
             var query = @"mutation { int(number: ""100"") }";
             string expected = null;
             var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
-            result.Errors[0].Message.ShouldBe("Argument \"number\" has invalid value \"100\".\nExpected type \"Int\", found \"100\".");
+            result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Int', found \"100\".");
         }
 
         [Fact]
@@ -204,7 +204,7 @@ mutation {
             var query = @"mutation { long(number: ""100"") }";
             string expected = null;
             var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
-            result.Errors[0].Message.ShouldBe("Argument \"number\" has invalid value \"100\".\nExpected type \"Long\", found \"100\".");
+            result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Long', found \"100\".");
         }
 
         [Fact]

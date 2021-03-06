@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Errors
 
         internal static string UndefinedVarMessage(string varName, string opName)
             => !string.IsNullOrWhiteSpace(opName)
-                ? $"Variable \"${varName}\" is not defined by operation \"{opName}\"."
-                : $"Variable \"${varName}\" is not defined.";
+                ? $"Variable '${varName}' is not defined by operation '{opName}'."
+                : $"Variable '${varName}' is not defined.";
     }
 }

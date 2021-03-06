@@ -27,9 +27,9 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string InlineFragmentOnNonCompositeErrorMessage(string type)
-            => $"Fragment cannot condition on non composite type \"{type}\".";
+            => $"Fragment cannot condition on non composite type '{type}'.";
 
         internal static string FragmentOnNonCompositeErrorMessage(string fragName, string type)
-            => $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
+            => $"Fragment '{fragName}' cannot condition on non composite type '{type}'.";
     }
 }
