@@ -184,7 +184,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
-        public static string[] IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
+        public static string IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static GraphQL.Language.AST.IValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
@@ -2838,12 +2838,12 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class ArgumentsOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
-        public ArgumentsOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
+        public ArgumentsOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, string verboseErrors) { }
     }
     [System.Serializable]
     public class DefaultValuesOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
-        public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
+        public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, string verboseErrors) { }
     }
     [System.Serializable]
     public class DirectivesInAllowedLocationsError : GraphQL.Validation.ValidationError
