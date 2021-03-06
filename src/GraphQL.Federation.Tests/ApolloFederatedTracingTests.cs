@@ -37,7 +37,7 @@ query {
             byte[] bytes = Convert.FromBase64String(federaredTrace);
             var trace = Trace.Parser.ParseFrom(bytes);
 
-            trace.StartTime.ToDateTime().ShouldBeGreaterThan(DateTime.Now);
+            trace.StartTime.ToDateTime().ShouldBeLessThan(DateTime.UtcNow);
             trace.EndTime.ToDateTime().ShouldBeGreaterThan(trace.StartTime.ToDateTime());
             ((long)trace.DurationNs).ShouldBeGreaterThan(0);
             trace.Root.ShouldNotBeNull();
