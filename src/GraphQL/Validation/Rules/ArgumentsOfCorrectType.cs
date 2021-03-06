@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
 
             var type = argDef.ResolvedType;
             var errors = type.IsValidLiteralValue(argAst.Value, context.Schema);
-            if (errors.Length > 0)
+            if (errors != null)
             {
                 context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));
             }
