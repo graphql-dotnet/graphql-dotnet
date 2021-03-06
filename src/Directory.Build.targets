@@ -3,6 +3,7 @@
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <CoverletOutputFormat>opencover</CoverletOutputFormat>
     <CoverletOutput>$(MSBuildThisFileDirectory)../.coverage/$(AssemblyName)/</CoverletOutput>
+    <Exclude>[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*</Exclude>
   </PropertyGroup>
 
 </Project>
