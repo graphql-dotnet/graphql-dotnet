@@ -83,6 +83,9 @@ namespace GraphQL.Types
         private readonly INameConverter _nameConverter;
         private readonly object _lock = new object();
 
+        /// <summary>
+        /// Initializes a new instance with no types registered
+        /// </summary>
         protected SchemaTypes()
         {
         }
@@ -91,21 +94,21 @@ namespace GraphQL.Types
         /// Initializes a new instance for the specified schema, and with the specified type resolver.
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
-        /// <param name="types">A list of graph type instances to register in the lookup table.</param>
         /// <param name="graphTypeProvider">A service provider used to resolve graph types.</param>
-        public SchemaTypes(ISchema schema, IEnumerable<IGraphType> types, IServiceProvider graphTypeProvider)
+        public SchemaTypes(ISchema schema, IServiceProvider graphTypeProvider)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
-            if (types == null)
-                throw new ArgumentNullException(nameof(types));
             if (graphTypeProvider == null)
                 throw new ArgumentNullException(nameof(graphTypeProvider));
 
+            var types = GetSchemaTypes(schema, graphTypeProvider);
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
             Func<Type, IGraphType> resolveType = t => (IGraphType)graphTypeProvider.GetRequiredService(t);
+
+            // old constructor -- creates introspection types
 
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
@@ -130,6 +133,8 @@ namespace GraphQL.Types
 
             // set the name converter properly
             _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
+
+            // old static Create method -- adds specified types
 
             var ctx = new TypeCollectionContext(
                 t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t),
@@ -176,6 +181,29 @@ namespace GraphQL.Types
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
         }
+
+        private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider graphTypeProvider)
+        {
+            foreach (var instance in schema.AdditionalInstances)
+                yield return instance;
+
+            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
+            // if (Query == null)
+            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+
+            if (schema.Query != null)
+                yield return schema.Query;
+
+            if (schema.Mutation != null)
+                yield return schema.Mutation;
+
+            if (schema.Subscription != null)
+                yield return schema.Subscription;
+
+            foreach (var type in schema.AdditionalTypes)
+                yield return (IGraphType)graphTypeProvider.GetRequiredService(type.GetNamedType());
+        }
+
 
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
         {
