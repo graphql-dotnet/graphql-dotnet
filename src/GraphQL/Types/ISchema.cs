@@ -82,6 +82,11 @@ namespace GraphQL.Types
         IEnumerable<Type> AdditionalTypes { get; }
 
         /// <summary>
+        /// A list of additional graph type instances manually added to the schema by RegisterType call.
+        /// </summary>
+        IEnumerable<IGraphType> AdditionalTypeInstances { get; }
+
+        /// <summary>
         /// Adds the specified instance of an <see cref="ISchemaNodeVisitor"/> to the schema.
         /// When initializing a schema, all registered visitors will be executed on each
         /// schema element when it is traversed.
