@@ -1922,6 +1922,7 @@ namespace GraphQL.Types
     }
     public interface ISchema : GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         GraphQL.Types.SchemaTypes AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
@@ -2127,6 +2128,7 @@ namespace GraphQL.Types
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
+        public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public GraphQL.Types.SchemaTypes AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
@@ -2421,6 +2423,7 @@ namespace GraphQL.Utilities
     {
         public FieldConfig(string name) { }
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
+        public object DefaultValue { get; set; }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; }

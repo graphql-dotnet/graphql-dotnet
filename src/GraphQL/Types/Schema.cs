@@ -164,6 +164,9 @@ namespace GraphQL.Types
         public IEnumerable<Type> AdditionalTypes => _additionalTypes ?? Enumerable.Empty<Type>();
 
         /// <inheritdoc/>
+        public IEnumerable<IGraphType> AdditionalTypeInstances => _additionalInstances ?? Enumerable.Empty<IGraphType>();
+
+        /// <inheritdoc/>
         public FieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
 
         /// <inheritdoc/>
