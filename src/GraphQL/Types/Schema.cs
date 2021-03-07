@@ -350,12 +350,7 @@ namespace GraphQL.Types
                 }
             }
 
-            _allTypes = SchemaTypes.Create(
-                GetTypes(),
-                _clrToGraphTypeMappings,
-                Directives,
-                type => (IGraphType)_services.GetRequiredService(type),
-                this);
+            _allTypes = new SchemaTypes(this, GetTypes(), _services);
 
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
