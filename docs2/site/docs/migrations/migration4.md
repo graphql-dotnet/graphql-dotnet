@@ -502,7 +502,7 @@ default continues to be `ResolverType.Resolver`.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
 * `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
-* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `ErrorLocation` struct became `readonly`.
 * `DebugNodeVisitor` class has been removed.
