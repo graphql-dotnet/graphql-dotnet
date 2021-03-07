@@ -45,6 +45,7 @@ namespace GraphQL.Validation
         /// <inheritdoc cref="ExecutionContext.Document"/>
         public Document Document { get; set; }
 
+        /// <inheritdoc cref="Validation.TypeInfo"/>
         public TypeInfo TypeInfo { get; set; }
 
         /// <inheritdoc/>

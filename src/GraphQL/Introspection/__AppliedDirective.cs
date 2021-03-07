@@ -9,6 +9,9 @@ namespace GraphQL.Introspection
     /// </summary>
     public class __AppliedDirective : ObjectGraphType<AppliedDirective>
     {
+        /// <summary>
+        /// Initializes a new instance of this graph type
+        /// </summary>
         public __AppliedDirective()
         {
             Description =
