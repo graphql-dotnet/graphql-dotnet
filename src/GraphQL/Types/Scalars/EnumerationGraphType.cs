@@ -62,32 +62,59 @@ namespace GraphQL.Types
         public EnumValues Values { get; }
 
         /// <inheritdoc/>
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            EnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            EnumValue enumValue => Values.FindByName(enumValue.Name) != null,
+            NullValue _ => true,
+            _ => false
+        };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            string s => Values.FindByName(s)?.Value ?? ThrowValueConversionError(value),
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object value) => value switch
+        {
+            string s => Values.FindByName(s) != null,
+            null => true,
+            _ => false
+        };
+
+        /// <inheritdoc/>
         public override object Serialize(object value)
         {
-            var valueString = value.ToString(); //TODO: find only by value?
-            var foundByName = Values.FindByName(valueString);
-            if (foundByName != null)
-            {
-                return foundByName.Name;
-            }
+            if (value == null)
+                return null;
 
             var foundByValue = Values.FindByValue(value);
-            return foundByValue?.Name;
+            return foundByValue == null
+                ? ThrowSerializationError(value)
+                : foundByValue.Name;
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value)
+        public override IValue ToAST(object value)
         {
             if (value == null)
-            {
-                return null;
-            }
+                return new NullValue();
 
-            var found = Values.FindByName(value.ToString());
-            return found?.Value;
+            var foundByValue = Values.FindByValue(value);
+            return foundByValue == null
+                ? ThrowASTConversionError(value)
+                : new EnumValue(foundByValue.Name);
         }
     }
 

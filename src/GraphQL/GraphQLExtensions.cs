@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -36,8 +35,9 @@ namespace GraphQL
         /// </summary>
         public static bool IsLeafType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
-            return namedType is ScalarGraphType;
+            var (namedType, namedType2) = type.GetNamedTypes();
+            return namedType is ScalarGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -70,9 +70,11 @@ namespace GraphQL
         /// </summary>
         public static bool IsInputType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
             return namedType is ScalarGraphType ||
-                   namedType is IInputObjectGraphType;
+                   namedType is IInputObjectGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -107,11 +109,16 @@ namespace GraphQL
         /// </summary>
         public static bool IsOutputType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
             return namedType is ScalarGraphType ||
                    namedType is IObjectGraphType ||
                    namedType is IInterfaceGraphType ||
-                   namedType is UnionGraphType;
+                   namedType is UnionGraphType ||
+                   typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IObjectGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(IInterfaceGraphType).IsAssignableFrom(namedType2) ||
+                   typeof(UnionGraphType).IsAssignableFrom(namedType2);
+            ;
         }
 
         /// <summary>
@@ -119,8 +126,25 @@ namespace GraphQL
         /// </summary>
         public static bool IsInputObjectType(this IGraphType type)
         {
-            var namedType = type.GetNamedType();
-            return namedType is IInputObjectGraphType;
+            var (namedType, namedType2) = type.GetNamedTypes();
+            return namedType is IInputObjectGraphType ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
+        }
+
+        internal static bool IsGraphQLTypeReference(this IGraphType type)
+        {
+            var (namedType, _) = type.GetNamedTypes();
+            return namedType is GraphQLTypeReference;
+        }
+
+        internal static (IGraphType resolvedType, Type type) GetNamedTypes(this IGraphType type)
+        {
+            return type switch
+            {
+                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type)),
+                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type)),
+                _ => (type, null)
+            };
         }
 
         /// <summary>
@@ -128,12 +152,11 @@ namespace GraphQL
         /// </summary>
         public static IGraphType GetNamedType(this IGraphType type)
         {
-            return type switch
-            {
-                NonNullGraphType nonNull => GetNamedType(nonNull.ResolvedType),
-                ListGraphType list => GetNamedType(list.ResolvedType),
-                _ => type
-            };
+            if (type == null)
+                return null;
+
+            var (namedType, _) = type.GetNamedTypes();
+            return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
         }
 
         /// <summary>
@@ -211,14 +234,12 @@ namespace GraphQL
                        $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
         }
 
-        private static readonly string[] _foundNull = new[] { "Expected non-null value, found null" };
-
         /// <summary>
         /// Validates that the specified AST value is valid for the specified scalar or input graph type.
         /// Graph types that are lists or non-null types are handled appropriately by this method.
-        /// Returns a list of strings representing the errors encountered while validating the value.
+        /// Returns a string representing the errors encountered while validating the value.
         /// </summary>
-        public static string[] IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
+        public static string IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
@@ -229,29 +250,29 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected \"{ofType.Name}!\", found null." };
+                        return $"Expected '{ofType.Name}!', found null.";
                     }
 
-                    return _foundNull;
+                    return "Expected non-null value, found null";
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
             else if (valueAst is NullValue)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             if (valueAst == null)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return Array.Empty<string>();
+                return null;
             }
 
             if (type is ListGraphType list)
@@ -260,12 +281,18 @@ namespace GraphQL
 
                 if (valueAst is ListValue listValue)
                 {
-                    return listValue.Values
-                        .SelectMany(value =>
-                            IsValidLiteralValue(ofType, value, schema)
-                                .Select((err, index) => $"In element #{index + 1}: {err}")
-                        )
-                        .ToArray();
+                    List<string> errors = null;
+
+                    for (int index = 0; index < listValue.ValuesList.Count; ++index)
+                    {
+                        string error = IsValidLiteralValue(ofType, listValue.ValuesList[index], schema);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                    }
+
+                    return errors == null
+                        ? null
+                        : string.Join(" ", errors);
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -275,13 +302,13 @@ namespace GraphQL
             {
                 if (!(valueAst is ObjectValue objValue))
                 {
-                    return new[] { $"Expected \"{inputType.Name}\", found not an object." };
+                    return $"Expected '{inputType.Name}', found not an object.";
                 }
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = objValue.ObjectFields.ToList();
 
-                var errors = new List<string>();
+                List<string> errors = null;
 
                 // ensure every provided field is defined
                 foreach (var providedFieldAst in fieldAsts)
@@ -289,7 +316,7 @@ namespace GraphQL
                     var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
-                        errors.Add($"In field \"{providedFieldAst.Name}\": Unknown field.");
+                        (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
                     }
                 }
 
@@ -297,19 +324,29 @@ namespace GraphQL
                 foreach (var field in fields)
                 {
                     var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value ?? field.GetDefaultValueAST(schema), schema);
 
-                    errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                    if (fieldAst != null)
+                    {
+                        string error = IsValidLiteralValue(field.ResolvedType, fieldAst.Value, schema);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
+                    }
+                    else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
+                    {
+                        (errors ??= new List<string>()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                    }
                 }
 
-                return errors.ToArray();
+                return errors == null
+                    ? null
+                    : string.Join(" ", errors);
             }
 
             if (type is ScalarGraphType scalar)
             {
                 return scalar.CanParseLiteral(valueAst)
-                    ? Array.Empty<string>()
-                    : new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
+                    ? null
+                    : $"Expected type '{type.Name}', found {AstPrinter.Print(valueAst)}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");
@@ -479,17 +516,81 @@ namespace GraphQL
         private static readonly NullValue _null = new NullValue();
 
         /// <summary>
+        /// Returns a value indicating whether the provided value is a valid default value
+        /// for the specified input graph type.
+        /// </summary>
+        public static bool IsValidDefault(this IGraphType type, object value)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type is NonNullGraphType nonNullGraphType)
+            {
+                return value == null ? false : nonNullGraphType.ResolvedType.IsValidDefault(value);
+            }
+
+            if (value == null)
+            {
+                return true;
+            }
+
+            // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
+            // the value is not an IEnumerable, convert the value using the list's item type.
+            if (type is ListGraphType listType)
+            {
+                var itemType = listType.ResolvedType;
+
+                if (!(value is string) && value is IEnumerable list)
+                {
+                    foreach (var item in list)
+                    {
+                        if (!IsValidDefault(itemType, item))
+                            return false;
+                    }
+                    return true;
+                }
+                else
+                {
+                    return IsValidDefault(itemType, value);
+                }
+            }
+
+            if (type is IInputObjectGraphType inputObjectGraphType)
+            {
+                return inputObjectGraphType.IsValidDefault(value);
+            }
+
+            if (type is ScalarGraphType scalar)
+                return scalar.IsValidDefault(value);
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
+        }
+
+        /// <summary>
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
+        public static IValue ToAST(this IGraphType type, object value)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             if (type is NonNullGraphType nonnull)
             {
-                return AstFromValue(value, schema, nonnull.ResolvedType);
+                var astValue = ToAST(nonnull.ResolvedType, value);
+
+                if (astValue is NullValue)
+                    throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
+
+                return astValue;
             }
 
-            if (value == null || type == null)
+            if (type is ScalarGraphType scalar)
+            {
+                return scalar.ToAST(value) ?? scalar.ThrowASTConversionError(value);
+            }
+
+            if (value == null)
             {
                 return _null;
             }
@@ -504,72 +605,23 @@ namespace GraphQL
                 {
                     var values = list
                         .Cast<object>()
-                        .Select(item => AstFromValue(item, schema, itemType))
+                        .Select(item => ToAST(itemType, item))
                         .ToList();
 
                     return new ListValue(values);
                 }
 
-                return AstFromValue(value, schema, itemType);
+                return ToAST(itemType, value);
             }
 
             // Populate the fields of the input object by creating ASTs from each value
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                if (!(value is Dictionary<string, object> dict))
-                {
-                    return null;
-                }
-
-                var fields = dict
-                    .Select(pair =>
-                    {
-                        var fieldType = input.GetField(pair.Key)?.ResolvedType;
-                        return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
-                    })
-                    .ToList();
-
-                return new ObjectValue(fields);
+                return input.ToAST(value) ?? throw new InvalidOperationException($"Unable to get an AST representation of the input object type '{input.Name}' for '{value}'.");
             }
 
-            if (!(type is ScalarGraphType inputType))
-                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
-
-            // Since value is an internally represented value, it must be serialized
-            // to an externally represented value before converting into an AST.
-            var serialized = inputType.Serialize(value) ?? throw new InvalidOperationException($"Unable to serialize '{value}' to '{inputType.Name}'.");
-
-            return serialized switch
-            {
-                bool b => new BooleanValue(b),
-                int i => new IntValue(i),
-                BigInteger bi => new BigIntValue(bi),
-                long l => new LongValue(l),
-                decimal @decimal => new DecimalValue(@decimal),
-                double d => new FloatValue(d),
-                DateTime time => new DateTimeValue(time),
-                Uri uri => new UriValue(uri),
-                DateTimeOffset offset => new DateTimeOffsetValue(offset),
-                TimeSpan span => new TimeSpanValue(span),
-                Guid guid => new GuidValue(guid),
-                sbyte @sbyte => new SByteValue(@sbyte),
-                byte @byte => new ByteValue(@byte),
-                short @short => new ShortValue(@short),
-                ushort uint16 => new UShortValue(uint16),
-                uint uint32 => new UIntValue(uint32),
-                ulong uint64 => new ULongValue(uint64),
-                string str => type is EnumerationGraphType ? (IValue)new EnumValue(str) : new StringValue(str),
-                _ => Convert()
-            };
-
-            IValue Convert()
-            {
-                var converter = schema.FindValueConverter(serialized, type);
-                return converter != null
-                    ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
-            }
+            throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
         }
     }
 }

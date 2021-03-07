@@ -318,21 +318,14 @@ namespace GraphQL.Validation
             // Coerces a scalar value
             object ParseValueScalar(ScalarGraphType scalarGraphType, VariableDefinition variableDef, VariableName variableName, object value)
             {
-                if (value == null)
-                    return null;
-
-                object ret;
-
                 try
                 {
-                    ret = scalarGraphType.ParseValue(value);
+                    return scalarGraphType.ParseValue(value);
                 }
                 catch (Exception ex)
                 {
                     throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
                 }
-
-                return ret ?? throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
             }
 
             IList<object> ParseValueList(ListGraphType listGraphType, VariableDefinition variableDef, VariableName variableName, object value, IVariableVisitor visitor)

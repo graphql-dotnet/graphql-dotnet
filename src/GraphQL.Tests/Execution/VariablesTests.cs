@@ -123,12 +123,7 @@ namespace GraphQL.Tests.Execution
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType> { Name = "input" }
                 ),
-                resolve: context =>
-                {
-                    var val = context.GetArgument<int>("input");
-                    var result = JsonSerializer.Serialize(val);
-                    return result;
-                });
+                resolve: context => context.GetArgument<int>("input"));
 
             Field<StringGraphType>(
                 "fieldWithNonNullableStringInput",
@@ -640,7 +635,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.")
+            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0027input\u0027 has invalid value. Expected type \u0027String\u0027, found WRONG_TYPE.")
             {
                 Code = "ARGUMENTS_OF_CORRECT_TYPE",
             };

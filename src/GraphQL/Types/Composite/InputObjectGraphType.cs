@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -14,6 +15,19 @@ namespace GraphQL.Types
         /// properties for your input object which were not passed in the GraphQL request.
         /// </summary>
         object ParseDictionary(IDictionary<string, object> value);
+
+        /// <summary>
+        /// Returns a boolean indicating if the provided value is valid as a default value for a
+        /// field of this type.
+        /// </summary>
+        bool IsValidDefault(object value);
+
+        /// <summary>
+        /// Converts a value to an AST representation. This is necessary for introspection queries
+        /// to return the default value for fields of this scalar type. This method may throw an exception
+        /// or return <see langword="null"/> for a failed conversion.
+        /// </summary>
+        IValue ToAST(object value);
     }
 
     /// <inheritdoc/>
@@ -43,6 +57,23 @@ namespace GraphQL.Types
 
             // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
             return value.ToObject(typeof(TSourceType), this);
+        }
+
+        /// <inheritdoc/>
+        public virtual bool IsValidDefault(object value) => value is TSourceType;
+
+        /// <summary>
+        /// Converts a value to an AST representation. This is necessary for introspection queries
+        /// to return the default value for fields of this input object type. This method may throw an exception
+        /// or return <see langword="null"/> for a failed conversion.
+        /// <br/><br/>
+        /// The default implementation always throws an exception. It is recommended that this method be
+        /// overridden to support introspection of fields of this type that have default values. This method
+        /// is not otherwise needed to be implemented.
+        /// </summary>
+        public virtual IValue ToAST(object value)
+        {
+            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.");
         }
     }
 }

@@ -37,7 +37,7 @@ namespace GraphQL.Utilities
         {
             if (FieldsList.Exists(x => x.Name == field.Name))
             {
-                throw new ArgumentException($"A field with name \"{field.Name}\" already exists!", nameof(field));
+                throw new ArgumentException($"A field with name '{field.Name}' already exists!", nameof(field));
             }
 
             FieldsList.Add(field);
@@ -366,12 +366,6 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
-            });
-
-            Config<UriValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
 
             // Directive

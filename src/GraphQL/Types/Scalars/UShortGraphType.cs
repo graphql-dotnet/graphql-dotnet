@@ -1,3 +1,4 @@
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -11,20 +12,37 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            UShortValue ushortValue => ushortValue.Value,
-            IntValue intValue => ushort.MinValue <= intValue.Value && intValue.Value <= ushort.MaxValue ? (ushort?)intValue.Value : null,
-            _ => null
+            IntValue intValue => checked((ushort)intValue.Value),
+            LongValue longValue => checked((ushort)longValue.Value),
+            BigIntValue bigIntValue => checked((ushort)bigIntValue.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(ushort));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            UShortValue _ => true,
             IntValue intValue => ushort.MinValue <= intValue.Value && intValue.Value <= ushort.MaxValue,
+            LongValue longValue => ushort.MinValue <= longValue.Value && longValue.Value <= ushort.MaxValue,
+            BigIntValue bigIntValue => ushort.MinValue <= bigIntValue.Value && bigIntValue.Value <= ushort.MaxValue,
+            NullValue _ => true,
             _ => false
+        };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            ushort _ => value,
+            null => null,
+            int i => checked((ushort)i),
+            sbyte sb => checked((ushort)sb),
+            byte b => checked((ushort)b),
+            short s => checked((ushort)s),
+            uint ui => checked((ushort)ui),
+            long l => checked((ushort)l),
+            ulong ul => checked((ushort)ul),
+            BigInteger bi => checked((ushort)bi),
+            _ => ThrowValueConversionError(value)
         };
     }
 }

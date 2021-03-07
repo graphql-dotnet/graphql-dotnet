@@ -18,6 +18,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string DuplicateVariableMessage(string variableName)
-            => $"There can be only one variable named \"{variableName}\"";
+            => $"There can be only one variable named '{variableName}'";
     }
 }

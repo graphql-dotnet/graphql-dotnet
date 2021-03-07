@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Numerics;
 using GraphQL.Language.AST;
 
@@ -11,18 +10,30 @@ namespace GraphQL.Types
     public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            IntValue intVal => (decimal)intVal.Value,
+            LongValue longVal => (decimal)longVal.Value,
+            FloatValue floatVal => checked((decimal)floatVal.Value),
+            DecimalValue decVal => decVal.Value,
+            BigIntValue bigIntVal => checked((decimal)bigIntVal.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value)
         {
             try
             {
                 return value switch
                 {
-                    DecimalValue _ => true,
                     IntValue _ => true,
                     LongValue _ => true,
-                    StringValue s => decimal.TryParse(s.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
                     FloatValue f => Ret(checked((decimal)f.Value)),
+                    DecimalValue _ => true,
                     BigIntValue b => Ret(checked((decimal)b.Value)),
+                    NullValue _ => true,
                     _ => false
                 };
             }
@@ -33,55 +44,24 @@ namespace GraphQL.Types
 
             static bool Ret(decimal _) => true;
         }
-
-        /// <inheritdoc/>
-        public override bool CanParseValue(object value)
-        {
-            try
-            {
-                return value switch
-                {
-                    decimal _ => true,
-                    int _ => true,
-                    long _ => true,
-                    string s => decimal.TryParse(s, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out _),
-                    float f => Ret(checked((decimal)f)),
-                    BigInteger b => Ret(checked((decimal)b)),
-                    double d => Ret(checked((decimal)d)),
-                    _ => false
-                };
-            }
-            catch
-            {
-                return false;
-            }
-
-            static bool Ret(decimal _) => true;
-        }
-
-        /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
-        {
-            DecimalValue d => d.Value,
-            IntValue i => (decimal)i.Value,
-            LongValue l => (decimal)l.Value,
-            StringValue s => decimal.Parse(s.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo),
-            FloatValue f => checked((decimal)f.Value),
-            BigIntValue b => checked((decimal)b.Value),
-            _ => null
-        };
 
         /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
-            decimal _ => value, // no boxing
-            int i => (decimal)i,
-            long l => (decimal)l,
-            string s => decimal.Parse(s, NumberStyles.Float, NumberFormatInfo.InvariantInfo),
-            float f => checked((decimal)f),
-            BigInteger b => checked((decimal)b),
+            decimal _ => value,
+            int i => checked((decimal)i),
             double d => checked((decimal)d),
-            _ => null
+            null => null,
+            float f => checked((decimal)f),
+            sbyte sb => checked((decimal)sb),
+            byte b => checked((decimal)b),
+            short s => checked((decimal)s),
+            ushort us => checked((decimal)us),
+            uint ui => checked((decimal)ui),
+            long l => checked((decimal)l),
+            ulong ul => checked((decimal)ul),
+            BigInteger bi => (decimal)bi,
+            _ => ThrowValueConversionError(value)
         };
     }
 }

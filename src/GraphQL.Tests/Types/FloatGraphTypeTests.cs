@@ -15,13 +15,13 @@ namespace GraphQL.Tests.Types
         public void coerces_null_to_null()
         {
             type.ParseValue(null).ShouldBeNull();
-            type.ParseLiteral(null).ShouldBeNull();
+            type.ParseLiteral(new NullValue()).ShouldBeNull();
         }
 
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            Should.Throw<FormatException>(() => type.ParseValue("abcd"));
+            Should.Throw<InvalidOperationException>(() => type.ParseValue("abcd"));
         }
 
         [Fact]

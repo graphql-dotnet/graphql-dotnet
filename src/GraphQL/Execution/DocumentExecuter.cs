@@ -139,29 +139,7 @@ namespace GraphQL
                     _documentCache[options.Query] = document;
                 }
 
-                context = new ExecutionContext
-                {
-                    Document = document,
-                    Schema = options.Schema,
-                    RootValue = options.Root,
-                    UserContext = options.UserContext,
-
-                    Operation = operation,
-                    Variables = variables,
-                    Fragments = document.Fragments,
-                    Errors = new ExecutionErrors(),
-                    Extensions = new Dictionary<string, object>(),
-                    CancellationToken = options.CancellationToken,
-
-                    Metrics = metrics,
-                    Listeners = options.Listeners,
-                    ThrowOnUnhandledException = options.ThrowOnUnhandledException,
-                    UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
-                    MaxParallelExecutionCount = options.MaxParallelExecutionCount,
-                    RequestServices = options.RequestServices
-                };
-
-                context.ExecutionStrategy = SelectExecutionStrategy(context);
+                context = BuildExecutionContext(options, document, operation, variables, metrics);
 
                 foreach (var listener in options.Listeners)
                 {
@@ -261,6 +239,38 @@ namespace GraphQL
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
+        /// </summary>
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, Document document, Operation operation, Variables variables, Metrics metrics)
+        {
+            var context = new ExecutionContext
+            {
+                Document = document,
+                Schema = options.Schema,
+                RootValue = options.Root,
+                UserContext = options.UserContext,
+
+                Operation = operation,
+                Variables = variables,
+                Fragments = document.Fragments,
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
+                CancellationToken = options.CancellationToken,
+
+                Metrics = metrics,
+                Listeners = options.Listeners,
+                ThrowOnUnhandledException = options.ThrowOnUnhandledException,
+                UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
+                MaxParallelExecutionCount = options.MaxParallelExecutionCount,
+                RequestServices = options.RequestServices,
+            };
+
+            context.ExecutionStrategy = SelectExecutionStrategy(context);
+
+            return context;
         }
 
         /// <summary>

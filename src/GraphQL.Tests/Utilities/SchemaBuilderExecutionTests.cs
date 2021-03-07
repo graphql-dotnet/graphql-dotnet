@@ -152,9 +152,67 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void issue_1155_throws_on_build_if_AllowUnknownTypes_disabled()
+        {
+            Should.Throw<InvalidOperationException>(() => Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder =>
+            {
+                builder.AllowUnknownTypes = false;
+                builder.Types.Include<Query>();
+            })).Message.ShouldBe("Unknown type 'Test'. Verify that you have configured SchemaBuilder correctly.");
+        }
+
+        [Fact]
+        public void issue_1155_throws_on_build_if_AllowUnknownFields_disabled_1()
+        {
+            Should.Throw<InvalidOperationException>(() => Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder =>
+                   {
+                       builder.AllowUnknownFields = false;
+                       builder.Types.Include<Query>();
+                   })).Message.ShouldBe("Unknown field 'Test.id' has no resolver. Verify that you have configured SchemaBuilder correctly.");
+        }
+
+        [Fact]
+        public void issue_1155_throws_on_build_if_AllowUnknownFields_disabled_2()
+        {
+            Should.Throw<InvalidOperationException>(() => Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder =>
+            {
+                builder.AllowUnknownFields = false;
+                builder.Types.Include<Query>();
+                builder.Types.Include<Test>();
+            })).Message.ShouldBe("Unknown field 'Test.name' has no resolver. Verify that you have configured SchemaBuilder correctly.");
+        }
+
+        [Fact]
         public void can_read_schema_with_custom_root_names()
         {
-            var schema = Schema.For("CustomSubscription".ReadGraphQLRequest());
+            var schema = Schema.For("CustomSubscription".ReadSDL());
 
             schema.Query.Name.ShouldBe("CustomQuery");
             schema.Mutation.Name.ShouldBe("CustomMutation");
@@ -168,7 +226,7 @@ namespace GraphQL.Tests.Utilities
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
-                fileName.ReadGraphQLRequest(),
+                fileName.ReadSDL(),
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
@@ -179,7 +237,7 @@ namespace GraphQL.Tests.Utilities
         public void can_read_complex_schema()
         {
             var schema = Schema.For(
-                "PetComplex".ReadGraphQLRequest(),
+                "PetComplex".ReadSDL(),
                 builder =>
                 {
                     builder.Types.ForAll(config => config.ResolveType = _ => null);
@@ -364,7 +422,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.For("Cat").IsTypeOf<Cat>();
             Builder.Types.Include<PetQueryType>();
 
-            Should.Throw<InvalidOperationException>(() => Builder.Build(defs));
+            Should.Throw<InvalidOperationException>(() => Builder.Build(defs).Initialize());
         }
 
         [Fact]

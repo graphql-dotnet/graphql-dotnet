@@ -46,11 +46,11 @@ namespace GraphQL.Tests.Types
 
             var errors = result.Errors.ToArray();
             errors[0].Message.ShouldBe("Error trying to resolve field 'a'.");
-            errors[0].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: a, Type: Int!.");
+            errors[0].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: a, Type: Int!.");
             errors[1].Message.ShouldBe("Error trying to resolve field 'b'.");
-            errors[1].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: b, Type: Boolean!.");
+            errors[1].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: b, Type: Boolean!.");
             errors[2].Message.ShouldBe("Error trying to resolve field 'c'.");
-            errors[2].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: c, Type: String!.");
+            errors[2].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: c, Type: String!.");
         }
 
         [Fact]

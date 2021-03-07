@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -10,13 +11,9 @@ namespace GraphQL.Tests.Types
         private readonly TimeSpanSecondsGraphType _type = new TimeSpanSecondsGraphType();
 
         [Fact]
-        public void serialize_string_returns_null()
+        public void serialize_string_throws()
         {
-            CultureTestHelper.UseCultures(() =>
-            {
-                var actual = _type.Serialize("foo");
-                actual.ShouldBeNull();
-            });
+            CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.Serialize("foo")));
         }
 
         [Fact]
@@ -48,6 +45,48 @@ namespace GraphQL.Tests.Types
             {
                 var expected = (long)new TimeSpan(1, 2, 3, 4, 5).TotalSeconds;
                 var actual = _type.Serialize(new TimeSpan(1, 2, 3, 4, 5));
+                actual.ShouldBe(expected);
+            });
+        }
+
+        [Theory]
+        [InlineData((int)5)]
+        [InlineData((long)7)]
+        public void parseliteral_to_timespan(object value)
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                var expected = TimeSpan.FromSeconds(Convert.ToDouble(value));
+
+                IValue ast = value switch
+                {
+                    int i => new IntValue(i),
+                    long l => new LongValue(l),
+                    _ => null
+                };
+                var actual = _type.ParseLiteral(ast);
+
+                actual.ShouldBe(expected);
+            });
+        }
+
+        [Theory]
+        [InlineData((byte)1)]
+        [InlineData((sbyte)2)]
+        [InlineData((short)3)]
+        [InlineData((ushort)4)]
+        [InlineData((int)5)]
+        [InlineData((uint)6)]
+        [InlineData((long)7)]
+        [InlineData((ulong)8)]
+        public void parsevalue_to_timespan(object value)
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                var expected = TimeSpan.FromSeconds(Convert.ToDouble(value));
+
+                var actual = _type.ParseValue(value);
+
                 actual.ShouldBe(expected);
             });
         }

@@ -93,7 +93,7 @@ namespace GraphQL.Types
 
             NameValidator.ValidateNameNotNull(fieldType.Name, NamedElement.Field);
 
-            if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
+            if (!fieldType.ResolvedType.IsGraphQLTypeReference())
             {
                 if (this is IInputObjectGraphType)
                 {

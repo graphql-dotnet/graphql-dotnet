@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
@@ -13,6 +12,17 @@ namespace GraphQL.Tests.Validation
             ShouldPassRule(@"{
               complicatedArgs {
                 intArgField(intArg: 2)
+              }
+            }");
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void good_int_null_value()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                intArgField(intArg: null)
               }
             }");
         }
@@ -532,11 +542,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "stringListArg", "[String]", "[\"one\", 2]", 3, 36,
-                    new[]
-                    {
-                        "In element #1: Expected type \"String\", found 2."
-                    });
+                Rule.badValue(_, "stringListArg", "[String]", "[\"one\", 2]", 3, 36, "In element #2: [Expected type 'String', found 2.]");
             });
         }
 
@@ -629,6 +635,28 @@ namespace GraphQL.Tests.Validation
             }");
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void one_null_arg_on_multiple_optional()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                multipleOpts(opt1: null)
+              }
+            }");
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void both_null_arg_on_multiple_optional()
+        {
+            ShouldPassRule(@"{
+              complicatedArgs {
+                multipleOpts(opt2: null, opt1: null)
+              }
+            }");
+        }
+
         [Fact]
         public void multiple_reqs_on_mixed()
         {
@@ -692,6 +720,58 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 Rule.badValue(_, "req1", "Int", "\"one\"", 3, 30);
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_one_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req1: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req1", "Int", "null", 3, 30, "Expected 'Int!', found null.");
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_second_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req2: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req2", "Int", "null", 3, 30, "Expected 'Int!', found null.");
+            });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2339
+        [Fact]
+        public void multiple_args_with_both_null()
+        {
+            var query = @"{
+              complicatedArgs {
+                multipleReqs(req2: null, req1: null)
+              }
+            }";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                Rule.badValue(_, "req2", "Int", "null", 3, 30, "Expected 'Int!', found null.");
+                Rule.badValue(_, "req1", "Int", "null", 3, 42, "Expected 'Int!', found null.");
             });
         }
     }
@@ -785,11 +865,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "complexArg", "ComplexInput", "{intField: 4}", 3, 33,
-                    new[]
-                    {
-                        "In field \"requiredField\": Expected \"Boolean!\", found null."
-                    });
+                Rule.badValue(_, "complexArg", "ComplexInput", "{intField: 4}", 3, 33, "Missing required field 'requiredField' of type 'Boolean'.");
             });
         }
 
@@ -808,11 +884,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "complexArg", "ComplexInput", "{stringListField: [\"one\", 2], requiredField: true}", 3, 33,
-                    new[]
-                    {
-                        "In field \"stringListField\": In element #1: Expected type \"String\", found 2."
-                    });
+                Rule.badValue(_, "complexArg", "ComplexInput", "{stringListField: [\"one\", 2], requiredField: true}", 3, 33, "In field 'stringListField': [In element #2: [Expected type 'String', found 2.]]");
             });
         }
 
@@ -831,15 +903,10 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "complexArg", "ComplexInput", "{requiredField: true, unknownField: \"value\"}", 3, 33,
-                    new[]
-                    {
-                        "In field \"unknownField\": Unknown field."
-                    });
+                Rule.badValue(_, "complexArg", "ComplexInput", "{requiredField: true, unknownField: \"value\"}", 3, 33, "In field 'unknownField': Unknown field.");
             });
         }
     }
-
 
     public class ArgumentsOfCorrectType_directive_arguments : ValidationTestBase<ArgumentsOfCorrectType, ValidationSchema>
     {
@@ -885,12 +952,12 @@ namespace GraphQL.Tests.Validation
             string value,
             int line,
             int column,
-            IEnumerable<string> errors = null)
+            string errors = null)
         {
-            errors ??= new[] { $"Expected type \"{typeName}\", found {value}." };
+            errors ??= $"Expected type '{typeName}', found {value}.";
 
             config.Error(
-                ArgumentsOfCorrectTypeError.BadValueMessage(argName, value, errors),
+                ArgumentsOfCorrectTypeError.BadValueMessage(argName, errors),
                 line,
                 column);
         }

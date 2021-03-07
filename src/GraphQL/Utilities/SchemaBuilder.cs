@@ -32,6 +32,20 @@ namespace GraphQL.Utilities
         /// </summary>
         public bool IgnoreComments { get; set; } = true;
 
+        /// <summary>
+        /// Allows to successfully build the schema even if types are found that are not registered int <see cref="Types"/>.
+        /// <br/>
+        /// By default <see langword="true"/>.
+        /// </summary>
+        public bool AllowUnknownTypes { get; set; } = true;
+
+        /// <summary>
+        /// Allows to successfully build the schema even if fields are found that have no resolvers.
+        /// <br/>
+        /// By default <see langword="true"/>.
+        /// </summary>
+        public bool AllowUnknownFields { get; set; } = true;
+
         public TypeSettings Types { get; } = new TypeSettings();
 
         /// <summary>
@@ -194,10 +208,24 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type.Name == operationDefinition.Type.Name.Value;
         }
 
+        private void AssertKnownType(TypeConfig typeConfig)
+        {
+            if (typeConfig.Type == null && !AllowUnknownTypes) //TODO: the same for subscriptions?
+                throw new InvalidOperationException($"Unknown type '{typeConfig.Name}'. Verify that you have configured SchemaBuilder correctly.");
+        }
+
+        private void AssertKnownField(TypeConfig typeConfig, FieldConfig fieldConfig)
+        {
+            if (fieldConfig.Resolver == null && !AllowUnknownFields) //TODO: the same for subscriptions?
+                throw new InvalidOperationException($"Unknown field '{typeConfig.Name}.{fieldConfig.Name}' has no resolver. Verify that you have configured SchemaBuilder correctly.");
+        }
+
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var name = (string)astType.Name.Value;
             var typeConfig = Types.For(name);
+
+            AssertKnownType(typeConfig);
 
             ObjectGraphType type;
             if (!_types.ContainsKey(name))
@@ -255,8 +283,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
+
+            AssertKnownType(typeConfig);
+
             var name = (string)fieldDef.Name.Value;
             var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
+
+            AssertKnownField(typeConfig, fieldConfig);
 
             var field = new FieldType
             {
@@ -279,6 +312,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
+
+            AssertKnownType(typeConfig);
+
             var name = (string)fieldDef.Name.Value;
             var fieldConfig = typeConfig.SubscriptionFieldFor(name, ServiceProvider);
 
@@ -305,6 +341,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
             var typeConfig = Types.For(parentTypeName);
+
+            AssertKnownType(typeConfig);
+
             var name = (string)inputDef.Name.Value;
             var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
 
@@ -314,7 +353,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = inputDef.DefaultValue.ToValue()
+                DefaultValue = inputDef.DefaultValue
             }.SetAstType(inputDef);
 
             return field;
@@ -324,6 +363,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
             var name = (string)interfaceDef.Name.Value;
             var typeConfig = Types.For(name);
+
+            AssertKnownType(typeConfig);
 
             var type = new InterfaceGraphType
             {
@@ -348,6 +389,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
             var name = (string)unionDef.Name.Value;
             var typeConfig = Types.For(name);
+
+            AssertKnownType(typeConfig);
 
             var type = new UnionGraphType
             {
@@ -376,6 +419,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var name = (string)inputDef.Name.Value;
             var typeConfig = Types.For(name);
 
+            AssertKnownType(typeConfig);
+
             var type = new InputObjectGraphType
             {
                 Name = name,
@@ -398,6 +443,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
             var name = (string)enumDef.Name.Value;
             var typeConfig = Types.For(name);
+
+            AssertKnownType(typeConfig);
 
             var type = new EnumerationGraphType
             {
@@ -440,10 +487,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
         {
+            var name = (string)valDef.Name.Value;
             return new EnumValueDefinition
             {
-                Value = valDef.Name.Value,
-                Name = (string)valDef.Name.Value,
+                Value = name,
+                Name = name,
                 Description = valDef.Comment?.Text.ToString()
             }.SetAstType(valDef);
         }
@@ -453,8 +501,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return new QueryArgument(ToGraphType(inputDef.Type))
             {
                 Name = (string)inputDef.Name.Value,
-                DefaultValue = inputDef.DefaultValue.ToValue(),
-                ResolvedType = ToGraphType(inputDef.Type),
+                DefaultValue = inputDef.DefaultValue,
                 Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
         }

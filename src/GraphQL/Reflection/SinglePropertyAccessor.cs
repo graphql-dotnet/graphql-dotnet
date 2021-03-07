@@ -15,10 +15,15 @@ namespace GraphQL.Reflection
         }
 
         public string FieldName => _property.Name;
+
         public Type ReturnType => _property.PropertyType;
+
         public Type DeclaringType => _property.DeclaringType;
+
         public ParameterInfo[] Parameters => null;
+
         public MethodInfo MethodInfo => _property.GetMethod;
+
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => _property.GetCustomAttributes<T>();
 
         public object GetValue(object target, object[] arguments)

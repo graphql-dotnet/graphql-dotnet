@@ -369,8 +369,8 @@ namespace GraphQL.Types
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
                             throw new InvalidOperationException(
-                               $"Interface type \"{interfaceInstance.Name}\" does not provide a \"resolveType\" function " +
-                               $"and possible Type \"{obj.Name}\" does not provide a \"isTypeOf\" function. " +
+                               $"Interface type '{interfaceInstance.Name}' does not provide a 'resolveType' function " +
+                               $"and possible Type '{obj.Name}' does not provide a 'isTypeOf' function. " +
                                 "There is no way to resolve this possible type during execution.");
                         }
                     }
@@ -395,8 +395,8 @@ namespace GraphQL.Types
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)
                     {
                         throw new InvalidOperationException(
-                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
-                           $"and possible Type \"{unionedType.Name}\" does not provide a \"isTypeOf\" function. " +
+                           $"Union type '{union.Name}' does not provide a 'resolveType' function " +
+                           $"and possible Type '{unionedType.Name}' does not provide a 'isTypeOf' function. " +
                             "There is no way to resolve this possible type during execution.");
                     }
                 }
@@ -410,8 +410,8 @@ namespace GraphQL.Types
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
                         throw new InvalidOperationException(
-                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
-                           $"and possible Type \"{objType.Name}\" does not provide a \"isTypeOf\" function. " +
+                           $"Union type '{union.Name}' does not provide a 'resolveType' function " +
+                           $"and possible Type '{objType.Name}' does not provide a 'isTypeOf' function. " +
                             "There is no way to resolve this possible type during execution.");
                     }
 
@@ -527,7 +527,9 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
         {
-            var namedType = type.GetNamedType();
+            var (namedType, namedType2) = type.GetNamedTypes();
+            namedType ??= context.ResolveType(namedType2);
+
             var foundType = this[namedType.Name];
             if (foundType == null)
             {
@@ -623,8 +625,8 @@ Make sure that your ServiceProvider is configured correctly.");
                     if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                     {
                         throw new InvalidOperationException(
-                               $"Interface type \"{interfaceType.Name}\" does not provide a \"resolveType\" function " +
-                               $"and possible Type \"{objectType.Name}\" does not provide a \"isTypeOf\" function.  " +
+                               $"Interface type '{interfaceType.Name}' does not provide a 'resolveType' function " +
+                               $"and possible Type '{objectType.Name}' does not provide a 'isTypeOf' function.  " +
                                 "There is no way to resolve this possible type during execution.");
                     }
 
@@ -644,8 +646,8 @@ Make sure that your ServiceProvider is configured correctly.");
                     if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                     {
                         throw new InvalidOperationException(
-                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
-                           $"and possible Type \"{union.Name}\" does not provide a \"isTypeOf\" function. " +
+                           $"Union type '{union.Name}' does not provide a 'resolveType' function " +
+                           $"and possible Type '{union.Name}' does not provide a 'isTypeOf' function. " +
                             "There is no way to resolve this possible type during execution.");
                     }
 

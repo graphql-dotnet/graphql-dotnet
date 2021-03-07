@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -9,27 +10,19 @@ namespace GraphQL.Types
     public class GuidGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
-        {
-            GuidValue _ => true,
-            StringValue s => Guid.TryParse(s.Value, out _),
-            _ => false
-        };
-
-        /// <inheritdoc/>
-        public override bool CanParseValue(object value) => value switch
-        {
-            Guid _ => true,
-            string s => Guid.TryParse(s, out _),
-            _ => false
-        };
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            GuidValue g => g.Value,
             StringValue s => Guid.Parse(s.Value),
-            _ => null
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseLiteral(IValue value) => value switch
+        {
+            StringValue s => Guid.TryParse(s.Value, out _),
+            NullValue _ => true,
+            _ => false
         };
 
         /// <inheritdoc/>
@@ -37,7 +30,25 @@ namespace GraphQL.Types
         {
             Guid _ => value, // no boxing
             string s => Guid.Parse(s),
-            _ => null
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object value) => value switch
+        {
+            Guid _ => true,
+            string s => Guid.TryParse(s, out _),
+            null => true,
+            _ => false
+        };
+
+        /// <inheritdoc/>
+        public override object Serialize(object value) => value switch
+        {
+            Guid g => g.ToString("D", CultureInfo.InvariantCulture),
+            null => null,
+            _ => ThrowSerializationError(value)
         };
     }
 }

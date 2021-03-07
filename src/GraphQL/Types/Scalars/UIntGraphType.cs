@@ -1,3 +1,4 @@
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -11,22 +12,37 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
-            UIntValue uintValue => uintValue.Value,
-            IntValue intValue => intValue.Value >= 0 ? (uint?)intValue.Value : null,
-            LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue ? (uint?)longValue.Value : null,
-            _ => null
+            IntValue intValue => checked((uint)intValue.Value),
+            LongValue longValue => checked((uint)longValue.Value),
+            BigIntValue bigIntValue => checked((uint)bigIntValue.Value),
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(uint));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value) => value switch
         {
-            UIntValue _ => true,
-            IntValue intValue => intValue.Value >= 0,
+            IntValue intValue => uint.MinValue <= intValue.Value,
             LongValue longValue => uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue,
+            BigIntValue bigIntValue => uint.MinValue <= bigIntValue.Value && bigIntValue.Value <= uint.MaxValue,
+            NullValue _ => true,
             _ => false
+        };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            uint _ => value,
+            null => null,
+            int i => checked((uint)i),
+            long l => checked((uint)l),
+            sbyte sb => checked((uint)sb),
+            byte b => checked((uint)b),
+            short s => checked((uint)s),
+            ushort us => checked((uint)us),
+            ulong ul => checked((uint)ul),
+            BigInteger bi => checked((uint)bi),
+            _ => ThrowValueConversionError(value)
         };
     }
 }

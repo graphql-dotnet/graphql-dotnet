@@ -11,65 +11,6 @@ namespace GraphQL.Execution
     public static class ExecutionHelper
     {
         /// <summary>
-        /// Returns the root graph type for the execution -- for a specified schema and operation type.
-        /// </summary>
-        public static IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
-        {
-            IObjectGraphType type;
-
-            switch (operation.OperationType)
-            {
-                case OperationType.Query:
-                    type = schema.Query;
-                    break;
-
-                case OperationType.Mutation:
-                    type = schema.Mutation;
-                    if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(operation, document);
-                    break;
-
-                case OperationType.Subscription:
-                    type = schema.Subscription;
-                    if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(operation, document);
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
-            }
-
-            return type;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
-        /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
-        /// </summary>
-        public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
-        {
-            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
-            {
-                return schema.SchemaMetaFieldType;
-            }
-            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
-            {
-                return schema.TypeMetaFieldType;
-            }
-            if (field.Name == schema.TypeNameMetaFieldType.Name)
-            {
-                return schema.TypeNameMetaFieldType;
-            }
-
-            if (parentType == null)
-            {
-                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
-            }
-
-            return parentType.GetField(field.Name);
-        }
-
-        /// <summary>
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
@@ -114,11 +55,6 @@ namespace GraphQL.Execution
                 return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
-            if (input is NullValue)
-            {
-                return ArgumentValue.NullLiteral;
-            }
-
             if (input is VariableReference variable)
             {
                 if (variables == null)
@@ -126,6 +62,16 @@ namespace GraphQL.Execution
 
                 var found = variables.ValueFor(variable.Name, out var ret);
                 return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+            }
+
+            if (type is ScalarGraphType scalarType)
+            {
+                return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
+            }
+
+            if (input is NullValue)
+            {
+                return ArgumentValue.NullLiteral;
             }
 
             if (type is ListGraphType listType)
@@ -194,45 +140,7 @@ namespace GraphQL.Execution
                 return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
             }
 
-            if (type is ScalarGraphType scalarType)
-            {
-                return new ArgumentValue(scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'"), ArgumentSource.Literal);
-            }
-
             throw new ArgumentOutOfRangeException(nameof(input), $"Unknown type of input object '{type.GetType()}'");
-        }
-
-        /// <summary>
-        /// Examines @skip and @include directives for a node and returns a value indicating if the node should be included or not.
-        /// <br/><br/>
-        /// Note: Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
-        /// directives are provided on the same field or fragment, it must be queried only if the @skip condition
-        /// is <see langword="false"/> and the @include condition is <see langword="true"/>. Stated conversely, the field or
-        /// fragment must not be queried if either the @skip condition is <see langword="true"/> or the @include condition is <see langword="false"/>.
-        /// </summary>
-        public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
-        {
-            if (directives != null)
-            {
-                var directive = directives.Find(DirectiveGraphType.Skip.Name);
-                if (directive != null)
-                {
-                    var arg = DirectiveGraphType.Skip.Arguments.Find("if");
-
-                    if ((bool)CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
-                        return false;
-                }
-
-                directive = directives.Find(DirectiveGraphType.Include.Name);
-                if (directive != null)
-                {
-                    var arg = DirectiveGraphType.Include.Arguments.Find("if");
-
-                    return (bool)CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
-                }
-            }
-
-            return true;
         }
     }
 }

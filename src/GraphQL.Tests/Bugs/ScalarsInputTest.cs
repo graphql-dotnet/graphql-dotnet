@@ -165,6 +165,14 @@ mutation {
         }
 
         [Fact]
+        public void Should_Accept_Int_As_Int_In_Literal()
+        {
+            var query = @"mutation { int(number: 100) }";
+            var expected = @"{ ""int"": 100 }";
+            AssertQuerySuccess(query, expected, null, null);
+        }
+
+        [Fact]
         public void Should_Accept_Long_As_Long_In_Literal()
         {
             var query = @"mutation { long(number: 100) }";
@@ -173,20 +181,39 @@ mutation {
         }
 
         [Fact]
+        public void Should_Not_Accept_String_As_Int_In_Literal()
+        {
+            var query = @"mutation { int(number: ""100"") }";
+            string expected = null;
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
+            result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Int', found \"100\".");
+        }
+
+        [Fact]
+        public void Should_Not_Accept_String_As_Int_In_Variable()
+        {
+            var query = @"mutation AAA($val : Int!) { int(number: $val) }";
+            var expected = @"{ ""int"": 100 }";
+            var result = AssertQueryWithErrors(query, expected, inputs: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
+            result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Int'");
+        }
+
+        [Fact]
         public void Should_Not_Accept_String_As_Long_In_Literal()
         {
             var query = @"mutation { long(number: ""100"") }";
             string expected = null;
-            AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
+            result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Long', found \"100\".");
         }
 
-        // TODO: rework to throw exception
         [Fact]
-        public void Should_Accept_String_As_Long_In_Variable()
+        public void Should_Not_Accept_String_As_Long_In_Variable()
         {
             var query = @"mutation AAA($val : Long!) { long(number: $val) }";
             var expected = @"{ ""long"": 100 }";
-            AssertQuerySuccess(query, expected, @"{ ""val"": ""100"" }".ToInputs(), null);
+            var result = AssertQueryWithErrors(query, expected, inputs: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
+            result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Long'");
         }
     }
 
@@ -351,6 +378,16 @@ mutation {
                 {
                     var arg = ctx.GetArgument<long>("number");
                     arg.ShouldBe(100L);
+                    return arg;
+                });
+
+            Field<IntGraphType>(
+                "int",
+                arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "number" }),
+                resolve: ctx =>
+                {
+                    var arg = ctx.GetArgument<int>("number");
+                    arg.ShouldBe(100);
                     return arg;
                 });
         }

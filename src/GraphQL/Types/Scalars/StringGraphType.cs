@@ -9,12 +9,25 @@ namespace GraphQL.Types
     public class StringGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => (value as StringValue)?.Value;
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            StringValue s => s.Value,
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value?.ToString();
+        public override bool CanParseLiteral(IValue value) => value is StringValue || value is NullValue;
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value is StringValue;
+        public override object ParseValue(object value) => value switch
+        {
+            string _ => value,
+            null => null,
+            _ => ThrowValueConversionError(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object value) => value is string || value == null;
     }
 }

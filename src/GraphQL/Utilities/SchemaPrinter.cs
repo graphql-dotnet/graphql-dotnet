@@ -313,12 +313,7 @@ namespace GraphQL.Utilities
                 ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => (enumeration.Serialize(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unknown value '{value}' for enumeration '{enumeration.Name}'")).ToString(),
-                ScalarGraphType _ => value switch
-                {
-                    string s => $"\"{s}\"",
-                    bool b => b ? "true" : "false",
-                    _ => value.ToString() // TODO: how to print custom scalars ("") ?
-                },
+                ScalarGraphType scalar => AstPrinter.Print(scalar.ToAST(value)),
                 _ => throw new NotSupportedException($"Unsupported graph type '{graphType}'")
             };
         }

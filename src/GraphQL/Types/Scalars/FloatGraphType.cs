@@ -1,3 +1,4 @@
+using System.Numerics;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -16,11 +17,9 @@ namespace GraphQL.Types
             LongValue longVal => (double)longVal.Value,
             DecimalValue decVal => checked((double)decVal.Value),
             BigIntValue bigIntVal => checked((double)bigIntVal.Value),
-            _ => null
+            NullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
         };
-
-        /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(double));
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(IValue value)
@@ -34,6 +33,7 @@ namespace GraphQL.Types
                     LongValue _ => true,
                     DecimalValue decVal => Ret(checked((double)decVal.Value)),
                     BigIntValue bigIntVal => Ret(checked((double)bigIntVal.Value)),
+                    NullValue _ => true,
                     _ => false
                 };
             }
@@ -44,5 +44,24 @@ namespace GraphQL.Types
 
             static bool Ret(double _) => true;
         }
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value switch
+        {
+            double _ => value,
+            int i => checked((double)i),
+            null => null,
+            float f => checked((double)f),
+            decimal d => checked((double)d),
+            sbyte sb => checked((double)sb),
+            byte b => checked((double)b),
+            short s => checked((double)s),
+            ushort us => checked((double)us),
+            uint ui => checked((double)ui),
+            long l => checked((double)l),
+            ulong ul => checked((double)ul),
+            BigInteger bi => (double)bi,
+            _ => ThrowValueConversionError(value)
+        };
     }
 }

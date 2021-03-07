@@ -1,5 +1,7 @@
 # Migrating from v3.x to v4.x
 
+See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A4.0+is%3Aissue+is%3Aclosed) and [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A4.0+is%3Aclosed) done in v4.
+
 ## New Features
 
 ### Improved Performance
@@ -129,10 +131,8 @@ It is not recommended to use this feature for interim calculations, as it is bet
 - `EnableReadDeprecationReasonFromAttributes` enables or disables setting default values for 'deprecationReason' from `ObsoleteAttribute`. Enabled by default.
 - `EnableReadDescriptionFromAttributes` enables or disables setting default values for 'description' from `DescriptionAttribute`. Enabled by default.
 - `EnableReadDescriptionFromXmlDocumentation` enables or disables setting default values for 'description' from XML documentation. Disabled by default.
-- `Validation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
+- `NameValidation` configures the validator used when setting the `Name` property on types, arguments, etc. Can be used to disable validation
   when the configured `INameConverter` fixes up invalid names. See `ISchema.NameConverter`.
-- `ValidationOnSchemaInitialize` configures the validator used to verify the schema after the `INameConverter` has processed all the names.
-  Disabling this validator is unlikely to be of any use, since the parser will not be able to parse a document that contains invalid characters in a name.
 
 It is recommended to configure these options once when your application starts, such as within your `void Main()` method, a static
 constructor of your schema, or a similar location.
@@ -173,7 +173,12 @@ This may be needed to get the parameters of parent nodes.
 
 * New property `ISchema.ValueConverters`
 * New method `IParentExecutionNode.ApplyToChildren`
-* `IExecutionStrategy.ShouldIncludeNode` and ability to control the set of fields that the strategy executes
+* `ExecutionStrategy` exposes a number of `protected virtual` methods that can be used to alter the execution
+  of a document without rewriting the entire class. For instance, overriding `ShouldIncludeNode` provides
+  the ability to control the set of fields that the strategy executes; overriding `ProcessNodeUnhandledException`
+  provides a way to customize exception handling, and so on.
+* With the addition of `ExecutionContext.ExecutionStrategy` and `IExecutionStrategy.GetSubFields`, the
+  execution strategy now controls the fields that are returned when requested from `IResolveFieldContext.SubFields`.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
@@ -250,6 +255,12 @@ protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext c
     };
 }
 ```
+
+### DataLoader Moved to Separate Project
+
+The implementation for data loaders, contained within the `GraphQL.DataLoader` namespace, has been moved into the
+[`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader) NuGet package. Please import the NuGet
+package if you use data loaders. No code changes are necessary.
 
 ### `ExecutionOptions.EnableMetrics` is disabled by default
 
@@ -480,7 +491,11 @@ default continues to be `ResolverType.Resolver`.
 * `TypeExtensions.As` method has been removed
 * `ExecutionHelper.SubFieldsFor` and `ExecutionHelper.DoesFragmentConditionMatch` methods have been removed.
 * `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
-* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`
+* All methods inside `ExecutionHelper` except `CoerceValue` and `GetArgumentValues` have been moved into protected
+  methods within `ExecutionStrategy`. Method signatures may have changed a very little.
+* `RootExecutionNode`'s constructor requires the root field's selection set, but `null` can be provided if this value
+  is not needed by the execution strategy.
+* `UnhandledExceptionContext.Context` is now of type `IExecutionContext`, returning a read-only view of the execution context.
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
@@ -532,7 +547,9 @@ default continues to be `ResolverType.Resolver`.
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
 * `ExecutionNode.IsResultSet` has been removed
 * `ExecutionNode.Source` is read-only; additional derived classes have been added for subscriptions
-* `NameValidator.ValidateName` and `NameValidator.ValidateNameOnSchemaInitialize` accept an enum instead of a string for their second argument
+* `NameValidator.ValidateName` accepts an enum instead of a string for its second argument
+* `NameValidator.ValidateNameOnSchemaInitialize` has been made internal and `ValidationOnSchemaInitialize` has been removed
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
+* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]`
