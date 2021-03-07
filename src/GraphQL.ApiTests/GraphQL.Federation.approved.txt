@@ -1,0 +1,765 @@
+namespace GraphQL.Federation.Instrumentation
+{
+    public class FederatedInstrumentFieldMiddleware : GraphQL.Instrumentation.IFieldMiddleware
+    {
+        public FederatedInstrumentFieldMiddleware() { }
+        public System.Threading.Tasks.Task<object> Resolve(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
+    }
+    public class FederatedTraceBuilder
+    {
+        public FederatedTraceBuilder(GraphQL.Instrumentation.PerfRecord[] records, GraphQL.ExecutionErrors errors, System.DateTime start) { }
+        public string ToProtoBase64() { }
+    }
+    public static class FederatedTracingExtensions
+    {
+        public static void EnrichWithApolloFederatedTracing(this GraphQL.ExecutionResult executionResult, System.DateTime start) { }
+    }
+    public class ResultPath
+    {
+        public static GraphQL.Federation.Instrumentation.ResultPath ROOT_PATH { get; }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+        public bool IsRootPath() { }
+        public GraphQL.Federation.Instrumentation.ResultPath Segment(int segment) { }
+        public GraphQL.Federation.Instrumentation.ResultPath Segment(string segment) { }
+        public System.Collections.Generic.IEnumerable<object> ToList() { }
+        public static GraphQL.Federation.Instrumentation.ResultPath FromList(System.Collections.Generic.List<object> objects) { }
+    }
+}
+namespace Mdg.Engine.Proto
+{
+    public sealed class ContextualizedQueryLatencyStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>, System.IEquatable<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>
+    {
+        public const int ContextFieldNumber = 2;
+        public const int QueryLatencyStatsFieldNumber = 1;
+        public ContextualizedQueryLatencyStats() { }
+        public ContextualizedQueryLatencyStats(Mdg.Engine.Proto.ContextualizedQueryLatencyStats other) { }
+        public Mdg.Engine.Proto.StatsContext Context { get; set; }
+        public Mdg.Engine.Proto.QueryLatencyStats QueryLatencyStats { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.ContextualizedQueryLatencyStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.ContextualizedQueryLatencyStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.ContextualizedQueryLatencyStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.ContextualizedQueryLatencyStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class ContextualizedStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.ContextualizedStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.ContextualizedStats>, System.IEquatable<Mdg.Engine.Proto.ContextualizedStats>
+    {
+        public const int ContextFieldNumber = 1;
+        public const int PerTypeStatFieldNumber = 3;
+        public const int QueryLatencyStatsFieldNumber = 2;
+        public ContextualizedStats() { }
+        public ContextualizedStats(Mdg.Engine.Proto.ContextualizedStats other) { }
+        public Mdg.Engine.Proto.StatsContext Context { get; set; }
+        public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.TypeStat> PerTypeStat { get; }
+        public Mdg.Engine.Proto.QueryLatencyStats QueryLatencyStats { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.ContextualizedStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.ContextualizedStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.ContextualizedStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.ContextualizedStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class ContextualizedTypeStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.ContextualizedTypeStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.ContextualizedTypeStats>, System.IEquatable<Mdg.Engine.Proto.ContextualizedTypeStats>
+    {
+        public const int ContextFieldNumber = 1;
+        public const int PerTypeStatFieldNumber = 2;
+        public ContextualizedTypeStats() { }
+        public ContextualizedTypeStats(Mdg.Engine.Proto.ContextualizedTypeStats other) { }
+        public Mdg.Engine.Proto.StatsContext Context { get; set; }
+        public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.TypeStat> PerTypeStat { get; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.ContextualizedTypeStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.ContextualizedTypeStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.ContextualizedTypeStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.ContextualizedTypeStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class Field : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Field>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Field>, System.IEquatable<Mdg.Engine.Proto.Field>
+    {
+        public const int NameFieldNumber = 2;
+        public const int ReturnTypeFieldNumber = 3;
+        public Field() { }
+        public Field(Mdg.Engine.Proto.Field other) { }
+        public string Name { get; set; }
+        public string ReturnType { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Field> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.Field Clone() { }
+        public bool Equals(Mdg.Engine.Proto.Field other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.Field other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class FieldStat : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.FieldStat>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.FieldStat>, System.IEquatable<Mdg.Engine.Proto.FieldStat>
+    {
+        public const int CountFieldNumber = 5;
+        public const int ErrorsCountFieldNumber = 4;
+        public const int LatencyCountFieldNumber = 8;
+        public const int RequestsWithErrorsCountFieldNumber = 6;
+        public const int ReturnTypeFieldNumber = 3;
+        public FieldStat() { }
+        public FieldStat(Mdg.Engine.Proto.FieldStat other) { }
+        public ulong Count { get; set; }
+        public ulong ErrorsCount { get; set; }
+        public Google.Protobuf.Collections.RepeatedField<long> LatencyCount { get; }
+        public ulong RequestsWithErrorsCount { get; set; }
+        public string ReturnType { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.FieldStat> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.FieldStat Clone() { }
+        public bool Equals(Mdg.Engine.Proto.FieldStat other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.FieldStat other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class PathErrorStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.PathErrorStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.PathErrorStats>, System.IEquatable<Mdg.Engine.Proto.PathErrorStats>
+    {
+        public const int ChildrenFieldNumber = 1;
+        public const int ErrorsCountFieldNumber = 4;
+        public const int RequestsWithErrorsCountFieldNumber = 5;
+        public PathErrorStats() { }
+        public PathErrorStats(Mdg.Engine.Proto.PathErrorStats other) { }
+        public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.PathErrorStats> Children { get; }
+        public ulong ErrorsCount { get; set; }
+        public ulong RequestsWithErrorsCount { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.PathErrorStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.PathErrorStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.PathErrorStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.PathErrorStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class QueryLatencyStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.QueryLatencyStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.QueryLatencyStats>, System.IEquatable<Mdg.Engine.Proto.QueryLatencyStats>
+    {
+        public const int CacheHitsFieldNumber = 3;
+        public const int CacheLatencyCountFieldNumber = 6;
+        public const int ForbiddenOperationCountFieldNumber = 12;
+        public const int LatencyCountFieldNumber = 1;
+        public const int PersistedQueryHitsFieldNumber = 4;
+        public const int PersistedQueryMissesFieldNumber = 5;
+        public const int PrivateCacheTtlCountFieldNumber = 10;
+        public const int PublicCacheTtlCountFieldNumber = 9;
+        public const int RegisteredOperationCountFieldNumber = 11;
+        public const int RequestCountFieldNumber = 2;
+        public const int RequestsWithErrorsCountFieldNumber = 8;
+        public const int RootErrorStatsFieldNumber = 7;
+        public QueryLatencyStats() { }
+        public QueryLatencyStats(Mdg.Engine.Proto.QueryLatencyStats other) { }
+        public ulong CacheHits { get; set; }
+        public Google.Protobuf.Collections.RepeatedField<long> CacheLatencyCount { get; }
+        public ulong ForbiddenOperationCount { get; set; }
+        public Google.Protobuf.Collections.RepeatedField<long> LatencyCount { get; }
+        public ulong PersistedQueryHits { get; set; }
+        public ulong PersistedQueryMisses { get; set; }
+        public Google.Protobuf.Collections.RepeatedField<long> PrivateCacheTtlCount { get; }
+        public Google.Protobuf.Collections.RepeatedField<long> PublicCacheTtlCount { get; }
+        public ulong RegisteredOperationCount { get; set; }
+        public ulong RequestCount { get; set; }
+        public ulong RequestsWithErrorsCount { get; set; }
+        public Mdg.Engine.Proto.PathErrorStats RootErrorStats { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.QueryLatencyStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.QueryLatencyStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.QueryLatencyStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.QueryLatencyStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class Report : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Report>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Report>, System.IEquatable<Mdg.Engine.Proto.Report>
+    {
+        public const int EndTimeFieldNumber = 2;
+        public const int HeaderFieldNumber = 1;
+        public const int TracesPerQueryFieldNumber = 5;
+        public Report() { }
+        public Report(Mdg.Engine.Proto.Report other) { }
+        public Google.Protobuf.WellKnownTypes.Timestamp EndTime { get; set; }
+        public Mdg.Engine.Proto.ReportHeader Header { get; set; }
+        public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.TracesAndStats> TracesPerQuery { get; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Report> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.Report Clone() { }
+        public bool Equals(Mdg.Engine.Proto.Report other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.Report other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class ReportHeader : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.ReportHeader>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.ReportHeader>, System.IEquatable<Mdg.Engine.Proto.ReportHeader>
+    {
+        public const int AgentVersionFieldNumber = 6;
+        public const int ExecutableSchemaIdFieldNumber = 11;
+        public const int HostnameFieldNumber = 5;
+        public const int RuntimeVersionFieldNumber = 8;
+        public const int SchemaTagFieldNumber = 10;
+        public const int ServiceVersionFieldNumber = 7;
+        public const int UnameFieldNumber = 9;
+        public ReportHeader() { }
+        public ReportHeader(Mdg.Engine.Proto.ReportHeader other) { }
+        public string AgentVersion { get; set; }
+        public string ExecutableSchemaId { get; set; }
+        public string Hostname { get; set; }
+        public string RuntimeVersion { get; set; }
+        public string SchemaTag { get; set; }
+        public string ServiceVersion { get; set; }
+        public string Uname { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.ReportHeader> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.ReportHeader Clone() { }
+        public bool Equals(Mdg.Engine.Proto.ReportHeader other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.ReportHeader other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public static class ReportsReflection
+    {
+        public static Google.Protobuf.Reflection.FileDescriptor Descriptor { get; }
+    }
+    public sealed class StatsContext : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.StatsContext>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.StatsContext>, System.IEquatable<Mdg.Engine.Proto.StatsContext>
+    {
+        public const int ClientNameFieldNumber = 2;
+        public const int ClientReferenceIdFieldNumber = 1;
+        public const int ClientVersionFieldNumber = 3;
+        public StatsContext() { }
+        public StatsContext(Mdg.Engine.Proto.StatsContext other) { }
+        public string ClientName { get; set; }
+        public string ClientReferenceId { get; set; }
+        public string ClientVersion { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.StatsContext> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.StatsContext Clone() { }
+        public bool Equals(Mdg.Engine.Proto.StatsContext other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.StatsContext other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class Trace : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace>, System.IEquatable<Mdg.Engine.Proto.Trace>
+    {
+        public const int CachePolicyFieldNumber = 18;
+        public const int ClientAddressFieldNumber = 9;
+        public const int ClientNameFieldNumber = 7;
+        public const int ClientReferenceIdFieldNumber = 23;
+        public const int ClientVersionFieldNumber = 8;
+        public const int DetailsFieldNumber = 6;
+        public const int DurationNsFieldNumber = 11;
+        public const int EndTimeFieldNumber = 3;
+        public const int ForbiddenOperationFieldNumber = 25;
+        public const int FullQueryCacheHitFieldNumber = 20;
+        public const int HttpFieldNumber = 10;
+        public const int LegacySignatureNeedsResigningFieldNumber = 5;
+        public const int PersistedQueryHitFieldNumber = 21;
+        public const int PersistedQueryRegisterFieldNumber = 22;
+        public const int QueryPlanFieldNumber = 26;
+        public const int RegisteredOperationFieldNumber = 24;
+        public const int RootFieldNumber = 14;
+        public const int SignatureFieldNumber = 19;
+        public const int StartTimeFieldNumber = 4;
+        public const int UnexecutedOperationBodyFieldNumber = 27;
+        public const int UnexecutedOperationNameFieldNumber = 28;
+        public Trace() { }
+        public Trace(Mdg.Engine.Proto.Trace other) { }
+        public Mdg.Engine.Proto.Trace.Types.CachePolicy CachePolicy { get; set; }
+        public string ClientAddress { get; set; }
+        public string ClientName { get; set; }
+        public string ClientReferenceId { get; set; }
+        public string ClientVersion { get; set; }
+        public Mdg.Engine.Proto.Trace.Types.Details Details { get; set; }
+        public ulong DurationNs { get; set; }
+        public Google.Protobuf.WellKnownTypes.Timestamp EndTime { get; set; }
+        public bool ForbiddenOperation { get; set; }
+        public bool FullQueryCacheHit { get; set; }
+        public Mdg.Engine.Proto.Trace.Types.HTTP Http { get; set; }
+        public string LegacySignatureNeedsResigning { get; set; }
+        public bool PersistedQueryHit { get; set; }
+        public bool PersistedQueryRegister { get; set; }
+        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode QueryPlan { get; set; }
+        public bool RegisteredOperation { get; set; }
+        public Mdg.Engine.Proto.Trace.Types.Node Root { get; set; }
+        public string Signature { get; set; }
+        public Google.Protobuf.WellKnownTypes.Timestamp StartTime { get; set; }
+        public string UnexecutedOperationBody { get; set; }
+        public string UnexecutedOperationName { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.Trace Clone() { }
+        public bool Equals(Mdg.Engine.Proto.Trace other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.Trace other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+        public static class Types
+        {
+            public sealed class CachePolicy : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.CachePolicy>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.CachePolicy>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.CachePolicy>
+            {
+                public const int MaxAgeNsFieldNumber = 2;
+                public const int ScopeFieldNumber = 1;
+                public CachePolicy() { }
+                public CachePolicy(Mdg.Engine.Proto.Trace.Types.CachePolicy other) { }
+                public long MaxAgeNs { get; set; }
+                public Mdg.Engine.Proto.Trace.Types.CachePolicy.Types.Scope Scope { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.CachePolicy> Parser { get; }
+                public int CalculateSize() { }
+                public Mdg.Engine.Proto.Trace.Types.CachePolicy Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.CachePolicy other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.CachePolicy other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                public static class Types
+                {
+                    public enum Scope
+                    {
+                        [Google.Protobuf.Reflection.OriginalName("UNKNOWN")]
+                        Unknown = 0,
+                        [Google.Protobuf.Reflection.OriginalName("PUBLIC")]
+                        Public = 1,
+                        [Google.Protobuf.Reflection.OriginalName("PRIVATE")]
+                        Private = 2,
+                    }
+                }
+            }
+            public sealed class Details : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.Details>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.Details>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.Details>
+            {
+                public const int DeprecatedVariablesFieldNumber = 1;
+                public const int OperationNameFieldNumber = 3;
+                public const int VariablesJsonFieldNumber = 4;
+                public Details() { }
+                public Details(Mdg.Engine.Proto.Trace.Types.Details other) { }
+                public Google.Protobuf.Collections.MapField<string, Google.Protobuf.ByteString> DeprecatedVariables { get; }
+                public string OperationName { get; set; }
+                public Google.Protobuf.Collections.MapField<string, string> VariablesJson { get; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.Details> Parser { get; }
+                public int CalculateSize() { }
+                public Mdg.Engine.Proto.Trace.Types.Details Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.Details other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.Details other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+            }
+            public sealed class Error : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.Error>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.Error>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.Error>
+            {
+                public const int JsonFieldNumber = 4;
+                public const int LocationFieldNumber = 2;
+                public const int MessageFieldNumber = 1;
+                public const int TimeNsFieldNumber = 3;
+                public Error() { }
+                public Error(Mdg.Engine.Proto.Trace.Types.Error other) { }
+                public string Json { get; set; }
+                public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.Location> Location { get; }
+                public string Message { get; set; }
+                public ulong TimeNs { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.Error> Parser { get; }
+                public int CalculateSize() { }
+                public Mdg.Engine.Proto.Trace.Types.Error Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.Error other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.Error other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+            }
+            public sealed class HTTP : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.HTTP>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.HTTP>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.HTTP>
+            {
+                public const int HostFieldNumber = 2;
+                public const int MethodFieldNumber = 1;
+                public const int PathFieldNumber = 3;
+                public const int ProtocolFieldNumber = 9;
+                public const int RequestHeadersFieldNumber = 4;
+                public const int ResponseHeadersFieldNumber = 5;
+                public const int SecureFieldNumber = 8;
+                public const int StatusCodeFieldNumber = 6;
+                public HTTP() { }
+                public HTTP(Mdg.Engine.Proto.Trace.Types.HTTP other) { }
+                public string Host { get; set; }
+                public Mdg.Engine.Proto.Trace.Types.HTTP.Types.Method Method { get; set; }
+                public string Path { get; set; }
+                public string Protocol { get; set; }
+                public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values> RequestHeaders { get; }
+                public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values> ResponseHeaders { get; }
+                public bool Secure { get; set; }
+                public uint StatusCode { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.HTTP> Parser { get; }
+                public int CalculateSize() { }
+                public Mdg.Engine.Proto.Trace.Types.HTTP Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.HTTP other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.HTTP other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                public static class Types
+                {
+                    public enum Method
+                    {
+                        [Google.Protobuf.Reflection.OriginalName("UNKNOWN")]
+                        Unknown = 0,
+                        [Google.Protobuf.Reflection.OriginalName("OPTIONS")]
+                        Options = 1,
+                        [Google.Protobuf.Reflection.OriginalName("GET")]
+                        Get = 2,
+                        [Google.Protobuf.Reflection.OriginalName("HEAD")]
+                        Head = 3,
+                        [Google.Protobuf.Reflection.OriginalName("POST")]
+                        Post = 4,
+                        [Google.Protobuf.Reflection.OriginalName("PUT")]
+                        Put = 5,
+                        [Google.Protobuf.Reflection.OriginalName("DELETE")]
+                        Delete = 6,
+                        [Google.Protobuf.Reflection.OriginalName("TRACE")]
+                        Trace = 7,
+                        [Google.Protobuf.Reflection.OriginalName("CONNECT")]
+                        Connect = 8,
+                        [Google.Protobuf.Reflection.OriginalName("PATCH")]
+                        Patch = 9,
+                    }
+                    public sealed class Values : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values>
+                    {
+                        public const int ValueFieldNumber = 1;
+                        public Values() { }
+                        public Values(Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values other) { }
+                        public Google.Protobuf.Collections.RepeatedField<string> Value { get; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values> Parser { get; }
+                        public int CalculateSize() { }
+                        public Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.HTTP.Types.Values other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                    }
+                }
+            }
+            public sealed class Location : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.Location>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.Location>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.Location>
+            {
+                public const int ColumnFieldNumber = 2;
+                public const int LineFieldNumber = 1;
+                public Location() { }
+                public Location(Mdg.Engine.Proto.Trace.Types.Location other) { }
+                public uint Column { get; set; }
+                public uint Line { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.Location> Parser { get; }
+                public int CalculateSize() { }
+                public Mdg.Engine.Proto.Trace.Types.Location Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.Location other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.Location other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+            }
+            public sealed class Node : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.Node>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.Node>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.Node>
+            {
+                public const int CachePolicyFieldNumber = 5;
+                public const int ChildFieldNumber = 12;
+                public const int EndTimeFieldNumber = 9;
+                public const int ErrorFieldNumber = 11;
+                public const int IndexFieldNumber = 2;
+                public const int OriginalFieldNameFieldNumber = 14;
+                public const int ParentTypeFieldNumber = 13;
+                public const int ResponseNameFieldNumber = 1;
+                public const int StartTimeFieldNumber = 8;
+                public const int TypeFieldNumber = 3;
+                public Node() { }
+                public Node(Mdg.Engine.Proto.Trace.Types.Node other) { }
+                public Mdg.Engine.Proto.Trace.Types.CachePolicy CachePolicy { get; set; }
+                public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.Node> Child { get; }
+                public ulong EndTime { get; set; }
+                public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.Error> Error { get; }
+                public Mdg.Engine.Proto.Trace.Types.Node.IdOneofCase IdCase { get; }
+                public uint Index { get; set; }
+                public string OriginalFieldName { get; set; }
+                public string ParentType { get; set; }
+                public string ResponseName { get; set; }
+                public ulong StartTime { get; set; }
+                public string Type { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.Node> Parser { get; }
+                public int CalculateSize() { }
+                public void ClearId() { }
+                public Mdg.Engine.Proto.Trace.Types.Node Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.Node other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.Node other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                public enum IdOneofCase
+                {
+                    None = 0,
+                    ResponseName = 1,
+                    Index = 2,
+                }
+            }
+            public sealed class QueryPlanNode : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode>
+            {
+                public const int FetchFieldNumber = 3;
+                public const int FlattenFieldNumber = 4;
+                public const int ParallelFieldNumber = 2;
+                public const int SequenceFieldNumber = 1;
+                public QueryPlanNode() { }
+                public QueryPlanNode(Mdg.Engine.Proto.Trace.Types.QueryPlanNode other) { }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode Fetch { get; set; }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode Flatten { get; set; }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.NodeOneofCase NodeCase { get; }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode Parallel { get; set; }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode Sequence { get; set; }
+                public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode> Parser { get; }
+                public int CalculateSize() { }
+                public void ClearNode() { }
+                public Mdg.Engine.Proto.Trace.Types.QueryPlanNode Clone() { }
+                public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode other) { }
+                public override bool Equals(object other) { }
+                public override int GetHashCode() { }
+                public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode other) { }
+                public override string ToString() { }
+                public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                public enum NodeOneofCase
+                {
+                    None = 0,
+                    Sequence = 1,
+                    Parallel = 2,
+                    Fetch = 3,
+                    Flatten = 4,
+                }
+                public static class Types
+                {
+                    public sealed class FetchNode : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode>
+                    {
+                        public const int ReceivedTimeFieldNumber = 6;
+                        public const int SentTimeFieldNumber = 5;
+                        public const int SentTimeOffsetFieldNumber = 4;
+                        public const int ServiceNameFieldNumber = 1;
+                        public const int TraceFieldNumber = 3;
+                        public const int TraceParsingFailedFieldNumber = 2;
+                        public FetchNode() { }
+                        public FetchNode(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode other) { }
+                        public Google.Protobuf.WellKnownTypes.Timestamp ReceivedTime { get; set; }
+                        public Google.Protobuf.WellKnownTypes.Timestamp SentTime { get; set; }
+                        public ulong SentTimeOffset { get; set; }
+                        public string ServiceName { get; set; }
+                        public Mdg.Engine.Proto.Trace Trace { get; set; }
+                        public bool TraceParsingFailed { get; set; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode> Parser { get; }
+                        public int CalculateSize() { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FetchNode other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                    }
+                    public sealed class FlattenNode : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode>
+                    {
+                        public const int NodeFieldNumber = 2;
+                        public const int ResponsePathFieldNumber = 1;
+                        public FlattenNode() { }
+                        public FlattenNode(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode other) { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode Node { get; set; }
+                        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement> ResponsePath { get; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode> Parser { get; }
+                        public int CalculateSize() { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.FlattenNode other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                    }
+                    public sealed class ParallelNode : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode>
+                    {
+                        public const int NodesFieldNumber = 1;
+                        public ParallelNode() { }
+                        public ParallelNode(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode other) { }
+                        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.QueryPlanNode> Nodes { get; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode> Parser { get; }
+                        public int CalculateSize() { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ParallelNode other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                    }
+                    public sealed class ResponsePathElement : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement>
+                    {
+                        public const int FieldNameFieldNumber = 1;
+                        public const int IndexFieldNumber = 2;
+                        public ResponsePathElement() { }
+                        public ResponsePathElement(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement other) { }
+                        public string FieldName { get; set; }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement.IdOneofCase IdCase { get; }
+                        public uint Index { get; set; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement> Parser { get; }
+                        public int CalculateSize() { }
+                        public void ClearId() { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.ResponsePathElement other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                        public enum IdOneofCase
+                        {
+                            None = 0,
+                            FieldName = 1,
+                            Index = 2,
+                        }
+                    }
+                    public sealed class SequenceNode : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode>, System.IEquatable<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode>
+                    {
+                        public const int NodesFieldNumber = 1;
+                        public SequenceNode() { }
+                        public SequenceNode(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode other) { }
+                        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace.Types.QueryPlanNode> Nodes { get; }
+                        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+                        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode> Parser { get; }
+                        public int CalculateSize() { }
+                        public Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode Clone() { }
+                        public bool Equals(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode other) { }
+                        public override bool Equals(object other) { }
+                        public override int GetHashCode() { }
+                        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+                        public void MergeFrom(Mdg.Engine.Proto.Trace.Types.QueryPlanNode.Types.SequenceNode other) { }
+                        public override string ToString() { }
+                        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+                    }
+                }
+            }
+        }
+    }
+    public sealed class TracesAndStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.TracesAndStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.TracesAndStats>, System.IEquatable<Mdg.Engine.Proto.TracesAndStats>
+    {
+        public const int StatsWithContextFieldNumber = 2;
+        public const int TraceFieldNumber = 1;
+        public TracesAndStats() { }
+        public TracesAndStats(Mdg.Engine.Proto.TracesAndStats other) { }
+        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.ContextualizedStats> StatsWithContext { get; }
+        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Trace> Trace { get; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.TracesAndStats> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.TracesAndStats Clone() { }
+        public bool Equals(Mdg.Engine.Proto.TracesAndStats other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.TracesAndStats other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class Type : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.Type>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.Type>, System.IEquatable<Mdg.Engine.Proto.Type>
+    {
+        public const int FieldFieldNumber = 2;
+        public const int NameFieldNumber = 1;
+        public Type() { }
+        public Type(Mdg.Engine.Proto.Type other) { }
+        public Google.Protobuf.Collections.RepeatedField<Mdg.Engine.Proto.Field> Field { get; }
+        public string Name { get; set; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.Type> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.Type Clone() { }
+        public bool Equals(Mdg.Engine.Proto.Type other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.Type other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+    public sealed class TypeStat : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.TypeStat>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.TypeStat>, System.IEquatable<Mdg.Engine.Proto.TypeStat>
+    {
+        public const int PerFieldStatFieldNumber = 3;
+        public TypeStat() { }
+        public TypeStat(Mdg.Engine.Proto.TypeStat other) { }
+        public Google.Protobuf.Collections.MapField<string, Mdg.Engine.Proto.FieldStat> PerFieldStat { get; }
+        public static Google.Protobuf.Reflection.MessageDescriptor Descriptor { get; }
+        public static Google.Protobuf.MessageParser<Mdg.Engine.Proto.TypeStat> Parser { get; }
+        public int CalculateSize() { }
+        public Mdg.Engine.Proto.TypeStat Clone() { }
+        public bool Equals(Mdg.Engine.Proto.TypeStat other) { }
+        public override bool Equals(object other) { }
+        public override int GetHashCode() { }
+        public void MergeFrom(Google.Protobuf.CodedInputStream input) { }
+        public void MergeFrom(Mdg.Engine.Proto.TypeStat other) { }
+        public override string ToString() { }
+        public void WriteTo(Google.Protobuf.CodedOutputStream output) { }
+    }
+}
