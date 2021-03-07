@@ -184,7 +184,7 @@ namespace GraphQL.Types
 
         private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider graphTypeProvider)
         {
-            foreach (var instance in schema.AdditionalInstances)
+            foreach (var instance in schema.AdditionalTypeInstances)
                 yield return instance;
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
