@@ -2418,6 +2418,7 @@ namespace GraphQL.Utilities
     {
         public FieldConfig(string name) { }
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
+        public object DefaultValue { get; set; }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; }
