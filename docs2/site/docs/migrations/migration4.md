@@ -436,6 +436,10 @@ schema.RegisterTypeMapping<int, MyIntGraphType>();
 schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
 ```
 
+If you have dynamic code that relies on a call to `GraphTypeTypeRegistry.Get<T>` then you will need to instead utilize
+a graph type of `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>` where `T` is the CLR type.
+The type reference will be replaced with the proper graph type during schema initialization.
+
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
 In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
