@@ -436,6 +436,10 @@ schema.RegisterTypeMapping<int, MyIntGraphType>();
 schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
 ```
 
+If you have dynamic code that relies on a call to `GraphTypeTypeRegistry.Get<T>` then you will need to instead utilize
+a graph type of `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>` where `T` is the CLR type.
+The type reference will be replaced with the proper graph type during schema initialization.
+
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
 In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
@@ -502,7 +506,7 @@ default continues to be `ResolverType.Resolver`.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
 * `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
-* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `ErrorLocation` struct became `readonly`.
 * `DebugNodeVisitor` class has been removed.

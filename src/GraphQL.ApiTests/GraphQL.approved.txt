@@ -1836,6 +1836,19 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
+    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.InputObjectGraphType { }
+    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.InterfaceGraphType { }
+    public sealed class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    {
+        public GraphQLTypeReference(string typeName) { }
+        public GraphQL.Types.Interfaces Interfaces { get; }
+        public System.Func<object, bool> IsTypeOf { get; set; }
+        public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public string TypeName { get; }
+        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+    }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
