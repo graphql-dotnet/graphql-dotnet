@@ -327,7 +327,7 @@ namespace GraphQL.Types
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
-        internal IGraphType this[Type type]
+        private IGraphType this[Type type]
         {
             get
             {
