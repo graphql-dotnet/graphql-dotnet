@@ -172,7 +172,6 @@ namespace GraphQL.Tests.Types
                 return ThrowSerializationError(value);
             }
 
-            // this code is tested when the schema is built; tests fail without it
             public override IValue ToAST(object value)
             {
                 if (value == null)
