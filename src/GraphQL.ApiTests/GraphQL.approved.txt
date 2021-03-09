@@ -678,7 +678,7 @@ namespace GraphQL.Execution
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public object Result { get; set; }
         public virtual object Source { get; }
-        public GraphQL.Types.IObjectGraphType GetParentType() { }
+        public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
         public virtual bool PropagateNull() { }
         public abstract object ToValue();
     }
@@ -787,7 +787,7 @@ namespace GraphQL.Execution
         public virtual GraphQL.Language.AST.SelectionSet SelectionSet { get; }
         public GraphQL.Execution.ExecutionNode[] SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
-        public GraphQL.Types.IObjectGraphType GetObjectGraphType() { }
+        public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
         public override bool PropagateNull() { }
         public override object ToValue() { }
     }
@@ -1578,7 +1578,7 @@ namespace GraphQL.Types
 {
     public static class AbstractGraphTypeExtensions
     {
-        public static GraphQL.Types.IObjectGraphType GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value) { }
+        public static GraphQL.Types.IObjectGraphType GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value, GraphQL.Types.ISchema schema) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
     public class AppliedDirective : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable

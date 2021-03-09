@@ -65,7 +65,7 @@ namespace GraphQL.Execution
                 {
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
-                    ParentType = node.GetParentType(),
+                    ParentType = node.GetParentType(context.Schema),
                     Arguments = arguments,
                     Source = source,
                     Schema = context.Schema,

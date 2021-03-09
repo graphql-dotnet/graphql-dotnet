@@ -155,9 +155,9 @@ namespace GraphQL.Execution
         {
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
 
-            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(), parent.SelectionSet, fields);
+            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema), parent.SelectionSet, fields);
 
-            var parentType = parent.GetObjectGraphType();
+            var parentType = parent.GetObjectGraphType(context.Schema);
 
             var subFields = new ExecutionNode[fields.Count];
 
@@ -570,7 +570,7 @@ namespace GraphQL.Execution
 
             if (fieldType is IAbstractGraphType abstractType)
             {
-                objectType = abstractType.GetObjectType(result);
+                objectType = abstractType.GetObjectType(result, context.Schema);
 
                 if (objectType == null)
                 {

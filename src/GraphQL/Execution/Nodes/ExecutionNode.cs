@@ -103,7 +103,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the parent graph type of this node.
         /// </summary>
-        public IObjectGraphType GetParentType()
+        public IObjectGraphType GetParentType(ISchema schema)
         {
             IGraphType parentType = Parent?.GraphType;
 
@@ -111,7 +111,7 @@ namespace GraphQL.Execution
                 return objectType;
 
             if (parentType is IAbstractGraphType abstractType)
-                return abstractType.GetObjectType(Parent.Result);
+                return abstractType.GetObjectType(Parent.Result, schema);
 
             return null;
         }

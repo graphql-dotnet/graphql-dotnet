@@ -53,7 +53,7 @@ namespace GraphQL
         public FieldType FieldDefinition => _executionNode.FieldDefinition;
 
         /// <inheritdoc/>
-        public IObjectGraphType ParentType => _executionNode.GetParentType();
+        public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
         /// <inheritdoc/>
         public IResolveFieldContext Parent

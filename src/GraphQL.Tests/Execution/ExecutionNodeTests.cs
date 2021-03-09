@@ -19,8 +19,8 @@ namespace GraphQL.Tests.Execution
             root.Field.ShouldBeNull();
             root.FieldDefinition.ShouldBeNull();
             root.GetHashCode().ShouldNotBe(0);
-            root.GetObjectGraphType().ShouldBe(type);
-            root.GetParentType().ShouldBeNull();
+            root.GetObjectGraphType(null).ShouldBe(type);
+            root.GetParentType(null).ShouldBeNull();
             root.GraphType.ShouldBe(type);
             root.IndexInParentNode.ShouldBeNull();
             root.Name.ShouldBeNull();
