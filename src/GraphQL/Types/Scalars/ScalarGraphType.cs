@@ -23,7 +23,7 @@ namespace GraphQL.Types
         /// This method should handle a value of <see langword="null"/>, but may throw an exception
         /// if <see langword="null"/> is an invalid internal scalar representation.
         /// </summary>
-        /// <param name="value">Resolved value (internal scalar representation). Might be <see langword="null"/> if returned from a field resolver.</param>
+        /// <param name="value">Resolved value (internal scalar representation). May be <see langword="null"/>.</param>
         /// <returns>
         /// The returned value of a the result coercion is part of the overall execution result.
         /// Normally this value is a primitive value like String or Integer to make it easy for
