@@ -106,7 +106,6 @@ namespace GraphQL.Types
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
-            Func<Type, IGraphType> resolveType = t => (IGraphType)serviceProvider.GetRequiredService(t);
 
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
@@ -133,7 +132,7 @@ namespace GraphQL.Types
             _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
             var ctx = new TypeCollectionContext(
-                t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t),
+                t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : (IGraphType)serviceProvider.GetRequiredService(t),
                 (name, graphType, context) =>
                 {
                     if (this[name] == null)
