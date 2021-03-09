@@ -178,7 +178,7 @@ namespace GraphQL.Types
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
         }
 
-        private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider graphTypeProvider)
+        private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         {
             foreach (var instance in schema.AdditionalTypeInstances)
                 yield return instance;
@@ -197,7 +197,7 @@ namespace GraphQL.Types
                 yield return schema.Subscription;
 
             foreach (var type in schema.AdditionalTypes)
-                yield return (IGraphType)graphTypeProvider.GetRequiredService(type.GetNamedType());
+                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
         }
 
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
