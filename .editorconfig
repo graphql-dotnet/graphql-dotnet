@@ -32,10 +32,6 @@ insert_final_newline = false
 [*.cs]
 indent_size = 4
 
-# Do not insert newline for ApiApprovalTests
-[*.txt]
-insert_final_newline = false
-
 # Code files
 [*.{cs,vb}]
 
