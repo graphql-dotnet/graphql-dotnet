@@ -108,8 +108,6 @@ namespace GraphQL.Types
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
             Func<Type, IGraphType> resolveType = t => (IGraphType)graphTypeProvider.GetRequiredService(t);
 
-            // old constructor -- creates introspection types
-
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
