@@ -200,7 +200,7 @@ This may be needed to get the parameters of parent nodes.
 ### Scalar Deserialization Type Enforcement
 
 Scalars do not coerce values if passed an incompatible type during deserialization from a variable. Previously, values would pass
-through the `ValueConverter` while being deserialized. Now the `ValueConverter` is ignored for deserialization of built-in fields.
+through the `ValueConverter` while being deserialized. Now the `ValueConverter` is ignored for deserialization of built-in scalars.
 Calling `GetArgument<T>` within the field resolver will still call the `ValueConverter` to coerce the input data to the correct type,
 but if the document is unable to deserialize successfully, the field resolver will not run.
 
