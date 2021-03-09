@@ -20,9 +20,10 @@ var result = await _executer.ExecuteAsync(options =>
 });
 
 // add the tracing data to the result
-  result.EnrichWithFederatedTracing(start);
+  result.EnrichWithApolloFederatedTracing(start);
 ```
-
+Use [IsApolloFederatedTracingEnabled](https://github.com/graphql-dotnet/server/blob/master/src/Transports.AspNetCore/GraphQLHttpRequestExtensions.cs#L20) extension method to check if federated tracing is enabled/requested before calling 
+`EnrichWithApolloFederatedTracing`.
 ### Testing
 
 Include `apollo-federation-include-trace : ftv1` header with the request and the
