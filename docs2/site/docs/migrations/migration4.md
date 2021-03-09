@@ -272,7 +272,7 @@ any exception is valid to throw.
 You may wish to add implementations for the new `CanParseValue`, `CanParseLiteral` and `IsValidDefault` methods. This is not necessary
 as the default implementations will call `ParseValue`, `ParseLiteral` and `ToAST` respectively, returning `true` unless the method
 throws an exception. Adding a custom implementation of `CanParseLiteral` can improve performance if `ParseLiteral` causes memory allocation / boxing.
-`CanParseValue` is not used by the framework at this time, and `ToAST` is only called during schema initialization.
+`CanParseValue` is not used by the framework at this time, and `ToAST` is only called during schema initialization and schema printing.
 
 ### Schema Configuration Options Moved
 
