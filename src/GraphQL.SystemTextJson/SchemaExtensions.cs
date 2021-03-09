@@ -4,6 +4,9 @@ using GraphQL.Types;
 
 namespace GraphQL.SystemTextJson
 {
+    /// <summary>
+    /// Provides extension methods for executing a document against a schema and returning a json-formatted response.
+    /// </summary>
     public static class SchemaExtensions
     {
         /// <summary>

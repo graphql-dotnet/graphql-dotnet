@@ -13,10 +13,12 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class ObjectDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {
+        /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
             => throw new NotImplementedException(
                 "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.");
 
+        /// <inheritdoc/>
         public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => ReadDictionary(ref reader);
 
