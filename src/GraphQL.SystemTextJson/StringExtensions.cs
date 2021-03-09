@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace GraphQL.SystemTextJson
 {
     /// <summary>
-    /// Provides extension methods to deserialize json strings into object dictionaries
+    /// Provides extension methods to deserialize json strings into object dictionaries.
     /// </summary>
     public static class StringExtensions
     {
