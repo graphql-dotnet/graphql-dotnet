@@ -94,19 +94,19 @@ namespace GraphQL.Types
         /// Initializes a new instance for the specified schema, and with the specified type resolver.
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
-        /// <param name="graphTypeProvider">A service provider used to resolve graph types.</param>
-        public SchemaTypes(ISchema schema, IServiceProvider graphTypeProvider)
+        /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+        public SchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
-            if (graphTypeProvider == null)
-                throw new ArgumentNullException(nameof(graphTypeProvider));
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
 
-            var types = GetSchemaTypes(schema, graphTypeProvider);
+            var types = GetSchemaTypes(schema, serviceProvider);
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
-            Func<Type, IGraphType> resolveType = t => (IGraphType)graphTypeProvider.GetRequiredService(t);
+            Func<Type, IGraphType> resolveType = t => (IGraphType)serviceProvider.GetRequiredService(t);
 
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
