@@ -19,7 +19,7 @@ namespace GraphQL.SystemTextJson
             => TryGetBigInteger(ref reader, out var bi) ? bi : throw new JsonException();
 
         /// <summary>
-        /// Attempts to read a <see cref="BigInteger"/> value from a <see cref="Utf8JsonReader"/>
+        /// Attempts to read a <see cref="BigInteger"/> value from a <see cref="Utf8JsonReader"/>.
         /// </summary>
 #if NETSTANDARD2_0
         public static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
