@@ -84,7 +84,7 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
 
         /// <summary>
-        /// Initializes a new instance with no types registered
+        /// Initializes a new instance with no types registered.
         /// </summary>
         protected SchemaTypes()
         {
