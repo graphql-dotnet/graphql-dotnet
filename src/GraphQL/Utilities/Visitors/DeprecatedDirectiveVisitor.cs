@@ -8,7 +8,7 @@ namespace GraphQL.Utilities
     public class DeprecatedDirectiveVisitor : BaseSchemaNodeVisitor
     {
         /// <summary>
-        /// Returns the string "No longer supported" - see <see cref="DeprecatedDirective.DeprecatedDirective"/>
+        /// Returns the string "No longer supported" - see <see cref="DeprecatedDirective.DeprecatedDirective"/>.
         /// </summary>
         protected static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
 

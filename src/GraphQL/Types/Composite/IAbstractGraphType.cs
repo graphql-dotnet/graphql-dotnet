@@ -19,7 +19,7 @@ namespace GraphQL.Types
         PossibleTypes PossibleTypes { get; }
 
         /// <summary>
-        /// Adds the specified graph type to a list of possible graph types for this abstract graph type
+        /// Adds the specified graph type to a list of possible graph types for this abstract graph type.
         /// </summary>
         void AddPossibleType(IObjectGraphType type);
     }
