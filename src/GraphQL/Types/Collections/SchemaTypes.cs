@@ -200,7 +200,6 @@ namespace GraphQL.Types
                 yield return (IGraphType)graphTypeProvider.GetRequiredService(type.GetNamedType());
         }
 
-
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
         {
             return (allowAppliedDirectives
