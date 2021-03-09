@@ -70,7 +70,7 @@ It can also be used to control deserialization of external `null` values, such a
 the value zero.
 
 GraphQL nullability semantics are enforced on the external AST representation of the data. For instance,
-if a custom scalar converted empty strings to null during serialization, an error would occur if a field
+if a custom scalar converted empty strings to `null` during serialization, an error would occur if a field
 resolver tried to return an empty string for a non-null field.
 
 See the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars)
