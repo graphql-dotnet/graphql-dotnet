@@ -134,8 +134,6 @@ namespace GraphQL.Types
             // set the name converter properly
             _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
-            // old static Create method -- adds specified types
-
             var ctx = new TypeCollectionContext(
                 t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t),
                 (name, graphType, context) =>
