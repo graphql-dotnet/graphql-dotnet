@@ -311,34 +311,6 @@ namespace GraphQL.Types
 
         private void CreateSchemaTypes()
         {
-            IEnumerable<IGraphType> GetTypes()
-            {
-                if (_additionalInstances != null)
-                {
-                    foreach (var instance in _additionalInstances)
-                        yield return instance;
-                }
-
-                //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
-                // if (Query == null)
-                //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
-
-                if (Query != null)
-                    yield return Query;
-
-                if (Mutation != null)
-                    yield return Mutation;
-
-                if (Subscription != null)
-                    yield return Subscription;
-
-                if (_additionalTypes != null)
-                {
-                    foreach (var type in _additionalTypes)
-                        yield return (IGraphType)_services.GetRequiredService(type.GetNamedType());
-                }
-            }
-
             IEnumerable<ISchemaNodeVisitor> GetVisitors()
             {
                 if (_visitors != null)
@@ -354,12 +326,7 @@ namespace GraphQL.Types
                 }
             }
 
-            _allTypes = SchemaTypes.Create(
-                GetTypes(),
-                _clrToGraphTypeMappings,
-                Directives,
-                type => (IGraphType)_services.GetRequiredService(type),
-                this);
+            _allTypes = new SchemaTypes(this, _services);
 
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
