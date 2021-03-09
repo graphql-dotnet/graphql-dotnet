@@ -48,9 +48,6 @@ namespace GraphQL
                     return true;
                 }
 
-                if (argumentType.IsPrimitive())
-                    throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
-
                 result = inputObject.ToObject(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
                 return true;
             }

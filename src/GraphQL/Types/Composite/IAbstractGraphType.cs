@@ -30,27 +30,24 @@ namespace GraphQL.Types
             return false;
         }
 
-        public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
+        public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value)
         {
             var result = abstractType.ResolveType != null
                 ? abstractType.ResolveType(value)
                 : GetTypeOf(abstractType, value);
 
-            if (result is GraphQLTypeReference reference)
-                result = schema.AllTypes[reference.TypeName] as IObjectGraphType;
-
             return result;
-        }
 
-        public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value) //TODO: possible merge this into method above
-        {
-            foreach (var possible in abstractType.PossibleTypes.List)
+            static IObjectGraphType GetTypeOf(IAbstractGraphType abstractType, object value)
             {
-                if (possible.IsTypeOf != null && possible.IsTypeOf(value))
-                    return possible;
-            }
+                foreach (var possible in abstractType.PossibleTypes.List)
+                {
+                    if (possible.IsTypeOf != null && possible.IsTypeOf(value))
+                        return possible;
+                }
 
-            return null;
+                return null;
+            }
         }
     }
 }

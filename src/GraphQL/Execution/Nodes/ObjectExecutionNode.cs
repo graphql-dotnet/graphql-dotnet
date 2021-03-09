@@ -29,12 +29,12 @@ namespace GraphQL.Execution
         /// proper <see cref="IObjectGraphType"/> based on the set <see cref="ExecutionNode.Result"/>.
         /// Otherwise returns the value of <see cref="ExecutionNode.GraphType"/>.
         /// </summary>
-        public IObjectGraphType GetObjectGraphType(ISchema schema)
+        public IObjectGraphType GetObjectGraphType()
         {
             var objectGraphType = GraphType as IObjectGraphType;
 
             if (GraphType is IAbstractGraphType abstractGraphType)
-                objectGraphType = abstractGraphType.GetObjectType(Result, schema);
+                objectGraphType = abstractGraphType.GetObjectType(Result);
 
             return objectGraphType;
         }
