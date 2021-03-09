@@ -66,7 +66,7 @@ requested type via `ObjectExtensions.ToObject` as it did before.
 
 Custom scalars can now handle serialization or deserialization of `null` values. This can be useful if
 you have a need to coerce certain internal values to `null`, such as serializing empty strings to `null`.
-It can also be used to control deserialization of external null values, such as deserializing null to
+It can also be used to control deserialization of external `null` values, such as deserializing `null` to
 the value zero.
 
 GraphQL nullability semantics are enforced on the external AST representation of the data. For instance,
