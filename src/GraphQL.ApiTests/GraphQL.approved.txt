@@ -2179,7 +2179,7 @@ namespace GraphQL.Types
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         protected SchemaTypes() { }
-        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider graphTypeProvider) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType this[string typeName] { get; }
