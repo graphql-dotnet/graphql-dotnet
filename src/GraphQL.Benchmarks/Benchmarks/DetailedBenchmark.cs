@@ -259,7 +259,6 @@ namespace GraphQL.Benchmarks
 
                     Operation = Operation,
                     Variables = Variables,
-                    Fragments = Document.Fragments,
                     Errors = new ExecutionErrors(),
                     Extensions = new Dictionary<string, object>(),
                     CancellationToken = default,

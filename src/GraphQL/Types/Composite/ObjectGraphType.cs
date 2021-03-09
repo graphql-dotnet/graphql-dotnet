@@ -13,7 +13,7 @@ namespace GraphQL.Types
         Func<object, bool> IsTypeOf { get; set; }
 
         /// <summary>
-        /// Adds an instanse of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
+        /// Adds an instance of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
         /// </summary>
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }

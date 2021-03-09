@@ -70,7 +70,6 @@ namespace GraphQL.Execution
                     Source = source,
                     Schema = context.Schema,
                     Document = context.Document,
-                    Fragments = context.Fragments,
                     RootValue = context.RootValue,
                     UserContext = context.UserContext,
                     Operation = context.Operation,

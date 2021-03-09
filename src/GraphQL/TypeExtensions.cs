@@ -41,17 +41,6 @@ namespace GraphQL
             => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
         /// <summary>
-        /// Determines whether this type is a .NET primitive type (int, bool, etc), or a string, DateTime or DateTimeOffset.
-        /// </summary>
-        public static bool IsPrimitive(this Type type)
-        {
-            return type.IsPrimitive
-                || type == typeof(string)
-                || type == typeof(DateTime)
-                || type == typeof(DateTimeOffset);
-        }
-
-        /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>
         /// <param name="type">The type.</param>

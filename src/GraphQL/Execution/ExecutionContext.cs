@@ -31,9 +31,6 @@ namespace GraphQL.Execution
         public Operation Operation { get; set; }
 
         /// <inheritdoc/>
-        public Fragments Fragments { get; set; }
-
-        /// <inheritdoc/>
         public Variables Variables { get; set; }
 
         /// <inheritdoc/>
@@ -134,11 +131,11 @@ namespace GraphQL.Execution
         internal ReadonlyResolveFieldContext ReusableReadonlyResolveFieldContext;
 
         /// <summary>
-        /// Allows for an execution strategy to reuse an instance of <see cref="Fields"/>.
+        /// Allows for an execution strategy to reuse an instance of <see cref="Dictionary{TKey, TValue}"/>.
         /// This field may be accessed by multiple threads at the same time, so
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
         /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
-        internal Fields ReusableFields;
+        internal Dictionary<string, Field> ReusableFields;
     }
 }

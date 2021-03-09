@@ -48,9 +48,6 @@ namespace GraphQL
         public Operation Operation { get; set; }
 
         /// <inheritdoc/>
-        public Fragments Fragments { get; set; }
-
-        /// <inheritdoc/>
         public Variables Variables { get; set; }
 
         /// <inheritdoc/>
@@ -69,7 +66,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public Fields SubFields { get; set; }
+        public Dictionary<string, Field> SubFields { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
@@ -98,7 +95,6 @@ namespace GraphQL
             Arguments = context.Arguments;
             Schema = context.Schema;
             Document = context.Document;
-            Fragments = context.Fragments;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
             Operation = context.Operation;
