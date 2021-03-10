@@ -30,7 +30,7 @@ namespace GraphQL.Utilities
         {
             ValidateNameNotNull(name, type);
 
-            if (name.Length > 1 && name[0] == '_' && name[1] == '_')
+            if (name.Length > 1 && name[0] == '_' && name[1] == '_' && type != NamedElement.EnumValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     $"A {type.ToString().ToLower()} name: '{name}' must not begin with __, which is reserved by GraphQL introspection.");

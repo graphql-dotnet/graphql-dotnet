@@ -31,8 +31,19 @@ namespace GraphQL.Tests.Utilities
             Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(" ", NamedElement.Field));
 
         [Fact]
-        public void ValidateName_whenNameStartsWithReservedCharacters_throwsArgumentOutOfRange() =>
+        public void ValidateName_whenNameStartsWithReservedCharacters_throwsArgumentOutOfRange()
+        {
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede", NamedElement.Type));
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede", NamedElement.Directive));
             Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede", NamedElement.Field));
+            Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName("__dede", NamedElement.Argument));
+        }
+
+        [Fact]
+        public void ValidateName_whenNameStartsWithReservedCharacters_validForCertainElements()
+        {
+            NameValidator.ValidateName("__dede", NamedElement.EnumValue);
+        }
 
         [Theory]
         [InlineData("śćłó")]
