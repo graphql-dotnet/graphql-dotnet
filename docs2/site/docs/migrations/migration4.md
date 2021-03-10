@@ -535,6 +535,7 @@ default continues to be `ResolverType.Resolver`.
 * `ValidationContext.Print(INode node)` and `ValidationContext.Print(IGraphType type)` methods have been removed
 * `Directives.HasDuplicates` property has been removed
 * `KnownDirectives` validation rule has been renamed to `KnownDirectivesInAllowedLocations` and now also generates `5.7.2` validation error number
+* `AstPrinter` supporting classes have been removed; the static method `AstPrinter.Print(INode node)` is the only exposed member.
 * `Language.AST.Fields` was replaced with `Dictionary<string, Field>`
 * `IResolveFieldContext.Fragments` was removed; use `IResolveFieldContext.Document.Fragments` instead
 * `ExecutionContext.Fragments` was removed; use `ExecutionContext.Document.Fragments` instead
