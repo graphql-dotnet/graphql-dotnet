@@ -2354,6 +2354,13 @@ namespace GraphQL.Utilities
         public void VisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
+    public class ArgumentConfig : GraphQL.Utilities.MetadataProvider
+    {
+        public ArgumentConfig(string name) { }
+        public object DefaultValue { get; set; }
+        public string Description { get; set; }
+        public string Name { get; }
+    }
     public static class AstPrinter
     {
         public static string Print(GraphQL.Language.AST.INode node) { }
@@ -2398,6 +2405,7 @@ namespace GraphQL.Utilities
         public GraphQL.Reflection.IAccessor ResolverAccessor { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
         public GraphQL.Reflection.IAccessor SubscriberAccessor { get; set; }
+        public GraphQL.Utilities.ArgumentConfig ArgumentFor(string argumentName) { }
     }
     public interface ISchemaNodeVisitor
     {
@@ -2451,7 +2459,7 @@ namespace GraphQL.Utilities
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
         protected virtual GraphQL.Types.IGraphType GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
-        protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
+        protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
@@ -2533,9 +2541,8 @@ namespace GraphQL.Utilities
         public string Name { get; }
         public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
         public System.Type Type { get; set; }
-        public GraphQL.Utilities.FieldConfig FieldFor(string field, System.IServiceProvider serviceProvider) { }
+        public GraphQL.Utilities.FieldConfig FieldFor(string fieldName) { }
         public void IsTypeOf<T>() { }
-        public GraphQL.Utilities.FieldConfig SubscriptionFieldFor(string field, System.IServiceProvider serviceProvider) { }
     }
     public class TypeSettings
     {
