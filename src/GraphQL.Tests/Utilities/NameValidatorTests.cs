@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void ValidateName_whenNameStartsWithReservedCharacters_validForCertainElements()
+        public void ValidateName_whenNameStartsWithReservedCharacters_validForEnumValues()
         {
             NameValidator.ValidateName("__dede", NamedElement.EnumValue);
         }
