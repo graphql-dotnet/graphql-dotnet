@@ -107,6 +107,7 @@ namespace GraphQL.Types
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
+            _typeDictionary = new Dictionary<Type, IGraphType>();
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
@@ -175,6 +176,8 @@ namespace GraphQL.Types
             ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
+
+            _typeDictionary = null;
         }
 
         private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
@@ -232,6 +235,7 @@ namespace GraphQL.Types
         }
 
         protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
+        private readonly Dictionary<Type, IGraphType> _typeDictionary = null;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();
@@ -330,13 +334,7 @@ namespace GraphQL.Types
 
                 lock (_lock)
                 {
-                    foreach (var item in Dictionary)
-                    {
-                        if (item.Value.GetType() == type)
-                            return item.Value;
-                    }
-
-                    return null;
+                    return _typeDictionary.TryGetValue(type, out var value) ? value : null;
                 }
             }
         }
@@ -698,32 +696,44 @@ Make sure that your ServiceProvider is configured correctly.");
             return type;
         }
 
-        private void SetGraphType(string typeName, IGraphType type)
+        private void SetGraphType(string typeName, IGraphType graphType)
         {
             if (string.IsNullOrWhiteSpace(typeName))
             {
                 throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
             }
 
+            var type = graphType.GetType();
             if (Dictionary.TryGetValue(typeName, out var existingGraphType))
             {
-                if (ReferenceEquals(existingGraphType, type) || existingGraphType.GetType() == type.GetType())
+                if (ReferenceEquals(existingGraphType, graphType) || existingGraphType.GetType() == type)
                 {
                     // Soft schema configuration error.
                     // Intentionally or inadvertently, a situation may arise when the same GraphType is registered more that one time.
                     // This may be due to the simultaneous registration of GraphType instances and the GraphType types. In this case
                     // the duplicate MUST be ignored, otherwise errors will occur.
                 }
+                else if (type.IsAssignableFrom(existingGraphType.GetType()) && typeof(ScalarGraphType).IsAssignableFrom(type))
+                {
+                    // This can occur when a built-in scalar graph type is overridden by preregistering a replacement graph type that
+                    // has the same name and inherits from it
+
+                    if (!_typeDictionary.ContainsKey(type))
+                        _typeDictionary.Add(type, existingGraphType);
+                }
                 else
                 {
                     // Fatal schema configuration error.
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetType().FullName}' with the name '{typeName}'.
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'.
 The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
                 }
             }
             else
             {
-                Dictionary.Add(typeName, type);
+                Dictionary.Add(typeName, graphType);
+                // if building a schema from code, the .NET types will not be unique, which should be ignored
+                if (!_typeDictionary.ContainsKey(type))
+                    _typeDictionary.Add(type, graphType);
             }
         }
 
