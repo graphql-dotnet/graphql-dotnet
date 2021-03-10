@@ -536,6 +536,10 @@ default continues to be `ResolverType.Resolver`.
 * `Directives.HasDuplicates` property has been removed
 * `KnownDirectives` validation rule has been renamed to `KnownDirectivesInAllowedLocations` and now also generates `5.7.2` validation error number
 * `AstPrinter` supporting classes have been removed; the static method `AstPrinter.Print(INode node)` is the only exposed member.
+* `Language.AST.Fields` was replaced with `Dictionary<string, Field>`
+* `IResolveFieldContext.Fragments` was removed; use `IResolveFieldContext.Document.Fragments` instead
+* `ExecutionContext.Fragments` was removed; use `ExecutionContext.Document.Fragments` instead
+* `AbstractGraphTypeExtensions.GetTypeOf` was removed; use `AbstractGraphTypeExtensions.GetObjectType` instead
 
 ### Other Breaking Changes (including but not limited to)
 
