@@ -33,11 +33,6 @@ namespace GraphQL.Execution
         ExecutionErrors Errors { get; }
 
         /// <summary>
-        /// A list of <see cref="FragmentDefinition"/>s that pertain to the GraphQL request
-        /// </summary>
-        Fragments Fragments { get; }
-
-        /// <summary>
         /// A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query
         /// </summary>
         List<IDocumentExecutionListener> Listeners { get; }

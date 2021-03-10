@@ -1,0 +1,13 @@
+schema {
+  query: Bug2194Query
+}
+
+type Bug2194Query {
+  test(applicationId: Guid! = "a62413d8-41df-45c5-b228-447f2cd2d368", date1: Date! = "2021-03-06", date2: DateTime! = "2021-03-06T17:53:21"): String
+}
+
+scalar Date
+
+scalar DateTime
+
+scalar Guid

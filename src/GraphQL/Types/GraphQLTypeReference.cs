@@ -8,7 +8,7 @@ namespace GraphQL.Types
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
     [DebuggerDisplay("ref {TypeName,nq}")]
-    internal sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
+    public sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         public GraphQLTypeReference(string typeName)
         {
@@ -21,20 +21,25 @@ namespace GraphQL.Types
         /// </summary>
         public string TypeName { get; private set; }
 
+        /// <inheritdoc/>
         public Func<object, bool> IsTypeOf
         {
             get => throw Invalid();
             set => throw Invalid();
         }
-
+        
+        /// <inheritdoc/>
         public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
+        /// <inheritdoc/>
         public Interfaces Interfaces => throw Invalid();
 
+        /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
 
         private InvalidOperationException Invalid() => new InvalidOperationException($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return obj is GraphQLTypeReference other
@@ -42,6 +47,7 @@ namespace GraphQL.Types
                 : base.Equals(obj);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode() => TypeName?.GetHashCode() ?? 0;
     }
 
@@ -49,7 +55,7 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Output type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    internal sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType
+    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType
     {
         internal GraphQLClrOutputTypeReference()
         {
@@ -61,7 +67,7 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Input type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    internal sealed class GraphQLClrInputTypeReference<T> : InputObjectGraphType
+    public sealed class GraphQLClrInputTypeReference<T> : InputObjectGraphType
     {
         internal GraphQLClrInputTypeReference()
         {

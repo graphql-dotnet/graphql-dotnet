@@ -25,6 +25,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string BadVarPosMessage(string varName, string varType, string expectedType)
-            => $"Variable \"${varName}\" of type \"{varType}\" used in position expecting type \"{expectedType}\".";
+            => $"Variable '${varName}' of type '{varType}' used in position expecting type '{expectedType}'.";
     }
 }

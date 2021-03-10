@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Errors
             {
                 return string.Join(
                     " and ",
-                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
+                    reasonMessage.Msgs.Select(x => $"subfields '{x.Name}' conflict because {ReasonMessage(x.Message)}").ToArray()
                 );
             }
             else

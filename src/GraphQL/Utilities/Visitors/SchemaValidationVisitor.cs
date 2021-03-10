@@ -60,6 +60,8 @@ namespace GraphQL.Utilities
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
+
+            ValidateArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -114,6 +116,8 @@ namespace GraphQL.Utilities
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
+
+            ValidateArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -151,7 +155,7 @@ namespace GraphQL.Utilities
             foreach (var item in type.Fields.List.ToLookup(f => f.Name))
             {
                 if (item.Count() > 1)
-                    throw new InvalidOperationException($"The inpit field '{item.Key}' must have a unique name within Input Object type '{type.Name}'; no two fields may share the same name.");
+                    throw new InvalidOperationException($"The input field '{item.Key}' must have a unique name within Input Object type '{type.Name}'; no two fields may share the same name.");
             }
         }
 
@@ -261,6 +265,18 @@ namespace GraphQL.Utilities
             else if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
             {
                 throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
+            }
+        }
+
+        private void ValidateArgumentsUniqueness(FieldType field, INamedType type)
+        {
+            if (field.Arguments?.Count > 0)
+            {
+                foreach (var item in field.Arguments.List.ToLookup(f => f.Name))
+                {
+                    if (item.Count() > 1)
+                        throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name.");
+                }
             }
         }
     }

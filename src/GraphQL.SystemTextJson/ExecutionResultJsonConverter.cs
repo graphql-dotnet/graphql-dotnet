@@ -289,8 +289,10 @@ namespace GraphQL.SystemTextJson
             }
         }
 
+        /// <inheritdoc/>
         public override ExecutionResult Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public override bool CanConvert(Type typeToConvert) => typeof(ExecutionResult).IsAssignableFrom(typeToConvert);
     }
 }

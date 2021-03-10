@@ -436,6 +436,10 @@ schema.RegisterTypeMapping<int, MyIntGraphType>();
 schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
 ```
 
+If you have dynamic code that relies on a call to `GraphTypeTypeRegistry.Get<T>` then you will need to instead utilize
+a graph type of `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>` where `T` is the CLR type.
+The type reference will be replaced with the proper graph type during schema initialization.
+
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
 In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
@@ -500,9 +504,10 @@ default continues to be `ResolverType.Resolver`.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
-* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs
+* `GraphTypesLookup.Create` has been removed; use the `SchemaTypes` constructor instead.
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
-* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `ErrorLocation` struct became `readonly`.
 * `DebugNodeVisitor` class has been removed.
@@ -552,3 +557,4 @@ default continues to be `ResolverType.Resolver`.
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
+* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]`

@@ -33,7 +33,7 @@ namespace GraphQL.Utilities
             if (name.Length > 1 && name[0] == '_' && name[1] == '_')
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type.ToString().ToLower()} name: '{name}' must not begin with \"__\", which is reserved by GraphQL introspection.");
+                    $"A {type.ToString().ToLower()} name: '{name}' must not begin with __, which is reserved by GraphQL introspection.");
             }
 
             var c = name[0];

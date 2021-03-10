@@ -25,7 +25,7 @@ namespace GraphQL.ApiTests
                 IncludeAssemblyAttributes = false,
                 //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
                 ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
-            });
+            }) + Environment.NewLine;
 
             // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
             // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,

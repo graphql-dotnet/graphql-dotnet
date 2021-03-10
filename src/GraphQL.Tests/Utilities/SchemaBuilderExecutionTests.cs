@@ -212,7 +212,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_read_schema_with_custom_root_names()
         {
-            var schema = Schema.For("CustomSubscription".ReadGraphQLRequest());
+            var schema = Schema.For("CustomSubscription".ReadSDL());
 
             schema.Query.Name.ShouldBe("CustomQuery");
             schema.Mutation.Name.ShouldBe("CustomMutation");
@@ -226,7 +226,7 @@ namespace GraphQL.Tests.Utilities
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
-                fileName.ReadGraphQLRequest(),
+                fileName.ReadSDL(),
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
@@ -237,7 +237,7 @@ namespace GraphQL.Tests.Utilities
         public void can_read_complex_schema()
         {
             var schema = Schema.For(
-                "PetComplex".ReadGraphQLRequest(),
+                "PetComplex".ReadSDL(),
                 builder =>
                 {
                     builder.Types.ForAll(config => config.ResolveType = _ => null);

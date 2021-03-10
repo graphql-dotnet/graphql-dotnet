@@ -18,6 +18,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string UnknownFragmentMessage(string fragName)
-            => $"Unknown fragment \"{fragName}\".";
+            => $"Unknown fragment '{fragName}'.";
     }
 }

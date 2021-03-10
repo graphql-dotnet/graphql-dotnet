@@ -71,8 +71,6 @@ namespace GraphQL
 
         public Operation Operation => _baseContext.Operation;
 
-        public Fragments Fragments => _baseContext.Fragments;
-
         public Variables Variables => _baseContext.Variables;
 
         public CancellationToken CancellationToken => _baseContext.CancellationToken;
@@ -85,7 +83,7 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Fields SubFields => _baseContext.SubFields;
+        public Dictionary<string, Field> SubFields => _baseContext.SubFields;
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 
