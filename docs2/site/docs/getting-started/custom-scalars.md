@@ -255,7 +255,7 @@ In this example, you created a custom scalar. In summary:
 
 - Create a class for the server-side representation of the scalar
 - Implement a `ScalarGraphType` which handles variable parsing, literal parsing, and serialization
-- Register the `ScalarGraphType` with the DI container
+- Register the `ScalarGraphType` within the DI container
 
 You can also choose to override `CanParseLiteral`, `CanParseValue` or `IsValidDefault` for
 enhanced performance. The default implementations call `ParseLiteral`, `ParseValue` and
