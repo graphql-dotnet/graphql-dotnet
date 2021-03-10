@@ -2354,35 +2354,6 @@ namespace GraphQL.Utilities
         public void VisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
-    public class AstPrintConfig
-    {
-        public AstPrintConfig() { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Utilities.AstPrintFieldDefinition> Fields { get; }
-        public System.Func<GraphQL.Language.AST.INode, bool> Matches { get; set; }
-        public System.Func<System.Collections.Generic.IDictionary<string, object>, object> PrintAst { get; set; }
-        public void Field(GraphQL.Utilities.AstPrintFieldDefinition field) { }
-    }
-    public class AstPrintConfig<T> : GraphQL.Utilities.AstPrintConfig
-        where T : GraphQL.Language.AST.INode
-    {
-        public AstPrintConfig() { }
-        public void Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> resolve) { }
-        public void Print(System.Func<GraphQL.Utilities.PrintFormat<T>, object> configure) { }
-    }
-    public class AstPrintFieldDefinition
-    {
-        public AstPrintFieldDefinition() { }
-        public string Name { get; set; }
-        public GraphQL.Utilities.IValueResolver Resolver { get; set; }
-    }
-    public class AstPrintVisitor
-    {
-        public AstPrintVisitor() { }
-        public object ApplyConfig(GraphQL.Language.AST.INode node) { }
-        public void Config<T>(System.Action<GraphQL.Utilities.AstPrintConfig<T>> configure)
-            where T : GraphQL.Language.AST.INode { }
-        public object Visit(GraphQL.Language.AST.INode node) { }
-    }
     public static class AstPrinter
     {
         public static string Print(GraphQL.Language.AST.INode node) { }
@@ -2415,11 +2386,6 @@ namespace GraphQL.Utilities
         public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
-    public class ExpressionValueResolver<TObject, TProperty> : GraphQL.Utilities.IValueResolver, GraphQL.Utilities.IValueResolver<TProperty>
-    {
-        public ExpressionValueResolver(System.Linq.Expressions.Expression<System.Func<TObject, TProperty>> property) { }
-        public TProperty Resolve(in GraphQL.Utilities.ResolveValueContext context) { }
-    }
     public class FieldConfig : GraphQL.Utilities.MetadataProvider
     {
         public FieldConfig(string name) { }
@@ -2451,14 +2417,6 @@ namespace GraphQL.Utilities
         void VisitSchema(GraphQL.Types.ISchema schema);
         void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema);
     }
-    public interface IValueResolver
-    {
-        object Resolve(in GraphQL.Utilities.ResolveValueContext context);
-    }
-    public interface IValueResolver<T> : GraphQL.Utilities.IValueResolver
-    {
-        T Resolve(in GraphQL.Utilities.ResolveValueContext context);
-    }
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
@@ -2480,20 +2438,6 @@ namespace GraphQL.Utilities
         Argument = 2,
         EnumValue = 3,
         Directive = 4,
-    }
-    public class PrintFormat<T>
-    {
-        public PrintFormat(System.Collections.Generic.IDictionary<string, object> args) { }
-        public object Arg(string key) { }
-        public object Arg<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
-        public TVal Arg<TVal>(string key) { }
-        public System.Collections.Generic.IEnumerable<object> ArgArray<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
-    }
-    public readonly struct ResolveValueContext
-    {
-        public ResolveValueContext(object source) { }
-        public object Source { get; }
-        public TType SourceAs<TType>() { }
     }
     public class SchemaBuilder
     {
