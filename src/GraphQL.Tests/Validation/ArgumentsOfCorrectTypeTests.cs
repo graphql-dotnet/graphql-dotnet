@@ -151,7 +151,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "stringArg", "String", "1.0", 3, 32);
+                Rule.badValue(_, "stringArg", "String", "1", 3, 32);
             });
         }
 
@@ -247,7 +247,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "intArg", "Int", "3.0", 3, 29);
+                Rule.badValue(_, "intArg", "Int", "3", 3, 29);
             });
         }
 
@@ -343,7 +343,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "booleanArg", "Boolean", "1.0", 3, 33);
+                Rule.badValue(_, "booleanArg", "Boolean", "1", 3, 33);
             });
         }
 
@@ -391,7 +391,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "idArg", "ID", "1.0", 3, 28);
+                Rule.badValue(_, "idArg", "ID", "1", 3, 28);
             });
         }
 
@@ -461,7 +461,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                Rule.badValue(_, "dogCommand", "DogCommand", "1.0", 3, 33);
+                Rule.badValue(_, "dogCommand", "DogCommand", "1", 3, 33);
             });
         }
 
