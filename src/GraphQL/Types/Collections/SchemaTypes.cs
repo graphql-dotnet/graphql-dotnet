@@ -243,7 +243,7 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
-        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => this[t] ?? resolver(t));
+        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => FindGraphType(t) ?? resolver(t));
 
         /// <summary>
         /// Applies all delegates specified by the middleware builder to the schema.
@@ -309,16 +309,7 @@ namespace GraphQL.Types
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
-        private IGraphType this[Type type]
-        {
-            get
-            {
-                if (type == null)
-                    throw new ArgumentOutOfRangeException(nameof(type), "A type is required to lookup.");
-
-                return _typeDictionary.TryGetValue(type, out var value) ? value : null;
-            }
-        }
+        private IGraphType FindGraphType(Type type) => _typeDictionary.TryGetValue(type, out var value) ? value : null;
 
         private void AddType(IGraphType type, TypeCollectionContext context)
         {
@@ -349,7 +340,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
-                    if (this[objectInterface] is IInterfaceGraphType interfaceInstance)
+                    if (FindGraphType(objectInterface) is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);
@@ -393,7 +384,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(unionedType, context);
 
-                    var objType = this[unionedType] as IObjectGraphType;
+                    var objType = FindGraphType(unionedType) as IObjectGraphType;
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
@@ -491,7 +482,7 @@ Make sure that your ServiceProvider is configured correctly.");
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
             var namedType = type.GetNamedType();
-            var foundType = this[namedType];
+            var foundType = FindGraphType(namedType);
             if (foundType == null)
             {
                 if (namedType == typeof(PageInfoType))
