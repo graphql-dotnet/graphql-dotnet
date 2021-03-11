@@ -81,7 +81,6 @@ namespace GraphQL.Types
 
         private readonly TypeCollectionContext _context;
         private readonly INameConverter _nameConverter;
-        private readonly object _lock = new object();
 
         /// <summary>
         /// Initializes a new instance with no types registered.
@@ -114,10 +113,7 @@ namespace GraphQL.Types
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
                (name, type, ctx) =>
                {
-                   lock (_lock)
-                   {
-                       SetGraphType(name, type);
-                   }
+                   SetGraphType(name, type);
                    ctx.AddType(name, type, null);
                },
                typeMappings);
@@ -305,19 +301,7 @@ namespace GraphQL.Types
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }
 
-                IGraphType type;
-                lock (_lock)
-                {
-                    Dictionary.TryGetValue(typeName, out type);
-                }
-                return type;
-            }
-            private set
-            {
-                lock (_lock)
-                {
-                    SetGraphType(typeName, value);
-                }
+                return Dictionary.TryGetValue(typeName, out var type) ? type : null;
             }
         }
 
@@ -332,10 +316,7 @@ namespace GraphQL.Types
                 if (type == null)
                     throw new ArgumentOutOfRangeException(nameof(type), "A type is required to lookup.");
 
-                lock (_lock)
-                {
-                    return _typeDictionary.TryGetValue(type, out var value) ? value : null;
-                }
+                return _typeDictionary.TryGetValue(type, out var value) ? value : null;
             }
         }
 
@@ -352,10 +333,7 @@ namespace GraphQL.Types
             }
 
             string name = context.CollectTypes(type);
-            lock (_lock)
-            {
-                SetGraphType(name, type);
-            }
+            SetGraphType(name, type);
 
             if (type is IComplexGraphType complexType)
             {
@@ -684,7 +662,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 {
                     type = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                     if (type != null)
-                        this[type.Name] = type;
+                        SetGraphType(type.Name, type);
                 }
             }
 
