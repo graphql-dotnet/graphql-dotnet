@@ -52,7 +52,6 @@ namespace GraphQL.Tests.Bugs
             var json = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "{ testOutput }";
-                _.Root = new SchemaFirstRoot();
             });
             json.ShouldBeCrossPlatJson("{\"data\":{\"testOutput\": 124}}");
         }
