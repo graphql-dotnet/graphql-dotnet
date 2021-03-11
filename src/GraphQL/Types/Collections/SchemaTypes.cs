@@ -178,8 +178,14 @@ namespace GraphQL.Types
 
         private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         {
+            // Manually registered AdditionalTypeInstances and AdditionalTypes should be handled first.
+            // This is necessary for the correct processing of overridden built-in scalars.
+
             foreach (var instance in schema.AdditionalTypeInstances)
                 yield return instance;
+
+            foreach (var type in schema.AdditionalTypes)
+                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
@@ -193,9 +199,6 @@ namespace GraphQL.Types
 
             if (schema.Subscription != null)
                 yield return schema.Subscription;
-
-            foreach (var type in schema.AdditionalTypes)
-                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
         }
 
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
