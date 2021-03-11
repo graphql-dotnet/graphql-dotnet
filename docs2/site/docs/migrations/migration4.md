@@ -171,6 +171,7 @@ This may be needed to get the parameters of parent nodes.
 
 ### Other Features
 
+* New method `FieldConfig.ArgumentFor`
 * New property `ISchema.ValueConverters`
 * New method `IParentExecutionNode.ApplyToChildren`
 * `ExecutionStrategy` exposes a number of `protected virtual` methods that can be used to alter the execution
@@ -540,6 +541,8 @@ default continues to be `ResolverType.Resolver`.
 * `IResolveFieldContext.Fragments` was removed; use `IResolveFieldContext.Document.Fragments` instead
 * `ExecutionContext.Fragments` was removed; use `ExecutionContext.Document.Fragments` instead
 * `AbstractGraphTypeExtensions.GetTypeOf` was removed; use `AbstractGraphTypeExtensions.GetObjectType` instead
+* `TypeConfig.FieldFor(string, IServiceProvider)` and `TypeConfig.SubscriptionFieldFor(string, IServiceProvider)` 
+  methods were merged into single `TypeConfig.FieldFor(string)` method and just return the required configuration without its initialization
 
 ### Other Breaking Changes (including but not limited to)
 

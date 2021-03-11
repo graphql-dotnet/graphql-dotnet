@@ -199,7 +199,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions);
+            var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").Description = "Some argument");
             schema.Initialize();
 
             var query = schema.Query;
@@ -214,6 +214,7 @@ namespace GraphQL.Tests.Utilities
             arg.Name.ShouldBe("id");
             arg.DefaultValue.ShouldBe(1);
             arg.ResolvedType.Name.ShouldBe("ID");
+            arg.Description.ShouldBe("Some argument");
         }
 
         [Fact]
@@ -299,7 +300,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions);
+            var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").DefaultValue = 999);
             schema.Initialize();
 
             var query = schema.Query;
@@ -316,6 +317,11 @@ namespace GraphQL.Tests.Utilities
             var post = schema.AllTypes["Post"] as IObjectGraphType;
             post.ShouldNotBeNull();
             post.Fields.Count.ShouldBe(3);
+
+            var arg = query.Fields.Last().Arguments.Single();
+            arg.Name.ShouldBe("id");
+            arg.DefaultValue.ShouldBe(999);
+            arg.Description.ShouldBeNull();
         }
 
         [Fact]
