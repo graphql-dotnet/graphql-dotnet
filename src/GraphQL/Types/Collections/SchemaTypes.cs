@@ -235,7 +235,7 @@ namespace GraphQL.Types
         }
 
         protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
-        private readonly Dictionary<Type, IGraphType> _typeDictionary = null;
+        private readonly Dictionary<Type, IGraphType> _typeDictionary;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();
