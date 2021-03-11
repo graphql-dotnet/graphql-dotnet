@@ -100,6 +100,7 @@ type Query {
             {
                 return 123;
             }
+            
             public string TestInput(IResolveFieldContext context)
             {
                 return context.GetArgument<int>("arg").ToString();
