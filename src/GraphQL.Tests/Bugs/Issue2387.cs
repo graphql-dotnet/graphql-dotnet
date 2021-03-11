@@ -153,5 +153,4 @@ type Query {
                 => value is int i ? (object)(i + 1) : null;
         }
     }
-
 }
