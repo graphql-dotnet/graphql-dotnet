@@ -49,10 +49,7 @@ namespace GraphQL.Tests.Bugs
         public async Task schemafirst_output()
         {
             var schema = BuildSchemaFirst();
-            var json = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = "{ testOutput }";
-            });
+            var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }");
             json.ShouldBeCrossPlatJson("{\"data\":{\"testOutput\": 124}}");
         }
 
@@ -60,10 +57,7 @@ namespace GraphQL.Tests.Bugs
         public async Task schemafirst_parseliteral()
         {
             var schema = BuildSchemaFirst();
-            var json = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = "{ testInput(arg:123) }";
-            });
+            var json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }");
             json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
         }
 
