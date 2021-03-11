@@ -716,7 +716,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else if (type.IsAssignableFrom(existingGraphType.GetType()) && typeof(ScalarGraphType).IsAssignableFrom(type))
                 {
                     // This can occur when a built-in scalar graph type is overridden by preregistering a replacement graph type that
-                    // has the same name and inherits from it
+                    // has the same name and inherits from it.
 
                     if (!_typeDictionary.ContainsKey(type))
                         _typeDictionary.Add(type, existingGraphType);
