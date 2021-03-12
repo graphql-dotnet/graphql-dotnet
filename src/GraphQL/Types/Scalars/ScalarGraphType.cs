@@ -42,7 +42,18 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
-        public abstract object ParseLiteral(IValue value);
+        public virtual object ParseLiteral(IValue value) => value switch
+        {
+            BooleanValue b => ParseValue(b.Value.Boxed()),
+            IntValue i => ParseValue(i.Value),
+            LongValue l => ParseValue(l.Value),
+            BigIntValue bi => ParseValue(bi.Value),
+            FloatValue f => ParseValue(f.Value),
+            DecimalValue d => ParseValue(d.Value),
+            StringValue s => ParseValue(s.Value),
+            NullValue _ => ParseValue(null),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <summary>
         /// Value input coercion. Argument values can not only provided via GraphQL syntax inside a

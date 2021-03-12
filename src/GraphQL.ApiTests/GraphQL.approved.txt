@@ -2116,7 +2116,7 @@ namespace GraphQL.Types
         public virtual bool CanParseLiteral(GraphQL.Language.AST.IValue value) { }
         public virtual bool CanParseValue(object value) { }
         public virtual bool IsValidDefault(object value) { }
-        public abstract object ParseLiteral(GraphQL.Language.AST.IValue value);
+        public virtual object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }
         protected GraphQL.Language.AST.IValue ThrowASTConversionError(object value) { }
