@@ -254,6 +254,8 @@ public class MyBooleanGraphType : BooleanGraphType
             return false;
         }
     }
+
+    public virtual object Serialize(object value) => ParseValue(value);
 }
 ```
 
