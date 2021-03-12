@@ -11,6 +11,7 @@ namespace GraphQL.StarWars.IoC
         void Register<TService>() where TService : class;
         void Register<TService>(Func<TService> instanceCreator) where TService : class;
         void Register<TService, TImpl>() where TService : class where TImpl : class, TService;
+        void Singleton<TService>() where TService : class;
         void Singleton<TService>(TService instance) where TService : class;
         void Singleton<TService>(Func<TService> instanceCreator) where TService : class;
     }
@@ -39,6 +40,12 @@ namespace GraphQL.StarWars.IoC
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             _registrations.Add(typeof(TService), () => instanceCreator());
+        }
+
+        public void Singleton<TService>() where TService : class
+        {
+            var lazy = new Lazy<TService>(() => (TService)CreateInstance(typeof(TService)));
+            Register(() => lazy.Value);
         }
 
         public void Singleton<TService>(TService instance) where TService : class

@@ -206,7 +206,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Throws an exception indicating that an internal value (typically returned from a field resolver) cannot be converted
-        /// to its external representataion. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
+        /// to its external representation. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
         /// scalar type.
         /// </summary>
         /// <remarks>

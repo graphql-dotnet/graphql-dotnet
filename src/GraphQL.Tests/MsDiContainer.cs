@@ -45,16 +45,22 @@ namespace GraphQL.Tests
             _services.AddTransient<TService, TImpl>();
         }
 
+        public void Singleton<TService>() where TService : class
+        {
+            AssertNotCreated();
+            _services.AddSingleton<TService>();
+        }
+
         public void Singleton<TService>(TService instance) where TService : class
         {
             AssertNotCreated();
-            _services.AddSingleton<TService>(instance);
+            _services.AddSingleton(instance);
         }
 
         public void Singleton<TService>(Func<TService> instanceCreator) where TService : class
         {
             AssertNotCreated();
-            _services.AddSingleton<TService>(provider => instanceCreator());
+            _services.AddSingleton(provider => instanceCreator());
         }
 
         public void Dispose()

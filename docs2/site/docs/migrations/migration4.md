@@ -487,6 +487,12 @@ This property was renamed. If you have explicitly set this property in an attrib
 directly anywhere, then just change its name. If you did not explicitly set this property, the
 default continues to be `ResolverType.Resolver`.
 
+### No more static predefined directives
+
+`DirectiveGraphType.Deprecated`, `DirectiveGraphType.Include` and `DirectiveGraphType.Skip` static properties were moved
+into corresponding virtual properties within `SchemaDirectives` class. This is done in order to be able to independently change
+the directives implementation without mutual influence on the schemas using them.
+
 ### API Cleanup
 
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
