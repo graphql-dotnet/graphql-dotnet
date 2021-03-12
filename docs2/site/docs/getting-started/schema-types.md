@@ -304,7 +304,7 @@ public class MySchema
         // For output graphs, map the 'User' data model class to the output object graph type 'UserGraphType'
         this.RegisterTypeMapping<User, UserGraphType>();
 
-        // For input graphs, map the 'User' data model class to the input object graph type 'UserGraphType'
+        // For input graphs, map the 'User' data model class to the input object graph type 'UserInputGraphType'
         this.RegisterTypeMapping<User, UserInputGraphType>();
 
         // For input or output graphs, map the 'Vector' class/struct to the scalar graph type 'VectorGraphType'
