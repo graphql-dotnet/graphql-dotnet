@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
@@ -13,6 +14,16 @@ namespace GraphQL.Tests.Bugs
         public Issue2387_OverrideBuiltInScalars_Alt()
         {
             Services.Singleton<MySchema>();
+        }
+
+        [Fact]
+        public void replace_not_scalar_should_throw()
+        {
+            Schema.AllTypes["MyQuery"].ShouldBeOfType<MyQuery>();
+
+            Should.Throw<InvalidOperationException>(() => Schema.ReplaceScalar(new BadScalar()));
+
+            Schema.AllTypes["MyQuery"].ShouldBeOfType<MyQuery>();
         }
 
         [Fact]
@@ -254,6 +265,18 @@ type Query {
 
             public override object Serialize(object value)
                 => value is string s ? "output-" + s : base.Serialize(value);
+        }
+
+        public class BadScalar : ScalarGraphType
+        {
+            public BadScalar()
+            {
+                Name = "MyQuery";
+            }
+
+            public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();
+
+            public override object ParseValue(object value) => throw new System.NotImplementedException();
         }
     }
 }

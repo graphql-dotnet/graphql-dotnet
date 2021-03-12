@@ -270,7 +270,15 @@ namespace GraphQL
                 _replacement = replacement ?? throw new ArgumentNullException(nameof(replacement));
             }
 
-            public override void VisitSchema(ISchema schema) => schema.AllTypes.Dictionary[_replacement.Name] = _replacement;
+            public override void VisitSchema(ISchema schema)
+            {
+                if (schema.AllTypes.Dictionary.TryGetValue(_replacement.Name, out var type))
+                {
+                    schema.AllTypes.Dictionary[_replacement.Name] = type is ScalarGraphType
+                        ? _replacement
+                        : throw new InvalidOperationException($"The scalar should be replaced only by another scalar. You are trying to replace non scalar type '{type.GetType().Name}' with name '{type.Name}' to scalar type '{_replacement.GetType().Name}'.");
+                }
+            }
 
             public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => Replace(argument);
 
