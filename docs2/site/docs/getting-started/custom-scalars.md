@@ -12,6 +12,11 @@ Parsing for arguments and variables are handled separately because while argumen
 query syntax, variable format is transport-specific (usually JSON). You can find more information about
 these methods [here](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Types/Scalars/ScalarGraphType.cs).
 
+You may wish to read more about how scalars work at the following links:
+
+- https://www.graphql-scalars.com/scalars-guide/
+- https://www.graphql.de/blog/scalars-in-depth/
+
 ## Vector3 sample with string parsing and serialization
 
 The following example shows how to create a custom scalar in GraphQL.NET. You will create a 3D Vector which will be exchanged
