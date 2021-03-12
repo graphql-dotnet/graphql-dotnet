@@ -91,15 +91,46 @@ namespace GraphQL.Tests.Bugs
             json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
         }
 
+        [Fact]
+        public async Task schemafirst_output_string()
+        {
+            var schema = BuildSchemaFirst();
+            var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }");
+            json.ShouldBeCrossPlatJson("{\"data\":{\"testOutputString\": \"output-hello\"}}");
+        }
+
+        [Fact]
+        public async Task schemafirst_parseliteral_string()
+        {
+            var schema = BuildSchemaFirst();
+            var json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }");
+            json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
+        }
+
+        [Fact]
+        public async Task schemafirst_parsevalue_string()
+        {
+            var schema = BuildSchemaFirst();
+            var json = await schema.ExecuteAsync(_ =>
+            {
+                _.Query = "query ($arg: String!) { testInputString(arg:$arg) }";
+                _.Inputs = "{\"arg\":\"hello\"}".ToInputs();
+            });
+            json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
+        }
+
         private Schema BuildSchemaFirst()
         {
             var typeDefs = @"
 type Query {
   testOutput: Int!
-  testInput(arg: Int!): String!
+  testInput(arg: Int!): ID!
+  testOutputString: String!
+  testInputString(arg: String!): ID!
 }";
             var schema = GraphQL.Types.Schema.For(typeDefs, config => config.Types.Include<SchemaFirstRoot>());
             schema.RegisterType(new MyIntGraphType());
+            schema.RegisterType<MyStringGraphType>();
             return schema;
         }
 
@@ -115,6 +146,16 @@ type Query {
             {
                 return context.GetArgument<int>("arg").ToString();
             }
+
+            public string TestOutputString()
+            {
+                return "hello";
+            }
+
+            public string TestInputString(IResolveFieldContext context)
+            {
+                return context.GetArgument<string>("arg");
+            }
         }
 
         public class MySchema : Schema
@@ -123,7 +164,7 @@ type Query {
             {
                 Query = new MyQuery();
                 RegisterType(new MyIntGraphType());
-                RegisterType(new MyStringGraphType());
+                RegisterType(typeof(MyStringGraphType));
             }
         }
 
@@ -166,10 +207,10 @@ type Query {
             }
 
             public override object ParseValue(object value)
-                => value is int i ? i - 1 : value;
+                => value is int i ? i - 1 : base.ParseValue(value);
 
             public override object Serialize(object value)
-                => value is int i ? (object)(i + 1) : null;
+                => value is int i ? i + 1 : base.Serialize(value);
         }
 
         public class MyStringGraphType : StringGraphType
