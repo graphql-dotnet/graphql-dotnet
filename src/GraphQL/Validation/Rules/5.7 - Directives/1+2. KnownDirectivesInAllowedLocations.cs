@@ -63,7 +63,7 @@ namespace GraphQL.Validation.Rules
                 Field _ => DirectiveLocation.Field,
                 FragmentSpread _ => DirectiveLocation.FragmentSpread,
                 InlineFragment _ => DirectiveLocation.InlineFragment,
-                FragmentDefinition _=> DirectiveLocation.FragmentDefinition,
+                FragmentDefinition _ => DirectiveLocation.FragmentDefinition,
                 _ => throw new InvalidOperationException($"Unable to determine directive location for '{AstPrinter.Print(appliedTo)}'.")
             };
         }

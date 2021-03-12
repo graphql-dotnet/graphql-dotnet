@@ -16,7 +16,8 @@ namespace GraphQL.Tests.Execution
             // create a middleware that increments a variable when every field is resolved
             var middleware = new FieldMiddlewareBuilder();
             int count = 0;
-            middleware.Use(d => context => {
+            middleware.Use(d => context =>
+            {
                 Interlocked.Increment(ref count);
                 return d(context);
             });

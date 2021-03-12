@@ -142,7 +142,7 @@ namespace GraphQL
         /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
         /// </summary>
         public static TError AddLocation<TError>(this TError error, AbstractNode abstractNode, Document document)
-            where TError: ExecutionError
+            where TError : ExecutionError
         {
             if (abstractNode == null || document == null)
                 return error;
