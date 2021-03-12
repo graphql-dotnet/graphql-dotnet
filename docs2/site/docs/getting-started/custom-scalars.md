@@ -652,3 +652,13 @@ Field<StringGraphType>("sample",
     },
     resolve: ...);
 ```
+
+This is by design. However, you can call the `ReplaceScalar` extension method after the schema is
+built, which will walk through all the graph types configured on the schema and replace any remaining
+references of the "Boolean" scalar graph type with references to your replacement scalar graph type.
+The scalar to be replaced is matched based on the name of the scalar.
+
+```csharp
+var schema = Schema.For(...);
+schema.ReplaceScalar(new MyBooleanGraphType());
+```
