@@ -8,10 +8,10 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2387
-    public class Issue2387_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2387_OverrideBuiltInScalars_Alt.MySchema>
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2392
+    public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_OverrideBuiltInScalars_Alt.MySchema>
     {
-        public Issue2387_OverrideBuiltInScalars_Alt()
+        public Issue2392_OverrideBuiltInScalars_Alt()
         {
             Services.Singleton<MySchema>();
         }
