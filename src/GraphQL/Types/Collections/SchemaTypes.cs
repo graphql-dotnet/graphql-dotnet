@@ -123,7 +123,7 @@ namespace GraphQL.Types
             foreach (var type in types)
             {
                 if (type is ScalarGraphType)
-                    AddType(type, null);
+                    AddType(type, _context);
             }
 
             // Add introspection types. Note that introspection types rely on the
