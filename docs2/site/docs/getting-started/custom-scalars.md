@@ -265,8 +265,14 @@ exception, and that they are not always called when executing a document.
 
 ## Vector3 sample with combined string/structured parsing and serialization
 
-Now to extend our sample, let's assume that we want the Vector3 scalar to instead accept and
-return data in a more structured format, in addition to support the string format for variables.
+Keep in mind that the serialized value returned by custom scalar can by anything that the
+environment allows. For example it can be a structured object, rather than a simple value.
+This is also true of variables, however literals can only be the represented by the native
+scalar types supported by the GraphQL query language -- integers, floating-point values,
+booleans and null values. You cannot parse a structured literal object into a scalar value.
+
+So to extend our sample, let's assume that we want the Vector3 scalar to instead accept and
+return data in a more structured format, in addition to supporting the string format for literals.
 
 Here is a sample of a variable supporting a more structured format:
 
@@ -384,7 +390,8 @@ public override IValue ToAST(object value)
 }
 ```
 
-With these changes, a variable can be parsed as a string or as a structured object, and is always returned as a structured object.
+With these changes, a variable can be parsed as a string or as a structured object, and is always returned
+as a structured object. Again, note that as an input literal, it must be parsed as a string.
 
 ## ValueConverter
 
@@ -467,49 +474,155 @@ public class DbIdGraphType : ScalarGraphType
 ## Replacing built-in scalar types
 
 In some cases you may want or need to replace the functionality of the built-in graph types. This can
-be accomplished by running a schema node visitor on the schema after it has been initialized. Keep in
-mind that the node visitor will walk through the introspection portion of the schema, so replacing
-a built-in type may affect the operation of introspection queries.
+be accomplished by registering a replacement scalar before the schema has been initialized. Keep in
+mind that replacing a built-in type may affect the operation of introspection queries.
 
-Below is a sample of how to replace the built-in `IdGraphType` with the `DbIdGraphType` shown above.
+In order to replace a built-in scalar graph type, the new scalar graph type must:
 
-1. Name the `DbIdGraphType` to be the same as the built-in type
+1. inherit from the scalar graph type it is replacing; and
+2. have the `Name` property set to the name of the built-in graph type.
+
+You may then override any of the members to provide custom implementations. Note that most of the
+built-in scalars override `CanParseLiteral`, so it may be necessary to override that method if you
+override `ParseLiteral`. Check the source code for the built-in scalar type you are overriding for
+further reference.
+
+Below is a sample of how to replace the built-in `BooleanGraphType` so it will accept 0 and non-zero
+values to represent false and true.
+
+1. Create a new scalar graph type `MyBooleanGraphType`. Inherit from `BooleanGraphType` and set
+the name to be `Boolean`.
 
 ```csharp
-public class DbIdGraphType : ScalarGraphType
+public class MyBooleanGraphType : BooleanGraphType
 {
-    public DbIdGraphType()
+    public MyBooleanGraphType()
     {
-        Name = "ID";
+        Name = "Boolean";
     }
-
-    ...
 }
 ```
 
-2. Create a node walker
+2. Override the methods as necessary; in this case we must override all of them except `IsValidDefault`.
 
 ```csharp
-// sungam3r to provide sample
-// perhaps we should provide a node walker for this purpose, or provide a more convenient method to replace types
-// note: don't we need to fix up schematypes also so that if a type name is provided to a query variable argument, it gets a proper reference?
-// todo: add validation for sample
+public class MyBooleanGraphType : BooleanGraphType
+{
+    public MyBooleanGraphType()
+    {
+        Name = "Boolean";
+    }
+
+    public override object ParseLiteral(IValue value) => value switch
+    {
+        BooleanValue b => b.Value,
+        IntValue i => ParseValue(i.Value),
+        LongValue l => ParseValue(l.Value),
+        BigIntValue bi => ParseValue(bi.Value),
+        StringValue s => ParseValue(s.Value),
+        FloatValue f => ParseValue(f.Value),
+        DecimalValue d => ParseValue(d.Value),
+        NullValue _ => null,
+        _ => ThrowLiteralConversionError(value)
+    }
+
+    public virtual bool CanParseLiteral(IValue value)
+    {
+        try
+        {
+            _ = ParseLiteral(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public override object ParseValue(object value) => value switch
+    {
+        bool _ => value,
+        byte b => b != 0,
+        sbyte sb => sb != 0,
+        short s => s != 0,
+        ushort us => us != 0,
+        int i => i != 0,
+        uint ui => ui != 0,
+        long l => l != 0,
+        ulong ul => ul != 0,
+        BigInteger bi => bi != 0,
+        float f => f != 0,
+        double d => d != 0,
+        decimal d => d != 0,
+        string s => bool.Parse(s),
+        null => null,
+        _ => ThrowValueConversionError(value)
+    }
+
+    public virtual bool CanParseValue(object value)
+    {
+        try
+        {
+            _ = ParseValue(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public virtual object Serialize(object value) => ParseValue(value);
+
+    public override IValue ToAST(object value) => Serialize(value) switch
+    {
+        bool b => new BooleanValue(b),
+        null => new NullValue(),
+        _ => ThrowASTConversionError(value)
+    };
+}
 ```
 
-3. Execute the node walker on the schema after it builds, during the validation stage
+3. Register the custom scalar within your schema.
+
+The final step is to register an instance of the custom scalar to the schema. This can be
+done for code-first or schema-first schemas. For code-first schemas, register it within
+your constructor via `RegisterType`, as follows:
 
 ```csharp
 public class MySchema : Schema
 {
-    ...
-
-    private readonly MyNodeWalker _myNodeWalker = new MyNodeWalker();
-    protected override void Validate()
+    public void MySchema()
     {
-        _myNodeWalker.Run(this);
-        base.Validate();
+        Query = ....;
+
+        RegisterType(new MyBooleanGraphType());
     }
 }
 ```
 
-With the above sample, all `IdGraphType` references will be replaced with `DbIdGraphType` instances.
+For schema-first schemas, register it immediately after calling `Schema.For` to create the schema.
+
+```csharp
+var schema = Schema.For(...);
+schema.RegisterType(new MyBooleanGraphType());
+```
+
+Now all `BooleanGraphType` references in your schema will utilize the new `MyBooleanGraphType`
+registered with the schema. This technique can be used to replace any of the built-in graph types.
+
+Note that if you set the `ResolvedType` property of a field or argument to an instance of a built-in
+type, or provide an instance of a built-in type to an applicable constructor, it will not be replaced
+with your registered replacement built-in type. For example, consider this code:
+
+```csharp
+Field<StringGraphType>("sample",
+    arguments: new QueryArguments {
+        // will be replaced with MyBooleanGraphType
+        new QueryArgument<BooleanGraphType> { Name = "argNewBehavior" }
+
+        // will retain default behavior
+        new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }
+    },
+    resolve: ...);
+```
