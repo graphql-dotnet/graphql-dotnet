@@ -44,7 +44,7 @@ namespace GraphQL.Types
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
         public virtual object ParseLiteral(IValue value) => value switch
         {
-            BooleanValue b => ParseValue(b.Value),
+            BooleanValue b => ParseValue(b.Value.Boxed()),
             IntValue i => ParseValue(i.Value),
             LongValue l => ParseValue(l.Value),
             BigIntValue bi => ParseValue(bi.Value),
