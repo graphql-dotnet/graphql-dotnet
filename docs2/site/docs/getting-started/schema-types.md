@@ -316,7 +316,9 @@ public class MySchema
 }
 
 There is no limitation on the CLR type of registered mappings -- for instance, scalar graph types
-can map to .NET objects or value types such as structs.
+can map to .NET objects or value types such as structs. However, mapping a list type such as `byte[]`
+is not supported, as the GraphQL.NET infrastructure will change this into a list graph type
+automatically and only search the registered mappings for a registration for `byte`.
 
 In order to implement these type mappings, GraphQL.NET will build the field or argument using a
 pseudo-type of either `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>`.
