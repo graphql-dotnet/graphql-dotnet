@@ -240,6 +240,19 @@ public class MyBooleanGraphType : ScalarGraphType
         null => null,
         _ => ValueConverter.ConvertTo(value, typeof(bool)) ?? ThrowValueConversionException(value)
     };
+
+    public virtual bool CanParseValue(object value)
+    {
+        try
+        {
+            _ = ParseValue(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
 ```
 
