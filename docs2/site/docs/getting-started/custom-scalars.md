@@ -70,7 +70,7 @@ Vectors should be returned in the same format:
 }
 ```
 
-1. Create the class for the server-side representation.
+### 1. Create the class for the server-side representation.
 
 ```csharp
 public struct Vector3
@@ -88,7 +88,7 @@ public struct Vector3
 }
 ```
 
-2. Create a graph type for the scalar by inheriting `ScalarGraphType`.
+### 2. Create a graph type for the scalar by inheriting `ScalarGraphType`.
 
 ```csharp
 using GraphQL;
@@ -119,7 +119,7 @@ public class Vector3Type : ScalarGraphType
 }
 ```
 
-3. Register the graph type with the DI container.
+### 3. Register the graph type with the DI container.
 
 ```csharp
 // In Startup.cs
@@ -132,7 +132,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-4. Prepare to accept `Vector3` inputs from query arguments. Implement `ScalarGraphType.ParseLiteral`.
+### 4. Prepare to accept `Vector3` inputs from query arguments. Implement `ScalarGraphType.ParseLiteral`.
 
 Keep in mind that AST parsing may present values as any of the following types:
 - `IntValue` - integers that can be represented within an `int`
@@ -171,7 +171,7 @@ public override object ParseLiteral(IValue value)
 
 Once the raw string is extracted from the value node, normal parsing can proceed.
 
-5. Prepare to accept `Vector3` inputs from query variables. Implement `ScalarGraphType.ParseValue`.
+### 5. Prepare to accept `Vector3` inputs from query variables. Implement `ScalarGraphType.ParseValue`.
 
 Similar to `ParseLiteral`, you must keep in mind the expected format of values that are likely
 to be presented to this method. For instance, if you are using a JSON deserializer, you may be
@@ -223,7 +223,7 @@ public override object ParseValue(object value)
 }
 ```
 
-6. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
+### 6. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
 Keep in mind that a `null` value also required to be handled.
 
 It is recommended that the type of data this method returns match the same type as
@@ -247,7 +247,7 @@ public override object Serialize(object value)
 }
 ```
 
-7. Override `ScalarGraphType.ToAST` if necessary.
+### 7. Override `ScalarGraphType.ToAST` if necessary.
 
 The infrastructure converts default field values to AST representations during initialization
 in order to verify that the default values are valid within an AST tree. The default implementation
@@ -310,7 +310,7 @@ And a sample of a response with a vector in a more structured format:
 }
 ```
 
-1. Change `ParseValue` to accept strings or structured data:
+### 1. Change `ParseValue` to accept strings or structured data:
 
 ```csharp
 // In Vector3Type
@@ -356,7 +356,7 @@ public override object ParseValue(object value)
 }
 ```
 
-2. Change `Serialize` to return structured data.
+### 2. Change `Serialize` to return structured data.
 
 ```csharp
 // In Vector3Type
@@ -373,7 +373,7 @@ public override object Serialize(object value)
 }
 ```
 
-3. Change `ToAST` to return an AST literal that represents the data.
+### 3. Change `ToAST` to return an AST literal that represents the data.
 
 Since `Serialize` no longer returns a type that can be converted to an AST node, it is
 necessary to override this method.
@@ -495,7 +495,7 @@ further reference.
 Below is a sample of how to replace the built-in `BooleanGraphType` so it will accept 0 and non-zero
 values to represent false and true.
 
-1. Create a new scalar graph type `MyBooleanGraphType`. Inherit from `BooleanGraphType` and set
+### 1. Create a new scalar graph type `MyBooleanGraphType`. Inherit from `BooleanGraphType` and set
 the name to be `Boolean`.
 
 ```csharp
@@ -508,7 +508,7 @@ public class MyBooleanGraphType : BooleanGraphType
 }
 ```
 
-2. Override the methods as necessary; in this case we must override all of them except `IsValidDefault`.
+### 2. Override the methods as necessary; in this case we must override all of them except `IsValidDefault`.
 
 ```csharp
 public class MyBooleanGraphType : BooleanGraphType
@@ -588,7 +588,7 @@ public class MyBooleanGraphType : BooleanGraphType
 }
 ```
 
-3. Register the custom scalar within your schema.
+### 3. Register the custom scalar within your schema.
 
 The final step is to register an instance of the custom scalar to the schema. This can be
 done for code-first or schema-first schemas. For code-first schemas, register it within
