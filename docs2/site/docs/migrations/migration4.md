@@ -229,13 +229,6 @@ public class MyBooleanGraphType : BooleanGraphType
         Name = "Boolean";
     }
 
-    public override object ParseLiteral(IValue value) => value switch
-    {
-        BooleanValue b => b.Value,
-        NullValue _ => null,
-        _ => ThrowLiteralConversionException(value)
-    };
-
     public override object ParseValue(object value) => value switch
     {
         null => null,
