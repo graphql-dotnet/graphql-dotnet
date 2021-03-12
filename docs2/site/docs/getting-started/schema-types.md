@@ -314,6 +314,7 @@ public class MySchema
         this.RegisterTypeMapping<Guid, MyGuidGraphType>()
     }
 }
+```
 
 There is no limitation on the CLR type of registered mappings -- for instance, scalar graph types
 can map to .NET objects or value types such as structs. However, mapping a list type such as `byte[]`
