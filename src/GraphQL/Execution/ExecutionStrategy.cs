@@ -126,19 +126,19 @@ namespace GraphQL.Execution
 
             if (directives != null)
             {
-                var directive = directives.Find(DirectiveGraphType.Skip.Name);
+                var directive = directives.Find(context.Schema.Directives.Skip.Name);
                 if (directive != null)
                 {
-                    var arg = DirectiveGraphType.Skip.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Skip.Arguments.Find("if");
 
                     if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
                         return false;
                 }
 
-                directive = directives.Find(DirectiveGraphType.Include.Name);
+                directive = directives.Find(context.Schema.Directives.Include.Name);
                 if (directive != null)
                 {
-                    var arg = DirectiveGraphType.Include.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Include.Arguments.Find("if");
 
                     return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
                 }

@@ -39,6 +39,11 @@ namespace GraphQL.Tests
 
         public ISimpleContainer Services { get; set; }
 
+        /// <summary>
+        /// WARNING! By default each time you access this property a new schema instance is created.
+        /// <br/>
+        /// Call Services.Singleton&lt;TSchema&gt;(); in your test constructor to configure schema as singleton.
+        /// </summary>
         public TSchema Schema => Services.Get<TSchema>();
 
         public IDocumentExecuter Executer { get; private set; }

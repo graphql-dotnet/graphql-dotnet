@@ -80,10 +80,11 @@ namespace GraphQL.Tests.Utilities
         public void prints_directive()
         {
             var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
-            var arg = DirectiveGraphType.Skip.Arguments.First();
+            var skip = new SkipDirective();
+            var arg = skip.Arguments.First();
             arg.ResolvedType = arg.Type.BuildNamedType();
 
-            var result = printer.PrintDirective(DirectiveGraphType.Skip);
+            var result = printer.PrintDirective(skip);
             const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
 directive @skip(
   if: Boolean!

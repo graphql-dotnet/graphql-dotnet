@@ -67,7 +67,7 @@ namespace GraphQL.Types
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// <br/><br/>
-        /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
+        /// <see cref="Schema"/> initializes the list to include <see cref="SchemaDirectives.Include"/>, <see cref="SchemaDirectives.Skip"/> and <see cref="SchemaDirectives.Deprecated"/> by default.
         /// </summary>
         SchemaDirectives Directives { get; }
 

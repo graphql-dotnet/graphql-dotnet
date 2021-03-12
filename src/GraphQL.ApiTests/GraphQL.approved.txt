@@ -1711,9 +1711,6 @@ namespace GraphQL.Types
     }
     public class DirectiveGraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
     {
-        public static readonly GraphQL.Types.DeprecatedDirective Deprecated;
-        public static readonly GraphQL.Types.IncludeDirective Include;
-        public static readonly GraphQL.Types.SkipDirective Skip;
         public DirectiveGraphType(string name, params GraphQL.Types.DirectiveLocation[] locations) { }
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
@@ -2173,6 +2170,9 @@ namespace GraphQL.Types
     {
         public SchemaDirectives() { }
         public int Count { get; }
+        public virtual GraphQL.Types.DeprecatedDirective Deprecated { get; }
+        public virtual GraphQL.Types.IncludeDirective Include { get; }
+        public virtual GraphQL.Types.SkipDirective Skip { get; }
         public GraphQL.Types.DirectiveGraphType Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveGraphType> GetEnumerator() { }
         public void Register(GraphQL.Types.DirectiveGraphType directive) { }
@@ -2387,7 +2387,6 @@ namespace GraphQL.Utilities
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
-        protected static readonly string DeprecatedDefaultValue;
         public DeprecatedDirectiveVisitor() { }
         public static GraphQL.Utilities.DeprecatedDirectiveVisitor Instance { get; }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
