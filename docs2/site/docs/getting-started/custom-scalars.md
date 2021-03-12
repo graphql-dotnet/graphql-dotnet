@@ -457,7 +457,7 @@ public class DbIdGraphType : ScalarGraphType
     public override object ParseLiteral(IValue value) => value switch
     {
         StringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
-        null => 0,
+        NullValue _ => 0,
         _ => ThrowLiteralConversionError(value)
     };
 
