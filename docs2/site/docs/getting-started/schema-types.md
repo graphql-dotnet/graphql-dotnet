@@ -285,7 +285,7 @@ attribute specified on it indicating the graph type to use for the data model. F
 specify the graph type for a `Widget` class in the following manner:
 
 ```csharp
-[GraphQLMetadata(InputType = typeof(WidgetInputGraphType), OutputType = typeof(WidgetOutputGraphType)]
+[GraphQLMetadata(InputType = typeof(WidgetInputGraphType), OutputType = typeof(WidgetGraphType)]
 public class Widget
 {
     ...
