@@ -18,6 +18,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string UnusedFragMessage(string fragName)
-            => $"Fragment \"{fragName}\" is never used.";
+            => $"Fragment '{fragName}' is never used.";
     }
 }

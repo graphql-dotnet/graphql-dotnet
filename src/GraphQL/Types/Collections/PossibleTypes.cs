@@ -25,6 +25,9 @@ namespace GraphQL.Types
                 List.Add(type);
         }
 
+        /// <summary>
+        /// Determines if the specified graph type is in the list.
+        /// </summary>
         public bool Contains(IObjectGraphType type) => List.Contains(type ?? throw new ArgumentNullException(nameof(type)));
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>

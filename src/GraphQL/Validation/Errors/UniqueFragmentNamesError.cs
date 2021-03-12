@@ -18,6 +18,6 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string DuplicateFragmentNameMessage(string fragName)
-            => $"There can only be one fragment named \"{fragName}\"";
+            => $"There can only be one fragment named '{fragName}'";
     }
 }

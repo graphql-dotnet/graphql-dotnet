@@ -27,9 +27,9 @@ namespace GraphQL.Validation.Errors
         }
 
         internal static string MissingFieldArgMessage(string fieldName, string argName, string type)
-            => $"Argument \"{argName}\" of type \"{type}\" is required for field \"{fieldName}\" but not provided.";
+            => $"Argument '{argName}' of type '{type}' is required for field '{fieldName}' but not provided.";
 
         internal static string MissingDirectiveArgMessage(string directiveName, string argName, string type)
-            => $"Argument \"{argName}\" of type \"{type}\" is required for directive \"{directiveName}\" but not provided.";
+            => $"Argument '{argName}' of type '{type}' is required for directive '{directiveName}' but not provided.";
     }
 }

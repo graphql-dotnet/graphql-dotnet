@@ -184,7 +184,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
-        public static string[] IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
+        public static string IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static GraphQL.Language.AST.IValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
@@ -223,7 +223,6 @@ namespace GraphQL
         System.Collections.Generic.IDictionary<string, object> Extensions { get; }
         GraphQL.Language.AST.Field FieldAst { get; }
         GraphQL.Types.FieldType FieldDefinition { get; }
-        GraphQL.Language.AST.Fragments Fragments { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
         GraphQL.IResolveFieldContext Parent { get; }
@@ -234,7 +233,7 @@ namespace GraphQL
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         object Source { get; }
-        GraphQL.Language.AST.Fields SubFields { get; }
+        System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
     }
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
@@ -298,7 +297,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> Extensions { get; }
         public GraphQL.Language.AST.Field FieldAst { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
-        public GraphQL.Language.AST.Fragments Fragments { get; }
         public GraphQL.Instrumentation.Metrics Metrics { get; }
         public GraphQL.Language.AST.Operation Operation { get; }
         public GraphQL.IResolveFieldContext Parent { get; }
@@ -309,7 +307,7 @@ namespace GraphQL
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
         public object Source { get; }
-        public GraphQL.Language.AST.Fields SubFields { get; }
+        public System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
@@ -325,7 +323,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> Extensions { get; set; }
         public GraphQL.Language.AST.Field FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
-        public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.IResolveFieldContext Parent { get; set; }
@@ -336,7 +333,7 @@ namespace GraphQL
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public object Source { get; set; }
-        public GraphQL.Language.AST.Fields SubFields { get; set; }
+        public System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
     }
@@ -400,7 +397,6 @@ namespace GraphQL
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
         public static bool IsNullable(this System.Type type) { }
-        public static bool IsPrimitive(this System.Type type) { }
         public static string ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
     public enum TypeMappingMode
@@ -565,105 +561,6 @@ namespace GraphQL.Conversion
 }
 namespace GraphQL.DataLoader
 {
-    public class BatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<TKey, T>
-    {
-        public BatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchDelegate, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        public BatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchDelegate, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        protected override System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken) { }
-    }
-    public class CollectionBatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<TKey, System.Collections.Generic.IEnumerable<T>>
-    {
-        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchDelegate, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchDelegate, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        protected override System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, System.Collections.Generic.IEnumerable<T>>> list, System.Threading.CancellationToken cancellationToken) { }
-    }
-    public abstract class DataLoaderBase<TKey, T> : GraphQL.DataLoader.IDataLoader, GraphQL.DataLoader.IDataLoader<TKey, T>
-    {
-        protected readonly System.Collections.Generic.IEqualityComparer<TKey> EqualityComparer;
-        protected readonly int MaxBatchSize;
-        public DataLoaderBase() { }
-        public DataLoaderBase(bool caching) { }
-        public DataLoaderBase(System.Collections.Generic.IEqualityComparer<TKey> equalityComparer) { }
-        public DataLoaderBase(bool caching, int maxBatchSize) { }
-        public DataLoaderBase(System.Collections.Generic.IEqualityComparer<TKey> equalityComparer, int maxBatchSize) { }
-        public DataLoaderBase(bool caching, System.Collections.Generic.IEqualityComparer<TKey> equalityComparer, int maxBatchSize) { }
-        public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        protected abstract System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken);
-        public virtual GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync(TKey key) { }
-    }
-    public class DataLoaderContext
-    {
-        public DataLoaderContext() { }
-        public TDataLoader GetOrAdd<TDataLoader>(string loaderKey, System.Func<TDataLoader> dataLoaderFactory)
-            where TDataLoader : GraphQL.DataLoader.IDataLoader { }
-    }
-    public class DataLoaderContextAccessor : GraphQL.DataLoader.IDataLoaderContextAccessor
-    {
-        public DataLoaderContextAccessor() { }
-        public GraphQL.DataLoader.DataLoaderContext Context { get; set; }
-    }
-    public static class DataLoaderContextExtensions
-    {
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
-        public static GraphQL.DataLoader.IDataLoader<T> GetOrAddLoader<T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Threading.Tasks.Task<T>> fetchFunc) { }
-        public static GraphQL.DataLoader.IDataLoader<T> GetOrAddLoader<T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> fetchFunc) { }
-        public static System.Func<System.Threading.CancellationToken, TResult> WrapNonCancellableFunc<TResult>(System.Func<TResult> func) { }
-        public static System.Func<T, System.Threading.CancellationToken, TResult> WrapNonCancellableFunc<T, TResult>(System.Func<T, TResult> func) { }
-    }
-    public class DataLoaderDocumentListener : GraphQL.Execution.IDocumentExecutionListener
-    {
-        public DataLoaderDocumentListener(GraphQL.DataLoader.IDataLoaderContextAccessor accessor) { }
-        public System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
-        public System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
-        public System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
-        public System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
-        public System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
-    }
-    public static class DataLoaderExtensions
-    {
-        public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, System.Collections.Generic.IEnumerable<TKey> keys) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, params TKey[] keys) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>>> resolve) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>> resolve) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, GraphQL.DataLoader.IDataLoaderResult<TReturnType>> resolve) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>>>> resolve) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>>> resolve) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>> resolve) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, TResult> chainedDelegate) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
-    }
-    public sealed class DataLoaderPair<TKey, T> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>
-    {
-        public DataLoaderPair(GraphQL.DataLoader.IDataLoader loader, TKey key) { }
-        public bool IsResultSet { get; }
-        public TKey Key { get; }
-        public GraphQL.DataLoader.IDataLoader Loader { get; }
-        public T Result { get; }
-        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        public void SetResult(T value) { }
-    }
-    public class DataLoaderResult<T> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>
-    {
-        public DataLoaderResult(System.Threading.Tasks.Task<T> result) { }
-        public DataLoaderResult(T result) { }
-        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
-    }
-    public interface IDataLoader
-    {
-        System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default);
-    }
-    public interface IDataLoaderContextAccessor
-    {
-        GraphQL.DataLoader.DataLoaderContext Context { get; set; }
-    }
     public interface IDataLoaderResult
     {
         System.Threading.Tasks.Task<object> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
@@ -671,21 +568,6 @@ namespace GraphQL.DataLoader
     public interface IDataLoaderResult<T> : GraphQL.DataLoader.IDataLoaderResult
     {
         System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
-    }
-    public interface IDataLoader<T>
-    {
-        GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync();
-    }
-    public interface IDataLoader<TKey, T>
-    {
-        GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync(TKey key);
-    }
-    public class SimpleDataLoader<T> : GraphQL.DataLoader.IDataLoader, GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>, GraphQL.DataLoader.IDataLoader<T>
-    {
-        public SimpleDataLoader(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> fetchDelegate) { }
-        public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        public GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync() { }
     }
 }
 namespace GraphQL.Execution
@@ -763,7 +645,6 @@ namespace GraphQL.Execution
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; set; }
         public System.Collections.Generic.Dictionary<string, object> Extensions { get; set; }
-        public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
@@ -806,7 +687,7 @@ namespace GraphQL.Execution
         protected ExecutionStrategy() { }
         protected virtual GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
         protected virtual GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
-        protected virtual GraphQL.Language.AST.Fields CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, GraphQL.Language.AST.Fields fields) { }
+        protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> fields) { }
         protected virtual System.Threading.Tasks.Task CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual void CompleteNode(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
@@ -815,7 +696,7 @@ namespace GraphQL.Execution
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
         protected GraphQL.Types.FieldType GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
         protected virtual GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Execution.ExecutionContext context) { }
-        public virtual GraphQL.Language.AST.Fields GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+        public virtual System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         [System.Obsolete]
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
@@ -860,7 +741,6 @@ namespace GraphQL.Execution
         GraphQL.ExecutionErrors Errors { get; }
         GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; }
         System.Collections.Generic.Dictionary<string, object> Extensions { get; }
-        GraphQL.Language.AST.Fragments Fragments { get; }
         System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         int? MaxParallelExecutionCount { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
@@ -875,7 +755,7 @@ namespace GraphQL.Execution
     public interface IExecutionStrategy
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context);
-        GraphQL.Language.AST.Fields GetSubFields(GraphQL.Execution.ExecutionContext executionContext, GraphQL.Execution.ExecutionNode executionNode);
+        System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> GetSubFields(GraphQL.Execution.ExecutionContext executionContext, GraphQL.Execution.ExecutionNode executionNode);
     }
     public interface IParentExecutionNode
     {
@@ -1301,11 +1181,6 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class Fields : System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field>
-    {
-        public Fields() { }
-        public void Add(GraphQL.Language.AST.Field field) { }
-    }
     public class FloatValue : GraphQL.Language.AST.ValueNode<double>
     {
         public FloatValue(double value) { }
@@ -1704,7 +1579,6 @@ namespace GraphQL.Types
     public static class AbstractGraphTypeExtensions
     {
         public static GraphQL.Types.IObjectGraphType GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value, GraphQL.Types.ISchema schema) { }
-        public static GraphQL.Types.IObjectGraphType GetTypeOf(this GraphQL.Types.IAbstractGraphType abstractType, object value) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
     public class AppliedDirective : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
@@ -1950,6 +1824,19 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
+    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.InputObjectGraphType { }
+    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.InterfaceGraphType { }
+    public sealed class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    {
+        public GraphQLTypeReference(string typeName) { }
+        public GraphQL.Types.Interfaces Interfaces { get; }
+        public System.Func<object, bool> IsTypeOf { get; set; }
+        public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public string TypeName { get; }
+        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+    }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
@@ -2036,6 +1923,7 @@ namespace GraphQL.Types
     }
     public interface ISchema : GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         GraphQL.Types.SchemaTypes AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
@@ -2241,6 +2129,7 @@ namespace GraphQL.Types
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
+        public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public GraphQL.Types.SchemaTypes AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
@@ -2290,14 +2179,17 @@ namespace GraphQL.Types
     }
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
+        protected SchemaTypes() { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public int Count { get; }
+        protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType this[string typeName] { get; }
+        protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
+        protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "clrType",
-                "graphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Types.ISchema schema) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2462,34 +2354,12 @@ namespace GraphQL.Utilities
         public void VisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
-    public class AstPrintConfig
+    public class ArgumentConfig : GraphQL.Utilities.MetadataProvider
     {
-        public AstPrintConfig() { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Utilities.AstPrintFieldDefinition> Fields { get; }
-        public System.Func<GraphQL.Language.AST.INode, bool> Matches { get; set; }
-        public System.Func<System.Collections.Generic.IDictionary<string, object>, object> PrintAst { get; set; }
-        public void Field(GraphQL.Utilities.AstPrintFieldDefinition field) { }
-    }
-    public class AstPrintConfig<T> : GraphQL.Utilities.AstPrintConfig
-        where T : GraphQL.Language.AST.INode
-    {
-        public AstPrintConfig() { }
-        public void Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> resolve) { }
-        public void Print(System.Func<GraphQL.Utilities.PrintFormat<T>, object> configure) { }
-    }
-    public class AstPrintFieldDefinition
-    {
-        public AstPrintFieldDefinition() { }
-        public string Name { get; set; }
-        public GraphQL.Utilities.IValueResolver Resolver { get; set; }
-    }
-    public class AstPrintVisitor
-    {
-        public AstPrintVisitor() { }
-        public object ApplyConfig(GraphQL.Language.AST.INode node) { }
-        public void Config<T>(System.Action<GraphQL.Utilities.AstPrintConfig<T>> configure)
-            where T : GraphQL.Language.AST.INode { }
-        public object Visit(GraphQL.Language.AST.INode node) { }
+        public ArgumentConfig(string name) { }
+        public object DefaultValue { get; set; }
+        public string Description { get; set; }
+        public string Name { get; }
     }
     public static class AstPrinter
     {
@@ -2523,15 +2393,11 @@ namespace GraphQL.Utilities
         public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
-    public class ExpressionValueResolver<TObject, TProperty> : GraphQL.Utilities.IValueResolver, GraphQL.Utilities.IValueResolver<TProperty>
-    {
-        public ExpressionValueResolver(System.Linq.Expressions.Expression<System.Func<TObject, TProperty>> property) { }
-        public TProperty Resolve(in GraphQL.Utilities.ResolveValueContext context) { }
-    }
     public class FieldConfig : GraphQL.Utilities.MetadataProvider
     {
         public FieldConfig(string name) { }
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
+        public object DefaultValue { get; set; }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; }
@@ -2539,6 +2405,7 @@ namespace GraphQL.Utilities
         public GraphQL.Reflection.IAccessor ResolverAccessor { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
         public GraphQL.Reflection.IAccessor SubscriberAccessor { get; set; }
+        public GraphQL.Utilities.ArgumentConfig ArgumentFor(string argumentName) { }
     }
     public interface ISchemaNodeVisitor
     {
@@ -2557,14 +2424,6 @@ namespace GraphQL.Utilities
         void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema);
         void VisitSchema(GraphQL.Types.ISchema schema);
         void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema);
-    }
-    public interface IValueResolver
-    {
-        object Resolve(in GraphQL.Utilities.ResolveValueContext context);
-    }
-    public interface IValueResolver<T> : GraphQL.Utilities.IValueResolver
-    {
-        T Resolve(in GraphQL.Utilities.ResolveValueContext context);
     }
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
@@ -2588,20 +2447,6 @@ namespace GraphQL.Utilities
         EnumValue = 3,
         Directive = 4,
     }
-    public class PrintFormat<T>
-    {
-        public PrintFormat(System.Collections.Generic.IDictionary<string, object> args) { }
-        public object Arg(string key) { }
-        public object Arg<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
-        public TVal Arg<TVal>(string key) { }
-        public System.Collections.Generic.IEnumerable<object> ArgArray<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
-    }
-    public readonly struct ResolveValueContext
-    {
-        public ResolveValueContext(object source) { }
-        public object Source { get; }
-        public TType SourceAs<TType>() { }
-    }
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
@@ -2614,7 +2459,7 @@ namespace GraphQL.Utilities
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
         protected virtual GraphQL.Types.IGraphType GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
-        protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
+        protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
@@ -2696,9 +2541,8 @@ namespace GraphQL.Utilities
         public string Name { get; }
         public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
         public System.Type Type { get; set; }
-        public GraphQL.Utilities.FieldConfig FieldFor(string field, System.IServiceProvider serviceProvider) { }
+        public GraphQL.Utilities.FieldConfig FieldFor(string fieldName) { }
         public void IsTypeOf<T>() { }
-        public GraphQL.Utilities.FieldConfig SubscriptionFieldFor(string field, System.IServiceProvider serviceProvider) { }
     }
     public class TypeSettings
     {
@@ -2952,12 +2796,12 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class ArgumentsOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
-        public ArgumentsOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
+        public ArgumentsOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, string verboseErrors) { }
     }
     [System.Serializable]
     public class DefaultValuesOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
-        public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
+        public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, string verboseErrors) { }
     }
     [System.Serializable]
     public class DirectivesInAllowedLocationsError : GraphQL.Validation.ValidationError

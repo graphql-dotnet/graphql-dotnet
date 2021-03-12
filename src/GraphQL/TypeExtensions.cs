@@ -40,14 +40,6 @@ namespace GraphQL
         public static bool IsNullable(this Type type)
             => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-        public static bool IsPrimitive(this Type type)
-        {
-            return type.IsPrimitive
-                || type == typeof(string)
-                || type == typeof(DateTime)
-                || type == typeof(DateTimeOffset);
-        }
-
         /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>

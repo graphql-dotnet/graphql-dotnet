@@ -260,8 +260,8 @@ namespace GraphQL.Tests.Validation
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" },
-                    new QueryArgument<IntGraphType> { Name = "req1", DefaultValue = 0 },
-                    new QueryArgument<IntGraphType> { Name = "req2", DefaultValue = 0 }
+                    new QueryArgument<IntGraphType> { Name = "req3", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "req4", DefaultValue = 0 }
                 ));
         }
     }

@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Errors
 
         internal static string UnknownArgMessage(string argName, string fieldName, string type, string[] suggestedArgs)
         {
-            var message = $"Unknown argument \"{argName}\" on field \"{fieldName}\" of type \"{type}\".";
+            var message = $"Unknown argument '{argName}' on field '{fieldName}' of type '{type}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
                 message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
@@ -51,7 +51,7 @@ namespace GraphQL.Validation.Errors
 
         internal static string UnknownDirectiveArgMessage(string argName, string directiveName, string[] suggestedArgs)
         {
-            var message = $"Unknown argument \"{argName}\" on directive \"{directiveName}\".";
+            var message = $"Unknown argument '{argName}' on directive '{directiveName}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
                 message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
