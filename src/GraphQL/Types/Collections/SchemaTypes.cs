@@ -119,7 +119,7 @@ namespace GraphQL.Types
                typeMappings);
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
-            // prior to adding introspection types.
+            // prior to adding any other types (including introspection types).
             foreach (var type in types)
             {
                 if (type is ScalarGraphType)
