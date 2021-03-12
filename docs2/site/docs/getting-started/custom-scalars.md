@@ -258,7 +258,7 @@ values, or if you are returning structured data.
 
 In this example, you created a custom scalar. In summary:
 
-- Create a class for the server-side representation of the scalar
+- Create a data class for the server-side representation of the scalar
 - Implement a `ScalarGraphType` which handles variable parsing, literal parsing, and serialization
 - Register the `ScalarGraphType` within the DI container
 
