@@ -377,6 +377,8 @@ namespace GraphQL
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
             where TVisitor : GraphQL.Utilities.ISchemaNodeVisitor { }
+        public static TSchema ReplaceScalar<TSchema>(this TSchema schema, GraphQL.Types.ScalarGraphType scalar)
+            where TSchema : GraphQL.Types.ISchema { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
     }
     public static class StringExtensions
@@ -1918,8 +1920,7 @@ namespace GraphQL.Types
     }
     public interface IProvideResolvedType
     {
-        GraphQL.Types.IGraphType ResolvedType { get; }
-        System.Type Type { get; }
+        GraphQL.Types.IGraphType ResolvedType { get; set; }
     }
     public interface ISchema : GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
