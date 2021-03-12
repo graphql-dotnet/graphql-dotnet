@@ -218,7 +218,8 @@ Here are some of the situations that you may run into with version 4:
 For situations where it is necessary to revert scalars to previous behavior, you can override the built-in scalar by following the
 instructions within the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars) documentation page.
 
-Below is a sample replacement for the `BooleanGraphType` which will restore the previous behavior.
+Below is a sample replacement for the `BooleanGraphType` which will restore the previous behavior exactly
+as it was in version 3.x.
 
 ```csharp
 public class MyBooleanGraphType : BooleanGraphType
