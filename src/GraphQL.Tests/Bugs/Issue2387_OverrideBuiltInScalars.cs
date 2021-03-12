@@ -201,7 +201,8 @@ type Query {
                 Name = "Int";
             }
 
-            public override object ParseLiteral(IValue value) {
+            public override object ParseLiteral(IValue value)
+            {
                 var ret = base.ParseLiteral(value);
                 return ret is int i ? i - 1 : ret;
             }

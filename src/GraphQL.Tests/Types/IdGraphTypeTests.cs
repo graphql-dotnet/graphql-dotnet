@@ -34,7 +34,8 @@ namespace GraphQL.Tests.Types
         [InlineData("hello")]
         public void parse_literal_value_to_identifier(object value)
         {
-            IValue ast = value switch {
+            IValue ast = value switch
+            {
                 int i => new IntValue(i),
                 long l => new LongValue(l),
                 string s => new StringValue(s),

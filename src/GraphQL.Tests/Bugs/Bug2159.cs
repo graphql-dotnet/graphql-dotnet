@@ -156,7 +156,7 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug2159ReqObjGraphType: InputObjectGraphType<Bug2159Object>
+    public class Bug2159ReqObjGraphType : InputObjectGraphType<Bug2159Object>
     {
         public Bug2159ReqObjGraphType()
         {

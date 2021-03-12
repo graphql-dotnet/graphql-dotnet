@@ -68,7 +68,7 @@ namespace GraphQL.Execution
                     else
                     {
                         isNullableType = true;
-                    } 
+                    }
                 }
             }
 

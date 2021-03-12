@@ -1,8 +1,8 @@
+using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Tests.Utilities.Visitors;
 using GraphQL.Types;
 using Shouldly;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities

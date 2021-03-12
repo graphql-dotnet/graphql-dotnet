@@ -38,7 +38,8 @@ namespace GraphQL.Resolvers
         /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
-            if (resolver == null) throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
             _resolver = GetResolverFor(resolver);
         }
 
@@ -104,7 +105,8 @@ namespace GraphQL.Resolvers
                     adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
                     var ret = resolver(adapter);
                     var t = (Task)(object)ret;
-                    if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion) {
+                    if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion)
+                    {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     }

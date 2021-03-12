@@ -347,7 +347,7 @@ namespace GraphQL.Execution
 
             if (data is IList list)
             {
-                for (int i=0; i<list.Count; ++i)
+                for (int i = 0; i < list.Count; ++i)
                     SetArrayItemNode(list[i]);
             }
             else
