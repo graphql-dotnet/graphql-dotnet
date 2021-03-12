@@ -28,6 +28,24 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
+        public void codefirst_output_string()
+        {
+            AssertQuerySuccess("{ testOutputString }", "{\"testOutputString\": \"output-hello\"}");
+        }
+
+        [Fact]
+        public void codefirst_parseliteral_string()
+        {
+            AssertQuerySuccess("{ testInputString(arg:\"hello\") }", "{\"testInputString\": \"input-hello\"}");
+        }
+
+        [Fact]
+        public void codefirst_parsevalue_string()
+        {
+            AssertQuerySuccess("query ($arg: String) { testInputString(arg:$arg) }", "{\"testInputString\": \"input-hello\"}", "{\"arg\":\"hello\"}".ToInputs());
+        }
+
+        [Fact]
         public void codefirst_nonnull_output()
         {
             AssertQuerySuccess("{ testNonNullOutput }", "{\"testNonNullOutput\": 124}");
@@ -105,6 +123,7 @@ type Query {
             {
                 Query = new MyQuery();
                 RegisterType(new MyIntGraphType());
+                RegisterType(new MyStringGraphType());
             }
         }
 
@@ -113,17 +132,24 @@ type Query {
             public MyQuery()
             {
                 Field<IntGraphType>("testOutput", resolve: context => 123);
-                Field<StringGraphType>("testInput",
+                Field<IdGraphType>("testInput",
                     arguments: new QueryArguments {
                         new QueryArgument<IntGraphType> { Name = "arg" }
                     },
                     resolve: context => context.GetArgument<int>("arg").ToString());
                 Field<NonNullGraphType<IntGraphType>>("testNonNullOutput", resolve: context => 123);
-                Field<StringGraphType>("testNonNullInput",
+                Field<IdGraphType>("testNonNullInput",
                     arguments: new QueryArguments {
                         new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "arg" }
                     },
                     resolve: context => context.GetArgument<int>("arg").ToString());
+                Field<StringGraphType>("testOutputString", resolve: context => "hello");
+                Field<IdGraphType>("testInputString",
+                    arguments: new QueryArguments
+                    {
+                        new QueryArgument<StringGraphType> { Name = "arg" }
+                    },
+                    resolve: context => context.GetArgument<string>("arg"));
             }
         }
 
@@ -144,6 +170,23 @@ type Query {
 
             public override object Serialize(object value)
                 => value is int i ? (object)(i + 1) : null;
+        }
+
+        public class MyStringGraphType : StringGraphType
+        {
+            public MyStringGraphType()
+            {
+                Name = "String";
+            }
+
+            public override object ParseLiteral(IValue value)
+                => value is StringValue s ? "input-" + s.Value : base.ParseLiteral(value);
+
+            public override object ParseValue(object value)
+                => value is string s ? "input-" + s : base.ParseValue(value);
+
+            public override object Serialize(object value)
+                => value is string s ? "output-" + s : base.Serialize(value);
         }
     }
 }
