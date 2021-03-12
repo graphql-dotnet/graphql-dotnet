@@ -256,6 +256,27 @@ appropriate AST node based on the data type returned from `Serialize`. It is lik
 only need to override this method if you are creating a custom scalar that returns enumeration
 values, or if you are returning structured data.
 
+### 8. Code-first: Register the .NET type mapping with the schema (optional).
+
+In order to allow simple field mappings like `Field(x => x.Vector)`, you need to register the
+custom scalar with the schema so that the proper graph type can be selected for the field.
+Call `RegisterTypeMapping` with the CLR data model type and the graph type you want it mapped to.
+
+```csharp
+public class MySchema
+{
+    public MySchema()
+    {
+        ...
+
+        this.RegisterTypeMapping<Vector3, Vector3Type>();
+    }
+}
+```
+
+This is not necessary if you use the alternate `Field<T>` syntax which specifies the graph type
+to be used for the field.
+
 In this example, you created a custom scalar. In summary:
 
 - Create a data class for the server-side representation of the scalar
