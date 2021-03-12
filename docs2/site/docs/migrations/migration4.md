@@ -221,7 +221,7 @@ instructions within the [Custom Scalars](https://graphql-dotnet.github.io/docs/g
 Below is a sample replacement for the `BooleanGraphType` which will restore the previous behavior.
 
 ```csharp
-public class MyBooleanGraphType : ScalarGraphType
+public class MyBooleanGraphType : BooleanGraphType
 {
     public MyBooleanGraphType()
     {
