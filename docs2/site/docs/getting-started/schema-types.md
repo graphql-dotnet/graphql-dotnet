@@ -279,9 +279,20 @@ be implemented as:
 
 ## Type Mapping
 
-When specifying a field using the shortcut syntax `Field(x => x.Name)`, which does not specify
-a specific graph type, GraphQL.NET will search a list of CLR mappings to graph type classes.
+When specifying a field using the shortcut syntax `Field(x => x.Parent)`, which does not specify
+a specific graph type, GraphQL.NET will first look at the data model to see if it has a `GraphQLMetadata`
+attribute specified on it indicating the graph type to use for the data model. For instance, you can
+specify the graph type for a `Widget` class in the following manner:
 
+```csharp
+[GraphQLMetadata(InputType = typeof(WidgetInputGraphType), OutputType = typeof(WidgetOutputGraphType)]
+public class Widget
+{
+    ...
+}
+```
+
+If no attribute is specified on the type, it will search a list of CLR mappings to graph type classes.
 All of the intrinsic and supplemental scalar graph types included with GraphQL.NET will be searched,
 and lists are handled automatically as well.
 
@@ -290,7 +301,6 @@ when the schema is initialized. These mappings can be for input objects, output 
 A single CLR type can be mapped separately for both input and output objects.
 
 You can override default mappings of built-in scalars by registering your own mapping.
-
 To add a mapping, call the `RegisterTypeMapping` method on the `Schema`. Below is a sample of how
 to add mappings:
 
