@@ -136,6 +136,7 @@ namespace GraphQL.NewtonsoftJson
             return serializer;
         }
 
+        /// <inheritdoc/>
         public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

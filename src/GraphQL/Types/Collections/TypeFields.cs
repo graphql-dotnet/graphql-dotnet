@@ -39,8 +39,14 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <summary>
+        /// Determines if the specified field type is in the list.
+        /// </summary>
         public bool Contains(FieldType field) => List.Contains(field ?? throw new ArgumentNullException(nameof(field)));
 
+        /// <summary>
+        /// Determines if the specified field type is in the list.
+        /// </summary>
         public bool Contains(IFieldType field) => List.Contains((FieldType)field ?? throw new ArgumentNullException(nameof(field)));
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>

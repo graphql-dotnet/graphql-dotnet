@@ -255,7 +255,6 @@ namespace GraphQL
 
                 Operation = operation,
                 Variables = variables,
-                Fragments = document.Fragments,
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object>(),
                 CancellationToken = options.CancellationToken,

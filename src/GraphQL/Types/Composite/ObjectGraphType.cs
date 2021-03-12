@@ -7,8 +7,14 @@ namespace GraphQL.Types
     /// </summary>
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
+        /// <summary>
+        /// Gets or sets a delegate that determines if the specified object is valid for this graph type.
+        /// </summary>
         Func<object, bool> IsTypeOf { get; set; }
 
+        /// <summary>
+        /// Adds an instance of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
+        /// </summary>
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 

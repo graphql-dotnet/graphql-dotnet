@@ -160,24 +160,49 @@ namespace GraphQL.Types
             };
         }
 
+        /// <summary>
+        /// Throws an exception indicating that a value cannot be converted to its AST representation. Typically called by
+        /// <see cref="ToAST(object)"/> if the provided object (an internal representataion) is not valid for this scalar type.
+        /// </summary>
         protected internal IValue ThrowASTConversionError(object value)
         {
             throw new InvalidOperationException($"Unable to convert '{value}' to its AST representation for the scalar type '{Name}'.");
         }
 
+        /// <summary>
+        /// Throws an exception indicating that an AST scalar node cannot be converted to a value. Typically called by
+        /// <see cref="ParseLiteral(IValue)"/> if the node type is invalid or cannot be parsed.
+        /// </summary>
         protected object ThrowLiteralConversionError(IValue input)
         {
             throw new InvalidOperationException($"Unable to convert '{input}' literal from AST representation to the scalar type '{Name}'");
         }
 
-        // this is often called for serialization errors, since Serialize calls ParseValue by default
-        // also may be called for serialization errors during ToAST, since ToAST calls Serialize by default, which by default calls ParseValue
+        /// <summary>
+        /// Throws an exception indicating that an external value (typically provided through a variable) cannot be converted
+        /// to an internal representation. Typically called by <see cref="ParseValue(object)"/> if the provided object is invalid
+        /// or cannot be parsed.
+        /// </summary>
+        /// <remarks>
+        /// This is often called for serialization errors, since <see cref="Serialize(object)"/> calls <see cref="ParseValue(object)"/> by default.
+        /// This also may be called for serialization errors during <see cref="ToAST(object)"/>, since <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/>
+        /// by default, which by default calls <see cref="ParseValue(object)"/>.
+        /// </remarks>
         protected object ThrowValueConversionError(object value)
         {
             throw new InvalidOperationException($"Unable to convert '{value}' to the scalar type '{Name}'");
         }
 
-        // also may be called for serialization errors during ToAST, since ToAST calls Serialize by default
+        /// <summary>
+        /// Throws an exception indicating that an internal value (typically returned from a field resolver) cannot be converted
+        /// to its external representataion. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
+        /// scalar type.
+        /// </summary>
+        /// <remarks>
+        /// This may be called for serialization errors during <see cref="ToAST(object)"/>, since the default implementation
+        /// of <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/> to serialize the value before converting the
+        /// result to an AST node.
+        /// </remarks>
         protected object ThrowSerializationError(object value)
         {
             throw new InvalidOperationException($"Unable to serialize '{value}' to the scalar type '{Name}'.");
