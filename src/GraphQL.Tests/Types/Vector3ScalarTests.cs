@@ -4,6 +4,7 @@ using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types
@@ -57,6 +58,19 @@ namespace GraphQL.Tests.Types
         public void test_loopback_with_null()
         {
             AssertQuerySuccess(@"{ loopback }", @"{ ""loopback"": null }");
+        }
+
+        [Fact]
+        public void test_parseLiteral_toAst()
+        {
+            var scalar = new Vector3Type();
+            var input = new Vector3(1, 2, 3);
+            var ast = scalar.ToAST(input);
+            var value = scalar.ParseLiteral(ast);
+            var output = value.ShouldBeOfType<Vector3>();
+            output.X.ShouldBe(input.X);
+            output.Y.ShouldBe(input.Y);
+            output.Z.ShouldBe(input.Z);
         }
 
         public struct Vector3
@@ -206,7 +220,12 @@ namespace GraphQL.Tests.Types
 
                 if (value is Vector3 vector3)
                 {
-                    return new StringValue($"{vector3.X},{vector3.Y},{vector3.Z}");
+                    return new ObjectValue(new[]
+                    {
+                        new ObjectField("x", new FloatValue(vector3.X)),
+                        new ObjectField("y", new FloatValue(vector3.Y)),
+                        new ObjectField("z", new FloatValue(vector3.Z)),
+                    });
                 }
 
                 return ThrowASTConversionError(value);
