@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -11,9 +12,15 @@ namespace GraphQL.Tests.Types
     public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3ScalarSchema>
     {
         [Fact]
-        public void test_parseliteral()
+        public void test_parseliteral_string()
         {
             AssertQuerySuccess(@"{ input(arg: ""1,2,3"") }", @"{ ""input"": ""=1=2=3="" }");
+        }
+
+        [Fact]
+        public void test_parseliteral_structured()
+        {
+            AssertQuerySuccess(@"{ input(arg: {x:1,y:2,z:3}) }", @"{ ""input"": ""=1=2=3="" }");
         }
 
         [Fact]
@@ -104,6 +111,8 @@ namespace GraphQL.Tests.Types
 
         public class Vector3Type : ScalarGraphType
         {
+            private readonly FloatGraphType _floatScalar = new FloatGraphType();
+
             public Vector3Type()
             {
                 Name = "Vector3";
@@ -158,6 +167,17 @@ namespace GraphQL.Tests.Types
                 if (value is StringValue stringValue)
                     return ParseValue(stringValue.Value);
 
+                if (value is ObjectValue objectValue)
+                {
+                    var entries = objectValue.ObjectFields.ToDictionary(x => x.Name, x => _floatScalar.ParseLiteral(x.Value));
+                    if (entries.Count != 3)
+                        return ThrowLiteralConversionError(value);
+                    var x = (double)entries["x"];
+                    var y = (double)entries["y"];
+                    var z = (double)entries["z"];
+                    return new Vector3((float)x, (float)y, (float)z);
+                }
+
                 return ThrowLiteralConversionError(value);
             }
 
@@ -167,7 +187,14 @@ namespace GraphQL.Tests.Types
                     return null;
 
                 if (value is Vector3 vector3)
-                    return vector3;
+                {
+                    return new
+                    {
+                        x = vector3.X,
+                        y = vector3.Y,
+                        z = vector3.Z
+                    };
+                }
 
                 return ThrowSerializationError(value);
             }
