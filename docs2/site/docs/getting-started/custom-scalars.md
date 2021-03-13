@@ -70,7 +70,10 @@ Vectors should be returned in the same format:
 }
 ```
 
-### 1. Create the class for the server-side representation.
+### 1. Create the class/struct for the server-side representation.
+
+This is not necessary if you intend to use already existing classes (`string`, `int`, etc.)
+for the server-side representation.
 
 ```csharp
 public struct Vector3
@@ -259,7 +262,7 @@ values, or if you are returning structured data.
 ### 8. Code-first: Register the .NET type mapping with the schema (optional).
 
 In order to allow simple field mappings like `Field(x => x.Vector)`, you need to register the
-custom scalar with the schema so that the proper graph type can be selected for the field.
+custom scalar within the schema so that the proper graph type can be selected for the field.
 Call `RegisterTypeMapping` with the CLR data model type and the graph type you want it mapped to.
 
 ```csharp
@@ -275,11 +278,12 @@ public class MySchema
 ```
 
 This is not necessary if you use the alternate `Field<T>` syntax which specifies the graph type
-to be used for the field.
+to be used for the field, or if your scalar data type is marked with the `GraphQLMetadata`
+attribute setting the `InputType` and/or `OutputType` properties.
 
 In this example, you created a custom scalar. In summary:
 
-- Create a data class for the server-side representation of the scalar
+- Create (if necessary) a data class/struct for the server-side representation of the scalar
 - Implement a `ScalarGraphType` which handles variable parsing, literal parsing, and serialization
 - Register the `ScalarGraphType` within the DI container
 
@@ -293,7 +297,7 @@ exception, and that they are not always called when executing a document.
 
 Keep in mind that the serialized value returned by custom scalar can by anything that the
 environment allows. For example it can be a structured object, rather than a simple value.
-This is also true of variables, however literals can only be the represented by the native
+This is also true for variables, however literals can only be represented by the native
 scalar types supported by the GraphQL query language -- integers, floating-point values,
 booleans and null values. You cannot parse a structured literal object into a scalar value.
 
@@ -445,7 +449,7 @@ The value converter can be extended globally by calling the static method `Regis
 ValueConverter.Register<Vector3, string>(v => $"{v.X},{v.Y},{v.Z}");
 ```
 
-The above method registers a conversion from the `Vector3` format to a `string`. Since the registration is static,
+The above method registers a conversion from the `Vector3` struct to a `string`. Since the registration is static,
 it should only be done once per application lifetime. For instance, in a static constructor of your schema.
 
 ```csharp
@@ -514,7 +518,7 @@ override `ParseLiteral`. Check the source code for the built-in scalar type you 
 further reference.
 
 Below is a sample of how to replace the built-in `BooleanGraphType` so it will accept 0 and non-zero
-values to represent false and true.
+values to represent `false` and `true`.
 
 ### 1. Create a new scalar graph type `MyBooleanGraphType`. Inherit from `BooleanGraphType` and set
 the name to be `Boolean`.
@@ -611,7 +615,7 @@ public class MyBooleanGraphType : BooleanGraphType
 
 ### 3. Register the custom scalar within your schema.
 
-The final step is to register an instance of the custom scalar to the schema. This can be
+The final step is to register an instance of the custom scalar within the schema. This can be
 done for code-first or schema-first schemas. For code-first schemas, register it within
 your constructor via `RegisterType`, as follows:
 
@@ -628,6 +632,7 @@ public class MySchema : Schema
 ```
 
 For schema-first schemas, register it immediately after calling `Schema.For` to create the schema.
+Immediately after calling `Schema.For` the schema is not yet initialized, therefore allowing registration of types.
 
 ```csharp
 var schema = Schema.For(...);
@@ -635,7 +640,7 @@ schema.RegisterType(new MyBooleanGraphType());
 ```
 
 Now all `BooleanGraphType` references in your schema will utilize the new `MyBooleanGraphType`
-registered with the schema. This technique can be used to replace any of the built-in graph types.
+registered within the schema. This technique can be used to replace any of the built-in graph types.
 
 Note that if you set the `ResolvedType` property of a field or argument to an instance of a built-in
 type, or provide an instance of a built-in type to an applicable constructor, it will not be replaced
