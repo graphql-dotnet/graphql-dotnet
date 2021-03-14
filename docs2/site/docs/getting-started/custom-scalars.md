@@ -468,7 +468,7 @@ No conversion takes place when the requested type matches the type of the object
 `ParseLiteral` or `ParseValue`). But you can also use the value converter to assist with input deserialization.
 
 For instance, you may be using `IdGraphType` within your schema as unique identifiers for your data objects. Pursuant
-to the GraphQL specification, these identifiers should be passed as strings such as in the below example:
+to the GraphQL specification, these identifiers may be passed as strings such as in the below example:
 
 ```graphql
 {
