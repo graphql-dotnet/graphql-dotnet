@@ -311,9 +311,9 @@ mutation AddVector($vector3: Vector3!) {
 //variables
 {
     "vector3": {
-        "X":"23",
-        "Y":"43",
-        "Z":"66"
+        "x":"23",
+        "y":"43",
+        "z":"66"
     }
 }
 ```
@@ -324,11 +324,39 @@ And a sample of a response with a vector in a more structured format:
 {
     "data": {
         "getVector": {
-            "X":"23",
-            "Y":"43",
-            "Z":"66"
+            "x":"23",
+            "y":"43",
+            "z":"66"
         }
     }
+}
+```
+
+### 1. Change `ParseLiteral` to accept strings or structured data:
+
+```csharp
+// In Vector3Type
+
+public override object ParseLiteral(IValue value)
+{
+    if (value is NullValue)
+        return null;
+
+    if (value is StringValue stringValue)
+        return ParseValue(stringValue.Value);
+
+    if (value is ObjectValue objectValue)
+    {
+        var entries = objectValue.ObjectFields.ToDictionary(x => x.Name, x => _floatScalar.ParseLiteral(x.Value));
+        if (entries.Count != 3)
+            return ThrowLiteralConversionError(value);
+        var x = (double)entries["x"];
+        var y = (double)entries["y"];
+        var z = (double)entries["z"];
+        return new Vector3((float)x, (float)y, (float)z);
+    }
+
+    return ThrowLiteralConversionError(value);
 }
 ```
 
@@ -336,6 +364,7 @@ And a sample of a response with a vector in a more structured format:
 
 ```csharp
 // In Vector3Type
+
 public override object ParseValue(object value)
 {
     if (value == null)
@@ -389,7 +418,14 @@ public override object Serialize(object value)
         return null;
 
     if (value is Vector3 vector3)
-        return vector3;
+    {
+        return new
+        {
+            x = vector3.X,
+            y = vector3.Y,
+            z = vector3.Z
+        };
+    }
 
     return ThrowSerializationError(value);
 }
@@ -410,7 +446,12 @@ public override IValue ToAST(object value)
 
     if (value is Vector3 vector3)
     {
-        return new StringValue($"{vector3.X},{vector3.Y},{vector3.Z}");
+        return new ObjectValue(new[]
+        {
+            new ObjectField("x", new FloatValue(vector3.X)),
+            new ObjectField("y", new FloatValue(vector3.Y)),
+            new ObjectField("z", new FloatValue(vector3.Z)),
+        });
     }
 
     return ThrowASTConversionError(value);
