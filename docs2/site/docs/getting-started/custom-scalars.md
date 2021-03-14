@@ -533,7 +533,7 @@ public class MyBooleanGraphType : BooleanGraphType
 }
 ```
 
-### 2. Override the methods as necessary; in this case we must override all of them except `IsValidDefault`.
+### 2. Override the methods as necessary; in this case we must override all of them except `Serialize` and `IsValidDefault`.
 
 ```csharp
 public class MyBooleanGraphType : BooleanGraphType
@@ -556,7 +556,7 @@ public class MyBooleanGraphType : BooleanGraphType
         _ => ThrowLiteralConversionError(value)
     }
 
-    public virtual bool CanParseLiteral(IValue value)
+    public override bool CanParseLiteral(IValue value)
     {
         try
         {
@@ -589,7 +589,7 @@ public class MyBooleanGraphType : BooleanGraphType
         _ => ThrowValueConversionError(value)
     }
 
-    public virtual bool CanParseValue(object value)
+    public override bool CanParseValue(object value)
     {
         try
         {
@@ -601,8 +601,6 @@ public class MyBooleanGraphType : BooleanGraphType
             return false;
         }
     }
-
-    public virtual object Serialize(object value) => ParseValue(value);
 
     public override IValue ToAST(object value) => Serialize(value) switch
     {
