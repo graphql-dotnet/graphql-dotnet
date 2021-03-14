@@ -20,7 +20,8 @@ namespace GraphQL.Types
         /// responsible for preparing the scalar for transport to the client. It is only responsible
         /// for generating an object which can eventually be serialized by some transport-focused API.
         /// <br/><br/>
-        /// This method must handle a value of <see langword="null"/>.
+        /// This method should handle a value of <see langword="null"/>, but may throw an exception
+        /// if <see langword="null"/> is an invalid internal scalar representation.
         /// </summary>
         /// <param name="value">Resolved value (internal scalar representation). May be <see langword="null"/>.</param>
         /// <returns>
