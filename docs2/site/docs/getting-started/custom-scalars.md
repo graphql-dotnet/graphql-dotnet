@@ -504,10 +504,11 @@ public class MySchema : Schema
 
 ## Null values
 
-Custom scalars process and handle null values during serialization and deserialization. This allows
-for custom scalars that can assist when you have database values such as 0 that should represent null
-when exposed outside the schema. Below is an example of a scalar intended to represent a database
-autoincrementing numeric identifier internally, where null values are stored as 0.
+Custom scalars process and handle null values during serialization and deserialization. For instance,
+let's say you have a database where database ID values of 0 should be represented as GraphQL 'null'
+values. You could of course write code within the field resolver to translate the values, or you may
+utilize a custom scalar to translate the values for you. The below example of a custom scalar does
+this and also rejects external values that are not strings containing integers, and rejects 0 or negative values:
 
 ```csharp
 public class DbIdGraphType : ScalarGraphType
