@@ -295,7 +295,7 @@ exception, and that they are not always called when executing a document.
 
 ## Vector3 sample with combined string/structured parsing and serialization
 
-Keep in mind that the serialized value returned by custom scalar can by anything that the
+Keep in mind that the serialized value returned by custom scalar can be anything that the
 environment allows. For example it can be a structured object, rather than a simple value.
 
 So to extend our sample, let's assume that we want the Vector3 scalar to instead accept and
