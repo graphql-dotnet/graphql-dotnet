@@ -297,9 +297,6 @@ exception, and that they are not always called when executing a document.
 
 Keep in mind that the serialized value returned by custom scalar can by anything that the
 environment allows. For example it can be a structured object, rather than a simple value.
-This is also true for variables, however literals can only be represented by the native
-scalar types supported by the GraphQL query language -- integers, floating-point values,
-booleans and null values. You cannot parse a structured literal object into a scalar value.
 
 So to extend our sample, let's assume that we want the Vector3 scalar to instead accept and
 return data in a more structured format, in addition to supporting the string format for literals.
@@ -335,7 +332,7 @@ And a sample of a response with a vector in a more structured format:
 }
 ```
 
-### 1. Change `ParseValue` to accept strings or structured data:
+### 2. Change `ParseValue` to accept strings or structured data:
 
 ```csharp
 // In Vector3Type
@@ -381,7 +378,7 @@ public override object ParseValue(object value)
 }
 ```
 
-### 2. Change `Serialize` to return structured data.
+### 3. Change `Serialize` to return structured data.
 
 ```csharp
 // In Vector3Type
@@ -398,7 +395,7 @@ public override object Serialize(object value)
 }
 ```
 
-### 3. Change `ToAST` to return an AST literal that represents the data.
+### 4. Change `ToAST` to return an AST literal that represents the data.
 
 Since `Serialize` no longer returns a type that can be converted to an AST node, it is
 necessary to override this method.
@@ -420,8 +417,8 @@ public override IValue ToAST(object value)
 }
 ```
 
-With these changes, a variable can be parsed as a string or as a structured object, and is always returned
-as a structured object. Again, note that as an input literal, it must be parsed as a string.
+With these changes, a literal or variable can be parsed as a string or as a structured object, and
+is always returned as a structured object.
 
 ## ValueConverter
 
