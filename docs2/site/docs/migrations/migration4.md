@@ -235,7 +235,7 @@ public class MyBooleanGraphType : BooleanGraphType
         _ => ValueConverter.ConvertTo(value, typeof(bool)) ?? ThrowValueConversionException(value)
     };
 
-    public virtual bool CanParseValue(object value)
+    public override bool CanParseValue(object value)
     {
         try
         {
