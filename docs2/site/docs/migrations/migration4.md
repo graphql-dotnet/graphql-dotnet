@@ -248,6 +248,12 @@ public class MyBooleanGraphType : BooleanGraphType
         }
     }
 }
+
+// Code-first: add the following line of code to your schema's constructor
+RegisterType(new MyBooleanGraphType());
+
+// Schema-first: add the following line of code after your schema is built, before it is initialized
+schema.RegisterType(new MyBooleanGraphType());
 ```
 
 ### Custom Scalar Cleanup
