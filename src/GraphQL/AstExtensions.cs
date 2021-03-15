@@ -9,7 +9,7 @@ namespace GraphQL
     public static class AstExtensions
     {
         /// <summary>
-        /// Returns the original string that was parsed into the specified node.
+        /// Returns the original string that was parsed from the provided document into the specified node.
         /// </summary>
         public static string ToString(this INode node, Document document)
         {
