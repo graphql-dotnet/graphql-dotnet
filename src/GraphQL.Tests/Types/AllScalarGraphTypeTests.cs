@@ -271,21 +271,7 @@ namespace GraphQL.Tests.Types
                 value = new BigInteger(Convert.ToDecimal(value));
 
             var g = Create(graphType);
-            var valueString = value switch
-            {
-                byte b => b.ToString(CultureInfo.InvariantCulture),
-                sbyte sb => sb.ToString(CultureInfo.InvariantCulture),
-                short s => s.ToString(CultureInfo.InvariantCulture),
-                ushort us => us.ToString(CultureInfo.InvariantCulture),
-                int i => i.ToString(CultureInfo.InvariantCulture),
-                uint ui => ui.ToString(CultureInfo.InvariantCulture),
-                long l => l.ToString(CultureInfo.InvariantCulture),
-                ulong ul => ul.ToString(CultureInfo.InvariantCulture),
-                BigInteger bi => bi.ToString(CultureInfo.InvariantCulture),
-                float f => f.ToString(CultureInfo.InvariantCulture),
-                double d => d.ToString(CultureInfo.InvariantCulture),
-                _ => null
-            };
+            var valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
             object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {valueString} }}")["arg"];
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
