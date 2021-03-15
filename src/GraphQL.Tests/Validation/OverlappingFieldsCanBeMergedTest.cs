@@ -576,10 +576,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation( 4, 25));
-                    e.Locations.Add(new ErrorLocation( 5, 29));
-                    e.Locations.Add(new ErrorLocation( 7, 25));
-                    e.Locations.Add(new ErrorLocation( 8, 29));
+                    e.Locations.Add(new ErrorLocation(4, 25));
+                    e.Locations.Add(new ErrorLocation(5, 29));
+                    e.Locations.Add(new ErrorLocation(7, 25));
+                    e.Locations.Add(new ErrorLocation(8, 29));
                 });
             });
         }
@@ -975,10 +975,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation (31, 21));
-                    e.Locations.Add(new ErrorLocation (39, 21));
-                    e.Locations.Add(new ErrorLocation (34, 21));
-                    e.Locations.Add(new ErrorLocation (42, 21));
+                    e.Locations.Add(new ErrorLocation(31, 21));
+                    e.Locations.Add(new ErrorLocation(39, 21));
+                    e.Locations.Add(new ErrorLocation(34, 21));
+                    e.Locations.Add(new ErrorLocation(42, 21));
                 });
             });
         }

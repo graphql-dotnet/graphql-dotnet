@@ -20,7 +20,8 @@ namespace GraphQL.Types
         /// responsible for preparing the scalar for transport to the client. It is only responsible
         /// for generating an object which can eventually be serialized by some transport-focused API.
         /// <br/><br/>
-        /// This method must handle a value of <see langword="null"/>.
+        /// This method should handle a value of <see langword="null"/>, but may throw an exception
+        /// if <see langword="null"/> is an invalid internal scalar representation.
         /// </summary>
         /// <param name="value">Resolved value (internal scalar representation). May be <see langword="null"/>.</param>
         /// <returns>
@@ -42,7 +43,18 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
-        public abstract object ParseLiteral(IValue value);
+        public virtual object ParseLiteral(IValue value) => value switch
+        {
+            BooleanValue b => ParseValue(b.Value.Boxed()),
+            IntValue i => ParseValue(i.Value),
+            LongValue l => ParseValue(l.Value),
+            BigIntValue bi => ParseValue(bi.Value),
+            FloatValue f => ParseValue(f.Value),
+            DecimalValue d => ParseValue(d.Value),
+            StringValue s => ParseValue(s.Value),
+            NullValue _ => ParseValue(null),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <summary>
         /// Value input coercion. Argument values can not only provided via GraphQL syntax inside a
@@ -117,7 +129,7 @@ namespace GraphQL.Types
         {
             if (value == null)
                 return false;
-            
+
             try
             {
                 return ToAST(value) != null;
@@ -195,7 +207,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Throws an exception indicating that an internal value (typically returned from a field resolver) cannot be converted
-        /// to its external representataion. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
+        /// to its external representation. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
         /// scalar type.
         /// </summary>
         /// <remarks>

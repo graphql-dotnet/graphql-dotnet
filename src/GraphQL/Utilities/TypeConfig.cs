@@ -1,12 +1,12 @@
 using System;
 using System.Reflection;
-using System.Threading.Tasks;
-using GraphQL.Reflection;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Provides configuration for specific GraphType when building schema via <see cref="SchemaBuilder"/>.
+    /// </summary>
     public class TypeConfig : MetadataProvider
     {
         private readonly LightweightCache<string, FieldConfig> _fields =
@@ -14,6 +14,10 @@ namespace GraphQL.Utilities
 
         private Type _type;
 
+        /// <summary>
+        /// Creates an instance of <see cref="TypeConfig"/> with the specified name.
+        /// </summary>
+        /// <param name="name">Field argument name.</param>
         public TypeConfig(string name)
         {
             Name = name;
@@ -29,10 +33,20 @@ namespace GraphQL.Utilities
             }
         }
 
+        /// <summary>
+        /// Gets the name of the GraphType.
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets or sets the description of the GraphType.
+        /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Gets or sets the reason this GraphType has been deprecated;
+        /// <see langword="null"/> if this element has not been deprecated.
+        /// </summary>
         public string DeprecationReason { get; set; }
 
         public Func<object, IObjectGraphType> ResolveType { get; set; }
@@ -44,53 +58,11 @@ namespace GraphQL.Utilities
             IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeof(T)) ?? false;
         }
 
-        public FieldConfig FieldFor(string field, IServiceProvider serviceProvider)
-        {
-            var config = _fields[field];
-            config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
-
-            if (Type != null && config.ResolverAccessor != null)
-            {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
-                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
-                if (attrs != null)
-                {
-                    foreach (var a in attrs)
-                        a.Modify(config);
-                }
-            }
-
-            return config;
-        }
-
-        public FieldConfig SubscriptionFieldFor(string field, IServiceProvider serviceProvider)
-        {
-            var config = _fields[field];
-            config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
-            config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
-
-            if (Type != null && config.ResolverAccessor != null && config.SubscriberAccessor != null)
-            {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
-                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
-                if (attrs != null)
-                {
-                    foreach (var a in attrs)
-                        a.Modify(config);
-                }
-
-                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, serviceProvider);
-                }
-                else
-                {
-                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, serviceProvider);
-                }
-            }
-
-            return config;
-        }
+        /// <summary>
+        /// Gets configuration for specific field of GraphType by field name.
+        /// </summary>
+        /// <param name="fieldName">Name of the field.</param>
+        public FieldConfig FieldFor(string fieldName) => _fields[fieldName];
 
         private void ApplyMetadata(Type type)
         {

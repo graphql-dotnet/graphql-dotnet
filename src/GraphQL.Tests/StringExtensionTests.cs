@@ -28,7 +28,7 @@ namespace GraphQL.Tests
         {
             input.ToConstantCase().ShouldBe(expected);
         }
-        
+
         [Theory]
         [InlineData(typeof(void), "Void")]
         [InlineData(typeof(int), "Int32")]
@@ -36,7 +36,7 @@ namespace GraphQL.Tests
 #if !NET48 //HACK: hangs test process after successfully compiling, prior to actually running the test
         [InlineData(typeof(List<Dictionary<string, HashSet<DateTime>>>), "List<Dictionary<String,HashSet<DateTime>>>")]
 #endif
-        [InlineData(typeof(Dictionary<,>), "Dictionary<TKey,TValue>")]       
+        [InlineData(typeof(Dictionary<,>), "Dictionary<TKey,TValue>")]
         [InlineData(typeof(List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<int>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>), "List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<Int32>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")]
         public void GetFriendlyName_Should_Return_Expected_Results(Type source, string expected)
         {

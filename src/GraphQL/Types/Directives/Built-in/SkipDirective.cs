@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Types
+namespace GraphQL.Types
 {
     /// <summary>
     /// Used to conditionally skip (exclude) fields or fragments.

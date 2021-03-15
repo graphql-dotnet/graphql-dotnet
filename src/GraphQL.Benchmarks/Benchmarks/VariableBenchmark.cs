@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
-using GraphQL.SystemTextJson;
 
 namespace GraphQL.Benchmarks
 {
@@ -117,7 +117,8 @@ namespace GraphQL.Benchmarks
                     "test",
                     arguments: new QueryArguments(
                         new QueryArgument(typeof(NonNullGraphType<ListGraphType<MyInputObjectGraphType>>)) { Name = "inputs" }),
-                    resolve: context => {
+                    resolve: context =>
+                    {
                         var arg = context.GetArgument<IList<MyInputObject>>("inputs");
                         if (arg.Count != 3)
                             throw new Exception();
@@ -130,7 +131,7 @@ namespace GraphQL.Benchmarks
                         if (arg[0].Widgets[0].Description != "this is a test")
                             throw new Exception();
                         return "OK";
-                        });
+                    });
             }
         }
 

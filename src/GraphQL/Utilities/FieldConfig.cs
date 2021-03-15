@@ -3,15 +3,25 @@ using GraphQL.Resolvers;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Provides configuration for specific field of GraphType when building schema via <see cref="SchemaBuilder"/>.
+    /// </summary>
     public class FieldConfig : MetadataProvider
     {
+        private readonly LightweightCache<string, ArgumentConfig> _arguments =
+           new LightweightCache<string, ArgumentConfig>(f => new ArgumentConfig(f));
+
+        /// <summary>
+        /// Creates an instance of <see cref="FieldConfig"/> with the specified name.
+        /// </summary>
+        /// <param name="name">Field argument name.</param>
         public FieldConfig(string name)
         {
             Name = name;
         }
 
         /// <summary>
-        /// Gets or sets the name of the field.
+        /// Gets the name of the field.
         /// </summary>
         public string Name { get; }
 
@@ -41,5 +51,11 @@ namespace GraphQL.Utilities
         public IAccessor ResolverAccessor { get; set; }
 
         public IAccessor SubscriberAccessor { get; set; }
+
+        /// <summary>
+        /// Gets configuration for specific field argument by argument name.
+        /// </summary>
+        /// <param name="argumentName">Name of the field argument.</param>
+        public ArgumentConfig ArgumentFor(string argumentName) => _arguments[argumentName];
     }
 }

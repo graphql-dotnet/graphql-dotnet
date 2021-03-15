@@ -28,7 +28,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintConfig
+    internal class AstPrintConfig
     {
         internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
         public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
@@ -46,7 +46,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class PrintFormat<T>
+    internal class PrintFormat<T>
     {
         private readonly IDictionary<string, object> _args;
 
@@ -79,7 +79,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintConfig<T> : AstPrintConfig
+    internal class AstPrintConfig<T> : AstPrintConfig
         where T : INode
     {
         public void Field<TProperty>(Expression<Func<T, TProperty>> resolve)
@@ -104,13 +104,13 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintFieldDefinition
+    internal class AstPrintFieldDefinition
     {
         public string Name { get; set; }
         public IValueResolver Resolver { get; set; }
     }
 
-    public readonly struct ResolveValueContext
+    internal readonly struct ResolveValueContext
     {
         public ResolveValueContext(object source)
         {
@@ -130,17 +130,17 @@ namespace GraphQL.Utilities
         }
     }
 
-    public interface IValueResolver
+    internal interface IValueResolver
     {
         object Resolve(in ResolveValueContext context);
     }
 
-    public interface IValueResolver<T> : IValueResolver
+    internal interface IValueResolver<T> : IValueResolver
     {
         new T Resolve(in ResolveValueContext context);
     }
 
-    public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
+    internal class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
     {
         private readonly Func<TObject, TProperty> _property;
 
@@ -160,7 +160,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintVisitor
+    internal class AstPrintVisitor
     {
         private readonly List<AstPrintConfig> _configs = new List<AstPrintConfig>();
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Provides configuration for GraphTypes and their fields and arguments when building schema via <see cref="SchemaBuilder"/>.
+    /// </summary>
     public class TypeSettings
     {
         private readonly LightweightCache<string, TypeConfig> _typeConfigurations;
@@ -14,6 +17,10 @@ namespace GraphQL.Utilities
             _forAllTypesConfigurationDelegates = new List<Action<TypeConfig>>();
         }
 
+        /// <summary>
+        /// Gets configuration for specific GraphType by its name.
+        /// </summary>
+        /// <param name="typeName">Name of the GraphType.</param>
         public TypeConfig For(string typeName)
         {
             var exists = _typeConfigurations.Has(typeName);

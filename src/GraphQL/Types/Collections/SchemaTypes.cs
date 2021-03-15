@@ -81,7 +81,6 @@ namespace GraphQL.Types
 
         private readonly TypeCollectionContext _context;
         private readonly INameConverter _nameConverter;
-        private readonly object _lock = new object();
 
         /// <summary>
         /// Initializes a new instance with no types registered.
@@ -107,19 +106,25 @@ namespace GraphQL.Types
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
+            _typeDictionary = new Dictionary<Type, IGraphType>();
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
                (name, type, ctx) =>
                {
-                   lock (_lock)
-                   {
-                       SetGraphType(name, type);
-                   }
+                   SetGraphType(name, type);
                    ctx.AddType(name, type, null);
                },
                typeMappings);
+
+            // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
+            // prior to adding any other types (including introspection types).
+            foreach (var type in types)
+            {
+                if (type is ScalarGraphType)
+                    AddType(type, _context);
+            }
 
             // Add introspection types. Note that introspection types rely on the
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
@@ -144,7 +149,8 @@ namespace GraphQL.Types
 
             foreach (var type in types)
             {
-                AddType(type, ctx);
+                if (!(type is ScalarGraphType))
+                    AddType(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
@@ -175,12 +181,20 @@ namespace GraphQL.Types
             ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
+
+            _typeDictionary = null;
         }
 
         private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         {
+            // Manually registered AdditionalTypeInstances and AdditionalTypes should be handled first.
+            // This is necessary for the correct processing of overridden built-in scalars.
+
             foreach (var instance in schema.AdditionalTypeInstances)
                 yield return instance;
+
+            foreach (var type in schema.AdditionalTypes)
+                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
@@ -194,9 +208,6 @@ namespace GraphQL.Types
 
             if (schema.Subscription != null)
                 yield return schema.Subscription;
-
-            foreach (var type in schema.AdditionalTypes)
-                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
         }
 
         private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
@@ -232,6 +243,7 @@ namespace GraphQL.Types
         }
 
         protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
+        private readonly Dictionary<Type, IGraphType> _typeDictionary;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();
@@ -243,7 +255,7 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
-        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => this[t] ?? resolver(t));
+        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => FindGraphType(t) ?? resolver(t));
 
         /// <summary>
         /// Applies all delegates specified by the middleware builder to the schema.
@@ -301,19 +313,7 @@ namespace GraphQL.Types
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }
 
-                IGraphType type;
-                lock (_lock)
-                {
-                    Dictionary.TryGetValue(typeName, out type);
-                }
-                return type;
-            }
-            private set
-            {
-                lock (_lock)
-                {
-                    SetGraphType(typeName, value);
-                }
+                return Dictionary.TryGetValue(typeName, out var type) ? type : null;
             }
         }
 
@@ -321,25 +321,7 @@ namespace GraphQL.Types
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
-        private IGraphType this[Type type]
-        {
-            get
-            {
-                if (type == null)
-                    throw new ArgumentOutOfRangeException(nameof(type), "A type is required to lookup.");
-
-                lock (_lock)
-                {
-                    foreach (var item in Dictionary)
-                    {
-                        if (item.Value.GetType() == type)
-                            return item.Value;
-                    }
-
-                    return null;
-                }
-            }
-        }
+        private IGraphType FindGraphType(Type type) => _typeDictionary.TryGetValue(type, out var value) ? value : null;
 
         private void AddType(IGraphType type, TypeCollectionContext context)
         {
@@ -353,11 +335,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
             }
 
-            string name = context.CollectTypes(type);
-            lock (_lock)
-            {
-                SetGraphType(name, type);
-            }
+            SetGraphType(type.Name, type);
 
             if (type is IComplexGraphType complexType)
             {
@@ -373,7 +351,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
-                    if (this[objectInterface] is IInterfaceGraphType interfaceInstance)
+                    if (FindGraphType(objectInterface) is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);
@@ -417,7 +395,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(unionedType, context);
 
-                    var objType = this[unionedType] as IObjectGraphType;
+                    var objType = FindGraphType(unionedType) as IObjectGraphType;
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
@@ -515,7 +493,7 @@ Make sure that your ServiceProvider is configured correctly.");
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
             var namedType = type.GetNamedType();
-            var foundType = this[namedType];
+            var foundType = FindGraphType(namedType);
             if (foundType == null)
             {
                 if (namedType == typeof(PageInfoType))
@@ -647,7 +625,7 @@ Make sure that your ServiceProvider is configured correctly.");
             if (type is UnionGraphType union)
             {
                 var list = union.PossibleTypes.List;
-                for (int i=0; i<list.Count; ++i)
+                for (int i = 0; i < list.Count; ++i)
                 {
                     var unionType = ConvertTypeReference(union, list[i]) as IObjectGraphType;
 
@@ -686,7 +664,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 {
                     type = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                     if (type != null)
-                        this[type.Name] = type;
+                        SetGraphType(type.Name, type);
                 }
             }
 
@@ -698,32 +676,44 @@ Make sure that your ServiceProvider is configured correctly.");
             return type;
         }
 
-        private void SetGraphType(string typeName, IGraphType type)
+        private void SetGraphType(string typeName, IGraphType graphType)
         {
             if (string.IsNullOrWhiteSpace(typeName))
             {
                 throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
             }
 
+            var type = graphType.GetType();
             if (Dictionary.TryGetValue(typeName, out var existingGraphType))
             {
-                if (ReferenceEquals(existingGraphType, type) || existingGraphType.GetType() == type.GetType())
+                if (ReferenceEquals(existingGraphType, graphType) || existingGraphType.GetType() == type)
                 {
                     // Soft schema configuration error.
                     // Intentionally or inadvertently, a situation may arise when the same GraphType is registered more that one time.
                     // This may be due to the simultaneous registration of GraphType instances and the GraphType types. In this case
                     // the duplicate MUST be ignored, otherwise errors will occur.
                 }
+                else if (type.IsAssignableFrom(existingGraphType.GetType()) && typeof(ScalarGraphType).IsAssignableFrom(type))
+                {
+                    // This can occur when a built-in scalar graph type is overridden by preregistering a replacement graph type that
+                    // has the same name and inherits from it.
+
+                    if (!_typeDictionary.ContainsKey(type))
+                        _typeDictionary.Add(type, existingGraphType);
+                }
                 else
                 {
                     // Fatal schema configuration error.
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetType().FullName}' with the name '{typeName}'.
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'.
 The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
                 }
             }
             else
             {
-                Dictionary.Add(typeName, type);
+                Dictionary.Add(typeName, graphType);
+                // if building a schema from code, the .NET types will not be unique, which should be ignored
+                if (!_typeDictionary.ContainsKey(type))
+                    _typeDictionary.Add(type, graphType);
             }
         }
 

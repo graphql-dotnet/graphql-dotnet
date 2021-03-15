@@ -323,6 +323,21 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2233
+        [Fact]
+        public void allow_querying_input_object_type_fields()
+        {
+            var query = @"{
+  __type(name: ""HumanInput"") {
+    fields { name }
+    inputFields { name }
+  }
+}
+            ";
+
+            AssertQuerySuccess(query, "HumanInputIntrospectionResult".ReadJsonResult());
+        }
+
         [Fact]
         public void allows_querying_field_args()
         {

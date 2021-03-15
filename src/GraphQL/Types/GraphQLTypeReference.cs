@@ -27,7 +27,7 @@ namespace GraphQL.Types
             get => throw Invalid();
             set => throw Invalid();
         }
-        
+
         /// <inheritdoc/>
         public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
