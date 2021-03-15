@@ -229,22 +229,7 @@ namespace GraphQL.Tests.Types
                 value = new BigInteger(Convert.ToDecimal(value));
 
             var g = Create(graphType);
-            var valueString = value switch
-            {
-                byte b => b.ToString(CultureInfo.InvariantCulture),
-                sbyte sb => sb.ToString(CultureInfo.InvariantCulture),
-                short s => s.ToString(CultureInfo.InvariantCulture),
-                ushort us => us.ToString(CultureInfo.InvariantCulture),
-                int i => i.ToString(CultureInfo.InvariantCulture),
-                uint ui => ui.ToString(CultureInfo.InvariantCulture),
-                long l => l.ToString(CultureInfo.InvariantCulture),
-                ulong ul => ul.ToString(CultureInfo.InvariantCulture),
-                BigInteger bi => bi.ToString(CultureInfo.InvariantCulture),
-                float f => f.ToString(CultureInfo.InvariantCulture),
-                double d => d.ToString(CultureInfo.InvariantCulture),
-                _ => null
-            };
-            object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(valueString);
+            object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
