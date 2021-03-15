@@ -462,7 +462,7 @@ type __AppliedDirective {                     <--- NEW INTROSPECTION TYPE
 
 type __DirectiveArgument {                    <--- NEW INTROSPECTION TYPE
   name: String!
-  value: String
+  value: String!
 }
 ```
 

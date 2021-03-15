@@ -29,14 +29,14 @@ namespace GraphQL.Introspection
                 "Argument name",
                 resolve: context => context.Source.Name);
 
-            Field<StringGraphType>(
+            Field<NonNullGraphType<StringGraphType>>(
                 "value",
                 "A GraphQL-formatted string representing the value for argument.",
                 resolve: context =>
                 {
                     var argument = context.Source;
                     if (argument.Value == null)
-                        return null;
+                        return "null";
 
                     var grandParent = context.Parent.Parent;
                     int index = (int)grandParent.Path.Last();
@@ -45,15 +45,8 @@ namespace GraphQL.Introspection
                     var argumentDefinition = directiveDefinition.Arguments.Find(argument.Name);
 
                     var ast = argumentDefinition.ResolvedType.ToAST(argument.Value);
-                    if (ast is StringValue value) //TODO: ???
-                    {
-                        return value.Value;
-                    }
-                    else
-                    {
-                        string result = AstPrinter.Print(ast);
-                        return string.IsNullOrWhiteSpace(result) ? null : result;
-                    }
+                    string result = AstPrinter.Print(ast);
+                    return string.IsNullOrWhiteSpace(result) ? null : result;
                 });
         }
     }

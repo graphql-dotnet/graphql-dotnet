@@ -8,7 +8,7 @@
           "args": [
             {
               "name": "quality",
-              "value": "high"
+              "value": "\"high\""
             }
           ]
         }
@@ -329,7 +329,7 @@
                   "args": [
                     {
                       "name": "quality",
-                      "value": "low"
+                      "value": "\"low\""
                     }
                   ]
                 }
@@ -343,7 +343,7 @@
                       "args": [
                         {
                           "name": "quality",
-                          "value": "moderate"
+                          "value": "\"moderate\""
                         }
                       ]
                     }
