@@ -66,6 +66,12 @@ public class MyDirective : DirectiveGraphType
 }
 ```
 
+In SDL this definition will look like the following:
+
+```graphql
+directive @my(secret: String!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+```
+
 Then register an instance of this class within your schema.
 
 ```csharp
@@ -112,6 +118,12 @@ public class LengthDirective : DirectiveGraphType
         );
     }
 }
+```
+
+In SDL this definition will look like the following:
+
+```graphql
+directive @length(min: Int, max: Int) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 ```
 
 Applying `@length` directive to an input field.
@@ -174,6 +186,12 @@ public class UpperDirective : DirectiveGraphType
         Description = "Converts the value of string fields to uppercase.";
     }
 }
+```
+
+In SDL this definition will look like the following:
+
+```graphql
+directive @upper on FIELD_DEFINITION
 ```
 
 To make this directive work, you need to write a class like the following by implementing the necessary
@@ -252,6 +270,12 @@ public class AuthorDirective : DirectiveGraphType
         );
     }
 }
+```
+
+In SDL this definition will look like the following:
+
+```graphql
+directive @author(name: String, email: String!) on FIELD_DEFINITION
 ```
 
 Then the directive can be applied like this:

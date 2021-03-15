@@ -1054,7 +1054,7 @@ directive @skip(
 type __AppliedDirective {
   # Directive name
   name: String!
-  # Values of directive arguments
+  # Values of explicitly specified directive arguments
   args: [__DirectiveArgument!]!
 }
 

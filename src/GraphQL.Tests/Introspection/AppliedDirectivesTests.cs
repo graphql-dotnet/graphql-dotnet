@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Introspection
                     arguments: new QueryArguments(new QueryArgument(typeof(StringGraphType)) { Name = "some" }.ApplyDirective("traits", "quality", "moderate"))
                 ).ApplyDirective("traits", "quality", "low");
 
-                this.ApplyDirective("traits"); // default value used
+                this.ApplyDirective("traits"); // default arguments values used, therefore they will not be returned by introspection
             }
         }
 
