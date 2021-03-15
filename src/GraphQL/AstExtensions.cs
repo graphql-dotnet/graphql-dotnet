@@ -11,7 +11,7 @@ namespace GraphQL
         /// <summary>
         /// Returns the original string that was parsed from the provided document into the specified node.
         /// </summary>
-        public static string ToString(this INode node, Document document)
+        public static string StringFrom(this INode node, Document document)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));

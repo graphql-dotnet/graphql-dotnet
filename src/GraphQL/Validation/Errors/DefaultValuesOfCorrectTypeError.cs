@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, IGraphType inputType, string verboseErrors)
-            : base(context.Document.OriginalQuery, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, inputType.ToString(), varDefAst.DefaultValue.ToString(context.Document), verboseErrors), varDefAst.DefaultValue)
+            : base(context.Document.OriginalQuery, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, inputType.ToString(), varDefAst.DefaultValue.StringFrom(context.Document), verboseErrors), varDefAst.DefaultValue)
         {
         }
 

@@ -463,7 +463,6 @@ namespace GraphQL.Validation
         /// </summary>
         public string IsValidLiteralValue(IGraphType type, IValue valueAst)
         {
-            // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType;
@@ -568,7 +567,7 @@ namespace GraphQL.Validation
             {
                 return scalar.CanParseLiteral(valueAst)
                     ? null
-                    : $"Expected type '{type.Name}', found {valueAst.ToString(Document)}.";
+                    : $"Expected type '{type.Name}', found {valueAst.StringFrom(Document)}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");

@@ -2,7 +2,7 @@ namespace GraphQL
 {
     public static class AstExtensions
     {
-        public static string ToString(this GraphQL.Language.AST.INode node, GraphQL.Language.AST.Document document) { }
+        public static string StringFrom(this GraphQL.Language.AST.INode node, GraphQL.Language.AST.Document document) { }
     }
     public static class AuthorizationExtensions
     {
