@@ -313,8 +313,10 @@ namespace GraphQL.Utilities
                     var val = (double)f.Arg(x => x.Value);
                     if (double.IsNaN(val) || double.IsInfinity(val))
                         throw new InvalidOperationException($"Cannot print value: {val}");
-                    //print most compact form of value with up to 15 digits of precision (C# default)
-                    //note: G17 format (17 digits of precision) is necessary to prevent losing any information during roundtrip to string
+                    // print most compact form of value with up to 15 digits of precision (C# default)
+                    // note: G17 format (17 digits of precision) is necessary to prevent losing any
+                    // information during roundtrip to string. However, "3.33" prints something like
+                    // "3.330000000000001" which probably is not desirable.
                     return val.ToString("G15", CultureInfo.InvariantCulture);
                 });
             });
