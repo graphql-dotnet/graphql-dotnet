@@ -8,7 +8,7 @@
           "args": [
             {
               "name": "quality",
-              "value": "high"
+              "value": "\"high\""
             }
           ]
         }
@@ -317,12 +317,7 @@
           "appliedDirectives": [
             {
               "name": "traits",
-              "args": [
-                {
-                  "name": "quality",
-                  "value": "unknown"
-                }
-              ]
+              "args": []
             }
           ],
           "fields": [
@@ -334,7 +329,7 @@
                   "args": [
                     {
                       "name": "quality",
-                      "value": "low"
+                      "value": "\"low\""
                     }
                   ]
                 }
@@ -348,7 +343,7 @@
                       "args": [
                         {
                           "name": "quality",
-                          "value": "moderate"
+                          "value": "\"moderate\""
                         }
                       ]
                     }

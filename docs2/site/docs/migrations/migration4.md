@@ -675,4 +675,4 @@ the directives implementation without mutual influence on the schemas using them
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
-* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]`
+* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]` and is a member of `ValidationContext`.

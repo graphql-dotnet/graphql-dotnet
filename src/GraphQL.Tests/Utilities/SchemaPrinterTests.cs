@@ -1054,7 +1054,7 @@ directive @skip(
 type __AppliedDirective {
   # Directive name
   name: String!
-  # Values of directive arguments
+  # Values of explicitly specified directive arguments
   args: [__DirectiveArgument!]!
 }
 
@@ -1082,7 +1082,7 @@ type __DirectiveArgument {
   # Argument name
   name: String!
   # A GraphQL-formatted string representing the value for argument.
-  value: String
+  value: String!
 }
 
 # A Directive can be adjacent to many parts of the GraphQL language, a
