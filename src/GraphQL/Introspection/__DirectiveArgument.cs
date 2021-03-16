@@ -1,11 +1,17 @@
-using GraphQL.Language.AST;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__DirectiveArgument</c> introspection type represents an argument of a directive applied to a schema element - type, field, argument, etc.
+    /// The <c>__DirectiveArgument</c> introspection type represents an argument of a directive applied to a
+    /// schema element - type, field, argument, etc.
+    /// <br/><br/>
+    /// Note that this class describes only explicitly specified arguments. If the argument in the directive
+    /// definition has default value and this argument was not specified when applying the directive to schema
+    /// element, then such an argument with default value will not be returned.
     /// </summary>
     public class __DirectiveArgument : ObjectGraphType<DirectiveArgument>
     {
@@ -22,25 +28,24 @@ namespace GraphQL.Introspection
                 "Argument name",
                 resolve: context => context.Source.Name);
 
-            Field<StringGraphType>(
+            Field<NonNullGraphType<StringGraphType>>(
                 "value",
                 "A GraphQL-formatted string representing the value for argument.",
                 resolve: context =>
                 {
                     var argument = context.Source;
                     if (argument.Value == null)
-                        return null;
+                        return "null";
 
-                    var ast = argument.ResolvedType.ToAST(argument.Value);
-                    if (ast is StringValue value) //TODO: ???
-                    {
-                        return value.Value;
-                    }
-                    else
-                    {
-                        string result = AstPrinter.Print(ast);
-                        return string.IsNullOrWhiteSpace(result) ? null : result;
-                    }
+                    var grandParent = context.Parent.Parent;
+                    int index = (int)grandParent.Path.Last();
+                    var appliedDirective = ((IList<AppliedDirective>)grandParent.Source)[index];
+                    var directiveDefinition = context.Schema.Directives.Find(appliedDirective.Name);
+                    var argumentDefinition = directiveDefinition.Arguments.Find(argument.Name);
+
+                    var ast = argumentDefinition.ResolvedType.ToAST(argument.Value);
+                    string result = AstPrinter.Print(ast);
+                    return string.IsNullOrWhiteSpace(result) ? null : result;
                 });
         }
     }

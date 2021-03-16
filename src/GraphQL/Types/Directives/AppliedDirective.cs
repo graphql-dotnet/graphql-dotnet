@@ -12,7 +12,7 @@ namespace GraphQL.Types
     {
         private string _name;
 
-        internal List<DirectiveArgument> Arguments { get; private set; }
+        internal List<DirectiveArgument> List { get; private set; }
 
         /// <summary>
         /// Creates directive.
@@ -39,7 +39,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the number of directive arguments.
         /// </summary>
-        public int ArgumentsCount => Arguments?.Count ?? 0;
+        public int ArgumentsCount => List?.Count ?? 0;
 
         /// <summary>
         /// Adds an argument to the directive.
@@ -49,7 +49,7 @@ namespace GraphQL.Types
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            (Arguments ??= new List<DirectiveArgument>()).Add(argument);
+            (List ??= new List<DirectiveArgument>()).Add(argument);
 
             return this;
         }
@@ -60,9 +60,9 @@ namespace GraphQL.Types
         /// <param name="argumentName">Argument name.</param>
         public DirectiveArgument FindArgument(string argumentName)
         {
-            if (Arguments != null)
+            if (List != null)
             {
-                foreach (var arg in Arguments)
+                foreach (var arg in List)
                 {
                     if (arg.Name == argumentName)
                         return arg;
@@ -73,7 +73,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        public IEnumerator<DirectiveArgument> GetEnumerator() => (Arguments ?? System.Linq.Enumerable.Empty<DirectiveArgument>()).GetEnumerator();
+        public IEnumerator<DirectiveArgument> GetEnumerator() => (List ?? System.Linq.Enumerable.Empty<DirectiveArgument>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

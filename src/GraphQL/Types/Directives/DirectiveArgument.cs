@@ -35,7 +35,5 @@ namespace GraphQL.Types
         /// Argument value.
         /// </summary>
         public object Value { get; set; }
-
-        internal IGraphType ResolvedType { get; set; } //TODO: possible remove after AstFromValue and AstPrinter rework
     }
 }
