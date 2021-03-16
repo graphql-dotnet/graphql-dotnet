@@ -356,7 +356,7 @@ namespace GraphQL.Utilities
                         }
                         else if (ch == '\\')
                             sb.Append("\\\\");
-                        else if (ch == '\"')
+                        else if (ch == '"')
                             sb.Append("\\\"");
                         else
                             sb.Append(ch);
