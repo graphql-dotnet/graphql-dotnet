@@ -361,7 +361,7 @@ namespace GraphQL.Utilities
                         else
                             sb.Append(ch);
                     }
-                    sb.Append('\"');
+                    sb.Append('"');
                     return sb;
                 });
 
