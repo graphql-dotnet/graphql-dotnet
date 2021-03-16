@@ -348,7 +348,7 @@ namespace GraphQL.Utilities
                             if (ch == '\n')
                                 sb.Append("\\\n");
                             else if (ch == '\r')
-                                sb.Append("\\\r");
+                                sb.Append("\\r");
                             else if (ch == '\t')
                                 sb.Append("\\t");
                             else
