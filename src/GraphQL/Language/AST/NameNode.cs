@@ -13,7 +13,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public NameNode(string name, SourceLocation location)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             SourceLocation = location;
         }
 
@@ -22,7 +22,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public NameNode(string name)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             SourceLocation = default;
         }
 

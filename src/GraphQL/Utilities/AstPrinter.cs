@@ -311,7 +311,7 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (double)f.Arg(x => x.Value);
-                    if (double.IsNaN(val) || double.IsInfinity(val))
+                    if (double.IsInfinity(val))
                         throw new InvalidOperationException($"Cannot print value: {val}");
                     // print most compact form of value with up to 15 digits of precision (C# default)
                     // note: G17 format (17 digits of precision) is necessary to prevent losing any
@@ -374,14 +374,7 @@ namespace GraphQL.Utilities
             Config<EnumValue>(c =>
             {
                 c.Field(x => x.Name);
-                c.Print(p =>
-                {
-                    var name = (string)p.Arg(x => x.Name);
-                    if (name == null)
-                        throw new InvalidOperationException("EnumValue name cannot be null");
-                    NameValidator.ValidateDefault(name, NamedElement.EnumValue);
-                    return name;
-                });
+                c.Print(p => p.Arg(x => x.Name));
             });
 
             Config<ListValue>(c =>

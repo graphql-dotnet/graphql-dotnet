@@ -12,24 +12,23 @@ namespace GraphQL.Language.AST
         /// Initializes a new instance for the specified field name and value.
         /// </summary>
         public ObjectField(NameNode name, IValue value)
-            : this(name.Name, value)
         {
             NameNode = name;
+            Value = value;
         }
 
         /// <summary>
         /// Initializes a new instance for the specified field name and value.
         /// </summary>
         public ObjectField(string name, IValue value)
+            : this(new NameNode(name), value)
         {
-            Name = name;
-            Value = value;
         }
 
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name { get; }
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of the field, if initialized with the <see cref="ObjectField.ObjectField(NameNode, IValue)"/> constructor.
