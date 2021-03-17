@@ -1,8 +1,5 @@
 using System;
-using System.Linq;
-using GraphQL.Language;
 using GraphQL.Language.AST;
-using GraphQLParser;
 using Shouldly;
 using Xunit;
 
