@@ -134,6 +134,7 @@ namespace GraphQL.Execution
                         // Return the result
                         return new ExecutionResult
                         {
+                            Executed = true,
                             Data = new RootExecutionNode(null, null)
                             {
                                 SubFields = new ExecutionNode[]
