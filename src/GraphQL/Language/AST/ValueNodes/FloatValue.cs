@@ -12,8 +12,8 @@ namespace GraphQL.Language.AST
         /// </summary>
         public FloatValue(double value)
         {
-            if (double.IsNaN(value) || double.IsInfinity(value))
-                throw new ArgumentOutOfRangeException(nameof(value), @"Value cannot be {value}.");
+            if (double.IsNaN(value))
+                throw new ArgumentOutOfRangeException(nameof(value), "Value cannot be NaN.");
 
             Value = value;
         }
