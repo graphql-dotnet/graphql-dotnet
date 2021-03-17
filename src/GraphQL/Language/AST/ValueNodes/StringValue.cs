@@ -1,3 +1,5 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public StringValue(string value)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 }

@@ -311,8 +311,6 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (double)f.Arg(x => x.Value);
-                    if (double.IsNaN(val) || double.IsInfinity(val))
-                        throw new InvalidOperationException($"Cannot print value: {val}");
                     // print most compact form of value with up to 15 digits of precision (C# default)
                     // note: G17 format (17 digits of precision) is necessary to prevent losing any
                     // information during roundtrip to string. However, "3.33" prints something like
@@ -337,8 +335,6 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (string)f.Arg(x => x.Value);
-                    if (val == null)
-                        throw new InvalidOperationException("StringValue cannot contain null");
                     var sb = new System.Text.StringBuilder(val.Length + 2);
                     sb.Append('"');
                     foreach (var ch in val)

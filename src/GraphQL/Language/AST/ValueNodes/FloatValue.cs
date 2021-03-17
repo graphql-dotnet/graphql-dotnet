@@ -1,3 +1,5 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -10,6 +12,9 @@ namespace GraphQL.Language.AST
         /// </summary>
         public FloatValue(double value)
         {
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new ArgumentOutOfRangeException(nameof(value), @"Value cannot be {value}.");
+
             Value = value;
         }
     }

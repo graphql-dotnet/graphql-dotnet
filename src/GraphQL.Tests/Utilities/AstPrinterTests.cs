@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
@@ -122,17 +123,12 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void invalid_floatvalue_throws()
+        public void string_encodes_control_characters()
         {
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new FloatValue(double.PositiveInfinity)));
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new FloatValue(double.NegativeInfinity)));
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new FloatValue(double.NaN)));
-        }
-
-        [Fact]
-        public void null_stringvalue_throws()
-        {
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new StringValue(null)));
+            var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
+            var ret = AstPrinter.Print(new StringValue(sample));
+            var deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
+            deserialized.ShouldBe(sample);
         }
 
         [Theory]
@@ -151,10 +147,14 @@ namespace GraphQL.Tests.Utilities
 
         public static object[][] NodeTests = new object[][]
         {
-            new object[] { new StringValue("test"), "\"test\"" },
-            new object[] { new StringValue("ab\"cd"), "\"ab\\\"cd\"" },
-            new object[] { new StringValue("ab\u0019cd"), "\"ab\\u0019cd\"" },
-            new object[] { new StringValue("\"abcd\""), "\"\\\"abcd\\\"\"" },
+            new object[] { new StringValue("test"), @"""test""" },
+            new object[] { new StringValue("ab\rcd"), @"""ab\rcd""" },
+            new object[] { new StringValue("ab\ncd"), @"""ab\ncd""" },
+            new object[] { new StringValue("ab\tcd"), @"""ab\tcd""" },
+            new object[] { new StringValue("ab\\cd"), @"""ab\\cd""" },
+            new object[] { new StringValue("ab\"cd"), @"""ab\""cd""" },
+            new object[] { new StringValue("ab\u0019cd"), @"""ab\u0019cd""" },
+            new object[] { new StringValue("\"abcd\""), @"""\""abcd\""""" },
             new object[] { new IntValue(int.MinValue), "-2147483648" },
             new object[] { new IntValue(0), "0" },
             new object[] { new IntValue(int.MaxValue), "2147483647" },
