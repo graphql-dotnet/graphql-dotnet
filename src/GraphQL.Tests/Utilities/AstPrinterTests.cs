@@ -127,6 +127,8 @@ namespace GraphQL.Tests.Utilities
         {
             var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
             var ret = AstPrinter.Print(new StringValue(sample));
+            foreach (var c in ret)
+                c.ShouldBeGreaterThanOrEqualTo(' ');
             var deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
             deserialized.ShouldBe(sample);
         }
