@@ -340,7 +340,7 @@ namespace GraphQL.Utilities
                     if (val == null)
                         throw new InvalidOperationException("StringValue cannot contain null");
                     var sb = new System.Text.StringBuilder(val.Length + 2);
-                    sb.Append('\"');
+                    sb.Append('"');
                     foreach (var ch in val)
                     {
                         if (ch < ' ')
