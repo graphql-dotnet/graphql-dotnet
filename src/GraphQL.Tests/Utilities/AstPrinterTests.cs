@@ -165,7 +165,7 @@ namespace GraphQL.Tests.Utilities
         public static object[][] NodeTests = new object[][]
         {
             new object[] { new StringValue("test"), @"""test""" },
-            new object[] { new StringValue("ab/cd"), @"""ab\/cd""" },
+            new object[] { new StringValue("ab/cd"), @"""ab/cd""" },
             new object[] { new StringValue("ab\bcd"), @"""ab\bcd""" },
             new object[] { new StringValue("ab\fcd"), @"""ab\fcd""" },
             new object[] { new StringValue("ab\rcd"), @"""ab\rcd""" },

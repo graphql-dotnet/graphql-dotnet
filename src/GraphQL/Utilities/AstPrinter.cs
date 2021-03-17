@@ -358,8 +358,6 @@ namespace GraphQL.Utilities
                             else
                                 sb.Append("\\u" + ((int)ch).ToString("X4"));
                         }
-                        else if (ch == '/')
-                            sb.Append("\\/");
                         else if (ch == '\\')
                             sb.Append("\\\\");
                         else if (ch == '"')
