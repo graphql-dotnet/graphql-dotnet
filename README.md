@@ -14,9 +14,6 @@
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
 
-[![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
-[![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
-
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
@@ -31,6 +28,21 @@ Now the [specification](https://github.com/graphql/graphql-spec) is being develo
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
 by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
 
+Provides the following packages:
+
+| Package                | Downloads                                                                                                                 | NuGet Latest                                                                                                             |
+|------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| GraphQL                | [![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)                               | [![Nuget](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)                               |
+| GraphQL.SystemTextJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) | [![Nuget](https://img.shields.io/nuget/v/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) |
+| GraphQL.NewtonsoftJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![Nuget](https://img.shields.io/nuget/v/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) |
+| GraphQL.MemoryCache    | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.MemoryCache)](https://www.nuget.org/packages/GraphQL.MemoryCache)       | [![Nuget](https://img.shields.io/nuget/v/GraphQL.MemoryCache)](https://www.nuget.org/packages/GraphQL.MemoryCache)       |
+| GraphQL.DataLoader     | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.DataLoader)](https://www.nuget.org/packages/GraphQL.DataLoader)         | [![Nuget](https://img.shields.io/nuget/v/GraphQL.DataLoader)](https://www.nuget.org/packages/GraphQL.DataLoader)         |
+| GraphQL.SystemReactive | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemReactive)](https://www.nuget.org/packages/GraphQL.SystemReactive) | [![Nuget](https://img.shields.io/nuget/v/GraphQL.SystemReactive)](https://www.nuget.org/packages/GraphQL.SystemReactive) |
+| GraphQL.MicrosoftDI    | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.MicrosoftDI)](https://www.nuget.org/packages/GraphQL.MicrosoftDI)       | [![Nuget](https://img.shields.io/nuget/v/GraphQL.MicrosoftDI)](https://www.nuget.org/packages/GraphQL.MicrosoftDI)       |
+
+You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
+Note that GitHub requires authentication to consume the feed.  See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
+
 ## Documentation
 
 1. http://graphql-dotnet.github.io - documentation site that is built from the [docs](/docs2/site/) folder in the `master` branch.
@@ -44,30 +56,78 @@ Source Link in your IDE settings. Then you can debug GraphQL.NET source code as 
 
 ## Installation
 
-You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
+#### 1. GraphQL.NET engine
+
+This is the main package, the heart of the repository in which you can find all the necessary classes
+for GraphQL request processing.
+
 ```
 > dotnet add package GraphQL
 ```
 
-For serialized results, you'll need an `IDocumentWriter` implementation.
-We support several serializers (or you can bring your own):
+#### 2. Serialization
 
-| Package | Downloads | Nuget Latest |
-|---------|-----------|--------------|
-| GraphQL.SystemTextJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) |
-| GraphQL.NewtonsoftJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) |
+For serialized results, you'll need an `IDocumentWriter` implementation.
+We provide several serializers (or you can bring your own).
 
 ```
 > dotnet add package GraphQL.SystemTextJson
 > dotnet add package GraphQL.NewtonsoftJson
 ```
+
 > *Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
 > capabilities so writing to an ASP.NET Core 3.0 `HttpResponse.Body` will require you to set 
 > `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
 > which isn't recommended.*
 
-You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
-Note that GitHub requires authentication to consume the feed.  See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
+#### 3. Document Caching
+
+For caching of parsed GraphQL documents you'll need an `IDocumentCache` implementation.
+We provide in-memory implementation on top of `Microsoft.Extensions.Caching.Memory` package.
+
+```
+> dotnet add package GraphQL.MemoryCache
+```
+
+For more information see [Document Caching](https://graphql-dotnet.github.io/docs/guides/document-caching).
+
+#### 4. DataLoader
+
+DataLoader is a generic utility to be used as part of your application's data fetching layer
+to provide a simplified and consistent API over various remote data sources such as databases
+or web services via batching and caching.
+
+```
+> dotnet add package GraphQL.DataLoader
+```
+
+For more information see [DataLoader](https://graphql-dotnet.github.io/docs/guides/dataloader).
+
+> *Note: Prior to version 4, the contents of this package was part of the main GraphQL.NET package.*
+
+#### 5. Subscriptions
+
+For handling subscriptions you'll need an instance of `DocumentExecuter` that supports this
+GraphQL operation type. `DocumentExecuter` class from the main GraphQL.NET package supports
+only queries and mutations. We provide `SubscriptionDocumentExecuter` implementation on top
+of `System.Reactive` packages.
+
+```
+> dotnet add package GraphQL.SystemReactive
+```
+
+For more information see [Subscriptions](https://graphql-dotnet.github.io/docs/getting-started/subscriptions).
+
+#### 6. Advanced Dependency Injection
+
+Also we provide some extra classes for advanced dependency injection usage on top of
+`Microsoft.Extensions.DependencyInjection.Abstractions` package.
+
+```
+> dotnet add package GraphQL.MicrosoftDI
+```
+
+For more information see [Thread safety with scoped services](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection#thread-safety-with-scoped-services).
 
 ## Examples
 
@@ -90,7 +150,7 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0/lib/netstandard2.0/diff/2.4.0/).
 
-* [3.x to 4.x - under development](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/docs2/site/docs/guides/migration4.md)
+* [3.x to 4.x](https://graphql-dotnet.github.io/docs/migrations/migration4)
 * [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/migrations/migration3)
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/migrations/migration2)
 * [0.11.0](https://graphql-dotnet.github.io/docs/migrations/v0_11_0)
@@ -289,6 +349,12 @@ Stable versions of packages are published to NuGet when a [release](https://gith
 
 This project exists thanks to all the people who contribute. 
 <a href="https://github.com/graphql-dotnet/graphql-dotnet/graphs/contributors"><img src="https://opencollective.com/graphql-net/contributors.svg?width=890&button=false" /></a>
+
+PRs are welcome! Looking for something to work on? The list of [open issues](https://github.com/graphql-dotnet/graphql-dotnet/issues)
+is a great place to start. You can help the project simply respond to some of the [asked questions](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aissue+is%3Aopen+label%3Aquestion).
+
+The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 4.x.x.
+If you have a PR with some breaking changes, then please target it to the `develop` branch.
 
 ## Backers
 
