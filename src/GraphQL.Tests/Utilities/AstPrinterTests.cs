@@ -127,17 +127,32 @@ namespace GraphQL.Tests.Utilities
         {
             var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
             var ret = AstPrinter.Print(new StringValue(sample));
-            foreach (var c in ret)
+
+            foreach (char c in ret)
                 c.ShouldBeGreaterThanOrEqualTo(' ');
+
             var deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
             deserialized.ShouldBe(sample);
+
+            var token = GraphQLParser.Lexer.Lex(ret);
+            token.Kind.ShouldBe(GraphQLParser.TokenKind.STRING);
+            token.Value.ShouldBe(sample);
         }
 
         [Theory]
         [MemberData(nameof(NodeTests))]
         public void prints_node(INode node, string expected)
         {
-            AstPrinter.Print(node).ShouldBe(expected);
+            var printed = AstPrinter.Print(node);
+
+            printed.ShouldBe(expected);
+
+            if (node is StringValue str)
+            {
+                var token = GraphQLParser.Lexer.Lex(printed);
+                token.Kind.ShouldBe(GraphQLParser.TokenKind.STRING);
+                token.Value.ShouldBe(str.Value);
+            }
         }
 
         [Theory]
@@ -150,6 +165,9 @@ namespace GraphQL.Tests.Utilities
         public static object[][] NodeTests = new object[][]
         {
             new object[] { new StringValue("test"), @"""test""" },
+            new object[] { new StringValue("ab/cd"), @"""ab\/cd""" },
+            new object[] { new StringValue("ab\bcd"), @"""ab\bcd""" },
+            new object[] { new StringValue("ab\fcd"), @"""ab\fcd""" },
             new object[] { new StringValue("ab\rcd"), @"""ab\rcd""" },
             new object[] { new StringValue("ab\ncd"), @"""ab\ncd""" },
             new object[] { new StringValue("ab\tcd"), @"""ab\tcd""" },

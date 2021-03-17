@@ -336,14 +336,20 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
+                    // http://spec.graphql.org/June2018/#sec-String-Value
+                    // TODO: can be changed to stackalloc / string.Create()
                     var val = (string)f.Arg(x => x.Value);
                     var sb = new System.Text.StringBuilder(val.Length + 2);
                     sb.Append('"');
-                    foreach (var ch in val)
+                    foreach (char ch in val)
                     {
                         if (ch < ' ')
                         {
-                            if (ch == '\n')
+                            if (ch == '\b')
+                                sb.Append("\\b");
+                            else if (ch == '\f')
+                                sb.Append("\\f");
+                            else if (ch == '\n')
                                 sb.Append("\\n");
                             else if (ch == '\r')
                                 sb.Append("\\r");
@@ -352,6 +358,8 @@ namespace GraphQL.Utilities
                             else
                                 sb.Append("\\u" + ((int)ch).ToString("X4"));
                         }
+                        else if (ch == '/')
+                            sb.Append("\\/");
                         else if (ch == '\\')
                             sb.Append("\\\\");
                         else if (ch == '"')
