@@ -14,6 +14,12 @@ namespace GraphQL.Validation
     {
         private readonly List<INode> _nodes = new List<INode>();
 
+        /// <inheritdoc cref="ValidationError(string, string, string, INode[])">
+        public ValidationError(string originalQuery, string number, string message, INode node)
+            : this(originalQuery, number, message, (Exception)null, node)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
         /// Sets locations based on the original query and specified AST nodes that this error applies to.
@@ -21,6 +27,26 @@ namespace GraphQL.Validation
         public ValidationError(string originalQuery, string number, string message, params INode[] nodes)
             : this(originalQuery, number, message, null, nodes)
         {
+        }
+
+        /// <inheritdoc cref="ValidationError(string, string, string, Exception, INode[])"/>
+        public ValidationError(
+            string originalQuery,
+            string number,
+            string message,
+            Exception innerException,
+            INode node)
+            : base(message, innerException)
+        {
+            Code = GetValidationErrorCode(GetType());
+            Number = number;
+
+            if (node != null)
+            {
+                _nodes.Add(node);
+                var location = new Location(originalQuery, node.SourceLocation.Start);
+                AddLocation(location.Line, location.Column);
+            }
         }
 
         /// <summary>
