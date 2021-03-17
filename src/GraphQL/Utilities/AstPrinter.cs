@@ -405,7 +405,7 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<AnyValue>(c => c.Print(x => throw new InvalidOperationException("Cannot print AnyValue representations.")));
+            Config<AnyValue>(c => c.Print(x => throw new InvalidOperationException("Cannot print AnyValue representation.")));
 
             // Directive
             Config<Directive>(c =>
