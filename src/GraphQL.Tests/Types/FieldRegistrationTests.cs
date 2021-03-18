@@ -34,5 +34,15 @@ namespace GraphQL.Tests.Types
                 () => graphType.Field(typeof(string), "id")
             );
         }
+
+        [Fact]
+        public void throws_error_when_trying_to_register_field_of_generic_type()
+        {
+            var graphType = new ObjectGraphType();
+
+            Should.Throw<ArgumentOutOfRangeException>(
+                () => graphType.Field(typeof(NonNullGraphType<>), "id")
+            );
+        }
     }
 }
