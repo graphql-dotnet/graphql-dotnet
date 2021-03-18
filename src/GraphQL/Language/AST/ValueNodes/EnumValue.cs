@@ -1,3 +1,5 @@
+using GraphQL.Utilities;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public EnumValue(NameNode name)
         {
-            Name = name.Name;
+            NameValidator.ValidateDefault(name.Name, NamedElement.EnumValue);
             NameNode = name;
         }
 
@@ -18,8 +20,8 @@ namespace GraphQL.Language.AST
         /// Initializes a new instance with a specified string representation of the enumeration value.
         /// </summary>
         public EnumValue(string name)
+            : this(new NameNode(name))
         {
-            Name = name;
         }
 
         object IValue.Value => Name;
@@ -27,7 +29,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the string representation of the enumeration value.
         /// </summary>
-        public string Name { get; }
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the string representation of the enumeration value.

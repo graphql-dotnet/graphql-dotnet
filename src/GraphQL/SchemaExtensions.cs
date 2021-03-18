@@ -133,9 +133,10 @@ namespace GraphQL
         /// Keep in mind that the implementation of experimental features can change over time, up to their complete
         /// removal, if the official specification is supplemented with all the missing features.
         /// </summary>
+        /// <typeparam name="TSchema">Type of the schema.</typeparam>
         /// <param name="schema">The schema for which the features are enabled.</param>
         /// <param name="mode">Experimental features mode.</param>
-        /// <returns>Reference to the provided <paramref name="schema"/>Experimental features mode.</returns>
+        /// <returns>Reference to the provided <paramref name="schema"/>.</returns>
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, ExperimentalIntrospectionFeaturesMode mode = ExperimentalIntrospectionFeaturesMode.ExecutionOnly)
             where TSchema : ISchema
         {
@@ -243,6 +244,60 @@ namespace GraphQL
                             visitor.VisitInputObjectFieldDefinition(field, input, schema);
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Replaces one scalar in the schema to another with the same name.
+        /// </summary>
+        /// <typeparam name="TSchema">Type of the schema.</typeparam>
+        /// <param name="schema">The schema for which to replace the scalar.</param>
+        /// <param name="scalar">New scalar. The replacement occurs by its name.</param>
+        /// <returns>Reference to the provided <paramref name="schema"/>.</returns>
+        public static TSchema ReplaceScalar<TSchema>(this TSchema schema, ScalarGraphType scalar)
+            where TSchema : ISchema
+        {
+            new ReplaceScalarVisitor(scalar).Run(schema);
+            return schema;
+        }
+
+        private sealed class ReplaceScalarVisitor : BaseSchemaNodeVisitor
+        {
+            private readonly ScalarGraphType _replacement;
+
+            public ReplaceScalarVisitor(ScalarGraphType replacement)
+            {
+                _replacement = replacement ?? throw new ArgumentNullException(nameof(replacement));
+            }
+
+            public override void VisitSchema(ISchema schema)
+            {
+                if (schema.AllTypes.Dictionary.TryGetValue(_replacement.Name, out var type))
+                {
+                    schema.AllTypes.Dictionary[_replacement.Name] = type is ScalarGraphType
+                        ? _replacement
+                        : throw new InvalidOperationException($"The scalar should be replaced only by another scalar. You are trying to replace non scalar type '{type.GetType().Name}' with name '{type.Name}' to scalar type '{_replacement.GetType().Name}'.");
+                }
+            }
+
+            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => Replace(argument);
+
+            public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
+
+            public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema) => Replace(argument);
+
+            public override void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => Replace(field);
+
+            public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => Replace(argument);
+
+            public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => Replace(field);
+
+            private void Replace(IProvideResolvedType provider)
+            {
+                if (provider.ResolvedType is IProvideResolvedType wrappedProvider)
+                    Replace(wrappedProvider);
+                else if (provider.ResolvedType is ScalarGraphType scalar && scalar.Name == _replacement.Name)
+                    provider.ResolvedType = _replacement;
             }
         }
     }

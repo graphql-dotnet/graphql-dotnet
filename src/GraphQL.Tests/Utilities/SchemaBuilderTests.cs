@@ -149,7 +149,7 @@ namespace GraphQL.Tests.Utilities
             schema.GetAppliedDirectives().Count.ShouldBe(1);
             schema.GetAppliedDirectives().Find("public").ShouldNotBeNull();
             schema.GetAppliedDirectives().Find("public").ArgumentsCount.ShouldBe(0);
-            schema.GetAppliedDirectives().Find("public").Arguments.ShouldBeNull();
+            schema.GetAppliedDirectives().Find("public").List.ShouldBeNull();
 
             var query = schema.Query;
             query.ShouldNotBeNull();
@@ -163,9 +163,9 @@ namespace GraphQL.Tests.Utilities
             mutation.HasAppliedDirectives().ShouldBeTrue();
             mutation.GetAppliedDirectives().Count.ShouldBe(1);
             mutation.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
-            mutation.GetAppliedDirectives().Find("requireAuth").Arguments.Count.ShouldBe(1);
-            mutation.GetAppliedDirectives().Find("requireAuth").Arguments[0].Name.ShouldBe("role");
-            mutation.GetAppliedDirectives().Find("requireAuth").Arguments[0].Value.ShouldBe("Admin");
+            mutation.GetAppliedDirectives().Find("requireAuth").List.Count.ShouldBe(1);
+            mutation.GetAppliedDirectives().Find("requireAuth").List[0].Name.ShouldBe("role");
+            mutation.GetAppliedDirectives().Find("requireAuth").List[0].Value.ShouldBe("Admin");
 
             var subscription = schema.Subscription;
             subscription.ShouldNotBeNull();
@@ -173,19 +173,19 @@ namespace GraphQL.Tests.Utilities
             subscription.GetAppliedDirectives().Count.ShouldBe(1);
             subscription.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
             subscription.GetAppliedDirectives().Find("requireAuth").ArgumentsCount.ShouldBe(0);
-            subscription.GetAppliedDirectives().Find("requireAuth").Arguments.ShouldBeNull();
+            subscription.GetAppliedDirectives().Find("requireAuth").List.ShouldBeNull();
 
             var field = subscription.Fields.Find("subscribe");
             field.ShouldNotBeNull();
             field.GetAppliedDirectives().Count.ShouldBe(3);
             field.GetAppliedDirectives().Find("traits").ShouldNotBeNull();
-            field.GetAppliedDirectives().Find("traits").Arguments.Count.ShouldBe(3);
-            field.GetAppliedDirectives().Find("traits").Arguments[0].Name.ShouldBe("volatile");
-            field.GetAppliedDirectives().Find("traits").Arguments[0].Value.ShouldBe(true);
-            field.GetAppliedDirectives().Find("traits").Arguments[1].Name.ShouldBe("documented");
-            field.GetAppliedDirectives().Find("traits").Arguments[1].Value.ShouldBe(false);
-            field.GetAppliedDirectives().Find("traits").Arguments[2].Name.ShouldBe("enumerated");
-            field.GetAppliedDirectives().Find("traits").Arguments[2].Value.ShouldBe("DESC");
+            field.GetAppliedDirectives().Find("traits").List.Count.ShouldBe(3);
+            field.GetAppliedDirectives().Find("traits").List[0].Name.ShouldBe("volatile");
+            field.GetAppliedDirectives().Find("traits").List[0].Value.ShouldBe(true);
+            field.GetAppliedDirectives().Find("traits").List[1].Name.ShouldBe("documented");
+            field.GetAppliedDirectives().Find("traits").List[1].Value.ShouldBe(false);
+            field.GetAppliedDirectives().Find("traits").List[2].Name.ShouldBe("enumerated");
+            field.GetAppliedDirectives().Find("traits").List[2].Value.ShouldBe("DESC");
             field.GetAppliedDirectives().Find("some").ShouldNotBeNull();
             field.GetAppliedDirectives().Find("some").ArgumentsCount.ShouldBe(0);
         }
@@ -199,7 +199,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions);
+            var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").Description = "Some argument");
             schema.Initialize();
 
             var query = schema.Query;
@@ -214,6 +214,7 @@ namespace GraphQL.Tests.Utilities
             arg.Name.ShouldBe("id");
             arg.DefaultValue.ShouldBe(1);
             arg.ResolvedType.Name.ShouldBe("ID");
+            arg.Description.ShouldBe("Some argument");
         }
 
         [Fact]
@@ -299,7 +300,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions);
+            var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").DefaultValue = 999);
             schema.Initialize();
 
             var query = schema.Query;
@@ -316,6 +317,11 @@ namespace GraphQL.Tests.Utilities
             var post = schema.AllTypes["Post"] as IObjectGraphType;
             post.ShouldNotBeNull();
             post.Fields.Count.ShouldBe(3);
+
+            var arg = query.Fields.Last().Arguments.Single();
+            arg.Name.ShouldBe("id");
+            arg.DefaultValue.ShouldBe(999);
+            arg.Description.ShouldBeNull();
         }
 
         [Fact]

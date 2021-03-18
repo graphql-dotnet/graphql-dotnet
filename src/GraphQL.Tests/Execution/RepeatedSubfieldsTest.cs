@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -33,14 +34,14 @@ namespace GraphQL.Tests.Execution
         private Field SecondTestField { get; }
         private Field AliasedTestField { get; }
 
-        private Fields CollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+        private Dictionary<string, Field> CollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
         {
             return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
         }
 
         private class MyExecutionStrategy : ParallelExecutionStrategy
         {
-            public Fields MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+            public Dictionary<string, Field> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
                 => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
         }
 
@@ -83,14 +84,15 @@ namespace GraphQL.Tests.Execution
             fragment.Type = new GraphQL.Language.AST.NamedType(
                 new NameNode("Person"));
 
-            var fragments = new Fragments { fragment };
+            var document = new Document();
+            document.Fragments.Add(fragment);
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
 
             var context = new ExecutionContext
             {
-                Fragments = fragments,
+                Document = document,
                 Schema = schema
             };
 

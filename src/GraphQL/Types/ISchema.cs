@@ -67,7 +67,7 @@ namespace GraphQL.Types
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// <br/><br/>
-        /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
+        /// <see cref="Schema"/> initializes the list to include <see cref="SchemaDirectives.Include"/>, <see cref="SchemaDirectives.Skip"/> and <see cref="SchemaDirectives.Deprecated"/> by default.
         /// </summary>
         SchemaDirectives Directives { get; }
 
@@ -77,9 +77,14 @@ namespace GraphQL.Types
         SchemaTypes AllTypes { get; }
 
         /// <summary>
-        /// A list of additional graph types manually added to the schema by RegisterType call.
+        /// A list of additional graph types manually added to the schema by a <see cref="RegisterType(Type)"/> call.
         /// </summary>
         IEnumerable<Type> AdditionalTypes { get; }
+
+        /// <summary>
+        /// A list of additional graph type instances manually added to the schema by a <see cref="RegisterType(IGraphType)"/> call.
+        /// </summary>
+        IEnumerable<IGraphType> AdditionalTypeInstances { get; }
 
         /// <summary>
         /// Adds the specified instance of an <see cref="ISchemaNodeVisitor"/> to the schema.

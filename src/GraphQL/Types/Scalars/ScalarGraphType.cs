@@ -20,7 +20,8 @@ namespace GraphQL.Types
         /// responsible for preparing the scalar for transport to the client. It is only responsible
         /// for generating an object which can eventually be serialized by some transport-focused API.
         /// <br/><br/>
-        /// This method must handle a value of <see langword="null"/>.
+        /// This method should handle a value of <see langword="null"/>, but may throw an exception
+        /// if <see langword="null"/> is an invalid internal scalar representation.
         /// </summary>
         /// <param name="value">Resolved value (internal scalar representation). May be <see langword="null"/>.</param>
         /// <returns>
@@ -42,7 +43,18 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
-        public abstract object ParseLiteral(IValue value);
+        public virtual object ParseLiteral(IValue value) => value switch
+        {
+            BooleanValue b => ParseValue(b.Value.Boxed()),
+            IntValue i => ParseValue(i.Value),
+            LongValue l => ParseValue(l.Value),
+            BigIntValue bi => ParseValue(bi.Value),
+            FloatValue f => ParseValue(f.Value),
+            DecimalValue d => ParseValue(d.Value),
+            StringValue s => ParseValue(s.Value),
+            NullValue _ => ParseValue(null),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <summary>
         /// Value input coercion. Argument values can not only provided via GraphQL syntax inside a
@@ -117,7 +129,7 @@ namespace GraphQL.Types
         {
             if (value == null)
                 return false;
-            
+
             try
             {
                 return ToAST(value) != null;
@@ -160,24 +172,49 @@ namespace GraphQL.Types
             };
         }
 
+        /// <summary>
+        /// Throws an exception indicating that a value cannot be converted to its AST representation. Typically called by
+        /// <see cref="ToAST(object)"/> if the provided object (an internal representataion) is not valid for this scalar type.
+        /// </summary>
         protected internal IValue ThrowASTConversionError(object value)
         {
             throw new InvalidOperationException($"Unable to convert '{value}' to its AST representation for the scalar type '{Name}'.");
         }
 
+        /// <summary>
+        /// Throws an exception indicating that an AST scalar node cannot be converted to a value. Typically called by
+        /// <see cref="ParseLiteral(IValue)"/> if the node type is invalid or cannot be parsed.
+        /// </summary>
         protected object ThrowLiteralConversionError(IValue input)
         {
             throw new InvalidOperationException($"Unable to convert '{input}' literal from AST representation to the scalar type '{Name}'");
         }
 
-        // this is often called for serialization errors, since Serialize calls ParseValue by default
-        // also may be called for serialization errors during ToAST, since ToAST calls Serialize by default, which by default calls ParseValue
+        /// <summary>
+        /// Throws an exception indicating that an external value (typically provided through a variable) cannot be converted
+        /// to an internal representation. Typically called by <see cref="ParseValue(object)"/> if the provided object is invalid
+        /// or cannot be parsed.
+        /// </summary>
+        /// <remarks>
+        /// This is often called for serialization errors, since <see cref="Serialize(object)"/> calls <see cref="ParseValue(object)"/> by default.
+        /// This also may be called for serialization errors during <see cref="ToAST(object)"/>, since <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/>
+        /// by default, which by default calls <see cref="ParseValue(object)"/>.
+        /// </remarks>
         protected object ThrowValueConversionError(object value)
         {
             throw new InvalidOperationException($"Unable to convert '{value}' to the scalar type '{Name}'");
         }
 
-        // also may be called for serialization errors during ToAST, since ToAST calls Serialize by default
+        /// <summary>
+        /// Throws an exception indicating that an internal value (typically returned from a field resolver) cannot be converted
+        /// to its external representation. Typically called by <see cref="Serialize(object)"/> if the object is not valid for this
+        /// scalar type.
+        /// </summary>
+        /// <remarks>
+        /// This may be called for serialization errors during <see cref="ToAST(object)"/>, since the default implementation
+        /// of <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/> to serialize the value before converting the
+        /// result to an AST node.
+        /// </remarks>
         protected object ThrowSerializationError(object value)
         {
             throw new InvalidOperationException($"Unable to serialize '{value}' to the scalar type '{Name}'.");

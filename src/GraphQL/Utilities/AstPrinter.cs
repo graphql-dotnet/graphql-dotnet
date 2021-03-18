@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Utilities
 {
@@ -26,7 +28,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintConfig
+    internal class AstPrintConfig
     {
         internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
         public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
@@ -44,7 +46,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class PrintFormat<T>
+    internal class PrintFormat<T>
     {
         private readonly IDictionary<string, object> _args;
 
@@ -77,7 +79,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintConfig<T> : AstPrintConfig
+    internal class AstPrintConfig<T> : AstPrintConfig
         where T : INode
     {
         public void Field<TProperty>(Expression<Func<T, TProperty>> resolve)
@@ -102,13 +104,13 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintFieldDefinition
+    internal class AstPrintFieldDefinition
     {
         public string Name { get; set; }
         public IValueResolver Resolver { get; set; }
     }
 
-    public readonly struct ResolveValueContext
+    internal readonly struct ResolveValueContext
     {
         public ResolveValueContext(object source)
         {
@@ -128,17 +130,17 @@ namespace GraphQL.Utilities
         }
     }
 
-    public interface IValueResolver
+    internal interface IValueResolver
     {
         object Resolve(in ResolveValueContext context);
     }
 
-    public interface IValueResolver<T> : IValueResolver
+    internal interface IValueResolver<T> : IValueResolver
     {
         new T Resolve(in ResolveValueContext context);
     }
 
-    public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
+    internal class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
     {
         private readonly Func<TObject, TProperty> _property;
 
@@ -158,7 +160,7 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintVisitor
+    internal class AstPrintVisitor
     {
         private readonly List<AstPrintConfig> _configs = new List<AstPrintConfig>();
 
@@ -286,7 +288,7 @@ namespace GraphQL.Utilities
             Config<IntValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((int)f.Arg(x => x.Value)).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<NullValue>(c => c.Print(f => "null"));
@@ -294,13 +296,13 @@ namespace GraphQL.Utilities
             Config<LongValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((long)f.Arg(x => x.Value)).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<BigIntValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((BigInteger)f.Arg(x => x.Value)).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<FloatValue>(c =>
@@ -309,7 +311,13 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (double)f.Arg(x => x.Value);
-                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                    if (double.IsInfinity(val))
+                        throw new InvalidOperationException($"Cannot print value: {val}");
+                    // print most compact form of value with up to 15 digits of precision (C# default)
+                    // note: G17 format (17 digits of precision) is necessary to prevent losing any
+                    // information during roundtrip to string. However, "3.33" prints something like
+                    // "3.330000000000001" which probably is not desirable.
+                    return val.ToString("G15", CultureInfo.InvariantCulture);
                 });
             });
 
@@ -319,7 +327,7 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (decimal)f.Arg(x => x.Value);
-                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                    return val.ToString("G29", CultureInfo.InvariantCulture); //prints most compact form of value without losing any precision
                 });
             });
 
@@ -328,19 +336,45 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
-                    var val = f.Arg(x => x.Value);
-                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
+                    // http://spec.graphql.org/June2018/#sec-String-Value
+                    // TODO: can be changed to stackalloc / string.Create()
+                    var val = (string)f.Arg(x => x.Value);
+                    var sb = new System.Text.StringBuilder(val.Length + 2);
+                    sb.Append('"');
+                    foreach (char ch in val)
                     {
-                        val = $"\"{val}\"";
+                        if (ch < ' ')
+                        {
+                            if (ch == '\b')
+                                sb.Append("\\b");
+                            else if (ch == '\f')
+                                sb.Append("\\f");
+                            else if (ch == '\n')
+                                sb.Append("\\n");
+                            else if (ch == '\r')
+                                sb.Append("\\r");
+                            else if (ch == '\t')
+                                sb.Append("\\t");
+                            else
+                                sb.Append("\\u" + ((int)ch).ToString("X4"));
+                        }
+                        else if (ch == '\\')
+                            sb.Append("\\\\");
+                        else if (ch == '"')
+                            sb.Append("\\\"");
+                        else
+                            sb.Append(ch);
                     }
-                    return val;
+                    sb.Append('"');
+                    return sb;
                 });
+
             });
 
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
+                c.Print(f => (bool)f.Arg(x => x.Value) ? "true" : "false");
             });
 
             Config<EnumValue>(c =>
@@ -367,6 +401,8 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
+
+            Config<AnyValue>(c => c.Print(x => throw new InvalidOperationException("Cannot print AnyValue representation.")));
 
             // Directive
             Config<Directive>(c =>

@@ -62,6 +62,20 @@ For untyped `InputObjectGraphType` classes, like shown above, the default behavi
 will be to return the dictionary. `GetArgument<T>` will still attempt to convert a dictionary to the
 requested type via `ObjectExtensions.ToObject` as it did before.
 
+### Scalar null value handling
+
+Custom scalars can now handle serialization or deserialization of `null` values. This can be useful if
+you have a need to coerce certain internal values to `null`, such as serializing empty strings to `null`.
+It can also be used to control deserialization of external `null` values, such as deserializing `null` to
+the value zero.
+
+GraphQL nullability semantics are enforced on the external AST representation of the data. For instance,
+if a custom scalar converted empty strings to `null` during serialization, an error would occur if a field
+resolver tried to return an empty string for a non-null field.
+
+See the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars)
+documentation page which describes this in detail.
+
 ### Experimental Features / Applied Directives
 
 In v4 we added ability to apply directives to the schema elements and expose user-defined meta-information
@@ -171,6 +185,7 @@ This may be needed to get the parameters of parent nodes.
 
 ### Other Features
 
+* New method `FieldConfig.ArgumentFor`
 * New property `ISchema.ValueConverters`
 * New method `IParentExecutionNode.ApplyToChildren`
 * `ExecutionStrategy` exposes a number of `protected virtual` methods that can be used to alter the execution
@@ -182,6 +197,96 @@ This may be needed to get the parameters of parent nodes.
 * Schema validation upon initialization and better support for schema traversal via `ISchemaNodeVisitor`
 
 ## Breaking Changes
+
+### Scalar Deserialization Type Enforcement
+
+Scalars do not coerce values if passed an incompatible type during deserialization from a variable. Previously, values would pass
+through the `ValueConverter` while being deserialized. Now the `ValueConverter` is ignored for deserialization of built-in scalars.
+Calling `GetArgument<T>` within the field resolver will still call the `ValueConverter` to coerce the input data to the correct type,
+but if the document is unable to deserialize successfully, the field resolver will not run.
+
+Here are some of the situations that you may run into with version 4:
+
+- `StringGraphType` does not serialize integers to strings
+- Numeric scalars such as `IntGraphType` do not deserialize strings to their numeric type
+- Integer numeric scalars such as `IntGraphType` do not coerce floating-point values to their numeric type
+- `BooleanGraphType` does not deserialize/serialize strings or integers (e.g. "true", "false", 0, 1, etc)
+- `EnumGraphType` is stricter, requiring internal values for serialization, and external values for deserialization
+- `IdGraphType` (which allows any basic type) does not coerce variable values to trimmed strings during deserialization
+- `IdGraphType` does not trim serialized values (but does convert them to strings)
+
+For situations where it is necessary to revert scalars to previous behavior, you can override the built-in scalar by following the
+instructions within the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars) documentation page.
+
+Below is a sample replacement for the `BooleanGraphType` which will restore the previous behavior exactly
+as it was in version 3.x.
+
+```csharp
+public class MyBooleanGraphType : BooleanGraphType
+{
+    public MyBooleanGraphType()
+    {
+        Name = "Boolean";
+    }
+
+    public override object ParseValue(object value) => value switch
+    {
+        null => null,
+        _ => ValueConverter.ConvertTo(value, typeof(bool)) ?? ThrowValueConversionException(value)
+    };
+
+    public override bool CanParseValue(object value)
+    {
+        try
+        {
+            _ = ParseValue(value);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+
+// Code-first: add the following line of code to your schema's constructor
+RegisterType(new MyBooleanGraphType());
+
+// Schema-first: add the following line of code after your schema is built, before it is initialized
+schema.RegisterType(new MyBooleanGraphType());
+```
+
+### Custom Scalar Cleanup
+
+All of the code necessary for a proper custom scalar implementation has been moved from the `ValueConverter` and `IAstNodeConverter`
+directly into the scalar itself. Some changes will be necessary for custom scalars as follows:
+
+`IAstNodeConverter` has been completely removed along with the properties relating to it on the `Schema`. Code that had been configured
+for a custom scalar may need to be moved into the new `ToAST` virtual member of the custom scalar. `ValueNode` implementations are not
+recommended; the `ToAST` member should return one of the base value node types present in the library, such as `StringValue` or `IntValue`.
+If the `Serialize` method returns a basic .NET type (such as `int` or `string`), the default `ToAST` implementation should suffice.
+
+Code within `ValueConverter` registrations should be moved directly into the `ParseLiteral` and/or `ParseValue` methods. Having a
+`ValueConverter` registration should no longer be necessary for custom scalars.
+
+`ParseLiteral` and `ParseValue` must handle null values (`NullValue` for `ParseLiteral` and `null` for `ParseValue`). Typically
+this involves returning `null` for each of these cases.
+
+`ParseLiteral`, `ParseValue` and `Serialize` must throw an exception if the value cannot be parsed. Previously, returning `null` would
+indicate a conversion failure. `ThrowLiteralConversionError`, `ThrowValueConversionError` and `ThrowSerializationError` convenience
+methods are provided for this purpose but any exception is valid to throw.
+
+`Serialize`'s default behavior still calls `ParseValue`. With the other changes, it should be verified if this is still valid
+for the custom scalar.
+
+If `ToAST` is overridden, it must process a value of `null` (typically by returning a new instance of `NullValue`) and throw an
+exception if there are serialization errors. The `ThrowASTConversionError` convenience method is provided for this purpose but
+any exception is valid to throw.
+
+You may wish to add implementations for the new `CanParseValue`, `CanParseLiteral` and `IsValidDefault` methods. This is not necessary
+as the default implementations will call `ParseValue`, `ParseLiteral` and `ToAST` respectively, returning `true` unless the method
+throws an exception. Adding a custom implementation of `CanParseLiteral` can improve performance if `ParseLiteral` causes memory allocation / boxing.
+`CanParseValue` is not used by the framework at this time, and `ToAST` is only called during schema initialization and schema printing.
 
 ### Schema Configuration Options Moved
 
@@ -436,6 +541,10 @@ schema.RegisterTypeMapping<int, MyIntGraphType>();
 schema.RegisterTypeMapping<string, MySpecialFormattedStringGraphType>();
 ```
 
+If you have dynamic code that relies on a call to `GraphTypeTypeRegistry.Get<T>` then you will need to instead utilize
+a graph type of `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>` where `T` is the CLR type.
+The type reference will be replaced with the proper graph type during schema initialization.
+
 ### Classes for automatic GraphType registration by default use all properties of the CLR type
 
 In v4 `AutoRegisteringObjectGraphType<TSourceType>` and `AutoRegisteringInputObjectGraphType<TSourceType>`
@@ -482,6 +591,12 @@ This property was renamed. If you have explicitly set this property in an attrib
 directly anywhere, then just change its name. If you did not explicitly set this property, the
 default continues to be `ResolverType.Resolver`.
 
+### No more static predefined directives
+
+`DirectiveGraphType.Deprecated`, `DirectiveGraphType.Include` and `DirectiveGraphType.Skip` static properties were moved
+into corresponding virtual properties within `SchemaDirectives` class. This is done in order to be able to independently change
+the directives implementation without mutual influence on the schemas using them.
+
 ### API Cleanup
 
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into
@@ -500,9 +615,10 @@ default continues to be `ResolverType.Resolver`.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
-* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs
+* `GraphTypesLookup.Create` has been removed; use the `SchemaTypes` constructor instead.
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` (now `SchemaTypes`) are private.
-* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `ErrorLocation` struct became `readonly`.
 * `DebugNodeVisitor` class has been removed.
@@ -530,6 +646,13 @@ default continues to be `ResolverType.Resolver`.
 * `ValidationContext.Print(INode node)` and `ValidationContext.Print(IGraphType type)` methods have been removed
 * `Directives.HasDuplicates` property has been removed
 * `KnownDirectives` validation rule has been renamed to `KnownDirectivesInAllowedLocations` and now also generates `5.7.2` validation error number
+* `AstPrinter` supporting classes have been removed; the static method `AstPrinter.Print(INode node)` is the only exposed member.
+* `Language.AST.Fields` was replaced with `Dictionary<string, Field>`
+* `IResolveFieldContext.Fragments` was removed; use `IResolveFieldContext.Document.Fragments` instead
+* `ExecutionContext.Fragments` was removed; use `ExecutionContext.Document.Fragments` instead
+* `AbstractGraphTypeExtensions.GetTypeOf` was removed; use `AbstractGraphTypeExtensions.GetObjectType` instead
+* `TypeConfig.FieldFor(string, IServiceProvider)` and `TypeConfig.SubscriptionFieldFor(string, IServiceProvider)` 
+  methods were merged into single `TypeConfig.FieldFor(string)` method and just return the required configuration without its initialization
 
 ### Other Breaking Changes (including but not limited to)
 
@@ -552,4 +675,4 @@ default continues to be `ResolverType.Resolver`.
 * `ExecutionNode.PropagateNull` must be called before `ExecutionNode.ToValue`; see reference implementation
 * `IDocumentValidator.ValidateAsync` does not take `originalQuery` parameter; use `Document.OriginalQuery` instead
 * `IDocumentValidator.ValidateAsync` now returns `(IValidationResult validationResult, Variables variables)` tuple instead of single `IValidationResult` before
-* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]`
+* `GraphQLExtensions.IsValidLiteralValue` now returns `string` instead of `string[]` and is a member of `ValidationContext`.

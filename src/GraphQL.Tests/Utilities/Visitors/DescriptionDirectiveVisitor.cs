@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class DescriptionDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        private static void SetDescription<T>(T element) where T: IProvideMetadata, IProvideDescription
+        private static void SetDescription<T>(T element) where T : IProvideMetadata, IProvideDescription
         {
             // if a value has already been set, prefer that
             if (element.Description == null)

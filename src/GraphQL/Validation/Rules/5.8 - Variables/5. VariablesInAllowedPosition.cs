@@ -23,7 +23,8 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<VariableDefinition>(
-                (varDefAst, context) => {
+                (varDefAst, context) =>
+                {
                     var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
                     varDefMap[varDefAst.Name] = varDefAst;
                 }

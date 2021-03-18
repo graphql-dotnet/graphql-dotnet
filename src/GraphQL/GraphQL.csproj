@@ -4,12 +4,12 @@
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Description>GraphQL for .NET</Description>
     <Authors>Joe McBride</Authors>
-    <Copyright>Copyright 2015-2017 Joseph T. McBride et al. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2015-2021 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>
     <PackageTags>GraphQL;json;api</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="7.0.0-preview-28" />
+    <PackageReference Include="GraphQL-Parser" Version="7.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />

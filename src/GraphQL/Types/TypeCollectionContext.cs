@@ -36,28 +36,5 @@ namespace GraphQL.Types
         internal List<(Type, Type)> TypeMappings { get; private set; }
 
         internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
-
-        internal string CollectTypes(IGraphType type)
-        {
-            if (type is NonNullGraphType nonNull)
-            {
-                var innerType = ResolveType(nonNull.Type);
-                nonNull.ResolvedType = innerType;
-                string name = CollectTypes(innerType);
-                AddType(name, innerType, this);
-                return name;
-            }
-
-            if (type is ListGraphType list)
-            {
-                var innerType = ResolveType(list.Type);
-                list.ResolvedType = innerType;
-                string name = CollectTypes(innerType);
-                AddType(name, innerType, this);
-                return name;
-            }
-
-            return type.Name;
-        }
     }
 }

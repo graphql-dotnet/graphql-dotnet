@@ -63,7 +63,7 @@ namespace GraphQL.Types
         {
             if (value.TimeOfDay == TimeSpan.Zero)
                 return value;
-            
+
             throw new FormatException($"Expected date to have no time component. Value: {value}");
         }
     }

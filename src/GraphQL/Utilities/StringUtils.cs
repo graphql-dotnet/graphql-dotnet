@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Provides utility methods for strings.
+    /// </summary>
     public static class StringUtils
     {
         /// <summary>

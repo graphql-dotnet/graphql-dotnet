@@ -12,6 +12,21 @@ namespace GraphQL.Types
         internal List<DirectiveGraphType> List { get; } = new List<DirectiveGraphType>();
 
         /// <summary>
+        /// Returns an instance of the predefined 'include' directive.
+        /// </summary>
+        public virtual IncludeDirective Include { get; } = new IncludeDirective();
+
+        /// <summary>
+        /// Returns an instance of the predefined 'skip' directive.
+        /// </summary>
+        public virtual SkipDirective Skip { get; } = new SkipDirective();
+
+        /// <summary>
+        /// Returns an instance of the predefined 'deprecated' directive.
+        /// </summary>
+        public virtual DeprecatedDirective Deprecated { get; } = new DeprecatedDirective();
+
+        /// <summary>
         /// Gets the count of directives.
         /// </summary>
         public int Count => List.Count;

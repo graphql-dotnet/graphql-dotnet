@@ -55,8 +55,6 @@ namespace GraphQL.MicrosoftDI
 
         public Operation Operation => _baseContext.Operation;
 
-        public Fragments Fragments => _baseContext.Fragments;
-
         public Variables Variables => _baseContext.Variables;
 
         public CancellationToken CancellationToken => _baseContext.CancellationToken;
@@ -69,7 +67,7 @@ namespace GraphQL.MicrosoftDI
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Fields SubFields => _baseContext.SubFields;
+        public Dictionary<string, Field> SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
 

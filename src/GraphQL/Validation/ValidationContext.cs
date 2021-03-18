@@ -45,6 +45,7 @@ namespace GraphQL.Validation
         /// <inheritdoc cref="ExecutionContext.Document"/>
         public Document Document { get; set; }
 
+        /// <inheritdoc cref="Validation.TypeInfo"/>
         public TypeInfo TypeInfo { get; set; }
 
         /// <inheritdoc/>
@@ -453,6 +454,123 @@ namespace GraphQL.Validation
 
                 return graphType.ParseDictionary(newDictionary);
             }
+        }
+
+        /// <summary>
+        /// Validates that the specified AST value is valid for the specified scalar or input graph type.
+        /// Graph types that are lists or non-null types are handled appropriately by this method.
+        /// Returns a string representing the errors encountered while validating the value.
+        /// </summary>
+        public string IsValidLiteralValue(IGraphType type, IValue valueAst)
+        {
+            if (type is NonNullGraphType nonNull)
+            {
+                var ofType = nonNull.ResolvedType;
+
+                if (valueAst == null || valueAst is NullValue)
+                {
+                    if (ofType != null)
+                    {
+                        return $"Expected '{ofType.Name}!', found null.";
+                    }
+
+                    return "Expected non-null value, found null";
+                }
+
+                return IsValidLiteralValue(ofType, valueAst);
+            }
+            else if (valueAst is NullValue)
+            {
+                return null;
+            }
+
+            if (valueAst == null)
+            {
+                return null;
+            }
+
+            // This function only tests literals, and assumes variables will provide
+            // values of the correct type.
+            if (valueAst is VariableReference)
+            {
+                return null;
+            }
+
+            if (type is ListGraphType list)
+            {
+                var ofType = list.ResolvedType;
+
+                if (valueAst is ListValue listValue)
+                {
+                    List<string> errors = null;
+
+                    for (int index = 0; index < listValue.ValuesList.Count; ++index)
+                    {
+                        string error = IsValidLiteralValue(ofType, listValue.ValuesList[index]);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                    }
+
+                    return errors == null
+                        ? null
+                        : string.Join(" ", errors);
+                }
+
+                return IsValidLiteralValue(ofType, valueAst);
+            }
+
+            if (type is IInputObjectGraphType inputType)
+            {
+                if (!(valueAst is ObjectValue objValue))
+                {
+                    return $"Expected '{inputType.Name}', found not an object.";
+                }
+
+                var fields = inputType.Fields.ToList();
+                var fieldAsts = objValue.ObjectFields.ToList();
+
+                List<string> errors = null;
+
+                // ensure every provided field is defined
+                foreach (var providedFieldAst in fieldAsts)
+                {
+                    var found = fields.Find(x => x.Name == providedFieldAst.Name);
+                    if (found == null)
+                    {
+                        (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
+                    }
+                }
+
+                // ensure every defined field is valid
+                foreach (var field in fields)
+                {
+                    var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
+
+                    if (fieldAst != null)
+                    {
+                        string error = IsValidLiteralValue(field.ResolvedType, fieldAst.Value);
+                        if (error != null)
+                            (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
+                    }
+                    else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
+                    {
+                        (errors ??= new List<string>()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                    }
+                }
+
+                return errors == null
+                    ? null
+                    : string.Join(" ", errors);
+            }
+
+            if (type is ScalarGraphType scalar)
+            {
+                return scalar.CanParseLiteral(valueAst)
+                    ? null
+                    : $"Expected type '{type.Name}', found {valueAst.StringFrom(Document)}.";
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");
         }
     }
 }

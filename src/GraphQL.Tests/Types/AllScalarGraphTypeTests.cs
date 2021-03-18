@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -217,6 +218,8 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(FloatGraphType), 3.33)]
+        [InlineData(typeof(FloatGraphType), 15.55)]
         [InlineData(typeof(BigIntGraphType), -1E+25)]
         [InlineData(typeof(BigIntGraphType), 0)]
         [InlineData(typeof(BigIntGraphType), 1E+25)]
@@ -226,7 +229,7 @@ namespace GraphQL.Tests.Types
                 value = new BigInteger(Convert.ToDecimal(value));
 
             var g = Create(graphType);
-            object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(value.ToString());
+            object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
@@ -257,6 +260,8 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType), ulong.MaxValue)]
         [InlineData(typeof(FloatGraphType), -2.0)]
         [InlineData(typeof(FloatGraphType), 2.0)]
+        [InlineData(typeof(FloatGraphType), 3.33)]
+        [InlineData(typeof(FloatGraphType), 15.55)]
         [InlineData(typeof(BigIntGraphType), -1E+25)]
         [InlineData(typeof(BigIntGraphType), 0)]
         [InlineData(typeof(BigIntGraphType), 1E+25)]
@@ -266,7 +271,8 @@ namespace GraphQL.Tests.Types
                 value = new BigInteger(Convert.ToDecimal(value));
 
             var g = Create(graphType);
-            object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {value} }}")["arg"];
+            var valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+            object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {valueString} }}")["arg"];
             g.CanParseValue(converted).ShouldBeTrue();
             var parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned

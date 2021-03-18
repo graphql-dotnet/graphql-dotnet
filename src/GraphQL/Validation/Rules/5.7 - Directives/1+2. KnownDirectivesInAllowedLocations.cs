@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
@@ -63,8 +62,8 @@ namespace GraphQL.Validation.Rules
                 Field _ => DirectiveLocation.Field,
                 FragmentSpread _ => DirectiveLocation.FragmentSpread,
                 InlineFragment _ => DirectiveLocation.InlineFragment,
-                FragmentDefinition _=> DirectiveLocation.FragmentDefinition,
-                _ => throw new InvalidOperationException($"Unable to determine directive location for '{AstPrinter.Print(appliedTo)}'.")
+                FragmentDefinition _ => DirectiveLocation.FragmentDefinition,
+                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo.StringFrom(context.Document)}'.")
             };
         }
     }

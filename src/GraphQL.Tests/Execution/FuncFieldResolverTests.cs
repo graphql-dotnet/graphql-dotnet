@@ -202,12 +202,14 @@ namespace GraphQL.Tests.Execution
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<string>>(async context => {
+            var ffr1 = new FuncFieldResolver<int?, Task<string>>(async context =>
+            {
                 rfc1 = context;
                 await Task.Delay(100);
                 return "ok";
             });
-            var ffr2 = new FuncFieldResolver<int?, Task<string>>(async context => {
+            var ffr2 = new FuncFieldResolver<int?, Task<string>>(async context =>
+            {
                 rfc2 = context;
                 await Task.Delay(100);
                 return "ok";

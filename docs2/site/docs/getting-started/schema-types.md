@@ -276,3 +276,76 @@ be implemented as:
         }
     }
 ```
+
+## Type Mapping
+
+When specifying a field using the shortcut syntax `Field(x => x.Parent)`, which does not specify
+a specific graph type, GraphQL.NET will first look at the data model to see if it has a `GraphQLMetadata`
+attribute specified on it indicating the graph type to use for the data model. For instance, you can
+specify the graph type for a `Widget` class in the following manner:
+
+```csharp
+[GraphQLMetadata(InputType = typeof(WidgetInputGraphType), OutputType = typeof(WidgetGraphType)]
+public class Widget
+{
+    ...
+}
+```
+
+If no attribute is specified on the type, it will search a list of CLR mappings to graph type classes.
+All of the intrinsic and supplemental scalar graph types included with GraphQL.NET will be searched,
+and lists are handled automatically as well.
+
+You can also specify additional mappings during the schema initialization, which will be searched
+when the schema is initialized. These mappings can be for input objects, output objects, or scalars.
+A single CLR type can be mapped separately for both input and output objects.
+
+You can override default mappings of built-in scalars by registering your own mapping.
+To add a mapping, call the `RegisterTypeMapping` method on the `Schema`. Below is a sample of how
+to add mappings:
+
+```csharp
+public class MySchema
+{
+    public void MySchema()
+    {
+        ...
+
+        // For output graphs, map the 'User' data model class to the output object graph type 'UserGraphType'
+        this.RegisterTypeMapping<User, UserGraphType>();
+
+        // For input graphs, map the 'User' data model class to the input object graph type 'UserInputGraphType'
+        this.RegisterTypeMapping<User, UserInputGraphType>();
+
+        // For input or output graphs, map the 'Vector' class/struct to the scalar graph type 'VectorGraphType'
+        this.RegisterTypeMapping<Vector, VectorGraphType>();
+
+        // Override Guid default mapping to use the custom scalar graph type 'MyGuidGraphType'
+        this.RegisterTypeMapping<Guid, MyGuidGraphType>()
+    }
+}
+```
+
+There is no limitation on the CLR type of registered mappings -- for instance, scalar graph types
+can map to .NET objects or value types such as structs. However, mapping a list type such as `byte[]`
+is not supported, as the GraphQL.NET infrastructure will change this into a list graph type
+automatically and only search the registered mappings for a registration for `byte`.
+
+In order to implement these type mappings, GraphQL.NET will build the field or argument using a
+pseudo-type of either `GraphQLClrOutputTypeReference<T>` or `GraphQLClrInputTypeReference<T>`.
+These are resolved automatically during schema initialization. If you are writing your own field
+builders, you may use these pseudo-graphtype classes as placeholders for .NET-type-mapped fields
+or arguments.
+
+## Type references
+
+If you are writing your own dynamic schema-builder or field-builder code, you may have a need to
+have a placeholder graph type that is resolved during schema initialization. There are three type
+reference types available for this purpose:
+
+- `GraphQLTypeReference` can be used as a placeholder for another named graph type within the schema.
+- `GraphQLClrOutputTypeReference<T>` can be used as a placeholder for a CLR-mapped output graph type.
+- `GraphQLClrInputTypeReference<T>` can be used as a placeholder for a CLR-mapped input graph type.
+
+These type references will be resolved during schema initialization. Please refer to the source
+code for implementation and usage details.

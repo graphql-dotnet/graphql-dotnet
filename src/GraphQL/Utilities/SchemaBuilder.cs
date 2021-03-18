@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Introspection;
+using GraphQL.Reflection;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -46,6 +49,7 @@ namespace GraphQL.Utilities
         /// </summary>
         public bool AllowUnknownFields { get; set; } = true;
 
+        /// <inheritdoc cref="TypeSettings" />
         public TypeSettings Types { get; } = new TypeSettings();
 
         /// <summary>
@@ -202,21 +206,20 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         private bool IsSubscriptionType(ObjectGraphType type)
         {
             var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
-            if (operationDefinition == null)
-                return type.Name == "Subscription";
-
-            return type.Name == operationDefinition.Type.Name.Value;
+            return operationDefinition == null
+                ? type.Name == "Subscription"
+                : type.Name == operationDefinition.Type.Name.Value;
         }
 
         private void AssertKnownType(TypeConfig typeConfig)
         {
-            if (typeConfig.Type == null && !AllowUnknownTypes) //TODO: the same for subscriptions?
+            if (typeConfig.Type == null && !AllowUnknownTypes)
                 throw new InvalidOperationException($"Unknown type '{typeConfig.Name}'. Verify that you have configured SchemaBuilder correctly.");
         }
 
-        private void AssertKnownField(TypeConfig typeConfig, FieldConfig fieldConfig)
+        private void AssertKnownField(FieldConfig fieldConfig, TypeConfig typeConfig)
         {
-            if (fieldConfig.Resolver == null && !AllowUnknownFields) //TODO: the same for subscriptions?
+            if (fieldConfig.Resolver == null && !AllowUnknownFields)
                 throw new InvalidOperationException($"Unknown field '{typeConfig.Name}.{fieldConfig.Name}' has no resolver. Verify that you have configured SchemaBuilder correctly.");
         }
 
@@ -280,20 +283,62 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        private void InitializeField(FieldConfig config, Type parentType)
+        {
+            config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
+
+            if (config.ResolverAccessor != null)
+            {
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
+                if (attrs != null)
+                {
+                    foreach (var a in attrs)
+                        a.Modify(config);
+                }
+            }
+        }
+
+        private void InitializeSubscriptionField(FieldConfig config, Type parentType)
+        {
+            config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
+            config.SubscriberAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Subscriber);
+
+            if (config.ResolverAccessor != null && config.SubscriberAccessor != null)
+            {
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
+                if (attrs != null)
+                {
+                    foreach (var a in attrs)
+                        a.Modify(config);
+                }
+
+                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, ServiceProvider);
+                }
+                else
+                {
+                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, ServiceProvider);
+                }
+            }
+        }
+
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
 
             AssertKnownType(typeConfig);
 
-            var name = (string)fieldDef.Name.Value;
-            var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name.Value);
+            InitializeField(fieldConfig, typeConfig.Type);
 
-            AssertKnownField(typeConfig, fieldConfig);
+            AssertKnownField(fieldConfig, typeConfig);
 
             var field = new FieldType
             {
-                Name = name,
+                Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
@@ -302,7 +347,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
 
             field.SetAstType(fieldDef);
 
@@ -315,12 +360,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var name = (string)fieldDef.Name.Value;
-            var fieldConfig = typeConfig.SubscriptionFieldFor(name, ServiceProvider);
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name.Value);
+            InitializeSubscriptionField(fieldConfig, typeConfig.Type);
+
+            AssertKnownField(fieldConfig, typeConfig);
 
             var field = new EventStreamFieldType
             {
-                Name = name,
+                Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
@@ -331,7 +378,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
 
             field.SetAstType(fieldDef);
 
@@ -344,16 +391,18 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var name = (string)inputDef.Name.Value;
-            var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
+            var fieldConfig = typeConfig.FieldFor((string)inputDef.Name.Value);
+            InitializeField(fieldConfig, typeConfig.Type);
+
+            AssertKnownField(fieldConfig, typeConfig);
 
             var field = new FieldType
             {
-                Name = name,
+                Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = inputDef.DefaultValue
+                DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
 
             return field;
@@ -496,14 +545,18 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }.SetAstType(valDef);
         }
 
-        protected virtual QueryArgument ToArgument(GraphQLInputValueDefinition inputDef)
+        protected virtual QueryArgument ToArgument(ArgumentConfig argumentConfig, GraphQLInputValueDefinition inputDef)
         {
-            return new QueryArgument(ToGraphType(inputDef.Type))
+            var argument = new QueryArgument(ToGraphType(inputDef.Type))
             {
-                Name = (string)inputDef.Name.Value,
-                DefaultValue = inputDef.DefaultValue,
-                Description = inputDef.Comment?.Text.ToString()
+                Name = argumentConfig.Name,
+                DefaultValue = argumentConfig.DefaultValue ?? inputDef.DefaultValue,
+                Description = argumentConfig.Description ?? inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
+
+            argumentConfig.CopyMetadataTo(argument);
+
+            return argument;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)
@@ -535,9 +588,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
+        //TODO: add support for directive arguments
         private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition> arguments)
         {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(ToArgument));
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name.Value), a)));
+        }
+
+        private QueryArguments ToQueryArguments(FieldConfig fieldConfig, List<GraphQLInputValueDefinition> arguments)
+        {
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name.Value), a)));
         }
     }
 

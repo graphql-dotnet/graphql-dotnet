@@ -11,21 +11,6 @@ namespace GraphQL.Types
     public class DirectiveGraphType : MetadataProvider, INamedType, IProvideDescription
     {
         /// <summary>
-        /// Returns a static instance of the predefined 'include' directive.
-        /// </summary>
-        public static readonly IncludeDirective Include = new IncludeDirective();
-
-        /// <summary>
-        /// Returns a static instance of the predefined 'skip' directive.
-        /// </summary>
-        public static readonly SkipDirective Skip = new SkipDirective();
-
-        /// <summary>
-        /// Returns a static instance of the predefined 'deprecated' directive.
-        /// </summary>
-        public static readonly DeprecatedDirective Deprecated = new DeprecatedDirective();
-
-        /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
         /// <param name="name">The directive name within the GraphQL schema.</param>

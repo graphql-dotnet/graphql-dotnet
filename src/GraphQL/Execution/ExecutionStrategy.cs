@@ -126,19 +126,19 @@ namespace GraphQL.Execution
 
             if (directives != null)
             {
-                var directive = directives.Find(DirectiveGraphType.Skip.Name);
+                var directive = directives.Find(context.Schema.Directives.Skip.Name);
                 if (directive != null)
                 {
-                    var arg = DirectiveGraphType.Skip.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Skip.Arguments.Find("if");
 
                     if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
                         return false;
                 }
 
-                directive = directives.Find(DirectiveGraphType.Include.Name);
+                directive = directives.Find(context.Schema.Directives.Include.Name);
                 if (directive != null)
                 {
-                    var arg = DirectiveGraphType.Include.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Include.Arguments.Find("if");
 
                     return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
                 }
@@ -210,7 +210,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public virtual Fields GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, Field> GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition.ResolvedType, node.Field.SelectionSet, null)
@@ -230,14 +230,14 @@ namespace GraphQL.Execution
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Fields CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields)
+        protected virtual Dictionary<string, Field> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields)
         {
-            fields ??= new Fields();
+            fields ??= new Dictionary<string, Field>();
             List<string> visitedFragmentNames = null;
             CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Fields fields, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
             {
                 if (selectionSet != null)
                 {
@@ -246,7 +246,7 @@ namespace GraphQL.Execution
                         if (selection is Field field)
                         {
                             if (ShouldIncludeNode(context, field))
-                                fields.Add(field);
+                                Add(fields, field);
                         }
                         else if (selection is FragmentSpread spread)
                         {
@@ -254,7 +254,7 @@ namespace GraphQL.Execution
                             {
                                 (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
 
-                                var fragment = context.Fragments.FindDefinition(spread.Name);
+                                var fragment = context.Document.Fragments.FindDefinition(spread.Name);
                                 if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
                                     CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
                             }
@@ -267,6 +267,27 @@ namespace GraphQL.Execution
                                 CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
                         }
                     }
+                }
+            }
+
+            static void Add(Dictionary<string, Field> fields, Field field)
+            {
+                string name = field.Alias ?? field.Name;
+
+                if (fields.TryGetValue(name, out Field original))
+                {
+                    // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    fields[name] = new Field(original.AliasNode, original.NameNode)
+                    {
+                        Arguments = original.Arguments,
+                        SelectionSet = original.SelectionSet.Merge(field.SelectionSet),
+                        Directives = original.Directives,
+                        SourceLocation = original.SourceLocation,
+                    };
+                }
+                else
+                {
+                    fields[name] = field;
                 }
             }
         }
@@ -326,7 +347,7 @@ namespace GraphQL.Execution
 
             if (data is IList list)
             {
-                for (int i=0; i<list.Count; ++i)
+                for (int i = 0; i < list.Count; ++i)
                     SetArrayItemNode(list[i]);
             }
             else

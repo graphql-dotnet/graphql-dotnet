@@ -60,7 +60,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 Extensions = new Dictionary<string, object>() { { "1", new object() } },
                 FieldAst = new Field(default, new NameNode("test")),
                 FieldDefinition = new FieldType(),
-                Fragments = new Fragments(),
                 Metrics = new Instrumentation.Metrics(),
                 Operation = new Operation(new NameNode()),
                 ParentType = Mock.Of<IObjectGraphType>(),
@@ -70,7 +69,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 RootValue = new object(),
                 Schema = Mock.Of<ISchema>(),
                 Source = "hello",
-                SubFields = new Fields(),
+                SubFields = new Dictionary<string, Field>(),
                 UserContext = new Dictionary<string, object>() { { "3", new object() } },
                 Variables = new Variables(),
             };
@@ -84,7 +83,6 @@ namespace GraphQL.MicrosoftDI.Tests
             mocked.Extensions.ShouldBe(rfc.Extensions);
             mocked.FieldAst.ShouldBe(rfc.FieldAst);
             mocked.FieldDefinition.ShouldBe(rfc.FieldDefinition);
-            mocked.Fragments.ShouldBe(rfc.Fragments);
             mocked.Metrics.ShouldBe(rfc.Metrics);
             mocked.Operation.ShouldBe(rfc.Operation);
             mocked.ParentType.ShouldBe(rfc.ParentType);

@@ -101,9 +101,9 @@ namespace GraphQL.Utilities
                         }
                     }
 
-                    if (appliedDirective.Arguments?.Count > 0)
+                    if (appliedDirective.ArgumentsCount > 0)
                     {
-                        foreach (var arg in appliedDirective.Arguments)
+                        foreach (var arg in appliedDirective.List)
                         {
                             if (schemaDirective.Arguments?.Find(arg.Name) == null)
                                 throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}'.");
