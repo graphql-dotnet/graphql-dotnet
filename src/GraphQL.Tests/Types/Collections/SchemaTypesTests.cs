@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
-using Shouldly;
+using GraphQL.StarWars.Types;
+using Moq;
 using Xunit;
 
 namespace GraphQL.Tests.Types.Collections
@@ -12,33 +12,27 @@ namespace GraphQL.Tests.Types.Collections
         [Fact]
         public void does_not_request_instance_more_than_once()
         {
+            // configure DI provider
             var baseProvider = new SimpleContainer();
             baseProvider.Singleton<StarWarsData>();
-            var testProvider = new TestProvider(baseProvider);
-            var schema = new StarWarsSchema(testProvider);
+
+            // mock it so we can verify behavior
+            var testProviderMock = new Mock<IServiceProvider>(MockBehavior.Loose);
+            testProviderMock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => ((IServiceProvider)baseProvider).GetService(type));
+
+            // run test
+            var schema = new StarWarsSchema(testProviderMock.Object);
             schema.Initialize();
-            testProvider.Count.ShouldBe(7); // number of types used in the star wars schema
-        }
 
-        private class TestProvider : IServiceProvider
-        {
-            private readonly IServiceProvider _baseServiceProvider;
-            private readonly HashSet<Type> _requestedTypes = new HashSet<Type>();
-
-            public TestProvider(IServiceProvider baseServiceProvider)
-            {
-                _baseServiceProvider = baseServiceProvider;
-            }
-
-            public object GetService(Type serviceType)
-            {
-                if (!_requestedTypes.Add(serviceType))
-                    throw new InvalidOperationException("This type has already been requested");
-
-                return _baseServiceProvider.GetService(serviceType);
-            }
-
-            public int Count => _requestedTypes.Count;
+            // verify that GetService was only called once for each schema type
+            testProviderMock.Verify(x => x.GetService(typeof(StarWarsQuery)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(StarWarsMutation)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(CharacterInterface)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(DroidType)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(HumanInputType)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
+            testProviderMock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
+            testProviderMock.VerifyNoOtherCalls();
         }
     }
 }
