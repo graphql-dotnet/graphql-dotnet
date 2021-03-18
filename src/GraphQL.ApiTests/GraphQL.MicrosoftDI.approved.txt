@@ -1,5 +1,10 @@
 namespace GraphQL.MicrosoftDI
 {
+    public class AutoCreatingServiceProvider : System.IServiceProvider
+    {
+        public AutoCreatingServiceProvider(System.IServiceProvider serviceProvider) { }
+        public object GetService(System.Type serviceType) { }
+    }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
         public ResolverBuilder(GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, bool scoped) { }
