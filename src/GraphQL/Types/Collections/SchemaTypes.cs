@@ -547,7 +547,7 @@ Make sure that your ServiceProvider is configured correctly.");
                     if (typeOrError is string)
                         return typeOrError;
                     var changedType = (Type)typeOrError;
-                    changed |= changedType == typeList[i];
+                    changed |= changedType != typeList[i];
                     typeList[i] = changedType;
                 }
                 return changed ? genericDef.MakeGenericType(typeList) : type;
