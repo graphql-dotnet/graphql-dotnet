@@ -17,22 +17,22 @@ namespace GraphQL.Tests.Types.Collections
             baseProvider.Singleton<StarWarsData>();
 
             // mock it so we can verify behavior
-            var testProviderMock = new Mock<IServiceProvider>(MockBehavior.Loose);
-            testProviderMock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => ((IServiceProvider)baseProvider).GetService(type));
+            var mock = new Mock<IServiceProvider>(MockBehavior.Loose);
+            mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => ((IServiceProvider)baseProvider).GetService(type));
 
             // run test
-            var schema = new StarWarsSchema(testProviderMock.Object);
+            var schema = new StarWarsSchema(mock.Object);
             schema.Initialize();
 
             // verify that GetService was only called once for each schema type
-            testProviderMock.Verify(x => x.GetService(typeof(StarWarsQuery)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(StarWarsMutation)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(CharacterInterface)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(DroidType)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(HumanInputType)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
-            testProviderMock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
-            testProviderMock.VerifyNoOtherCalls();
+            mock.Verify(x => x.GetService(typeof(StarWarsQuery)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(StarWarsMutation)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(CharacterInterface)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(DroidType)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(HumanInputType)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
+            mock.VerifyNoOtherCalls();
         }
     }
 }
