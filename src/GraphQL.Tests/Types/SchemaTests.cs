@@ -203,7 +203,6 @@ namespace GraphQL.Tests.Types
         public void generic_types_of_mapped_clr_reference_types_should_resolve()
         {
             var schema = new Schema();
-
             var query = new ObjectGraphType();
             var field = query.Field(typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>), "test");
             schema.Query = query;
