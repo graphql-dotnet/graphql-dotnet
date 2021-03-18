@@ -43,7 +43,7 @@ The goal is to execute mutations with both arguments:
 
 ```graphql
 mutation {
-    addVector(vector3: "23, 43, 66")
+    addVector(vector3: "23,43,66")
 }
 ```
 
@@ -56,7 +56,7 @@ mutation AddVector($vector3: Vector3!) {
 
 //variables
 {
-    "vector3": "23, 43, 66"
+    "vector3": "23,43,66"
 }
 ```
 
@@ -65,7 +65,7 @@ Vectors should be returned in the same format:
 ```json
 {
     "data": {
-        "getVector": "23, 43, 66"
+        "getVector": "23,43,66"
     }
 }
 ```
