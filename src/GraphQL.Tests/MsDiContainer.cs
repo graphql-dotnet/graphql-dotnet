@@ -27,8 +27,7 @@ namespace GraphQL.Tests
             return _provider.GetService<T>();
         }
 
-        object IServiceProvider.GetService(Type serviceType)
-            => (_provider ??= _services.BuildServiceProvider()).GetService(serviceType);
+        object IServiceProvider.GetService(Type serviceType) => Get(serviceType);
 
         public void Register<TService>() where TService : class
         {
