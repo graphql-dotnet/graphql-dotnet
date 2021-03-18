@@ -13,12 +13,12 @@ namespace GraphQL.Tests.Types.Collections
         public void does_not_request_instance_more_than_once()
         {
             // configure DI provider
-            var baseProvider = new SimpleContainer();
-            baseProvider.Singleton<StarWarsData>();
+            var services = new SimpleContainer();
+            services.Singleton<StarWarsData>();
 
             // mock it so we can verify behavior
             var mock = new Mock<IServiceProvider>(MockBehavior.Loose);
-            mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => ((IServiceProvider)baseProvider).GetService(type));
+            mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => services.Get(type));
 
             // run test
             var schema = new StarWarsSchema(mock.Object);
