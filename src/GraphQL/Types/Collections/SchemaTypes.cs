@@ -533,22 +533,24 @@ Make sure that your ServiceProvider is configured correctly.");
                 return type;
 
             var genericDef = type.GetGenericTypeDefinition();
-            if (genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>))
-            {
-                var innerType = type.GenericTypeArguments[0];
-                object typeOrError = RebuildType(innerType, input, typeMappings);
-                if (typeOrError is string)
-                    return typeOrError;
-                var changed = (Type)typeOrError;
-                return changed == innerType ? type : genericDef.MakeGenericType(changed);
-            }
-            else if (genericDef == typeof(GraphQLClrOutputTypeReference<>) || genericDef == typeof(GraphQLClrInputTypeReference<>))
+            if (genericDef == typeof(GraphQLClrOutputTypeReference<>) || genericDef == typeof(GraphQLClrInputTypeReference<>))
             {
                 return GetGraphType(type.GetGenericArguments()[0], input, typeMappings);
             }
             else
             {
-                return type;
+                var typeList = type.GetGenericArguments();
+                var changed = false;
+                for (var i = 0; i < typeList.Length; i++)
+                {
+                    object typeOrError = RebuildType(typeList[i], input, typeMappings);
+                    if (typeOrError is string)
+                        return typeOrError;
+                    var changedType = (Type)typeOrError;
+                    changed |= changedType == typeList[i];
+                    typeList[i] = changedType;
+                }
+                return changed ? genericDef.MakeGenericType(typeList) : type;
             }
         }
 
