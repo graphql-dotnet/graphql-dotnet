@@ -51,16 +51,16 @@ namespace GraphQL
         public static Action<string, NamedElement> NameValidation = NameValidator.ValidateDefault;
 
         /// <summary>
-        /// This setting can improve performance if your schema uses only scalar types or types marked with
-        /// <see cref="GraphQLMetadataAttribute"/> attribute with configured <see cref="GraphQLMetadataAttribute.InputType"/>
-        /// or <see cref="GraphQLMetadataAttribute.OutputType"/> properties when constructing fields using expressions:
+        /// This setting restricts the use of CLR type mappings within the schema. This can help improve
+        /// performance by restricting the use of constructing fields using expressions:
         /// <br/>
         /// <c>
         /// Field(x => x.Filter);
         /// </c>
         /// <br/>
-        /// If you are using a scoped schema with many field expressions, then this setting will help speed up the
-        /// initialization of your schema when set to <see langword="false"/>.
+        /// If you are using a scoped schema, then this setting may help speed up the initialization of your
+        /// schema when set to <see langword="false"/> by effectively preventing the use of the field expression
+        /// syntax, which is relatively slow.
         /// <br/>
         /// If you are registering your own mappings via <see cref="ISchema.RegisterTypeMapping(Type, Type)"/>,
         /// then be sure to set to <see langword="true"/>. Otherwise, you will most likely see an error message when
