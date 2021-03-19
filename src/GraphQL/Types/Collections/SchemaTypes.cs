@@ -41,6 +41,7 @@ namespace GraphQL.Types
             [typeof(uint)] = typeof(UIntGraphType),
             [typeof(byte)] = typeof(ByteGraphType),
             [typeof(sbyte)] = typeof(SByteGraphType),
+            [typeof(Uri)] = typeof(UriGraphType),
         };
 
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
@@ -572,6 +573,10 @@ Make sure that your ServiceProvider is configured correctly.");
             // then built-in mappings
             if (BuiltInScalarMappings.TryGetValue(clrType, out var graphType))
                 return graphType;
+
+            // create an enumeration graph type if applicable
+            if (clrType.IsEnum)
+                return typeof(EnumerationGraphType<>).MakeGenericType(clrType);
 
             return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
         }

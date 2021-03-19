@@ -137,23 +137,23 @@ namespace GraphQL
                     if (mode == TypeMappingMode.UseBuiltInScalarMappings || !GlobalSwitches.UseRuntimeTypeMappings)
                     {
                         SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType);
+
+                        if (graphType == null)
+                        {
+                            if (type.IsEnum)
+                            {
+                                graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
+                            }
+                            else
+                            {
+                                throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
+                            }
+                        }
                     }
-                    else if (!type.IsEnum)
+                    else
                     {
                         graphType = (mode == TypeMappingMode.OutputType ? typeof(GraphQLClrOutputTypeReference<>) : typeof(GraphQLClrInputTypeReference<>)).MakeGenericType(type);
                     }
-                }
-            }
-
-            if (graphType == null)
-            {
-                if (type.IsEnum)
-                {
-                    graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(type), $"The CLR type '{type.FullName}' cannot be coerced effectively to a GraphQL type.");
                 }
             }
 
@@ -206,9 +206,7 @@ namespace GraphQL
         /// </summary>
         public static Type GetEnumerableElementType(this Type type)
         {
-            if (_untypedContainers.Contains(type))
-                return typeof(object);
-
+            // prefer a known type, just in case multiple enumerable interfaces are supported
             if (type.IsConstructedGenericType)
             {
                 var definition = type.GetGenericTypeDefinition();
@@ -218,10 +216,22 @@ namespace GraphQL
                 }
             }
 
+            // see if the type supports IEnumerable<T>
+            var supportedInterfaces = type.GetInterfaces();
+            foreach (var iface in supportedInterfaces)
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    return iface.GenericTypeArguments[0];
+                }
+            }
+
+            // see if the type supports IEnumerable
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+                return typeof(object);
+
             throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
         }
-
-        private static readonly Type[] _untypedContainers = { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
 
         private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
 
