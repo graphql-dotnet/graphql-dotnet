@@ -139,9 +139,7 @@ namespace GraphQL
                 {
                     if (mode == TypeMappingMode.UseBuiltInScalarMappings)
                     {
-                        SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType);
-
-                        if (graphType == null)
+                        if (!SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType))
                         {
                             if (type.IsEnum)
                             {
