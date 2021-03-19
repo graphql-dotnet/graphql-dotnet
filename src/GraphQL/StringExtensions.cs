@@ -78,25 +78,40 @@ namespace GraphQL
             {
                 var curChar = value[i];
                 var nextChar = value[i + 1];
-                // look for the pattern [a-z0-9][A-Z]
-                if ((char.IsLower(curChar) || char.IsDigit(curChar)) && char.IsUpper(nextChar))
+                // look for the pattern [a-z][A-Z]
+                if (char.IsLower(curChar) && char.IsUpper(nextChar))
                 {
-                    // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
-                    value = value.Substring(0, ++i) + '_' + value.Substring(i);
-                    ++strLength;
-                    // skip the following match check since we already found a match here
+                    InsertDash();
+                    continue;
+                }
+                // look for the pattern [0-9][A-Za-z]
+                if (char.IsDigit(curChar) && char.IsLetter(nextChar))
+                {
+                    InsertDash();
+                    continue;
+                }
+                // look for the pattern [A-Za-z][0-9]
+                if (char.IsLetter(curChar) && char.IsDigit(nextChar))
+                {
+                    InsertDash();
                     continue;
                 }
                 // if there's enough characters left, look for the pattern [A-Z][A-Z][a-z]
                 if (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2]))
                 {
-                    // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
-                    value = value.Substring(0, ++i) + '_' + value.Substring(i);
-                    ++strLength;
+                    InsertDash();
                 }
             }
             // convert the resulting string to uppercase
             return value.ToUpperInvariant();
+
+            void InsertDash()
+            {
+                // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
+                value = value.Substring(0, ++i) + '_' + value.Substring(i);
+                ++strLength;
+                // then skip the following match check since we already found a match here via the 'continue' statement
+            }
         }
 
         private static readonly char[] _bangs = new char[] { '!', '[', ']' };
