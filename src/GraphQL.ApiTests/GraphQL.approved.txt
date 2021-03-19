@@ -2749,7 +2749,9 @@ namespace GraphQL.Validation
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
     {
+        public ValidationError(string originalQuery, string number, string message, GraphQL.Language.AST.INode node) { }
         public ValidationError(string originalQuery, string number, string message, params GraphQL.Language.AST.INode[] nodes) { }
+        public ValidationError(string originalQuery, string number, string message, System.Exception innerException, GraphQL.Language.AST.INode node) { }
         public ValidationError(string originalQuery, string number, string message, System.Exception innerException, params GraphQL.Language.AST.INode[] nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Nodes { get; }
         public string Number { get; set; }
