@@ -254,10 +254,13 @@ namespace GraphQL.Tests.Types
         public void throws_when_type_is_not_inferable()
         {
             var type = new ComplexType<TestObject>();
-
-            var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.valuePair));
-
-            exp.Message.ShouldStartWith("The GraphQL type for field 'TestObject.valuePair' could not be derived implicitly from expression 'd => d.valuePair'.");
+            type.Field(d => d.valuePair);
+            var schema = new Schema
+            {
+                Query = type
+            };
+            var exp = Should.Throw<InvalidOperationException>(() => schema.Initialize());
+            exp.Message.ShouldStartWith($"The GraphQL type for field 'TestObject.valuePair' could not be derived implicitly. Could not find type mapping from CLR type '{typeof(KeyValuePair<int, string>).FullName}' to GraphType. Did you forget to register the type mapping with the 'ISchema.RegisterTypeMapping'?");
         }
 
         [Fact]
