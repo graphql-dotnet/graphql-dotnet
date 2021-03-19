@@ -37,7 +37,7 @@ namespace GraphQL
         /// <returns>
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
-        [Obsolete("This member will be removed in GraphQL v5.")]
+        [Obsolete("This member will be removed in GraphQL.NET v5.")]
         public static bool IsNullable(this Type type)
             => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
