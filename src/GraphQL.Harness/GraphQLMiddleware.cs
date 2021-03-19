@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -70,6 +71,7 @@ namespace Example
             if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
+                result.EnrichWithApolloFederatedTracing(start);
             }
 
             await WriteResponseAsync(context, result);

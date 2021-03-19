@@ -16,6 +16,7 @@ namespace GraphQL.ApiTests
         [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
         [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]
         [InlineData(typeof(Caching.MemoryDocumentCache))]
+        [InlineData(typeof(Federation.Instrumentation.FederatedInstrumentFieldMiddleware))]
         [InlineData(typeof(DataLoader.DataLoaderContext))]
         public void PublicApi(Type type)
         {

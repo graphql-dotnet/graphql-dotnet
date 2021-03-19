@@ -76,7 +76,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v1.2.1
         with:
-          files: .coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net5.opencover.xml
+          files: .coverage/GraphQL.Federation.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net5.opencover.xml
 
   buildcheck:
     needs:

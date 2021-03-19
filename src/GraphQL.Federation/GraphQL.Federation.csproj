@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Apollo Federation for GraphQL.NET</Description>
+    <PackageTags>GraphQL;Federation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+  </ItemGroup>
+</Project>
