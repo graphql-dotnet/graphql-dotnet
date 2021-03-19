@@ -394,13 +394,14 @@ namespace GraphQL
     {
         public static object DefaultValue(this System.Reflection.MemberInfo memberInfo) { }
         public static string Description(this System.Reflection.MemberInfo memberInfo) { }
+        [System.Obsolete("This member will be removed in GraphQL.NET v5.")]
         public static System.Type GetEnumerableElementType(this System.Type type) { }
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
-        [System.Obsolete("This member will be removed in GraphQL v5.")]
+        [System.Obsolete("This member will be removed in GraphQL.NET v5.")]
         public static bool IsNullable(this System.Type type) { }
         public static string ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }

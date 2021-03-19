@@ -91,8 +91,6 @@ namespace GraphQL
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
-            // note: when parsing lists of class types (including lists of lists), the inner type is treated as non-nullable, except for strings
-
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
                 type = type.GetGenericArguments()[0];
@@ -118,7 +116,9 @@ namespace GraphQL
             }
             else if (IsAnIEnumerable(type))
             {
+#pragma warning disable 0618
                 var clrElementType = GetEnumerableElementType(type);
+#pragma warning restore 0618
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
@@ -166,7 +166,7 @@ namespace GraphQL
             return graphType;
 
             //TODO: rewrite nullability condition in v5
-            static bool IsNullableType(Type type) => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
         /// <summary>
@@ -208,6 +208,7 @@ namespace GraphQL
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
         /// as a one-dimensional container type.
         /// </summary>
+        [Obsolete("This member will be removed in GraphQL.NET v5.")]
         public static Type GetEnumerableElementType(this Type type)
         {
             // prefer a known type, just in case multiple enumerable interfaces are supported
