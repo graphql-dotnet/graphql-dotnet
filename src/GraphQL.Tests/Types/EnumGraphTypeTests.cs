@@ -144,5 +144,20 @@ namespace GraphQL.Tests.Types
                 .ShouldBeOfType<EnumValue>()
                 .Name.ShouldBe("RED");
         }
+
+        [Fact]
+        public void to_constant_case_tests()
+        {
+            var e = new EnumerationGraphType<MyEnum>();
+            e.Values.Count.ShouldBe(2);
+            e.Values.FindByValue(MyEnum.TestHello).Name.ShouldBe("TEST_HELLO");
+            e.Values.FindByValue(MyEnum.Hello1).Name.ShouldBe("HELLO_1");
+        }
+
+        private enum MyEnum
+        {
+            TestHello,
+            Hello1
+        }
     }
 }
