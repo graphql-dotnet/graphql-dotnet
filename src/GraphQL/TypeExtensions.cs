@@ -113,13 +113,13 @@ namespace GraphQL
             if (type.IsArray)
             {
                 var clrElementType = type.GetElementType();
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent array
+                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else if (IsAnIEnumerable(type))
             {
                 var clrElementType = GetEnumerableElementType(type);
-                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable(), mode); // isNullable from elementType, not from parent container
+                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else
@@ -166,6 +166,8 @@ namespace GraphQL
             }
 
             return graphType;
+
+            static bool IsNullableType(Type type) => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
         /// <summary>

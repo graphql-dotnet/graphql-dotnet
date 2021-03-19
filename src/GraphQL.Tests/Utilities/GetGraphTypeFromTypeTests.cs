@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using GraphQL.Types;
@@ -119,6 +120,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(Guid?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyEnum?), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         //built-in mapping mode - various types of lists
+        [InlineData(typeof(IEnumerable), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(IEnumerable<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
         [InlineData(typeof(IEnumerable<string>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<StringGraphType>))]
         [InlineData(typeof(IEnumerable<decimal>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ListGraphType<NonNullGraphType<DecimalGraphType>>))]
@@ -161,6 +163,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(Guid?), false, TypeMappingMode.OutputType, null)]
         [InlineData(typeof(MyEnum?), false, TypeMappingMode.OutputType, null)]
         //output mapping mode - various types of lists
+        [InlineData(typeof(IEnumerable), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<object>>>))]
         [InlineData(typeof(IEnumerable<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
         [InlineData(typeof(IEnumerable<string>), true, TypeMappingMode.OutputType, typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
         [InlineData(typeof(IEnumerable<decimal>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>>))]
