@@ -153,6 +153,14 @@ public class EpisodeEnum : EnumerationGraphType<Episodes>
 }
 ```
 
+When defining a field via an expression syntax as in the following example, GraphQL.NET
+will automatically map enumeration types to `EnumerationGraphType<TEnum>`, unless otherwise
+mapped via `Schema.RegisterTypeMapping`:
+
+```csharp
+Field(x => x.MyEnum);
+```
+
 You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
 - The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
@@ -180,14 +188,14 @@ are strictly for use on the back end - the client will never see them.
 
 **Resolving Enumerations**
 
-Fields typed as enumerations are resolved by returning either the name or backing value of
+Fields typed as enumerations are resolved by returning the backing value of
 one of the enum members. Lists of enumerations are resolved by returning collections of enum
 members. In the below examples, notice the identical implementations of the `appearsIn` field
 for both human graph types. In both implementations, the client receives the GraphQL enum member
 names in response to queries on the `appearsIn` field.
 
 If the field resolves a value which cannot be mapped to one of the enum's legal values,
-GraphQL.NET will return `null` to the client in the data for the field.
+GraphQL.NET will trigger a [Processing Error](errors#ProcessingErrors).
 
 ```csharp
 public class HumanString
