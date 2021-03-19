@@ -251,16 +251,6 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void throws_when_type_is_not_inferable()
-        {
-            var type = new ComplexType<TestObject>();
-
-            var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.valuePair));
-
-            exp.Message.ShouldStartWith("The GraphQL type for field 'TestObject.valuePair' could not be derived implicitly from expression 'd => d.valuePair'.");
-        }
-
-        [Fact]
         public void throws_when_type_is_incompatible()
         {
             var type = new ComplexType<TestObject>();
