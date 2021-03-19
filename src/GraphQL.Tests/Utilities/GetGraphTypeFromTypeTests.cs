@@ -175,12 +175,10 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(int[]), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
         [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
         [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
-
         //input mapping mode
         [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
         public void GetGraphTypeFromType_Matrix(Type type, bool nullable, TypeMappingMode typeMappingMode, Type expectedType)
         {
-            GlobalSwitches.UseRuntimeTypeMappings = true;
             if (expectedType == null)
             {
                 Should.Throw<ArgumentOutOfRangeException>(() => type.GetGraphTypeFromType(nullable, typeMappingMode));

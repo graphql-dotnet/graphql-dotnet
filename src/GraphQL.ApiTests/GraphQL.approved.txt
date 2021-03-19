@@ -400,6 +400,7 @@ namespace GraphQL
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
+        [System.Obsolete("This member will be removed in GraphQL v5.")]
         public static bool IsNullable(this System.Type type) { }
         public static string ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }

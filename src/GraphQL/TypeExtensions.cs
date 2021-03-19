@@ -37,6 +37,7 @@ namespace GraphQL
         /// <returns>
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("This member will be removed in GraphQL v5.")]
         public static bool IsNullable(this Type type)
             => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
@@ -90,6 +91,8 @@ namespace GraphQL
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
+            // note: when parsing lists of class types (including lists of lists), the inner type is treated as non-nullable, except for strings
+
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
                 type = type.GetGenericArguments()[0];
