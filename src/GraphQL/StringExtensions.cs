@@ -81,6 +81,7 @@ namespace GraphQL
                 if (char.IsLower(curChar) && char.IsUpper(nextChar))
                 {
                     InsertUnderscore();
+                    // then skip the remaining match checks since we already found a match here
                     continue;
                 }
                 // look for the pattern [0-9][A-Za-z]
@@ -99,6 +100,7 @@ namespace GraphQL
                 if (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2]))
                 {
                     InsertUnderscore();
+                    continue;
                 }
             }
             // convert the resulting string to uppercase
@@ -109,7 +111,6 @@ namespace GraphQL
                 // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
                 value = value.Substring(0, ++i) + '_' + value.Substring(i);
                 ++strLength;
-                // then skip the following match check since we already found a match here via the 'continue' statement
             }
         }
 
