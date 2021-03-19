@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using GraphQL.Conversion;
-using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
