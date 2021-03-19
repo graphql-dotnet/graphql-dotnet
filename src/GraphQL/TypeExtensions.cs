@@ -165,6 +165,7 @@ namespace GraphQL
 
             return graphType;
 
+            //TODO: rewrite nullability condition in v5
             static bool IsNullableType(Type type) => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
