@@ -77,40 +77,23 @@ namespace GraphQL
             {
                 var curChar = value[i];
                 var nextChar = value[i + 1];
+                
                 // look for the pattern [a-z][A-Z]
-                if (char.IsLower(curChar) && char.IsUpper(nextChar))
+                if ((char.IsLower(curChar) && char.IsUpper(nextChar)) ||
+                    // or the pattern [0-9][A-Za-z]
+                    (char.IsDigit(curChar) && char.IsLetter(nextChar)) ||
+                    // or the pattern [A-Za-z][0-9]
+                    (char.IsLetter(curChar) && char.IsDigit(nextChar)) ||
+                    // or if there's enough characters left, look for the pattern [A-Z][A-Z][a-z]
+                    (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2])))
                 {
-                    InsertUnderscore();
-                    continue;
-                }
-                // look for the pattern [0-9][A-Za-z]
-                if (char.IsDigit(curChar) && char.IsLetter(nextChar))
-                {
-                    InsertUnderscore();
-                    continue;
-                }
-                // look for the pattern [A-Za-z][0-9]
-                if (char.IsLetter(curChar) && char.IsDigit(nextChar))
-                {
-                    InsertUnderscore();
-                    continue;
-                }
-                // if there's enough characters left, look for the pattern [A-Z][A-Z][a-z]
-                if (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2]))
-                {
-                    InsertUnderscore();
+                    // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
+                    value = value.Substring(0, ++i) + '_' + value.Substring(i);
+                    ++strLength;
                 }
             }
             // convert the resulting string to uppercase
             return value.ToUpperInvariant();
-
-            void InsertUnderscore()
-            {
-                // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
-                value = value.Substring(0, ++i) + '_' + value.Substring(i);
-                ++strLength;
-                // then skip the following match check since we already found a match here via the 'continue' statement
-            }
         }
 
         private static readonly char[] _bangs = new char[] { '!', '[', ']' };
