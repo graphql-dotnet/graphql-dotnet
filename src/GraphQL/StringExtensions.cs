@@ -70,7 +70,6 @@ namespace GraphQL
         /// </summary>
         public static string ToConstantCase(this string value)
         {
-            //aka: return Regex.Replace(s, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4").ToUpperInvariant();
             int i;
             int strLength = value.Length;
             // iterate through each character in the string, stopping a character short of the end
