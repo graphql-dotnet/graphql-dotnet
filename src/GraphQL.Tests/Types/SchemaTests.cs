@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using Shouldly;
 using Xunit;
 
@@ -196,6 +197,27 @@ namespace GraphQL.Tests.Types
             Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(typeof(DroidType)));
             Should.Throw<InvalidOperationException>(() => schema.RegisterType<DroidType>());
+        }
+
+        [Fact]
+        public void generic_types_of_mapped_clr_reference_types_should_resolve()
+        {
+            var schema = new Schema();
+            var query = new ObjectGraphType();
+            var field = query.Field(typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>), "test");
+            schema.Query = query;
+            schema.RegisterTypeMapping<MyDto, MyDtoGraphType>();
+            schema.Initialize();
+            field.ResolvedType.ShouldNotBeNull();
+            field.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
+        }
+    }
+
+    public class MyDtoGraphType : ObjectGraphType<MyDto>
+    {
+        public MyDtoGraphType()
+        {
+            Field<BooleanGraphType>("dummy");
         }
     }
 
