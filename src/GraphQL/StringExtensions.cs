@@ -81,31 +81,31 @@ namespace GraphQL
                 // look for the pattern [a-z][A-Z]
                 if (char.IsLower(curChar) && char.IsUpper(nextChar))
                 {
-                    InsertDash();
+                    InsertUnderscore();
                     continue;
                 }
                 // look for the pattern [0-9][A-Za-z]
                 if (char.IsDigit(curChar) && char.IsLetter(nextChar))
                 {
-                    InsertDash();
+                    InsertUnderscore();
                     continue;
                 }
                 // look for the pattern [A-Za-z][0-9]
                 if (char.IsLetter(curChar) && char.IsDigit(nextChar))
                 {
-                    InsertDash();
+                    InsertUnderscore();
                     continue;
                 }
                 // if there's enough characters left, look for the pattern [A-Z][A-Z][a-z]
                 if (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2]))
                 {
-                    InsertDash();
+                    InsertUnderscore();
                 }
             }
             // convert the resulting string to uppercase
             return value.ToUpperInvariant();
 
-            void InsertDash()
+            void InsertUnderscore()
             {
                 // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
                 value = value.Substring(0, ++i) + '_' + value.Substring(i);
