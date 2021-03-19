@@ -14,7 +14,7 @@ namespace GraphQL.Validation
     {
         private readonly List<INode> _nodes = new List<INode>();
 
-        /// <inheritdoc cref="ValidationError(string, string, string, INode[])">
+        /// <inheritdoc cref="ValidationError(string, string, string, INode[])"/>
         public ValidationError(string originalQuery, string number, string message, INode node)
             : this(originalQuery, number, message, (Exception)null, node)
         {
