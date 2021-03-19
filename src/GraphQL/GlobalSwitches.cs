@@ -49,27 +49,5 @@ namespace GraphQL
         /// member would become unusable.
         /// </summary>
         public static Action<string, NamedElement> NameValidation = NameValidator.ValidateDefault;
-
-        /// <summary>
-        /// This setting restricts the use of CLR type mappings within the schema. This can help improve
-        /// performance by restricting the use of constructing fields using expressions:
-        /// <br/>
-        /// <c>
-        /// Field(x => x.Filter);
-        /// </c>
-        /// <br/>
-        /// If you are using a scoped schema, then this setting may help speed up the initialization of your
-        /// schema when set to <see langword="false"/> by effectively preventing the use of the field expression
-        /// syntax, which is relatively slow.
-        /// <br/>
-        /// If you are registering your own mappings via <see cref="ISchema.RegisterTypeMapping(Type, Type)"/>,
-        /// then be sure to set to <see langword="true"/>. Otherwise, you will most likely see an error message when
-        /// you try to add a field:
-        /// <br/>
-        /// <c>
-        /// The GraphQL type for field 'ParentObject.Filter' could not be derived implicitly from expression 'Field(x => x.Filter)'.
-        /// </c>
-        /// </summary>
-        public static bool UseRuntimeTypeMappings { get; set; } = true;
     }
 }
