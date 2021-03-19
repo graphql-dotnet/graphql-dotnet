@@ -134,7 +134,7 @@ namespace GraphQL
 
                 if (graphType == null)
                 {
-                    if (mode == TypeMappingMode.UseBuiltInScalarMappings || !GlobalSwitches.UseRuntimeTypeMappings)
+                    if (mode == TypeMappingMode.UseBuiltInScalarMappings)
                     {
                         SchemaTypes.BuiltInScalarMappings.TryGetValue(type, out graphType);
                     }
