@@ -68,7 +68,7 @@ namespace GraphQL
         /// <summary>
         /// Returns a constant case version of this string. For example, converts 'StringError' into 'STRING_ERROR'.
         /// </summary>
-        public static string ToConstantCase(this string value)
+        public static string ToConstantCase(this string value) //TODO: rewrite to stackalloc/ string.Create()
         {
             int i;
             int strLength = value.Length;
