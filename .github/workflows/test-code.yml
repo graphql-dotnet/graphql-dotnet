@@ -52,7 +52,13 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: List Nuget Sources # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
+        run: dotnet nuget list source
       - name: Install dependencies
+        working-directory: src
+        run: dotnet restore
+      - name: Install dependencies [AGAIN] # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
+        if: failure()
         working-directory: src
         run: dotnet restore
       - name: Check formatting
@@ -71,7 +77,7 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore -p:CollectCoverage=true
+        run: dotnet test --no-restore --no-build -p:CollectCoverage=true
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v1.2.1

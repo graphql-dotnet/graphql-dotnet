@@ -174,7 +174,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Throws an exception indicating that a value cannot be converted to its AST representation. Typically called by
-        /// <see cref="ToAST(object)"/> if the provided object (an internal representataion) is not valid for this scalar type.
+        /// <see cref="ToAST(object)"/> if the provided object (an internal representation) is not valid for this scalar type.
         /// </summary>
         protected internal IValue ThrowASTConversionError(object value)
         {
