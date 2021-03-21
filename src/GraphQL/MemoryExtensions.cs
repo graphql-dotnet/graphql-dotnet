@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary>
@@ -16,7 +18,7 @@ namespace GraphQL
         internal static void Return(this Array array) => _delegates.GetOrAdd(array.GetType(), _factory)(array);
 
         // 'ArrayPool.Return' method takes generic T[] parameter for returned array, therefore it is required
-        // to generate a method-adapter which takes 'Array' parameter and then casts it to the required type. 
+        // to generate a method-adapter which takes 'Array' parameter and then casts it to the required type.
         //
         // Example:
         //
