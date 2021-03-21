@@ -19,9 +19,10 @@ namespace GraphQL.MicrosoftDI
     /// <code>Query = services.GetRequiredService&lt;MyQuery&gt;();</code>
     /// <br/><br/>
     /// None of the graph types will need to be registered. Note that if any of the graph types implement
-    /// IDisposable, be sure to register those types with your dependency injection provider, or their Dispose
-    /// methods will not be called. Any dependencies of graph types that implement IDisposable will be
-    /// disposed of properly, regardless of whether the graph type is registered within the service provider.
+    /// <see cref="IDisposable"/>, be sure to register those types with your dependency injection provider,
+    /// or their <see cref="IDisposable.Dispose"/> methods will not be called. Any dependencies of graph types
+    /// that implement <see cref="IDisposable"/> will be disposed of properly, regardless of whether the graph
+    /// type is registered within the service provider.
     /// </summary>
     public class SelfActivatingServiceProvider : IServiceProvider
     {
