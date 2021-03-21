@@ -69,7 +69,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var myprovider = new SelfActivatingServiceProvider(provider);
             var class2 = myprovider.GetRequiredService<MyClass2>();
             provider.Dispose();
-            (myprovider as IServiceProvider).ShouldBeNull(); // SelfActivatingServiceProvider does not yet support IDisposable
+            (myprovider as IDisposable).ShouldBeNull(); // SelfActivatingServiceProvider does not yet support IDisposable
             class1.Disposed.ShouldBeTrue();
             class2.Disposed.ShouldBeFalse();
         }
