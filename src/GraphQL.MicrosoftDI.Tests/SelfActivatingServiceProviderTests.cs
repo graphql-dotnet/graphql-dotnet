@@ -5,13 +5,13 @@ using Xunit;
 
 namespace GraphQL.MicrosoftDI.Tests
 {
-    public class AutoCreatingServiceProviderTests
+    public class SelfActivatingServiceProviderTests
     {
         private readonly IServiceProvider _scopedServiceProvider1;
         private readonly IServiceProvider _scopedServiceProvider2;
         private readonly IServiceProvider _selfActivatingServiceProvider2;
 
-        public AutoCreatingServiceProviderTests()
+        public SelfActivatingServiceProviderTests()
         {
             var services = new ServiceCollection();
             services.AddSingleton<TestSingleton>();
