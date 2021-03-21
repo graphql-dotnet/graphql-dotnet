@@ -19,7 +19,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var rootServiceProvider = services.BuildServiceProvider();
             _scopedServiceProvider1 = rootServiceProvider.CreateScope().ServiceProvider;
             _scopedServiceProvider2 = rootServiceProvider.CreateScope().ServiceProvider;
-            _autoCreatingServiceProvider2 = new AutoCreatingServiceProvider(_scopedServiceProvider2);
+            _autoCreatingServiceProvider2 = new SelfActivatingServiceProvider(_scopedServiceProvider2);
         }
 
         [Fact]

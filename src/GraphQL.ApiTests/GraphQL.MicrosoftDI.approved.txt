@@ -1,10 +1,5 @@
 namespace GraphQL.MicrosoftDI
 {
-    public class AutoCreatingServiceProvider : System.IServiceProvider
-    {
-        public AutoCreatingServiceProvider(System.IServiceProvider serviceProvider) { }
-        public object GetService(System.Type serviceType) { }
-    }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
         public ResolverBuilder(GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, bool scoped) { }
@@ -77,5 +72,10 @@ namespace GraphQL.MicrosoftDI
     public class ScopedFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
     {
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType> resolver) { }
+    }
+    public class SelfActivatingServiceProvider : System.IServiceProvider
+    {
+        public SelfActivatingServiceProvider(System.IServiceProvider serviceProvider) { }
+        public object GetService(System.Type serviceType) { }
     }
 }

@@ -11,23 +11,23 @@ namespace GraphQL.MicrosoftDI
     /// <br/><br/>
     /// To use this, simply register the <see cref="ISchema"/> itself as follows:
     /// <br/><br/>
-    /// <code>services.AddSingleton&lt;ISchema, MySchema&gt;(services => new MySchema(new AutoCreatingServiceProvider(services)));</code>
+    /// <code>services.AddSingleton&lt;ISchema, MySchema&gt;(services => new MySchema(new SelfActivatingServiceProvider(services)));</code>
     /// <br/><br/>
     /// Within your <see cref="Schema"/> constructor, you may need to set your <see cref="Schema.Query"/>, <see cref="Schema.Mutation"/> and
-    /// <see cref="Schema.Subscription"/> fields to pull from the <see cref="AutoCreatingServiceProvider"/>:
+    /// <see cref="Schema.Subscription"/> fields to pull from the <see cref="SelfActivatingServiceProvider"/>:
     /// <br/><br/>
     /// <code>Query = services.GetRequiredService&lt;MyQuery&gt;();</code>
     /// <br/><br/>
     /// None of the graph types will need to be registered.
     /// </summary>
-    public class AutoCreatingServiceProvider : IServiceProvider
+    public class SelfActivatingServiceProvider : IServiceProvider
     {
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Creates a new instance with the specified underlying service provider.
         /// </summary>
-        public AutoCreatingServiceProvider(IServiceProvider serviceProvider)
+        public SelfActivatingServiceProvider(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
