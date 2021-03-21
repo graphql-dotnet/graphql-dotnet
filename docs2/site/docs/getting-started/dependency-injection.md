@@ -94,6 +94,15 @@ public class StarWarsSchema : Schema
 No other graph types will need to be registered. Graph types will only be instantiated once, during schema initialization
 as usual. Graph types can also pull in any services registered with dependency injection as usual.
 
+Keep in mind that if any of the graph types directly implement `IDisposable`, be sure to register those types with your
+dependency injection provider, or their `Dispose` methods will not be called.
+
+You can also use the `services.AddGraphTypes()` extension method within the [server](https://github.com/graphql-dotnet/server)
+project to scan the calling assembly for classes that implement `IGraphType` and register them all as singletons
+within the service provider. For additional options, see
+[GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs)
+for additional overloads of this method.
+
 ## Nancy TinyIoCContainer
 
 ```csharp
