@@ -23,6 +23,8 @@ namespace GraphQL.Tests.Types
          *    BooleanGraphType
          *    FloatGraphType
          *    StringGraphType
+         *
+         *  Does not test:
          *    IdGraphType
          *    DecimalGraphType
          *    UriGraphType
