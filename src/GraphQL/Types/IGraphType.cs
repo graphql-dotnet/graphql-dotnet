@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -21,7 +23,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the element description.
         /// </summary>
-        string Description { get; set; }
+        string? Description { get; set; }
     }
 
     /// <summary>
@@ -35,7 +37,7 @@ namespace GraphQL.Types
         /// Gets or sets the reason this element has been deprecated;
         /// <see langword="null"/> if this element has not been deprecated.
         /// </summary>
-        string DeprecationReason { get; set; }
+        string? DeprecationReason { get; set; }
     }
 
     /// <summary>

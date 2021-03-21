@@ -1,6 +1,8 @@
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Types
     public class BigIntGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             IntValue intValue => new BigInteger(intValue.Value),
             LongValue longValue => new BigInteger(longValue.Value),
@@ -30,7 +32,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             BigInteger _ => value,
             null => null,

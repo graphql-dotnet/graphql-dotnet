@@ -1,6 +1,8 @@
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Types
     public class FloatGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             FloatValue floatVal => floatVal.Value,
             IntValue intVal => (double)intVal.Value,
@@ -46,7 +48,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             double _ => value,
             int i => checked((double)i),

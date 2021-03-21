@@ -1,5 +1,7 @@
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace GraphQL.Types
     public class StringGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             StringValue s => s.Value,
             NullValue _ => null,
@@ -20,7 +22,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value is StringValue || value is NullValue;
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             string _ => value,
             null => null,
@@ -28,6 +30,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value) => value is string || value == null;
+        public override bool CanParseValue(object? value) => value is string || value == null;
     }
 }

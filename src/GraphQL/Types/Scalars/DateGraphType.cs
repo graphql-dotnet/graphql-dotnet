@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             NullValue _ => null,
             StringValue stringValue => ParseDate(stringValue.Value),
@@ -27,7 +29,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             DateTime d => ValidateDate(d, value), // no boxing
             string stringValue => ParseDate(stringValue),
@@ -36,7 +38,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             DateTime d => ValidateDate(d).ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo),
             null => null,
