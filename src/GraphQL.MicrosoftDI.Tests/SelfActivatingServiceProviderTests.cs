@@ -58,6 +58,22 @@ namespace GraphQL.MicrosoftDI.Tests
             Should.Throw<InvalidOperationException>(() => _selfActivatingServiceProvider2.GetRequiredService<TestUnregisteredWithMissingDependencies>());
         }
 
+        [Fact]
+        public void created_instances_are_not_disposed()
+        {
+            // if this test "fails", then our documentation needs to change. It does not necessarily indicate a fault.
+            MyClass1 class1 = null;
+            var services = new ServiceCollection();
+            services.AddSingleton(services => class1 = new MyClass1());
+            var provider = services.BuildServiceProvider();
+            var myprovider = new SelfActivatingServiceProvider(provider);
+            var class2 = myprovider.GetRequiredService<MyClass2>();
+            provider.Dispose();
+            (myprovider as IServiceProvider).ShouldBeNull(); // SelfActivatingServiceProvider does not yet support IDisposable
+            class1.Disposed.ShouldBeTrue();
+            class2.Disposed.ShouldBeFalse();
+        }
+
         private class TestSingleton
         {
         }
@@ -84,6 +100,30 @@ namespace GraphQL.MicrosoftDI.Tests
             public TestUnregisteredWithMissingDependencies(TestUnregistered testUnregistered)
             {
                 _ = testUnregistered; // ignore compile warning about unused member
+            }
+        }
+
+        public class MyClass1 : IDisposable
+        {
+            public bool Disposed { get; set; }
+
+            public void Dispose()
+            {
+                Disposed = true;
+            }
+        }
+
+        public class MyClass2 : IDisposable
+        {
+            public bool Disposed { get; set; }
+
+            public MyClass2(MyClass1 class1)
+            {
+            }
+
+            public void Dispose()
+            {
+                Disposed = true;
             }
         }
     }
