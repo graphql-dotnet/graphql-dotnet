@@ -52,6 +52,9 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Disable MSVS Nuget Source # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        run: dotnet nuget disable source 'Microsoft Visual Studio Offline Packages'
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
@@ -71,7 +74,7 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore -p:CollectCoverage=true
+        run: dotnet test --no-restore --no-build -p:CollectCoverage=true
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v1.2.1
