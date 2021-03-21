@@ -1,5 +1,62 @@
 namespace GraphQL.MicrosoftDI
 {
+    public class ConnectionResolverBuilder<TSourceType, TReturnType>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType> WithScope() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithService<T1>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithServices<T1, T2>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithServices<T1, T2, T3>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithServices<T1, T2, T3, T4>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithServices<T1, T2, T3, T4, T5>() { }
+    }
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType, T1> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithScope() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T2>() { }
+    }
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithScope() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T3>() { }
+    }
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithScope() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T4>() { }
+    }
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithScope() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T5>() { }
+    }
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
+    {
+        public ConnectionResolverBuilder(GraphQL.Builders.ConnectionBuilder<TSourceType> builder, bool scoped) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4, T5> Returns<TNewReturnType>() { }
+        public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
+    }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
         public ResolverBuilder(GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, bool scoped) { }
@@ -58,6 +115,12 @@ namespace GraphQL.MicrosoftDI
     public class ScopedAsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.AsyncFieldResolver<TReturnType>
     {
         public ScopedAsyncFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+    }
+    public static class ScopedConnectionBuilderExtensions
+    {
+        public static GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder) { }
+        public static void ResolveScoped<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
+        public static void ResolveScopedAsync<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
     }
     public static class ScopedFieldBuilderExtensions
     {

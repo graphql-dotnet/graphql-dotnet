@@ -1,0 +1,405 @@
+using System;
+using System.Threading.Tasks;
+using GraphQL.Builders;
+using GraphQL.Types.Relay.DataObjects;
+using GraphQL.Utilities;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace GraphQL.MicrosoftDI
+{
+    /// <summary>
+    /// A builder for connection field resolvers with no extra service types.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <summary>
+        /// Specifies a type that is to be resolved via dependency injection during the resolver's execution.
+        /// </summary>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithService<T1>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1>(_builder, _scoped);
+
+        /// <summary>
+        /// Specifies types that are to be resolved via dependency injection during the resolver's execution.
+        /// </summary>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithServices<T1, T2>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithServices<T1, T2, T3>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithServices<T1, T2, T3, T4>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
+
+        /// <inheritdoc cref="WithServices{T1, T2}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithServices<T1, T2, T3, T4, T5>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+
+        /// <summary>
+        /// Specifies that the resolver should run within its own dependency injection scope.
+        /// </summary>
+        public ConnectionResolverBuilder<TSourceType, TReturnType> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the return data type of the connection resolver. Typically this would be <see cref="Connection{TNode}"/>
+        /// or <see cref="Connection{TNode, TEdge}"/>, but it can be any type that returns the proper fields for the
+        /// connection graph type.
+        /// <br/><br/>
+        /// For instance, to specify a return type for a Widget you might write:
+        /// <br/><br/>
+        /// <code>
+        /// .Returns&lt;Connection&lt;Widget&gt;&gt;()
+        /// </code>
+        /// </summary>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType>(_builder, _scoped);
+
+        /// <summary>
+        /// Specifies the delegate to execute when the field is being resolved.
+        /// </summary>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        {
+            if (_scoped)
+                _builder.ResolveScoped(resolver);
+            else
+                _builder.Resolve(context => resolver(context));
+        }
+
+        /// <inheritdoc cref="Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        {
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver);
+            else
+                _builder.ResolveAsync(async context => await resolver(context));
+        }
+    }
+
+    /// <summary>
+    /// A builder for connection field resolvers with 1 extra service type.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType}, bool)"/>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T2>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Returns{TNewReturnType}"/>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType, T1> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType, T1>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, TReturnType> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>());
+
+            if (_scoped)
+                _builder.ResolveScoped(resolver2);
+            else
+                _builder.Resolve(context => resolver2(context));
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, Task<TReturnType>> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>());
+
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver2);
+            else
+                _builder.ResolveAsync(async context => await resolver2(context));
+        }
+    }
+
+    /// <summary>
+    /// A builder for connection field resolvers with 2 extra service types.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType}, bool)"/>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T3>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Returns{TNewReturnType}"/>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, TReturnType> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>());
+
+            if (_scoped)
+                _builder.ResolveScoped(resolver2);
+            else
+                _builder.Resolve(context => resolver2(context));
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, Task<TReturnType>> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>());
+
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver2);
+            else
+                _builder.ResolveAsync(async context => await resolver2(context));
+        }
+    }
+
+    /// <summary>
+    /// A builder for connection field resolvers with 3 extra service types.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType}, bool)"/>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T4>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Returns{TNewReturnType}"/>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, TReturnType> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>());
+
+            if (_scoped)
+                _builder.ResolveScoped(resolver2);
+            else
+                _builder.Resolve(context => resolver2(context));
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, Task<TReturnType>> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>());
+
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver2);
+            else
+                _builder.ResolveAsync(async context => await resolver2(context));
+        }
+    }
+
+    /// <summary>
+    /// A builder for connection field resolvers with 4 extra service types.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType}, bool)"/>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T5>()
+            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Returns{TNewReturnType}"/>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, TReturnType> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>(),
+                    context.RequestServices.GetRequiredService<T4>());
+
+            if (_scoped)
+                _builder.ResolveScoped(resolver2);
+            else
+                _builder.Resolve(context => resolver2(context));
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType>> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>(),
+                    context.RequestServices.GetRequiredService<T4>());
+
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver2);
+            else
+                _builder.ResolveAsync(async context => await resolver2(context));
+        }
+    }
+
+    /// <summary>
+    /// A builder for connection field resolvers with 5 extra service types.
+    /// </summary>
+    public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
+    {
+        private readonly ConnectionBuilder<TSourceType> _builder;
+        private bool _scoped;
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType}, bool)"/>
+        public ConnectionResolverBuilder(ConnectionBuilder<TSourceType> builder, bool scoped)
+        {
+            _builder = builder;
+            _scoped = scoped;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
+        public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope()
+        {
+            _scoped = true;
+            return this;
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Returns{TNewReturnType}"/>
+        public ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4, T5> Returns<TNewReturnType>()
+            => new ConnectionResolverBuilder<TSourceType, TNewReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>(),
+                    context.RequestServices.GetRequiredService<T4>(),
+                    context.RequestServices.GetRequiredService<T5>());
+
+            if (_scoped)
+                _builder.ResolveScoped(resolver2);
+            else
+                _builder.Resolve(context => resolver2(context));
+        }
+
+        /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType>> resolver)
+        {
+            Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver2 =
+                context => resolver(
+                    context,
+                    context.RequestServices.GetRequiredService<T1>(),
+                    context.RequestServices.GetRequiredService<T2>(),
+                    context.RequestServices.GetRequiredService<T3>(),
+                    context.RequestServices.GetRequiredService<T4>(),
+                    context.RequestServices.GetRequiredService<T5>());
+
+            if (_scoped)
+                _builder.ResolveScopedAsync(resolver2);
+            else
+                _builder.ResolveAsync(async context => await resolver2(context));
+        }
+    }
+}
