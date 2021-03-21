@@ -1,6 +1,8 @@
 using System;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Types
     public class UriGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             StringValue s => new Uri(s.Value),
             NullValue _ => null,
@@ -18,7 +20,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             string s => new Uri(s),
             Uri _ => value,
@@ -27,6 +29,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => ParseValue(value)?.ToString();
+        public override object? Serialize(object? value) => ParseValue(value)?.ToString();
     }
 }

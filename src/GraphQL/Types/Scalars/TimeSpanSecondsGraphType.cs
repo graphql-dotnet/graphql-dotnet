@@ -2,6 +2,8 @@ using System;
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -21,7 +23,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             IntValue intValue => TimeSpan.FromSeconds(intValue.Value),
             LongValue longValue => TimeSpan.FromSeconds(longValue.Value),
@@ -31,7 +33,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             TimeSpan _ => value, // no boxing
             int i => TimeSpan.FromSeconds(i),
@@ -48,7 +50,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             TimeSpan timeSpan => (long)timeSpan.TotalSeconds,
             int i => (long)i,

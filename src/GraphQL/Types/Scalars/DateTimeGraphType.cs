@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -21,7 +23,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             StringValue stringValue => ParseDate(stringValue.Value),
             NullValue _ => null,
@@ -29,7 +31,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             DateTime _ => value,
             string s => ParseDate(s),
@@ -51,7 +53,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             // ISO-8601 format
             // Note that the "O" format is similar but always prints the fractional parts

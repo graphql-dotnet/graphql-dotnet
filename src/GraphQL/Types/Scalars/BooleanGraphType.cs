@@ -1,5 +1,7 @@
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace GraphQL.Types
     public class BooleanGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             BooleanValue b => b.Value.Boxed(),
             NullValue _ => null,
@@ -20,7 +22,7 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(IValue value) => value is BooleanValue || value is NullValue;
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             bool _ => value,
             null => null,
@@ -28,10 +30,10 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value) => value is bool || value == null;
+        public override bool CanParseValue(object? value) => value is bool || value == null;
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value) => value switch
+        public override IValue? ToAST(object? value) => value switch
         {
             bool b => new BooleanValue(b),
             null => new NullValue(),

@@ -1,6 +1,8 @@
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Types
     public class UShortGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             IntValue intValue => checked((ushort)intValue.Value),
             LongValue longValue => checked((ushort)longValue.Value),
@@ -30,7 +32,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             ushort _ => value,
             null => null,
