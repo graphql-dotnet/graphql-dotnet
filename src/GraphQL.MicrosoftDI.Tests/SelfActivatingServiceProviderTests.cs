@@ -119,6 +119,7 @@ namespace GraphQL.MicrosoftDI.Tests
 
             public MyClass2(MyClass1 class1)
             {
+                _ = class1;
             }
 
             public void Dispose()
