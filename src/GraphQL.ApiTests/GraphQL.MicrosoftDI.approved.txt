@@ -73,4 +73,9 @@ namespace GraphQL.MicrosoftDI
     {
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType> resolver) { }
     }
+    public class SelfActivatingServiceProvider : System.IServiceProvider
+    {
+        public SelfActivatingServiceProvider(System.IServiceProvider serviceProvider) { }
+        public object GetService(System.Type serviceType) { }
+    }
 }

@@ -65,6 +65,44 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+To avoid having to register all of the individual graph types in your project, you can
+import the [GraphQL.MicrosoftDI NuGet package](https://www.nuget.org/packages/GraphQL.MicrosoftDI)
+package and utilize the `SelfActivatingServiceProvider` wrapper as follows:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<ISchema, StarWarsSchema>(services => new MySchema(new SelfActivatingServiceProvider(services)));
+}
+```
+
+If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you will need
+to manually pull in those dependencies from the `SelfActivatingServiceProvider` via `GetRequiredService` as follows:
+
+```csharp
+public class StarWarsSchema : Schema
+{
+    public StarWarsSchema(IServiceProvider serviceProvider)
+        : base(serviceProvider)
+    {
+        Query = serviceProvider.GetRequiredService<StarWarsQuery>();
+        Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
+    }
+}
+```
+
+No other graph types will need to be registered. Graph types will only be instantiated once, during schema initialization
+as usual. Graph types can also pull in any services registered with dependency injection as usual.
+
+Note that if any of the graph types directly or indirectly implement `IDisposable`, be sure to register those types with your dependency
+injection provider, or their `Dispose` methods will not be called. Any dependencies of graph types that implement
+`IDisposable` will be disposed of properly, regardless of whether the graph type is registered within the service provider.
+
+You can also use the `services.AddGraphTypes()` extension method from the [server](https://github.com/graphql-dotnet/server)
+project to scan the calling assembly for classes that implement `IGraphType` and register them all as singletons
+within the service provider. For additional options and overloads of this method, see
+[GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
+
 ## Nancy TinyIoCContainer
 
 ```csharp
