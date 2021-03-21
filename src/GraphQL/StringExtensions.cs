@@ -1,5 +1,7 @@
 using System;
 
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary>
@@ -12,7 +14,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="format">The format string in String.Format style.</param>
         /// <param name="args">The arguments.</param>
-        internal static string ToFormat(this string format, params object[] args)
+        internal static string ToFormat(this string format, params object?[] args) //TODO: remove in v5
             => string.Format(format, args);
 
         /// <summary>
