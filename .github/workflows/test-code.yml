@@ -59,7 +59,7 @@ jobs:
         run: dotnet nuget list source
       - name: Install dependencies
         working-directory: src
-        run: dotnet restore
+        run: dotnet restore && exit 1
       - name: Install dependencies [AGAIN] # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
         if: failure()
         working-directory: src
