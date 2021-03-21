@@ -9,7 +9,7 @@ namespace GraphQL.MicrosoftDI.Tests
     {
         private readonly IServiceProvider _scopedServiceProvider1;
         private readonly IServiceProvider _scopedServiceProvider2;
-        private readonly IServiceProvider _autoCreatingServiceProvider2;
+        private readonly IServiceProvider _selfActivatingServiceProvider2;
 
         public AutoCreatingServiceProviderTests()
         {
@@ -19,14 +19,14 @@ namespace GraphQL.MicrosoftDI.Tests
             var rootServiceProvider = services.BuildServiceProvider();
             _scopedServiceProvider1 = rootServiceProvider.CreateScope().ServiceProvider;
             _scopedServiceProvider2 = rootServiceProvider.CreateScope().ServiceProvider;
-            _autoCreatingServiceProvider2 = new SelfActivatingServiceProvider(_scopedServiceProvider2);
+            _selfActivatingServiceProvider2 = new SelfActivatingServiceProvider(_scopedServiceProvider2);
         }
 
         [Fact]
         public void prefers_pulling_from_service_provider()
         {
             var obj1 = _scopedServiceProvider1.GetRequiredService<TestSingleton>();
-            var obj2 = _autoCreatingServiceProvider2.GetRequiredService<TestSingleton>();
+            var obj2 = _selfActivatingServiceProvider2.GetRequiredService<TestSingleton>();
             obj1.ShouldBe(obj2);
         }
 
@@ -35,7 +35,7 @@ namespace GraphQL.MicrosoftDI.Tests
         {
             var obj1 = _scopedServiceProvider1.GetRequiredService<TestScoped>();
             var obj2 = _scopedServiceProvider2.GetRequiredService<TestScoped>();
-            var obj3 = _autoCreatingServiceProvider2.GetRequiredService<TestScoped>();
+            var obj3 = _selfActivatingServiceProvider2.GetRequiredService<TestScoped>();
             obj1.ShouldNotBe(obj2);
             obj2.ShouldBe(obj3);
         }
@@ -43,19 +43,19 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void creates_when_not_registered()
         {
-            _autoCreatingServiceProvider2.GetRequiredService<TestUnregistered>();
+            _selfActivatingServiceProvider2.GetRequiredService<TestUnregistered>();
         }
 
         [Fact]
         public void creates_when_not_registered_with_dependencies()
         {
-            _autoCreatingServiceProvider2.GetRequiredService<TestUnregisteredWithDependencies>();
+            _selfActivatingServiceProvider2.GetRequiredService<TestUnregisteredWithDependencies>();
         }
 
         [Fact]
         public void fails_with_missing_dependencies()
         {
-            Should.Throw<InvalidOperationException>(() => _autoCreatingServiceProvider2.GetRequiredService<TestUnregisteredWithMissingDependencies>());
+            Should.Throw<InvalidOperationException>(() => _selfActivatingServiceProvider2.GetRequiredService<TestUnregisteredWithMissingDependencies>());
         }
 
         private class TestSingleton
