@@ -11,7 +11,7 @@ using GraphQL.Utilities.Federation;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Prints a string representation of a specified AST document or node.
+    /// Prints a string representation of the specified AST document or node.
     /// </summary>
     public static class AstPrinter
     {
