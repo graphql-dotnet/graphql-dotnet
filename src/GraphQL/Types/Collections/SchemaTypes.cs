@@ -242,6 +242,9 @@ namespace GraphQL.Types
             .ToDictionary(t => t.GetType());
         }
 
+        /// <summary>
+        /// Returns a dictionary that relates type names to graph types
+        /// </summary>
         protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
         private readonly Dictionary<Type, IGraphType> _typeDictionary;
 
