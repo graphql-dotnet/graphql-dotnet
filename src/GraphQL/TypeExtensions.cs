@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -97,6 +98,14 @@ namespace GraphQL
             {
                 type = type.GetGenericArguments()[0];
             }
+
+            if (type == typeof(IDataLoaderResult))
+            {
+                type = typeof(object);
+            }
+
+            if (typeof(Task).IsAssignableFrom(type))
+                throw new ArgumentOutOfRangeException(nameof(type), "Task types cannot be coerced to a graph type; please unwrap the task type before calling this method.");
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {

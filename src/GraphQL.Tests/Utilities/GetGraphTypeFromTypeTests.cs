@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -99,6 +101,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(string), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
         [InlineData(typeof(Guid), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IdGraphType))]
         [InlineData(typeof(Uri), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(UriGraphType))]
+        [InlineData(typeof(object), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyClass), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyEnum), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(EnumerationGraphType<MyEnum>))]
         //built-in mapping mode - nullable structs
@@ -112,6 +115,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<DecimalGraphType>))]
         [InlineData(typeof(Guid), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IdGraphType>))]
         [InlineData(typeof(Uri), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<UriGraphType>))]
+        [InlineData(typeof(object), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyClass), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyEnum), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<EnumerationGraphType<MyEnum>>))]
         //built-in mapping mode - nullable structs
@@ -142,6 +146,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<decimal>))]
         [InlineData(typeof(Guid), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Guid>))]
         [InlineData(typeof(Uri), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Uri>))]
+        [InlineData(typeof(object), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
         [InlineData(typeof(MyClass), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyClass>))]
         [InlineData(typeof(MyEnum), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
         //output mapping mode - nullable structs
@@ -155,6 +160,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>))]
         [InlineData(typeof(Guid), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>))]
         [InlineData(typeof(Uri), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Uri>>))]
+        [InlineData(typeof(object), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(typeof(MyClass), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
         [InlineData(typeof(MyEnum), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>))]
         //output mapping mode - nullable structs
@@ -180,6 +186,31 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
         //input mapping mode
         [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
+        //data loader compatibility
+        [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
+        [InlineData(typeof(IDataLoaderResult), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
+        [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
+        [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
+        [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
+        [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
+        [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.OutputType, null)]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<string>>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(typeof(IDataLoaderResult<IEnumerable<IDataLoaderResult<int>>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        //task incompatibility
+        [InlineData(typeof(Task), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(Task), true, TypeMappingMode.OutputType, null)]
+        [InlineData(typeof(Task<string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(Task<string>), true, TypeMappingMode.OutputType, null)]
         public void GetGraphTypeFromType_Matrix(Type type, bool nullable, TypeMappingMode typeMappingMode, Type expectedType)
         {
             if (expectedType == null)
