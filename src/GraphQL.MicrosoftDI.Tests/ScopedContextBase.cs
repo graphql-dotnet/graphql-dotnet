@@ -7,7 +7,7 @@ namespace GraphQL.MicrosoftDI.Tests
 {
     public class ScopedContextBase
     {
-        protected readonly ResolveFieldContext<object> _scopedContext;
+        protected readonly ResolveFieldContext _scopedContext;
         protected readonly ResolveConnectionContext<object> _scopedConnectionContext;
         protected readonly Mock<IServiceProvider> _requestServicesMock;
         protected readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
@@ -29,7 +29,7 @@ namespace GraphQL.MicrosoftDI.Tests
             _requestServicesMock = new Mock<IServiceProvider>(MockBehavior.Strict);
             _requestServicesMock.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IServiceScopeFactory)))).Returns(serviceScopeFactory).Verifiable();
             var requestServices = _requestServicesMock.Object;
-            _scopedContext = new ResolveFieldContext<object>
+            _scopedContext = new ResolveFieldContext
             {
                 RequestServices = requestServices
             };
