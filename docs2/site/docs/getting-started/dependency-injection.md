@@ -72,7 +72,7 @@ package and utilize the `SelfActivatingServiceProvider` wrapper as follows:
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddSingleton<ISchema, StarWarsSchema>(services => new MySchema(new SelfActivatingServiceProvider(services)));
+    services.AddSingleton<ISchema, StarWarsSchema>(services => new StarWarsSchema(new SelfActivatingServiceProvider(services)));
 }
 ```
 
