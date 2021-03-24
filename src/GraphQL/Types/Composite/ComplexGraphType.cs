@@ -374,10 +374,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
-        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
+            where TGraphType : IGraphType
         {
             var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
                 .Name(name);
@@ -388,8 +389,10 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
-        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+            where TGraphType : IGraphType
+            => Field<TGraphType, object>();
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
