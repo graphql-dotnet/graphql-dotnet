@@ -310,7 +310,7 @@ namespace GraphQL.Tests.Utilities
                 {
                     new QueryArgument(inputType) { Name = "arg" }
                 });
-            var schema = new Schema()
+            var schema = new Schema
             {
                 Query = query
             };
