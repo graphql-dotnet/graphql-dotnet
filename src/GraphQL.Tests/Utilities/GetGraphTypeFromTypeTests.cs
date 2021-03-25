@@ -264,6 +264,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
         [InlineData(typeof(GraphQLClrInputTypeReference<MyClass>), typeof(MyClassInputType))]
         [InlineData(typeof(GraphQLClrInputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MappedEnum>), typeof(MappedEnumGraphType))]
         [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
         public void InputTypeIsDereferenced_Argument(Type referenceType, Type mappedType)
         {
@@ -279,6 +280,7 @@ namespace GraphQL.Tests.Utilities
             };
             schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
             schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
             schema.Initialize();
             schema.Query.Fields.Find("test").Arguments.Find("arg").Type.ShouldBe(mappedType);
         }
@@ -296,13 +298,11 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
         [InlineData(typeof(GraphQLClrInputTypeReference<MyClass>), typeof(MyClassInputType))]
         [InlineData(typeof(GraphQLClrInputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MappedEnum>), typeof(MappedEnumGraphType))]
         [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
         public void InputTypeIsDereferenced_InputField(Type referenceType, Type mappedType)
         {
-            var inputType = new InputObjectGraphType
-            {
-                Name = "TestType"
-            };
+            var inputType = new InputObjectGraphType();
             inputType.Field(referenceType, "field");
             var query = new ObjectGraphType();
             query.Field(typeof(IntGraphType), "test",
@@ -316,6 +316,7 @@ namespace GraphQL.Tests.Utilities
             };
             schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
             schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
             schema.Initialize();
             var inputTypeActual = schema.Query.Fields.Find("test").Arguments.Find("arg").ResolvedType.ShouldBeOfType<InputObjectGraphType>();
             inputTypeActual.ShouldBe(inputType);
@@ -353,6 +354,15 @@ namespace GraphQL.Tests.Utilities
         private enum MyEnum
         {
             Value1
+        }
+
+        private enum MappedEnum
+        {
+            Value1
+        }
+
+        private class MappedEnumGraphType : EnumerationGraphType<MappedEnum>
+        {
         }
     }
 }
