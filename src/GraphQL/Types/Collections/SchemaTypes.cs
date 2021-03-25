@@ -461,14 +461,23 @@ namespace GraphQL.Types
                         NameValidator.ValidateNameOnSchemaInitialize(arg.Name, NamedElement.Argument);
                     }
 
-                    if (arg.ResolvedType != null)
+                    if (arg.ResolvedType == null)
+                    {
+                        if (arg.Type == null)
+                            throw new InvalidOperationException($"Both ResolvedType and Type properties on argument '{parentType?.Name}.{field.Name}.{arg.Name}' are null.");
+
+                        object typeOrError = RebuildType(arg.Type, true, context.TypeMappings);
+                        if (typeOrError is string error)
+                            throw new InvalidOperationException($"The GraphQL type for argument '{parentType.Name}.{field.Name}.{arg.Name}' could not be derived implicitly. " + error);
+                        arg.Type = (Type)typeOrError;
+
+                        AddTypeIfNotRegistered(arg.Type, context);
+                        arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                    }
+                    else
                     {
                         AddTypeIfNotRegistered(arg.ResolvedType, context);
-                        continue;
                     }
-
-                    AddTypeIfNotRegistered(arg.Type, context);
-                    arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
                 }
             }
         }

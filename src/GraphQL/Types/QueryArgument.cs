@@ -92,7 +92,7 @@ namespace GraphQL.Types
         public Type Type
         {
             get => _type;
-            private set => _type = CheckType(value);
+            internal set => _type = CheckType(value);
         }
 
         private Type CheckType(Type type)
