@@ -274,7 +274,7 @@ namespace GraphQL.Tests.Utilities
                 {
                     new QueryArgument(referenceType) { Name = "arg" }
                 });
-            var schema = new Schema()
+            var schema = new Schema
             {
                 Query = query
             };
