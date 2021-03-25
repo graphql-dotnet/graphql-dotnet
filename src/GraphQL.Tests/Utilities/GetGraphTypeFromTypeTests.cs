@@ -241,7 +241,7 @@ namespace GraphQL.Tests.Utilities
         {
             var query = new ObjectGraphType();
             query.Field(referenceType, "test");
-            var schema = new Schema()
+            var schema = new Schema
             {
                 Query = query
             };
