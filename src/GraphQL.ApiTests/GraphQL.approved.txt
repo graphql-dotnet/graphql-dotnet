@@ -168,6 +168,13 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
+    public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
+    {
+        public GraphQLAuthorizeAttribute(string policy) { }
+        public string Policy { get; }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+    }
     public static class GraphQLExtensions
     {
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
