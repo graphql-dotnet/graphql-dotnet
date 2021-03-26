@@ -170,8 +170,8 @@ namespace GraphQL
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
     {
-        public GraphQLAuthorizeAttribute() { }
-        public string Policy { get; set; }
+        public GraphQLAuthorizeAttribute(string policy) { }
+        public string Policy { get; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
