@@ -1,52 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
 namespace GraphQL.Builders
 {
-    /// <summary>
-    /// Static methods to create connection field builders.
-    /// </summary>
-    public static class ConnectionBuilder
-    {
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
-            where TNodeType : IGraphType
-            => ConnectionBuilder<TSourceType>.Create<TNodeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
-    }
-
     /// <summary>
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
@@ -122,9 +81,7 @@ namespace GraphQL.Builders
         public ConnectionBuilder<TSourceType> Unidirectional()
         {
             if (_isUnidirectional)
-            {
                 return this;
-            }
 
             Argument<StringGraphType, string>("after",
                 "Only look at connected edges with cursors greater than the value of `after`.");
@@ -143,9 +100,7 @@ namespace GraphQL.Builders
         public ConnectionBuilder<TSourceType> Bidirectional()
         {
             if (_isBidirectional)
-            {
                 return this;
-            }
 
             Argument<StringGraphType, string>("before",
                 "Only look at connected edges with cursors smaller than the value of `before`.");
@@ -203,16 +158,14 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description)
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
             where TArgumentGraphType : IGraphType
-        {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            => Argument<TArgumentGraphType>(name, arg =>
             {
-                Name = name,
-                Description = description,
+                arg.Description = description;
+                configure?.Invoke(arg);
             });
-            return this;
-        }
 
         /// <summary>
         /// Adds an argument to the connection field.
@@ -222,16 +175,76 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
         public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default)
+            TArgumentType defaultValue = default, Action<QueryArgument> configure = null)
+            where TArgumentGraphType : IGraphType
+            => Argument<TArgumentGraphType>(name, arg =>
+            {
+                arg.Description = description;
+                arg.DefaultValue = defaultValue;
+                configure?.Invoke(arg);
+            });
+
+        /// <summary>
+        /// Adds an argument to the connection field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
             where TArgumentGraphType : IGraphType
         {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            var arg = new QueryArgument(typeof(TArgumentGraphType))
             {
                 Name = name,
-                Description = description,
-                DefaultValue = defaultValue,
-            });
+            };
+            configure?.Invoke(arg);
+            FieldType.Arguments.Add(arg);
+            return this;
+        }
+
+        /// <summary>
+        /// Runs a configuration delegate for the connection field.
+        /// </summary>
+        public virtual ConnectionBuilder<TSourceType> Configure(Action<FieldType> configure)
+        {
+            configure(FieldType);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field without specifying arguments. If the directive
+        /// declaration has arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public virtual ConnectionBuilder<TSourceType> Directive(string name)
+        {
+            FieldType.ApplyDirective(name);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying one argument. If the directive
+        /// declaration has other arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argumentName">Argument name.</param>
+        /// <param name="argumentValue">Argument value.</param>
+        public virtual ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object argumentValue)
+        {
+            FieldType.ApplyDirective(name, argumentName, argumentValue);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying configuration delegate.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="configure">Configuration delegate.</param>
+        public virtual ConnectionBuilder<TSourceType> Directive(string name, Action<AppliedDirective> configure)
+        {
+            FieldType.ApplyDirective(name, configure);
             return this;
         }
 
@@ -240,7 +253,7 @@ namespace GraphQL.Builders
         /// </summary>
         public void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
         {
-            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
+            FieldType.Resolver = new FuncFieldResolver<object>(context =>
             {
                 var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
@@ -253,7 +266,7 @@ namespace GraphQL.Builders
         /// </summary>
         public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object>> resolver)
         {
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
+            FieldType.Resolver = new AsyncFieldResolver<object>(context =>
             {
                 var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);

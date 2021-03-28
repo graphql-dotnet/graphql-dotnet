@@ -380,7 +380,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
             where TGraphType : IGraphType
         {
-            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
+            var builder = FieldBuilder<TSourceType, TReturnType>.Create(typeof(TGraphType))
                 .Name(name);
             AddField(builder.FieldType);
             return builder;
@@ -421,17 +421,17 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'.", exp);
             }
 
-            var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
+            var builder = FieldBuilder<TSourceType, TProperty>.Create(type)
                 .Name(name)
                 .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
                 .Description(expression.DescriptionOf())
-                .DeprecationReason(expression.DeprecationReasonOf())
-                .DefaultValue(expression.DefaultValueOf());
+                .DeprecationReason(expression.DeprecationReasonOf());
+
+            if (expression.DefaultValueOf() is TProperty defaultValue)
+                builder.DefaultValue(defaultValue);
 
             if (expression.Body is MemberExpression expr)
-            {
                 builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
-            }
 
             AddField(builder.FieldType);
             return builder;
@@ -471,7 +471,7 @@ namespace GraphQL.Types
         public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
-            var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
+            var builder = ConnectionBuilder<TSourceType>.Create<TNodeType>();
             AddField(builder.FieldType);
             return builder;
         }
@@ -481,7 +481,7 @@ namespace GraphQL.Types
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
         {
-            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>();
+            var builder = ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
             AddField(builder.FieldType);
             return builder;
         }
@@ -492,7 +492,7 @@ namespace GraphQL.Types
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
-            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TConnectionType, TSourceType>();
+            var builder = ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
             AddField(builder.FieldType);
             return builder;
         }

@@ -12,34 +12,14 @@ namespace GraphQL.MicrosoftDI
     /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
     /// The returned value must be of an <see cref="Task{TResult}"/> type.
     /// </summary>
-    public class ScopedAsyncFieldResolver<TReturnType> : AsyncFieldResolver<TReturnType>
-    {
-        /// <summary>
-        /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
-        /// </summary>
-        public ScopedAsyncFieldResolver(Func<IResolveFieldContext, Task<TReturnType>> resolver) : base(GetScopedResolver(resolver)) { }
-
-        private static Func<IResolveFieldContext, Task<TReturnType>> GetScopedResolver(Func<IResolveFieldContext, Task<TReturnType>> resolver)
-        {
-            return async (context) =>
-            {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return await resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
-                }
-            };
-        }
-    }
-
-    /// <inheritdoc cref="ScopedAsyncFieldResolver{TReturnType}"/>
-    public class ScopedAsyncFieldResolver<TSourceType, TReturnType> : AsyncFieldResolver<TReturnType>
+    public class ScopedAsyncFieldResolver<TSourceType, TReturnType> : AsyncFieldResolver<TSourceType, TReturnType>
     {
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
         public ScopedAsyncFieldResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, Task<TReturnType>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
+        private static Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
         {
             return async (context) =>
             {

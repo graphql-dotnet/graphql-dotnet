@@ -18,7 +18,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
-            => builder.Resolve(new ScopedAsyncFieldResolver<TSourceType, TReturnType>(resolver));
+            => builder.ResolveAsync(new ScopedAsyncFieldResolver<TSourceType, TReturnType>(resolver));
 
         /// <summary>
         /// Creates a resolve builder for the field.

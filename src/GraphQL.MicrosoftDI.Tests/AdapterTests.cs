@@ -25,29 +25,6 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Fact]
-        public void InvalidSourceTypeThrows()
-        {
-            var rfc = new ResolveFieldContext<string>
-            {
-                Source = "hello"
-            };
-            Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(rfc, null));
-        }
-
-        [Fact]
-        public void SourceNullThrowsForValueTypes()
-        {
-            Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(new ResolveFieldContext(), null));
-        }
-
-        [Fact]
-        public void SourceNullNullableTypes()
-        {
-            var adapter = new ScopedResolveFieldContextAdapter<int?>(new ResolveFieldContext(), null);
-            adapter.Source.ShouldBeNull();
-        }
-
-        [Fact]
         public void Passthrough()
         {
             var rfc = new ResolveFieldContext<string>

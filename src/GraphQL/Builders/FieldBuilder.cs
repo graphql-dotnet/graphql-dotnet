@@ -1,30 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
 {
-    /// <summary>
-    /// Static methods to create field builders.
-    /// </summary>
-    public static class FieldBuilder
-    {
-        /// <summary>
-        /// Returns a builder for a new field with a specified source type, return type and graph type.
-        /// </summary>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-        /// <param name="type">The graph type of the field.</param>
-        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(Type type = null)
-            => FieldBuilder<TSourceType, TReturnType>.Create(type);
-
-        /// <inheritdoc cref="Create{TSourceType, TReturnType}(Type)"/>
-        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(IGraphType type)
-            => FieldBuilder<TSourceType, TReturnType>.Create(type);
-    }
-
     /// <summary>
     /// Builds a field for a graph with a specified source type and return type.
     /// </summary>
@@ -116,28 +98,49 @@ namespace GraphQL.Builders
             return this;
         }
 
-        internal FieldBuilder<TSourceType, TReturnType> DefaultValue(object defaultValue)
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver<TReturnType> resolver)
         {
-            FieldType.DefaultValue = defaultValue;
+            FieldType.Resolver = resolver;
             return this;
         }
 
         /// <summary>
         /// Sets the resolver for the field.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(IFieldResolver<IDataLoaderResult<TReturnType>> resolver)
         {
             FieldType.Resolver = resolver;
             return this;
         }
 
-        /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(IFieldResolver<Task<TReturnType>> resolver)
+        {
+            FieldType.Resolver = resolver;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(IFieldResolver<Task<IDataLoaderResult<TReturnType>>> resolver)
+        {
+            FieldType.Resolver = resolver;
+            return this;
+        }
+
+        /// <inheritdoc cref="Resolve(IFieldResolver{TReturnType})"/>
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
-        /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+        /// <inheritdoc cref="ResolveAsync(IFieldResolver{Task{TReturnType}})"/>
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
-            => Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
+            => ResolveAsync(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
 
         /// <summary>
         /// Sets the return type of the field.
