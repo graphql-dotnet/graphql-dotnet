@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.0.0" />
-    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="5.0.0" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="5.0.1" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.0.0" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="5.0.0" />
   </ItemGroup>
