@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+
+#nullable enable
 
 namespace GraphQL.Builders
 {
@@ -106,14 +109,14 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
-        public ConnectionBuilder<TSourceType, TReturnType> Description(string description)
+        public ConnectionBuilder<TSourceType, TReturnType> Description(string? description)
         {
             FieldType.Description = description;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
-        public ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason)
+        public ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
@@ -142,17 +145,33 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description)
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            var arg = new QueryArgument(typeof(TArgumentGraphType))
             {
                 Name = name,
-                Description = description,
-            });
+            };
+            configure?.Invoke(arg);
+            FieldType.Arguments.Add(arg);
             return this;
         }
+
+        /// <summary>
+        /// Adds an argument to the connection field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="description">The description of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
+            where TArgumentGraphType : IGraphType
+            => Argument<TArgumentGraphType>(name, arg =>
+            {
+                arg.Description = description;
+                configure?.Invoke(arg);
+            });
 
         /// <summary>
         /// Adds an argument to the connection field.
@@ -162,16 +181,61 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
-        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default)
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+#if NETSTANDARD2_1
+            [AllowNull]
+#endif
+            TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
-        {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            => Argument<TArgumentGraphType>(name, arg =>
             {
-                Name = name,
-                Description = description,
-                DefaultValue = defaultValue,
+                arg.Description = description;
+                arg.DefaultValue = defaultValue;
+                configure?.Invoke(arg);
             });
+
+        /// <summary>
+        /// Runs a configuration delegate for the connection field.
+        /// </summary>
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
+        {
+            configure(FieldType);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field without specifying arguments. If the directive
+        /// declaration has arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name)
+        {
+            FieldType.ApplyDirective(name);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying one argument. If the directive
+        /// declaration has other arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argumentName">Argument name.</param>
+        /// <param name="argumentValue">Argument value.</param>
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
+        {
+            FieldType.ApplyDirective(name, argumentName, argumentValue);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying configuration delegate.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="configure">Configuration delegate.</param>
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
+        {
+            FieldType.ApplyDirective(name, configure);
             return this;
         }
 

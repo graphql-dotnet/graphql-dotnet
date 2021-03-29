@@ -197,17 +197,43 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
+            where TArgumentGraphType : IGraphType
+        {
+            var arg = new QueryArgument(typeof(TArgumentGraphType))
+            {
+                Name = name,
+            };
+            configure?.Invoke(arg);
+            FieldType.Arguments.Add(arg);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an argument to the connection field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description)
             where TArgumentGraphType : IGraphType
-        {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
+
+        /// <summary>
+        /// Adds an argument to the connection field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="description">The description of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure)
+            where TArgumentGraphType : IGraphType
+            => Argument<TArgumentGraphType>(name, arg =>
             {
-                Name = name,
-                Description = description,
+                arg.Description = description;
+                configure?.Invoke(arg);
             });
-            return this;
-        }
 
         /// <summary>
         /// Adds an argument to the connection field.
@@ -220,13 +246,72 @@ namespace GraphQL.Builders
         public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default)
             where TArgumentGraphType : IGraphType
-        {
-            FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            => Argument<TArgumentGraphType>(name, arg =>
             {
-                Name = name,
-                Description = description,
-                DefaultValue = defaultValue,
+                arg.Description = description;
+                arg.DefaultValue = defaultValue;
             });
+
+        /// <summary>
+        /// Adds an argument to the connection field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="description">The description of the argument.</param>
+        /// <param name="defaultValue">The default value of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
+            TArgumentType defaultValue, Action<QueryArgument> configure)
+            where TArgumentGraphType : IGraphType
+            => Argument<TArgumentGraphType>(name, arg =>
+            {
+                arg.Description = description;
+                arg.DefaultValue = defaultValue;
+                configure?.Invoke(arg);
+            });
+
+        /// <summary>
+        /// Runs a configuration delegate for the connection field.
+        /// </summary>
+        public ConnectionBuilder<TSourceType> Configure(Action<FieldType> configure)
+        {
+            configure(FieldType);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field without specifying arguments. If the directive
+        /// declaration has arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        public ConnectionBuilder<TSourceType> Directive(string name)
+        {
+            FieldType.ApplyDirective(name);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying one argument. If the directive
+        /// declaration has other arguments, then their default values (if any) will be used.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="argumentName">Argument name.</param>
+        /// <param name="argumentValue">Argument value.</param>
+        public ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object argumentValue)
+        {
+            FieldType.ApplyDirective(name, argumentName, argumentValue);
+            return this;
+        }
+
+        /// <summary>
+        /// Apply directive to connection field specifying configuration delegate.
+        /// </summary>
+        /// <param name="name">Directive name.</param>
+        /// <param name="configure">Configuration delegate.</param>
+        public ConnectionBuilder<TSourceType> Directive(string name, Action<AppliedDirective> configure)
+        {
+            FieldType.ApplyDirective(name, configure);
             return this;
         }
 
