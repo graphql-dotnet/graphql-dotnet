@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+
+#nullable enable
 
 namespace GraphQL.Builders
 {
@@ -161,14 +164,14 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
-        public ConnectionBuilder<TSourceType> Description(string description)
+        public ConnectionBuilder<TSourceType> Description(string? description)
         {
             FieldType.Description = description;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
-        public ConnectionBuilder<TSourceType> DeprecationReason(string deprecationReason)
+        public ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
@@ -198,7 +201,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
             var arg = new QueryArgument(typeof(TArgumentGraphType))
@@ -216,7 +219,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
 
@@ -227,7 +230,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -243,8 +246,11 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+#if NETSTANDARD2_1
+            [AllowNull]
+#endif
+            TArgumentType defaultValue = default!)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -261,8 +267,11 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue, Action<QueryArgument> configure)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+#if NETSTANDARD2_1
+            [AllowNull]
+#endif
+            TArgumentType defaultValue, Action<QueryArgument>? configure)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -298,7 +307,7 @@ namespace GraphQL.Builders
         /// <param name="name">Directive name.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
-        public ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object argumentValue)
+        public ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue)
         {
             FieldType.ApplyDirective(name, argumentName, argumentValue);
             return this;

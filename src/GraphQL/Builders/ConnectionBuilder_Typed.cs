@@ -222,7 +222,7 @@ namespace GraphQL.Builders
         /// <param name="name">Directive name.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
-        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue)
         {
             FieldType.ApplyDirective(name, argumentName, argumentValue);
             return this;
