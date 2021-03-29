@@ -34,7 +34,7 @@ mutation M($input_0: MyInput!) {
             {
                 Field<StringGraphType>(
                     "run",
-                    arguments: new QueryArguments(new QueryArgument<MyInput> {Name = "input"}),
+                    arguments: new QueryArguments(new QueryArgument<MyInputClass.MyInput> {Name = "input"}),
                     resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
             }
         }
@@ -42,14 +42,13 @@ mutation M($input_0: MyInput!) {
         public class MyInputClass
         {
             public string Id { get; set; }
-        }
 
-        public class MyInput : InputObjectGraphType
-        {
-            public MyInput()
+            public class MyInput : InputObjectGraphType
             {
-                Name = "MyInput"; // changed from "MyInput "
-                Field<NonNullGraphType<StringGraphType>>("id");
+                public MyInput()
+                {
+                    Field<NonNullGraphType<StringGraphType>>("id");
+                }
             }
         }
     }
