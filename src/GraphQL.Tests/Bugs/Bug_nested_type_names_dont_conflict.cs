@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nested_type_names_dont_conflict()
         {
-            var inputs = @"{ ""input_0"": { ""id"": ""123"", ""foo"": null, ""bar"": null } }".ToInputs();
+            var inputs = @"{ ""input_0"": { ""id"": ""123""} }".ToInputs();
             var query = @"
 mutation M($input_0: MyInput!) {
   run(input: $input_0)
@@ -42,8 +42,6 @@ mutation M($input_0: MyInput!) {
         public class MyInputClass
         {
             public string Id { get; set; }
-            public string Foo { get; set; }
-            public string Bar { get; set; }
         }
 
         public class MyInput : InputObjectGraphType
@@ -52,8 +50,6 @@ mutation M($input_0: MyInput!) {
             {
                 Name = "MyInput"; // changed from "MyInput "
                 Field<NonNullGraphType<StringGraphType>>("id");
-                Field<StringGraphType>("foo");
-                Field<StringGraphType>("bar");
             }
         }
     }
