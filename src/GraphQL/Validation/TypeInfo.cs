@@ -86,13 +86,11 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
-        /// <returns></returns>
         public DirectiveGraphType GetDirective() => _directive;
 
         /// <summary>
         /// Returns the last query argument matched, or <see langword="null"/> if none.
         /// </summary>
-        /// <returns></returns>
         public QueryArgument GetArgument() => _argument;
 
         /// <inheritdoc/>

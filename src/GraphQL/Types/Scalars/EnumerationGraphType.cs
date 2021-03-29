@@ -8,6 +8,8 @@ using System.Reflection;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -33,7 +35,7 @@ namespace GraphQL.Types
         /// <param name="description">A description of the enumeration member.</param>
         /// <param name="value">The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).</param>
         /// <param name="deprecationReason">The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.</param>
-        public void AddValue(string name, string description, object value, string deprecationReason = null)
+        public void AddValue(string name, string? description, object? value, string? deprecationReason = null)
         {
             AddValue(new EnumValueDefinition
             {
@@ -62,7 +64,7 @@ namespace GraphQL.Types
         public EnumValues Values { get; }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             EnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
             NullValue _ => null,
@@ -78,7 +80,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             string s => Values.FindByName(s)?.Value ?? ThrowValueConversionError(value),
             null => null,
@@ -86,7 +88,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override bool CanParseValue(object value) => value switch
+        public override bool CanParseValue(object? value) => value switch
         {
             string s => Values.FindByName(s) != null,
             null => true,
@@ -94,9 +96,9 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
         {
-            if (value == null)
+            if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
                 return null;
 
             var foundByValue = Values.FindByValue(value);
@@ -106,9 +108,9 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue ToAST(object value)
+        public override IValue? ToAST(object? value)
         {
-            if (value == null)
+            if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
                 return new NullValue();
 
             var foundByValue = Values.FindByValue(value);
@@ -167,9 +169,9 @@ namespace GraphQL.Types
         internal List<EnumValueDefinition> List { get; } = new List<EnumValueDefinition>();
 
         /// <summary>
-        /// Returns an enumeration definition for the specified name.
+        /// Returns an enumeration definition for the specified name and <see langword="null"/> if not found.
         /// </summary>
-        public EnumValueDefinition this[string name] => FindByName(name);
+        public EnumValueDefinition? this[string name] => FindByName(name);
 
         /// <summary>
         /// Gets the count of enumeration definitions.
@@ -185,7 +187,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns an enumeration definition for the specified name.
         /// </summary>
-        public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        public EnumValueDefinition? FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
@@ -200,7 +202,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns an enumeration definition for the specified name.
         /// </summary>
-        internal EnumValueDefinition FindByName(ReadOnlySpan<char> name)
+        internal EnumValueDefinition? FindByName(ReadOnlySpan<char> name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
@@ -215,7 +217,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns an enumeration definition for the specified value.
         /// </summary>
-        public EnumValueDefinition FindByValue(object value)
+        public EnumValueDefinition? FindByValue(object? value)
         {
             if (value is Enum)
             {
@@ -225,7 +227,7 @@ namespace GraphQL.Types
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
             {
-                if (def.UnderlyingValue.Equals(value))
+                if (Equals(def.UnderlyingValue, value))
                     return def;
             }
 
@@ -247,23 +249,23 @@ namespace GraphQL.Types
         /// <summary>
         /// The name of the enumeration member, as exposed through the GraphQL endpoint (e.g. "RED").
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// A description of the enumeration member.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.
         /// </summary>
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
 
-        private object _value;
+        private object? _value;
         /// <summary>
         /// The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).
         /// </summary>
-        public object Value
+        public object? Value
         {
             get => _value;
             set
@@ -278,6 +280,6 @@ namespace GraphQL.Types
         /// <summary>
         /// When mapped to a member of an <see cref="Enum"/>, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
         /// </summary>
-        internal object UnderlyingValue { get; set; }
+        internal object? UnderlyingValue { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary>
@@ -39,10 +41,10 @@ namespace GraphQL
         /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
-        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
+        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType? mappedType = null)
         {
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
-            string GetPropertyName(string key, out FieldType field)
+            string GetPropertyName(string key, out FieldType? field)
             {
                 var complexType = mappedType.GetNamedType() as IComplexGraphType;
 
@@ -52,14 +54,14 @@ namespace GraphQL
             }
 
             // Returns keys from source that match constructor signature
-            string[] MatchSourceKeys(ParameterInfo[] parameters)
+            string[]? MatchSourceKeys(ParameterInfo[] parameters)
             {
                 // parameterless constructors are the most common use case
                 if (parameters.Length == 0)
                     return Array.Empty<string>();
 
                 // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
-                List<string> keys = null;
+                List<string>? keys = null;
                 if (parameters.All(p => source.Any(keyValue =>
                 {
                     bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
@@ -68,7 +70,7 @@ namespace GraphQL
                     return matched;
                 })))
                 {
-                    return keys.ToArray();
+                    return keys!.ToArray();
                 }
 
                 return null;
@@ -84,9 +86,9 @@ namespace GraphQL
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
 
-            ConstructorInfo targetCtor = null;
-            ParameterInfo[] ctorParameters = null;
-            string[] matchedKeys = null;
+            ConstructorInfo? targetCtor = null;
+            ParameterInfo[]? ctorParameters = null;
+            string[]? matchedKeys = null;
 
             foreach (var ctor in ctorCandidates)
             {
@@ -103,11 +105,11 @@ namespace GraphQL
             if (targetCtor == null || ctorParameters == null || matchedKeys == null)
                 throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
 
-            object[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
+            object?[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
 
             for (int i = 0; i < ctorParameters.Length; ++i)
             {
-                object arg = GetPropertyValue(source[matchedKeys[i]], ctorParameters[i].ParameterType);
+                object? arg = GetPropertyValue(source[matchedKeys[i]], ctorParameters[i].ParameterType);
                 ctorArguments[i] = arg;
             }
 
@@ -119,7 +121,7 @@ namespace GraphQL
             catch (TargetInvocationException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null; // never executed, necessary only for intellisense
+                return ""; // never executed, necessary only for intellisense
             }
 
             foreach (var item in source)
@@ -129,7 +131,7 @@ namespace GraphQL
                     continue;
 
                 string propertyName = GetPropertyName(item.Key, out var field);
-                PropertyInfo propertyInfo = null;
+                PropertyInfo? propertyInfo = null;
 
                 try
                 {
@@ -142,7 +144,7 @@ namespace GraphQL
 
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    object value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
+                    object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
@@ -162,7 +164,7 @@ namespace GraphQL
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType mappedType = null)
+        public static object? GetPropertyValue(this object propertyValue, Type fieldType, IGraphType? mappedType = null)
         {
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
@@ -275,7 +277,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="type">An enum type.</param>
         /// <param name="value">The value being tested.</param>
-        public static bool IsDefinedEnumValue(Type type, object value) //TODO: rewrite, comment above seems wrong
+        public static bool IsDefinedEnumValue(Type type, object? value) //TODO: rewrite, comment above seems wrong
         {
             try
             {

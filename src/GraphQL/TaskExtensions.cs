@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
 
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary>
@@ -16,8 +18,7 @@ namespace GraphQL
         /// This will also throw an exception if the task is not Task&lt;TResult&gt;.
         /// </remarks>
         /// <param name="task">A task that has already been awaited</param>
-        /// <returns></returns>
-        internal static object GetResult(this Task task)
+        internal static object? GetResult(this Task task)
         {
             if (task is Task<object> to)
             {

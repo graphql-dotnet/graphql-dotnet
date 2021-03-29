@@ -1,6 +1,8 @@
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace GraphQL.Types
     public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             IntValue intVal => (decimal)intVal.Value,
             LongValue longVal => (decimal)longVal.Value,
@@ -46,7 +48,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             decimal _ => value,
             int i => checked((decimal)i),

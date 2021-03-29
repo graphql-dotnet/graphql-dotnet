@@ -80,7 +80,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void throws_for_invalid_type_when_conversion_returns_null()
         {
-            // in this case, the converstion returned null, and GraphQL threw an InvalidOperationException
+            // in this case, the conversion returned null, and GraphQL threw an InvalidOperationException
             AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
                 new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }

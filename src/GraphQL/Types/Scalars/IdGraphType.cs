@@ -2,6 +2,8 @@ using System;
 using System.Numerics;
 using GraphQL.Language.AST;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -25,7 +27,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(IValue value) => value switch
         {
             StringValue str => str.Value,
             IntValue num => num.Value,
@@ -47,7 +49,7 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             string _ => value,
             int _ => value,
@@ -65,6 +67,6 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object Serialize(object value) => ParseValue(value)?.ToString();
+        public override object? Serialize(object? value) => ParseValue(value)?.ToString();
     }
 }

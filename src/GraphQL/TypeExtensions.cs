@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
+
+#nullable enable
 
 namespace GraphQL
 {
@@ -64,7 +67,7 @@ namespace GraphQL
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
-                return attr.Name;
+                return attr!.Name;
             }
 
             var typeName = type.Name;
@@ -96,6 +99,14 @@ namespace GraphQL
                 type = type.GetGenericArguments()[0];
             }
 
+            if (type == typeof(IDataLoaderResult))
+            {
+                type = typeof(object);
+            }
+
+            if (typeof(Task).IsAssignableFrom(type))
+                throw new ArgumentOutOfRangeException(nameof(type), "Task types cannot be coerced to a graph type; please unwrap the task type before calling this method.");
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
@@ -106,7 +117,7 @@ namespace GraphQL
                 }
             }
 
-            Type graphType = null;
+            Type? graphType = null;
 
             if (type.IsArray)
             {
@@ -276,9 +287,9 @@ namespace GraphQL
         /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
         /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
         /// </summary>
-        public static string Description(this MemberInfo memberInfo)
+        public static string? Description(this MemberInfo memberInfo)
         {
-            string description = null;
+            string? description = null;
 
             if (GlobalSwitches.EnableReadDescriptionFromAttributes)
             {
@@ -300,7 +311,7 @@ namespace GraphQL
         /// the <see cref="ObsoleteAttribute.Message">message</see>, if any. Note that behavior of this
         /// method depends from <see cref="GlobalSwitches.EnableReadDeprecationReasonFromAttributes"/> setting.
         /// </summary>
-        public static string ObsoleteMessage(this MemberInfo memberInfo)
+        public static string? ObsoleteMessage(this MemberInfo memberInfo)
         {
             return GlobalSwitches.EnableReadDeprecationReasonFromAttributes
                 ? (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
@@ -312,7 +323,7 @@ namespace GraphQL
         /// the <see cref="DefaultValueAttribute.Value">value</see>, if any. Note that behavior of this
         /// method depends from <see cref="GlobalSwitches.EnableReadDefaultValueFromAttributes"/> setting.
         /// </summary>
-        public static object DefaultValue(this MemberInfo memberInfo)
+        public static object? DefaultValue(this MemberInfo memberInfo)
         {
             return GlobalSwitches.EnableReadDefaultValueFromAttributes
                 ? (memberInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value

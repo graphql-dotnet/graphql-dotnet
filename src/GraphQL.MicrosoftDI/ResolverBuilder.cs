@@ -50,7 +50,6 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Specifies that the resolver should run within its own dependency injection scope.
         /// </summary>
-        /// <returns></returns>
         public ResolverBuilder<TSourceType, TReturnType> WithScope()
         {
             _scoped = true;

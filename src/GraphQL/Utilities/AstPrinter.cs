@@ -10,6 +10,9 @@ using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Prints a string representation of the specified AST document or node.
+    /// </summary>
     public static class AstPrinter
     {
         // new-ing AstPrintVisitor every time we called AstPrinter

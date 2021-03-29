@@ -19,20 +19,20 @@ namespace GraphQL.Tests.Types
          *    UIntGraphType
          *    LongGraphType
          *    ULongGraphType
-         *    
+         *
          *    BooleanGraphType
          *    FloatGraphType
          *    StringGraphType
-         *    
+         *
          *  Does not test:
          *    IdGraphType
          *    DecimalGraphType
          *    UriGraphType
          *    date/time graph types
          *    enumeration graph types
-         *    
+         *
          *  Does test ALL scalars' handling of null
-         *  
+         *
          */
 
         [Theory]

@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL
 {
     public struct VariableName
@@ -28,7 +30,7 @@ namespace GraphQL
 
         public int? Index { get; set; }
 
-        public string ChildName { get; set; }
+        public string? ChildName { get; set; }
 
         public override string ToString() => (!Index.HasValue ? Name : Name + "[" + Index.Value + "]") + (ChildName != null ? '.' + ChildName : null);
 

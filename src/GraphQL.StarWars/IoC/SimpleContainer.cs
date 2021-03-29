@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GraphQL.StarWars.IoC
 {
-    public interface ISimpleContainer : IDisposable
+    public interface ISimpleContainer : IDisposable, IServiceProvider
     {
         object Get(Type serviceType);
         T Get<T>();
@@ -61,7 +61,12 @@ namespace GraphQL.StarWars.IoC
 
         public T Get<T>() => (T)Get(typeof(T));
 
-        public object Get(Type serviceType)
+        public object Get(Type serviceType) => GetService(serviceType) ?? throw new InvalidOperationException("No registration for " + serviceType);
+
+        object IServiceProvider.GetService(Type serviceType) => GetService(serviceType);
+
+        /// <inheritdoc cref="IServiceProvider.GetService(Type)"/>
+        private object GetService(Type serviceType)
         {
             if (_registrations.TryGetValue(serviceType, out var creator))
             {
@@ -73,7 +78,7 @@ namespace GraphQL.StarWars.IoC
                 return CreateInstance(serviceType);
             }
 
-            throw new InvalidOperationException("No registration for " + serviceType);
+            return null;
         }
 
         public void Dispose()

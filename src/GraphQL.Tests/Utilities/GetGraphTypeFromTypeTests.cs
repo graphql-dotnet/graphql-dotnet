@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -99,6 +101,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(string), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
         [InlineData(typeof(Guid), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IdGraphType))]
         [InlineData(typeof(Uri), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(UriGraphType))]
+        [InlineData(typeof(object), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyClass), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyEnum), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(EnumerationGraphType<MyEnum>))]
         //built-in mapping mode - nullable structs
@@ -112,6 +115,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<DecimalGraphType>))]
         [InlineData(typeof(Guid), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IdGraphType>))]
         [InlineData(typeof(Uri), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<UriGraphType>))]
+        [InlineData(typeof(object), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyClass), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(MyEnum), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<EnumerationGraphType<MyEnum>>))]
         //built-in mapping mode - nullable structs
@@ -142,6 +146,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<decimal>))]
         [InlineData(typeof(Guid), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Guid>))]
         [InlineData(typeof(Uri), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<Uri>))]
+        [InlineData(typeof(object), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
         [InlineData(typeof(MyClass), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyClass>))]
         [InlineData(typeof(MyEnum), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<MyEnum>))]
         //output mapping mode - nullable structs
@@ -155,6 +160,7 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(decimal), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<decimal>>))]
         [InlineData(typeof(Guid), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Guid>>))]
         [InlineData(typeof(Uri), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Uri>>))]
+        [InlineData(typeof(object), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(typeof(MyClass), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyClass>>))]
         [InlineData(typeof(MyEnum), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<MyEnum>>))]
         //output mapping mode - nullable structs
@@ -180,6 +186,31 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
         //input mapping mode
         [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
+        //data loader compatibility
+        [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(IDataLoaderResult), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<object>))]
+        [InlineData(typeof(IDataLoaderResult), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<object>>))]
+        [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
+        [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
+        [InlineData(typeof(IDataLoaderResult<string>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
+        [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<int>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(typeof(IDataLoaderResult<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(IntGraphType))]
+        [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(IDataLoaderResult<int?>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(typeof(IDataLoaderResult<int?>), false, TypeMappingMode.OutputType, null)]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<string>>), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(StringGraphType))]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<IntGraphType>))]
+        [InlineData(typeof(IDataLoaderResult<IDataLoaderResult<int>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(typeof(IDataLoaderResult<IEnumerable<IDataLoaderResult<int>>>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        //task incompatibility
+        [InlineData(typeof(Task), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(Task), true, TypeMappingMode.OutputType, null)]
+        [InlineData(typeof(Task<string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+        [InlineData(typeof(Task<string>), true, TypeMappingMode.OutputType, null)]
         public void GetGraphTypeFromType_Matrix(Type type, bool nullable, TypeMappingMode typeMappingMode, Type expectedType)
         {
             if (expectedType == null)
@@ -192,11 +223,176 @@ namespace GraphQL.Tests.Utilities
             }
         }
 
+        [Theory]
+        [InlineData(typeof(IntGraphType), typeof(IntGraphType))]
+        [InlineData(typeof(StringGraphType), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<StringGraphType>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<StringGraphType>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(MyClassObjectType), typeof(MyClassObjectType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassObjectType>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassObjectType>>>>))]
+        [InlineData(typeof(GraphQLClrOutputTypeReference<int>), typeof(IntGraphType))]
+        [InlineData(typeof(GraphQLClrOutputTypeReference<string>), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(GraphQLClrOutputTypeReference<MyClass>), typeof(MyClassObjectType))]
+        [InlineData(typeof(GraphQLClrOutputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassObjectType>>>>))]
+        public void OutputTypeIsDereferenced(Type referenceType, Type mappedType)
+        {
+            var query = new ObjectGraphType();
+            query.Field(referenceType, "test");
+            var schema = new Schema
+            {
+                Query = query
+            };
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.Initialize();
+            schema.Query.Fields.Find("test").Type.ShouldBe(mappedType);
+        }
+
+        [Theory]
+        [InlineData(typeof(IntGraphType), typeof(IntGraphType))]
+        [InlineData(typeof(StringGraphType), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<StringGraphType>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<StringGraphType>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(MyClassInputType), typeof(MyClassInputType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<int>), typeof(IntGraphType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<string>), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<GraphQLClrInputTypeReference<string>>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyClass>), typeof(MyClassInputType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MappedEnum>), typeof(MappedEnumGraphType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        public void InputTypeIsDereferenced_Argument(Type referenceType, Type mappedType)
+        {
+            var query = new ObjectGraphType();
+            query.Field(typeof(IntGraphType), "test",
+                arguments: new QueryArguments
+                {
+                    new QueryArgument(referenceType) { Name = "arg" }
+                });
+            var schema = new Schema
+            {
+                Query = query
+            };
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
+            schema.Initialize();
+            schema.Query.Fields.Find("test").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        }
+
+        [Theory]
+        [InlineData(typeof(IntGraphType), typeof(IntGraphType))]
+        [InlineData(typeof(StringGraphType), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<StringGraphType>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<StringGraphType>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(MyClassInputType), typeof(MyClassInputType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<int>), typeof(IntGraphType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<string>), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<GraphQLClrInputTypeReference<string>>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyClass>), typeof(MyClassInputType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MappedEnum>), typeof(MappedEnumGraphType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        public void InputTypeIsDereferenced_DirectiveArgument(Type referenceType, Type mappedType)
+        {
+            var query = new ObjectGraphType();
+            query.Field(typeof(StringGraphType), "test");
+            var schema = new Schema
+            {
+                Query = query
+            };
+            var directive = new DirectiveGraphType("MyDirective")
+            {
+                Arguments = new QueryArguments
+                {
+                    new QueryArgument(referenceType) { Name = "arg" }
+                }
+            };
+            directive.Locations.Add(DirectiveLocation.Field);
+            schema.Directives.Register(directive);
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
+            schema.Initialize();
+            schema.Directives.Find("MyDirective").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        }
+
+        [Theory]
+        [InlineData(typeof(IntGraphType), typeof(IntGraphType))]
+        [InlineData(typeof(StringGraphType), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<StringGraphType>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<StringGraphType>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(MyClassInputType), typeof(MyClassInputType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<int>), typeof(IntGraphType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<string>), typeof(StringGraphType))]
+        [InlineData(typeof(ListGraphType<GraphQLClrInputTypeReference<string>>), typeof(ListGraphType<StringGraphType>))]
+        [InlineData(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>), typeof(NonNullGraphType<StringGraphType>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyClass>), typeof(MyClassInputType))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MyEnum>), typeof(EnumerationGraphType<MyEnum>))]
+        [InlineData(typeof(GraphQLClrInputTypeReference<MappedEnum>), typeof(MappedEnumGraphType))]
+        [InlineData(typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<MyClass>>>>>), typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<MyClassInputType>>>>))]
+        public void InputTypeIsDereferenced_InputField(Type referenceType, Type mappedType)
+        {
+            var inputType = new InputObjectGraphType();
+            inputType.Field(referenceType, "field");
+            var query = new ObjectGraphType();
+            query.Field(typeof(IntGraphType), "test",
+                arguments: new QueryArguments
+                {
+                    new QueryArgument(inputType) { Name = "arg" }
+                });
+            var schema = new Schema
+            {
+                Query = query
+            };
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
+            schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
+            schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
+            schema.Initialize();
+            var inputTypeActual = schema.Query.Fields.Find("test").Arguments.Find("arg").ResolvedType.ShouldBeOfType<InputObjectGraphType>();
+            inputTypeActual.ShouldBe(inputType);
+            inputTypeActual.Fields.Find("field").Type.ShouldBe(mappedType);
+        }
+
+        private class MyClassObjectType : ObjectGraphType<MyClass>
+        {
+            public MyClassObjectType()
+            {
+                Field<IntGraphType>("field");
+            }
+        }
+
+        private class MyClassInputType : InputObjectGraphType
+        {
+            public MyClassInputType()
+            {
+                Field<IntGraphType>("field");
+            }
+        }
+
         private class MyClass
         {
         }
 
         private enum MyEnum
+        {
+            Value1
+        }
+
+        private enum MappedEnum
+        {
+            Value1
+        }
+
+        private class MappedEnumGraphType : EnumerationGraphType<MappedEnum>
         {
         }
     }
