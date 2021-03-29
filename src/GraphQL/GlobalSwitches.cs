@@ -53,6 +53,6 @@ namespace GraphQL
         /// Specifies whether to use the names of parent (declaring) types in case of nested graph types
         /// when calculating default graph type name.
         /// </summary>
-        public static bool UseDeclaringTypeNames { get; set; }
+        public static bool UseDeclaringTypeNames { get; set; } = false;
     }
 }
