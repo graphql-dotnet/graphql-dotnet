@@ -189,7 +189,7 @@ namespace GraphQL
                     return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. It has no field '{field.Name}'.") : false;
                 }
 
-                if (found.ResolvedType != null && field.ResolvedType != null)
+                if (found.ResolvedType != null && field.ResolvedType != null && found.ResolvedType is not GraphQLTypeReference && field.ResolvedType is not GraphQLTypeReference)
                 {
                     if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType))
                         return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. Field '{field.Name}' must be of type '{field.ResolvedType}' or covariant from it, but in fact it is of type '{found.ResolvedType}'.") : false;
