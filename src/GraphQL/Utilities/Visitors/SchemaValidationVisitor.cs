@@ -60,7 +60,7 @@ namespace GraphQL.Utilities
             if (field.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
-                // 2.3
+            // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
 
