@@ -2,6 +2,7 @@ using System;
 #if NETSTANDARD2_1
 using System.Diagnostics.CodeAnalysis;
 #endif
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
@@ -15,22 +16,21 @@ namespace GraphQL.Builders
     /// </summary>
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        private bool _isBidirectional;
+        private bool _isBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
 
-        private int? _pageSize;
+        private int? _pageSize
+        {
+            get => FieldType.GetMetadata<int?>(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY);
+            set => FieldType.WithMetadata(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY, value);
+        }
 
         /// <summary>
         /// Returns the generated field.
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        internal ConnectionBuilder(
-            FieldType fieldType,
-            bool isBidirectional,
-            int? pageSize)
+        internal ConnectionBuilder(FieldType fieldType)
         {
-            _isBidirectional = isBidirectional;
-            _pageSize = pageSize;
             FieldType = fieldType;
         }
 
@@ -82,7 +82,7 @@ namespace GraphQL.Builders
                 Description = "Specifies the number of edges to return starting from `after` or the first entry if `after` is not specified.",
             });
 
-            return new ConnectionBuilder<TSourceType, TReturnType>(fieldType, false, null);
+            return new ConnectionBuilder<TSourceType, TReturnType>(fieldType);
         }
 
         /// <summary>
@@ -97,8 +97,6 @@ namespace GraphQL.Builders
                 "Only look at connected edges with cursors smaller than the value of `before`.");
             Argument<IntGraphType, int?>("last",
                 "Specifies the number of edges to return counting reversely from `before`, or the last entry if `before` is not specified.");
-
-            _isBidirectional = true;
 
             return this;
         }
@@ -247,7 +245,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
         public ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
-            return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType, _isBidirectional, _pageSize);
+            return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
         }
 
         /// <summary>
