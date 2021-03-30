@@ -84,7 +84,7 @@ namespace GraphQL.Harness
 
             app.UseMiddleware<GraphQLMiddleware>();
             app.UseGraphQLPlayground();
-            app.UseGraphiQLServer();
+            app.UseGraphQLGraphiQL();
             app.UseGraphQLAltair();
             app.UseGraphQLVoyager();
         }
