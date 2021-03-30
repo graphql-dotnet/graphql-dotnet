@@ -57,6 +57,9 @@ namespace GraphQL.Utilities
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
 
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
@@ -73,6 +76,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
             if (!argument.ResolvedType.IsInputType())
@@ -113,6 +119,9 @@ namespace GraphQL.Utilities
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
 
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
@@ -129,6 +138,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
             if (!argument.ResolvedType.IsInputType())
@@ -168,6 +180,9 @@ namespace GraphQL.Utilities
 
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.3
             if (!field.ResolvedType.IsInputType())
@@ -240,6 +255,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 4.2
             if (!argument.ResolvedType.IsInputType())
