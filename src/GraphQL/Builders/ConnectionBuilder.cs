@@ -123,7 +123,7 @@ namespace GraphQL.Builders
             fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
             {
                 Name = "first",
-                Description = "Specifies the number of edges to return starting from `after` or the first entry if `after` is not specified.",
+                Description = "Specifies the maximum number of edges to return, starting after the cursor specified by `after`, or the first number of edges if `after` is not specified.",
             });
             return new ConnectionBuilder<TSourceType>(fieldType);
         }
