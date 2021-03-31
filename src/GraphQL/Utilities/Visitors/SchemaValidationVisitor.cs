@@ -64,7 +64,7 @@ namespace GraphQL.Utilities
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
 
-            ValidateArgumentsUniqueness(field, type);
+            ValidateFieldArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -126,7 +126,7 @@ namespace GraphQL.Utilities
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
 
-            ValidateArgumentsUniqueness(field, type);
+            ValidateFieldArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -244,6 +244,8 @@ namespace GraphQL.Utilities
             // 3
             if (type.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
+
+            ValidateDirectiveArgumentsUniqueness(type);
         }
 
         /// <inheritdoc/>
@@ -286,7 +288,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private void ValidateArgumentsUniqueness(FieldType field, INamedType type)
+        private void ValidateFieldArgumentsUniqueness(FieldType field, INamedType type)
         {
             if (field.Arguments?.Count > 0)
             {
@@ -294,6 +296,18 @@ namespace GraphQL.Utilities
                 {
                     if (item.Count() > 1)
                         throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name.");
+                }
+            }
+        }
+
+        private void ValidateDirectiveArgumentsUniqueness(DirectiveGraphType type)
+        {
+            if (type.Arguments?.Count > 0)
+            {
+                foreach (var item in type.Arguments.List.ToLookup(f => f.Name))
+                {
+                    if (item.Count() > 1)
+                        throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{type.Name}'; no two directive arguments may share the same name.");
                 }
             }
         }
