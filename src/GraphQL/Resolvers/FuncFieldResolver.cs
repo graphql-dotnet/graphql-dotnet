@@ -43,7 +43,7 @@ namespace GraphQL.Resolvers
             _resolver = GetResolverFor(resolver);
         }
 
-        private Func<IResolveFieldContext, TReturnType> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        private static Func<IResolveFieldContext, TReturnType> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
             if (typeof(TSourceType) == typeof(object))
             {

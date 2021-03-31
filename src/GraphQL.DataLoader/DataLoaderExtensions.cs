@@ -113,30 +113,52 @@ namespace GraphQL.DataLoader
             });
         }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
+        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.ResolveAsync(IFieldResolver{IDataLoaderResult{TReturnType}})"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
-            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+            => builder.ResolveAsync(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
+        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.ResolveAsync(IFieldResolver{Task{IDataLoaderResult{TReturnType}}})"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+            => builder.ResolveAsync(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
 
         // chained data loaders
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
-        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<TReturnType>>> resolve)
-            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve));
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<TReturnType>>> resolve)
+        {
+            builder.FieldType.Resolver = new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve));
+        {
+            builder.FieldType.Resolver = new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve);
+            return builder;
+        }
 
         // chain of 3 data loaders
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
-        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
-            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve));
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
+        {
+            builder.FieldType.Resolver = new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the resolver for the field.
+        /// </summary>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve));
+        {
+            builder.FieldType.Resolver = new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve);
+            return builder;
+        }
     }
 }

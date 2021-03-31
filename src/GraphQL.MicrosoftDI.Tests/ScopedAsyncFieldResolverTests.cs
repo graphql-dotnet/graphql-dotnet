@@ -7,18 +7,6 @@ namespace GraphQL.MicrosoftDI.Tests
     public class ScopedAsyncFieldResolverTests : ScopedContextBase
     {
         [Fact]
-        public async Task TReturn_only()
-        {
-            var resolver = new ScopedAsyncFieldResolver<string>(context =>
-            {
-                context.RequestServices.ShouldBe(_scopedServiceProvider);
-                return Task.FromResult("success");
-            });
-            (await resolver.Resolve(_scopedContext)).ShouldBe("success");
-            VerifyScoped();
-        }
-
-        [Fact]
         public async Task TSource_and_TReturn()
         {
             var resolver = new ScopedAsyncFieldResolver<string, int>(context =>
@@ -30,13 +18,6 @@ namespace GraphQL.MicrosoftDI.Tests
             _scopedContext.Source = "test";
             (await resolver.Resolve(_scopedContext)).ShouldBe(2);
             VerifyScoped();
-        }
-
-        [Fact]
-        public void RequiresRequestServices_TReturn_only()
-        {
-            var resolver = new ScopedAsyncFieldResolver<int>(context => Task.FromResult(5));
-            Should.Throw<MissingRequestServicesException>(() => resolver.Resolve(new ResolveFieldContext()));
         }
 
         [Fact]
