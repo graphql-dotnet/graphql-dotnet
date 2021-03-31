@@ -12,7 +12,7 @@ using GraphQL.Types.Relay;
 namespace GraphQL.Builders
 {
     /// <summary>
-    /// Builds a connection field for graphs that have the specified source type.
+    /// Builds a connection field for graphs that have the specified source and return type.
     /// </summary>
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
