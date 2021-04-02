@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
@@ -50,7 +51,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
-    public class ConnectionBuilder<TSourceType>
+    public class ConnectionBuilder<TSourceType> : IProvideMetadata
     {
         private bool _isUnidirectional;
 
@@ -272,5 +273,13 @@ namespace GraphQL.Builders
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
         }
+
+        Dictionary<string, object> IProvideMetadata.Metadata => FieldType.Metadata;
+
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

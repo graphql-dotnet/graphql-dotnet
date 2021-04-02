@@ -454,7 +454,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType>
+    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IProvideMetadata
     {
         public GraphQL.Types.FieldType FieldType { get; set; }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description)
@@ -485,7 +485,7 @@ namespace GraphQL.Builders
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(GraphQL.Types.IGraphType type) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(System.Type type = null) { }
     }
-    public class FieldBuilder<TSourceType, TReturnType>
+    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IProvideMetadata
     {
         public GraphQL.Types.EventStreamFieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null)

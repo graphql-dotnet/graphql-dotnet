@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
@@ -30,7 +31,7 @@ namespace GraphQL.Builders
     /// </summary>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-    public class FieldBuilder<TSourceType, TReturnType>
+    public class FieldBuilder<TSourceType, TReturnType> : IProvideMetadata
     {
         /// <summary>
         /// Returns the generated field.
@@ -253,5 +254,13 @@ namespace GraphQL.Builders
             FieldType.ApplyDirective(name, configure);
             return this;
         }
+
+        Dictionary<string, object> IProvideMetadata.Metadata => FieldType.Metadata;
+
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }
