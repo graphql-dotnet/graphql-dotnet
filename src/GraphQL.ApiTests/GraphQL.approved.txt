@@ -457,31 +457,31 @@ namespace GraphQL.Builders
     public class ConnectionBuilder<TSourceType>
     {
         public GraphQL.Types.FieldType FieldType { get; set; }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional() { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Description(string? description) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
-        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object> resolver) { }
-        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object>> resolver) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Description(string? description) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
+        public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object> resolver) { }
+        public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object>> resolver) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         [System.Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Unidirectional() { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Unidirectional() { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
@@ -495,25 +495,24 @@ namespace GraphQL.Builders
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
         public GraphQL.Types.FieldType FieldType { get; set; }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Bidirectional() { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Description(string? description) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Description(string? description) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int pageSize) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ReturnAll() { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType, TEdgeType>(string name = "default")

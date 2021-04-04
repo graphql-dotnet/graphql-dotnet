@@ -89,7 +89,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Configure the connection to be bi-directional.
         /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> Bidirectional()
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Bidirectional()
         {
             if (_isBidirectional)
                 return this;
@@ -103,21 +103,21 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
-        public ConnectionBuilder<TSourceType, TReturnType> Name(string name)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
-        public ConnectionBuilder<TSourceType, TReturnType> Description(string? description)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Description(string? description)
         {
             FieldType.Description = description;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
-        public ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
@@ -126,7 +126,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the default page size or clears (if null) the default page size, so all records are returned by default.
         /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize)
         {
             _pageSize = pageSize;
             return this;
@@ -138,7 +138,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
             var arg = new QueryArgument(typeof(TArgumentGraphType))
@@ -157,7 +157,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -174,7 +174,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
 #if NETSTANDARD2_1
             [AllowNull]
 #endif
@@ -235,7 +235,7 @@ namespace GraphQL.Builders
         /// Sets the return type of the field.
         /// </summary>
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
-        public ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
             return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
         }
@@ -243,7 +243,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
@@ -257,7 +257,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
             {
