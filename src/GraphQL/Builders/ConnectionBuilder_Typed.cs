@@ -73,12 +73,12 @@ namespace GraphQL.Builders
                     new QueryArgument<StringGraphType>
                     {
                         Name = "after",
-                        Description = "Only look at connected edges with cursors greater than the value of `after`.",
+                        Description = "Only look at connected edges with cursors greater than the value of 'after'.",
                     },
                     new QueryArgument<IntGraphType>
                     {
                         Name = "first",
-                        Description = "Specifies the maximum number of edges to return, starting after the cursor specified by `after`, or the first number of edges if `after` is not specified.",
+                        Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
                     }
                 ),
             };
@@ -95,9 +95,9 @@ namespace GraphQL.Builders
                 return this;
 
             Argument<StringGraphType, string>("before",
-                "Only look at connected edges with cursors smaller than the value of `before`.");
+                "Only look at connected edges with cursors smaller than the value of 'before'.");
             Argument<IntGraphType, int?>("last",
-                "Specifies the number of edges to return counting reversely from `before`, or the last entry if `before` is not specified.");
+                "Specifies the number of edges to return counting reversely from 'before', or the last entry if 'before' is not specified.");
 
             return this;
         }
