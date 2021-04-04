@@ -124,20 +124,11 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets the default page size.
+        /// Sets the default page size or clears (if null) the default page size, so all records are returned by default.
         /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> PageSize(int pageSize)
+        public ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize)
         {
             _pageSize = pageSize;
-            return this;
-        }
-
-        /// <summary>
-        /// Clears the default page size, so all records are returned by default.
-        /// </summary>
-        public ConnectionBuilder<TSourceType, TReturnType> ReturnAll()
-        {
-            _pageSize = null;
             return this;
         }
 
