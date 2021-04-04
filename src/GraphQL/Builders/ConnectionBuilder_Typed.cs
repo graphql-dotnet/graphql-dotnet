@@ -268,13 +268,13 @@ namespace GraphQL.Builders
             return this;
         }
 
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> args)
+        private void CheckForErrors(IResolveConnectionContext<TSourceType> context)
         {
-            if (args.First.HasValue && args.Last.HasValue)
+            if (context.First.HasValue && context.Last.HasValue)
             {
                 throw new ArgumentException("Cannot specify both `first` and `last`.");
             }
-            if (args.IsUnidirectional && args.Last.HasValue)
+            if (context.IsUnidirectional && context.Last.HasValue)
             {
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
