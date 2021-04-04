@@ -69,18 +69,19 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = typeof(TConnectionType),
-                Arguments = new QueryArguments(),
+                Arguments = new QueryArguments(
+                    new QueryArgument<StringGraphType>
+                    {
+                        Name = "after",
+                        Description = "Only look at connected edges with cursors greater than the value of `after`.",
+                    },
+                    new QueryArgument<IntGraphType>
+                    {
+                        Name = "first",
+                        Description = "Specifies the maximum number of edges to return, starting after the cursor specified by `after`, or the first number of edges if `after` is not specified.",
+                    }
+                ),
             };
-            fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
-            {
-                Name = "after",
-                Description = "Only look at connected edges with cursors greater than the value of `after`.",
-            });
-            fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
-            {
-                Name = "first",
-                Description = "Specifies the maximum number of edges to return, starting after the cursor specified by `after`, or the first number of edges if `after` is not specified.",
-            });
 
             return new ConnectionBuilder<TSourceType, TReturnType>(fieldType);
         }
