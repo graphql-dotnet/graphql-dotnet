@@ -342,9 +342,9 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
-                var args = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
-                CheckForErrors(args);
-                return resolver(args);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                CheckForErrors(connectionContext);
+                return resolver(connectionContext);
             });
         }
 
@@ -355,9 +355,9 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
-                var args = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
-                CheckForErrors(args);
-                return resolver(args);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                CheckForErrors(connectionContext);
+                return resolver(connectionContext);
             });
         }
 
