@@ -16,9 +16,9 @@ namespace GraphQL.Builders
     /// </summary>
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        private bool _isBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
+        private bool IsBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
 
-        private int? _pageSize
+        private int? PageSizeFromMeatadata
         {
             get => FieldType.GetMetadata<int?>(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY);
             set => FieldType.WithMetadata(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY, value);
@@ -91,7 +91,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType, TReturnType> Bidirectional()
         {
-            if (_isBidirectional)
+            if (IsBidirectional)
                 return this;
 
             Argument<StringGraphType, string>("before",
@@ -128,7 +128,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize)
         {
-            _pageSize = pageSize;
+            PageSizeFromMeatadata = pageSize;
             return this;
         }
 
@@ -247,7 +247,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMeatadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
@@ -261,7 +261,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMeatadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });

@@ -60,9 +60,9 @@ namespace GraphQL.Builders
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
 
-        private bool _isBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
+        private bool IsBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
 
-        private int? _pageSize
+        private int? PagrSizeFromMetadata
         {
             get => FieldType.GetMetadata<int?>(PAGE_SIZE_METADATA_KEY);
             set => FieldType.WithMetadata(PAGE_SIZE_METADATA_KEY, value);
@@ -134,7 +134,7 @@ namespace GraphQL.Builders
         [Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
         public virtual ConnectionBuilder<TSourceType> Unidirectional()
         {
-            if (_isBidirectional)
+            if (IsBidirectional)
                 throw new InvalidOperationException("Cannot call Unidirectional after a call to Bidirectional.");
 
             return this;
@@ -145,7 +145,7 @@ namespace GraphQL.Builders
         /// </summary>
         public ConnectionBuilder<TSourceType> Bidirectional()
         {
-            if (_isBidirectional)
+            if (IsBidirectional)
             {
                 return this;
             }
@@ -184,7 +184,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType> PageSize(int pageSize)
         {
-            _pageSize = pageSize;
+            PagrSizeFromMetadata = pageSize;
             return this;
         }
 
@@ -193,7 +193,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType> ReturnAll()
         {
-            _pageSize = null;
+            PagrSizeFromMetadata = null;
             return this;
         }
 
@@ -342,7 +342,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PagrSizeFromMetadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
@@ -355,7 +355,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !_isBidirectional, _pageSize);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PagrSizeFromMetadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
