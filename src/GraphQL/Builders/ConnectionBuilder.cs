@@ -56,6 +56,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
+    // TODO: Remove in v5
     public class ConnectionBuilder<TSourceType>
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
