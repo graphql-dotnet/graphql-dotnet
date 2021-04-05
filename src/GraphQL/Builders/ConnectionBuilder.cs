@@ -56,6 +56,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
+    // TODO: Remove in v5
     public class ConnectionBuilder<TSourceType>
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
@@ -118,7 +119,7 @@ namespace GraphQL.Builders
             fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
             {
                 Name = "after",
-                Description = "Only look at connected edges with cursors greater than the value of 'after'.",
+                Description = "Only return edges after the specified cursor.",
             });
             fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
             {
@@ -151,9 +152,9 @@ namespace GraphQL.Builders
             }
 
             Argument<StringGraphType, string>("before",
-                "Only look at connected edges with cursors smaller than the value of 'before'.");
+                "Only return edges prior to the specified cursor.");
             Argument<IntGraphType, int?>("last",
-                "Specifies the number of edges to return counting reversely from 'before', or the last entry if 'before' is not specified.");
+                "Specifies the maximum number of edges to return, starting prior to the cursor specified by 'before', or the last number of edges if 'before' is not specified.");
 
             return this;
         }
