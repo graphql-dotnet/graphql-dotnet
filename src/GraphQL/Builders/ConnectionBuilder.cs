@@ -62,7 +62,7 @@ namespace GraphQL.Builders
 
         private bool IsBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
 
-        private int? PagrSizeFromMetadata
+        private int? PageSizeFromMetadata
         {
             get => FieldType.GetMetadata<int?>(PAGE_SIZE_METADATA_KEY);
             set => FieldType.WithMetadata(PAGE_SIZE_METADATA_KEY, value);
@@ -184,7 +184,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType> PageSize(int pageSize)
         {
-            PagrSizeFromMetadata = pageSize;
+            PageSizeFromMetadata = pageSize;
             return this;
         }
 
@@ -193,7 +193,7 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual ConnectionBuilder<TSourceType> ReturnAll()
         {
-            PagrSizeFromMetadata = null;
+            PageSizeFromMetadata = null;
             return this;
         }
 
@@ -342,7 +342,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PagrSizeFromMetadata);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMetadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
@@ -355,7 +355,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PagrSizeFromMetadata);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMetadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
