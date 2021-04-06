@@ -94,7 +94,7 @@ namespace GraphQL.Builders
                 return this;
 
             Argument<StringGraphType, string>("before",
-                "Only look at connected edges with cursors smaller than the value of 'before'.");
+                "Only return edges prior to the specified cursor.");
             Argument<IntGraphType, int?>("last",
                 "Specifies the maximum number of edges to return, starting prior to the cursor specified by 'before', or the last number of edges if 'before' is not specified.");
 
