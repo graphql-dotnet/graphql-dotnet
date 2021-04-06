@@ -16,7 +16,7 @@ namespace GraphQL.Builders
     /// </summary>
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        private bool IsBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
+        private bool IsBidirectional => FieldType.Arguments.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
         private int? PageSizeFromMeatadata
         {

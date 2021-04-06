@@ -61,7 +61,7 @@ namespace GraphQL.Builders
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
 
-        private bool IsBidirectional => FieldType.Arguments.Any(x => x.Name == "before");
+        private bool IsBidirectional => FieldType.Arguments.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
         private int? PageSizeFromMetadata
         {
