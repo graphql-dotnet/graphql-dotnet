@@ -72,7 +72,7 @@ namespace GraphQL.Builders
                     new QueryArgument<StringGraphType>
                     {
                         Name = "after",
-                        Description = "Only look at connected edges with cursors greater than the value of 'after'.",
+                        Description = "Only return edges after the specified cursor.",
                     },
                     new QueryArgument<IntGraphType>
                     {
