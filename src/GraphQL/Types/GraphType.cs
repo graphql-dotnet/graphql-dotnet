@@ -38,7 +38,18 @@ namespace GraphQL.Types
                 return attr.Name;
             }
 
-            var name = type.Name.Replace('`', '_');
+            string name = type.Name;
+            if (GlobalSwitches.UseDeclaringTypeNames)
+            {
+                var parent = type.DeclaringType;
+                while (parent != null)
+                {
+                    name = parent.Name + "_" + name;
+                    parent = parent.DeclaringType;
+                }
+            }
+
+            name = name.Replace('`', '_');
             if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
                 name = name.Substring(0, name.Length - nameof(GraphType).Length);
 

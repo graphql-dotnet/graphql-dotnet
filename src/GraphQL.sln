@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-
 		..\docs2\site\docs\getting-started\field-middleware.md = ..\docs2\site\docs\getting-started\field-middleware.md
 		..\docs2\site\docs\getting-started\fields.md = ..\docs2\site\docs\getting-started\fields.md
 		..\docs2\site\docs\getting-started\fragments.md = ..\docs2\site\docs\getting-started\fragments.md
+		..\docs2\site\docs\getting-started\global-switches.md = ..\docs2\site\docs\getting-started\global-switches.md
 		..\docs2\site\docs\getting-started\graphiql.md = ..\docs2\site\docs\getting-started\graphiql.md
 		..\docs2\site\docs\getting-started\installation.md = ..\docs2\site\docs\getting-started\installation.md
 		..\docs2\site\docs\getting-started\interfaces.md = ..\docs2\site\docs\getting-started\interfaces.md

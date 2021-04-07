@@ -360,6 +360,40 @@ namespace GraphQL.Tests.Builders
             }
         }
 
+        [Fact]
+        public void unidirectional_creates_proper_arguments()
+        {
+            var graph = new ParentType();
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "after").ShouldBe(1);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "first").ShouldBe(1);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "before").ShouldBe(0);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "last").ShouldBe(0);
+        }
+
+        [Fact]
+        public void bidirectional_creates_proper_arguments()
+        {
+            var graph = new ParentType();
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "after").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "first").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "before").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        }
+
+        [Fact]
+        public void bidirectional_called_twice_creates_proper_arguments()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .Description("RandomDescription")
+                .Bidirectional()
+                .Bidirectional();
+
+            graph.Fields.Find("connection").Arguments.Count(x => x.Name == "before").ShouldBe(1);
+            graph.Fields.Find("connection").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        }
+
         public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
         {
             public int? HighestField2 => Edges?.Max(e => e.Node?.Field2);

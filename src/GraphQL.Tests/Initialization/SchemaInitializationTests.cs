@@ -19,6 +19,18 @@ namespace GraphQL.Tests.Initialization
         }
 
         [Fact]
+        public void SchemaWithDuplicateArguments_Should_Throw()
+        {
+            ShouldThrow<SchemaWithDuplicateArguments, InvalidOperationException>("The argument 'arg' must have a unique name within field 'Dup.field'; no two field arguments may share the same name.");
+        }
+
+        [Fact]
+        public void SchemaWithDuplicateArgumentsInDirective_Should_Throw()
+        {
+            ShouldThrow<SchemaWithDuplicateArgumentsInDirective, InvalidOperationException>("The argument 'arg' must have a unique name within directive 'my'; no two directive arguments may share the same name.");
+        }
+
+        [Fact]
         public void EmptyInterfaceSchema_Should_Throw()
         {
             ShouldThrow<EmptyInterfaceSchema, InvalidOperationException>("An Interface type 'Empty' must define one or more fields.");
@@ -39,6 +51,29 @@ namespace GraphQL.Tests.Initialization
         }
     }
 
+    public class SchemaWithDuplicateArgumentsInDirective : Schema
+    {
+        public SchemaWithDuplicateArgumentsInDirective()
+        {
+            Query = new ObjectGraphType { Name = "q" };
+            Query.Fields.Add(new FieldType { Name = "f", ResolvedType = new StringGraphType() });
+
+            Directives.Register(new MyDirective());
+        }
+
+        public class MyDirective : DirectiveGraphType
+        {
+            public MyDirective()
+                : base("my", DirectiveLocation.Field)
+            {
+                Arguments = new QueryArguments(
+                    new QueryArgument<BooleanGraphType> { Name = "arg" },
+                    new QueryArgument<BooleanGraphType> { Name = "arg" }
+                );
+            }
+        }
+    }
+
     public class SchemaWithDuplicateFields : Schema
     {
         public SchemaWithDuplicateFields()
@@ -47,6 +82,21 @@ namespace GraphQL.Tests.Initialization
             Query.AddField(new FieldType { Name = "field", ResolvedType = new StringGraphType() });
             Query.AddField(new FieldType { Name = "field_2", ResolvedType = new StringGraphType() }); // bypass HasField check
             Query.Fields.List[1].Name = "field";
+        }
+    }
+
+    public class SchemaWithDuplicateArguments : Schema
+    {
+        public SchemaWithDuplicateArguments()
+        {
+            Query = new ObjectGraphType { Name = "Dup" };
+            Query.Field(
+                "field",
+                new StringGraphType(),
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "arg" },
+                    new QueryArgument<StringGraphType> { Name = "arg" }
+                ));
         }
     }
 
