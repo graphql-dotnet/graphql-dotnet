@@ -42,7 +42,6 @@ namespace GraphQL.MicrosoftDI.Tests
             builder
                 .Resolve()
                 .WithScope()
-                .Returns<string>()
                 .Resolve(context => "hello");
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
             VerifyScoped();
@@ -69,7 +68,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 .Resolve()
                 .WithScope()
                 .WithService<string>()
-                .Returns<string>()
                 .Resolve((context, value) => value);
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
             VerifyScoped();
@@ -86,7 +84,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithService<string>()
                 .WithService<int>()
-                .Returns<string>()
                 .Resolve((context, value, v2) => value + v2);
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello2");
             VerifyScoped();
@@ -104,7 +101,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<string>()
                 .WithService<int>()
                 .WithService<short>()
-                .Returns<string>()
                 .Resolve((context, value, v2, v3) => value + v2 + v3);
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello23");
             VerifyScoped();
@@ -123,7 +119,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<int>()
                 .WithService<short>()
                 .WithService<byte>()
-                .Returns<string>()
                 .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4);
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello234");
             VerifyScoped();
@@ -143,7 +138,6 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<short>()
                 .WithService<byte>()
                 .WithService<long>()
-                .Returns<string>()
                 .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
             field.Resolver.Resolve(_scopedContext).ShouldBe("hello2345");
             VerifyScoped();
