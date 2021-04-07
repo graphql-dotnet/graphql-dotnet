@@ -28,7 +28,7 @@ namespace GraphQL.MicrosoftDI
             return builder;
         }
 
-        /// <inheritdoc cref="ResolveScopedAsync{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
+        /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
         public static ConnectionBuilder<TSourceType> ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
         {
             if (resolver == null)
@@ -49,10 +49,7 @@ namespace GraphQL.MicrosoftDI
         public static ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this ConnectionBuilder<TSourceType> builder)
             => new ConnectionResolverBuilder<TSourceType, object>(builder.Returns<object>(), false);
 
-        /// <summary>
-        /// Sets the resolver for the connection field. A dependency injection scope is created for the duration of the resolver's execution
-        /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
-        /// </summary>
+        /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
         public static ConnectionBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
             if (resolver == null)
@@ -80,9 +77,7 @@ namespace GraphQL.MicrosoftDI
             });
         }
 
-        /// <summary>
-        /// Creates a resolve builder for the connection field.
-        /// </summary>
+        /// <inheritdoc cref="Resolve{TSourceType}(ConnectionBuilder{TSourceType})"/>
         public static ConnectionResolverBuilder<TSourceType, TReturnType> Resolve<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder)
             => new ConnectionResolverBuilder<TSourceType, TReturnType>(builder, false);
     }
