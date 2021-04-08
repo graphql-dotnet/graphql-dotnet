@@ -666,6 +666,7 @@ the directives implementation without mutual influence on the schemas using them
 * `ExecutionResult.Data` format breaking changes.
   Both `GraphQL.NewtonsoftJson` and `GraphQL.SystemTextJson` serializers received the necessary changes to produce the same JSON as before.
   However, consumers using `ExecutionResult` instances directly most likely will not work correctly.
+  Call `((RootExecutionNode)result.Data).ToValue()` to return the data in the same format as 3.x (as a dictionary).
 * Most `ExecutionStrategy` methods are now `protected`
 * `ObjectExecutionNode.SubFields` property type was changed from `Dictionary<string, ExecutionNode>` to `ExecutionNode[]`
 * `ExecutionNode.IsResultSet` has been removed
