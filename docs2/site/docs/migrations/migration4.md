@@ -215,6 +215,26 @@ Here are some of the situations that you may run into with version 4:
 - `IdGraphType` (which allows any basic type) does not coerce variable values to trimmed strings during deserialization
 - `IdGraphType` does not trim serialized values (but does convert them to strings)
 
+If you have a schema-first schema, you may run into an issue with enumeration types, since the `SchemaBuilder` uses the name of each
+enumeration value as its value also. In other words, you must return a string corresponding to the enumeration value (e.g, `"Cat"` or
+`"Dog"`) rather than a matching C# enumeration value (e.g. `Animal.Cat` or `Animal.Dog`). You can configure the `SchemaBuilder` to
+match the defined enumeration values to a C# enumeration type in this manner demonstrated below. Then when used as an input type,
+the values will be parsed into the matching C# enumeration values, and when used as an output type, you must return the C# enumeration
+value or its underlying value (typically an `int`). Below are a few examples of how this is configured:
+
+```csharp
+var schema = Schema.For(definitions, c => {
+    // example 1: define the "Animal" schema enumeration type to use the C# type Animal
+    c.Types.Include<Animal>();
+
+    // example 2: define the "AnimalType" schema enumeration type to use the C# type Animal
+    c.Types.Include<Animal>("AnimalType");
+
+    // example 3: define the "Animal" schema enumeration type to use the C# type Animal
+    c.Types.For("Animal").Type = typeof(Animal);
+});
+```
+
 For situations where it is necessary to revert scalars to previous behavior, you can override the built-in scalar by following the
 instructions within the [Custom Scalars](https://graphql-dotnet.github.io/docs/getting-started/custom-scalars) documentation page.
 
