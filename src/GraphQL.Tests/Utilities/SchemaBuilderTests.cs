@@ -274,7 +274,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions, c => c.Types.Include<PetKind>("PetKind"));
+            var schema = Schema.For(definitions, c => c.Types.Include<PetKind>());
             schema.Initialize();
 
             var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
