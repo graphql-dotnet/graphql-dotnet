@@ -647,7 +647,7 @@ type BlameRange {
 }
 
 # Represents a Git blob.
-type Blob implements Node, GitObject {
+type Blob implements Node & GitObject {
   # An abbreviated version of the Git object ID
   abbreviatedOid: String!
   # Byte size of Blob object
@@ -673,7 +673,7 @@ type Blob implements Node, GitObject {
 scalar Boolean
 
 # A special type of user which takes actions on behalf of GitHub Apps.
-type Bot implements Node, Actor, UniformResourceLocatable {
+type Bot implements Node & Actor & UniformResourceLocatable {
   # A URL pointing to the GitHub App's public avatar.
   avatarUrl(
     # The size of the resulting square image.
@@ -1030,7 +1030,7 @@ enum CheckConclusionState {
 }
 
 # A check run.
-type CheckRun implements Node, UniformResourceLocatable, RequirableByPullRequest {
+type CheckRun implements Node & UniformResourceLocatable & RequirableByPullRequest {
   # The check run's annotations
   annotations(
     # Returns the elements in the list that come after the specified cursor.
@@ -1382,7 +1382,7 @@ type ClosePullRequestPayload {
 }
 
 # Represents a 'closed' event on any `Closable`.
-type ClosedEvent implements Node, UniformResourceLocatable {
+type ClosedEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Object that was closed.
@@ -1520,7 +1520,7 @@ type CommentDeletedEvent implements Node {
 }
 
 # Represents a Git commit.
-type Commit implements Node, GitObject, Subscribable, UniformResourceLocatable {
+type Commit implements Node & GitObject & Subscribable & UniformResourceLocatable {
   # An abbreviated version of the Git object ID
   abbreviatedOid: String!
   # The number of additions in this commit.
@@ -1716,7 +1716,7 @@ input CommitAuthor {
 }
 
 # Represents a comment on a given Commit.
-type CommitComment implements Node, Comment, Deletable, Minimizable, Updatable, UpdatableComment, Reactable, RepositoryNode {
+type CommitComment implements Node & Comment & Deletable & Minimizable & Updatable & UpdatableComment & Reactable & RepositoryNode {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the subject of the comment.
@@ -1823,7 +1823,7 @@ type CommitCommentEdge {
 }
 
 # A thread of comments on a commit.
-type CommitCommentThread implements Node, RepositoryNode {
+type CommitCommentThread implements Node & RepositoryNode {
   # The comments that exist in this thread.
   comments(
     # Returns the elements in the list that come after the specified cursor.
@@ -2220,7 +2220,7 @@ type ConvertProjectCardNoteToIssuePayload {
 }
 
 # Represents a 'convert_to_draft' event on a given pull request.
-type ConvertToDraftEvent implements Node, UniformResourceLocatable {
+type ConvertToDraftEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Identifies the date and time when the object was created.
@@ -2780,7 +2780,7 @@ type CreatedRepositoryContributionEdge {
 union CreatedRepositoryOrRestrictedContribution = CreatedRepositoryContribution | RestrictedContribution
 
 # Represents a mention made by one issue or pull request to another.
-type CrossReferencedEvent implements Node, UniformResourceLocatable {
+type CrossReferencedEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Identifies the date and time when the object was created.
@@ -4575,7 +4575,7 @@ enum EnterpriseServerUserAccountsUploadSyncState {
 }
 
 # An account for a user who is an admin of an enterprise or a member of an enterprise through one or more organizations.
-type EnterpriseUserAccount implements Node, Actor {
+type EnterpriseUserAccount implements Node & Actor {
   # A URL pointing to the enterprise user account's public avatar.
   avatarUrl(
     # The size of the resulting square image.
@@ -4812,7 +4812,7 @@ type GenericHovercardContext implements HovercardContext {
 }
 
 # A Gist.
-type Gist implements Node, Starrable, UniformResourceLocatable {
+type Gist implements Node & Starrable & UniformResourceLocatable {
   # A list of comments associated with the gist
   comments(
     # Returns the elements in the list that come after the specified cursor.
@@ -4885,7 +4885,7 @@ type Gist implements Node, Starrable, UniformResourceLocatable {
 }
 
 # Represents a comment on an Gist.
-type GistComment implements Node, Comment, Deletable, Minimizable, Updatable, UpdatableComment {
+type GistComment implements Node & Comment & Deletable & Minimizable & Updatable & UpdatableComment {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the gist.
@@ -5351,7 +5351,7 @@ enum IpAllowListEntryOrderField {
 union IpAllowListOwner = Enterprise | Organization
 
 # An Issue is a place to discuss ideas, enhancements, tasks, and bugs for a project.
-type Issue implements Node, Assignable, Closable, Comment, Updatable, UpdatableComment, Labelable, Lockable, Reactable, RepositoryNode, Subscribable, UniformResourceLocatable {
+type Issue implements Node & Assignable & Closable & Comment & Updatable & UpdatableComment & Labelable & Lockable & Reactable & RepositoryNode & Subscribable & UniformResourceLocatable {
   # Reason that the conversation was locked.
   activeLockReason: LockReason
   # A list of Users assigned to this object.
@@ -5548,7 +5548,7 @@ type Issue implements Node, Assignable, Closable, Comment, Updatable, UpdatableC
 }
 
 # Represents a comment on an Issue.
-type IssueComment implements Node, Comment, Deletable, Minimizable, Updatable, UpdatableComment, Reactable, RepositoryNode {
+type IssueComment implements Node & Comment & Deletable & Minimizable & Updatable & UpdatableComment & Reactable & RepositoryNode {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the subject of the comment.
@@ -6190,7 +6190,7 @@ type LockedEvent implements Node {
 }
 
 # A placeholder user for attribution of imported data on GitHub.
-type Mannequin implements Node, Actor, UniformResourceLocatable {
+type Mannequin implements Node & Actor & UniformResourceLocatable {
   # A URL pointing to the GitHub App's public avatar.
   avatarUrl(
     # The size of the resulting square image.
@@ -6444,7 +6444,7 @@ interface MemberStatusable {
 }
 
 # Audit log entry for a members_can_delete_repos.clear event.
-type MembersCanDeleteReposClearAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type MembersCanDeleteReposClearAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -6489,7 +6489,7 @@ type MembersCanDeleteReposClearAuditEntry implements Node, AuditEntry, Enterpris
 }
 
 # Audit log entry for a members_can_delete_repos.disable event.
-type MembersCanDeleteReposDisableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type MembersCanDeleteReposDisableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -6534,7 +6534,7 @@ type MembersCanDeleteReposDisableAuditEntry implements Node, AuditEntry, Enterpr
 }
 
 # Audit log entry for a members_can_delete_repos.enable event.
-type MembersCanDeleteReposEnableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type MembersCanDeleteReposEnableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -6652,7 +6652,7 @@ enum MergeableState {
 }
 
 # Represents a 'merged' event on a given pull request.
-type MergedEvent implements Node, UniformResourceLocatable {
+type MergedEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Identifies the commit associated with the `merge` event.
@@ -6673,7 +6673,7 @@ type MergedEvent implements Node, UniformResourceLocatable {
 }
 
 # Represents a Milestone object on a given repository.
-type Milestone implements Node, Closable, UniformResourceLocatable {
+type Milestone implements Node & Closable & UniformResourceLocatable {
   # `true` if the object is closed (definition of closed may depend on type)
   closed: Boolean!
   # Identifies the date and time when the object was closed.
@@ -7585,7 +7585,7 @@ interface OauthApplicationAuditEntryData {
 }
 
 # Audit log entry for a oauth_application.create event.
-type OauthApplicationCreateAuditEntry implements Node, AuditEntry, OauthApplicationAuditEntryData, OrganizationAuditEntryData {
+type OauthApplicationCreateAuditEntry implements Node & AuditEntry & OauthApplicationAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7674,7 +7674,7 @@ enum OrderDirection {
 }
 
 # Audit log entry for a org.add_billing_manager
-type OrgAddBillingManagerAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgAddBillingManagerAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7715,7 +7715,7 @@ type OrgAddBillingManagerAuditEntry implements Node, AuditEntry, OrganizationAud
 }
 
 # Audit log entry for a org.add_member
-type OrgAddMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgAddMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7764,7 +7764,7 @@ enum OrgAddMemberAuditEntryPermission {
 }
 
 # Audit log entry for a org.block_user
-type OrgBlockUserAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgBlockUserAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7811,7 +7811,7 @@ type OrgBlockUserAuditEntry implements Node, AuditEntry, OrganizationAuditEntryD
 }
 
 # Audit log entry for a org.config.disable_collaborators_only event.
-type OrgConfigDisableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgConfigDisableCollaboratorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7850,7 +7850,7 @@ type OrgConfigDisableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, Or
 }
 
 # Audit log entry for a org.config.enable_collaborators_only event.
-type OrgConfigEnableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgConfigEnableCollaboratorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7889,7 +7889,7 @@ type OrgConfigEnableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, Org
 }
 
 # Audit log entry for a org.create event.
-type OrgCreateAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgCreateAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7944,7 +7944,7 @@ enum OrgCreateAuditEntryBillingPlan {
 }
 
 # Audit log entry for a org.disable_oauth_app_restrictions event.
-type OrgDisableOauthAppRestrictionsAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgDisableOauthAppRestrictionsAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -7983,7 +7983,7 @@ type OrgDisableOauthAppRestrictionsAuditEntry implements Node, AuditEntry, Organ
 }
 
 # Audit log entry for a org.disable_saml event.
-type OrgDisableSamlAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgDisableSamlAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8030,7 +8030,7 @@ type OrgDisableSamlAuditEntry implements Node, AuditEntry, OrganizationAuditEntr
 }
 
 # Audit log entry for a org.disable_two_factor_requirement event.
-type OrgDisableTwoFactorRequirementAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgDisableTwoFactorRequirementAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8069,7 +8069,7 @@ type OrgDisableTwoFactorRequirementAuditEntry implements Node, AuditEntry, Organ
 }
 
 # Audit log entry for a org.enable_oauth_app_restrictions event.
-type OrgEnableOauthAppRestrictionsAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgEnableOauthAppRestrictionsAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8108,7 +8108,7 @@ type OrgEnableOauthAppRestrictionsAuditEntry implements Node, AuditEntry, Organi
 }
 
 # Audit log entry for a org.enable_saml event.
-type OrgEnableSamlAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgEnableSamlAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8155,7 +8155,7 @@ type OrgEnableSamlAuditEntry implements Node, AuditEntry, OrganizationAuditEntry
 }
 
 # Audit log entry for a org.enable_two_factor_requirement event.
-type OrgEnableTwoFactorRequirementAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgEnableTwoFactorRequirementAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8194,7 +8194,7 @@ type OrgEnableTwoFactorRequirementAuditEntry implements Node, AuditEntry, Organi
 }
 
 # Audit log entry for a org.invite_member event.
-type OrgInviteMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgInviteMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8237,7 +8237,7 @@ type OrgInviteMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEnt
 }
 
 # Audit log entry for a org.invite_to_business event.
-type OrgInviteToBusinessAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type OrgInviteToBusinessAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8282,7 +8282,7 @@ type OrgInviteToBusinessAuditEntry implements Node, AuditEntry, EnterpriseAuditE
 }
 
 # Audit log entry for a org.oauth_app_access_approved event.
-type OrgOauthAppAccessApprovedAuditEntry implements Node, AuditEntry, OauthApplicationAuditEntryData, OrganizationAuditEntryData {
+type OrgOauthAppAccessApprovedAuditEntry implements Node & AuditEntry & OauthApplicationAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8327,7 +8327,7 @@ type OrgOauthAppAccessApprovedAuditEntry implements Node, AuditEntry, OauthAppli
 }
 
 # Audit log entry for a org.oauth_app_access_denied event.
-type OrgOauthAppAccessDeniedAuditEntry implements Node, AuditEntry, OauthApplicationAuditEntryData, OrganizationAuditEntryData {
+type OrgOauthAppAccessDeniedAuditEntry implements Node & AuditEntry & OauthApplicationAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8372,7 +8372,7 @@ type OrgOauthAppAccessDeniedAuditEntry implements Node, AuditEntry, OauthApplica
 }
 
 # Audit log entry for a org.oauth_app_access_requested event.
-type OrgOauthAppAccessRequestedAuditEntry implements Node, AuditEntry, OauthApplicationAuditEntryData, OrganizationAuditEntryData {
+type OrgOauthAppAccessRequestedAuditEntry implements Node & AuditEntry & OauthApplicationAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8417,7 +8417,7 @@ type OrgOauthAppAccessRequestedAuditEntry implements Node, AuditEntry, OauthAppl
 }
 
 # Audit log entry for a org.remove_billing_manager event.
-type OrgRemoveBillingManagerAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgRemoveBillingManagerAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8468,7 +8468,7 @@ enum OrgRemoveBillingManagerAuditEntryReason {
 }
 
 # Audit log entry for a org.remove_member event.
-type OrgRemoveMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgRemoveMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8539,7 +8539,7 @@ enum OrgRemoveMemberAuditEntryReason {
 }
 
 # Audit log entry for a org.remove_outside_collaborator event.
-type OrgRemoveOutsideCollaboratorAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgRemoveOutsideCollaboratorAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8600,7 +8600,7 @@ enum OrgRemoveOutsideCollaboratorAuditEntryReason {
 }
 
 # Audit log entry for a org.restore_member event.
-type OrgRestoreMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgRestoreMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8692,7 +8692,7 @@ type OrgRestoreMemberMembershipTeamAuditEntryData implements TeamAuditEntryData 
 }
 
 # Audit log entry for a org.unblock_user
-type OrgUnblockUserAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgUnblockUserAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8739,7 +8739,7 @@ type OrgUnblockUserAuditEntry implements Node, AuditEntry, OrganizationAuditEntr
 }
 
 # Audit log entry for a org.update_default_repository_permission
-type OrgUpdateDefaultRepositoryPermissionAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgUpdateDefaultRepositoryPermissionAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8794,7 +8794,7 @@ enum OrgUpdateDefaultRepositoryPermissionAuditEntryPermission {
 }
 
 # Audit log entry for a org.update_member event.
-type OrgUpdateMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgUpdateMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8845,7 +8845,7 @@ enum OrgUpdateMemberAuditEntryPermission {
 }
 
 # Audit log entry for a org.update_member_repository_creation_permission event.
-type OrgUpdateMemberRepositoryCreationPermissionAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgUpdateMemberRepositoryCreationPermissionAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8908,7 +8908,7 @@ enum OrgUpdateMemberRepositoryCreationPermissionAuditEntryVisibility {
 }
 
 # Audit log entry for a org.update_member_repository_invitation_permission event.
-type OrgUpdateMemberRepositoryInvitationPermissionAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData {
+type OrgUpdateMemberRepositoryInvitationPermissionAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -8949,7 +8949,7 @@ type OrgUpdateMemberRepositoryInvitationPermissionAuditEntry implements Node, Au
 }
 
 # An account on GitHub, with one or more owners, that has repositories, members and teams.
-type Organization implements Node, Actor, PackageOwner, ProjectOwner, RepositoryOwner, UniformResourceLocatable, MemberStatusable, ProfileOwner, Sponsorable {
+type Organization implements Node & Actor & PackageOwner & ProjectOwner & RepositoryOwner & UniformResourceLocatable & MemberStatusable & ProfileOwner & Sponsorable {
   # Determine if this repository owner has any items that can be pinned to their profile.
   anyPinnableItems(
     # Filter to only a particular kind of pinnable item.
@@ -9910,7 +9910,7 @@ type PinnedIssueEdge {
 scalar PreciseDateTime
 
 # Audit log entry for a private_repository_forking.disable event.
-type PrivateRepositoryForkingDisableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type PrivateRepositoryForkingDisableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -9963,7 +9963,7 @@ type PrivateRepositoryForkingDisableAuditEntry implements Node, AuditEntry, Ente
 }
 
 # Audit log entry for a private_repository_forking.enable event.
-type PrivateRepositoryForkingEnableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type PrivateRepositoryForkingEnableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -10085,7 +10085,7 @@ interface ProfileOwner {
 }
 
 # Projects manage issues, pull requests and notes within a project owner.
-type Project implements Node, Closable, Updatable {
+type Project implements Node & Closable & Updatable {
   # The project's description body.
   body: String
   # The projects description body rendered to HTML.
@@ -10429,7 +10429,7 @@ type PublicKeyEdge {
 }
 
 # A repository pull request.
-type PullRequest implements Node, Assignable, Closable, Comment, Updatable, UpdatableComment, Labelable, Lockable, Reactable, RepositoryNode, Subscribable, UniformResourceLocatable {
+type PullRequest implements Node & Assignable & Closable & Comment & Updatable & UpdatableComment & Labelable & Lockable & Reactable & RepositoryNode & Subscribable & UniformResourceLocatable {
   # Reason that the conversation was locked.
   activeLockReason: LockReason
   # The number of additions in this pull request.
@@ -10815,7 +10815,7 @@ type PullRequestChangedFileEdge {
 }
 
 # Represents a Git commit part of a pull request.
-type PullRequestCommit implements Node, UniformResourceLocatable {
+type PullRequestCommit implements Node & UniformResourceLocatable {
   # The Git commit object
   commit: Commit!
   id: ID!
@@ -10828,7 +10828,7 @@ type PullRequestCommit implements Node, UniformResourceLocatable {
 }
 
 # Represents a commit comment thread part of a pull request.
-type PullRequestCommitCommentThread implements Node, RepositoryNode {
+type PullRequestCommitCommentThread implements Node & RepositoryNode {
   # The comments that exist in this thread.
   comments(
     # Returns the elements in the list that come after the specified cursor.
@@ -10939,7 +10939,7 @@ enum PullRequestOrderField {
 }
 
 # A review object for a given pull request.
-type PullRequestReview implements Node, Comment, Deletable, Updatable, UpdatableComment, Reactable, RepositoryNode {
+type PullRequestReview implements Node & Comment & Deletable & Updatable & UpdatableComment & Reactable & RepositoryNode {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the subject of the comment.
@@ -11046,7 +11046,7 @@ type PullRequestReview implements Node, Comment, Deletable, Updatable, Updatable
 }
 
 # A review comment associated with a given repository pull request.
-type PullRequestReviewComment implements Node, Comment, Deletable, Minimizable, Updatable, UpdatableComment, Reactable, RepositoryNode {
+type PullRequestReviewComment implements Node & Comment & Deletable & Minimizable & Updatable & UpdatableComment & Reactable & RepositoryNode {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the subject of the comment.
@@ -11948,7 +11948,7 @@ enum ReactionOrderField {
 }
 
 # Represents a 'ready_for_review' event on a given pull request.
-type ReadyForReviewEvent implements Node, UniformResourceLocatable {
+type ReadyForReviewEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Identifies the date and time when the object was created.
@@ -12115,7 +12115,7 @@ type RegenerateVerifiableDomainTokenPayload {
 }
 
 # A release contains the content for a release.
-type Release implements Node, UniformResourceLocatable {
+type Release implements Node & UniformResourceLocatable {
   # The author of the release
   author: User
   # Identifies the date and time when the object was created.
@@ -12493,7 +12493,7 @@ type ReopenedEvent implements Node {
 }
 
 # Audit log entry for a repo.access event.
-type RepoAccessAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoAccessAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12552,7 +12552,7 @@ enum RepoAccessAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.add_member event.
-type RepoAddMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoAddMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12611,7 +12611,7 @@ enum RepoAddMemberAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.add_topic event.
-type RepoAddTopicAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData, TopicAuditEntryData {
+type RepoAddTopicAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData & TopicAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12662,7 +12662,7 @@ type RepoAddTopicAuditEntry implements Node, AuditEntry, RepositoryAuditEntryDat
 }
 
 # Audit log entry for a repo.archived event.
-type RepoArchivedAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData {
+type RepoArchivedAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12721,7 +12721,7 @@ enum RepoArchivedAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.change_merge_setting event.
-type RepoChangeMergeSettingAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData {
+type RepoChangeMergeSettingAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12782,7 +12782,7 @@ enum RepoChangeMergeSettingAuditEntryMergeType {
 }
 
 # Audit log entry for a repo.config.disable_anonymous_git_access event.
-type RepoConfigDisableAnonymousGitAccessAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigDisableAnonymousGitAccessAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12829,7 +12829,7 @@ type RepoConfigDisableAnonymousGitAccessAuditEntry implements Node, AuditEntry, 
 }
 
 # Audit log entry for a repo.config.disable_collaborators_only event.
-type RepoConfigDisableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigDisableCollaboratorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12876,7 +12876,7 @@ type RepoConfigDisableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, O
 }
 
 # Audit log entry for a repo.config.disable_contributors_only event.
-type RepoConfigDisableContributorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigDisableContributorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12923,7 +12923,7 @@ type RepoConfigDisableContributorsOnlyAuditEntry implements Node, AuditEntry, Or
 }
 
 # Audit log entry for a repo.config.disable_sockpuppet_disallowed event.
-type RepoConfigDisableSockpuppetDisallowedAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigDisableSockpuppetDisallowedAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -12970,7 +12970,7 @@ type RepoConfigDisableSockpuppetDisallowedAuditEntry implements Node, AuditEntry
 }
 
 # Audit log entry for a repo.config.enable_anonymous_git_access event.
-type RepoConfigEnableAnonymousGitAccessAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigEnableAnonymousGitAccessAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13017,7 +13017,7 @@ type RepoConfigEnableAnonymousGitAccessAuditEntry implements Node, AuditEntry, O
 }
 
 # Audit log entry for a repo.config.enable_collaborators_only event.
-type RepoConfigEnableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigEnableCollaboratorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13064,7 +13064,7 @@ type RepoConfigEnableCollaboratorsOnlyAuditEntry implements Node, AuditEntry, Or
 }
 
 # Audit log entry for a repo.config.enable_contributors_only event.
-type RepoConfigEnableContributorsOnlyAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigEnableContributorsOnlyAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13111,7 +13111,7 @@ type RepoConfigEnableContributorsOnlyAuditEntry implements Node, AuditEntry, Org
 }
 
 # Audit log entry for a repo.config.enable_sockpuppet_disallowed event.
-type RepoConfigEnableSockpuppetDisallowedAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigEnableSockpuppetDisallowedAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13158,7 +13158,7 @@ type RepoConfigEnableSockpuppetDisallowedAuditEntry implements Node, AuditEntry,
 }
 
 # Audit log entry for a repo.config.lock_anonymous_git_access event.
-type RepoConfigLockAnonymousGitAccessAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigLockAnonymousGitAccessAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13205,7 +13205,7 @@ type RepoConfigLockAnonymousGitAccessAuditEntry implements Node, AuditEntry, Org
 }
 
 # Audit log entry for a repo.config.unlock_anonymous_git_access event.
-type RepoConfigUnlockAnonymousGitAccessAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoConfigUnlockAnonymousGitAccessAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13252,7 +13252,7 @@ type RepoConfigUnlockAnonymousGitAccessAuditEntry implements Node, AuditEntry, O
 }
 
 # Audit log entry for a repo.create event.
-type RepoCreateAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData {
+type RepoCreateAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13315,7 +13315,7 @@ enum RepoCreateAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.destroy event.
-type RepoDestroyAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData {
+type RepoDestroyAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13374,7 +13374,7 @@ enum RepoDestroyAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.remove_member event.
-type RepoRemoveMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData {
+type RepoRemoveMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13433,7 +13433,7 @@ enum RepoRemoveMemberAuditEntryVisibility {
 }
 
 # Audit log entry for a repo.remove_topic event.
-type RepoRemoveTopicAuditEntry implements Node, AuditEntry, RepositoryAuditEntryData, OrganizationAuditEntryData, TopicAuditEntryData {
+type RepoRemoveTopicAuditEntry implements Node & AuditEntry & RepositoryAuditEntryData & OrganizationAuditEntryData & TopicAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -13500,7 +13500,7 @@ enum ReportedContentClassifiers {
 }
 
 # A repository contains the content for a project.
-type Repository implements Node, ProjectOwner, PackageOwner, Subscribable, Starrable, UniformResourceLocatable, RepositoryInfo {
+type Repository implements Node & ProjectOwner & PackageOwner & Subscribable & Starrable & UniformResourceLocatable & RepositoryInfo {
   # A list of users that can be assigned to issues in this repository.
   assignableUsers(
     # Filters users with query on user name and login
@@ -14375,7 +14375,7 @@ enum RepositoryPrivacy {
 }
 
 # A repository-topic connects a repository to a topic.
-type RepositoryTopic implements Node, UniformResourceLocatable {
+type RepositoryTopic implements Node & UniformResourceLocatable {
   id: ID!
   # The HTTP path for this repository-topic.
   resourcePath: URI!
@@ -14416,7 +14416,7 @@ enum RepositoryVisibility {
 }
 
 # Audit log entry for a repository_visibility_change.disable event.
-type RepositoryVisibilityChangeDisableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type RepositoryVisibilityChangeDisableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -14461,7 +14461,7 @@ type RepositoryVisibilityChangeDisableAuditEntry implements Node, AuditEntry, En
 }
 
 # Audit log entry for a repository_visibility_change.enable event.
-type RepositoryVisibilityChangeEnableAuditEntry implements Node, AuditEntry, EnterpriseAuditEntryData, OrganizationAuditEntryData {
+type RepositoryVisibilityChangeEnableAuditEntry implements Node & AuditEntry & EnterpriseAuditEntryData & OrganizationAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -14506,7 +14506,7 @@ type RepositoryVisibilityChangeEnableAuditEntry implements Node, AuditEntry, Ent
 }
 
 # A alert for a repository with an affected vulnerability.
-type RepositoryVulnerabilityAlert implements Node, RepositoryNode {
+type RepositoryVulnerabilityAlert implements Node & RepositoryNode {
   # When was the alert created?
   createdAt: DateTime!
   # The reason the alert was dismissed
@@ -14685,7 +14685,7 @@ type ReviewDismissalAllowanceEdge {
 }
 
 # Represents a 'review_dismissed' event on a given issue or pull request.
-type ReviewDismissedEvent implements Node, UniformResourceLocatable {
+type ReviewDismissedEvent implements Node & UniformResourceLocatable {
   # Identifies the actor who performed the event.
   actor: Actor
   # Identifies the date and time when the object was created.
@@ -15669,7 +15669,7 @@ type StatusCheckRollupContextEdge {
 }
 
 # Represents an individual commit status context
-type StatusContext implements Node, RequirableByPullRequest {
+type StatusContext implements Node & RequirableByPullRequest {
   # The avatar of the OAuth application or the user that created the status
   avatarUrl(
     # The size of the resulting square image.
@@ -15813,7 +15813,7 @@ type SuggestedReviewer {
 }
 
 # Represents a Git tag.
-type Tag implements Node, GitObject {
+type Tag implements Node & GitObject {
   # An abbreviated version of the Git object ID
   abbreviatedOid: String!
   # The HTTP path for this Git object
@@ -15836,7 +15836,7 @@ type Tag implements Node, GitObject {
 }
 
 # A team of users in an organization.
-type Team implements Node, Subscribable, MemberStatusable {
+type Team implements Node & Subscribable & MemberStatusable {
   # A list of teams that are ancestors of this team.
   ancestors(
     # Returns the elements in the list that come after the specified cursor.
@@ -16006,7 +16006,7 @@ type Team implements Node, Subscribable, MemberStatusable {
 }
 
 # Audit log entry for a team.add_member event.
-type TeamAddMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, TeamAuditEntryData {
+type TeamAddMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & TeamAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -16055,7 +16055,7 @@ type TeamAddMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntry
 }
 
 # Audit log entry for a team.add_repository event.
-type TeamAddRepositoryAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData, TeamAuditEntryData {
+type TeamAddRepositoryAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData & TeamAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -16124,7 +16124,7 @@ interface TeamAuditEntryData {
 }
 
 # Audit log entry for a team.change_parent_team event.
-type TeamChangeParentTeamAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, TeamAuditEntryData {
+type TeamChangeParentTeamAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & TeamAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -16201,7 +16201,7 @@ type TeamConnection {
 }
 
 # A team discussion.
-type TeamDiscussion implements Node, Comment, Deletable, Reactable, Subscribable, UniformResourceLocatable, Updatable, UpdatableComment {
+type TeamDiscussion implements Node & Comment & Deletable & Reactable & Subscribable & UniformResourceLocatable & Updatable & UpdatableComment {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the discussion's team.
@@ -16311,7 +16311,7 @@ type TeamDiscussion implements Node, Comment, Deletable, Reactable, Subscribable
 }
 
 # A comment on a team discussion.
-type TeamDiscussionComment implements Node, Comment, Deletable, Reactable, UniformResourceLocatable, Updatable, UpdatableComment {
+type TeamDiscussionComment implements Node & Comment & Deletable & Reactable & UniformResourceLocatable & Updatable & UpdatableComment {
   # The actor who authored the comment.
   author: Actor
   # Author's association with the comment's team.
@@ -16547,7 +16547,7 @@ enum TeamPrivacy {
 }
 
 # Audit log entry for a team.remove_member event.
-type TeamRemoveMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, TeamAuditEntryData {
+type TeamRemoveMemberAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & TeamAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -16596,7 +16596,7 @@ type TeamRemoveMemberAuditEntry implements Node, AuditEntry, OrganizationAuditEn
 }
 
 # Audit log entry for a team.remove_repository event.
-type TeamRemoveRepositoryAuditEntry implements Node, AuditEntry, OrganizationAuditEntryData, RepositoryAuditEntryData, TeamAuditEntryData {
+type TeamRemoveRepositoryAuditEntry implements Node & AuditEntry & OrganizationAuditEntryData & RepositoryAuditEntryData & TeamAuditEntryData {
   # The action name
   action: String!
   # The user who initiated the action
@@ -16726,7 +16726,7 @@ type TextMatchHighlight {
 }
 
 # A topic aggregates entities that are related to a subject.
-type Topic implements Node, Starrable {
+type Topic implements Node & Starrable {
   id: ID!
   # The topic's name.
   name: String!
@@ -16807,7 +16807,7 @@ type TransferredEvent implements Node {
 }
 
 # Represents a Git tree.
-type Tree implements Node, GitObject {
+type Tree implements Node & GitObject {
   # An abbreviated version of the Git object ID
   abbreviatedOid: String!
   # The HTTP path for this Git object
@@ -17930,7 +17930,7 @@ type UpdateTopicsPayload {
 }
 
 # A user is an individual's account on GitHub that owns repositories and can make new content.
-type User implements Node, Actor, PackageOwner, ProjectOwner, RepositoryOwner, UniformResourceLocatable, ProfileOwner, Sponsorable {
+type User implements Node & Actor & PackageOwner & ProjectOwner & RepositoryOwner & UniformResourceLocatable & ProfileOwner & Sponsorable {
   # Determine if this repository owner has any items that can be pinned to their profile.
   anyPinnableItems(
     # Filter to only a particular kind of pinnable item.
