@@ -258,7 +258,7 @@ namespace GraphQL.Tests.Utilities
             type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
         }
 
-        private enum PetKindEnum
+        private enum PetKind
         {
             Cat,
             Dog
@@ -274,14 +274,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = Schema.For(definitions, c => c.Types.Include<PetKindEnum>("PetKind"));
+            var schema = Schema.For(definitions, c => c.Types.Include<PetKind>("PetKind"));
             schema.Initialize();
 
             var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
             type.ShouldNotBeNull();
 
             type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
-            type.Values.Select(x => (PetKindEnum)x.Value).ShouldBe(new[] { PetKindEnum.Cat, PetKindEnum.Dog });
+            type.Values.Select(x => (PetKind)x.Value).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
         }
 
         [Fact]
