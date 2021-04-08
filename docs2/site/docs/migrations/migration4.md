@@ -220,7 +220,7 @@ enumeration value as its value also. In other words, you must return a string co
 `"Dog"`) rather than a matching C# enumeration value (e.g. `Animal.Cat` or `Animal.Dog`). You can configure the `SchemaBuilder` to
 match the defined enumeration values to a C# enumeration type in this manner demonstrated below. Then when used as an input type,
 the values will be parsed into the matching C# enumeration values, and when used as an output type, you must return the C# enumeration
-value or its underlying value (typically an `int`). Below are a few examples of how this is configured:
+value (e.g. `Animal.Cat`) or its underlying value (typically an `int`). Below are a few examples of how this is configured:
 
 ```csharp
 var schema = Schema.For(definitions, c => {
