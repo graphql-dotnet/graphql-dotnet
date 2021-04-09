@@ -68,6 +68,8 @@
             file: authorization.md
           - title: Relay
             file: relay.md
+          - title: Global Switches
+            file: global-switches.md
       - title: Guides
         dir: guides
         items:

@@ -57,11 +57,14 @@ namespace GraphQL.Utilities
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
 
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
 
-            ValidateArgumentsUniqueness(field, type);
+            ValidateFieldArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -73,6 +76,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
             if (!argument.ResolvedType.IsInputType())
@@ -113,11 +119,14 @@ namespace GraphQL.Utilities
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
 
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+
             // 2.3
             if (!field.ResolvedType.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
 
-            ValidateArgumentsUniqueness(field, type);
+            ValidateFieldArgumentsUniqueness(field, type);
         }
 
         /// <inheritdoc/>
@@ -129,6 +138,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
             if (!argument.ResolvedType.IsInputType())
@@ -168,6 +180,9 @@ namespace GraphQL.Utilities
 
             if (field.ResolvedType == null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (field.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.3
             if (!field.ResolvedType.IsInputType())
@@ -229,6 +244,8 @@ namespace GraphQL.Utilities
             // 3
             if (type.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
+
+            ValidateDirectiveArgumentsUniqueness(type);
         }
 
         /// <inheritdoc/>
@@ -240,6 +257,9 @@ namespace GraphQL.Utilities
 
             if (argument.ResolvedType == null)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+
+            if (argument.ResolvedType is GraphQLTypeReference)
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 4.2
             if (!argument.ResolvedType.IsInputType())
@@ -268,7 +288,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private void ValidateArgumentsUniqueness(FieldType field, INamedType type)
+        private void ValidateFieldArgumentsUniqueness(FieldType field, INamedType type)
         {
             if (field.Arguments?.Count > 0)
             {
@@ -276,6 +296,18 @@ namespace GraphQL.Utilities
                 {
                     if (item.Count() > 1)
                         throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name.");
+                }
+            }
+        }
+
+        private void ValidateDirectiveArgumentsUniqueness(DirectiveGraphType type)
+        {
+            if (type.Arguments?.Count > 0)
+            {
+                foreach (var item in type.Arguments.List.ToLookup(f => f.Name))
+                {
+                    if (item.Count() > 1)
+                        throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{type.Name}'; no two directive arguments may share the same name.");
                 }
             }
         }

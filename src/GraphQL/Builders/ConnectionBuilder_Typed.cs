@@ -11,61 +11,16 @@ using GraphQL.Types.Relay;
 namespace GraphQL.Builders
 {
     /// <summary>
-    /// Static methods to create connection field builders.
+    /// Builds a connection field for graphs that have the specified source and return type.
     /// </summary>
-    public static class ConnectionBuilder
+    public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
-            where TNodeType : IGraphType
-            => ConnectionBuilder<TSourceType>.Create<TNodeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
-    }
-
-    /// <summary>
-    /// Builds a connection field for graphs that have the specified source type.
-    /// </summary>
-    // TODO: Remove in v5
-    public class ConnectionBuilder<TSourceType>
-    {
-        internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
-
         private bool IsBidirectional => FieldType.Arguments.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
-        private int? PageSizeFromMetadata
+        private int? PageSizeFromMeatadata
         {
-            get => FieldType.GetMetadata<int?>(PAGE_SIZE_METADATA_KEY);
-            set => FieldType.WithMetadata(PAGE_SIZE_METADATA_KEY, value);
+            get => FieldType.GetMetadata<int?>(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY);
+            set => FieldType.WithMetadata(ConnectionBuilder<TSourceType>.PAGE_SIZE_METADATA_KEY, value);
         }
 
         /// <summary>
@@ -73,7 +28,7 @@ namespace GraphQL.Builders
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        private ConnectionBuilder(FieldType fieldType)
+        internal ConnectionBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -84,7 +39,7 @@ namespace GraphQL.Builders
         /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
         /// </summary>
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
+        public static ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType>(string name = "default")
             where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
 
         /// <summary>
@@ -93,7 +48,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
+        public static ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType, TEdgeType>(string name = "default")
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
@@ -104,7 +59,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+        public static ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -113,42 +68,30 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = typeof(TConnectionType),
-                Arguments = new QueryArguments(),
+                Arguments = new QueryArguments(
+                    new QueryArgument<StringGraphType>
+                    {
+                        Name = "after",
+                        Description = "Only return edges after the specified cursor.",
+                    },
+                    new QueryArgument<IntGraphType>
+                    {
+                        Name = "first",
+                        Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
+                    }
+                ),
             };
-            fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
-            {
-                Name = "after",
-                Description = "Only return edges after the specified cursor.",
-            });
-            fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
-            {
-                Name = "first",
-                Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
-            });
-            return new ConnectionBuilder<TSourceType>(fieldType);
-        }
 
-        /// <summary>
-        /// Configure the connection to be forward-only.
-        /// </summary>
-        [Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
-        public virtual ConnectionBuilder<TSourceType> Unidirectional()
-        {
-            if (IsBidirectional)
-                throw new InvalidOperationException("Cannot call Unidirectional after a call to Bidirectional.");
-
-            return this;
+            return new ConnectionBuilder<TSourceType, TReturnType>(fieldType);
         }
 
         /// <summary>
         /// Configure the connection to be bi-directional.
         /// </summary>
-        public ConnectionBuilder<TSourceType> Bidirectional()
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Bidirectional()
         {
             if (IsBidirectional)
-            {
                 return this;
-            }
 
             Argument<StringGraphType, string>("before",
                 "Only return edges prior to the specified cursor.");
@@ -159,41 +102,32 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
-        public virtual ConnectionBuilder<TSourceType> Name(string name)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
-        public virtual ConnectionBuilder<TSourceType> Description(string? description)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Description(string? description)
         {
             FieldType.Description = description;
             return this;
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
-        public virtual ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
         }
 
         /// <summary>
-        /// Sets the default page size.
+        /// Sets the default page size or clears (if null) the default page size, so all records are returned by default.
         /// </summary>
-        public virtual ConnectionBuilder<TSourceType> PageSize(int pageSize)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize)
         {
-            PageSizeFromMetadata = pageSize;
-            return this;
-        }
-
-        /// <summary>
-        /// Clears the default page size, so all records are returned by default.
-        /// </summary>
-        public virtual ConnectionBuilder<TSourceType> ReturnAll()
-        {
-            PageSizeFromMetadata = null;
+            PageSizeFromMeatadata = pageSize;
             return this;
         }
 
@@ -203,7 +137,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
             var arg = new QueryArgument(typeof(TArgumentGraphType))
@@ -221,18 +155,8 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
-
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -248,32 +172,12 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
-#if NETSTANDARD2_1
-            [AllowNull]
-#endif
-            TArgumentType defaultValue = default!)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg =>
-            {
-                arg.Description = description;
-                arg.DefaultValue = defaultValue;
-            });
-
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
 #if NETSTANDARD2_1
             [AllowNull]
 #endif
-            TArgumentType defaultValue, Action<QueryArgument>? configure)
+            TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -285,7 +189,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Runs a configuration delegate for the connection field.
         /// </summary>
-        public virtual ConnectionBuilder<TSourceType> Configure(Action<FieldType> configure)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
         {
             configure(FieldType);
             return this;
@@ -296,7 +200,7 @@ namespace GraphQL.Builders
         /// declaration has arguments, then their default values (if any) will be used.
         /// </summary>
         /// <param name="name">Directive name.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name)
         {
             FieldType.ApplyDirective(name);
             return this;
@@ -309,7 +213,7 @@ namespace GraphQL.Builders
         /// <param name="name">Directive name.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue)
         {
             FieldType.ApplyDirective(name, argumentName, argumentValue);
             return this;
@@ -320,7 +224,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <param name="name">Directive name.</param>
         /// <param name="configure">Configuration delegate.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name, Action<AppliedDirective> configure)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
         {
             FieldType.ApplyDirective(name, configure);
             return this;
@@ -338,27 +242,29 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
-            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMetadata);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMeatadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object>> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
         {
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
+            FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
             {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMetadata);
+                var connectionContext = new ResolveConnectionContext<TSourceType>(context, !IsBidirectional, PageSizeFromMeatadata);
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+            return this;
         }
 
         private void CheckForErrors(IResolveConnectionContext<TSourceType> context)

@@ -12,7 +12,7 @@ namespace GraphQL.SystemTextJson
         /// <summary>
         /// Configures an <see cref="ExecutionOptions"/> using the given <paramref name="configure"/> action
         /// then executes those options using the <paramref name="schema"/> and a <see cref="DocumentWriter"/>
-        /// with indentation turned on. 
+        /// with indentation turned on.
         /// </summary>
         /// <param name="schema">A schema to use.</param>
         /// <param name="configure">An action that configures something to execute.</param>
