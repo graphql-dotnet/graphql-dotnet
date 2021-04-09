@@ -292,7 +292,8 @@ values will default to a string matching the name of the enumeration value. If y
 enumeration type instead, configure the type as demonstrated in one of the following examples:
 
 ```csharp
-var schema = Schema.For(definitions, c => {
+var schema = Schema.For(definitions, c =>
+{
     // example 1: define the "Animal" schema enumeration type to use the C# type Animal
     c.Types.Include<Animal>();
 
