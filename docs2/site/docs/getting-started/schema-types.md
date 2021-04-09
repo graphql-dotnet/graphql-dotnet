@@ -285,6 +285,26 @@ be implemented as:
     }
 ```
 
+**Schema-First Enumeration Types**
+
+If you have defined your schema with the schema-first syntax, the backing value of each of the enumeration
+values will default to a string matching the name of the enumeration value. If you wish to use a C#
+enumeration type instead, configure the type as demonstrated in one of the following examples:
+
+```csharp
+var schema = Schema.For(definitions, c =>
+{
+    // example 1: define the "Animal" schema enumeration type to use the C# type Animal
+    c.Types.Include<Animal>();
+
+    // example 2: define the "AnimalType" schema enumeration type to use the C# type Animal
+    c.Types.Include<Animal>("AnimalType");
+
+    // example 3: define the "Animal" schema enumeration type to use the C# type Animal
+    c.Types.For("Animal").Type = typeof(Animal);
+});
+```
+
 ## Type Mapping
 
 When specifying a field using the shortcut syntax `Field(x => x.Parent)`, which does not specify

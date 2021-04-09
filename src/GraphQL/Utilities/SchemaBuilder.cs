@@ -505,7 +505,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (enumDef.Values?.Count > 0) // just in case
             {
                 foreach (var value in enumDef.Values)
-                    type.AddValue(ToEnumValue(value));
+                    type.AddValue(ToEnumValue(value, typeConfig.Type));
             }
 
             return type;
@@ -534,12 +534,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return result;
         }
 
-        private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
+        private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type enumType)
         {
             var name = (string)valDef.Name.Value;
             return new EnumValueDefinition
             {
-                Value = name,
+                Value = enumType == null ? name : Enum.Parse(enumType, name, true),
                 Name = name,
                 Description = valDef.Comment?.Text.ToString()
             }.SetAstType(valDef);

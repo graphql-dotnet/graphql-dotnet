@@ -254,7 +254,34 @@ namespace GraphQL.Tests.Utilities
             var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
             type.ShouldNotBeNull();
 
+            type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
             type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
+        }
+
+        private enum PetKind
+        {
+            Cat,
+            Dog
+        }
+
+        [Fact]
+        public void builds_case_insensitive_typed_enum()
+        {
+            var definitions = @"
+                enum PetKind {
+                    CAT
+                    DOG
+                }
+            ";
+
+            var schema = Schema.For(definitions, c => c.Types.Include<PetKind>());
+            schema.Initialize();
+
+            var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
+            type.ShouldNotBeNull();
+
+            type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
+            type.Values.Select(x => (PetKind)x.Value).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
         }
 
         [Fact]
