@@ -223,7 +223,8 @@ the values will be parsed into the matching C# enumeration values, and when used
 value (e.g. `Animal.Cat`) or its underlying value (typically an `int`). Below are a few examples of how this is configured:
 
 ```csharp
-var schema = Schema.For(definitions, c => {
+var schema = Schema.For(definitions, c =>
+{
     // example 1: define the "Animal" schema enumeration type to use the C# type Animal
     c.Types.Include<Animal>();
 
