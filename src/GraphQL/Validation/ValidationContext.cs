@@ -325,7 +325,14 @@ namespace GraphQL.Validation
                     //  example.: type is int. value is '10'. 
                     //     This value can be parsed from string into int and solution is very practical for wide usage.
                     // Maybe best practice should be add new global switch which enable/disable this option.
-                    value = Convert.ChangeType(value, scalarGraphType);
+                    if (SchemaTypes.BuiltInScalarMappings.Where(m => m.Value == scalarGraphType.GetType()).Any())
+                    {
+                        var type = SchemaTypes.BuiltInScalarMappings.Where(m => m.Value == scalarGraphType.GetType()).FirstOrDefault().Key;
+                        if (type != null)
+                        {
+                            value = Convert.ChangeType(value, type);
+                        }
+                    }
 
                     return scalarGraphType.ParseValue(value);
                 }
