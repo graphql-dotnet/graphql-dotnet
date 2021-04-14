@@ -447,11 +447,11 @@ As a singleton, you can pull the singleton instance into your graphtype class in
     }
 ```
 
-## Caching
+## Adding a global cache
 
 Data loaders will, by default, cache values returned for a given key for the lifetime of a request. You can change the
 the fetch method of your data loader to use a global cache. The below sample demonstrates changes required to a singleton
-DI-based data loader as shown immediately above.
+DI-based data loader as shown immediately above, using the `Microsoft.Extensions.Caching.Memory` NuGet package.
 
 ```csharp
 public class MyOrderDataLoader : DataLoaderBase<int, Order>
@@ -499,6 +499,7 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
             {
                 if (data.TryGetValue(entry.Key, out var order))
                 {
+                    // only save the entry in the cache if it was found in the database
                     _memoryCache.Set(CACHE_PREFIX + entry.Key, order, _memoryCacheEntryOptions);
                     entry.SetResult(order);
                 }
