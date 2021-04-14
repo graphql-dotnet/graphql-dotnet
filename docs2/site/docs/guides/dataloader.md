@@ -467,7 +467,9 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
         _memoryCache = memoryCache;
         _memoryCacheEntryOptions = new MemoryCacheEntryOptions
         {
+            // specify a maximum lifetime of 5 minutes
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+            // set so that the size of the cache can be limited
             Size = 1,
         };
     }
@@ -512,6 +514,7 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
     }
 }
 
-// also, register the memory cache
+// also, register the memory cache in your DI configuration
+// limit cache to 10,000 entries
 services.AddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions { SizeLimit = 10000 }));
 ```
