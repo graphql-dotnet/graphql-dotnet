@@ -347,11 +347,11 @@ public class MyOrderItemsDataLoader : DataLoaderBase<int, IEnumerable<OrderItem>
 }
 ```
 
-You will need to regsiter the data loaders as a scoped service within your DI framework.
+You will need to register the data loader as a scoped service within your DI framework.
 
 ```csharp
 services.AddScoped<MyOrderDataLoader>();
-services.AddScoped<MyOrderItemDataLoader>();
+services.AddScoped<MyOrderItemsDataLoader>();
 ```
 
 Then within your field resolvers, access the data loader via the `RequestServices` property and call `LoadAsync` as before:
@@ -369,10 +369,10 @@ public class MyQuery : ObjectGraphType
                 // Get the custom data loader
                 var loader = context.RequestServices.GetRequiredService<MyOrderDataLoader>();
 
-                // Add this UserId to the pending keys to fetch
+                // Add this UserId to the pending keys to fetch.
                 // The execution strategy will trigger the data loader to fetch the data via MyOrderDataLoader.FetchAsync() at the
-                //   appropriate time, and the field will be resolved with an instance of Order once FetchAsync()
-                //   returns with the batched results
+                // appropriate time, and the field will be resolved with an instance of Order once FetchAsync()
+                // returns with the batched results
                 return loader.LoadAsync(context.GetArgument<int>("id"));
             });
     }
@@ -449,7 +449,7 @@ As a singleton, you can pull the singleton instance into your graphtype class in
 
 ## Adding a global cache
 
-Data loaders will, by default, cache values returned for a given key for the lifetime of a request. You can change the
+Data loaders will, by default, cache values returned for a given key for the lifetime of a request. You can change
 the fetch method of your data loader to use a global cache. The below sample demonstrates changes required to a singleton
 DI-based data loader as shown immediately above, using the `Microsoft.Extensions.Caching.Memory` NuGet package.
 
@@ -479,7 +479,7 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
         // create a list of keys that are not in the cache
         var unMatched = new List<DataLoaderPair<int, Order>>(list.Count());
         // attempt to match any keys possible from the global cache
-        foreach(var entry in list)
+        foreach (var entry in list)
         {
             if (_memoryCache.TryGetValue(CACHE_PREFIX + entry.Key, out var value))
             {
