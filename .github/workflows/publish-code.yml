@@ -49,7 +49,7 @@ jobs:
       - name: Setup .NET Core 5.0 SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.201'
+          dotnet-version: '5.0.x'
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
