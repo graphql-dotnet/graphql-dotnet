@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -7,6 +8,7 @@ namespace GraphQL.MicrosoftDI.Tests
     public class ScopedContextBase
     {
         protected readonly ResolveFieldContext _scopedContext;
+        protected readonly ResolveConnectionContext<object> _scopedConnectionContext;
         protected readonly Mock<IServiceProvider> _requestServicesMock;
         protected readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
         protected readonly Mock<IServiceScope> _scopedServiceScopeMock;
@@ -31,6 +33,7 @@ namespace GraphQL.MicrosoftDI.Tests
             {
                 RequestServices = requestServices
             };
+            _scopedConnectionContext = new ResolveConnectionContext<object>(_scopedContext, false, default);
         }
 
         public void VerifyScoped()

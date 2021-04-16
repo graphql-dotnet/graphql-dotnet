@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using GraphQL.Types.Relay.DataObjects;
 
 #nullable enable
 
@@ -327,9 +328,16 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets the return type of the field.
+        /// Specifies the return data type of the connection resolver. Typically this would be <see cref="Connection{TNode}"/>
+        /// or <see cref="Connection{TNode, TEdge}"/>, but it can be any type that returns the proper fields for the
+        /// connection graph type.
+        /// <br/><br/>
+        /// For instance, to specify a return type for a Widget you might write:
+        /// <br/><br/>
+        /// <code>
+        /// .Returns&lt;Connection&lt;Widget&gt;&gt;()
+        /// </code>
         /// </summary>
-        /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
         public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
             return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
