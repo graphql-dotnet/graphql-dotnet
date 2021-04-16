@@ -41,7 +41,6 @@ namespace GraphQL.Types
 
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
-            RegisterVisitor(DeprecatedDirectiveVisitor.Instance);
         }
 
         /// <summary>

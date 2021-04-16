@@ -1,5 +1,7 @@
 using GraphQL.Utilities;
 
+#nullable enable
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -34,6 +36,6 @@ namespace GraphQL.Types
         /// <summary>
         /// Argument value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
     }
 }

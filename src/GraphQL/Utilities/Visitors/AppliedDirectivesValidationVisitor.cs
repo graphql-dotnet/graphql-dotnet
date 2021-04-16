@@ -83,7 +83,12 @@ namespace GraphQL.Utilities
                         throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}'.");
 
                     if (location != null && !schemaDirective.Locations.Contains(location.Value))
-                        throw new InvalidOperationException($"Directive '{schemaDirective.Name}' is applied in the wrong location '{location.Value}'. Allowed locations: {string.Join(", ", schemaDirective.Locations)}");
+                    {
+                        // TODO: think about strict check; needs to rewrite some tests (5)
+                        // This is a temporary solution for @deprecated directive that we actually allow to more schema elements.
+                        if (schemaDirective.Name != "deprecated")
+                            throw new InvalidOperationException($"Directive '{schemaDirective.Name}' is applied in the wrong location '{location.Value}'. Allowed locations: {string.Join(", ", schemaDirective.Locations)}");
+                    }
 
                     if (schemaDirective.Arguments?.Count > 0)
                     {

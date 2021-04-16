@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Initialization
@@ -40,6 +41,12 @@ namespace GraphQL.Tests.Initialization
         public void SchemaWithDuplicateInterfaceFields_Should_Throw()
         {
             ShouldThrow<SchemaWithDuplicateInterfaceFields, InvalidOperationException>("The field 'field' must have a unique name within Interface type 'Dup'; no two fields may share the same name.");
+        }
+
+        [Fact]
+        public void SchemaWithDeprecatedAppliedDirective_Should_Not_Throw()
+        {
+            ShouldNotThrow<SchemaWithDeprecatedAppliedDirective>();
         }
     }
 
@@ -127,6 +134,19 @@ namespace GraphQL.Tests.Initialization
             Query.AddField(new FieldType { Name = "field", ResolvedType = new StringGraphType() });
             RegisterType(iface);
             Query.ResolvedInterfaces.Add(iface);
+        }
+    }
+
+    public class SchemaWithDeprecatedAppliedDirective : Schema
+    {
+        public SchemaWithDeprecatedAppliedDirective()
+        {
+            Query = new ObjectGraphType { Name = "Query" };
+
+            var f = Query.AddField(new FieldType { Name = "field1", ResolvedType = new StringGraphType() }).ApplyDirective("deprecated", "reason", "aaa");
+            f.DeprecationReason.ShouldBe("aaa");
+            f.DeprecationReason = "bbb";
+            f.FindAppliedDirective("deprecated").FindArgument("reason").Value.ShouldBe("bbb");
         }
     }
 }

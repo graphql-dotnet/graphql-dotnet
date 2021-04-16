@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -5,7 +6,8 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Visitor that sets <see cref="IProvideDeprecationReason.DeprecationReason"/> property to the corresponding schema elements.
     /// </summary>
-    public class DeprecatedDirectiveVisitor : BaseSchemaNodeVisitor
+    [Obsolete("This class is no longer required to set DeprecationReason property")]
+    public class DeprecatedDirectiveVisitor : BaseSchemaNodeVisitor // TODO: remove in v5
     {
         /// <summary>
         /// Returns a static instance of the <see cref="DeprecatedDirectiveVisitor"/>.

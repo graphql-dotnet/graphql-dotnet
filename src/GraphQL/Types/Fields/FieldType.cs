@@ -36,7 +36,11 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         /// <inheritdoc/>
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason
+        {
+            get => this.GetDeprecationReason();
+            set => this.SetDeprecationReason(value);
+        }
 
         /// <summary>
         /// Gets or sets the default value of the field. Only applies to fields of input object graph types.

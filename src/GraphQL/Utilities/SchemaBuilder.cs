@@ -223,6 +223,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 throw new InvalidOperationException($"Unknown field '{typeConfig.Name}.{fieldConfig.Name}' has no resolver. Verify that you have configured SchemaBuilder correctly.");
         }
 
+        private void OverrideDeprecationReason(IProvideDeprecationReason element, string reason)
+        {
+            if (reason != null)
+                element.DeprecationReason = reason;
+        }
+
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var name = (string)astType.Name.Value;
@@ -243,7 +249,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (!isExtensionType)
             {
                 type.Description = typeConfig.Description ?? astType.Comment?.Text.ToString();
-                type.DeprecationReason = typeConfig.DeprecationReason;
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
@@ -278,6 +283,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             else
             {
                 type.SetAstType(astType);
+                OverrideDeprecationReason(type, typeConfig.DeprecationReason);
             }
 
             return type;
@@ -340,7 +346,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
-                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver
             };
@@ -350,6 +355,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
 
             field.SetAstType(fieldDef);
+            OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
             return field;
         }
@@ -369,7 +375,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
-                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -381,6 +386,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
 
             field.SetAstType(fieldDef);
+            OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
             return field;
         }
@@ -400,10 +406,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
-                DeprecationReason = fieldConfig.DeprecationReason,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
+
+            OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
             return field;
         }
@@ -419,9 +426,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text.ToString(),
-                DeprecationReason = typeConfig.DeprecationReason,
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(interfaceDef);
+
+            OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
             typeConfig.CopyMetadataTo(type);
 
@@ -445,9 +453,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? unionDef.Comment?.Text.ToString(),
-                DeprecationReason = typeConfig.DeprecationReason,
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(unionDef);
+
+            OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
             typeConfig.CopyMetadataTo(type);
 
@@ -474,8 +483,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text.ToString(),
-                DeprecationReason = typeConfig.DeprecationReason,
             }.SetAstType(inputDef);
+
+            OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
             typeConfig.CopyMetadataTo(type);
 
@@ -499,8 +509,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text.ToString(),
-                DeprecationReason = typeConfig.DeprecationReason,
             }.SetAstType(enumDef);
+
+            OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
             if (enumDef.Values?.Count > 0) // just in case
             {
@@ -542,6 +553,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Value = enumType == null ? name : Enum.Parse(enumType, name, true),
                 Name = name,
                 Description = valDef.Comment?.Text.ToString()
+                // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
+                //DeprecationReason = ???
             }.SetAstType(valDef);
         }
 

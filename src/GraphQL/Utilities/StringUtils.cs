@@ -10,14 +10,14 @@ namespace GraphQL.Utilities
     public static class StringUtils
     {
         /// <summary>
-        /// Given [ A, B, C ] return '"A", "B", or "C"'.
+        /// Given array of strings [ "A", "B", "C" ] return one string "'A', 'B' or 'C'".
         /// </summary>
-        public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5)
+        public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5) //TODO: make internal in v5 and change items type
         {
             string[] itemsArray = items.Take(maxLength).ToArray();
             int index = 0;
             return itemsArray
-                .Select(x => $"\"{x}\"")
+                .Select(x => $"'{x}'")
                 .Aggregate((list, quoted) =>
                     list +
                     (itemsArray.Length > 2 ? ", " : " ") +
