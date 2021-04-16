@@ -278,3 +278,243 @@ your field resolver (do not use the `IDataLoaderContextAccessor` for this) and h
 `IDataLoaderResult<T>.GetResultAsync` method of the result obtained from the first data loader within a try/catch
 block. Return the result of the simple data loader's `LoadAsync()` function to the field resolver.  The data loader
 will still load at the appropriate time, and you can handle exceptions as desired.
+
+## DI-based data loaders
+
+The above instructions describe how to use the data loader context and accessor classes to create data loaders scoped
+to the current request. You can also use dependency injection to register a data loader instance. This can eliminate
+duplicated code if you call the same data loader from different field resolvers. It can also help to prevent
+unforseen bugs due to a data loader fetch delegate capturing variables from a field resolver's scope.
+
+To create a custom and register a custom data loader instance, first create a class and inherit `DataLoaderBase<TKey, T>`.
+Override the `FetchAsync` method with the code to retrieve the data based on the provided keys. Call `SetResult` on
+each provided `DataLoaderPair` to set the result. Feel free to use dependency injection to rely on any scoped services
+necessary to facilitate execution of the fetch method. See below sample:
+
+```csharp
+public class Order
+{
+    public int Id { get; set; }
+    public string ShipToName { get; set; }
+}
+
+public class OrderItem
+{
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+    public string ItemName { get; set; }
+}
+
+// similar to BatchDataLoader
+public class MyOrderDataLoader : DataLoaderBase<int, Order>
+{
+    private readonly MyDbContext _dbContext;
+    public MyOrderDataLoader(MyDbContext dataContext)
+    {
+        _dbContext = dataContext;
+    }
+
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, Order>> list, CancellationToken cancellationToken)
+    {
+        IEnumerable<int> ids = list.Select(pair => pair.Key);
+        IDictionary<int, Order> data = await _dbContext.Orders.Where(order => ids.Contains(order.Id)).ToDictionaryAsync(x => x.Id, cancellationToken);
+        foreach (DataLoaderPair<int, Order> entry in list)
+        {
+            entry.SetResult(data.TryGetValue(entry.Key, out var order) ? order : null);
+        }
+    }
+}
+
+// similar to CollectionBatchDataLoader
+public class MyOrderItemsDataLoader : DataLoaderBase<int, IEnumerable<OrderItem>>
+{
+    private readonly MyDbContext _dbContext;
+    public MyOrderItemsDataLoader(MyDbContext dataContext)
+    {
+        _dbContext = dataContext;
+    }
+
+    protected override Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<OrderItem>>> list, CancellationToken cancellationToken)
+    {
+        IEnumerable<int> ids = list.Select(pair => pair.Key);
+        IEnumerable<OrderItem> data = await _dbContext.OrderItems.Where(orderItem => ids.Contains(orderItem.OrderId)).ToListAsync(cancellationToken);
+        ILookup<int, OrderItem> dataLookup = data.ToLookup(x => x.OrderId);
+        foreach (DataLoaderPair<int, IEnumerable<OrderItem>> entry in list)
+        {
+            entry.SetResult(dataLookup[entry.Key]);
+        }
+    }
+}
+```
+
+You will need to register the data loader as a scoped service within your DI framework.
+
+```csharp
+services.AddScoped<MyOrderDataLoader>();
+services.AddScoped<MyOrderItemsDataLoader>();
+```
+
+Then within your field resolvers, access the data loader via the `RequestServices` property and call `LoadAsync` as before:
+
+```csharp
+public class MyQuery : ObjectGraphType
+{
+    public MyQuery()
+    {
+        Field<OrderType, Order>()
+            .Name("Order")
+            .Argument<IdGraphType>("id")
+            .ResolveAsync(context =>
+            {
+                // Get the custom data loader
+                var loader = context.RequestServices.GetRequiredService<MyOrderDataLoader>();
+
+                // Add this UserId to the pending keys to fetch.
+                // The execution strategy will trigger the data loader to fetch the data via MyOrderDataLoader.FetchAsync() at the
+                // appropriate time, and the field will be resolved with an instance of Order once FetchAsync()
+                // returns with the batched results
+                return loader.LoadAsync(context.GetArgument<int>("id"));
+            });
+    }
+}
+
+public class OrderType : ObjectGraphType<Order>
+{
+    public OrderType()
+    {
+        Field(x => x.Id, type: typeof(IdGraphType));
+        Field(x => x.ShipToName);
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
+            .Name("Items")
+            .ResolveAsync(context =>
+            {
+                var loader = context.RequestServices.GetRequiredService<MyOrderItemsDataLoader>();
+                return loader.LoadAsync(context.Source.Id);
+            });
+    }
+}
+```
+
+You do not need to use `IDataLoaderContextAccessor` or `DataLoaderDocumentListener` and may remove those references
+from your code.
+
+## Singleton DI-based data loader instances
+
+If you wish to register the data loader as a singleton, be sure to disable caching by calling `: base(false)` in
+the constructor, as the cache entries never expire. You will also need to be sure your code does not rely on any
+scoped services, or create a dedicated service scope within the fetch method as shown below.
+
+```csharp
+public class MyOrderDataLoader : DataLoaderBase<int, Order>
+{
+    private readonly IServiceProvider _rootServiceProvider;
+    public MyOrderDataLoader(IServiceProvider serviceProvider) : base(false)
+    {
+        _rootServiceProvider = serviceProvider;
+    }
+
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, Order>> list, CancellationToken cancellationToken)
+    {
+        using (var scope = _rootServiceProvider.CreateScope())
+        {
+            MyDbContext dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+            IEnumerable<int> ids = list.Select(pair => pair.Key);
+            IDictionary<int, Order> data = await dbContext.Orders.Where(order => ids.Contains(order.Id)).ToDictionaryAsync(x => x.Id, cancellationToken);
+            foreach (DataLoaderPair<int, Order> entry in list)
+            {
+                entry.SetResult(data.TryGetValue(entry.Key, out var order) ? order : null);
+            }
+        }
+    }
+}
+```
+
+As a singleton, you can pull the singleton instance into your graphtype class in its constructor.
+
+```csharp
+    public class MyQuery : ObjectGraphType
+    {
+        public MyQuery(MyOrderDataLoader loader)
+        {
+            Field<OrderType, Order>()
+                .Name("Order")
+                .Argument<IdGraphType>("id")
+                .ResolveAsync(context =>
+                {
+                    return loader.LoadAsync(context.GetArgument<int>("id"));
+                });
+        }
+    }
+```
+
+## Adding a global cache
+
+Data loaders will, by default, cache values returned for a given key for the lifetime of a request. You can change
+the fetch method of your data loader to use a global cache. The below sample demonstrates changes required to a singleton
+DI-based data loader as shown immediately above, using the `Microsoft.Extensions.Caching.Memory` NuGet package.
+
+```csharp
+public class MyOrderDataLoader : DataLoaderBase<int, Order>
+{
+    private readonly IServiceProvider _rootServiceProvider;
+    private readonly IMemoryCache _memoryCache;
+    private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
+    private const string CACHE_PREFIX = "ORDER_";
+        
+    public MyOrderDataLoader(IServiceProvider serviceProvider, IMemoryCache memoryCache) : base(false)
+    {
+        _rootServiceProvider = serviceProvider;
+        _memoryCache = memoryCache;
+        _memoryCacheEntryOptions = new MemoryCacheEntryOptions
+        {
+            // specify a maximum lifetime of 5 minutes
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+            // set so that the size of the cache can be limited
+            Size = 1,
+        };
+    }
+
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, Order>> list, CancellationToken cancellationToken)
+    {
+        // create a list of keys that are not in the cache
+        var unMatched = new List<DataLoaderPair<int, Order>>(list.Count());
+        // attempt to match any keys possible from the global cache
+        foreach (var entry in list)
+        {
+            if (_memoryCache.TryGetValue(CACHE_PREFIX + entry.Key, out var value))
+            {
+                entry.SetResult((Order)value);
+            }
+            else
+            {
+                unMatched.Add(entry);
+            }
+        }
+        // process the unmatched keys as usual
+        list = unMatched;
+        using (var scope = _rootServiceProvider.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+            IEnumerable<int> ids = list.Select(pair => pair.Key);
+            IDictionary<int, Order> data = await dbContext.Orders.Where(order => ids.Contains(order.Id)).ToDictionaryAsync(x => x.Id, cancellationToken);
+            foreach (DataLoaderPair<int, Order> entry in list)
+            {
+                if (data.TryGetValue(entry.Key, out var order))
+                {
+                    // only save the entry in the cache if it was found in the database
+                    _memoryCache.Set(CACHE_PREFIX + entry.Key, order, _memoryCacheEntryOptions);
+                    entry.SetResult(order);
+                }
+                else
+                {
+                    entry.SetResult(null);
+                }
+            }
+        }
+    }
+}
+
+// also, register the memory cache in your DI configuration
+// limit cache to 10,000 entries
+services.AddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions { SizeLimit = 10000 }));
+```
