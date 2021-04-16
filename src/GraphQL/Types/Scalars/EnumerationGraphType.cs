@@ -259,7 +259,11 @@ namespace GraphQL.Types
         /// <summary>
         /// The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.
         /// </summary>
-        public string? DeprecationReason { get; set; }
+        public string? DeprecationReason
+        {
+            get => this.GetDeprecationReason();
+            set => this.SetDeprecationReason(value);
+        }
 
         private object? _value;
         /// <summary>

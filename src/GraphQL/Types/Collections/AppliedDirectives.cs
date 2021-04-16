@@ -49,8 +49,14 @@ namespace GraphQL.Types
             }
 
             return null;
-
         }
+
+        /// <summary>
+        /// Removes a directive by its name from the list. If the list contains several
+        /// directives with the given name, then all such directives will be removed.
+        /// </summary>
+        public int Remove(string name) => List?.RemoveAll(d => d.Name == name) ?? 0;
+
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<AppliedDirective> GetEnumerator() => (List ?? System.Linq.Enumerable.Empty<AppliedDirective>()).GetEnumerator();
 

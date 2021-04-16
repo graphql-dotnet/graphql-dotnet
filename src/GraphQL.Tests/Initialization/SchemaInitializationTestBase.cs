@@ -17,5 +17,11 @@ namespace GraphQL.Tests.Initialization
         public void ShouldThrow<TSchema, TException>(string errorMessage)
             where TSchema : Schema, new()
             where TException : Exception => ShouldThrow<TSchema, TException>(ex => ex.Message.ShouldBe(errorMessage));
+
+        public void ShouldNotThrow<TSchema>()
+            where TSchema : Schema, new()
+        {
+            new TSchema().Initialize();
+        }
     }
 }

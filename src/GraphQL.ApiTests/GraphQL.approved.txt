@@ -39,13 +39,15 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, System.Action<GraphQL.Types.AppliedDirective> configure)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object? argumentValue)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object argument1Value, string argument2Name, object argument2Value)
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        public static GraphQL.Types.AppliedDirective FindAppliedDirective(this GraphQL.Types.IProvideMetadata provider, string name) { }
-        public static GraphQL.Types.AppliedDirectives GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
+        public static GraphQL.Types.AppliedDirective? FindAppliedDirective(this GraphQL.Types.IProvideMetadata provider, string name) { }
+        public static GraphQL.Types.AppliedDirectives? GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
+        public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
@@ -1654,6 +1656,7 @@ namespace GraphQL.Types
         public void Add(GraphQL.Types.AppliedDirective directive) { }
         public GraphQL.Types.AppliedDirective Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.AppliedDirective> GetEnumerator() { }
+        public int Remove(string name) { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
@@ -1764,7 +1767,7 @@ namespace GraphQL.Types
     {
         public DirectiveArgument(string name) { }
         public string Name { get; set; }
-        public object Value { get; set; }
+        public object? Value { get; set; }
     }
     public class DirectiveGraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
     {
@@ -1866,7 +1869,7 @@ namespace GraphQL.Types
         public FieldType() { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public object DefaultValue { get; set; }
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
@@ -1896,7 +1899,7 @@ namespace GraphQL.Types
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
@@ -2442,6 +2445,7 @@ namespace GraphQL.Utilities
         public virtual void VisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
+    [System.Obsolete("This class is no longer required to set DeprecationReason property")]
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public DeprecatedDirectiveVisitor() { }

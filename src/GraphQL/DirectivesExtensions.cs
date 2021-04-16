@@ -2,6 +2,8 @@ using System;
 using GraphQL.Introspection;
 using GraphQL.Types;
 
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// </summary>
-        public static bool HasAppliedDirectives(this IProvideMetadata provider) => provider.HasMetadata(DIRECTIVES_KEY);
+        public static bool HasAppliedDirectives(this IProvideMetadata provider) => provider.GetAppliedDirectives()?.Count > 0;
 
         /// <summary>
         /// Provides all directives applied to this provider if any. Otherwise returns <see langword="null"/>.
@@ -29,7 +31,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// </summary>
-        public static AppliedDirectives GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
+        public static AppliedDirectives? GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
 
         /// <summary>
         /// Finds applied directive by its name from the specified provider if any. Otherwise returns <see langword="null"/>.
@@ -39,7 +41,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <param name="name">Directive name.</param>
-        public static AppliedDirective FindAppliedDirective(this IProvideMetadata provider, string name) => provider.GetAppliedDirectives()?.Find(name);
+        public static AppliedDirective? FindAppliedDirective(this IProvideMetadata provider, string name) => provider.GetAppliedDirectives()?.Find(name);
 
         /// <summary>
         /// Apply directive without specifying arguments. If the directive declaration has arguments,
@@ -66,7 +68,7 @@ namespace GraphQL
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
-        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object argumentValue)
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object? argumentValue)
             where TMetadataProvider : IProvideMetadata
             => provider.ApplyDirective(name, directive => directive.AddArgument(new DirectiveArgument(argumentName) { Value = argumentValue }));
 
@@ -84,7 +86,7 @@ namespace GraphQL
         /// <param name="argument2Name">Second argument name.</param>
         /// <param name="argument2Value">Second argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
-        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object argument1Value, string argument2Name, object argument2Value)
+        public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
             where TMetadataProvider : IProvideMetadata
             => provider.ApplyDirective(name, directive => directive
                                                 .AddArgument(new DirectiveArgument(argument1Name) { Value = argument1Value })
@@ -117,6 +119,57 @@ namespace GraphQL
             return provider;
         }
 
+        /// <summary>
+        /// Remove applied directive by its name.
+        /// </summary>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
+        /// <param name="name">Directive name.</param>
+        /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
+        public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
+             where TMetadataProvider : IProvideMetadata
+        {
+            provider.GetAppliedDirectives()?.Remove(name);
+            return provider;
+        }
+
+        internal static string? GetDeprecationReason(this IProvideMetadata provider)
+        {
+            var deprecated = provider.FindAppliedDirective("deprecated");
+
+            return deprecated == null
+                ? null
+                : deprecated.FindArgument("reason")?.Value is string str
+                    ? str
+                    : "No longer supported";
+        }
+
+        internal static void SetDeprecationReason(this IProvideMetadata provider, string? reason)
+        {
+            if (reason == null)
+            {
+                provider.RemoveAppliedDirective("deprecated");
+            }
+            else
+            {
+                var deprecated = provider.FindAppliedDirective("deprecated");
+                if (deprecated == null)
+                {
+                    provider.ApplyDirective("deprecated", "reason", reason);
+                }
+                else
+                {
+                    var arg = deprecated.FindArgument("reason");
+                    if (arg != null)
+                        arg.Value = reason;
+                    else
+                        deprecated.AddArgument(new DirectiveArgument("reason") { Value = reason });
+                }
+            }
+        }
+
         internal static void AddAppliedDirectivesField<TSourceType>(this ComplexGraphType<TSourceType> type, string element)
             where TSourceType : IProvideMetadata
         {
@@ -128,7 +181,7 @@ namespace GraphQL
                    if (context.Source.HasAppliedDirectives())
                    {
                        var appliedDirectives = context.Source.GetAppliedDirectives();
-                       var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives.Count);
+                       var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives!.Count);
 
                        int index = 0;
                        foreach (var applied in appliedDirectives.List)
