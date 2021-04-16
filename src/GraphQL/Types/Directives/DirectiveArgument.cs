@@ -18,7 +18,7 @@ namespace GraphQL.Types
             Name = name;
         }
 
-        private string _name;
+        private string _name = null!;
 
         /// <summary>
         /// Argument name.
