@@ -91,7 +91,6 @@ namespace GraphQL
                     }
 
                     return false;
-
                 }))
                 {
                     return (values, keys);
