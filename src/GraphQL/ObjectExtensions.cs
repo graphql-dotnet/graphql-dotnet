@@ -28,6 +28,8 @@ namespace GraphQL
             where T : class
             => (T)ToObject(source, typeof(T));
 
+        private static readonly List<object> _emptyValues = new List<object>();
+
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// Can use any constructor of the indicated type, provided that there are keys in the
@@ -53,27 +55,49 @@ namespace GraphQL
                 return field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
             }
 
-            // Returns keys from source that match constructor signature
-            string[]? MatchSourceKeys(ParameterInfo[] parameters)
+            // Returns values (from source or defaults) that match constructor signature + used keys from source
+            (List<object>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
             {
                 // parameterless constructors are the most common use case
                 if (parameters.Length == 0)
-                    return Array.Empty<string>();
+                    return (_emptyValues, null);
 
                 // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
+                List<object>? values = null;
                 List<string>? keys = null;
-                if (parameters.All(p => source.Any(keyValue =>
+
+                if (parameters.All(p =>
                 {
-                    bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
-                    if (matched)
-                        (keys ??= new List<string>()).Add(keyValue.Key);
-                    return matched;
-                })))
+                    // Source values take precedence
+                    if (source.Any(keyValue =>
+                    {
+                        bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
+                        if (matched)
+                        {
+                            (values ??= new List<object>()).Add(keyValue.Value);
+                            (keys ??= new List<string>()).Add(keyValue.Key);
+                        }
+                        return matched;
+                    }))
+                    {
+                        return true;
+                    }
+
+                    // Then check for default values if any
+                    if (p.HasDefaultValue)
+                    {
+                        (values ??= new List<object>()).Add(p.DefaultValue);
+                        return true;
+                    }
+
+                    return false;
+
+                }))
                 {
-                    return keys!.ToArray();
+                    return (values, keys);
                 }
 
-                return null;
+                return (null, null);
             }
 
             if (source == null)
@@ -88,13 +112,14 @@ namespace GraphQL
 
             ConstructorInfo? targetCtor = null;
             ParameterInfo[]? ctorParameters = null;
-            string[]? matchedKeys = null;
+            List<object>? values = null;
+            List<string>? usedKeys = null;
 
             foreach (var ctor in ctorCandidates)
             {
                 var parameters = ctor.GetParameters();
-                matchedKeys = MatchSourceKeys(parameters);
-                if (matchedKeys != null)
+                (values, usedKeys) = GetValuesAndUsedKeys(parameters);
+                if (values != null)
                 {
                     targetCtor = ctor;
                     ctorParameters = parameters;
@@ -102,14 +127,14 @@ namespace GraphQL
                 }
             }
 
-            if (targetCtor == null || ctorParameters == null || matchedKeys == null)
+            if (targetCtor == null || ctorParameters == null || values == null)
                 throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
 
             object?[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
 
             for (int i = 0; i < ctorParameters.Length; ++i)
             {
-                object? arg = GetPropertyValue(source[matchedKeys[i]], ctorParameters[i].ParameterType);
+                object? arg = GetPropertyValue(values[i], ctorParameters[i].ParameterType);
                 ctorArguments[i] = arg;
             }
 
@@ -127,7 +152,7 @@ namespace GraphQL
             foreach (var item in source)
             {
                 // these parameters have already been used in the constructor, no need to set property
-                if (matchedKeys.Length > 0 && matchedKeys.Any(k => k == item.Key))
+                if (usedKeys?.Any(k => k == item.Key) == true)
                     continue;
 
                 string propertyName = GetPropertyName(item.Key, out var field);
