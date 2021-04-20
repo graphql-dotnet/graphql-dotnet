@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -125,6 +127,59 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
             schema.AutoRegister(typeof(TClrType), mode);
+        }
+
+        public static void RegisterTypeMappings(this ISchema schema)
+            => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+
+        public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
+            var genericTypesToRegister = new Type[]
+            {
+                typeof(ObjectGraphType<>),
+                typeof(InputObjectGraphType<>),
+                typeof(AutoRegisteringInputObjectGraphType<>),
+                typeof(AutoRegisteringObjectGraphType<>),
+                typeof(EnumerationGraphType<>),
+            };
+
+            var types = assembly
+                .GetTypes()
+                .Where(x => !x.IsAbstract && !x.IsInterface);
+
+            foreach (var graphType in types)
+            {
+                // skip types marked with the DoNotRegister attribute
+                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                    continue;
+
+                // get the base type
+                var baseType = graphType.BaseType;
+                while (baseType != null)
+                {
+                    // skip types marked with the DoNotRegister attribute
+                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                        break;
+
+                    // look for generic types that match our list above
+                    if (baseType.IsConstructedGenericType && genericTypesToRegister.Contains(baseType.GetGenericTypeDefinition()))
+                    {
+                        // get the generic type argument of the graph type
+                        var clrType = baseType.GetGenericArguments()[0];
+                        // and register it, so long as it's not just "object"
+                        if (clrType != typeof(object))
+                            schema.RegisterTypeMapping(clrType, graphType);
+
+                        // skip to the next type
+                        break;
+                    }
+                    // traverse up the inheritance chain for a match
+                    baseType = baseType.BaseType;
+                }
+            }
         }
 
         /// <summary>
