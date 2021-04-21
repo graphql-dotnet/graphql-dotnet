@@ -5,7 +5,7 @@ using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests
+namespace GraphQL.Tests.Serialization
 {
     public class ObjectDictionaryConverterFacts
     {
