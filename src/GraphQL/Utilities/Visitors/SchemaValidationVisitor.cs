@@ -197,6 +197,9 @@ namespace GraphQL.Utilities
             {
                 throw new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid.");
             }
+
+            if (field.Arguments?.Count > 0)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have any arguments specified.");
         }
 
         #endregion
