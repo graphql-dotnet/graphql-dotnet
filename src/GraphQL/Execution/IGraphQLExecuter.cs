@@ -35,21 +35,27 @@ namespace GraphQL.Execution
         private readonly TSchema _schema;
         private readonly IDocumentExecuter _documentExecuter;
         private readonly IEnumerable<IDocumentExecutionListener> _listeners;
+        private readonly ComplexityConfiguration _complexityConfiguration;
         private readonly Action<UnhandledExceptionContext> _unhandledExceptionDelegate;
 
         protected IEnumerable<IValidationRule> CachedDocumentValidationRules { get; init; }
         protected IEnumerable<IValidationRule> ValidationRules { get; init; }
-        protected ComplexityConfiguration ComplexityConfiguration { get; init; }
         protected bool ThrowOnUnhandledException { get; init; }
         protected bool EnableMetrics { get; init; }
         protected int? MaxParallelExecutionCount { get; init; }
 
         public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners)
         {
-            _schema = schema;
-            _documentExecuter = documentExecuter;
-            _unhandledExceptionDelegate = OnUnhandledException;
+            _schema = schema ?? throw new ArgumentNullException(nameof(schema));
+            _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
             _listeners = documentListeners;
+            _unhandledExceptionDelegate = OnUnhandledException;
+        }
+
+        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners, ComplexityConfiguration complexityConfiguration)
+            : this(schema, documentExecuter, documentListeners)
+        {
+            _complexityConfiguration = complexityConfiguration; // Support null so that if the DI returns a null value (due to IOptions mapping) it will still work
         }
 
         public virtual Task<ExecutionResult> ExecuteAsync(
@@ -83,7 +89,7 @@ namespace GraphQL.Execution
                 CachedDocumentValidationRules = CachedDocumentValidationRules,
                 ValidationRules = ValidationRules,
                 CancellationToken = cancellationToken,
-                ComplexityConfiguration = ComplexityConfiguration,
+                ComplexityConfiguration = _complexityConfiguration,
                 EnableMetrics = EnableMetrics,
                 Inputs = variables,
                 ThrowOnUnhandledException = ThrowOnUnhandledException,
@@ -95,10 +101,15 @@ namespace GraphQL.Execution
                 Schema = _schema,
                 UserContext = context,
             };
-            foreach (var listener in _listeners)
+
+            if (_listeners != null)
             {
-                options.Listeners.Add(listener);
+                foreach (var listener in _listeners)
+                {
+                    options.Listeners.Add(listener);
+                }
             }
+
             return options;
         }
 

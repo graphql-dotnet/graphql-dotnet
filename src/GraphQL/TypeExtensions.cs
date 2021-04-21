@@ -30,7 +30,7 @@ namespace GraphQL
             if (type == null)
                 return false;
 
-            return !type.IsAbstract && !type.IsInterface;
+            return !type.IsAbstract && !type.IsInterface; // && !type.IsGenericTypeDefinition; ??
         }
 
         /// <summary>

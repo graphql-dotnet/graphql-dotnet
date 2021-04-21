@@ -20,18 +20,10 @@ namespace GraphQL.MicrosoftDI
             services.TryAddSingleton<IDocumentBuilder, GraphQLDocumentBuilder>();
             services.TryAddSingleton<IDocumentValidator, DocumentValidator>();
             services.TryAddSingleton<IComplexityAnalyzer, ComplexityAnalyzer>();
+            services.TryAddTransient(services => services.GetService<IOptions<ComplexityConfiguration>>()?.Value); // Registering IOptions<ComplexityConfiguration> or registering ComplexityConfiguration will work
             services.TryAddSingleton<IDocumentCache>(DefaultDocumentCache.Instance);
-            services.TryAddSingleton<IErrorInfoProvider>(services =>
-            {
-                var options = services.GetService<IOptions<ErrorInfoProviderOptions>>();
-                if (options != null)
-                    return new ErrorInfoProvider(options.Value);
-                var optionsValue = services.GetService<ErrorInfoProviderOptions>();
-                if (optionsValue != null)
-                    return new ErrorInfoProvider(optionsValue);
-                return new ErrorInfoProvider();
-            });
-            
+            services.TryAddSingleton<IErrorInfoProvider, ErrorInfoProvider>();
+            services.TryAddTransient(services => services.GetService<IOptions<ErrorInfoProviderOptions>>()?.Value); // Registering IOptions<ErrorInfoProviderOptions> or registering ErrorInfoProviderOptions will work
             services.TryAddSingleton<IDocumentWriter>(x =>
             {
                 throw new InvalidOperationException(

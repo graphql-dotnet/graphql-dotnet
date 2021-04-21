@@ -1,8 +1,7 @@
 using System;
-using GraphQL.Caching;
 using Microsoft.Extensions.Options;
 
-namespace GraphQL.MemoryCache
+namespace GraphQL.Caching
 {
     public static class GraphQLBuilderExtensions
     {
