@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using GraphQL;
 
 namespace Example
 {

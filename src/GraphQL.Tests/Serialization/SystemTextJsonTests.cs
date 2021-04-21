@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -78,6 +79,29 @@ namespace GraphQL.Tests.Serialization
             var actual = await testData.FromJsonAsync<TestClass1>();
             actual.query.ShouldBe("hello");
             Verify(actual.variables);
+            // verify that the stream has not been disposed
+            testData.ReadByte().ShouldBe(-1);
+            testData.Dispose();
+            Should.Throw<ObjectDisposedException>(() => testData.ReadByte());
+        }
+
+        [Fact]
+        public void FromJson_Inputs()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass3>();
+            actual.query.ShouldBe("hello");
+            Verify(actual.variables);
+        }
+
+        [Fact]
+        public async Task FromJsonAsync_Inputs()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
+            var actual = await testData.FromJsonAsync<TestClass3>();
+            actual.query.ShouldBe("hello");
+            Verify(actual.variables);
         }
 
         [Fact]
@@ -100,6 +124,12 @@ namespace GraphQL.Tests.Serialization
         {
             public string query { get; set; }
             public JsonElement variables { get; set; }
+        }
+
+        private class TestClass3
+        {
+            public string query { get; set; }
+            public Inputs variables { get; set; }
         }
 
         public class TestData

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json.Linq;
@@ -58,6 +61,29 @@ namespace GraphQL.Tests.Serialization
         }
 
         [Fact]
+        public void FromJson()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.query.ShouldBe("hello");
+            Verify(actual.variables);
+        }
+
+        [Fact]
+        public async Task FromJsonAsync()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
+            var actual = await testData.FromJsonAsync<TestClass1>();
+            actual.query.ShouldBe("hello");
+            Verify(actual.variables);
+            // verify that the stream has not been disposed
+            testData.ReadByte().ShouldBe(-1);
+            testData.Dispose();
+            Should.Throw<ObjectDisposedException>(() => testData.ReadByte());
+        }
+
+        [Fact]
         public void ElementToInputs()
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
@@ -70,7 +96,7 @@ namespace GraphQL.Tests.Serialization
         private class TestClass1
         {
             public string query { get; set; }
-            public Dictionary<string, object> variables { get; set; }
+            public Inputs variables { get; set; }
         }
 
         private class TestClass2

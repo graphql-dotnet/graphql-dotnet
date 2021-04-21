@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -48,6 +49,38 @@ namespace GraphQL.NewtonsoftJson
                     DateParseHandling = DateParseHandling.None
                 });
             return GetValueInternal(values) as Dictionary<string, object>;
+        }
+
+        /// <summary>
+        /// Deserializes a JSON-formatted string of data into the specified type.
+        /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// </summary>
+        public static T FromJson<T>(this string json)
+        {
+            var settings = new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.None,
+            };
+            settings.Converters.Add(InputsConverter.Instance);
+            return JsonConvert.DeserializeObject<T>(json, settings);
+        }
+
+        /// <summary>
+        /// Deserializes a JSON-formatted stream of data into the specified type.
+        /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// </summary>
+        public static async Task<T> FromJsonAsync<T>(this System.IO.Stream stream)
+        {
+            using var streamReader = new System.IO.StreamReader(stream ?? throw new ArgumentNullException(nameof(stream)), System.Text.Encoding.UTF8, false, 1024, true);
+            var text = await streamReader.ReadToEndAsync();
+            var settings = new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.None,
+            };
+            settings.Converters.Add(InputsConverter.Instance);
+            return JsonConvert.DeserializeObject<T>(text, settings);
         }
 
         /// <summary>

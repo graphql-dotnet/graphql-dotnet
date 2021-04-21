@@ -46,6 +46,7 @@ namespace GraphQL.SystemTextJson
         /// Deserializes a JSON-formatted string of data into the specified type.
         /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
         /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
+        /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
         /// </summary>
         public static T FromJson<T>(this string json)
             => JsonSerializer.Deserialize<T>(json, _jsonOptions);
@@ -54,6 +55,7 @@ namespace GraphQL.SystemTextJson
         /// Deserializes a JSON-formatted stream of data into the specified type.
         /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
         /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
+        /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
         /// </summary>
         public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default)
             => JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
