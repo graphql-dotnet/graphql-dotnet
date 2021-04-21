@@ -114,7 +114,7 @@ namespace GraphQL.Tests.Serialization
             actual["itemString"].ShouldBeOfType<string>().ShouldBe("test");
             actual["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
             actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
-            actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe((BigInteger)((dynamic)_example).itemBigInt);
+            actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe(_example.itemBigInt);
         }
     }
 }
