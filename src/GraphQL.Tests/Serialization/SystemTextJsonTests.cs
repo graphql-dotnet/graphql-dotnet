@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Serialization
                 },
             obj = new TestChildData
             {
-                itemNull = (string)null,
+                itemNull = null,
                 itemString = "test",
                 itemNum = 123,
                 itemFloat = 12.4,

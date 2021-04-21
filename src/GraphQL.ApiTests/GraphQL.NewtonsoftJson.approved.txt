@@ -32,6 +32,7 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class StringExtensions
     {
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static object GetValue(this object value) { }
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }

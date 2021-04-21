@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -29,7 +30,7 @@ namespace GraphQL.NewtonsoftJson
         /// </remarks>
         public static Inputs ToInputs(this JObject obj)
         {
-            var variables = obj?.GetValue() as Dictionary<string, object>;
+            var variables = obj?.GetValueInternal() as Dictionary<string, object>;
             return variables.ToInputs();
         }
 
@@ -46,7 +47,7 @@ namespace GraphQL.NewtonsoftJson
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                     DateParseHandling = DateParseHandling.None
                 });
-            return GetValue(values) as Dictionary<string, object>;
+            return GetValueInternal(values) as Dictionary<string, object>;
         }
 
         /// <summary>
@@ -54,14 +55,18 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="value">The object containing the value to extract.</param>
         /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
+        [Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static object GetValue(this object value)
+            => GetValueInternal(value);
+
+        private static object GetValueInternal(this object value)
         {
             if (value is JObject objectValue)
             {
                 var output = new Dictionary<string, object>();
                 foreach (var kvp in objectValue)
                 {
-                    output.Add(kvp.Key, GetValue(kvp.Value));
+                    output.Add(kvp.Key, GetValueInternal(kvp.Value));
                 }
                 return output;
             }
@@ -70,7 +75,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 return new Dictionary<string, object>
                 {
-                    { propertyValue.Name, GetValue(propertyValue.Value) }
+                    { propertyValue.Name, GetValueInternal(propertyValue.Value) }
                 };
             }
 
@@ -78,7 +83,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 return arrayValue.Children().Aggregate(new List<object>(), (list, token) =>
                 {
-                    list.Add(GetValue(token));
+                    list.Add(GetValueInternal(token));
                     return list;
                 });
             }

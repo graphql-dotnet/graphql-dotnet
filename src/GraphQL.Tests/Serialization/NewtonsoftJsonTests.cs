@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Serialization
 {
     public class NewtonsoftJsonTests
     {
-        private readonly object _example = new
+        private readonly TestData _example = new TestData
         {
             array = new object[]
                 {
@@ -20,14 +20,14 @@ namespace GraphQL.Tests.Serialization
                     123,
                     1.2
                 },
-            obj = new
+            obj = new TestChildData
             {
-                itemNull = (string)null,
+                itemNull = null,
                 itemString = "test",
                 itemNum = 123,
                 itemFloat = 12.4,
             },
-            itemNull = (string)null,
+            itemNull = null,
             itemString = "test",
             itemNum = 123,
             itemFloat = 12.4,
@@ -77,6 +77,25 @@ namespace GraphQL.Tests.Serialization
         {
             public string query { get; set; }
             public JObject variables { get; set; }
+        }
+
+        public class TestData
+        {
+            public object[] array { get; set; }
+            public TestChildData obj { get; set; }
+            public string itemNull { get; set; }
+            public string itemString { get; set; }
+            public int itemNum { get; set; }
+            public double itemFloat { get; set; }
+            public BigInteger itemBigInt { get; set; }
+        }
+
+        public class TestChildData
+        {
+            public string itemNull { get; set; }
+            public string itemString { get; set; }
+            public int itemNum { get; set; }
+            public double itemFloat { get; set; }
         }
 
         private void Verify(IReadOnlyDictionary<string, object> actual)
