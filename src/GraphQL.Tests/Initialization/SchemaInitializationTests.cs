@@ -48,6 +48,18 @@ namespace GraphQL.Tests.Initialization
         {
             ShouldNotThrow<SchemaWithDeprecatedAppliedDirective>();
         }
+
+        [Fact]
+        public void SchemaWithNullDirectiveArgumentWhenShouldBeNonNull_Should_Throw()
+        {
+            ShouldThrow<SchemaWithNullDirectiveArgumentWhenShouldBeNonNull, InvalidOperationException>("Directive 'test' applied to field 'MyQuery.field' explicitly specifies 'null' value for required argument 'arg'. The value must be non-null.");
+        }
+
+        [Fact]
+        public void SchemaWithArgumentsOnInputField_Should_Throw()
+        {
+            ShouldThrow<SchemaWithArgumentsOnInputField, InvalidOperationException>("The field 'id' of an Input Object type 'MyInput' must not have any arguments specified.");
+        }
     }
 
     public class EmptyQuerySchema : Schema
@@ -147,6 +159,51 @@ namespace GraphQL.Tests.Initialization
             f.DeprecationReason.ShouldBe("aaa");
             f.DeprecationReason = "bbb";
             f.FindAppliedDirective("deprecated").FindArgument("reason").Value.ShouldBe("bbb");
+        }
+    }
+
+    public class SchemaWithNullDirectiveArgumentWhenShouldBeNonNull : Schema
+    {
+        public class TestDirective : DirectiveGraphType
+        {
+            public TestDirective()
+                : base("test", DirectiveLocation.Schema, DirectiveLocation.FieldDefinition)
+            {
+                Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>>
+                {
+                    Name = "arg"
+                });
+            }
+        }
+
+        public SchemaWithNullDirectiveArgumentWhenShouldBeNonNull()
+        {
+            Query = new ObjectGraphType { Name = "MyQuery" };
+            Query.AddField(new FieldType { Name = "field", ResolvedType = new StringGraphType() }).ApplyDirective("test", "arg", null);
+
+            Directives.Register(new TestDirective());
+        }
+    }
+
+    public class SchemaWithArgumentsOnInputField : Schema
+    {
+        public class MyInputGraphType : InputObjectGraphType
+        {
+            public MyInputGraphType()
+            {
+                Field<NonNullGraphType<StringGraphType>>("id", arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "x" }));
+            }
+        }
+
+        public SchemaWithArgumentsOnInputField()
+        {
+            Query = new ObjectGraphType { Name = "MyQuery" };
+            Query.AddField(new FieldType
+            {
+                Name = "field",
+                ResolvedType = new StringGraphType(),
+                Arguments = new QueryArguments(new QueryArgument<MyInputGraphType> { Name = "arg" })
+            });
         }
     }
 }

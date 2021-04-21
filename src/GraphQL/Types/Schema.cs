@@ -344,6 +344,7 @@ namespace GraphQL.Types
         {
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
+            // Do not change the order of these validations.
             SchemaValidationVisitor.Instance.Run(this);
             AppliedDirectivesValidationVisitor.Instance.Run(this);
         }
