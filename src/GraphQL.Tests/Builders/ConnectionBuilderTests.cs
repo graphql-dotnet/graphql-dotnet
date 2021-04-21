@@ -401,12 +401,8 @@ namespace GraphQL.Tests.Builders
             graph.Connection<ChildType>()
                 .Name("connection")
                 .PageSize(10)
-                .Resolve(context =>
-                {
-                    context.First.ShouldBe(10);
-                    return null;
-                });
-            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext());
+                .Resolve(context => context.First);
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBe(10);
         }
 
         [Fact]
@@ -416,12 +412,8 @@ namespace GraphQL.Tests.Builders
             graph.Connection<ChildType>()
                 .Name("connection")
                 .PageSize(10)
-                .ResolveAsync(context =>
-                {
-                    context.First.ShouldBe(10);
-                    return Task.FromResult<object>(null);
-                });
-            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext());
+                .ResolveAsync(context => Task.FromResult<object>(context.First));
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBeOfType<Task<object>>().Result.ShouldBe(10);
         }
 
         public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
