@@ -13,7 +13,8 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Sets the resolver for the connection field. A dependency injection scope is created for the duration of the resolver's execution
         /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>. This method must be called after
-        /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
         public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
@@ -44,7 +45,8 @@ namespace GraphQL.MicrosoftDI
 
         /// <summary>
         /// Creates a resolve builder for the connection field. This method must be called after
-        /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
         public static ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this ConnectionBuilder<TSourceType> builder)
             => new ConnectionResolverBuilder<TSourceType, object>(builder.Returns<object>(), false);
