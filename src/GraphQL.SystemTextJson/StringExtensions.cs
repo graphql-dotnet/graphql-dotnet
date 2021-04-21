@@ -63,7 +63,7 @@ namespace GraphQL.SystemTextJson
         public static Inputs ToInputs(this JsonElement obj)
         {
             if (obj.ValueKind == JsonValueKind.Null)
-                return null;
+                return Inputs.Empty;
 
             if (obj.ValueKind != JsonValueKind.Object)
                 throw new InvalidOperationException("This element is not an object element");

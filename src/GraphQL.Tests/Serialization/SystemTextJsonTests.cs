@@ -90,6 +90,23 @@ namespace GraphQL.Tests.Serialization
             Verify(variables);
         }
 
+        [Fact]
+        public void ElementToInputs_ReturnsEmptyForNull()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
+            var actual = test.FromJson<TestClass2>();
+            actual.query.ShouldBe("hello");
+            var variables = actual.variables.ToInputs();
+            variables.ShouldNotBeNull();
+            variables.Count.ShouldBe(0);
+        }
+
+        [Fact]
+        public void ToInputsReturnsEmptyForNull()
+        {
+            ((string)null).ToInputs().ShouldBeNull();
+        }
+
         private class TestClass1
         {
             public string query { get; set; }
