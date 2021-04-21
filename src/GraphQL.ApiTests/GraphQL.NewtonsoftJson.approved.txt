@@ -26,12 +26,23 @@ namespace GraphQL.NewtonsoftJson
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
+    public class InputsConverter : Newtonsoft.Json.JsonConverter
+    {
+        public static readonly GraphQL.NewtonsoftJson.InputsConverter Instance;
+        public InputsConverter() { }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
     public static class StringExtensions
     {
+        public static T FromJson<T>(this string json) { }
+        public static System.Threading.Tasks.Task<T> FromJsonAsync<T>(this System.IO.Stream stream) { }
         [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static object GetValue(this object value) { }
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
