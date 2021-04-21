@@ -12,9 +12,11 @@ namespace GraphQL.MicrosoftDI
     {
         /// <summary>
         /// Sets the resolver for the connection field. A dependency injection scope is created for the duration of the resolver's execution
-        /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
+        /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>. This method must be called after
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
-        public static ConnectionBuilder<TSourceType> ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
@@ -25,11 +27,10 @@ namespace GraphQL.MicrosoftDI
                     return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
                 }
             });
-            return builder;
         }
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-        public static ConnectionBuilder<TSourceType> ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
@@ -40,21 +41,22 @@ namespace GraphQL.MicrosoftDI
                     return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
                 }
             });
-            return builder;
         }
 
         /// <summary>
-        /// Creates a resolve builder for the connection field.
+        /// Creates a resolve builder for the connection field. This method must be called after
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
+        /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
         public static ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this ConnectionBuilder<TSourceType> builder)
             => new ConnectionResolverBuilder<TSourceType, object>(builder.Returns<object>(), false);
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
-            return builder.Resolve(context =>
+            builder.Resolve(context =>
             {
                 using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
@@ -64,11 +66,11 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolveScopedAsync{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
-            return builder.ResolveAsync(async context =>
+            builder.ResolveAsync(async context =>
             {
                 using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
                 {
