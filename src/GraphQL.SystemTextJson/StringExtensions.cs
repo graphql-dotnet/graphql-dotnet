@@ -14,6 +14,7 @@ namespace GraphQL.SystemTextJson
             Converters =
             {
                 new ObjectDictionaryConverter(),
+                new InputsConverter(),
                 new JsonConverterBigInteger(),
             }
         };
