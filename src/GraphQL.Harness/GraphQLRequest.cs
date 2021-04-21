@@ -1,6 +1,4 @@
-using System.Text.Json.Serialization;
-using GraphQL;
-using GraphQL.SystemTextJson;
+using System.Collections.Generic;
 
 namespace Example
 {
@@ -10,7 +8,6 @@ namespace Example
 
         public string Query { get; set; }
 
-        [JsonConverter(typeof(InputsConverter))]
         public Inputs Variables { get; set; }
     }
 }
