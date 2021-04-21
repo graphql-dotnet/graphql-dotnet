@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Serialization
 {
     public class SystemTextJsonTests
     {
-        private readonly object _example = new
+        private readonly TestData _example = new TestData
         {
             array = new object[]
                 {
@@ -22,25 +22,27 @@ namespace GraphQL.Tests.Serialization
                     123,
                     1.2
                 },
-            obj = new
+            obj = new TestChildData
             {
                 itemNull = (string)null,
                 itemString = "test",
                 itemNum = 123,
-                itemFloat = 12.3,
+                itemFloat = 12.4,
             },
-            itemNull = (string)null,
+            itemNull = null,
             itemString = "test",
             itemNum = 123,
-            itemFloat = 12.3,
+            itemFloat = 12.4,
             itemBigInt = BigInteger.Parse("1234567890123456789012345678901234567890"),
         };
-        private readonly string _exampleJson = "{\"array\":[null,\"test\",123,1.2],\"obj\":{\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.3},\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.3,\"itemBigInt\":1234567890123456789012345678901234567890}";
+        private readonly string _exampleJson = "{\"array\":[null,\"test\",123,1.2],\"obj\":{\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4},\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4,\"itemBigInt\":1234567890123456789012345678901234567890}";
 
         [Fact]
         public async Task SerializeWithDocumentWriter()
         {
             var dw = new DocumentWriter();
+            // note: WriteToStringAsync<object>(...) always returns "{}" on .Net Core 2.1 / 3.1, but works fine on 5.0
+            // so we need to use a strongly typed object here
             var actual = await dw.WriteToStringAsync(_example);
             actual.ShouldBe(_exampleJson);
         }
@@ -100,6 +102,25 @@ namespace GraphQL.Tests.Serialization
             public JsonElement variables { get; set; }
         }
 
+        public class TestData
+        {
+            public object[] array { get; set; }
+            public TestChildData obj { get; set; }
+            public string itemNull { get; set; }
+            public string itemString { get; set; }
+            public int itemNum { get; set; }
+            public double itemFloat { get; set; }
+            public BigInteger itemBigInt { get; set; }
+        }
+
+        public class TestChildData
+        {
+            public string itemNull { get; set; }
+            public string itemString { get; set; }
+            public int itemNum { get; set; }
+            public double itemFloat { get; set; }
+        }
+
         private void Verify(IReadOnlyDictionary<string, object> actual)
         {
             var array = actual["array"].ShouldBeOfType<List<object>>();
@@ -111,12 +132,12 @@ namespace GraphQL.Tests.Serialization
             obj["itemNull"].ShouldBeNull();
             obj["itemString"].ShouldBeOfType<string>().ShouldBe("test");
             obj["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.3);
+            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
             actual["itemNull"].ShouldBeNull();
             actual["itemString"].ShouldBeOfType<string>().ShouldBe("test");
             actual["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.3);
-            actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe((BigInteger)((dynamic)_example).itemBigInt);
+            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
+            actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe(_example.itemBigInt);
         }
     }
 }

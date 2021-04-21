@@ -25,15 +25,15 @@ namespace GraphQL.Tests.Serialization
                 itemNull = (string)null,
                 itemString = "test",
                 itemNum = 123,
-                itemFloat = 12.3,
+                itemFloat = 12.4,
             },
             itemNull = (string)null,
             itemString = "test",
             itemNum = 123,
-            itemFloat = 12.3,
+            itemFloat = 12.4,
             itemBigInt = BigInteger.Parse("1234567890123456789012345678901234567890"),
         };
-        private readonly string _exampleJson = "{\"array\":[null,\"test\",123,1.2],\"obj\":{\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.3},\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.3,\"itemBigInt\":1234567890123456789012345678901234567890}";
+        private readonly string _exampleJson = "{\"array\":[null,\"test\",123,1.2],\"obj\":{\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4},\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4,\"itemBigInt\":1234567890123456789012345678901234567890}";
 
         [Fact]
         public async Task SerializeWithDocumentWriter()
@@ -90,11 +90,11 @@ namespace GraphQL.Tests.Serialization
             obj["itemNull"].ShouldBeNull();
             obj["itemString"].ShouldBeOfType<string>().ShouldBe("test");
             obj["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.3);
+            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
             actual["itemNull"].ShouldBeNull();
             actual["itemString"].ShouldBeOfType<string>().ShouldBe("test");
             actual["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.3);
+            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
             actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe((BigInteger)((dynamic)_example).itemBigInt);
         }
     }
