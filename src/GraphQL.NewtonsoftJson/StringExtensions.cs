@@ -12,6 +12,8 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public static class StringExtensions
     {
+        private static readonly InputsConverter _inputsConverter = new();
+
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
@@ -62,7 +64,7 @@ namespace GraphQL.NewtonsoftJson
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateParseHandling = DateParseHandling.None,
             };
-            settings.Converters.Add(InputsConverter.Instance);
+            settings.Converters.Add(_inputsConverter);
             return JsonConvert.DeserializeObject<T>(json, settings);
         }
 
@@ -79,7 +81,7 @@ namespace GraphQL.NewtonsoftJson
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateParseHandling = DateParseHandling.None,
             };
-            settings.Converters.Add(InputsConverter.Instance);
+            settings.Converters.Add(_inputsConverter);
             return JsonConvert.DeserializeObject<T>(text, settings);
         }
 

@@ -28,7 +28,6 @@ namespace GraphQL.NewtonsoftJson
     }
     public class InputsConverter : Newtonsoft.Json.JsonConverter
     {
-        public static readonly GraphQL.NewtonsoftJson.InputsConverter Instance;
         public InputsConverter() { }
         public override bool CanWrite { get; }
         public override bool CanConvert(System.Type objectType) { }

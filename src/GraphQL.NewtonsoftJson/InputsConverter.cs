@@ -10,11 +10,6 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class InputsConverter : JsonConverter
     {
-        /// <summary>
-        /// Returns a static instance of this class.
-        /// </summary>
-        public static readonly InputsConverter Instance = new InputsConverter();
-
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             => ReadDictionary(reader).ToInputs();
