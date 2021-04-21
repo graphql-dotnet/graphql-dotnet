@@ -1,12 +1,12 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.Types;
 using GraphQL.SystemTextJson;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.Threading;
 
 namespace Example
 {
