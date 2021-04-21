@@ -7,6 +7,7 @@ using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace GraphQL.MicrosoftDI
 {
@@ -20,7 +21,16 @@ namespace GraphQL.MicrosoftDI
             services.TryAddSingleton<IDocumentValidator, DocumentValidator>();
             services.TryAddSingleton<IComplexityAnalyzer, ComplexityAnalyzer>();
             services.TryAddSingleton<IDocumentCache>(DefaultDocumentCache.Instance);
-            services.TryAddSingleton<IErrorInfoProvider, ErrorInfoProvider>();
+            services.TryAddSingleton<IErrorInfoProvider>(services =>
+            {
+                var options = services.GetService<IOptions<ErrorInfoProviderOptions>>();
+                if (options != null)
+                    return new ErrorInfoProvider(options.Value);
+                var optionsValue = services.GetService<ErrorInfoProviderOptions>();
+                if (optionsValue != null)
+                    return new ErrorInfoProvider(optionsValue);
+                return new ErrorInfoProvider();
+            });
             
             services.TryAddSingleton<IDocumentWriter>(x =>
             {
@@ -33,14 +43,23 @@ namespace GraphQL.MicrosoftDI
             return new GraphQLBuilder(services);
         }
 
-        public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+        public static IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
-            => builder.AddSchema<TSchema, GraphQLExecuter<TSchema>>(serviceLifetime);
+            => builder.AddSelfActivatingSchema<TSchema, GraphQLExecuter<TSchema>>(serviceLifetime);
 
-        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+        public static IGraphQLBuilder AddSelfActivatingSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
             where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
         {
+            if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
+            {
+                // This scenario can cause a memory leak if the schema is requested from the root service provider.
+                // If it was requested from a scoped provider, then there is no reason to register it as transient.
+                // See following link:
+                // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
+                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+            }
+
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, services =>
             {
@@ -48,7 +67,7 @@ namespace GraphQL.MicrosoftDI
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
             });
-            // Register ISchema with the DI provider if none already registered
+            // Register ISchema with the DI provider if none already registered; maps to the TSchema registration
             builder.TryRegister<ISchema>(serviceLifetime, services => services.GetRequiredService<TSchema>());
             // Register IGraphQLExecuter<TSchema> with the DI provider
             builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);

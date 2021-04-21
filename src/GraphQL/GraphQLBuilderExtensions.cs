@@ -35,6 +35,15 @@ namespace GraphQL
             where TSchema : class, ISchema
             where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
         {
+            if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
+            {
+                // This scenario can cause a memory leak if the schema is requested from the root service provider.
+                // If it was requested from a scoped provider, then there is no reason to register it as transient.
+                // See following link:
+                // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
+                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+            }
+
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register<TSchema>(serviceLifetime);
             // Register ISchema with the DI provider if none already registered
