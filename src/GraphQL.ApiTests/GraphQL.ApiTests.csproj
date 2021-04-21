@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GraphQL.SystemReactive.received.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
   </ItemGroup>
 
