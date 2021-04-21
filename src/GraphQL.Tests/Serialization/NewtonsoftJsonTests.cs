@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Serialization
         [Fact]
         public void ToInputsReturnsEmptyForNull()
         {
-            ((string)null).ToInputs().ShouldBeNull();
+            ((string)null).ToInputs().ShouldNotBeNull().Count.ShouldBe(0);
         }
 
         private class TestClass1
