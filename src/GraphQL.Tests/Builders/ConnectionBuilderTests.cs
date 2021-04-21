@@ -394,6 +394,36 @@ namespace GraphQL.Tests.Builders
             graph.Fields.Find("connection").Arguments.Count(x => x.Name == "last").ShouldBe(1);
         }
 
+        [Fact]
+        public void should_use_pagesize()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .PageSize(10)
+                .Resolve(context =>
+                {
+                    context.First.ShouldBe(10);
+                    return null;
+                });
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext());
+        }
+
+        [Fact]
+        public void should_use_pagesize_async()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .PageSize(10)
+                .ResolveAsync(context =>
+                {
+                    context.First.ShouldBe(10);
+                    return Task.FromResult<object>(null);
+                });
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext());
+        }
+
         public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
         {
             public int? HighestField2 => Edges?.Max(e => e.Node?.Field2);
