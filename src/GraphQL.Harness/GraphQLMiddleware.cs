@@ -1,8 +1,9 @@
 using System;
-using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -50,11 +51,7 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>
-            (
-                context.Request.Body,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
+            var request = await context.Request.Body.FromJsonAsync<GraphQLRequest>(context.RequestAborted);
 
             var result = await _executer.ExecuteAsync(options =>
             {
@@ -65,6 +62,7 @@ namespace Example
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
+                options.CancellationToken = context.RequestAborted;
             });
 
             if (_settings.EnableMetrics)
@@ -72,15 +70,15 @@ namespace Example
                 result.EnrichWithApolloTracing(start);
             }
 
-            await WriteResponseAsync(context, result);
+            await WriteResponseAsync(context, result, context.RequestAborted);
         }
 
-        private async Task WriteResponseAsync(HttpContext context, ExecutionResult result)
+        private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200; // OK
 
-            await _writer.WriteAsync(context.Response.Body, result);
+            await _writer.WriteAsync(context.Response.Body, result, cancellationToken);
         }
     }
 }

@@ -88,7 +88,7 @@ namespace GraphQL.Validation
 
                 if (!rules.Any())
                 {
-                    variables = context.GetVariableValues(schema, variableDefinitions, inputs); // can report errors even without rules enabled
+                    variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty); // can report errors even without rules enabled
                 }
                 else
                 {
