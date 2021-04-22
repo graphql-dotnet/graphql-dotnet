@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,7 +11,15 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public static class StringExtensions
     {
-        private static readonly InputsConverter _inputsConverter = new();
+        private static readonly JsonSerializer _jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
+        {
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateParseHandling = DateParseHandling.None,
+            Converters =
+            {
+                new InputsConverter()
+            },
+        });
 
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary.
@@ -44,45 +51,37 @@ namespace GraphQL.NewtonsoftJson
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
         public static Dictionary<string, object> ToDictionary(this string json)
         {
-            object values = JsonConvert.DeserializeObject(json,
-                new JsonSerializerSettings
-                {
-                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                    DateParseHandling = DateParseHandling.None
-                });
+            if (json == null)
+                return null;
+
+            using var stringReader = new System.IO.StringReader(json);
+            using var jsonTextReader = new JsonTextReader(stringReader);
+            var values = _jsonSerializer.Deserialize(jsonTextReader);
             return GetValueInternal(values) as Dictionary<string, object>;
         }
 
         /// <summary>
         /// Deserializes a JSON-formatted string of data into the specified type.
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// Property names are matched based on a case insensitive comparison (the default for Newtonsoft.Json).
         /// </summary>
         public static T FromJson<T>(this string json)
         {
-            var settings = new JsonSerializerSettings
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateParseHandling = DateParseHandling.None,
-            };
-            settings.Converters.Add(_inputsConverter);
-            return JsonConvert.DeserializeObject<T>(json, settings);
+            using var stringReader = new System.IO.StringReader(json);
+            using var jsonTextReader = new JsonTextReader(stringReader);
+            return _jsonSerializer.Deserialize<T>(jsonTextReader);
         }
 
         /// <summary>
         /// Deserializes a JSON-formatted stream of data into the specified type.
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// Property names are matched based on a case insensitive comparison (the default for Newtonsoft.Json).
         /// </summary>
-        public static async Task<T> FromJsonAsync<T>(this System.IO.Stream stream)
+        public static T FromJson<T>(this System.IO.Stream stream)
         {
             using var streamReader = new System.IO.StreamReader(stream ?? throw new ArgumentNullException(nameof(stream)), System.Text.Encoding.UTF8, false, 1024, true);
-            var text = await streamReader.ReadToEndAsync();
-            var settings = new JsonSerializerSettings
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateParseHandling = DateParseHandling.None,
-            };
-            settings.Converters.Add(_inputsConverter);
-            return JsonConvert.DeserializeObject<T>(text, settings);
+            using var jsonTextReader = new JsonTextReader(streamReader);
+            return _jsonSerializer.Deserialize<T>(jsonTextReader);
         }
 
         /// <summary>

@@ -72,6 +72,24 @@ namespace GraphQL.Tests.Serialization
         }
 
         [Fact]
+        public void FromJson_Null()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.query.ShouldBe("hello");
+            actual.variables.ShouldBeNull();
+        }
+
+        [Fact]
+        public void FromJson_Missing()
+        {
+            var test = $"{{\"query\":\"hello\"}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.query.ShouldBe("hello");
+            actual.variables.ShouldBeNull();
+        }
+
+        [Fact]
         public async Task FromJsonAsync()
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
@@ -90,8 +108,44 @@ namespace GraphQL.Tests.Serialization
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var actual = test.FromJson<TestClass3>();
-            actual.query.ShouldBe("hello");
-            Verify(actual.variables);
+            actual.Query.ShouldBe("hello");
+            Verify(actual.Variables);
+        }
+
+        [Fact]
+        public void FromJson_Inputs_Null()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
+            var actual = test.FromJson<TestClass3>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+        }
+
+        [Fact]
+        public void FromJson_Inputs_Missing()
+        {
+            var test = $"{{\"query\":\"hello\"}}";
+            var actual = test.FromJson<TestClass3>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+        }
+
+        [Fact]
+        public void FromJson_IsCaseSensitive_Element()
+        {
+            var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass2>();
+            actual.Query.ShouldBeNull();
+            actual.Variables.ValueKind.ShouldBe(JsonValueKind.Undefined);
+        }
+
+        [Fact]
+        public void FromJson_IsCaseSensitive_Inputs()
+        {
+            var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass3>();
+            actual.Query.ShouldBeNull();
+            actual.Variables.ShouldBeNull();
         }
 
         [Fact]
@@ -100,8 +154,8 @@ namespace GraphQL.Tests.Serialization
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
             var actual = await testData.FromJsonAsync<TestClass3>();
-            actual.query.ShouldBe("hello");
-            Verify(actual.variables);
+            actual.Query.ShouldBe("hello");
+            Verify(actual.Variables);
         }
 
         [Fact]
@@ -109,8 +163,8 @@ namespace GraphQL.Tests.Serialization
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var actual = test.FromJson<TestClass2>();
-            actual.query.ShouldBe("hello");
-            var variables = actual.variables.ToInputs();
+            actual.Query.ShouldBe("hello");
+            var variables = actual.Variables.ToInputs();
             Verify(variables);
         }
 
@@ -119,8 +173,21 @@ namespace GraphQL.Tests.Serialization
         {
             var test = $"{{\"query\":\"hello\",\"variables\":null}}";
             var actual = test.FromJson<TestClass2>();
-            actual.query.ShouldBe("hello");
-            var variables = actual.variables.ToInputs();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ValueKind.ShouldBe(JsonValueKind.Null);
+            var variables = actual.Variables.ToInputs();
+            variables.ShouldNotBeNull();
+            variables.Count.ShouldBe(0);
+        }
+
+        [Fact]
+        public void ElementToInputs_ReturnsEmptyForMissing()
+        {
+            var test = $"{{\"query\":\"hello\"}}";
+            var actual = test.FromJson<TestClass2>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ValueKind.ShouldBe(JsonValueKind.Undefined);
+            var variables = actual.Variables.ToInputs();
             variables.ShouldNotBeNull();
             variables.Count.ShouldBe(0);
         }
@@ -139,14 +206,14 @@ namespace GraphQL.Tests.Serialization
 
         private class TestClass2
         {
-            public string query { get; set; }
-            public JsonElement variables { get; set; }
+            public string Query { get; set; }
+            public JsonElement Variables { get; set; }
         }
 
         private class TestClass3
         {
-            public string query { get; set; }
-            public Inputs variables { get; set; }
+            public string Query { get; set; }
+            public Inputs Variables { get; set; }
         }
 
         public class TestData

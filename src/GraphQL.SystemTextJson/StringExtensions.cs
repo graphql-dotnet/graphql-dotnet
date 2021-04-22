@@ -44,18 +44,26 @@ namespace GraphQL.SystemTextJson
 
         /// <summary>
         /// Deserializes a JSON-formatted string of data into the specified type.
+        /// <br/><br/>
         /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
         /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
+        /// <br/><br/>
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// <br/><br/>
+        /// Property names are converted to camel case and matched based on a case sensitive comparison (the default for System.Text.Json).
         /// </summary>
         public static T FromJson<T>(this string json)
             => JsonSerializer.Deserialize<T>(json, _jsonOptions);
 
         /// <summary>
         /// Deserializes a JSON-formatted stream of data into the specified type.
+        /// <br/><br/>
         /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
         /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
+        /// <br/><br/>
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
+        /// <br/><br/>
+        /// Property names are converted to camel case and matched based on a case sensitive comparison (the default for System.Text.Json).
         /// </summary>
         public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default)
             => JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
@@ -65,7 +73,7 @@ namespace GraphQL.SystemTextJson
         /// </summary>
         public static Inputs ToInputs(this JsonElement obj)
         {
-            if (obj.ValueKind == JsonValueKind.Null)
+            if (obj.ValueKind == JsonValueKind.Null || obj.ValueKind == JsonValueKind.Undefined)
                 return Inputs.Empty;
 
             if (obj.ValueKind != JsonValueKind.Object)

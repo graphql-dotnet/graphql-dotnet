@@ -12,10 +12,13 @@ namespace GraphQL.NewtonsoftJson
     {
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            => ReadDictionary(reader).ToInputs();
+            => ReadDictionary(reader)?.ToInputs();
 
         internal static Dictionary<string, object> ReadDictionary(JsonReader reader)
         {
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException();
 
@@ -90,6 +93,6 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanWrite => false;
 
         /// <inheritdoc/>
-        public override bool CanConvert(Type objectType) => typeof(Inputs).IsAssignableFrom(objectType);
+        public override bool CanConvert(Type objectType) => typeof(Inputs) == objectType;
     }
 }
