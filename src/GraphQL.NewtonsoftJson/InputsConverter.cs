@@ -93,6 +93,6 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanWrite => false;
 
         /// <inheritdoc/>
-        public override bool CanConvert(Type objectType) => typeof(Inputs) == objectType;
+        public override bool CanConvert(Type objectType) => objectType == typeof(Inputs);
     }
 }
