@@ -9,6 +9,8 @@ namespace GraphQL.SystemTextJson
 {
     /// <summary>
     /// A custom JsonConverter for reading an <see cref="Inputs"/> object.
+    /// Unnecessary for writing, as <see cref="Inputs"/> implements
+    /// <see cref="IReadOnlyDictionary{TKey, TValue}">IReadOnlyDictionary&lt;string, object&gt;</see>.
     /// </summary>
     public class InputsConverter : JsonConverter<Inputs>
     {
