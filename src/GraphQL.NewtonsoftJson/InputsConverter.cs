@@ -6,7 +6,9 @@ namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
     /// A custom JsonConverter for reading an <see cref="Inputs"/> object.
-    /// Doesn't support write.
+    /// Doesn't support writing, but since <see cref="Inputs"/> implements
+    /// <see cref="IReadOnlyDictionary{TKey, TValue}">IReadOnlyDictionary&lt;string, object&gt;</see>,
+    /// serialization of <see cref="Inputs"/> is supported directly by Newtonsoft.Json.
     /// </summary>
     public class InputsConverter : JsonConverter
     {
