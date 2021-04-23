@@ -43,6 +43,18 @@ namespace GraphQL.Types
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
         }
 
+        public Schema(IServiceProvider services, IEnumerable<IFieldMiddleware> middleware)
+            : this(services)
+        {
+            if (middleware != null)
+            {
+                foreach (var fieldMiddleware in middleware)
+                {
+                    FieldMiddleware.Use(fieldMiddleware);
+                }
+            }    
+        }
+
         /// <summary>
         /// Builds schema from the specified string and configuration delegate.
         /// </summary>

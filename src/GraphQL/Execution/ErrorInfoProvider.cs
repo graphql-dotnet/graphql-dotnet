@@ -26,7 +26,7 @@ namespace GraphQL.Execution
         /// </summary>
         public ErrorInfoProvider(ErrorInfoProviderOptions options)
         {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _options = options ?? new ErrorInfoProviderOptions(); // Support null so if DI returns null here (to support IOptions mapping) it still works
         }
 
         /// <summary>
