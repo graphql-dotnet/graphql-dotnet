@@ -34,6 +34,7 @@ namespace GraphQL.Types
         public override object? ParseValue(object? value) => value switch
         {
             DateTimeOffset _ => value,
+            DateTime d => d.Kind == DateTimeKind.Unspecified ? new DateTimeOffset(d, TimeSpan.Zero) : new DateTimeOffset(d),
             string s => ParseDate(s),
             null => null,
             _ => ThrowValueConversionError(value)
