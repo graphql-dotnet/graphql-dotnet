@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using GraphQL;
 
 namespace Example
 {
@@ -8,6 +8,6 @@ namespace Example
 
         public string Query { get; set; }
 
-        public Dictionary<string, object> Variables { get; set; }
+        public Inputs Variables { get; set; }
     }
 }

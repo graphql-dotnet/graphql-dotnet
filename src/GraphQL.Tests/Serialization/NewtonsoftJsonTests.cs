@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json.Linq;
@@ -58,12 +61,73 @@ namespace GraphQL.Tests.Serialization
         }
 
         [Fact]
+        public void FromJson()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.Query.ShouldBe("hello");
+            Verify(actual.Variables);
+        }
+
+        [Fact]
+        public void FromJson_Null()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+        }
+
+        [Fact]
+        public void FromJson_Missing()
+        {
+            var test = $"{{\"query\":\"hello\"}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+        }
+
+        [Fact]
+        public void FromJson_IsCaseInsensitive_Element()
+        {
+            var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass2>();
+            actual.Query.ShouldBe("hello");
+            var variables = actual.Variables.ToInputs();
+            Verify(variables);
+        }
+
+        [Fact]
+        public void FromJson_IsCaseInsensitive_Inputs()
+        {
+            var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
+            var actual = test.FromJson<TestClass1>();
+            actual.Query.ShouldBe("hello");
+            var variables = actual.Variables;
+            Verify(variables);
+        }
+
+        [Fact]
+        public void FromJsonStream()
+        {
+            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
+            var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
+            var actual = testData.FromJson<TestClass1>();
+            actual.Query.ShouldBe("hello");
+            Verify(actual.Variables);
+            // verify that the stream has not been disposed
+            testData.ReadByte().ShouldBe(-1);
+            testData.Dispose();
+            Should.Throw<ObjectDisposedException>(() => testData.ReadByte());
+        }
+
+        [Fact]
         public void ElementToInputs()
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
-            actual.query.ShouldBe("hello");
-            var variables = actual.variables.ToInputs();
+            actual.Query.ShouldBe("hello");
+            var variables = actual.Variables.ToInputs();
             Verify(variables);
         }
 
@@ -72,8 +136,21 @@ namespace GraphQL.Tests.Serialization
         {
             var test = $"{{\"query\":\"hello\",\"variables\":null}}";
             var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
-            actual.query.ShouldBe("hello");
-            var variables = actual.variables.ToInputs();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+            var variables = actual.Variables.ToInputs();
+            variables.ShouldNotBeNull();
+            variables.Count.ShouldBe(0);
+        }
+
+        [Fact]
+        public void ElementToInputs_ReturnsEmptyForMissing()
+        {
+            var test = $"{{\"query\":\"hello\"}}";
+            var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
+            var variables = actual.Variables.ToInputs();
             variables.ShouldNotBeNull();
             variables.Count.ShouldBe(0);
         }
@@ -86,14 +163,14 @@ namespace GraphQL.Tests.Serialization
 
         private class TestClass1
         {
-            public string query { get; set; }
-            public Dictionary<string, object> variables { get; set; }
+            public string Query { get; set; }
+            public Inputs Variables { get; set; }
         }
 
         private class TestClass2
         {
-            public string query { get; set; }
-            public JObject variables { get; set; }
+            public string Query { get; set; }
+            public JObject Variables { get; set; }
         }
 
         public class TestData

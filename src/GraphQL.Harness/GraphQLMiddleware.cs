@@ -58,7 +58,7 @@ namespace Example
                 options.Schema = schema;
                 options.Query = request.Query;
                 options.OperationName = request.OperationName;
-                options.Inputs = request.Variables.ToInputs();
+                options.Inputs = request.Variables;
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
