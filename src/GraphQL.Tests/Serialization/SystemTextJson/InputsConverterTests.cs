@@ -204,7 +204,7 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
 }".Trim());
         }
 
-        [Fact]//(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_SimpleValues()
         {
             var source = new Nested
