@@ -7,11 +7,11 @@ using Xunit;
 
 namespace GraphQL.Tests.Serialization.SystemTextJson
 {
-    public class ObjectDictionaryConverterFacts
+    public class ObjectDictionaryConverterTests
     {
         private readonly JsonSerializerOptions _options;
 
-        public ObjectDictionaryConverterFacts()
+        public ObjectDictionaryConverterTests()
         {
             _options = new JsonSerializerOptions
             {
