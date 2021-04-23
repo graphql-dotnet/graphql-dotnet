@@ -32,6 +32,8 @@ namespace GraphQL.SystemTextJson
         public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Numerics.BigInteger value, System.Text.Json.JsonSerializerOptions options) { }
         public static bool TryGetBigInteger(ref System.Text.Json.Utf8JsonReader reader, out System.Numerics.BigInteger bi) { }
     }
+    [System.Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the Inp" +
+        "utsConverter instead.")]
     public class ObjectDictionaryConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.Dictionary<string, object>>
     {
         public ObjectDictionaryConverter() { }
@@ -46,6 +48,8 @@ namespace GraphQL.SystemTextJson
     {
         public static T FromJson<T>(this string json) { }
         public static System.Threading.Tasks.ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
+        [System.Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the ToI" +
+            "nputs method instead.")]
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static GraphQL.Inputs ToInputs(this System.Text.Json.JsonElement obj) { }
         public static GraphQL.Inputs ToInputs(this string json) { }

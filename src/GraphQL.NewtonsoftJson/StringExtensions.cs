@@ -28,7 +28,9 @@ namespace GraphQL.NewtonsoftJson
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var dictionary = json?.ToDictionary();
+#pragma warning restore CS0618 // Type or member is obsolete
             return dictionary.ToInputs();
         }
 
@@ -49,6 +51,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
+        [Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
         public static Dictionary<string, object> ToDictionary(this string json)
         {
             if (json == null)

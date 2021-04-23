@@ -44,6 +44,8 @@ namespace GraphQL.NewtonsoftJson
         public static T FromJson<T>(this string json) { }
         [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static object GetValue(this object value) { }
+        [System.Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the ToI" +
+            "nputs method instead.")]
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
         public static GraphQL.Inputs ToInputs(this string json) { }

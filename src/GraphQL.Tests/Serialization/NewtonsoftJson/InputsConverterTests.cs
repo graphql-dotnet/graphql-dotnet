@@ -1,29 +1,39 @@
 using System.Collections.Generic;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using GraphQL.SystemTextJson;
+using GraphQL.NewtonsoftJson;
+using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.Serialization
+namespace GraphQL.Tests.Serialization.NewtonsoftJson
 {
-    public class ObjectDictionaryConverterFacts
+    public class InputsConverterTests
     {
-        private readonly JsonSerializerOptions _options;
-
-        public ObjectDictionaryConverterFacts()
+        private static readonly JsonSerializer _jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
         {
-            _options = new JsonSerializerOptions
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateParseHandling = DateParseHandling.None,
+            Formatting = Formatting.Indented,
+            Converters =
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-                IgnoreNullValues = false,
-                Converters =
-                {
-                    new ObjectDictionaryConverter(),
-                    new JsonConverterBigInteger(),
-                }
-            };
+                new InputsConverter()
+            },
+        });
+
+        private T Deserialize<T>(string json)
+        {
+            using var stringReader = new System.IO.StringReader(json);
+            using var jsonReader = new JsonTextReader(stringReader);
+            return _jsonSerializer.Deserialize<T>(jsonReader);
+        }
+
+        private string Serialize<T>(T data)
+        {
+            using var stringWriter = new System.IO.StringWriter();
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                _jsonSerializer.Serialize(jsonWriter, data);
+            }
+            return stringWriter.ToString();
         }
 
         [Fact]
@@ -31,13 +41,9 @@ namespace GraphQL.Tests.Serialization
         {
             string json = "IntrospectionResult".ReadJsonResult();
 
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var data = Deserialize<Inputs>(json);
 
-            string roundtrip = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
+            string roundtrip = Serialize(data);
 
             roundtrip.ShouldBeCrossPlatJson(json);
         }
@@ -54,7 +60,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
             actual["int"].ShouldBe(123);
             actual["double"].ShouldBe(123.456);
@@ -71,7 +77,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
             actual["string"].ShouldBeNull();
         }
@@ -85,7 +91,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
             actual["values"].ShouldNotBeNull();
         }
@@ -99,7 +105,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
             actual["values"].ShouldNotBeNull();
             object values = actual["values"];
@@ -120,10 +126,9 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
-            actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
-            var complex = (IDictionary<string, object>)actual["complex"];
+            var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
             complex["int"].ShouldBe(123);
             complex["double"].ShouldBe(123.456);
             complex["string"].ShouldBe("string");
@@ -146,13 +151,12 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = Deserialize<Inputs>(json);
 
             actual["int"].ShouldBe(123);
             actual["bool"].ShouldBe(true);
 
-            actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
-            var complex = (IDictionary<string, object>)actual["complex"];
+            var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
             complex["int"].ShouldBe(123);
             complex["double"].ShouldBe(123.456);
             complex["string"].ShouldBe("string");
@@ -175,7 +179,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Nested>(json, _options);
+            var actual = Deserialize<Nested>(json);
 
             actual.Value1.ShouldBe("string");
             actual.Value2.ShouldBe(123);
@@ -190,17 +194,17 @@ namespace GraphQL.Tests.Serialization
                 Value1 = null
             };
 
-            string json = JsonSerializer.Serialize(source, _options);
+            string json = Serialize(source);
 
             json.ShouldBeCrossPlatJson(
                 @"{
-  ""value1"": null,
-  ""dictionary"": null,
-  ""value2"": 123
+  ""Value1"": null,
+  ""Dictionary"": null,
+  ""Value2"": 123
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_SimpleValues()
         {
             var source = new Nested
@@ -209,25 +213,25 @@ namespace GraphQL.Tests.Serialization
                 {
                     ["int"] = 123,
                     ["string"] = "string"
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
 
-            string json = JsonSerializer.Serialize(source, _options);
+            string json = Serialize(source);
 
             json.ShouldBeCrossPlatJson(
                 @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
+  ""Value1"": ""string"",
+  ""Dictionary"": {
     ""int"": 123,
     ""string"": ""string""
   },
-  ""value2"": 123
+  ""Value2"": 123
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_Simple_Null()
         {
             var source = new Nested
@@ -235,24 +239,24 @@ namespace GraphQL.Tests.Serialization
                 Dictionary = new Dictionary<string, object>
                 {
                     ["string"] = null
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
 
-            string json = JsonSerializer.Serialize(source, _options);
+            string json = Serialize(source);
 
             json.ShouldBeCrossPlatJson(
                 @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
+  ""Value1"": ""string"",
+  ""Dictionary"": {
     ""string"": null
   },
-  ""value2"": 123
+  ""Value2"": 123
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_ComplexValues()
         {
             var source = new Nested
@@ -265,24 +269,24 @@ namespace GraphQL.Tests.Serialization
                     {
                         ["double"] = 1.123d
                     }
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
 
-            string json = JsonSerializer.Serialize(source, _options);
+            string json = Serialize(source);
 
             json.ShouldBeCrossPlatJson(
                 @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
+  ""Value1"": ""string"",
+  ""Dictionary"": {
     ""int"": 123,
     ""string"": ""string"",
     ""complex"": {
       ""double"": 1.123
     }
   },
-  ""value2"": 123
+  ""Value2"": 123
 }".Trim());
         }
 
@@ -290,7 +294,7 @@ namespace GraphQL.Tests.Serialization
         {
             public string Value1 { get; set; }
 
-            public Dictionary<string, object> Dictionary { get; set; }
+            public Inputs Dictionary { get; set; }
 
             public int Value2 { get; set; }
         }
