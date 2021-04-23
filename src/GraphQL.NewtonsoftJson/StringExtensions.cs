@@ -51,7 +51,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
-        [Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
+        [Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
         public static Dictionary<string, object> ToDictionary(this string json)
         {
             if (json == null)
