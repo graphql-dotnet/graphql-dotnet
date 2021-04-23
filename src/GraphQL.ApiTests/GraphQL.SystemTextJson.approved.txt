@@ -48,8 +48,8 @@ namespace GraphQL.SystemTextJson
     {
         public static T FromJson<T>(this string json) { }
         public static System.Threading.Tasks.ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
-        [System.Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToI" +
-            "nputs method instead.")]
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the To" +
+            "Inputs method instead.")]
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static GraphQL.Inputs ToInputs(this System.Text.Json.JsonElement obj) { }
         public static GraphQL.Inputs ToInputs(this string json) { }
