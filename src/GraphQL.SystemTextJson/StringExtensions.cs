@@ -38,7 +38,7 @@ namespace GraphQL.SystemTextJson
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Dictionary.</returns>
-        [Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
+        [Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
         public static Dictionary<string, object> ToDictionary(this string json)
             => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
 
