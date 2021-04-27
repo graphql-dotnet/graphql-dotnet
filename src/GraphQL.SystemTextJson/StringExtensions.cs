@@ -17,7 +17,9 @@ namespace GraphQL.SystemTextJson
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters =
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 new ObjectDictionaryConverter(),
+#pragma warning restore CS0618 // Type or member is obsolete
                 new InputsConverter(),
                 new JsonConverterBigInteger(),
             }
@@ -29,24 +31,19 @@ namespace GraphQL.SystemTextJson
         /// <param name="json">A JSON formatted string.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
-        {
-            var dictionary = json?.ToDictionary();
-            return dictionary.ToInputs();
-        }
+            => json != null ? JsonSerializer.Deserialize<Inputs>(json, _jsonOptions) : Inputs.Empty;
 
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Dictionary.</returns>
+        [Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
         public static Dictionary<string, object> ToDictionary(this string json)
             => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
 
         /// <summary>
         /// Deserializes a JSON-formatted string of data into the specified type.
-        /// <br/><br/>
-        /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
-        /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
         /// <br/><br/>
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
         /// <br/><br/>
@@ -57,9 +54,6 @@ namespace GraphQL.SystemTextJson
 
         /// <summary>
         /// Deserializes a JSON-formatted stream of data into the specified type.
-        /// <br/><br/>
-        /// Any <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> objects will be deserialized
-        /// into the proper format for passing to <see cref="InputsExtensions.ToInputs(Dictionary{string, object})"/>.
         /// <br/><br/>
         /// Any <see cref="Inputs"/> objects will be deserialized into the proper format.
         /// <br/><br/>

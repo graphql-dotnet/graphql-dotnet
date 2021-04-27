@@ -22,16 +22,6 @@ namespace GraphQL.Benchmarks
   }
 }";
 
-        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new SystemTextJson.ObjectDictionaryConverter(),
-                new SystemTextJson.JsonConverterBigInteger(),
-            }
-        };
-
         [GlobalSetup]
         public void GlobalSetup()
         {
@@ -52,10 +42,10 @@ namespace GraphQL.Benchmarks
         };
 
         [Benchmark(Baseline = true)]
-        public Dictionary<string, object> NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToDictionary(Json);
+        public Inputs NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToInputs(Json);
 
         [Benchmark]
-        public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
+        public Inputs SystemTextJson() => GraphQL.SystemTextJson.StringExtensions.ToInputs(Json);
 
         void IBenchmark.RunProfiler()
         {

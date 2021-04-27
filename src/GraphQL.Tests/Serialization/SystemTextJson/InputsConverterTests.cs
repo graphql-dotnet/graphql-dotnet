@@ -5,33 +5,39 @@ using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.Serialization
+namespace GraphQL.Tests.Serialization.SystemTextJson
 {
-    public class ObjectDictionaryConverterFacts
+    public class InputsConverterTests
     {
-        private readonly JsonSerializerOptions _options;
-
-        public ObjectDictionaryConverterFacts()
+        private readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
-            _options = new JsonSerializerOptions
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            IgnoreNullValues = false,
+            Converters =
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-                IgnoreNullValues = false,
-                Converters =
-                {
-                    new ObjectDictionaryConverter(),
-                    new JsonConverterBigInteger(),
-                }
-            };
-        }
+                new InputsConverter(),
+                new JsonConverterBigInteger(),
+            }
+        };
+
+        private readonly JsonSerializerOptions _optionsWriter = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            IgnoreNullValues = false,
+            Converters =
+            {
+                new JsonConverterBigInteger(),
+            }
+        };
 
         [Fact]
         public void Deserialize_And_Serialize_Introspection()
         {
             string json = "IntrospectionResult".ReadJsonResult();
 
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var data = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             string roundtrip = JsonSerializer.Serialize(data, new JsonSerializerOptions
             {
@@ -54,7 +60,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             actual["int"].ShouldBe(123);
             actual["double"].ShouldBe(123.456);
@@ -71,7 +77,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             actual["string"].ShouldBeNull();
         }
@@ -85,7 +91,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             actual["values"].ShouldNotBeNull();
         }
@@ -99,7 +105,7 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             actual["values"].ShouldNotBeNull();
             object values = actual["values"];
@@ -120,10 +126,9 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
-            actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
-            var complex = (IDictionary<string, object>)actual["complex"];
+            var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
             complex["int"].ShouldBe(123);
             complex["double"].ShouldBe(123.456);
             complex["string"].ShouldBe("string");
@@ -146,13 +151,12 @@ namespace GraphQL.Tests.Serialization
                 }
             ";
 
-            var actual = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
+            var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
 
             actual["int"].ShouldBe(123);
             actual["bool"].ShouldBe(true);
 
-            actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
-            var complex = (IDictionary<string, object>)actual["complex"];
+            var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
             complex["int"].ShouldBe(123);
             complex["double"].ShouldBe(123.456);
             complex["string"].ShouldBe("string");
@@ -200,7 +204,7 @@ namespace GraphQL.Tests.Serialization
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_SimpleValues()
         {
             var source = new Nested
@@ -209,7 +213,7 @@ namespace GraphQL.Tests.Serialization
                 {
                     ["int"] = 123,
                     ["string"] = "string"
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
@@ -227,7 +231,7 @@ namespace GraphQL.Tests.Serialization
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_Simple_Null()
         {
             var source = new Nested
@@ -235,7 +239,7 @@ namespace GraphQL.Tests.Serialization
                 Dictionary = new Dictionary<string, object>
                 {
                     ["string"] = null
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
@@ -252,7 +256,7 @@ namespace GraphQL.Tests.Serialization
 }".Trim());
         }
 
-        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact]
         public void Serialize_Nested_ComplexValues()
         {
             var source = new Nested
@@ -265,7 +269,7 @@ namespace GraphQL.Tests.Serialization
                     {
                         ["double"] = 1.123d
                     }
-                },
+                }.ToInputs(),
                 Value2 = 123,
                 Value1 = "string"
             };
@@ -290,7 +294,7 @@ namespace GraphQL.Tests.Serialization
         {
             public string Value1 { get; set; }
 
-            public Dictionary<string, object> Dictionary { get; set; }
+            public Inputs Dictionary { get; set; }
 
             public int Value2 { get; set; }
         }
