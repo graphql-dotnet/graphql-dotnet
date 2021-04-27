@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using Example;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
-using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,39 +28,30 @@ namespace GraphQL.Harness
         public void ConfigureServices(IServiceCollection services)
         {
             // add execution components
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            services.AddSingleton<IDocumentWriter, DocumentWriter>();
-            services.AddSingleton<IErrorInfoProvider>(services =>
-            {
-                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions });
-            });
+            services.AddGraphQL()
+                .AddDocumentWriter()
+                .AddSchema<StarWarsSchema>()
+                .AddErrorInfoProvider(services =>
+                {
+                    var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                    return new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions };
+                })
+                .AddGraphTypes(typeof(StarWarsQuery).Assembly)
+                .AddSchema(services =>
+                {
+                    var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                    var schema = new StarWarsSchema(services);
+                    if (settings.Value.EnableMetrics)
+                    {
+                        var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
+                        foreach (var middleware in middlewares)
+                            schema.FieldMiddleware.Use(middleware);
+                    }
+                    return schema;
+                });
 
             // add something like repository
             services.AddSingleton<StarWarsData>();
-
-            // add graph types
-            services.AddSingleton<StarWarsQuery>();
-            services.AddSingleton<StarWarsMutation>();
-            services.AddSingleton<HumanType>();
-            services.AddSingleton<HumanInputType>();
-            services.AddSingleton<DroidType>();
-            services.AddSingleton<CharacterInterface>();
-            services.AddSingleton<EpisodeEnum>();
-
-            // add schema
-            services.AddSingleton<ISchema, StarWarsSchema>(services =>
-            {
-                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                var schema = new StarWarsSchema(services);
-                if (settings.Value.EnableMetrics)
-                {
-                    var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
-                    foreach (var middleware in middlewares)
-                        schema.FieldMiddleware.Use(middleware);
-                }
-                return schema;
-            });
 
             // add infrastructure stuff
             services.AddHttpContextAccessor();

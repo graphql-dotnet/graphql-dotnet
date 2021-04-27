@@ -736,8 +736,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else
                 {
                     // Fatal schema configuration error.
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'.
-The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'. The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
                 }
             }
             else

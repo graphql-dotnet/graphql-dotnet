@@ -1,12 +1,12 @@
 using System;
 using GraphQL.Caching;
 using GraphQL.Execution;
-using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.MicrosoftDI
@@ -15,7 +15,6 @@ namespace GraphQL.MicrosoftDI
     {
         public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
         {
-            services.TryAddSingleton<InstrumentFieldsMiddleware>();
             services.TryAddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.TryAddSingleton<IDocumentBuilder, GraphQLDocumentBuilder>();
             services.TryAddSingleton<IDocumentValidator, DocumentValidator>();

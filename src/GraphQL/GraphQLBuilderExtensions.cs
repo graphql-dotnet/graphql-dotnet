@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
@@ -11,7 +12,8 @@ namespace GraphQL
 {
     public static class GraphQLBuilderExtensions
     {
-        public static void Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime) where TService : class
+        public static void Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+            where TService : class
             => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime);
 
         public static void Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
@@ -19,7 +21,8 @@ namespace GraphQL
             where TImplementation : class
             => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime);
 
-        public static void TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime) where TService : class
+        public static void TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+            where TService : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
         public static void TryRegister<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
@@ -55,6 +58,43 @@ namespace GraphQL
             return builder;
         }
 
+        public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TSchema : class, ISchema
+            => AddSchema(builder, _ => schema, serviceLifetime);
+
+        public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TSchema : class, ISchema
+            => AddSchema<TSchema, GraphQLExecuter<TSchema>>(builder, schemaFactory, serviceLifetime);
+
+        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, TSchema schema, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TSchema : class, ISchema
+            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
+            => AddSchema<TSchema, TGraphQLExecuter>(builder, _ => schema, serviceLifetime);
+
+        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TSchema : class, ISchema
+            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
+        {
+            if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
+            {
+                // This scenario can cause a memory leak if the schema is requested from the root service provider.
+                // If it was requested from a scoped provider, then there is no reason to register it as transient.
+                // See following link:
+                // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
+                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+            }
+
+            // Register the service with the DI provider as TSchema, overwriting any existing registration
+            builder.Register(serviceLifetime, schemaFactory);
+            // Register ISchema with the DI provider if none already registered
+            builder.TryRegister<ISchema>(serviceLifetime, services => services.GetRequiredService<TSchema>());
+            // Register IGraphQLExecuter<TSchema> with the DI provider
+            builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
+            // Register IGraphQLExecuter with the DI provider if none already registered
+            builder.TryRegister<IGraphQLExecuter>(serviceLifetime, services => services.GetRequiredService<IGraphQLExecuter<TSchema>>());
+            return builder;
+        }
+
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
             where TDocumentExecuter : class, IDocumentExecuter
         {
@@ -62,12 +102,8 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
-            where TProvider : class, IErrorInfoProvider
-        {
-            builder.Register<TProvider>(ServiceLifetime.Singleton);
-            return builder;
-        }
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, ErrorInfoProviderOptions options)
+            => AddErrorInfoProvider(builder, _ => options);
 
         public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
         {
@@ -76,11 +112,21 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
+        public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
             where TProvider : class, IErrorInfoProvider
         {
             builder.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
-            builder.Register(ServiceLifetime.Singleton, optionsFactory);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
+            where TProvider : class, IErrorInfoProvider
+            => AddErrorInfoProvider(builder, _ => errorInfoProvider);
+
+        public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
+            where TProvider : class, IErrorInfoProvider
+        {
+            builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
             return builder;
         }
 
@@ -124,6 +170,35 @@ namespace GraphQL
             where TDocumentCache : class, IDocumentCache
         {
             builder.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
+            where TDocumentCache : class, IDocumentCache
+            => AddDocumentCache(builder, _ => documentCache);
+
+        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentCache> documentCacheFactory)
+            where TDocumentCache : class, IDocumentCache
+        {
+            builder.Register<IDocumentCache>(ServiceLifetime.Singleton, documentCacheFactory);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder)
+            where TDocumentWriter : class, IDocumentWriter
+        {
+            builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
+            where TDocumentWriter : class, IDocumentWriter
+            => AddDocumentWriter(builder, _ => documentWriter);
+
+        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentWriter> documentWriterFactory)
+            where TDocumentWriter : class, IDocumentWriter
+        {
+            builder.Register<IDocumentWriter>(ServiceLifetime.Singleton, documentWriterFactory);
             return builder;
         }
     }

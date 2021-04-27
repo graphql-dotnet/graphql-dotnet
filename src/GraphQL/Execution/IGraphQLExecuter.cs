@@ -36,7 +36,8 @@ namespace GraphQL.Execution
         private readonly IDocumentExecuter _documentExecuter;
         private readonly IEnumerable<IDocumentExecutionListener> _listeners;
         private readonly ComplexityConfiguration _complexityConfiguration;
-        private readonly Action<UnhandledExceptionContext> _unhandledExceptionDelegate;
+        private readonly Action<UnhandledExceptionContext> _onUnhandledExceptionDelegate; //eliminate allocation by caching delegate
+        private readonly Action<UnhandledExceptionContext> _ctorUnhandledExceptionDelegate;
 
         protected IEnumerable<IValidationRule> CachedDocumentValidationRules { get; init; }
         protected IEnumerable<IValidationRule> ValidationRules { get; init; }
@@ -44,12 +45,17 @@ namespace GraphQL.Execution
         protected bool EnableMetrics { get; init; }
         protected int? MaxParallelExecutionCount { get; init; }
 
-        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners)
+        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter)
         {
             _schema = schema ?? throw new ArgumentNullException(nameof(schema));
             _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
+            _onUnhandledExceptionDelegate = OnUnhandledException;
+        }
+
+        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners)
+            : this(schema, documentExecuter)
+        {
             _listeners = documentListeners;
-            _unhandledExceptionDelegate = OnUnhandledException;
         }
 
         public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners, ComplexityConfiguration complexityConfiguration)
@@ -93,7 +99,7 @@ namespace GraphQL.Execution
                 EnableMetrics = EnableMetrics,
                 Inputs = variables,
                 ThrowOnUnhandledException = ThrowOnUnhandledException,
-                UnhandledExceptionDelegate = _unhandledExceptionDelegate,
+                UnhandledExceptionDelegate = _onUnhandledExceptionDelegate,
                 MaxParallelExecutionCount = MaxParallelExecutionCount,
                 OperationName = operationName,
                 Query = query,
@@ -115,6 +121,7 @@ namespace GraphQL.Execution
 
         protected virtual void OnUnhandledException(UnhandledExceptionContext context)
         {
+            _ctorUnhandledExceptionDelegate?.Invoke(context);
         }
     }
 
