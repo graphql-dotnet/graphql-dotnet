@@ -25,6 +25,16 @@ namespace GraphQL.SystemTextJson
             }
         };
 
+        private static readonly JsonSerializerOptions _jsonOptions2 = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
+            {
+                new InputsConverter(),
+                new JsonConverterBigInteger(),
+            }
+        };
+
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
@@ -50,7 +60,7 @@ namespace GraphQL.SystemTextJson
         /// Property names are converted to camel case and matched based on a case sensitive comparison (the default for System.Text.Json).
         /// </summary>
         public static T FromJson<T>(this string json)
-            => JsonSerializer.Deserialize<T>(json, _jsonOptions);
+            => JsonSerializer.Deserialize<T>(json, _jsonOptions2);
 
         /// <summary>
         /// Deserializes a JSON-formatted stream of data into the specified type.
@@ -60,7 +70,7 @@ namespace GraphQL.SystemTextJson
         /// Property names are converted to camel case and matched based on a case sensitive comparison (the default for System.Text.Json).
         /// </summary>
         public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default)
-            => JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
+            => JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions2, cancellationToken);
 
         /// <summary>
         /// Converts a JSON element into an <see cref="Inputs"/> object.
