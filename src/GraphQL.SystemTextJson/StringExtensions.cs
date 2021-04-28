@@ -41,7 +41,7 @@ namespace GraphQL.SystemTextJson
         /// <param name="json">A JSON formatted string.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
-            => json != null ? JsonSerializer.Deserialize<Inputs>(json, _jsonOptions) : Inputs.Empty;
+            => json != null ? JsonSerializer.Deserialize<Inputs>(json, _jsonOptions2) : Inputs.Empty;
 
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
