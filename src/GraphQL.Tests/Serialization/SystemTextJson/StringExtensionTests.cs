@@ -63,44 +63,21 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         }
 
         [Fact]
-        public void FromJson()
-        {
-            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var actual = test.FromJson<TestClass1>();
-            actual.query.ShouldBe("hello");
-            Verify(actual.variables);
-        }
-
-        [Fact]
         public void FromJson_Null()
         {
             var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-            var actual = test.FromJson<TestClass1>();
-            actual.query.ShouldBe("hello");
-            actual.variables.ShouldBeNull();
+            var actual = test.FromJson<TestClass3>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
         }
 
         [Fact]
         public void FromJson_Missing()
         {
             var test = $"{{\"query\":\"hello\"}}";
-            var actual = test.FromJson<TestClass1>();
-            actual.query.ShouldBe("hello");
-            actual.variables.ShouldBeNull();
-        }
-
-        [Fact]
-        public async Task FromJsonAsync()
-        {
-            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
-            var actual = await testData.FromJsonAsync<TestClass1>();
-            actual.query.ShouldBe("hello");
-            Verify(actual.variables);
-            // verify that the stream has not been disposed
-            testData.ReadByte().ShouldBe(-1);
-            testData.Dispose();
-            Should.Throw<ObjectDisposedException>(() => testData.ReadByte());
+            var actual = test.FromJson<TestClass3>();
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
         }
 
         [Fact]
@@ -196,12 +173,6 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         public void ToInputsReturnsEmptyForNull()
         {
             ((string)null).ToInputs().ShouldNotBeNull().Count.ShouldBe(0);
-        }
-
-        private class TestClass1
-        {
-            public string query { get; set; }
-            public Dictionary<string, object> variables { get; set; }
         }
 
         private class TestClass2
