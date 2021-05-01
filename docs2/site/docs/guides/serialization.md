@@ -78,37 +78,7 @@ for a comprehensive table of differences between the two serialization engines.
 The remainder of the documentation here will assume the use of the `GraphQL.SystemTextJson`
 library; slight changes may be necessary if you are using the `GraphQL.NewtonsoftJson` library.
 
-# Serialization
-
-Serialization of a `ExecutionResult` node is handled by `ExecutionResultJsonConverter` which
-accepts in its constructor an instance of `IErrorInfoProvider` (see below). The converter can
-be registered within an instance of `JsonSerializerOptions` so that serializing an `ExecutionResult`
-produces the proper output.
-
-To assist, a `DocumentWriter` class is provided with a single method, `WriteAsync`, which
-handles constructing the options, registering the converter, and serializing a specified
-`ExecutionResult` to a data stream. This class is designed to be registered as a singleton
-within your dependency injection framework, if applicable.
-
-Here is an example of its use within the `Harness` sample project:
-
-```csharp
-private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
-{
-    context.Response.ContentType = "application/json";
-    context.Response.StatusCode = 200; // OK
-
-    await _documentWriter.WriteAsync(context.Response.Body, result, cancellationToken);
-}
-```
-
-You can also write the result to a string with the `WriteToStringAsync` extension method:
-
-```csharp
-var resultText = await _documentWriter.WriteToStringAsync(result);
-```
-
-# Deserialization
+# Deserialization of a GraphQL request and variables
 
 The GraphQL.NET `DocumentExecuter` requires the query and optional operation name as strings,
 and the variables (if supplied) deserialized into an `Inputs` object, which is a dictionary of
@@ -167,4 +137,91 @@ public class Request
 }
 ```
 
-# ErrorInfoProvider
+# Serialization of a GraphQL response
+
+Serialization of a `ExecutionResult` node is handled by `ExecutionResultJsonConverter` which accepts in its
+constructor an instance of `IErrorInfoProvider` (see [Error Serialization](#error-serialization) below).
+The converter can be registered within an instance of `JsonSerializerOptions` so that serializing an
+`ExecutionResult` produces the proper output.
+
+To assist, a `DocumentWriter` class is provided with a single method, `WriteAsync`, which
+handles constructing the options, registering the converter, and serializing a specified
+`ExecutionResult` to a data stream. This class is designed to be registered as a singleton
+within your dependency injection framework, if applicable.
+
+```csharp
+// Manually construct an instance
+var documentWriter = new DocumentWriter();
+
+// Or register it within your DI framework (Microsoft DI sample below)
+services.AddSingleton<IDocumentWriter, DocumentWriter>();
+```
+
+Here is an example of the `DocumentWriter`'s use within the `Harness` sample project:
+
+```csharp
+private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
+{
+    context.Response.ContentType = "application/json";
+    context.Response.StatusCode = 200; // OK
+
+    await _documentWriter.WriteAsync(context.Response.Body, result, cancellationToken);
+}
+```
+
+You can also write the result to a string with the `WriteToStringAsync` extension method:
+
+```csharp
+var resultText = await _documentWriter.WriteToStringAsync(result);
+```
+
+## Error Serialization
+
+The GraphQL spec allows for four properties to be returned within each
+error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations
+provided for the [`Newtonsoft.Json`](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) and
+[`System.Text.Json`](https://www.nuget.org/packages/GraphQL.SystemTextJson) packages allow you to control the
+serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider`
+to the constructor of the document writer. The `ErrorInfoProvider` class (default implementation of
+`IErrorInfoProvider`) contains 5 properties to control serialization behavior:
+
+* `ExposeExceptionStackTrace` when enabled sets the `message` property for errors to equal the
+exception's `.ToString()` method, which includes a stack trace. This property defaults to `false`.
+* `ExposeCode` when enabled sets the `extensions`'s `code` property to equal the error's `Code`
+property. This property defaults to `true`.
+* `ExposeCodes` when enabled sets the `extensions`'s `codes` property to equal a list containing both
+the error's `Code` property, if any, and the type name of inner exceptions (after being converted to
+UPPER_CASE and removing the "Extension" suffix). So an `ExecutionError` with a code of `INVALID_FORMAT`
+that has an inner exception of type `ArgumentNullException` would contain a `codes` property
+of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to `true`.
+* `ExposeData` when enabled sets the `extension`'s `data` property to equal the data within the error's
+`Data` property. This property defaults to `true`.
+* `ExposeExtensions` when disabled hides the entire `extensions` property, including `code`, `codes`,
+and `data` (if enabled). This property defaults to `true`.
+
+For example, to show the stack traces for unhandled errors during development, you might write code like this:
+
+```csharp
+#if DEBUG
+    var documentWriter = new DocumentWriter(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
+#else
+    var documentWriter = new DocumentWriter();
+#endif
+```
+
+You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
+the numerical codes provided by GraphQL.NET for validation errors, reveal stack traces
+only to logged-in administrators, or simply add information to the returned error object. Below is a sample
+of a custom `IErrorInfoProvider` that adds a date stamp to returned error objects:
+
+```csharp
+public class MyErrorInfoProvider : GraphQL.Execution.ErrorInfoProvider
+{
+    public override ErrorInfo GetInfo(ExecutionError executionError)
+    {
+        var info = base.GetInfo(executionError);
+        info.Extensions["timestamp"] = DateTime.Now.ToString("u");
+        return info;
+    }
+}
+```
