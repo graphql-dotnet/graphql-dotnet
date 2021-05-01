@@ -96,7 +96,10 @@ You can also use one of the following extension methods to deserialize data with
 public static Inputs ToInputs(this string json);
 public static Inputs ToInputs(this JsonElement obj);
 public static T FromJson<T>(this string json);
+// GraphQL.SystemTextJson only:
 public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default);
+// GraphQL.NewtonsoftJson only:
+public static T FromJson<T>(this System.IO.Stream stream);
 ```
 
 Here are a couple typical examples:
