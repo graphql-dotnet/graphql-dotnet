@@ -102,6 +102,12 @@ private async Task WriteResponseAsync(HttpContext context, ExecutionResult resul
 }
 ```
 
+You can also write the result to a string with the `WriteToStringAsync` extension method:
+
+```csharp
+var resultText = await _documentWriter.WriteToStringAsync(result);
+```
+
 # Deserialization
 
 The GraphQL.NET `DocumentExecuter` requires the query and optional operation name as strings,
