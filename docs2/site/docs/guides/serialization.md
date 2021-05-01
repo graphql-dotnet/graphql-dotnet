@@ -12,7 +12,7 @@ differences between the two libraries. First, the `Newtonsoft.Json` library does
 serialization or deserialization methods. Due to this reason, the async `GraphQL.NewtonsoftJson` serialization
 helper actually performs synchronous calls on the underlying stream when writing the JSON output. This is
 significant when hosting the service via ASP.NET Core, as it is required to specifically allow synchronous
-reading and writing of the underlying stream.
+reading and writing of the underlying stream. A sample of the required configuration is below:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -30,6 +30,8 @@ public void ConfigureServices(IServiceCollection services)
     });
 }
 ```
+
+The above configuration options are not necessary with the `System.Text.Json` serialization engine.
 
 Second, the `Newtonsoft.Json` library defaults to case-insensitive matching for key names when
 deserializing objects. `System.Text.Json` defaults to case-sensitive matching, but converts property
