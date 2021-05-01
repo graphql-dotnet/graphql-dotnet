@@ -123,10 +123,10 @@ so that the GraphQL.NET scalars can perform this task, enabling proper `DateTime
 You can also use one of the following extension methods to deserialize data with the required options set.
 
 ```csharp
-public static Inputs ToInputs(this string json)
-public static Inputs ToInputs(this JsonElement obj)
-public static T FromJson<T>(this string json)
-public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default)
+public static Inputs ToInputs(this string json);
+public static Inputs ToInputs(this JsonElement obj);
+public static T FromJson<T>(this string json);
+public static ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, CancellationToken cancellationToken = default);
 ```
 
 Here are a couple typical examples:
