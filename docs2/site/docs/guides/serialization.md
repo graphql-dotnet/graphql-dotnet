@@ -110,7 +110,7 @@ Here are a couple typical examples:
 public IActionResult GraphQL(string query, string operationName, string variables)
 {
     var inputs = variables?.ToInputs();
-    ...
+    // execute request and return result
 }
 
 
@@ -118,7 +118,7 @@ public IActionResult GraphQL(string query, string operationName, string variable
 [HttpPost("graphql")]
 public IActionResult GraphQL([FromBody] Request request)
 {
-    ...
+    // execute request and return result
 }
 
 public class Request
@@ -130,7 +130,11 @@ public class Request
 
 
 // Other, with the request as a JSON string
-var request = requestString.FromJson<Request>();
+private string Execute(string request)
+{
+    var request = requestString.FromJson<Request>();
+    // execute request and return result
+}
 
 public class Request
 {
