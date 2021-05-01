@@ -8,7 +8,7 @@ request or response format, but it is common to do so. The two libraries are:
 * [GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson), for use with the `Newtonsoft.Json` library
 
 These two projects have very similar classes and extension methods available. There are two notable
-differences between the two libraries. First, the `Newtonsoft.Json` library does not provide asynchronous
+differences between the two serialization engines. First, the `Newtonsoft.Json` library does not provide asynchronous
 serialization or deserialization methods. Due to this reason, the async `GraphQL.NewtonsoftJson` serialization
 helper actually performs synchronous calls on the underlying stream when writing the JSON output. This is
 significant when hosting the service via ASP.NET Core, as it is required to specifically allow synchronous
