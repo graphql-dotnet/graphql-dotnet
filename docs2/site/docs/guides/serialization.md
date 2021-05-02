@@ -127,7 +127,6 @@ public class Request
     JsonElement Variables { get; set; }
 }
 
-
 // Other, with the request as a JSON string
 private string Execute(string request)
 {
