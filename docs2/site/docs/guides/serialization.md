@@ -105,7 +105,7 @@ public static T FromJson<T>(this System.IO.Stream stream);
 Here are a couple typical examples:
 
 ```csharp
-// ASP.Net Core action with multipart/form-data or application/x-www-form-urlencoded encoding
+// ASP.NET Core action with multipart/form-data or application/x-www-form-urlencoded encoding
 [HttpPost("graphql")]
 public IActionResult GraphQL(string query, string operationName, string variables)
 {
