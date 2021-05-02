@@ -113,8 +113,7 @@ public IActionResult GraphQL(string query, string operationName, string variable
     // execute request and return result
 }
 
-
-// ASP.Net Core action with json encoding
+// ASP.NET Core action with json encoding
 [HttpPost("graphql")]
 public IActionResult GraphQL([FromBody] Request request)
 {
