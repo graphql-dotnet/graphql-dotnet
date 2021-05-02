@@ -68,7 +68,7 @@ However, the following JSON object fails with `System.Text.Json`:
 }
 ```
 
-You can also configure the serialization and deserialization process to your needs
+You can also configure the serialization and deserialization process for your needs
 with either library, such as using case insensitive matching with `System.Text.Json`
 or enabling or disabling indenting on the serialized output. There are a number of
 other differences as well.
