@@ -11,7 +11,7 @@ These two projects have very similar classes and extension methods available. Th
 differences between the two serialization engines. First, the `Newtonsoft.Json` library does not provide asynchronous
 serialization or deserialization methods. Due to this reason, the async `GraphQL.NewtonsoftJson` serialization
 helper actually performs synchronous calls on the underlying stream when writing the JSON output. This is
-significant when hosting the service via ASP.NET Core, as it is required to specifically allow synchronous
+significant when hosting the service via ASP.NET Core, as it is required to deliberately allow synchronous
 reading and writing of the underlying stream. A sample of the required configuration is below:
 
 ```csharp
