@@ -748,7 +748,7 @@ namespace GraphQL.Execution
         protected virtual GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet, System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> fields) { }
         protected virtual System.Threading.Tasks.Task CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        protected virtual void CompleteNode(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+        protected virtual System.Threading.Tasks.Task CompleteNode(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
@@ -759,7 +759,7 @@ namespace GraphQL.Execution
         [System.Obsolete]
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
-        protected virtual void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
+        protected virtual System.Threading.Tasks.Task SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         protected virtual void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         protected virtual void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
         protected virtual bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.IHaveDirectives node) { }
