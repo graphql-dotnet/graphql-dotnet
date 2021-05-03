@@ -144,7 +144,7 @@ public class Request
 
 # Serialization of a GraphQL response
 
-Serialization of a `ExecutionResult` node is handled by `ExecutionResultJsonConverter` which accepts in its
+Serialization of a `ExecutionResult` object is handled by `ExecutionResultJsonConverter` which accepts in its
 constructor an instance of `IErrorInfoProvider` (see [Error Serialization](#error-serialization) below).
 The converter can be registered within an instance of `JsonSerializerOptions` so that serializing an
 `ExecutionResult` produces the proper output.
