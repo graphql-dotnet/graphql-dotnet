@@ -73,6 +73,8 @@
       - title: Guides
         dir: guides
         items:
+          - title: Serialization
+            file: serialization.md
           - title: Dataloader
             file: dataloader.md
           - title: Schema Generation
