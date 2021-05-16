@@ -163,8 +163,8 @@ public class Query : ObjectGraphType
 Above was an example of how to create and how to apply the `@length` directive. Also, for the directive
 to work, additional code is required that would use the requirements specified by the directive. The
 implementation of this code for `@length` directive is intentionally omitted, due to the complexity,
-those who interested can look at it in the [sources](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Validation/Rules/InputFieldsAndArgumentsOfCorrectLength.cs).
-For a much simpler example of such an implementation, see [How do directives work](#How-do-directives-work)
+those who interested can look at it in the [sources](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Validation/Rules.Custom/InputFieldsAndArgumentsOfCorrectLength.cs).
+For a much simpler example of such an implementation, see [How do directives work](#how-do-directives-work)
 paragraph below describing the `@upper` directive.
 
 # How do directives work
