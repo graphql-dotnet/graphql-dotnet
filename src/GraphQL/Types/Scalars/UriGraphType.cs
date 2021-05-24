@@ -29,6 +29,12 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override object? Serialize(object? value) => ParseValue(value)?.ToString();
+        public override object? Serialize(object? value) => ParseValue(value) switch
+        {
+            Uri { IsAbsoluteUri: true } uri => uri.AbsoluteUri,
+            Uri { IsAbsoluteUri: false } uri => uri.OriginalString,
+            null => null,
+            _ => ThrowSerializationError(value)
+        };
     }
 }
