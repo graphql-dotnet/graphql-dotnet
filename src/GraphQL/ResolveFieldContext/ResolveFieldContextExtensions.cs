@@ -52,6 +52,12 @@ namespace GraphQL
                 return true;
             }
 
+            if (arg.Source == ArgumentSource.FieldDefault || arg.Source == ArgumentSource.VariableDefault)
+            {
+                result = null;
+                return false;
+            }
+
             result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
