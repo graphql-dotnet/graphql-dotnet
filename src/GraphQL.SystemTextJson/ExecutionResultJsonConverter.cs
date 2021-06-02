@@ -271,7 +271,7 @@ namespace GraphQL.SystemTextJson
                 if (info.Extensions?.Count > 0)
                 {
                     writer.WritePropertyName("extensions");
-                    JsonSerializer.Serialize(writer, info.Extensions);
+                    JsonSerializer.Serialize(writer, info.Extensions, options);
                 }
 
                 writer.WriteEndObject();
