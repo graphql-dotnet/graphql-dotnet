@@ -73,7 +73,7 @@ namespace GraphQL.Types
         /// </summary>
         public virtual IValue ToAST(object value)
         {
-            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.");
+            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
         }
     }
 }

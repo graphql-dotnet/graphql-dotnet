@@ -127,7 +127,7 @@ namespace GraphQL.Tests.Extensions
             public IEnumerator<object[]> GetEnumerator()
             {
                 yield return new object[] { new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'") };
-                yield return new object[] { new InputObjectGraphType<Person>(), new Person(), new NotImplementedException("Please override the 'ToAST' method of the 'InputObjectGraphType`1' scalar to support this operation.") };
+                yield return new object[] { new InputObjectGraphType<Person>(), new Person(), new NotImplementedException("Please override the 'ToAST' method of the 'InputObjectGraphType`1' Input Object to support this operation.") };
                 yield return new object[] { new BadPersonInputType(), new Person(), new InvalidOperationException("Unable to get an AST representation of the input object type 'BadPersonInputType' for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests+ToASTExceptionTestData+Person'.") };
                 yield return new object[] { new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
                 yield return new object[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of null value for type '[Boolean]!'.") };
