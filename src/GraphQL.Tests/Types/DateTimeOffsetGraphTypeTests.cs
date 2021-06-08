@@ -55,5 +55,26 @@ namespace GraphQL.Tests.Types
                     new DateTimeOffset(2015, 11, 21, 19, 59, 32, 987, TimeSpan.FromHours(2)));
             });
         }
+
+        public static object[][] DateTimeTypeTests()
+        {
+            var dateTimeNow = DateTime.Now;
+            var dateTimeUtcNow = DateTime.UtcNow;
+            var dateTimeUnspecified = new DateTime(2015, 11, 21, 17, 59, 32, DateTimeKind.Unspecified);
+
+            return new object[][]
+            {
+                new object[] { dateTimeNow, new DateTimeOffset(dateTimeNow) },
+                new object[] { dateTimeUtcNow, new DateTimeOffset(dateTimeUtcNow) },
+                new object[] { dateTimeUnspecified, new DateTimeOffset(dateTimeUnspecified, TimeSpan.Zero) }
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(DateTimeTypeTests))]
+        public void coerces_dateTime_type_to_date(DateTime input, DateTimeOffset expected)
+        {
+            CultureTestHelper.UseCultures(() => _type.ParseValue(input).ShouldBe(expected));
+        }
     }
 }
