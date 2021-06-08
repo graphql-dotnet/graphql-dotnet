@@ -43,14 +43,14 @@ namespace GraphQL.Types
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
         }
 
-        public Schema(IServiceProvider services, IEnumerable<IFieldMiddleware> middleware)
+        public Schema(IServiceProvider services, IEnumerable<Action<IServiceProvider, ISchema>> configurations)
             : this(services)
         {
-            if (middleware != null)
+            if (configurations != null)
             {
-                foreach (var fieldMiddleware in middleware)
+                foreach (var configuration in configurations)
                 {
-                    FieldMiddleware.Use(fieldMiddleware);
+                    configuration(services, this);
                 }
             }    
         }

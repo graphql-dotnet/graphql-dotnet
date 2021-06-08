@@ -34,16 +34,16 @@ namespace GraphQL.Execution
     {
         private readonly TSchema _schema;
         private readonly IDocumentExecuter _documentExecuter;
-        private readonly IEnumerable<IDocumentExecutionListener> _listeners;
+        private readonly IEnumerable<Action<IServiceProvider, ExecutionOptions>> _configurations;
         private readonly ComplexityConfiguration _complexityConfiguration;
-        private readonly Action<UnhandledExceptionContext> _onUnhandledExceptionDelegate; //eliminate allocation by caching delegate
-        private readonly Action<UnhandledExceptionContext> _ctorUnhandledExceptionDelegate;
+        private readonly Action<UnhandledExceptionContext> _onUnhandledExceptionDelegate; //eliminate runtime allocation by caching delegate
+        //private readonly Action<UnhandledExceptionContext> _ctorUnhandledExceptionDelegate;
 
-        protected IEnumerable<IValidationRule> CachedDocumentValidationRules { get; init; }
-        protected IEnumerable<IValidationRule> ValidationRules { get; init; }
-        protected bool ThrowOnUnhandledException { get; init; }
-        protected bool EnableMetrics { get; init; }
-        protected int? MaxParallelExecutionCount { get; init; }
+        //protected IEnumerable<IValidationRule> CachedDocumentValidationRules { get; init; }
+        //protected IEnumerable<IValidationRule> ValidationRules { get; init; }
+        //protected bool ThrowOnUnhandledException { get; init; }
+        //protected bool EnableMetrics { get; init; }
+        //protected int? MaxParallelExecutionCount { get; init; }
 
         public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter)
         {
@@ -52,14 +52,14 @@ namespace GraphQL.Execution
             _onUnhandledExceptionDelegate = OnUnhandledException;
         }
 
-        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners)
+        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<Action<IServiceProvider, ExecutionOptions>> configurations)
             : this(schema, documentExecuter)
         {
-            _listeners = documentListeners;
+            _configurations = configurations;
         }
 
-        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<IDocumentExecutionListener> documentListeners, ComplexityConfiguration complexityConfiguration)
-            : this(schema, documentExecuter, documentListeners)
+        public GraphQLExecuter(TSchema schema, IDocumentExecuter documentExecuter, IEnumerable<Action<IServiceProvider, ExecutionOptions>> configurations, ComplexityConfiguration complexityConfiguration)
+            : this(schema, documentExecuter, configurations)
         {
             _complexityConfiguration = complexityConfiguration; // Support null so that if the DI returns a null value (due to IOptions mapping) it will still work
         }
@@ -92,15 +92,15 @@ namespace GraphQL.Execution
         {
             var options = new ExecutionOptions
             {
-                CachedDocumentValidationRules = CachedDocumentValidationRules,
-                ValidationRules = ValidationRules,
+                //CachedDocumentValidationRules = CachedDocumentValidationRules,
+                //ValidationRules = ValidationRules,
                 CancellationToken = cancellationToken,
                 ComplexityConfiguration = _complexityConfiguration,
-                EnableMetrics = EnableMetrics,
+                //EnableMetrics = EnableMetrics,
                 Inputs = variables,
-                ThrowOnUnhandledException = ThrowOnUnhandledException,
+                //ThrowOnUnhandledException = ThrowOnUnhandledException,
                 UnhandledExceptionDelegate = _onUnhandledExceptionDelegate,
-                MaxParallelExecutionCount = MaxParallelExecutionCount,
+                //MaxParallelExecutionCount = MaxParallelExecutionCount,
                 OperationName = operationName,
                 Query = query,
                 RequestServices = requestServices,
@@ -108,11 +108,11 @@ namespace GraphQL.Execution
                 UserContext = context,
             };
 
-            if (_listeners != null)
+            if (_configurations != null)
             {
-                foreach (var listener in _listeners)
+                foreach (var configuration in _configurations)
                 {
-                    options.Listeners.Add(listener);
+                    configuration(requestServices, options);
                 }
             }
 
@@ -121,7 +121,7 @@ namespace GraphQL.Execution
 
         protected virtual void OnUnhandledException(UnhandledExceptionContext context)
         {
-            _ctorUnhandledExceptionDelegate?.Invoke(context);
+            //_ctorUnhandledExceptionDelegate?.Invoke(context);
         }
     }
 

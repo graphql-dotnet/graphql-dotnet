@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -49,12 +50,13 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register<TSchema>(serviceLifetime);
-            // Register ISchema with the DI provider if none already registered
-            builder.TryRegister<ISchema>(serviceLifetime, services => services.GetRequiredService<TSchema>());
-            // Register IGraphQLExecuter<TSchema> with the DI provider
+            // Also register IGraphQLExecuter<TSchema> with the DI provider, overwriting any existing registration
             builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
-            // Register IGraphQLExecuter with the DI provider if none already registered
-            builder.TryRegister<IGraphQLExecuter>(serviceLifetime, services => services.GetRequiredService<IGraphQLExecuter<TSchema>>());
+
+            // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
+            // overwrite previous default implementations, such as the error message registered by default.
+            builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
+            builder.Register<IDefaultService<IGraphQLExecuter>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<IGraphQLExecuter>(serviceProvider.GetRequiredService<IGraphQLExecuter<TSchema>>()));
             return builder;
         }
 
@@ -86,12 +88,13 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, schemaFactory);
-            // Register ISchema with the DI provider if none already registered
-            builder.TryRegister<ISchema>(serviceLifetime, services => services.GetRequiredService<TSchema>());
-            // Register IGraphQLExecuter<TSchema> with the DI provider
+            // Also register IGraphQLExecuter<TSchema> with the DI provider, overwriting any existing registration
             builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
-            // Register IGraphQLExecuter with the DI provider if none already registered
-            builder.TryRegister<IGraphQLExecuter>(serviceLifetime, services => services.GetRequiredService<IGraphQLExecuter<TSchema>>());
+
+            // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
+            // overwrite previous default implementations, such as the error message registered by default.
+            builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
+            builder.Register<IDefaultService<IGraphQLExecuter>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<IGraphQLExecuter>(serviceProvider.GetRequiredService<IGraphQLExecuter<TSchema>>()));
             return builder;
         }
 
@@ -107,7 +110,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
         {
-            builder.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+            builder.Register<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
             builder.Register(ServiceLifetime.Singleton, optionsFactory);
             return builder;
         }
@@ -159,10 +162,40 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.Register<IDocumentExecutionListener, TDocumentListener>(ServiceLifetime.Transient);
+            builder.Register<TDocumentListener>(serviceLifetime);
+            builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, services => services.GetRequiredService<TDocumentListener>());
+            builder.AddExecutionConfiguration((serviceProvider, options) => options.Listeners.Add(serviceProvider.GetRequiredService<TDocumentListener>()));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, TDocumentListener documentListener)
+            where TDocumentListener : class, IDocumentExecutionListener
+        {
+            builder.Register(ServiceLifetime.Transient, _ => documentListener);
+            builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, _ => documentListener);
+            builder.AddExecutionConfiguration((serviceProvider, options) => options.Listeners.Add(documentListener));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder)
+            where TMiddleware : class, IFieldMiddleware
+        {
+            // service lifetime is transient so that the lifetime will match that of the schema, be it scoped or singleton
+            builder.Register<TMiddleware>(ServiceLifetime.Transient);
+            builder.Register<IFieldMiddleware, TMiddleware>(ServiceLifetime.Transient);
+            builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware)
+            where TMiddleware : class, IFieldMiddleware
+        {
+            builder.Register(ServiceLifetime.Transient, _ => middleware);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, _ => middleware);
+            builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
             return builder;
         }
 
@@ -199,6 +232,39 @@ namespace GraphQL
             where TDocumentWriter : class, IDocumentWriter
         {
             builder.Register<IDocumentWriter>(ServiceLifetime.Singleton, documentWriterFactory);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddSchemaConfiguration(this IGraphQLBuilder builder, Action<IServiceProvider, ISchema> configuration)
+        {
+            builder.Register(ServiceLifetime.Transient, _ => configuration);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddExecutionConfiguration(this IGraphQLBuilder builder, Action<IServiceProvider, ExecutionOptions> configuration)
+        {
+            builder.Register(ServiceLifetime.Transient, _ => configuration);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
+        {
+            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            if (enable)
+                builder.AddExecutionConfiguration((_, options) => options.EnableMetrics = true);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
+        {
+            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            builder.AddExecutionConfiguration((_, options) =>
+            {
+                if (enablePredicate(options))
+                {
+                    options.EnableMetrics = true;
+                }
+            });
             return builder;
         }
     }
