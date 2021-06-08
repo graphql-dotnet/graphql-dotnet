@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Caching;
-using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -15,19 +14,15 @@ namespace GraphQL.MicrosoftDI
     {
         public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
         {
-            services.TryAddTransient(services => services.GetService<IOptions<ComplexityConfiguration>>()?.Value); // Registering IOptions<ComplexityConfiguration> or registering ComplexityConfiguration will work
-            services.TryAddTransient(services => services.GetService<IOptions<ErrorInfoProviderOptions>>()?.Value); // Registering IOptions<ErrorInfoProviderOptions> or registering ErrorInfoProviderOptions will work
+            var builder = new GraphQLBuilder(services);
 
-            // configure default services which can be overridden by extension methods
-            services.TryAddTransient<IDefaultService<IDocumentExecuter>, DefaultServiceFromDI<DocumentExecuter>>();
-            services.TryAddTransient<IDefaultService<IDocumentBuilder>, DefaultServiceFromDI<GraphQLDocumentBuilder>>();
-            services.TryAddTransient<IDefaultService<IDocumentValidator>, DefaultServiceFromDI<DocumentValidator>>();
-            services.TryAddTransient<IDefaultService<IComplexityAnalyzer>, DefaultServiceFromDI<ComplexityAnalyzer>>();
-            services.TryAddTransient<IDefaultService<IDocumentCache>>(_ => new DefaultService<IDocumentCache>(DefaultDocumentCache.Instance));
-            services.TryAddTransient<IDefaultService<IErrorInfoProvider>, DefaultServiceFromDI<ErrorInfoProvider>>();
+            // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
+            // note that this code will cause a null to be passed into applicable constructor arguments during DI injection if these objects are unconfigured
+            builder.TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ComplexityConfiguration>>()?.Value); // Registering IOptions<ComplexityConfiguration> or registering ComplexityConfiguration will work
+            builder.TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ErrorInfoProviderOptions>>()?.Value); // Registering IOptions<ErrorInfoProviderOptions> or registering ErrorInfoProviderOptions will work
 
-            // configure an error to be displayed for these service defaults
-            services.TryAddTransient<IDefaultService<IDocumentWriter>>(_ =>
+            // configure an error to be displayed when no IDocumentWriter is registered
+            services.TryAddTransient<IDocumentWriter>(_ =>
             {
                 throw new InvalidOperationException(
                     "IDocumentWriter not set in DI container. " +
@@ -35,26 +30,17 @@ namespace GraphQL.MicrosoftDI
                     "GraphQL.SystemTextJson.DocumentWriter or GraphQL.NewtonsoftJson.DocumentWriter." +
                     "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md and https://github.com/graphql-dotnet/server/blob/develop/README.md.");
             });
-            services.TryAddTransient<IDefaultService<ISchema>>(_ =>
-            {
-                throw new InvalidOperationException(
-                    "ISchema not set in DI container. " +
-                    "Please use AddSchema or register an ISchema implementation in your DI container.");
-            });
 
             // configure service implementations to use the configured default services when not overridden by a user
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentExecuter>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentBuilder>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentValidator>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IComplexityAnalyzer>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentCache>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IErrorInfoProvider>>().Instance);
+            services.TryAddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.TryAddSingleton<IDocumentBuilder, GraphQLDocumentBuilder>();
+            services.TryAddSingleton<IDocumentValidator, DocumentValidator>();
+            services.TryAddSingleton<IComplexityAnalyzer, ComplexityAnalyzer>();
+            services.TryAddSingleton<IDocumentCache>(DefaultDocumentCache.Instance);
+            services.TryAddSingleton<IErrorInfoProvider, ErrorInfoProvider>();
 
-            // these services have no default implementation initially
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentWriter>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<ISchema>>().Instance);
-
-            // configure the ComplexityAnalyzer to be pulled from DI and configured
+            // configure an error message to be displayed if RequestServices is null,
+            // and configure the ComplexityAnalyzer to be pulled from DI and configured (but left unchanged if not configured in DI)
             Action<ExecutionOptions> configureComplexityConfiguration = options =>
             {
                 if (options.RequestServices == null)
@@ -64,7 +50,6 @@ namespace GraphQL.MicrosoftDI
                 if (complexityConfiguration != null)
                     options.ComplexityConfiguration = complexityConfiguration;
             };
-
             services.AddSingleton(_ => configureComplexityConfiguration);
 
             return new GraphQLBuilder(services);
@@ -90,9 +75,14 @@ namespace GraphQL.MicrosoftDI
                 return schema;
             });
 
-            // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
-            // overwrite previous default implementations, such as the error message registered by default.
-            builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
+            // Now register the service as ISchema if not already registered.
+            builder.TryRegister<ISchema>(serviceLifetime, services =>
+            {
+                var selfActivatingServices = new SelfActivatingServiceProvider(services);
+                var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
+                return schema;
+            });
+
             return builder;
         }
     }

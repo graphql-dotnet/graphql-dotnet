@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
-using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -46,9 +45,9 @@ namespace GraphQL
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register<TSchema>(serviceLifetime);
 
-            // Now register default implementation of ISchema. This default implementation registration
-            // overwrites previous default implementations, such as the error message registered by default.
-            builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
+            // Now register the service as ISchema if not already registered.
+            builder.TryRegister<ISchema, TSchema>(serviceLifetime);
+
             return builder;
         }
 
@@ -71,9 +70,9 @@ namespace GraphQL
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, schemaFactory);
 
-            // Now register default implementation of ISchema. This default implementation registration
-            // overwrites previous default implementations, such as the error message registered by default.
-            builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
+            // Now register the service as ISchema if not already registered.
+            builder.TryRegister<ISchema>(serviceLifetime, schemaFactory);
+
             return builder;
         }
 
