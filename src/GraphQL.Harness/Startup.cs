@@ -29,25 +29,24 @@ namespace GraphQL.Harness
         {
             // add execution components
             services.AddGraphQL()
-                .AddDocumentWriter()
+                .AddSystemTextJson()
                 .AddSchema<StarWarsSchema>()
-                .AddErrorInfoProvider(services =>
+                .AddErrorInfoProvider(serviceProvider =>
                 {
-                    var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                    var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     return new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions };
                 })
                 .AddGraphTypes(typeof(StarWarsQuery).Assembly)
-                .AddSchema(services =>
+                .AddSchema<StarWarsSchema>(ServiceLifetime.Singleton)
+                .AddSchemaConfiguration((serviceProvider, schema) =>
                 {
-                    var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                    var schema = new StarWarsSchema(services);
+                    var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     if (settings.Value.EnableMetrics)
                     {
-                        var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
+                        var middlewares = serviceProvider.GetRequiredService<IEnumerable<IFieldMiddleware>>();
                         foreach (var middleware in middlewares)
                             schema.FieldMiddleware.Use(middleware);
                     }
-                    return schema;
                 });
 
             // add something like repository
@@ -61,7 +60,7 @@ namespace GraphQL.Harness
             services.Configure<GraphQLSettings>(Configuration);
             services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
 
-            // add Field Middlewares
+            // add Field Middlewares (do not use AddMiddleware or it will be installed into the schema regardless of EnableMetrics)
             services.AddSingleton<IFieldMiddleware, CountFieldMiddleware>();
             services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
         }

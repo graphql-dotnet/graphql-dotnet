@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
@@ -33,11 +34,6 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
-            => builder.AddSchema<TSchema, GraphQLExecuter<TSchema>>(serviceLifetime);
-
-        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
-            where TSchema : class, ISchema
-            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
         {
             if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
             {
@@ -50,13 +46,10 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register<TSchema>(serviceLifetime);
-            // Also register IGraphQLExecuter<TSchema> with the DI provider, overwriting any existing registration
-            builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
 
             // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
             // overwrite previous default implementations, such as the error message registered by default.
             builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
-            builder.Register<IDefaultService<IGraphQLExecuter>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<IGraphQLExecuter>(serviceProvider.GetRequiredService<IGraphQLExecuter<TSchema>>()));
             return builder;
         }
 
@@ -66,16 +59,6 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
-            => AddSchema<TSchema, GraphQLExecuter<TSchema>>(builder, schemaFactory, serviceLifetime);
-
-        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, TSchema schema, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
-            where TSchema : class, ISchema
-            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
-            => AddSchema<TSchema, TGraphQLExecuter>(builder, _ => schema, serviceLifetime);
-
-        public static IGraphQLBuilder AddSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
-            where TSchema : class, ISchema
-            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
         {
             if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
             {
@@ -88,13 +71,10 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, schemaFactory);
-            // Also register IGraphQLExecuter<TSchema> with the DI provider, overwriting any existing registration
-            builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
 
             // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
             // overwrite previous default implementations, such as the error message registered by default.
             builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
-            builder.Register<IDefaultService<IGraphQLExecuter>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<IGraphQLExecuter>(serviceProvider.GetRequiredService<IGraphQLExecuter<TSchema>>()));
             return builder;
         }
 
@@ -162,12 +142,71 @@ namespace GraphQL
             return builder;
         }
 
+        public static IGraphQLBuilder AddClrMappings(this IGraphQLBuilder builder)
+            => builder.AddClrMappings(Assembly.GetCallingAssembly());
+
+        public static IGraphQLBuilder AddClrMappings(this IGraphQLBuilder builder, Assembly assembly)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
+            var typesToRegister = new Type[]
+            {
+                typeof(ObjectGraphType<>),
+                typeof(InputObjectGraphType<>),
+                typeof(EnumerationGraphType<>),
+            };
+
+            var types = assembly
+                .GetTypes()
+                .Where(x => !x.IsAbstract && !x.IsInterface);
+
+            var typeMappings = new List<(Type clrType, Type graphType)>();
+            foreach (var graphType in types)
+            {
+                //skip types marked with the DoNotRegister attribute
+                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                    continue;
+                //get the base type
+                var baseType = graphType.BaseType;
+                while (baseType != null)
+                {
+                    //skip types marked with the DoNotRegister attribute
+                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                        break;
+                    //look for generic types that match our list above
+                    if (baseType.IsConstructedGenericType && typesToRegister.Contains(baseType.GetGenericTypeDefinition()))
+                    {
+                        //get the base type
+                        var clrType = baseType.GetGenericArguments()[0];
+                        //and register it
+                        if (clrType != typeof(object))
+                            typeMappings.Add((clrType, graphType));
+                        //skip to the next type
+                        break;
+                    }
+                    //look up the inheritance chain for a match
+                    baseType = baseType.BaseType;
+                }
+            }
+
+            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            {
+                foreach (var typeMapping in typeMappings)
+                {
+                    schema.RegisterTypeMapping(typeMapping.clrType, typeMapping.graphType);
+                }
+            });
+
+            return builder;
+        }
+
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Register<TDocumentListener>(serviceLifetime);
             builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, services => services.GetRequiredService<TDocumentListener>());
-            builder.AddExecutionConfiguration((serviceProvider, options) => options.Listeners.Add(serviceProvider.GetRequiredService<TDocumentListener>()));
+            builder.AddExecutionConfiguration(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -176,26 +215,55 @@ namespace GraphQL
         {
             builder.Register(ServiceLifetime.Transient, _ => documentListener);
             builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, _ => documentListener);
-            builder.AddExecutionConfiguration((serviceProvider, options) => options.Listeners.Add(documentListener));
+            builder.AddExecutionConfiguration(options => options.Listeners.Add(documentListener));
             return builder;
         }
 
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+            where TMiddleware : class, IFieldMiddleware
+        {
+            // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
+            builder.Register<TMiddleware>(serviceLifetime);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
+            if (install)
+                builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
             where TMiddleware : class, IFieldMiddleware
         {
             // service lifetime is transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.Register<TMiddleware>(ServiceLifetime.Transient);
-            builder.Register<IFieldMiddleware, TMiddleware>(ServiceLifetime.Transient);
-            builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            builder.Register<TMiddleware>(serviceLifetime);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
+            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            {
+                if (installPredicate(serviceProvider, schema))
+                    schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>());
+            });
             return builder;
         }
 
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware)
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
             where TMiddleware : class, IFieldMiddleware
         {
-            builder.Register(ServiceLifetime.Transient, _ => middleware);
-            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, _ => middleware);
-            builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
+            builder.Register(ServiceLifetime.Singleton, _ => middleware);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
+            if (install)
+                builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
+            where TMiddleware : class, IFieldMiddleware
+        {
+            builder.Register(ServiceLifetime.Singleton, _ => middleware);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
+            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            {
+                if (installPredicate(serviceProvider, schema))
+                    schema.FieldMiddleware.Use(middleware);
+            });
             return builder;
         }
 
@@ -237,13 +305,13 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddSchemaConfiguration(this IGraphQLBuilder builder, Action<IServiceProvider, ISchema> configuration)
         {
-            builder.Register(ServiceLifetime.Transient, _ => configuration);
+            builder.Register(ServiceLifetime.Singleton, _ => configuration);
             return builder;
         }
 
-        public static IGraphQLBuilder AddExecutionConfiguration(this IGraphQLBuilder builder, Action<IServiceProvider, ExecutionOptions> configuration)
+        public static IGraphQLBuilder AddExecutionConfiguration(this IGraphQLBuilder builder, Action<ExecutionOptions> configuration)
         {
-            builder.Register(ServiceLifetime.Transient, _ => configuration);
+            builder.Register(ServiceLifetime.Singleton, _ => configuration);
             return builder;
         }
 
@@ -251,14 +319,27 @@ namespace GraphQL
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             if (enable)
-                builder.AddExecutionConfiguration((_, options) => options.EnableMetrics = true);
+                builder.AddExecutionConfiguration(options => options.EnableMetrics = true);
             return builder;
         }
 
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.AddExecutionConfiguration((_, options) =>
+            builder.AddExecutionConfiguration(options =>
+            {
+                if (enablePredicate(options))
+                {
+                    options.EnableMetrics = true;
+                }
+            });
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
+        {
+            builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
+            builder.AddExecutionConfiguration(options =>
             {
                 if (enablePredicate(options))
                 {

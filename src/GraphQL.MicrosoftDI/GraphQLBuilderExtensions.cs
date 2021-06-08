@@ -41,12 +41,6 @@ namespace GraphQL.MicrosoftDI
                     "ISchema not set in DI container. " +
                     "Please use AddSchema or register an ISchema implementation in your DI container.");
             });
-            services.TryAddTransient<IDefaultService<IGraphQLExecuter>>(_ =>
-            {
-                throw new InvalidOperationException(
-                    "IGraphQLExecuter not set in DI container. " +
-                    "Please use AddSchema or register an ISchema implementation in your DI container.");
-            });
 
             // configure service implementations to use the configured default services when not overridden by a user
             services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentExecuter>>().Instance);
@@ -59,18 +53,25 @@ namespace GraphQL.MicrosoftDI
             // these services have no default implementation initially
             services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IDocumentWriter>>().Instance);
             services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<ISchema>>().Instance);
-            services.TryAddSingleton(serviceProvider => serviceProvider.GetRequiredService<IDefaultService<IGraphQLExecuter>>().Instance);
+
+            // configure the ComplexityAnalyzer to be pulled from DI and configured
+            Action<ExecutionOptions> configureComplexityConfiguration = options =>
+            {
+                if (options.RequestServices == null)
+                    throw new InvalidOperationException("Cannot execute request if RequestServices is null.");
+
+                var complexityConfiguration = options.RequestServices.GetService<ComplexityConfiguration>();
+                if (complexityConfiguration != null)
+                    options.ComplexityConfiguration = complexityConfiguration;
+            };
+
+            services.AddSingleton(_ => configureComplexityConfiguration);
 
             return new GraphQLBuilder(services);
         }
 
         public static IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
-            => builder.AddSelfActivatingSchema<TSchema, GraphQLExecuter<TSchema>>(serviceLifetime);
-
-        public static IGraphQLBuilder AddSelfActivatingSchema<TSchema, TGraphQLExecuter>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
-            where TSchema : class, ISchema
-            where TGraphQLExecuter : class, IGraphQLExecuter<TSchema>
         {
             if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
             {
@@ -88,13 +89,10 @@ namespace GraphQL.MicrosoftDI
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
             });
-            // Also register IGraphQLExecuter<TSchema> with the DI provider, overwriting any existing registration
-            builder.Register<IGraphQLExecuter<TSchema>, TGraphQLExecuter>(serviceLifetime);
 
             // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
             // overwrite previous default implementations, such as the error message registered by default.
             builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
-            builder.Register<IDefaultService<IGraphQLExecuter>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<IGraphQLExecuter>(serviceProvider.GetRequiredService<IGraphQLExecuter<TSchema>>()));
             return builder;
         }
     }
