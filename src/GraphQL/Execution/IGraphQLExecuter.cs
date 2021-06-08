@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Types;
-using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
-namespace System.Runtime.CompilerServices
-{
-    internal class IsExternalInit { }
-}
+//namespace System.Runtime.CompilerServices
+//{
+//    internal class IsExternalInit { }
+//}
 
 namespace GraphQL.Execution
 {
