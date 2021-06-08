@@ -19,6 +19,10 @@ namespace GraphQL.SystemTextJson
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.IGraphQLBuilder AddSystemTextJson(this GraphQL.IGraphQLBuilder builder) { }
+    }
     public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
     {
         public InputsConverter() { }

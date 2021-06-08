@@ -15,6 +15,14 @@ namespace GraphQL
     {
         public SubscriptionDocumentExecuter() { }
         public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
         protected override GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
+    }
+}
+namespace GraphQL.SystemReactive
+{
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.IGraphQLBuilder builder) { }
     }
 }

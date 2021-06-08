@@ -51,6 +51,22 @@ namespace GraphQL.MicrosoftDI
         public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType>> resolver) { }
         public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
     }
+    public class GraphQLBuilder : GraphQL.IGraphQLBuilder
+    {
+        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public virtual GraphQL.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.ServiceLifetime serviceLifetime) { }
+        public virtual GraphQL.IGraphQLBuilder Register<TService>(GraphQL.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
+            where TService :  class { }
+        public virtual GraphQL.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.ServiceLifetime serviceLifetime) { }
+        public virtual GraphQL.IGraphQLBuilder TryRegister<TService>(GraphQL.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
+            where TService :  class { }
+    }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.IGraphQLBuilder AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public static GraphQL.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.IGraphQLBuilder builder, GraphQL.ServiceLifetime serviceLifetime = 0)
+            where TSchema :  class, GraphQL.Types.ISchema { }
+    }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
         public ResolverBuilder(GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, bool scoped) { }
