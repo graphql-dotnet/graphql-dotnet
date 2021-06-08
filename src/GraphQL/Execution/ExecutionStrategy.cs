@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
@@ -327,7 +330,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not <see langword="null"/>.
         /// </summary>
-        protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        protected virtual async Task SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
@@ -335,41 +338,58 @@ namespace GraphQL.Execution
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType;
 
-            if (!(parent.Result is IEnumerable data))
+            var asyncIntfType = parent.Result.GetType().GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)).FirstOrDefault();
+
+            if (parent.Result is not IEnumerable && asyncIntfType == null)
             {
                 throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
             int index = 0;
-            var arrayItems = (data is ICollection collection)
+            var arrayItems = parent.Result is ICollection collection && asyncIntfType == null
                 ? new List<ExecutionNode>(collection.Count)
                 : new List<ExecutionNode>();
 
-            if (data is IList list)
+            if (asyncIntfType != null)
+            {
+                Func<IAsyncEnumerable<object>, Task> processAsyncEnumerable = ProcessAsyncEnumerable;
+                var methodInfo = processAsyncEnumerable.GetMethodInfo().GetGenericMethodDefinition().MakeGenericMethod(asyncIntfType.GenericTypeArguments[0]);
+
+                await ((Task)methodInfo.Invoke(processAsyncEnumerable.Target, new[] { parent.Result })).ConfigureAwait(false);
+            }
+            else if (parent.Result is IList list)
             {
                 for (int i = 0; i < list.Count; ++i)
-                    SetArrayItemNode(list[i]);
+                    await SetArrayItemNode(list[i]).ConfigureAwait(false);
             }
-            else
+            else if (parent.Result is IEnumerable data)
             {
                 foreach (object d in data)
-                    SetArrayItemNode(d);
+                    await SetArrayItemNode(d).ConfigureAwait(false);
             }
 
             parent.Items = arrayItems;
 
             // local function uses 'struct closure' without heap allocation
-            void SetArrayItemNode(object d)
+            async Task SetArrayItemNode(object d)
             {
                 var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
                 node.Result = d;
 
                 if (!(d is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                 }
 
                 arrayItems.Add(node);
+            }
+
+            async Task ProcessAsyncEnumerable<T>(IAsyncEnumerable<T> enumerable)
+            {
+                await foreach (var item in enumerable)
+                {
+                    await SetArrayItemNode(item).ConfigureAwait(false);
+                }
             }
         }
 
@@ -403,7 +423,7 @@ namespace GraphQL.Execution
 
                 if (!(result is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
                     resolveContext.Reset(null, null);
                     System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
@@ -439,7 +459,7 @@ namespace GraphQL.Execution
 
                 if (!(node.Result is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -462,7 +482,7 @@ namespace GraphQL.Execution
         /// and <see cref="SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)">SetArrayItemNodes</see>, but does not execute them. For value
         /// execution nodes, it will run <see cref="ScalarGraphType.Serialize(object)"/> to serialize the result.
         /// </summary>
-        protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task CompleteNode(ExecutionContext context, ExecutionNode node)
         {
             try
             {
@@ -482,7 +502,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ArrayExecutionNode arrayNode)
                     {
-                        SetArrayItemNodes(context, arrayNode);
+                        await SetArrayItemNodes(context, arrayNode).ConfigureAwait(false);
                     }
                 }
             }
