@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
@@ -47,15 +46,15 @@ namespace GraphQL
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register<TSchema>(serviceLifetime);
 
-            // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
-            // overwrite previous default implementations, such as the error message registered by default.
+            // Now register default implementation of ISchema. This default implementation registration
+            // overwrites previous default implementations, such as the error message registered by default.
             builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
             return builder;
         }
 
-        public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+        public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema)
             where TSchema : class, ISchema
-            => AddSchema(builder, _ => schema, serviceLifetime);
+            => AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
 
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
@@ -72,8 +71,8 @@ namespace GraphQL
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, schemaFactory);
 
-            // Now register default implementations of ISchema and IGraphQLExecuter. These default implementation registrations
-            // overwrite previous default implementations, such as the error message registered by default.
+            // Now register default implementation of ISchema. This default implementation registration
+            // overwrites previous default implementations, such as the error message registered by default.
             builder.Register<IDefaultService<ISchema>>(ServiceLifetime.Transient, serviceProvider => new DefaultService<ISchema>(serviceProvider.GetRequiredService<TSchema>()));
             return builder;
         }
@@ -142,59 +141,22 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddClrMappings(this IGraphQLBuilder builder)
-            => builder.AddClrMappings(Assembly.GetCallingAssembly());
+        public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
+            => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
-        public static IGraphQLBuilder AddClrMappings(this IGraphQLBuilder builder, Assembly assembly)
+        public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder, Assembly assembly)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
 
-            var typesToRegister = new Type[]
-            {
-                typeof(ObjectGraphType<>),
-                typeof(InputObjectGraphType<>),
-                typeof(EnumerationGraphType<>),
-            };
-
-            var types = assembly
-                .GetTypes()
-                .Where(x => !x.IsAbstract && !x.IsInterface);
-
-            var typeMappings = new List<(Type clrType, Type graphType)>();
-            foreach (var graphType in types)
-            {
-                //skip types marked with the DoNotRegister attribute
-                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
-                    continue;
-                //get the base type
-                var baseType = graphType.BaseType;
-                while (baseType != null)
-                {
-                    //skip types marked with the DoNotRegister attribute
-                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
-                        break;
-                    //look for generic types that match our list above
-                    if (baseType.IsConstructedGenericType && typesToRegister.Contains(baseType.GetGenericTypeDefinition()))
-                    {
-                        //get the base type
-                        var clrType = baseType.GetGenericArguments()[0];
-                        //and register it
-                        if (clrType != typeof(object))
-                            typeMappings.Add((clrType, graphType));
-                        //skip to the next type
-                        break;
-                    }
-                    //look up the inheritance chain for a match
-                    baseType = baseType.BaseType;
-                }
-            }
-
+            // retreive all of the type mappings ahead-of-time, in case of a scoped or transient schema,
+            // as reflection is relatively slow
+            var typeMappings = assembly.GetClrTypeMappings();
             builder.AddSchemaConfiguration((serviceProvider, schema) =>
             {
                 foreach (var typeMapping in typeMappings)
                 {
-                    schema.RegisterTypeMapping(typeMapping.clrType, typeMapping.graphType);
+                    schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
                 }
             });
 

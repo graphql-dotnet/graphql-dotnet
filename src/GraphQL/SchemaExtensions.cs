@@ -137,48 +137,9 @@ namespace GraphQL
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
 
-            var genericTypesToRegister = new Type[]
+            foreach (var typeMapping in assembly.GetClrTypeMappings())
             {
-                typeof(ObjectGraphType<>),
-                typeof(InputObjectGraphType<>),
-                typeof(AutoRegisteringInputObjectGraphType<>),
-                typeof(AutoRegisteringObjectGraphType<>),
-                typeof(EnumerationGraphType<>),
-            };
-
-            var types = assembly
-                .GetTypes()
-                .Where(x => !x.IsAbstract && !x.IsInterface);
-
-            foreach (var graphType in types)
-            {
-                // skip types marked with the DoNotRegister attribute
-                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
-                    continue;
-
-                // get the base type
-                var baseType = graphType.BaseType;
-                while (baseType != null)
-                {
-                    // skip types marked with the DoNotRegister attribute
-                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
-                        break;
-
-                    // look for generic types that match our list above
-                    if (baseType.IsConstructedGenericType && genericTypesToRegister.Contains(baseType.GetGenericTypeDefinition()))
-                    {
-                        // get the generic type argument of the graph type
-                        var clrType = baseType.GetGenericArguments()[0];
-                        // and register it, so long as it's not just "object"
-                        if (clrType != typeof(object))
-                            schema.RegisterTypeMapping(clrType, graphType);
-
-                        // skip to the next type
-                        break;
-                    }
-                    // traverse up the inheritance chain for a match
-                    baseType = baseType.BaseType;
-                }
+                schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
             }
         }
 
