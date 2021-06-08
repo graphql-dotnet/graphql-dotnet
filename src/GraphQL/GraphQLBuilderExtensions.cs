@@ -7,6 +7,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
@@ -83,10 +84,19 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, ErrorInfoProviderOptions options)
-            => AddErrorInfoProvider(builder, _ => options);
+        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, ComplexityConfiguration complexityConfiguration)
+            => ConfigureComplexity(builder, _ => complexityConfiguration);
 
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
+        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Func<IServiceProvider, ComplexityConfiguration> complexityConfigurationFactory)
+        {
+            builder.Register(ServiceLifetime.Singleton, complexityConfigurationFactory);
+            return builder;
+        }
+
+        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, ErrorInfoProviderOptions options)
+            => ConfigureErrorInfoProvider(builder, _ => options);
+
+        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
         {
             builder.Register<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
             builder.Register(ServiceLifetime.Singleton, optionsFactory);
@@ -151,7 +161,7 @@ namespace GraphQL
             // retreive all of the type mappings ahead-of-time, in case of a scoped or transient schema,
             // as reflection is relatively slow
             var typeMappings = assembly.GetClrTypeMappings();
-            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            builder.ConfigureSchema((serviceProvider, schema) =>
             {
                 foreach (var typeMapping in typeMappings)
                 {
@@ -167,7 +177,7 @@ namespace GraphQL
         {
             builder.Register<TDocumentListener>(serviceLifetime);
             builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, services => services.GetRequiredService<TDocumentListener>());
-            builder.AddExecutionConfiguration(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -176,7 +186,7 @@ namespace GraphQL
         {
             builder.Register(ServiceLifetime.Transient, _ => documentListener);
             builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, _ => documentListener);
-            builder.AddExecutionConfiguration(options => options.Listeners.Add(documentListener));
+            builder.ConfigureExecution(options => options.Listeners.Add(documentListener));
             return builder;
         }
 
@@ -187,17 +197,23 @@ namespace GraphQL
             builder.Register<TMiddleware>(serviceLifetime);
             builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
             if (install)
-                builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+                builder.ConfigureSchema((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
             return builder;
         }
 
         public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
             where TMiddleware : class, IFieldMiddleware
         {
-            // service lifetime is transient so that the lifetime will match that of the schema, be it scoped or singleton
+            if (serviceLifetime == ServiceLifetime.Scoped)
+            {
+                // this code prevents registrations of scoped middleware for a singleton schema, which is impossible.
+                throw new InvalidOperationException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
+            }
+
+            // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
             builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
-            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            builder.Register<IFieldMiddleware>(serviceLifetime);
+            builder.ConfigureSchema((serviceProvider, schema) =>
             {
                 if (installPredicate(serviceProvider, schema))
                     schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>());
@@ -211,7 +227,7 @@ namespace GraphQL
             builder.Register(ServiceLifetime.Singleton, _ => middleware);
             builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
             if (install)
-                builder.AddSchemaConfiguration((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
+                builder.ConfigureSchema((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
             return builder;
         }
 
@@ -220,7 +236,7 @@ namespace GraphQL
         {
             builder.Register(ServiceLifetime.Singleton, _ => middleware);
             builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
-            builder.AddSchemaConfiguration((serviceProvider, schema) =>
+            builder.ConfigureSchema((serviceProvider, schema) =>
             {
                 if (installPredicate(serviceProvider, schema))
                     schema.FieldMiddleware.Use(middleware);
@@ -264,13 +280,13 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder AddSchemaConfiguration(this IGraphQLBuilder builder, Action<IServiceProvider, ISchema> configuration)
+        public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<IServiceProvider, ISchema> configuration)
         {
             builder.Register(ServiceLifetime.Singleton, _ => configuration);
             return builder;
         }
 
-        public static IGraphQLBuilder AddExecutionConfiguration(this IGraphQLBuilder builder, Action<ExecutionOptions> configuration)
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> configuration)
         {
             builder.Register(ServiceLifetime.Singleton, _ => configuration);
             return builder;
@@ -280,14 +296,14 @@ namespace GraphQL
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             if (enable)
-                builder.AddExecutionConfiguration(options => options.EnableMetrics = true);
+                builder.ConfigureExecution(options => options.EnableMetrics = true);
             return builder;
         }
 
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.AddExecutionConfiguration(options =>
+            builder.ConfigureExecution(options =>
             {
                 if (enablePredicate(options))
                 {
@@ -300,7 +316,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
-            builder.AddExecutionConfiguration(options =>
+            builder.ConfigureExecution(options =>
             {
                 if (enablePredicate(options))
                 {

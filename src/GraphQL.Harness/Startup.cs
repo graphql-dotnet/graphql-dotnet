@@ -5,6 +5,7 @@ using GraphQL.Instrumentation;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
 using GraphQL.SystemTextJson;
+using GraphQL.Validation.Complexity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -31,14 +32,14 @@ namespace GraphQL.Harness
             services.AddGraphQL()
                 .AddSystemTextJson()
                 .AddSchema<StarWarsSchema>()
-                .AddErrorInfoProvider(serviceProvider =>
+                .ConfigureErrorInfoProvider(serviceProvider =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     return new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions };
                 })
                 .AddGraphTypes(typeof(StarWarsQuery).Assembly)
                 .AddSchema<StarWarsSchema>(ServiceLifetime.Singleton)
-                .AddSchemaConfiguration((serviceProvider, schema) =>
+                .ConfigureSchema((serviceProvider, schema) =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     if (settings.Value.EnableMetrics)

@@ -205,15 +205,12 @@ namespace GraphQL
             where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
         public static GraphQL.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
-        public static GraphQL.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.IGraphQLBuilder builder, GraphQL.Execution.ErrorInfoProviderOptions options) { }
-        public static GraphQL.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Execution.ErrorInfoProviderOptions> optionsFactory) { }
         public static GraphQL.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.IGraphQLBuilder builder)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
-        public static GraphQL.IGraphQLBuilder AddExecutionConfiguration(this GraphQL.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> configuration) { }
         public static GraphQL.IGraphQLBuilder AddGraphTypes(this GraphQL.IGraphQLBuilder builder) { }
         public static GraphQL.IGraphQLBuilder AddGraphTypes(this GraphQL.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.IGraphQLBuilder AddMetrics(this GraphQL.IGraphQLBuilder builder, bool enable = true) { }
@@ -233,7 +230,12 @@ namespace GraphQL
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchema> schemaFactory, GraphQL.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
-        public static GraphQL.IGraphQLBuilder AddSchemaConfiguration(this GraphQL.IGraphQLBuilder builder, System.Action<System.IServiceProvider, GraphQL.Types.ISchema> configuration) { }
+        public static GraphQL.IGraphQLBuilder ConfigureComplexity(this GraphQL.IGraphQLBuilder builder, GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
+        public static GraphQL.IGraphQLBuilder ConfigureComplexity(this GraphQL.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Validation.Complexity.ComplexityConfiguration> complexityConfigurationFactory) { }
+        public static GraphQL.IGraphQLBuilder ConfigureErrorInfoProvider(this GraphQL.IGraphQLBuilder builder, GraphQL.Execution.ErrorInfoProviderOptions options) { }
+        public static GraphQL.IGraphQLBuilder ConfigureErrorInfoProvider(this GraphQL.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Execution.ErrorInfoProviderOptions> optionsFactory) { }
+        public static GraphQL.IGraphQLBuilder ConfigureExecution(this GraphQL.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> configuration) { }
+        public static GraphQL.IGraphQLBuilder ConfigureSchema(this GraphQL.IGraphQLBuilder builder, System.Action<System.IServiceProvider, GraphQL.Types.ISchema> configuration) { }
         public static void Register<TService>(this GraphQL.IGraphQLBuilder graphQLBuilder, GraphQL.ServiceLifetime serviceLifetime)
             where TService :  class { }
         public static void Register<TService, TImplementation>(this GraphQL.IGraphQLBuilder graphQLBuilder, GraphQL.ServiceLifetime serviceLifetime)
