@@ -52,7 +52,7 @@ namespace GraphQL.Types
                 {
                     configuration(services, this);
                 }
-            }    
+            }
         }
 
         /// <summary>
