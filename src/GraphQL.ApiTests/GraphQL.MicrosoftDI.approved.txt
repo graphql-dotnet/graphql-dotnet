@@ -66,6 +66,8 @@ namespace GraphQL.MicrosoftDI
         public static GraphQL.IGraphQLBuilder AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
         public static GraphQL.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.IGraphQLBuilder builder, GraphQL.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.IGraphQLBuilder ConfigureComplexity(this GraphQL.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider> configureOptions) { }
+        public static GraphQL.IGraphQLBuilder ConfigureErrorInfoProvider(this GraphQL.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider> configureOptions) { }
     }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
