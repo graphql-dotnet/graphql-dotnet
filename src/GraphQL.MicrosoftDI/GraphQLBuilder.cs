@@ -1,6 +1,4 @@
 using System;
-using GraphQL.Execution;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -14,15 +12,31 @@ namespace GraphQL.MicrosoftDI
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
             Initialize();
+        }
 
-            // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
-            // note that this code will cause a null to be passed into applicable constructor arguments during DI injection if these objects are unconfigured
-            TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ComplexityConfiguration>>()?.Value); // Registering IOptions<ComplexityConfiguration> or registering ComplexityConfiguration will work
-            TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ErrorInfoProviderOptions>>()?.Value); // Registering IOptions<ErrorInfoProviderOptions> or registering ErrorInfoProviderOptions will work
+        public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+        {
+            TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
+            if (action != null)
+            {
+                Register<IPostConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new PostConfigureOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
+            }
+
+            return this;
+        }
+
+        public override IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
+            Register<IConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
+
+            return this;
         }
 
         public override IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
-            where TService : class
         {
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
@@ -69,7 +83,6 @@ namespace GraphQL.MicrosoftDI
         }
 
         public override IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
-            where TService : class
         {
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));

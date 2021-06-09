@@ -21,7 +21,8 @@ namespace GraphQL.SystemTextJson
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.IGraphQLBuilder AddSystemTextJson(this GraphQL.IGraphQLBuilder builder) { }
+        public static GraphQL.IGraphQLBuilder AddSystemTextJson(this GraphQL.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions> action = null) { }
+        public static GraphQL.IGraphQLBuilder AddSystemTextJson(this GraphQL.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider> action) { }
     }
     public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
     {

@@ -13,6 +13,12 @@ namespace GraphQL
             where TService : class;
 
         IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+
+        IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> optionsFactory)
+            where TOptions : class, new();
+
+        IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+            where TOptions : class, new();
     }
 
     public enum ServiceLifetime

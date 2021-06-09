@@ -13,23 +13,31 @@ namespace GraphQL
 {
     public static class GraphQLBuilderExtensions
     {
-        public static void Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime);
 
-        public static void Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class
             => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime);
 
-        public static void TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
-        public static void TryRegister<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder TryRegister<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime);
+
+        public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
+            where TOptions : class, new()
+            => graphQLBuilder.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
+
+        public static IGraphQLBuilder ConfigureDefaults<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
+            where TOptions : class, new()
+            => graphQLBuilder.ConfigureDefaults<TOptions>((opt, _) => action(opt));
 
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
@@ -84,24 +92,17 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, ComplexityConfiguration complexityConfiguration)
-            => ConfigureComplexity(builder, _ => complexityConfiguration);
+        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Action<ComplexityConfiguration> complexityConfiguration)
+            => builder.Configure(complexityConfiguration);
 
-        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Func<IServiceProvider, ComplexityConfiguration> complexityConfigurationFactory)
-        {
-            builder.Register(ServiceLifetime.Singleton, complexityConfigurationFactory);
-            return builder;
-        }
+        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> complexityConfiguration)
+            => builder.Configure(complexityConfiguration);
 
-        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, ErrorInfoProviderOptions options)
-            => ConfigureErrorInfoProvider(builder, _ => options);
+        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action)
+            => builder.Configure(action);
 
-        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Func<IServiceProvider, ErrorInfoProviderOptions> optionsFactory)
-        {
-            builder.Register<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
-            builder.Register(ServiceLifetime.Singleton, optionsFactory);
-            return builder;
-        }
+        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+            => builder.Configure(action);
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
             where TProvider : class, IErrorInfoProvider

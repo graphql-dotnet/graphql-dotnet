@@ -54,6 +54,10 @@ namespace GraphQL.MicrosoftDI
     public class GraphQLBuilder : GraphQL.GraphQLBuilderBase
     {
         public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public override GraphQL.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
+            where TOptions :  class, new () { }
+        public override GraphQL.IGraphQLBuilder ConfigureDefaults<TOptions>(System.Action<TOptions, System.IServiceProvider> action)
+            where TOptions :  class, new () { }
         public override GraphQL.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.ServiceLifetime serviceLifetime) { }
         public override GraphQL.IGraphQLBuilder Register<TService>(GraphQL.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
             where TService :  class { }

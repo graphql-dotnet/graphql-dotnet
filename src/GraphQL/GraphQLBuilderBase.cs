@@ -39,6 +39,12 @@ namespace GraphQL
                     options.ComplexityConfiguration = complexityConfiguration;
             };
             Register(ServiceLifetime.Singleton, _ => configureComplexityConfiguration);
+
+            // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
+            // note that this code will cause a null to be passed into applicable constructor arguments during DI injection if these objects are unconfigured
+            Configure<ComplexityConfiguration>();
+            Configure<ErrorInfoProviderOptions>();
+
         }
 
         public abstract IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
@@ -50,5 +56,12 @@ namespace GraphQL
             where TService : class;
 
         public abstract IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+
+        public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+            where TOptions : class, new();
+
+
+        public abstract IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
+            where TOptions : class, new();
     }
 }

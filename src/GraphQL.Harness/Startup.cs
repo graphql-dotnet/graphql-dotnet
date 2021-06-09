@@ -32,10 +32,10 @@ namespace GraphQL.Harness
             services.AddGraphQL()
                 .AddSystemTextJson()
                 .AddSchema<StarWarsSchema>()
-                .ConfigureErrorInfoProvider(serviceProvider =>
+                .ConfigureErrorInfoProvider((opts, serviceProvider) =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
-                    return new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions };
+                    opts.ExposeExceptionStackTrace = settings.Value.ExposeExceptions;
                 })
                 .AddGraphTypes(typeof(StarWarsQuery).Assembly)
                 .AddSchema<StarWarsSchema>(ServiceLifetime.Singleton)
