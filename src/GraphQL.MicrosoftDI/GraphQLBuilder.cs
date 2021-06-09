@@ -1,18 +1,27 @@
 using System;
+using GraphQL.Execution;
+using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace GraphQL.MicrosoftDI
 {
-    public class GraphQLBuilder : IGraphQLBuilder
+    public class GraphQLBuilder : GraphQLBuilderBase
     {
         private readonly IServiceCollection _services;
         public GraphQLBuilder(IServiceCollection services)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
+            Initialize();
+
+            // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
+            // note that this code will cause a null to be passed into applicable constructor arguments during DI injection if these objects are unconfigured
+            TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ComplexityConfiguration>>()?.Value); // Registering IOptions<ComplexityConfiguration> or registering ComplexityConfiguration will work
+            TryRegister(ServiceLifetime.Transient, services => services.GetService<IOptions<ErrorInfoProviderOptions>>()?.Value); // Registering IOptions<ErrorInfoProviderOptions> or registering ErrorInfoProviderOptions will work
         }
 
-        public virtual IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public override IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
             where TService : class
         {
             if (implementationFactory == null)
@@ -35,7 +44,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
-        public virtual IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -59,7 +68,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
-        public virtual IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public override IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
             where TService : class
         {
             if (implementationFactory == null)
@@ -82,7 +91,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
-        public virtual IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));

@@ -183,6 +183,17 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
+    public abstract class GraphQLBuilderBase : GraphQL.IGraphQLBuilder
+    {
+        protected GraphQLBuilderBase() { }
+        protected void Initialize() { }
+        public abstract GraphQL.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.IGraphQLBuilder Register<TService>(GraphQL.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
+            where TService :  class;
+        public abstract GraphQL.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.IGraphQLBuilder TryRegister<TService>(GraphQL.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
+            where TService :  class;
+    }
     public static class GraphQLBuilderExtensions
     {
         public static GraphQL.IGraphQLBuilder AddClrTypeMappings(this GraphQL.IGraphQLBuilder builder) { }
