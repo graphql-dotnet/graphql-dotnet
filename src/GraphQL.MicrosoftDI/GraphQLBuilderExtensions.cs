@@ -20,7 +20,7 @@ namespace GraphQL.MicrosoftDI
                 // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
                 throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
             }
-
+            
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             builder.Register(serviceLifetime, services =>
             {

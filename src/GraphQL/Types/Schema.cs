@@ -36,21 +36,25 @@ namespace GraphQL.Types
         /// to create required objects.
         /// </summary>
         public Schema(IServiceProvider services)
+            : this(services, true)
+        {
+        }
+
+        public Schema(IServiceProvider services, bool runConfigurations = true)
         {
             _services = services;
 
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
-        }
 
-        public Schema(IServiceProvider services, IEnumerable<Action<IServiceProvider, ISchema>> configurations)
-            : this(services)
-        {
-            if (configurations != null)
+            if (runConfigurations)
             {
-                foreach (var configuration in configurations)
+                if (_services.GetService(typeof(IEnumerable<Action<IServiceProvider, ISchema>>)) is IEnumerable<Action<IServiceProvider, ISchema>> configurations)
                 {
-                    configuration(services, this);
+                    foreach (var configuration in configurations)
+                    {
+                        configuration(services, this);
+                    }
                 }
             }
         }
