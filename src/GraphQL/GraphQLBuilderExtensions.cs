@@ -89,7 +89,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
             where TDocumentExecuter : class, IDocumentExecuter
-            =>  builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
+            => builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
 
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
             where TDocumentExecuter : class, IDocumentExecuter
