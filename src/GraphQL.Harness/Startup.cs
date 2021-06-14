@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using Example;
-using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
 using GraphQL.SystemTextJson;
-using GraphQL.Validation.Complexity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
