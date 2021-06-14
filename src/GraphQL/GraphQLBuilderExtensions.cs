@@ -92,24 +92,57 @@ namespace GraphQL
             return builder;
         }
 
-        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Action<ComplexityConfiguration> complexityConfiguration)
-            => builder.Configure(complexityConfiguration);
-
-        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> complexityConfiguration)
-            => builder.Configure(complexityConfiguration);
-
-        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action)
+        public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action)
             => builder.Configure(action);
 
-        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+        public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> action)
             => builder.Configure(action);
+
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+            => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
+
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+            => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
+
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
             where TProvider : class, IErrorInfoProvider
-        {
-            builder.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
-            return builder;
-        }
+            => builder.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider : class, IErrorInfoProvider
@@ -117,10 +150,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider : class, IErrorInfoProvider
-        {
-            builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
-            return builder;
-        }
+            => builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
 
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder)
             => builder.AddGraphTypes(Assembly.GetCallingAssembly());
