@@ -39,7 +39,7 @@ namespace GraphQL.Harness
                 })
                 .AddGraphTypes(typeof(StarWarsQuery).Assembly)
                 .AddSchema<StarWarsSchema>(ServiceLifetime.Singleton)
-                .ConfigureSchema((serviceProvider, schema) =>
+                .ConfigureSchema((schema, serviceProvider) =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     if (settings.Value.EnableMetrics)

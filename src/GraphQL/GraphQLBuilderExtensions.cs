@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
@@ -7,6 +8,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
 namespace GraphQL
@@ -87,12 +89,18 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
             where TDocumentExecuter : class, IDocumentExecuter
-        {
-            builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
-            return builder;
-        }
+            =>  builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
 
-        public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action)
+        public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
+            where TDocumentExecuter : class, IDocumentExecuter
+            => documentExecuter == null ? throw new ArgumentNullException(nameof(documentExecuter)) : builder.Register<IDocumentExecuter>(ServiceLifetime.Singleton, _ => documentExecuter);
+
+        public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentExecuter> documentExecuterFactory)
+            where TDocumentExecuter : class, IDocumentExecuter
+            => builder.Register<IDocumentExecuter>(ServiceLifetime.Singleton, documentExecuterFactory);
+
+
+        public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
             => builder.Configure(action);
 
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> action)
@@ -100,12 +108,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-        {
-            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            if (action != null)
-                builder.Configure(action);
-            return builder;
-        }
+            => builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton).Configure(action);
 
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
@@ -113,12 +116,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-        {
-            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
-            if (action != null)
-                builder.Configure(action);
-            return builder;
-        }
+            => builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory))).Configure(action);
 
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
@@ -126,18 +124,7 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-        {
-            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
-            if (action != null)
-                builder.Configure(action);
-            return builder;
-        }
-
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
-
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+            => builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory))).Configure(action);
 
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
@@ -146,11 +133,18 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider : class, IErrorInfoProvider
-            => AddErrorInfoProvider(builder, _ => errorInfoProvider);
+            => errorInfoProvider == null ? throw new ArgumentNullException(nameof(errorInfoProvider)) : AddErrorInfoProvider(builder, _ => errorInfoProvider);
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider : class, IErrorInfoProvider
             => builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
+
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action = null)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+
 
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder)
             => builder.AddGraphTypes(Assembly.GetCallingAssembly());
@@ -181,6 +175,7 @@ namespace GraphQL
             return builder;
         }
 
+
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
             => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
@@ -192,7 +187,7 @@ namespace GraphQL
             // retreive all of the type mappings ahead-of-time, in case of a scoped or transient schema,
             // as reflection is relatively slow
             var typeMappings = assembly.GetClrTypeMappings();
-            builder.ConfigureSchema((serviceProvider, schema) =>
+            builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 foreach (var typeMapping in typeMappings)
                 {
@@ -203,11 +198,12 @@ namespace GraphQL
             return builder;
         }
 
+
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Register<TDocumentListener>(serviceLifetime);
-            builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, services => services.GetRequiredService<TDocumentListener>());
+            builder.Register<IDocumentExecutionListener>(serviceLifetime);
             builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
             return builder;
         }
@@ -215,24 +211,26 @@ namespace GraphQL
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, TDocumentListener documentListener)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.Register(ServiceLifetime.Transient, _ => documentListener);
-            builder.Register<IDocumentExecutionListener>(ServiceLifetime.Transient, _ => documentListener);
+            if (documentListener == null)
+                throw new ArgumentNullException(nameof(documentListener));
+
+            builder.Register(ServiceLifetime.Singleton, _ => documentListener);
+            builder.Register<IDocumentExecutionListener>(ServiceLifetime.Singleton, _ => documentListener);
             builder.ConfigureExecution(options => options.Listeners.Add(documentListener));
             return builder;
         }
 
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-            where TMiddleware : class, IFieldMiddleware
+        public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentListener> documentListenerFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TDocumentListener : class, IDocumentExecutionListener
         {
-            // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
-            if (install)
-                builder.ConfigureSchema((serviceProvider, schema) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            builder.Register(serviceLifetime, documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)));
+            builder.Register<IDocumentExecutionListener>(serviceLifetime, documentListenerFactory);
+            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
             where TMiddleware : class, IFieldMiddleware
         {
             if (serviceLifetime == ServiceLifetime.Scoped)
@@ -243,8 +241,28 @@ namespace GraphQL
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
             builder.Register<TMiddleware>(serviceLifetime);
+            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
+            if (install)
+                builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+            where TMiddleware : class, IFieldMiddleware
+        {
+            if (installPredicate == null)
+                throw new ArgumentNullException(nameof(installPredicate));
+
+            if (serviceLifetime == ServiceLifetime.Scoped)
+            {
+                // this code prevents registrations of scoped middleware for a singleton schema, which is impossible.
+                throw new InvalidOperationException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
+            }
+
+            // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
+            builder.Register<TMiddleware>(serviceLifetime);
             builder.Register<IFieldMiddleware>(serviceLifetime);
-            builder.ConfigureSchema((serviceProvider, schema) =>
+            builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
                     schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>());
@@ -255,19 +273,28 @@ namespace GraphQL
         public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
             where TMiddleware : class, IFieldMiddleware
         {
+            if (middleware == null)
+                throw new ArgumentNullException(nameof(middleware));
+
             builder.Register(ServiceLifetime.Singleton, _ => middleware);
             builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
             if (install)
-                builder.ConfigureSchema((serviceProvider, schema) => schema.FieldMiddleware.Use(middleware));
+                builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(middleware));
             return builder;
         }
 
         public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
             where TMiddleware : class, IFieldMiddleware
         {
+            if (middleware == null)
+                throw new ArgumentNullException(nameof(middleware));
+
+            if (installPredicate == null)
+                throw new ArgumentNullException(nameof(installPredicate));
+
             builder.Register(ServiceLifetime.Singleton, _ => middleware);
             builder.Register<IFieldMiddleware>(ServiceLifetime.Singleton, _ => middleware);
-            builder.ConfigureSchema((serviceProvider, schema) =>
+            builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
                     schema.FieldMiddleware.Use(middleware);
@@ -275,12 +302,10 @@ namespace GraphQL
             return builder;
         }
 
+
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder)
             where TDocumentCache : class, IDocumentCache
-        {
-            builder.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
-            return builder;
-        }
+            => builder.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
 
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
             where TDocumentCache : class, IDocumentCache
@@ -288,17 +313,12 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentCache> documentCacheFactory)
             where TDocumentCache : class, IDocumentCache
-        {
-            builder.Register<IDocumentCache>(ServiceLifetime.Singleton, documentCacheFactory);
-            return builder;
-        }
+            => builder.Register<IDocumentCache>(ServiceLifetime.Singleton, documentCacheFactory);
+
 
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder)
             where TDocumentWriter : class, IDocumentWriter
-        {
-            builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton);
-            return builder;
-        }
+            => builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton);
 
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter : class, IDocumentWriter
@@ -306,22 +326,19 @@ namespace GraphQL
 
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentWriter> documentWriterFactory)
             where TDocumentWriter : class, IDocumentWriter
-        {
-            builder.Register<IDocumentWriter>(ServiceLifetime.Singleton, documentWriterFactory);
-            return builder;
-        }
+            => builder.Register<IDocumentWriter>(ServiceLifetime.Singleton, documentWriterFactory);
 
-        public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<IServiceProvider, ISchema> configuration)
-        {
-            builder.Register(ServiceLifetime.Singleton, _ => configuration);
-            return builder;
-        }
 
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> configuration)
-        {
-            builder.Register(ServiceLifetime.Singleton, _ => configuration);
-            return builder;
-        }
+        public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<ISchema> action)
+            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.ConfigureSchema((schema, _) => action(schema));
+
+        public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<ISchema, IServiceProvider> action)
+            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(ServiceLifetime.Singleton, _ => action);
+
+
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
+            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(ServiceLifetime.Singleton, _ => action);
+
 
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
         {
@@ -356,5 +373,42 @@ namespace GraphQL
             });
             return builder;
         }
+
+
+        public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false)
+            where TValidationRule : class, IValidationRule
+        {
+            builder.Register<TValidationRule>(ServiceLifetime.Singleton);
+            builder.ConfigureExecution(options =>
+            {
+                var rule = options.RequestServices.GetRequiredService<TValidationRule>();
+                options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
+                if (useForCachedDocuments)
+                {
+                    options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+                }
+            });
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
+            where TValidationRule : class, IValidationRule
+        {
+            builder.Register(ServiceLifetime.Singleton, validationRuleFactory);
+            builder.ConfigureExecution(options =>
+            {
+                var rule = options.RequestServices.GetRequiredService<TValidationRule>();
+                options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
+                if (useForCachedDocuments)
+                {
+                    options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+                }
+            });
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
+            where TValidationRule : class, IValidationRule
+            => validationRule == null ? throw new ArgumentNullException(nameof(validationRule)) : builder.AddValidationRule(_ => validationRule, useForCachedDocuments);
     }
 }

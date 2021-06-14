@@ -49,11 +49,11 @@ namespace GraphQL.Types
 
             if (runConfigurations)
             {
-                if (_services.GetService(typeof(IEnumerable<Action<IServiceProvider, ISchema>>)) is IEnumerable<Action<IServiceProvider, ISchema>> configurations)
+                if (_services.GetService(typeof(IEnumerable<Action<ISchema, IServiceProvider>>)) is IEnumerable<Action<ISchema, IServiceProvider>> configurations)
                 {
                     foreach (var configuration in configurations)
                     {
-                        configuration(services, this);
+                        configuration(this, services);
                     }
                 }
             }
