@@ -52,6 +52,10 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintObject(IObjectGraphType type)
         {
+            // Do not return an empty query type: "Query { }" as it is not valid as part of the sdl.
+            if (type != null && String.Equals(type.Name, "Query", StringComparison.Ordinal) && !type.Fields.Any(x => !IsFederatedType(x.ResolvedType.GetNamedType().Name)))
+               return String.Empty;
+
             var isExtension = type.IsExtensionType();
 
             var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
