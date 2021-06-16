@@ -54,7 +54,7 @@ namespace GraphQL.Utilities.Federation
         {
             // Do not return an empty query type: "Query { }" as it is not valid as part of the sdl.
             if (type != null && String.Equals(type.Name, "Query", StringComparison.Ordinal) && !type.Fields.Any(x => !IsFederatedType(x.ResolvedType.GetNamedType().Name)))
-               return String.Empty;
+                return String.Empty;
 
             var isExtension = type.IsExtensionType();
 
