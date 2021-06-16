@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
@@ -24,7 +23,7 @@ namespace GraphQL.Tests.Utilities.Federation
             string result = federatedSchemaPrinter.PrintObject(query);
 
             // Assert
-            Assert.Equal(String.Empty, result);
+            Assert.Equal(string.Empty, result);
         }
     }
 }

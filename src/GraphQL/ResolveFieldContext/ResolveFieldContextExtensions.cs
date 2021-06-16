@@ -61,8 +61,7 @@ namespace GraphQL
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
-            ArgumentValue value = default;
-            return (context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value.Source != ArgumentSource.FieldDefault;
+            return context.Arguments != null && context.Arguments.TryGetValue(argumentName, out var value) && value.Source != ArgumentSource.FieldDefault;
         }
 
         /// <summary>
