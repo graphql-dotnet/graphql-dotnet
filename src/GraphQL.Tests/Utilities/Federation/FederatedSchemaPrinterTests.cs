@@ -1,4 +1,3 @@
-using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
 using Xunit;
@@ -11,12 +10,12 @@ namespace GraphQL.Tests.Utilities.Federation
         public void PrintObject_ReturnsEmptyString_GivenQueryTypeHasOnlyFederatedFields()
         {
             // Arrange
-            ISchema schema = default;
+            var schema = FederatedSchema.For(@"type X @key(fields: ""id"") { id: ID! }");
             SchemaPrinterOptions options = default;
-            var query = new ObjectGraphType { Name = "Query" };
-            query.Field("_entities", new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any")))));
-            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")));
 
+            schema.Initialize();
+
+            var query = schema.Query;
             var federatedSchemaPrinter = new FederatedSchemaPrinter(schema, options);
 
             // Act
