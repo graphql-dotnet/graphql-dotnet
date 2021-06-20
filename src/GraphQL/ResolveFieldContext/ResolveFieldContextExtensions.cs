@@ -11,21 +11,24 @@ namespace GraphQL
     /// </summary>
     public static class ResolveFieldContextExtensions
     {
-        /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
+        /// <summary>
+        /// Returns the value of the specified field argument, or <paramref name="defaultValue"/> when unspecified or when specified as <see langword="null"/>.
+        /// Field and variable default values take precedence over the <paramref name="defaultValue"/> parameter.
+        /// </summary>
         public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
         {
             bool exists = context.TryGetArgument(typeof(TType), name, out object result);
             return exists
-                ? result == null && typeof(TType).IsValueType ? defaultValue : (TType)result
+                ? result == null ? defaultValue : (TType)result
                 : defaultValue;
         }
 
-        /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
+        /// <inheritdoc cref="GetArgument{TType}(IResolveFieldContext, string, TType)"/>
         public static object GetArgument(this IResolveFieldContext context, Type argumentType, string name, object defaultValue = null)
         {
             bool exists = context.TryGetArgument(argumentType, name, out object result);
             return exists
-                ? result == null && argumentType.IsValueType ? defaultValue : result
+                ? result ?? defaultValue
                 : defaultValue;
         }
 
