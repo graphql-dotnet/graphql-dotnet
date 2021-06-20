@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
@@ -19,6 +21,11 @@ namespace GraphQL
 
         public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
             : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
+        {
+        }
+
+        public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<Action<ExecutionOptions>> configurations)
+            : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations)
         {
         }
 
