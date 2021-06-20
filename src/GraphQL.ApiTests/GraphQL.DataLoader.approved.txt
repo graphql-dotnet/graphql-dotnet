@@ -93,7 +93,7 @@ namespace GraphQL.DataLoader
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.IGraphQLBuilder AddDataLoader(this GraphQL.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
     public interface IDataLoader
     {

@@ -28,8 +28,8 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings> action = null) { }
-        public static GraphQL.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings> action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider> action) { }
     }
     public class InputsConverter : Newtonsoft.Json.JsonConverter
     {

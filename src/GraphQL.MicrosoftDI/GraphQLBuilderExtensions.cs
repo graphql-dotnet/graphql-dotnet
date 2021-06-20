@@ -1,9 +1,8 @@
 using System;
-using GraphQL.Execution;
+using GraphQL.DI;
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.MicrosoftDI
 {
@@ -40,18 +39,6 @@ namespace GraphQL.MicrosoftDI
                 return schema;
             });
 
-            return builder;
-        }
-
-        public static IGraphQLBuilder ConfigureErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> configureOptions)
-        {
-            builder.Register<IConfigureOptions<ErrorInfoProviderOptions>>(ServiceLifetime.Singleton, x => new ConfigureNamedOptions<ErrorInfoProviderOptions>(Options.DefaultName, opt => configureOptions(opt, x)));
-            return builder;
-        }
-
-        public static IGraphQLBuilder ConfigureComplexity(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> configureOptions)
-        {
-            builder.Register<IConfigureOptions<ComplexityConfiguration>>(ServiceLifetime.Singleton, x => new ConfigureNamedOptions<ComplexityConfiguration>(Options.DefaultName, opt => configureOptions(opt, x)));
             return builder;
         }
     }

@@ -1,3 +1,5 @@
+using GraphQL.DI;
+
 namespace GraphQL.DataLoader
 {
     public static class GraphQLBuilderExtensions

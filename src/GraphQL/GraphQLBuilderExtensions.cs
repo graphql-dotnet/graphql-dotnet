@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Caching;
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;

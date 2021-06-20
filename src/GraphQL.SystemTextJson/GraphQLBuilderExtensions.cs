@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using GraphQL.DI;
 
 namespace GraphQL.SystemTextJson
 {
