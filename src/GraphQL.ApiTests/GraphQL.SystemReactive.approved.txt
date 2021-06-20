@@ -23,6 +23,6 @@ namespace GraphQL.SystemReactive
 {
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
 }

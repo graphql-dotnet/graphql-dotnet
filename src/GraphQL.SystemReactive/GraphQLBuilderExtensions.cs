@@ -1,3 +1,5 @@
+using GraphQL.DI;
+
 namespace GraphQL.SystemReactive
 {
     public static class GraphQLBuilderExtensions

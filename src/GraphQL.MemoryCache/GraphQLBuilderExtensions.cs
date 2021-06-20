@@ -1,4 +1,5 @@
 using System;
+using GraphQL.DI;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching

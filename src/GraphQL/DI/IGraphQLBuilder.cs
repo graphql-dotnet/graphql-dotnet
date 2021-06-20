@@ -1,6 +1,6 @@
 using System;
 
-namespace GraphQL
+namespace GraphQL.DI
 {
     public interface IGraphQLBuilder
     {
@@ -19,12 +19,5 @@ namespace GraphQL
 
         IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
             where TOptions : class, new();
-    }
-
-    public enum ServiceLifetime
-    {
-        Singleton,
-        Scoped,
-        Transient,
     }
 }

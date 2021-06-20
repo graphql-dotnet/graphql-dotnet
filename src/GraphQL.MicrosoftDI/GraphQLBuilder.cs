@@ -1,7 +1,9 @@
 using System;
+using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.MicrosoftDI
 {
