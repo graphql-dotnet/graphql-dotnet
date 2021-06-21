@@ -56,7 +56,7 @@ namespace GraphQL
         /// <inheritdoc cref="IGraphQLBuilder.ConfigureDefaults{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder ConfigureDefaults<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
             where TOptions : class, new()
-            => graphQLBuilder.ConfigureDefaults<TOptions>((opt, _) => action(opt));
+            => graphQLBuilder.ConfigureDefaults<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
 
         #region - AddSchema -
@@ -96,12 +96,15 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema)
             where TSchema : class, ISchema
-            => AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
+            => schema == null ? throw new ArgumentNullException(nameof(schema)) : AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
 
         /// <inheritdoc cref="AddSchema{TSchema}(IGraphQLBuilder, ServiceLifetime)"/>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
         {
+            if (schemaFactory == null)
+                throw new ArgumentNullException(nameof(schemaFactory));
+
             if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
             {
                 // This scenario can cause a memory leak if the schema is requested from the root service provider.
