@@ -269,12 +269,12 @@ namespace GraphQL
             where TService :  class { }
         public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class
-            where TImplementation :  class { }
+            where TImplementation :  class, TService { }
         public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
         public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class
-            where TImplementation :  class { }
+            where TImplementation :  class, TService { }
     }
     public static class GraphQLExtensions
     {
