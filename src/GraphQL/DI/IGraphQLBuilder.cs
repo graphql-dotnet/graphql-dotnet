@@ -36,6 +36,8 @@ namespace GraphQL.DI
         /// <br/><br/>
         /// Delegates registered with <see cref="ConfigureDefaults{TOptions}(Action{TOptions, IServiceProvider})">ConfigureDefaults</see> are
         /// executed prior to delegates registered with <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider})">Configure</see>.
+        /// <br/><br/>
+        /// Passing <see langword="null"/> as the delegate is allowed and will skip this registration.
         /// </summary>
         IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> optionsFactory)
             where TOptions : class, new();

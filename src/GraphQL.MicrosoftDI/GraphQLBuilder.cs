@@ -29,11 +29,11 @@ namespace GraphQL.MicrosoftDI
 
         public override IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
         {
-            if (action == null)
-                throw new ArgumentNullException(nameof(action));
-
             TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
-            Register<IConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
+            if (action != null)
+            {
+                Register<IConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
+            }
 
             return this;
         }

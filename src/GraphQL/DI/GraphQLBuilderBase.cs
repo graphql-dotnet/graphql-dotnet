@@ -16,6 +16,10 @@ namespace GraphQL.DI
         /// <br/><br/>
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
+        /// <br/><br/>
+        /// Also configures <see cref="ExecutionOptions.ComplexityConfiguration"/> to be pulled from the
+        /// dependency injection provider, and if an instance has been registered, overwrite the value
+        /// in <see cref="ExecutionOptions.ComplexityConfiguration"/> with the registered instance.
         /// </summary>
         protected void Initialize()
         {

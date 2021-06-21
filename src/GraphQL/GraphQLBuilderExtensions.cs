@@ -13,34 +13,61 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods to configure GraphQL.NET services within a dependency injection framework.
+    /// </summary>
     public static class GraphQLBuilderExtensions
     {
+        #region - Additional overloads for Register, TryRegister, ConfigureDefaults and Configure -
+        /// <inheritdoc cref="IGraphQLBuilder.Register{TService}(ServiceLifetime, Func{IServiceProvider, TService})"/>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime);
 
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
+        /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
+        /// </summary>
         public static IGraphQLBuilder Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class
             => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime);
 
+        /// <inheritdoc cref="IGraphQLBuilder.TryRegister{TService}(ServiceLifetime, Func{IServiceProvider, TService})"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
+        /// of the same type has not already been registered.
+        /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
+        /// </summary>
         public static IGraphQLBuilder TryRegister<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime);
 
+        /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
             where TOptions : class, new()
             => graphQLBuilder.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
 
+        /// <inheritdoc cref="IGraphQLBuilder.ConfigureDefaults{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder ConfigureDefaults<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
             where TOptions : class, new()
             => graphQLBuilder.ConfigureDefaults<TOptions>((opt, _) => action(opt));
+        #endregion
 
+        #region - AddSchema -
+        /// <summary>
+        /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
+        /// registered if it is not already registered within the dependency injection framework.
+        /// </summary>
+        /// <remarks>
+        /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
+        /// memory leak if requested from the root service provider.
+        /// </remarks>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
         {
@@ -62,10 +89,15 @@ namespace GraphQL
             return builder;
         }
 
+        /// <summary>
+        /// Registers <paramref name="schema"/> within the dependency injection framework as <typeparamref name="TSchema"/>. <see cref="ISchema"/> is also
+        /// registered if it is not already registered within the dependency injection framework.
+        /// </summary>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema)
             where TSchema : class, ISchema
             => AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
 
+        /// <inheritdoc cref="AddSchema{TSchema}(IGraphQLBuilder, ServiceLifetime)"/>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TSchema : class, ISchema
         {
@@ -86,45 +118,114 @@ namespace GraphQL
 
             return builder;
         }
+        #endregion
 
+        #region - AddDocumentExecuter -
+        /// <summary>
+        /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
+        /// dependency injection framework.
+        /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
             where TDocumentExecuter : class, IDocumentExecuter
             => builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
 
+        /// <summary>
+        /// Registers <paramref name="documentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
+        /// dependency injection framework.
+        /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
             where TDocumentExecuter : class, IDocumentExecuter
             => documentExecuter == null ? throw new ArgumentNullException(nameof(documentExecuter)) : builder.Register<IDocumentExecuter>(ServiceLifetime.Singleton, _ => documentExecuter);
 
+        /// <summary>
+        /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
+        /// dependency injection framework. The supplied factory method is used to create the document executer.
+        /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentExecuter> documentExecuterFactory)
             where TDocumentExecuter : class, IDocumentExecuter
             => builder.Register<IDocumentExecuter>(ServiceLifetime.Singleton, documentExecuterFactory);
+        #endregion
 
-
+        #region - AddComplexityAnalyzer -
+        /// <summary>
+        /// Configures the default complexity analyzer with the specified configuration delegate.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method with a configuration delegate will overwrite any value passed to
+        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
+        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
+        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
-            => builder.Configure(action);
+            => action != null ? builder.Configure(action) : builder;
 
+        /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> action)
-            => builder.Configure(action);
+            => action != null ? builder.Configure(action) : builder;
 
+        /// <summary>
+        /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
+        /// dependency injection framework and configures it with the specified configuration delegate.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method with a configuration delegate will overwrite any value passed to
+        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
+        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
+        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-            => builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton).Configure(action);
+        {
+            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
 
+        /// <summary>
+        /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
+        /// dependency injection framework and configures it with the specified configuration delegate.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method with a configuration delegate will overwrite any value passed to
+        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
+        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
+        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
             => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
 
-        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration> action = null)
-            where TAnalyzer : class, IComplexityAnalyzer
-            => builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory))).Configure(action);
-
+        /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
             => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
 
+        /// <summary>
+        /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
+        /// using the specified factory delegate, and configures it with the specified configuration delegate.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method with a configuration delegate will overwrite any value passed to
+        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
+        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
+        /// </remarks>
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration> action = null)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+
+        /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-            => builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory))).Configure(action);
+        {
+            builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+        #endregion
 
 
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
