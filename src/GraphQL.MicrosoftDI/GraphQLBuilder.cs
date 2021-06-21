@@ -7,15 +7,26 @@ using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.MicrosoftDI
 {
+    /// <summary>
+    /// An implementation of <see cref="IGraphQLBuilder"/> which uses the Microsoft dependency injection framework
+    /// to register services and configure options.
+    /// </summary>
     public class GraphQLBuilder : GraphQLBuilderBase
     {
         private readonly IServiceCollection _services;
+        /// <summary>
+        /// Initializes a new instance for the specified service collection.
+        /// </summary>
+        /// <remarks>
+        /// Registers various default services via <see cref="GraphQLBuilderBase.Initialize"/>.
+        /// </remarks>
         public GraphQLBuilder(IServiceCollection services)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
             Initialize();
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
         {
             TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
@@ -27,6 +38,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
         {
             TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
@@ -38,6 +50,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
         {
             if (implementationFactory == null)
@@ -60,6 +73,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
@@ -84,6 +98,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
         {
             if (implementationFactory == null)
@@ -106,6 +121,7 @@ namespace GraphQL.MicrosoftDI
             return this;
         }
 
+        /// <inheritdoc/>
         public override IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)

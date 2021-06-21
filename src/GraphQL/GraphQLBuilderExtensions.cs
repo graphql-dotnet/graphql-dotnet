@@ -62,7 +62,8 @@ namespace GraphQL
         #region - AddSchema -
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
-        /// registered if it is not already registered within the dependency injection framework.
+        /// registered if it is not already registered within the dependency injection framework. Singleton and scoped
+        /// lifetimes are supported.
         /// </summary>
         /// <remarks>
         /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
