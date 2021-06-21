@@ -25,14 +25,14 @@ namespace GraphQL
             foreach (var graphType in types)
             {
                 //skip types marked with the DoNotRegister attribute
-                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotMapClrTypeAttribute)))
                     continue;
                 //get the base type
                 var baseType = graphType.BaseType;
                 while (baseType != null)
                 {
                     //skip types marked with the DoNotRegister attribute
-                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotRegisterAttribute)))
+                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotMapClrTypeAttribute)))
                         break;
                     //look for generic types that match our list above
                     if (baseType.IsConstructedGenericType && typesToRegister.Contains(baseType.GetGenericTypeDefinition()))

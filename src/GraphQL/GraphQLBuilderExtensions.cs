@@ -180,6 +180,16 @@ namespace GraphQL
             return builder;
         }
 
+        /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> action)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
+
         /// <summary>
         /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
         /// dependency injection framework and configures it with the specified configuration delegate.
@@ -194,7 +204,7 @@ namespace GraphQL
             => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
-        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action = null)
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action)
             where TAnalyzer : class, IComplexityAnalyzer
             => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
 
@@ -217,7 +227,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
-        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider> action = null)
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider> action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(ServiceLifetime.Singleton, analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)));
@@ -227,29 +237,70 @@ namespace GraphQL
         }
         #endregion
 
+        #region - AddErrorInfoProvider
+        /// <summary>
+        /// Configures the default error info provider with the specified configuration delegate.
+        /// </summary>
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action = null)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
 
+        /// <inheritdoc cref="AddErrorInfoProvider(IGraphQLBuilder, Action{ErrorInfoProviderOptions})"/>
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+
+        /// <summary>
+        /// Registers <typeparamref name="TProvider"/> as a singleton of type <see cref="IErrorInfoProvider"/> within the
+        /// dependency injection framework.
+        /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
             where TProvider : class, IErrorInfoProvider
             => builder.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
 
+        /// <summary>
+        /// Registers <paramref name="errorInfoProvider"/> as a singleton of type <see cref="IErrorInfoProvider"/> within the
+        /// dependency injection framework.
+        /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider : class, IErrorInfoProvider
             => errorInfoProvider == null ? throw new ArgumentNullException(nameof(errorInfoProvider)) : AddErrorInfoProvider(builder, _ => errorInfoProvider);
 
+        /// <summary>
+        /// Registers <see cref="IErrorInfoProvider"/> within the dependency injection framework using the supplied
+        /// factory delegate.
+        /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider : class, IErrorInfoProvider
             => builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
+        #endregion
 
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions> action = null)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
-
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
-
-
+        #region - AddGraphTypes -
+        /// <summary>
+        /// Scans the calling assembly for classes that implement <see cref="IGraphType"/> and registers
+        /// them as transients within the dependency injection framework. A transient lifetime ensures
+        /// they are only instianted once each time the schema is built. If the schema is a scoped schema,
+        /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
+        /// the graph types will effectively be singleton graph types.
+        /// <br/><br/>
+        /// Also registers <see cref="EnumerationGraphType{TEnum}"/>, <see cref="ConnectionType{TNodeType}"/>,
+        /// <see cref="ConnectionType{TNodeType, TEdgeType}"/>, <see cref="EdgeType{TNodeType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
+        /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
+        /// </summary>
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder)
             => builder.AddGraphTypes(Assembly.GetCallingAssembly());
 
+        /// <summary>
+        /// Scans the supplied assembly for classes that implement <see cref="IGraphType"/> and registers
+        /// them as transients within the dependency injection framework. A transient lifetime ensures
+        /// they are only instianted once each time the schema is built. If the schema is a scoped schema,
+        /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
+        /// the graph types will effectively be singleton graph types.
+        /// <br/><br/>
+        /// Also registers <see cref="EnumerationGraphType{TEnum}"/>, <see cref="ConnectionType{TNodeType}"/>,
+        /// <see cref="ConnectionType{TNodeType, TEdgeType}"/>, <see cref="EdgeType{TNodeType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
+        /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
+        /// </summary>
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder, Assembly assembly)
         {
             // Graph types are always created with the transient lifetime, since they are only instianted once
@@ -268,6 +319,7 @@ namespace GraphQL
 
             builder.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
             builder.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
+            builder.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
             builder.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
             builder.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
             builder.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
@@ -275,11 +327,34 @@ namespace GraphQL
 
             return builder;
         }
+        #endregion
 
-
+        #region - AddClrTypeMappings -
+        /// <summary>
+        /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema)"/>
+        /// within the schema constructor.
+        /// </remarks>
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
             => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
+        /// <summary>
+        /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema, Assembly)"/>
+        /// within the schema constructor.
+        /// </remarks>
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder, Assembly assembly)
         {
             if (assembly == null)
@@ -298,6 +373,7 @@ namespace GraphQL
 
             return builder;
         }
+        #endregion
 
 
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)

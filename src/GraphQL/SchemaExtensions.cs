@@ -128,9 +128,24 @@ namespace GraphQL
             schema.AutoRegister(typeof(TClrType), mode);
         }
 
-        public static void RegisterTypeMappings(this ISchema schema)
-            => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
 
+        /// <summary>
+        /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        public static void RegisterTypeMappings(this ISchema schema)
+        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+
+        /// <summary>
+        /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
         public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
         {
             if (assembly == null)
