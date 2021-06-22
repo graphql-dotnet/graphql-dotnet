@@ -884,6 +884,19 @@ namespace GraphQL.Tests.DI
             opts.EnableMetrics.ShouldBeTrue();
             Verify();
         }
+
+        [Fact]
+        public void ConfigureSchema_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema>)null));
+            Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema, IServiceProvider>)null));
+        }
+
+        [Fact]
+        public void ConfigureExecution_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecution(null));
+        }
         #endregion
 
         private class Class1 : Interface1
