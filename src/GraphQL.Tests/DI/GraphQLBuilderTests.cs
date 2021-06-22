@@ -801,6 +801,40 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddDocumentWriter -
+        [Fact]
+        public void AddDocumentWriter()
+        {
+            MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>();
+            _builder.AddDocumentWriter<SystemTextJson.DocumentWriter>();
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentWriter_Instance()
+        {
+            var instance = new SystemTextJson.DocumentWriter();
+            MockSetupRegister<IDocumentWriter>(instance);
+            _builder.AddDocumentWriter(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentWriter_Factory()
+        {
+            var factory = MockSetupRegister<IDocumentWriter>();
+            _builder.AddDocumentWriter(factory);
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentWriter_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentWriter((SystemTextJson.DocumentWriter)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentWriter((Func<IServiceProvider, SystemTextJson.DocumentWriter>)null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
