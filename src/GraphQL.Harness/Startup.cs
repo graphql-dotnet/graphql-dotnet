@@ -29,16 +29,18 @@ namespace GraphQL.Harness
             // add execution components
             services.AddGraphQL()
                 .AddSystemTextJson()
-                .AddSchema<StarWarsSchema>()
                 .AddErrorInfoProvider((opts, serviceProvider) =>
                 {
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     opts.ExposeExceptionStackTrace = settings.Value.ExposeExceptions;
                 })
-                .AddGraphTypes(typeof(StarWarsQuery).Assembly)
                 .AddSchema<StarWarsSchema>()
+                .AddGraphTypes(typeof(StarWarsQuery).Assembly)
+                .AddMiddleware<CountFieldMiddleware>(false) // do not auto-install middleware
+                .AddMiddleware<InstrumentFieldsMiddleware>(false) // do not auto-install middleware
                 .ConfigureSchema((schema, serviceProvider) =>
                 {
+                    // install middleware only when the custom EnableMetrics option is set
                     var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
                     if (settings.Value.EnableMetrics)
                     {
@@ -58,10 +60,6 @@ namespace GraphQL.Harness
             // add options configuration
             services.Configure<GraphQLSettings>(Configuration);
             services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
-
-            // add Field Middlewares (do not use AddMiddleware or it will be installed into the schema regardless of EnableMetrics)
-            services.AddSingleton<IFieldMiddleware, CountFieldMiddleware>();
-            services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
