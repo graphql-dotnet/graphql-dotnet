@@ -577,11 +577,27 @@ namespace GraphQL.Tests.DI
         #endregion
 
         #region - AddDocumentListener -
+        [Fact]
+        public void AddDocumentListener()
+        {
+            MockSetupRegister<MyDocumentListener, MyDocumentListener>();
+            MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>();
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(new MyDocumentListener()).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            _builder.AddDocumentListener<MyDocumentListener>();
+            var opts = getOpts();
+            opts.Listeners.Count.ShouldBe(1);
+            opts.Listeners[0].ShouldBeOfType<MyDocumentListener>();
+            mockServiceProvider.Verify();
+            mockServiceProvider.VerifyNoOtherCalls();
+            Verify();
+        }
+
         [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
         [InlineData(ServiceLifetime.Scoped)]
         [InlineData(ServiceLifetime.Transient)]
-        public void AddDocumentListener(ServiceLifetime serviceLifetime)
+        public void AddDocumentListener_Lifetime(ServiceLifetime serviceLifetime)
         {
             MockSetupRegister<MyDocumentListener, MyDocumentListener>(serviceLifetime);
             MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>(serviceLifetime);
