@@ -73,6 +73,32 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(b => b.Configure((Action<TOptions, IServiceProvider>)null)).Returns(_builder).Verifiable();
         }
 
+        private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
+        {
+            Action<ExecutionOptions> actions = _ => { };
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ExecutionOptions>>>()))
+                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ExecutionOptions>>>((lifetime, actionFactory) =>
+                {
+                    var action = actionFactory(null);
+                    var actions2 = actions;
+                    actions = opts =>
+                    {
+                        actions2(opts);
+                        action(opts);
+                    };
+                    return _builder;
+                }).Verifiable();
+            return () =>
+            {
+                var opts = new ExecutionOptions()
+                {
+                    RequestServices = serviceProvider,
+                };
+                actions(opts);
+                return opts;
+            };
+        }
+
         #region - Overloads for Register, TryRegister, ConfigureDefaults and Configure -
         [Fact]
         public void Register()
@@ -550,6 +576,68 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddDocumentListener -
+        [Theory]
+        [InlineData(ServiceLifetime.Singleton)]
+        [InlineData(ServiceLifetime.Scoped)]
+        [InlineData(ServiceLifetime.Transient)]
+        public void AddDocumentListener(ServiceLifetime serviceLifetime)
+        {
+            MockSetupRegister<MyDocumentListener, MyDocumentListener>(serviceLifetime);
+            MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>(serviceLifetime);
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(new MyDocumentListener()).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            _builder.AddDocumentListener<MyDocumentListener>(serviceLifetime);
+            var opts = getOpts();
+            opts.Listeners.Count.ShouldBe(1);
+            opts.Listeners[0].ShouldBeOfType<MyDocumentListener>();
+            mockServiceProvider.Verify();
+            mockServiceProvider.VerifyNoOtherCalls();
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentListener_Instance()
+        {
+            var instance = new MyDocumentListener();
+            MockSetupRegister<IDocumentExecutionListener>(instance);
+            MockSetupRegister(instance);
+            var getOpts = MockSetupConfigureExecution();
+            _builder.AddDocumentListener(instance);
+            var opts = getOpts();
+            opts.Listeners.Count.ShouldBe(1);
+            opts.Listeners[0].ShouldBe(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentListener_Factory()
+        {
+            var instance = new MyDocumentListener();
+            Func<IServiceProvider, MyDocumentListener> factory = services => instance;
+            _builderMock.Setup(b => b.Register<IDocumentExecutionListener>(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(instance).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            _builder.AddDocumentListener(factory);
+            var opts = getOpts();
+            opts.Listeners.Count.ShouldBe(1);
+            opts.Listeners[0].ShouldBe(instance);
+            mockServiceProvider.Verify();
+            mockServiceProvider.VerifyNoOtherCalls();
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentListener_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((MyDocumentListener)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((Func<IServiceProvider, MyDocumentListener>)null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
@@ -584,6 +672,10 @@ namespace GraphQL.Tests.DI
         }
 
         private class MyScalar : IntGraphType
+        {
+        }
+
+        private class MyDocumentListener : DocumentExecutionListenerBase
         {
         }
     }

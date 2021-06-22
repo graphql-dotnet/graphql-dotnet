@@ -392,7 +392,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Register<TDocumentListener>(serviceLifetime);
-            builder.Register<IDocumentExecutionListener>(serviceLifetime);
+            builder.Register<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
             builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
             return builder;
         }
