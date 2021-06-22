@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -766,6 +767,40 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddDocumentCache -
+        [Fact]
+        public void AddDocumentCache()
+        {
+            MockSetupRegister<IDocumentCache, TestDocumentCache>();
+            _builder.AddDocumentCache<TestDocumentCache>();
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentCache_Instance()
+        {
+            var instance = new TestDocumentCache();
+            MockSetupRegister<IDocumentCache>(instance);
+            _builder.AddDocumentCache(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentCache_Factory()
+        {
+            var factory = MockSetupRegister<IDocumentCache>();
+            _builder.AddDocumentCache(factory);
+            Verify();
+        }
+
+        [Fact]
+        public void AddDocumentCache_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((TestDocumentCache)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((Func<IServiceProvider, TestDocumentCache>)null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
@@ -815,6 +850,10 @@ namespace GraphQL.Tests.DI
                 RanMiddleware = true;
                 return next(context);
             }
+        }
+
+        private class TestDocumentCache : MemoryDocumentCache
+        {
         }
     }
 }
