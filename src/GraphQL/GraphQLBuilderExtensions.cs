@@ -731,6 +731,9 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
+            if (enablePredicate == null)
+                throw new ArgumentNullException(nameof(enablePredicate));
+
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             builder.ConfigureExecution(options =>
             {
@@ -750,6 +753,11 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
         {
+            if (enablePredicate == null)
+                throw new ArgumentNullException(nameof(enablePredicate));
+            if (installPredicate == null)
+                throw new ArgumentNullException(nameof(installPredicate));
+
             builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
             builder.ConfigureExecution(options =>
             {

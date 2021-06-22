@@ -1027,6 +1027,76 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddMetrics -
+        [Theory]
+        [InlineData(true, false, true, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(true, true, true, false)]
+        [InlineData(false, true, true, false)]
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, false, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, true, false, true)]
+        public void AddMetrics(bool enable, bool useEnablePredicate, bool install, bool useInstallPredicate)
+        {
+            var instance = new InstrumentFieldsMiddleware();
+            MockSetupRegister<IFieldMiddleware, InstrumentFieldsMiddleware>(ServiceLifetime.Transient);
+            MockSetupRegister<InstrumentFieldsMiddleware, InstrumentFieldsMiddleware>(ServiceLifetime.Transient);
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            var schema = new TestSchema();
+            //setup middleware
+            Action runSchemaConfigs = null;
+            if (install || useInstallPredicate)
+            {
+                runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
+            }
+            if (install)
+            {
+                mockServiceProvider.Setup(sp => sp.GetService(typeof(InstrumentFieldsMiddleware))).Returns(instance).Verifiable();
+            }
+            //setup execution
+            Func<ExecutionOptions> getOptions = () => new ExecutionOptions();
+            if (enable || useEnablePredicate)
+            {
+                getOptions = MockSetupConfigureExecution(mockServiceProvider.Object);
+            }
+            //test
+            if (enable == true && useEnablePredicate == false && useInstallPredicate == false)
+            {
+                //verify that defaults parameters are configured appropriately
+                _builder.AddMetrics();
+            }
+            else if (useInstallPredicate)
+            {
+                _builder.AddMetrics(opts => enable, (services, schema) => install);
+            }
+            else if (useEnablePredicate)
+            {
+                _builder.AddMetrics(opts => enable);
+            }
+            else
+            {
+                _builder.AddMetrics(enable);
+            }
+            //verify
+            runSchemaConfigs?.Invoke();
+            var options = getOptions();
+            FieldMiddlewareDelegate fieldResolver = _ => null;
+            (schema.FieldMiddleware.Build() != null).ShouldBe(install);
+            options.EnableMetrics.ShouldBe(enable);
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+        [Fact]
+        public void AddMetrics_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(enablePredicate: null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(null, (_, _) => true));
+            Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(_ => true, null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
