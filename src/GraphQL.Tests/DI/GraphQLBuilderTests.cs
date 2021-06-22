@@ -6,6 +6,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Moq;
 using Shouldly;
@@ -156,7 +157,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void Configure()
         {
-            _builderMock.Setup(x => x.Configure(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a => {
+            _builderMock.Setup(x => x.Configure(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
+            {
                 var c = new Class1();
                 a(c, null);
                 c.Value.ShouldBe(1);
@@ -176,7 +178,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void ConfigureDefaults()
         {
-            _builderMock.Setup(x => x.ConfigureDefaults(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a => {
+            _builderMock.Setup(x => x.ConfigureDefaults(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
+            {
                 var c = new Class1();
                 a(c, null);
                 c.Value.ShouldBe(1);
@@ -234,12 +237,14 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Instance()
         {
             var schema = new TestSchema();
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, TestSchema>>((serviceLifetime, factory) => {
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, TestSchema>>((serviceLifetime, factory) =>
+            {
                 var schema2 = factory(null);
                 schema2.ShouldBe(schema);
                 return null;
             }).Verifiable();
-            _builderMock.Setup(b => b.TryRegister<ISchema>(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, ISchema>>((serviceLifetime, factory) => {
+            _builderMock.Setup(b => b.TryRegister<ISchema>(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, ISchema>>((serviceLifetime, factory) =>
+            {
                 var schema2 = factory(null);
                 schema2.ShouldBe(schema);
                 return null;
@@ -709,7 +714,10 @@ namespace GraphQL.Tests.DI
             runSchemaConfigs?.Invoke();
             FieldMiddlewareDelegate fieldResolver = _ => null;
             var middlewareTransform = schema.FieldMiddleware.Build();
-            if (middlewareTransform != null) fieldResolver = middlewareTransform(fieldResolver);
+            if (middlewareTransform != null)
+            {
+                fieldResolver = middlewareTransform(fieldResolver);
+            }
             fieldResolver(null);
             instance.RanMiddleware.ShouldBe(install);
             mockServiceProvider.Verify();
@@ -899,6 +907,126 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddValidationRule -
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddValidationRule(bool useForCachedDocuments)
+        {
+            var instance = new MyValidationRule();
+            MockSetupRegister<MyValidationRule, MyValidationRule>();
+            MockSetupRegister<IValidationRule, MyValidationRule>();
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            if (useForCachedDocuments)
+            {
+                //verify default argument value
+                _builder.AddValidationRule<MyValidationRule>(true);
+            }
+            else
+            {
+                _builder.AddValidationRule<MyValidationRule>();
+            }
+            var opts = getOpts();
+            opts.ValidationRules.ShouldNotBeNull();
+            opts.ValidationRules.ShouldContain(instance);
+            if (useForCachedDocuments)
+            {
+                opts.CachedDocumentValidationRules.ShouldNotBeNull();
+                opts.CachedDocumentValidationRules.ShouldContain(instance);
+            }
+            else
+            {
+                if (opts.CachedDocumentValidationRules != null)
+                    opts.CachedDocumentValidationRules.ShouldBeEmpty();
+            }
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddValidationRule_Instance(bool useForCachedDocuments)
+        {
+            var instance = new MyValidationRule();
+            MockSetupRegister<IValidationRule>(instance);
+            MockSetupRegister(instance);
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            if (useForCachedDocuments)
+            {
+                //verify default argument value
+                _builder.AddValidationRule(instance, true);
+            }
+            else
+            {
+                _builder.AddValidationRule(instance);
+            }
+            var opts = getOpts();
+            opts.ValidationRules.ShouldNotBeNull();
+            opts.ValidationRules.ShouldContain(instance);
+            if (useForCachedDocuments)
+            {
+                opts.CachedDocumentValidationRules.ShouldNotBeNull();
+                opts.CachedDocumentValidationRules.ShouldContain(instance);
+            }
+            else
+            {
+                opts.CachedDocumentValidationRules.ShouldBeNull();
+            }
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddValidationRule_Factory(bool useForCachedDocuments)
+        {
+            var instance = new MyValidationRule();
+            Func<IServiceProvider, MyValidationRule> factory = _ => instance;
+            _builderMock.Setup(b => b.Register<IValidationRule>(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
+            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+            if (useForCachedDocuments)
+            {
+                //verify default argument value
+                _builder.AddValidationRule(factory, true);
+            }
+            else
+            {
+                _builder.AddValidationRule(factory);
+            }
+            var opts = getOpts();
+            opts.ValidationRules.ShouldNotBeNull();
+            opts.ValidationRules.ShouldContain(instance);
+            if (useForCachedDocuments)
+            {
+                opts.CachedDocumentValidationRules.ShouldNotBeNull();
+                opts.CachedDocumentValidationRules.ShouldContain(instance);
+            }
+            else
+            {
+                opts.CachedDocumentValidationRules.ShouldBeNull();
+            }
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+        [Fact]
+        public void AddValidationRule_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((MyValidationRule)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((Func<IServiceProvider, MyValidationRule>)null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
@@ -952,6 +1080,11 @@ namespace GraphQL.Tests.DI
 
         private class TestDocumentCache : MemoryDocumentCache
         {
+        }
+
+        private class MyValidationRule : IValidationRule
+        {
+            public Task<INodeVisitor> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
         }
     }
 }
