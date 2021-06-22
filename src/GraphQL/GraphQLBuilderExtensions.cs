@@ -460,7 +460,7 @@ namespace GraphQL
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
             builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware>(ServiceLifetime.Transient, services => services.GetRequiredService<TMiddleware>());
+            builder.Register<IFieldMiddleware, TMiddleware>(serviceLifetime);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
             return builder;
@@ -492,7 +492,7 @@ namespace GraphQL
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
             builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware>(serviceLifetime);
+            builder.Register<IFieldMiddleware, TMiddleware>(serviceLifetime);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
