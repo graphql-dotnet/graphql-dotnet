@@ -835,6 +835,57 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - ConfigureSchema and ConfigureExecution -
+        [Fact]
+        public void ConfigureSchema()
+        {
+            bool ran = false;
+            var schema = new TestSchema();
+            var execute = MockSetupConfigureSchema(schema);
+            _builder.ConfigureSchema(schema2 =>
+            {
+                schema2.ShouldBe(schema);
+                ran = true;
+            });
+            execute();
+            ran.ShouldBeTrue();
+            Verify();
+        }
+
+        [Fact]
+        public void ConfigureSchema2()
+        {
+            bool ran = false;
+            var schema = new TestSchema();
+            var execute = MockSetupConfigureSchema(schema);
+            _builder.ConfigureSchema((schema2, services) =>
+            {
+                schema2.ShouldBe(schema);
+                ran = true;
+            });
+            execute();
+            ran.ShouldBeTrue();
+            Verify();
+        }
+
+        [Fact]
+        public void ConfigureExecution()
+        {
+            bool ran = false;
+            var execute = MockSetupConfigureExecution();
+            _builder.ConfigureExecution(opts =>
+            {
+                opts.EnableMetrics.ShouldBeFalse();
+                opts.EnableMetrics = true;
+                ran = true;
+            });
+            var opts = execute();
+            ran.ShouldBeTrue();
+            opts.EnableMetrics.ShouldBeTrue();
+            Verify();
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
