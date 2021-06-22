@@ -1,6 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.DI;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation.Complexity;
@@ -97,6 +99,24 @@ namespace GraphQL.Tests.DI
                 actions(opts);
                 return opts;
             };
+        }
+
+        private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider serviceProvider = null)
+        {
+            Action<ISchema, IServiceProvider> actions = (_, _) => { };
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>()))
+                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ISchema, IServiceProvider>>>((lifetime, actionFactory) =>
+                {
+                    var action = actionFactory(null);
+                    var actions2 = actions;
+                    actions = (opts, services) =>
+                    {
+                        actions2(opts, services);
+                        action(opts, services);
+                    };
+                    return _builder;
+                }).Verifiable();
+            return () => actions(schema, serviceProvider);
         }
 
         #region - Overloads for Register, TryRegister, ConfigureDefaults and Configure -
@@ -577,34 +597,26 @@ namespace GraphQL.Tests.DI
         #endregion
 
         #region - AddDocumentListener -
-        [Fact]
-        public void AddDocumentListener()
-        {
-            MockSetupRegister<MyDocumentListener, MyDocumentListener>();
-            MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>();
-            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-            mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(new MyDocumentListener()).Verifiable();
-            var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-            _builder.AddDocumentListener<MyDocumentListener>();
-            var opts = getOpts();
-            opts.Listeners.Count.ShouldBe(1);
-            opts.Listeners[0].ShouldBeOfType<MyDocumentListener>();
-            mockServiceProvider.Verify();
-            mockServiceProvider.VerifyNoOtherCalls();
-            Verify();
-        }
-
         [Theory]
+        [InlineData(ServiceLifetime.Singleton)]
         [InlineData(ServiceLifetime.Scoped)]
         [InlineData(ServiceLifetime.Transient)]
-        public void AddDocumentListener_Lifetime(ServiceLifetime serviceLifetime)
+        public void AddDocumentListener(ServiceLifetime serviceLifetime)
         {
             MockSetupRegister<MyDocumentListener, MyDocumentListener>(serviceLifetime);
             MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>(serviceLifetime);
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(new MyDocumentListener()).Verifiable();
             var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-            _builder.AddDocumentListener<MyDocumentListener>(serviceLifetime);
+            if (serviceLifetime == ServiceLifetime.Singleton)
+            {
+                //verify default service lifetime
+                _builder.AddDocumentListener<MyDocumentListener>();
+            }
+            else
+            {
+                _builder.AddDocumentListener<MyDocumentListener>(serviceLifetime);
+            }
             var opts = getOpts();
             opts.Listeners.Count.ShouldBe(1);
             opts.Listeners[0].ShouldBeOfType<MyDocumentListener>();
@@ -654,6 +666,106 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddMiddleware -
+        [Theory]
+        [InlineData(false, false, ServiceLifetime.Transient)]
+        [InlineData(false, false, ServiceLifetime.Singleton)]
+        [InlineData(true, false, ServiceLifetime.Transient)]
+        [InlineData(true, false, ServiceLifetime.Singleton)]
+        [InlineData(false, true, ServiceLifetime.Transient)]
+        [InlineData(false, true, ServiceLifetime.Singleton)]
+        [InlineData(true, true, ServiceLifetime.Transient)]
+        [InlineData(true, true, ServiceLifetime.Singleton)]
+        public void AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
+        {
+            var instance = new MyMiddleware();
+            MockSetupRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime);
+            MockSetupRegister<MyMiddleware, MyMiddleware>(serviceLifetime);
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            var schema = new TestSchema();
+            Action runSchemaConfigs = null;
+            if (install || usePredicate)
+            {
+                runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
+            }
+            if (install)
+            {
+                mockServiceProvider.Setup(sp => sp.GetService(typeof(MyMiddleware))).Returns(instance).Verifiable();
+            }
+            if (install == true && usePredicate == false && serviceLifetime == ServiceLifetime.Transient)
+            {
+                //verify that defaults parameters are configured appropriately
+                _builder.AddMiddleware<MyMiddleware>();
+            }
+            else if (usePredicate)
+            {
+                _builder.AddMiddleware<MyMiddleware>((services, schema) => install, serviceLifetime);
+            }
+            else
+            {
+                _builder.AddMiddleware<MyMiddleware>(install, serviceLifetime);
+            }
+            runSchemaConfigs?.Invoke();
+            FieldMiddlewareDelegate fieldResolver = _ => null;
+            var middlewareTransform = schema.FieldMiddleware.Build();
+            if (middlewareTransform != null) fieldResolver = middlewareTransform(fieldResolver);
+            fieldResolver(null);
+            instance.RanMiddleware.ShouldBe(install);
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void AddMiddleware_Instance(bool install)
+        {
+            var instance = new MyMiddleware();
+            MockSetupRegister<IFieldMiddleware>(instance);
+            MockSetupRegister(instance);
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            var schema = new TestSchema();
+            Action runSchemaConfigs = null;
+            if (install)
+            {
+                runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
+            }
+            if (install == true)
+            {
+                //verify that defaults parameters are configured appropriately
+                _builder.AddMiddleware(instance);
+            }
+            else
+            {
+                _builder.AddMiddleware(instance, install);
+            }
+            runSchemaConfigs?.Invoke();
+            FieldMiddlewareDelegate fieldResolver = _ => null;
+            var middlewareTransform = schema.FieldMiddleware.Build();
+            if (middlewareTransform != null)
+                fieldResolver = middlewareTransform(fieldResolver);
+            fieldResolver(null);
+            instance.RanMiddleware.ShouldBe(install);
+            mockServiceProvider.Verify();
+            Verify();
+        }
+
+        [Fact]
+        public void AddMiddleware_Scoped()
+        {
+            Should.Throw<ArgumentOutOfRangeException>(() => _builder.AddMiddleware<MyMiddleware>(serviceLifetime: ServiceLifetime.Scoped));
+            Should.Throw<ArgumentOutOfRangeException>(() => _builder.AddMiddleware<MyMiddleware>((_, _) => false, ServiceLifetime.Scoped));
+        }
+
+        [Fact]
+        public void AddMiddleware_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware<MyMiddleware>(installPredicate: null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware((MyMiddleware)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware(new MyMiddleware(), installPredicate: null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
@@ -693,6 +805,16 @@ namespace GraphQL.Tests.DI
 
         private class MyDocumentListener : DocumentExecutionListenerBase
         {
+        }
+
+        private class MyMiddleware : IFieldMiddleware
+        {
+            public bool RanMiddleware { get; set; } = false;
+            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+            {
+                RanMiddleware = true;
+                return next(context);
+            }
         }
     }
 }

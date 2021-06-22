@@ -455,7 +455,7 @@ namespace GraphQL
             if (serviceLifetime == ServiceLifetime.Scoped)
             {
                 // this code prevents registrations of scoped middleware for a singleton schema, which is impossible.
-                throw new InvalidOperationException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
+                throw new ArgumentOutOfRangeException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
@@ -487,7 +487,7 @@ namespace GraphQL
             if (serviceLifetime == ServiceLifetime.Scoped)
             {
                 // this code prevents registrations of scoped middleware for a singleton schema, which is impossible.
-                throw new InvalidOperationException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
+                throw new ArgumentOutOfRangeException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
