@@ -274,7 +274,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider : class, IErrorInfoProvider
-            => builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
+            => errorInfoProviderFactory == null ? throw new ArgumentNullException(nameof(errorInfoProviderFactory)) : builder.Register<IErrorInfoProvider>(ServiceLifetime.Singleton, errorInfoProviderFactory);
         #endregion
 
         #region - AddGraphTypes -

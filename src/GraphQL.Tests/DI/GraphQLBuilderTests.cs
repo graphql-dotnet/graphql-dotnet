@@ -1,6 +1,9 @@
 using System;
 using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
+using GraphQL.Validation.Complexity;
 using Moq;
 using Shouldly;
 using Xunit;
@@ -20,7 +23,7 @@ namespace GraphQL.Tests.DI
 
         private void MockSetupRegister<TService, TImplementation>(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         {
-            _builderMock.Setup(b => b.Register(typeof(TService), typeof(TImplementation), serviceLifetime)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TService), typeof(TImplementation), serviceLifetime)).Returns(_builder).Verifiable();
         }
 
         private void MockSetupRegister<TService>(TService instance, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
@@ -29,7 +32,7 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(b => b.Register(serviceLifetime, It.IsAny<Func<IServiceProvider, TService>>())).Returns<ServiceLifetime, Func<IServiceProvider, TService>>((_, factory) =>
             {
                 factory(null).ShouldBe(instance);
-                return null;
+                return _builder;
             }).Verifiable();
         }
 
@@ -37,8 +40,37 @@ namespace GraphQL.Tests.DI
             where TService : class
         {
             Func<IServiceProvider, TService> factory = _ => null;
-            _builderMock.Setup(b => b.Register(serviceLifetime, factory)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(serviceLifetime, factory)).Returns(_builder).Verifiable();
             return factory;
+        }
+
+        private Action<TOptions> MockSetupConfigure1<TOptions>()
+            where TOptions : class, new()
+        {
+            int ran = 0;
+            Action<TOptions> action = options => ran++;
+            _builderMock.Setup(b => b.Configure(It.IsAny<Action<TOptions, IServiceProvider>>())).Returns<Action<TOptions, IServiceProvider>>(action2 =>
+            {
+                ran.ShouldBe(0);
+                action2(null, null);
+                ran.ShouldBe(1);
+                return _builder;
+            }).Verifiable();
+            return action;
+        }
+
+        private Action<TOptions, IServiceProvider> MockSetupConfigure2<TOptions>()
+            where TOptions : class, new()
+        {
+            Action<TOptions, IServiceProvider> action = (opts, _) => { };
+            _builderMock.Setup(b => b.Configure(action)).Returns(_builder).Verifiable();
+            return action;
+        }
+
+        private void MockSetupConfigureNull<TOptions>()
+            where TOptions : class, new()
+        {
+            _builderMock.Setup(b => b.Configure((Action<TOptions, IServiceProvider>)null)).Returns(_builder).Verifiable();
         }
 
         #region - Overloads for Register, TryRegister, ConfigureDefaults and Configure -
@@ -216,6 +248,308 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddComplexityAnalyzer -
+        [Fact]
+        private void AddComplexityAnalyzer()
+        {
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer2()
+        {
+            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Null()
+        {
+            _builder.AddComplexityAnalyzer();
+            _builder.AddComplexityAnalyzer((Action<ComplexityConfiguration, IServiceProvider>)null);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Typed()
+        {
+            MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Typed2()
+        {
+            MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
+            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Typed2_Null()
+        {
+            MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
+            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>();
+            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>((Action<ComplexityConfiguration, IServiceProvider>)null);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Instance()
+        {
+            var instance = new TestComplexityAnalyzer();
+            MockSetupRegister<IComplexityAnalyzer>(instance);
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(instance, action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Instance2()
+        {
+            var instance = new TestComplexityAnalyzer();
+            MockSetupRegister<IComplexityAnalyzer>(instance);
+            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(instance, action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Instance2_Null()
+        {
+            var instance = new TestComplexityAnalyzer();
+            MockSetupRegister<IComplexityAnalyzer>(instance);
+            _builder.AddComplexityAnalyzer(instance);
+            _builder.AddComplexityAnalyzer(instance, (Action<ComplexityConfiguration, IServiceProvider>)null);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_InstanceNull()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Factory()
+        {
+            var factory = MockSetupRegister<IComplexityAnalyzer>();
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(factory, action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Factory2()
+        {
+            var factory = MockSetupRegister<IComplexityAnalyzer>();
+            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(factory, action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_Factory2_Null()
+        {
+            var factory = MockSetupRegister<IComplexityAnalyzer>();
+            _builder.AddComplexityAnalyzer(factory);
+            _builder.AddComplexityAnalyzer(factory, (Action<ComplexityConfiguration, IServiceProvider>)null);
+            Verify();
+        }
+
+        [Fact]
+        private void AddComplexityAnalyzer_FactoryNull()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
+        }
+        #endregion
+
+        #region - AddErrorInfoProvider -
+        [Fact]
+        private void AddErrorInfoProvider_Default1()
+        {
+            var action = MockSetupConfigure1<ErrorInfoProviderOptions>();
+            MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
+            _builder.AddErrorInfoProvider(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_Default2()
+        {
+            var action = MockSetupConfigure2<ErrorInfoProviderOptions>();
+            MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
+            _builder.AddErrorInfoProvider(action);
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_DefaultNull()
+        {
+            MockSetupConfigureNull<ErrorInfoProviderOptions>();
+            MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
+            _builder.AddErrorInfoProvider();
+            _builder.AddErrorInfoProvider((Action<ErrorInfoProviderOptions, IServiceProvider>)null);
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_Typed()
+        {
+            MockSetupRegister<IErrorInfoProvider, TestErrorInfoProvider>();
+            _builder.AddErrorInfoProvider<TestErrorInfoProvider>();
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_Instance()
+        {
+            var instance = new TestErrorInfoProvider();
+            MockSetupRegister<IErrorInfoProvider>(instance);
+            _builder.AddErrorInfoProvider(instance);
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_Factory()
+        {
+            var factory = MockSetupRegister<IErrorInfoProvider>();
+            _builder.AddErrorInfoProvider(factory);
+            Verify();
+        }
+
+        [Fact]
+        private void AddErrorInfoProvider_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((IErrorInfoProvider)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((Func<IServiceProvider, IErrorInfoProvider>)null));
+        }
+        #endregion
+
+        #region - AddGraphTypes -
+        [Fact]
+        public void AddGraphTypes()
+        {
+            var typeList = new Type[] {
+                typeof(MyGraph),
+                typeof(MyScalar),
+                typeof(IGraphType),
+                typeof(Class1),
+            };
+            var mockAssembly = new Mock<MockableAssembly>(MockBehavior.Strict);
+            mockAssembly.Setup(x => x.GetTypes()).Returns(typeList).Verifiable();
+            var assembly = mockAssembly.Object;
+
+            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+
+            _builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(MyScalar), typeof(MyScalar), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+
+            _builder.AddGraphTypes(assembly);
+            Verify();
+        }
+
+        [Fact]
+        public void AddGraphTypes_StarWars()
+        {
+            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.CharacterInterface), typeof(GraphQL.StarWars.Types.CharacterInterface), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.DroidType), typeof(GraphQL.StarWars.Types.DroidType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanInputType), typeof(GraphQL.StarWars.Types.HumanInputType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanType), typeof(GraphQL.StarWars.Types.HumanType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.EpisodeEnum), typeof(GraphQL.StarWars.Types.EpisodeEnum), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsQuery), typeof(GraphQL.StarWars.StarWarsQuery), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsMutation), typeof(GraphQL.StarWars.StarWarsMutation), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+
+            _builder.AddGraphTypes(typeof(GraphQL.StarWars.Types.Droid).Assembly);
+            Verify();
+        }
+
+        [Fact]
+        public void AddGraphTypes_CallingAssembly()
+        {
+            var builderMock = new Mock<IGraphQLBuilder>(MockBehavior.Loose);
+            builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(builderMock.Object).Verifiable();
+            builderMock.Object.AddGraphTypes();
+            builderMock.Verify();
+        }
+
+        [Fact]
+        public void AddGraphTypes_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddGraphTypes(null));
+        }
+        #endregion
+
+        #region - AddClrTypeMappings -
+        [Fact]
+        public void AddClrTypeMappings()
+        {
+            var mockSchema = AddClrTypeMappings_Setup();
+            _builder.AddClrTypeMappings();
+            Verify();
+            mockSchema.Verify();
+            mockSchema.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void AddClrTypeMappings_Assembly()
+        {
+            var mockSchema = AddClrTypeMappings_Setup();
+            _builder.AddClrTypeMappings(System.Reflection.Assembly.GetExecutingAssembly());
+            Verify();
+            mockSchema.Verify();
+            mockSchema.VerifyNoOtherCalls();
+        }
+
+        private Mock<ISchema> AddClrTypeMappings_Setup()
+        {
+            //note: this does not test the functionality of AssemblyExtensions.GetClrTypeMappings
+            var typeMappings = System.Reflection.Assembly.GetExecutingAssembly().GetClrTypeMappings();
+            typeMappings.Count.ShouldBeGreaterThan(0); //ensure we are testing SOMETHING
+            var mockSchema = new Mock<ISchema>(MockBehavior.Strict);
+            foreach (var typeMapping in typeMappings)
+            {
+                mockSchema.Setup(s => s.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType)).Verifiable();
+            }
+
+            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>()))
+                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ISchema, IServiceProvider>>>((serviceLifetime, factory) =>
+                {
+                    var action = factory(null);
+                    action(mockSchema.Object, null);
+                    return _builder;
+                }).Verifiable();
+
+            return mockSchema;
+        }
+
+        [Fact]
+        public void AddClrTypeMappings_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddClrTypeMappings(null));
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
@@ -225,11 +559,31 @@ namespace GraphQL.Tests.DI
         {
         }
 
+        public class MockableAssembly : System.Reflection.Assembly
+        {
+        }
+
         private class TestSchema : Schema
         {
         }
 
         private class TestDocumentExecuter : DocumentExecuter
+        {
+        }
+
+        private class TestComplexityAnalyzer : ComplexityAnalyzer
+        {
+        }
+
+        private class TestErrorInfoProvider : ErrorInfoProvider
+        {
+        }
+
+        private class MyGraph : ObjectGraphType
+        {
+        }
+
+        private class MyScalar : IntGraphType
         {
         }
     }
