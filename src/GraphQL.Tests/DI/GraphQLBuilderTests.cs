@@ -317,7 +317,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        public  void AddComplexityAnalyzer2()
+        public void AddComplexityAnalyzer2()
         {
             var action = MockSetupConfigure2<ComplexityConfiguration>();
             _builder.AddComplexityAnalyzer(action);
