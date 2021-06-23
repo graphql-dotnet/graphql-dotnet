@@ -179,29 +179,6 @@ namespace GraphQL.Tests.DI
             _builder.Configure(arg);
             Verify();
         }
-
-        [Fact]
-        public void ConfigureDefaults()
-        {
-            _builderMock.Setup(x => x.ConfigureDefaults(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
-            {
-                var c = new Class1();
-                a(c, null);
-                c.Value.ShouldBe(1);
-                return null;
-            }).Verifiable();
-            _builder.ConfigureDefaults<Class1>(x => x.Value = 1);
-            Verify();
-        }
-
-        [Fact]
-        public void ConfigureDefaultsNull()
-        {
-            _builderMock.Setup(x => x.ConfigureDefaults<Class1>(null)).Returns((IGraphQLBuilder)null).Verifiable();
-            Action<Class1> arg = null;
-            _builder.ConfigureDefaults(arg);
-            Verify();
-        }
         #endregion
 
         #region - AddSchema -

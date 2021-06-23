@@ -52,11 +52,6 @@ namespace GraphQL
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
             where TOptions : class, new()
             => graphQLBuilder.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
-
-        /// <inheritdoc cref="IGraphQLBuilder.ConfigureDefaults{TOptions}(Action{TOptions, IServiceProvider})"/>
-        public static IGraphQLBuilder ConfigureDefaults<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
-            where TOptions : class, new()
-            => graphQLBuilder.ConfigureDefaults<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
 
         #region - AddSchema -

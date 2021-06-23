@@ -95,10 +95,5 @@ namespace GraphQL.DI
         /// <inheritdoc/>
         public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
             where TOptions : class, new();
-
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
-            where TOptions : class, new();
     }
 }

@@ -33,18 +33,6 @@ namespace GraphQL.MicrosoftDI
             TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
             if (action != null)
             {
-                Register<IPostConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new PostConfigureOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
-            }
-
-            return this;
-        }
-
-        /// <inheritdoc/>
-        public override IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
-        {
-            TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
-            if (action != null)
-            {
                 Register<IConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
             }
 

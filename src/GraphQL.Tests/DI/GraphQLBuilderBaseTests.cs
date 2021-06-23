@@ -80,9 +80,6 @@ namespace GraphQL.Tests.DI
             public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
                 => MockBuilder.Object.Configure(action);
 
-            public override IGraphQLBuilder ConfigureDefaults<TOptions>(Action<TOptions, IServiceProvider> action)
-                => MockBuilder.Object.ConfigureDefaults(action);
-
             public override IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
                 => MockBuilder.Object.Register(serviceLifetime, implementationFactory);
 

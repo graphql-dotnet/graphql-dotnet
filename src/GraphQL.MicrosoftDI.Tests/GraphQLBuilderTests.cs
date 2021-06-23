@@ -225,7 +225,7 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Fact]
-        public void Configure_Default()
+        public void Configure()
         {
             var services = new ServiceCollection();
             services.AddGraphQL()
@@ -269,46 +269,6 @@ namespace GraphQL.MicrosoftDI.Tests
             var serviceProvider = services.BuildServiceProvider();
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(3);
             serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(3);
-        }
-
-        [Fact]
-        public void ConfigureDefaults1()
-        {
-            var services = new ServiceCollection();
-            services.AddGraphQL()
-                .Configure<TestOptions>((opts, _) =>
-                {
-                    opts.Value.ShouldBe(1);
-                    opts.Value = 2;
-                })
-                .ConfigureDefaults<TestOptions>((opts, _) =>
-                {
-                    opts.Value.ShouldBe(0);
-                    opts.Value = 1;
-                });
-            var serviceProvider = services.BuildServiceProvider();
-            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(2);
-            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(2);
-        }
-
-        [Fact]
-        public void ConfigureDefaults2()
-        {
-            var services = new ServiceCollection();
-            services.AddGraphQL()
-                .ConfigureDefaults<TestOptions>((opts, _) =>
-                {
-                    opts.Value.ShouldBe(0);
-                    opts.Value = 1;
-                })
-                .Configure<TestOptions>((opts, _) =>
-                {
-                    opts.Value.ShouldBe(1);
-                    opts.Value = 2;
-                });
-            var serviceProvider = services.BuildServiceProvider();
-            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(2);
-            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(2);
         }
 
         private class TestOptions

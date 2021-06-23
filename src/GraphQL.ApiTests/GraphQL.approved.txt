@@ -260,8 +260,6 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions> action)
             where TOptions :  class, new () { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureDefaults<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions> action)
-            where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
@@ -725,8 +723,6 @@ namespace GraphQL.DI
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
             where TOptions :  class, new ();
-        public abstract GraphQL.DI.IGraphQLBuilder ConfigureDefaults<TOptions>(System.Action<TOptions, System.IServiceProvider> action)
-            where TOptions :  class, new ();
         protected void Initialize() { }
         public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
         public abstract GraphQL.DI.IGraphQLBuilder Register<TService>(GraphQL.DI.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
@@ -738,8 +734,6 @@ namespace GraphQL.DI
     public interface IGraphQLBuilder
     {
         GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
-            where TOptions :  class, new ();
-        GraphQL.DI.IGraphQLBuilder ConfigureDefaults<TOptions>(System.Action<TOptions, System.IServiceProvider> optionsFactory)
             where TOptions :  class, new ();
         GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
         GraphQL.DI.IGraphQLBuilder Register<TService>(GraphQL.DI.ServiceLifetime serviceLifetime, System.Func<System.IServiceProvider, TService> implementationFactory)
