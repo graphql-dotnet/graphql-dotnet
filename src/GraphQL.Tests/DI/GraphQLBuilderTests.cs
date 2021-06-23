@@ -4,6 +4,9 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.SystemTextJson;
+using GraphQL.NewtonsoftJson;
+using GraphQL.SystemReactive;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
@@ -165,6 +168,7 @@ namespace GraphQL.Tests.DI
                 return null;
             }).Verifiable();
             _builder.Configure<Class1>(x => x.Value = 1);
+            Verify();
         }
 
         [Fact]
@@ -173,6 +177,7 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(x => x.Configure<Class1>(null)).Returns((IGraphQLBuilder)null).Verifiable();
             Action<Class1> arg = null;
             _builder.Configure(arg);
+            Verify();
         }
 
         [Fact]
@@ -186,6 +191,7 @@ namespace GraphQL.Tests.DI
                 return null;
             }).Verifiable();
             _builder.ConfigureDefaults<Class1>(x => x.Value = 1);
+            Verify();
         }
 
         [Fact]
@@ -194,6 +200,7 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(x => x.ConfigureDefaults<Class1>(null)).Returns((IGraphQLBuilder)null).Verifiable();
             Action<Class1> arg = null;
             _builder.ConfigureDefaults(arg);
+            Verify();
         }
         #endregion
 
@@ -1094,6 +1101,93 @@ namespace GraphQL.Tests.DI
             Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(enablePredicate: null));
             Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(null, (_, _) => true));
             Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(_ => true, null));
+        }
+        #endregion
+
+        #region - GraphQL.MemoryCache: AddMemoryCache -
+        [Fact]
+        public void AddMemoryCache()
+        {
+            MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+            MockSetupConfigureNull<MemoryDocumentCacheOptions>();
+            _builder.AddMemoryCache();
+            Verify();
+        }
+
+        [Fact]
+        public void AddMemoryCache_Options1()
+        {
+            MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+            var options = MockSetupConfigure1<MemoryDocumentCacheOptions>();
+            _builder.AddMemoryCache(options);
+            Verify();
+        }
+
+        [Fact]
+        public void AddMemoryCache_Options2()
+        {
+            MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+            var options = MockSetupConfigure2<MemoryDocumentCacheOptions>();
+            _builder.AddMemoryCache(options);
+            Verify();
+        }
+        #endregion
+
+        #region - GraphQL.SystemTextJson: AddSystemTextJson -
+        [Fact]
+        public void AddSystemTextJson()
+        {
+            MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>();
+            MockSetupConfigureNull<System.Text.Json.JsonSerializerOptions>();
+            _builder.AddSystemTextJson();
+            Verify();
+        }
+
+        [Fact]
+        public void AddSystemTextJson_Options1()
+        {
+            MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>();
+            var options = MockSetupConfigure1<System.Text.Json.JsonSerializerOptions>();
+            _builder.AddSystemTextJson(options);
+            Verify();
+        }
+
+        [Fact]
+        public void AddSystemTextJson_Options2()
+        {
+            MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>();
+            var options = MockSetupConfigure2<System.Text.Json.JsonSerializerOptions>();
+            _builder.AddSystemTextJson(options);
+            Verify();
+        }
+        #endregion
+
+        #region - GraphQL.NewtonsoftJson: AddNewtonsoftJson -
+        [Fact]
+        public void AddNewtonsoftJson()
+        {
+            MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>();
+            MockSetupConfigureNull<Newtonsoft.Json.JsonSerializerSettings>();
+            _builder.AddNewtonsoftJson();
+            Verify();
+        }
+
+        [Fact]
+        public void AddNewtonsoftJson_Options1()
+        {
+            MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>();
+            var options = MockSetupConfigure1<Newtonsoft.Json.JsonSerializerSettings>();
+            _builder.AddNewtonsoftJson(options);
+            Verify();
+        }
+
+        [Fact]
+        public void AddNewtonsoftJson_Options2()
+        {
+            MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>();
+            var options = MockSetupConfigure2<Newtonsoft.Json.JsonSerializerSettings>();
+            _builder.AddNewtonsoftJson(options);
+            Verify();
         }
         #endregion
 
