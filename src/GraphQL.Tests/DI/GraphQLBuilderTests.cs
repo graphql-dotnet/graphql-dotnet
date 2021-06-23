@@ -1191,6 +1191,15 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - GraphQL.SystemReactive: AddSubscriptionDocumentExecuter -
+        [Fact]
+        public void AddSubscriptionDocumentExecuter()
+        {
+            MockSetupRegister<IDocumentExecuter, SubscriptionDocumentExecuter>();
+            _builder.AddSubscriptionDocumentExecuter();
+        }
+        #endregion
+
         private class Class1 : Interface1
         {
             public int Value { get; set; }
