@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Shouldly;
 using Xunit;
 
@@ -72,6 +74,16 @@ namespace GraphQL.MicrosoftDI.Tests
             (myprovider as IDisposable).ShouldBeNull(); // SelfActivatingServiceProvider does not yet support IDisposable
             class1.Disposed.ShouldBeTrue();
             class2.Disposed.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void unregistered_generic_types_return_null()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(x => x.GetService(typeof(List<>))).Returns(null).Verifiable();
+            var sasp = new SelfActivatingServiceProvider(mockServiceProvider.Object);
+            sasp.GetService(typeof(List<>)).ShouldBeNull();
+            mockServiceProvider.Verify();
         }
 
         private class TestSingleton

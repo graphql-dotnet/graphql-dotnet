@@ -1,5 +1,6 @@
 using System;
 using GraphQL.DI;
+using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -11,7 +12,7 @@ namespace GraphQL.MicrosoftDI
     /// An implementation of <see cref="IGraphQLBuilder"/> which uses the Microsoft dependency injection framework
     /// to register services and configure options.
     /// </summary>
-    public class GraphQLBuilder : GraphQLBuilderBase
+    internal class GraphQLBuilder : GraphQLBuilderBase
     {
         private readonly IServiceCollection _services;
         /// <summary>

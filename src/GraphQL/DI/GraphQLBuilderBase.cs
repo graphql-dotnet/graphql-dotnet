@@ -43,21 +43,39 @@ namespace GraphQL.DI
 
             // configure an error message to be displayed if RequestServices is null,
             // and configure the ComplexityAnalyzer to be pulled from DI and configured (but left unchanged if not configured in DI)
+            var defaultMaxRecursionCount = new ComplexityConfiguration().MaxRecursionCount;
             Action<ExecutionOptions> configureComplexityConfiguration = options =>
             {
                 if (options.RequestServices == null)
                     throw new InvalidOperationException("Cannot execute request if RequestServices is null.");
 
                 if (options.RequestServices.GetService(typeof(ComplexityConfiguration)) is ComplexityConfiguration complexityConfiguration)
-                    options.ComplexityConfiguration = complexityConfiguration;
+                {
+                    if (options.ComplexityConfiguration == null)
+                    {
+                        options.ComplexityConfiguration = complexityConfiguration;
+                    }
+                    else
+                    {
+                        if (complexityConfiguration.FieldImpact.HasValue)
+                            options.ComplexityConfiguration.FieldImpact = complexityConfiguration.FieldImpact;
+
+                        if (complexityConfiguration.MaxComplexity.HasValue)
+                            options.ComplexityConfiguration.MaxComplexity = complexityConfiguration.MaxComplexity;
+
+                        if (complexityConfiguration.MaxDepth.HasValue)
+                            options.ComplexityConfiguration.MaxDepth = complexityConfiguration.MaxDepth;
+
+                        if (complexityConfiguration.MaxRecursionCount != defaultMaxRecursionCount)
+                            options.ComplexityConfiguration.MaxRecursionCount = complexityConfiguration.MaxRecursionCount;
+                    }
+                }
             };
             Register(ServiceLifetime.Singleton, _ => configureComplexityConfiguration);
 
             // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
-            // note that this code will cause a null to be passed into applicable constructor arguments during DI injection if these objects are unconfigured
             Configure<ComplexityConfiguration>();
             Configure<ErrorInfoProviderOptions>();
-
         }
 
         /// <inheritdoc/>
