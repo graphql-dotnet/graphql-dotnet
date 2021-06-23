@@ -30,17 +30,17 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc/>
         public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
         {
-            TryRegister(ServiceLifetime.Singleton, services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions());
+            TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
             if (action != null)
             {
-                Register<IConfigureOptions<TOptions>>(ServiceLifetime.Singleton, services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)));
+                Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);
             }
 
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public override IGraphQLBuilder Register<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
         {
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
@@ -88,7 +88,7 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public override IGraphQLBuilder TryRegister<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
         {
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));

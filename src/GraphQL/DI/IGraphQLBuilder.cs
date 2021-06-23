@@ -10,7 +10,7 @@ namespace GraphQL.DI
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
         /// </summary>
-        IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        IGraphQLBuilder Register<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class;
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace GraphQL.DI
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
         /// of the same type has not already been registered.
         /// </summary>
-        IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        IGraphQLBuilder TryRegister<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class;
 
         /// <summary>

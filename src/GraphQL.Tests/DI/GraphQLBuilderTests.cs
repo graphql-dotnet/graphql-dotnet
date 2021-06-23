@@ -36,7 +36,7 @@ namespace GraphQL.Tests.DI
         private void MockSetupRegister<TService>(TService instance, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TService : class
         {
-            _builderMock.Setup(b => b.Register(serviceLifetime, It.IsAny<Func<IServiceProvider, TService>>())).Returns<ServiceLifetime, Func<IServiceProvider, TService>>((_, factory) =>
+            _builderMock.Setup(b => b.Register(It.IsAny<Func<IServiceProvider, TService>>(), serviceLifetime)).Returns<Func<IServiceProvider, TService>, ServiceLifetime>((factory, _) =>
             {
                 factory(null).ShouldBe(instance);
                 return _builder;
@@ -47,7 +47,7 @@ namespace GraphQL.Tests.DI
             where TService : class
         {
             Func<IServiceProvider, TService> factory = _ => null;
-            _builderMock.Setup(b => b.Register(serviceLifetime, factory)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(factory, serviceLifetime)).Returns(_builder).Verifiable();
             return factory;
         }
 
@@ -83,8 +83,8 @@ namespace GraphQL.Tests.DI
         private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
         {
             Action<ExecutionOptions> actions = _ => { };
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ExecutionOptions>>>()))
-                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ExecutionOptions>>>((lifetime, actionFactory) =>
+            _builderMock.Setup(b => b.Register(It.IsAny<Func<IServiceProvider, Action<ExecutionOptions>>>(), ServiceLifetime.Singleton))
+                .Returns<Func<IServiceProvider, Action<ExecutionOptions>>, ServiceLifetime>((actionFactory, lifetime) =>
                 {
                     var action = actionFactory(null);
                     var actions2 = actions;
@@ -109,8 +109,8 @@ namespace GraphQL.Tests.DI
         private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider serviceProvider = null)
         {
             Action<ISchema, IServiceProvider> actions = (_, _) => { };
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>()))
-                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ISchema, IServiceProvider>>>((lifetime, actionFactory) =>
+            _builderMock.Setup(b => b.Register(It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>(), ServiceLifetime.Singleton))
+                .Returns<Func<IServiceProvider, Action<ISchema, IServiceProvider>>, ServiceLifetime>((actionFactory, lifetime) =>
                 {
                     var action = actionFactory(null);
                     var actions2 = actions;
@@ -211,8 +211,8 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Factory()
         {
             Func<IServiceProvider, TestSchema> factory = _ => null;
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, factory)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister<ISchema>(ServiceLifetime.Singleton, factory)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(factory, ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.TryRegister<ISchema>(factory, ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
             _builder.AddSchema(factory);
             Verify();
         }
@@ -221,18 +221,20 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Instance()
         {
             var schema = new TestSchema();
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, TestSchema>>((serviceLifetime, factory) =>
-            {
-                var schema2 = factory(null);
-                schema2.ShouldBe(schema);
-                return null;
-            }).Verifiable();
-            _builderMock.Setup(b => b.TryRegister<ISchema>(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, TestSchema>>())).Returns<ServiceLifetime, Func<IServiceProvider, ISchema>>((serviceLifetime, factory) =>
-            {
-                var schema2 = factory(null);
-                schema2.ShouldBe(schema);
-                return null;
-            }).Verifiable();
+            _builderMock.Setup(b => b.Register(It.IsAny<Func<IServiceProvider, TestSchema>>(), ServiceLifetime.Singleton))
+                .Returns<Func<IServiceProvider, TestSchema>, ServiceLifetime>((factory, serviceLifetime) =>
+                {
+                    var schema2 = factory(null);
+                    schema2.ShouldBe(schema);
+                    return null;
+                }).Verifiable();
+            _builderMock.Setup(b => b.TryRegister<ISchema>(It.IsAny<Func<IServiceProvider, TestSchema>>(), ServiceLifetime.Singleton))
+                .Returns<Func<IServiceProvider, ISchema>, ServiceLifetime>((factory, serviceLifetime) =>
+                {
+                    var schema2 = factory(null);
+                    schema2.ShouldBe(schema);
+                    return null;
+                }).Verifiable();
             _builder.AddSchema(schema);
             Verify();
         }
@@ -571,8 +573,8 @@ namespace GraphQL.Tests.DI
                 mockSchema.Setup(s => s.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType)).Verifiable();
             }
 
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>()))
-                .Returns<ServiceLifetime, Func<IServiceProvider, Action<ISchema, IServiceProvider>>>((serviceLifetime, factory) =>
+            _builderMock.Setup(b => b.Register(It.IsAny<Func<IServiceProvider, Action<ISchema, IServiceProvider>>>(), ServiceLifetime.Singleton))
+                .Returns<Func<IServiceProvider, Action<ISchema, IServiceProvider>>, ServiceLifetime>((factory, serviceLifetime) =>
                 {
                     var action = factory(null);
                     action(mockSchema.Object, null);
@@ -637,8 +639,8 @@ namespace GraphQL.Tests.DI
         {
             var instance = new MyDocumentListener();
             Func<IServiceProvider, MyDocumentListener> factory = services => instance;
-            _builderMock.Setup(b => b.Register<IDocumentExecutionListener>(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register<IDocumentExecutionListener>(factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(instance).Verifiable();
             var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
@@ -984,8 +986,8 @@ namespace GraphQL.Tests.DI
         {
             var instance = new MyValidationRule();
             Func<IServiceProvider, MyValidationRule> factory = _ => instance;
-            _builderMock.Setup(b => b.Register<IValidationRule>(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.Register(ServiceLifetime.Singleton, factory)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register<IValidationRule>(factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
             var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);

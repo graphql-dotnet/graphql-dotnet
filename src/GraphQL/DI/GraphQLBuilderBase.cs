@@ -24,21 +24,21 @@ namespace GraphQL.DI
         protected void Initialize()
         {
             // configure an error to be displayed when no IDocumentWriter is registered
-            TryRegister<IDocumentWriter>(ServiceLifetime.Transient, _ =>
+            TryRegister<IDocumentWriter>(_ =>
             {
                 throw new InvalidOperationException(
                     "IDocumentWriter not set in DI container. " +
                     "Add a IDocumentWriter implementation, for example " +
                     "GraphQL.SystemTextJson.DocumentWriter or GraphQL.NewtonsoftJson.DocumentWriter." +
                     "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md and https://github.com/graphql-dotnet/server/blob/develop/README.md.");
-            });
+            }, ServiceLifetime.Transient);
 
             // configure service implementations to use the configured default services when not overridden by a user
             this.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
             this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
-            TryRegister<IDocumentCache>(ServiceLifetime.Singleton, _ => DefaultDocumentCache.Instance);
+            TryRegister<IDocumentCache>(_ => DefaultDocumentCache.Instance, ServiceLifetime.Singleton);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
 
             // configure an error message to be displayed if RequestServices is null,
@@ -71,7 +71,7 @@ namespace GraphQL.DI
                     }
                 }
             };
-            Register(ServiceLifetime.Singleton, _ => configureComplexityConfiguration);
+            Register(_ => configureComplexityConfiguration, ServiceLifetime.Singleton);
 
             // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
             Configure<ComplexityConfiguration>();
@@ -79,14 +79,14 @@ namespace GraphQL.DI
         }
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public abstract IGraphQLBuilder Register<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class;
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder TryRegister<TService>(ServiceLifetime serviceLifetime, Func<IServiceProvider, TService> implementationFactory)
+        public abstract IGraphQLBuilder TryRegister<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class;
 
         /// <inheritdoc/>

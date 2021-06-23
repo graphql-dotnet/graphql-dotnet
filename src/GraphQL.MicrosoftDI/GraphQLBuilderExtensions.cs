@@ -48,20 +48,20 @@ namespace GraphQL.MicrosoftDI
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
-            builder.Register(serviceLifetime, services =>
+            builder.Register(services =>
             {
                 var selfActivatingServices = new SelfActivatingServiceProvider(services);
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
-            });
+            }, serviceLifetime);
 
             // Now register the service as ISchema if not already registered.
-            builder.TryRegister<ISchema>(serviceLifetime, services =>
+            builder.TryRegister<ISchema>(services =>
             {
                 var selfActivatingServices = new SelfActivatingServiceProvider(services);
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
-            });
+            }, serviceLifetime);
 
             return builder;
         }
