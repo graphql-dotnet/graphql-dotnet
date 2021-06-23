@@ -23,6 +23,7 @@ namespace GraphQL.MicrosoftDI
         public GraphQLBuilder(IServiceCollection services)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
+            services.AddOptions();
             Initialize();
         }
 

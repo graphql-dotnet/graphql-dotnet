@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using Shouldly;
 using Xunit;
@@ -221,6 +222,98 @@ namespace GraphQL.MicrosoftDI.Tests
             Should.Throw<ArgumentNullException>(() => builder.TryRegister<Class1>(DI.ServiceLifetime.Singleton, null));
             Should.Throw<ArgumentOutOfRangeException>(() => builder.TryRegister(typeof(Class1), typeof(Class1), (DI.ServiceLifetime)10));
             Should.Throw<ArgumentOutOfRangeException>(() => builder.TryRegister<Class1>((DI.ServiceLifetime)10));
+        }
+
+        [Fact]
+        public void Configure_Default()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .Configure<TestOptions>();
+            services.BuildServiceProvider().GetRequiredService<TestOptions>().Value.ShouldBe(0);
+            services.BuildServiceProvider().GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(0);
+        }
+
+        [Fact]
+        public void Configure_Value()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .Configure<TestOptions>(o => o.Value += 1);
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1);
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1); //ensure execution only occurs once
+            services.BuildServiceProvider().GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(1);
+        }
+
+        [Fact]
+        public void Configure_Multiple()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .Configure<TestOptions>(o => o.Value += 1)
+                .Configure<TestOptions>(o => o.Value += 2);
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(3);
+            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(3);
+        }
+
+        [Fact]
+        public void Configure_Options()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .Configure<TestOptions>();
+            services.Configure<TestOptions>(o => o.Value += 1);
+            services.Configure<TestOptions>(o => o.Value += 2);
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(3);
+            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(3);
+        }
+
+        [Fact]
+        public void ConfigureDefaults1()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .Configure<TestOptions>((opts, _) =>
+                {
+                    opts.Value.ShouldBe(1);
+                    opts.Value = 2;
+                })
+                .ConfigureDefaults<TestOptions>((opts, _) =>
+                {
+                    opts.Value.ShouldBe(0);
+                    opts.Value = 1;
+                });
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(2);
+            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(2);
+        }
+
+        [Fact]
+        public void ConfigureDefaults2()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL()
+                .ConfigureDefaults<TestOptions>((opts, _) =>
+                {
+                    opts.Value.ShouldBe(0);
+                    opts.Value = 1;
+                })
+                .Configure<TestOptions>((opts, _) =>
+                {
+                    opts.Value.ShouldBe(1);
+                    opts.Value = 2;
+                });
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(2);
+            serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(2);
+        }
+
+        private class TestOptions
+        {
+            public int Value { get; set; }
         }
 
         private class Class1 : Interface1
