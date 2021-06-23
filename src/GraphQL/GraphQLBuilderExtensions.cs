@@ -19,7 +19,7 @@ namespace GraphQL
     public static class GraphQLBuilderExtensions
     {
         #region - Additional overloads for Register, TryRegister, ConfigureDefaults and Configure -
-        /// <inheritdoc cref="IGraphQLBuilder.Register{TService}(ServiceLifetime, Func{IServiceProvider, TService})"/>
+        /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime);
@@ -33,7 +33,14 @@ namespace GraphQL
             where TImplementation : class, TService
             => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime);
 
-        /// <inheritdoc cref="IGraphQLBuilder.TryRegister{TService}(ServiceLifetime, Func{IServiceProvider, TService})"/>
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
+        /// </summary>
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+            where TService : class
+            => graphQLBuilder.Register(typeof(TService), implementationFactory, serviceLifetime);
+
+        /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
@@ -47,6 +54,14 @@ namespace GraphQL
             where TService : class
             where TImplementation : class, TService
             => graphQLBuilder.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime);
+
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
+        /// of the same type has not already been registered.
+        /// </summary>
+        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+            where TService : class
+            => graphQLBuilder.TryRegister(typeof(TService), implementationFactory, serviceLifetime);
 
         /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)

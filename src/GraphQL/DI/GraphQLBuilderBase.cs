@@ -24,7 +24,7 @@ namespace GraphQL.DI
         protected void Initialize()
         {
             // configure an error to be displayed when no IDocumentWriter is registered
-            TryRegister<IDocumentWriter>(_ =>
+            this.TryRegister<IDocumentWriter>(_ =>
             {
                 throw new InvalidOperationException(
                     "IDocumentWriter not set in DI container. " +
@@ -38,7 +38,7 @@ namespace GraphQL.DI
             this.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
             this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
-            TryRegister<IDocumentCache>(_ => DefaultDocumentCache.Instance, ServiceLifetime.Singleton);
+            this.TryRegister<IDocumentCache>(_ => DefaultDocumentCache.Instance, ServiceLifetime.Singleton);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
 
             // configure an error message to be displayed if RequestServices is null,
@@ -71,7 +71,7 @@ namespace GraphQL.DI
                     }
                 }
             };
-            Register(_ => configureComplexityConfiguration, ServiceLifetime.Singleton);
+            this.Register(_ => configureComplexityConfiguration, ServiceLifetime.Singleton);
 
             // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
             Configure<ComplexityConfiguration>();
@@ -79,15 +79,13 @@ namespace GraphQL.DI
         }
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
-            where TService : class;
+        public abstract IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder TryRegister<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
-            where TService : class;
+        public abstract IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);

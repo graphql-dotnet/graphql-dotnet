@@ -30,31 +30,33 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc/>
         public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
         {
-            TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
+            this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
             if (action != null)
             {
-                Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);
+                this.Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);
             }
 
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
         {
+            if (serviceType == null)
+                throw new ArgumentNullException(nameof(serviceType));
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    _services.AddSingleton(implementationFactory);
+                    _services.AddSingleton(serviceType, implementationFactory);
                     break;
                 case ServiceLifetime.Scoped:
-                    _services.AddScoped(implementationFactory);
+                    _services.AddScoped(serviceType, implementationFactory);
                     break;
                 case ServiceLifetime.Transient:
-                    _services.AddTransient(implementationFactory);
+                    _services.AddTransient(serviceType, implementationFactory);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(serviceLifetime));
@@ -88,21 +90,23 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder TryRegister<TService>(Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
         {
+            if (serviceType == null)
+                throw new ArgumentNullException(nameof(serviceType));
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
             switch (serviceLifetime)
             {
                 case ServiceLifetime.Singleton:
-                    _services.TryAddSingleton(implementationFactory);
+                    _services.TryAddSingleton(serviceType, implementationFactory);
                     break;
                 case ServiceLifetime.Scoped:
-                    _services.TryAddScoped(implementationFactory);
+                    _services.TryAddScoped(serviceType, implementationFactory);
                     break;
                 case ServiceLifetime.Transient:
-                    _services.TryAddTransient(implementationFactory);
+                    _services.TryAddTransient(serviceType, implementationFactory);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(serviceLifetime));
