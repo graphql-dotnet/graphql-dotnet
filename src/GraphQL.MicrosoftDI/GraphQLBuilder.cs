@@ -1,6 +1,5 @@
 using System;
 using GraphQL.DI;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
