@@ -142,6 +142,28 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
+        public void Register_Instance()
+        {
+            var instance = new Class1();
+            _builderMock.Setup(x => x.Register(typeof(Interface1), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
+                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, _) =>
+                {
+                    func(null).ShouldBe(instance);
+                    return _builder;
+                }).Verifiable();
+            _builder.Register<Interface1>(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void Register_Factory()
+        {
+            var factory = MockSetupRegister<Class1>(ServiceLifetime.Transient);
+            _builder.Register(factory, ServiceLifetime.Transient);
+            Verify();
+        }
+
+        [Fact]
         public void TryRegister()
         {
             _builderMock.Setup(x => x.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilder)null).Verifiable();
@@ -154,6 +176,29 @@ namespace GraphQL.Tests.DI
         {
             _builderMock.Setup(x => x.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilder)null).Verifiable();
             _builder.TryRegister<Interface1, Class1>(ServiceLifetime.Transient);
+            Verify();
+        }
+
+        [Fact]
+        public void TryRegister_Instance()
+        {
+            var instance = new Class1();
+            _builderMock.Setup(x => x.TryRegister(typeof(Interface1), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
+                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, _) =>
+                {
+                    func(null).ShouldBe(instance);
+                    return _builder;
+                }).Verifiable();
+            _builder.TryRegister<Interface1>(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void TryRegister_Factory()
+        {
+            Func<IServiceProvider, Class1> factory = _ => null;
+            _builderMock.Setup(b => b.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builder.TryRegister(factory, ServiceLifetime.Transient);
             Verify();
         }
 
@@ -949,7 +994,6 @@ namespace GraphQL.Tests.DI
             MockSetupRegister<IValidationRule>(instance);
             MockSetupRegister(instance);
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-            mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
             var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
             if (useForCachedDocuments)
             {

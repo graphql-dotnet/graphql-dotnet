@@ -40,6 +40,13 @@ namespace GraphQL
             where TService : class
             => graphQLBuilder.Register(typeof(TService), implementationFactory, serviceLifetime);
 
+        /// <summary>
+        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
+        /// </summary>
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
+            where TService : class
+            => graphQLBuilder.Register(typeof(TService), _ => instance, ServiceLifetime.Singleton);
+
         /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
             where TService : class
@@ -62,6 +69,13 @@ namespace GraphQL
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
             => graphQLBuilder.TryRegister(typeof(TService), implementationFactory, serviceLifetime);
+
+        /// <summary>
+        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
+        /// </summary>
+        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
+            where TService : class
+            => graphQLBuilder.TryRegister(typeof(TService), _ => instance, ServiceLifetime.Singleton);
 
         /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
@@ -149,7 +163,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
             where TDocumentExecuter : class, IDocumentExecuter
-            => documentExecuter == null ? throw new ArgumentNullException(nameof(documentExecuter)) : builder.Register<IDocumentExecuter>(_ => documentExecuter, ServiceLifetime.Singleton);
+            => builder.Register<IDocumentExecuter>(documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter)));
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
@@ -276,7 +290,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider : class, IErrorInfoProvider
-            => errorInfoProvider == null ? throw new ArgumentNullException(nameof(errorInfoProvider)) : AddErrorInfoProvider(builder, _ => errorInfoProvider);
+            => errorInfoProvider == null ? throw new ArgumentNullException(nameof(errorInfoProvider)) : builder.Register<IErrorInfoProvider>(errorInfoProvider);
 
         /// <summary>
         /// Registers <see cref="IErrorInfoProvider"/> within the dependency injection framework using the supplied
@@ -421,8 +435,8 @@ namespace GraphQL
             if (documentListener == null)
                 throw new ArgumentNullException(nameof(documentListener));
 
-            builder.Register(_ => documentListener, ServiceLifetime.Singleton);
-            builder.Register<IDocumentExecutionListener>(_ => documentListener, ServiceLifetime.Singleton);
+            builder.Register(documentListener);
+            builder.Register<IDocumentExecutionListener>(documentListener);
             builder.ConfigureExecution(options => options.Listeners.Add(documentListener));
             return builder;
         }
@@ -529,8 +543,8 @@ namespace GraphQL
             if (middleware == null)
                 throw new ArgumentNullException(nameof(middleware));
 
-            builder.Register(_ => middleware, ServiceLifetime.Singleton);
-            builder.Register<IFieldMiddleware>(_ => middleware, ServiceLifetime.Singleton);
+            builder.Register(middleware);
+            builder.Register<IFieldMiddleware>(middleware);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(middleware));
             return builder;
@@ -557,8 +571,8 @@ namespace GraphQL
             if (installPredicate == null)
                 throw new ArgumentNullException(nameof(installPredicate));
 
-            builder.Register(_ => middleware, ServiceLifetime.Singleton);
-            builder.Register<IFieldMiddleware>(_ => middleware, ServiceLifetime.Singleton);
+            builder.Register(middleware);
+            builder.Register<IFieldMiddleware>(middleware);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
@@ -583,7 +597,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
             where TDocumentCache : class, IDocumentCache
-            => documentCache == null ? throw new ArgumentNullException(nameof(documentCache)) : AddDocumentCache(builder, _ => documentCache);
+            => builder.Register<IDocumentCache>(documentCache ?? throw new ArgumentNullException(nameof(documentCache)));
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
@@ -609,7 +623,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter : class, IDocumentWriter
-            => documentWriter == null ? throw new ArgumentNullException(nameof(documentWriter)) : AddDocumentWriter(builder, _ => documentWriter);
+            => builder.Register<IDocumentWriter>(documentWriter ?? throw new ArgumentNullException(nameof(documentWriter)));
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
@@ -630,7 +644,7 @@ namespace GraphQL
 
         /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
         public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<ISchema, IServiceProvider> action)
-            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(_ => action, ServiceLifetime.Singleton);
+            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(action);
 
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
@@ -642,7 +656,7 @@ namespace GraphQL
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
-            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(_ => action, ServiceLifetime.Singleton);
+            => action == null ? throw new ArgumentNullException(nameof(action)) : builder.Register(action);
         #endregion
 
         #region - AddValidationRule -
@@ -687,8 +701,19 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
-            => validationRule == null ? throw new ArgumentNullException(nameof(validationRule)) : builder.AddValidationRule(_ => validationRule, useForCachedDocuments);
-
+        {
+            builder.Register(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
+            builder.Register<IValidationRule>(validationRule);
+            builder.ConfigureExecution(options =>
+            {
+                options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(validationRule);
+                if (useForCachedDocuments)
+                {
+                    options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(validationRule);
+                }
+            });
+            return builder;
+        }
         /// <summary>
         /// Registers <typeparamref name="TValidationRule"/> as a singleton within the dependency injection framework
         /// as <typeparamref name="TValidationRule"/> and as <see cref="IValidationRule"/> using the specified factory delegate.
