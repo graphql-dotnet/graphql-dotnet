@@ -38,7 +38,9 @@ namespace GraphQL.Tests.DI
                 .Returns<ServiceLifetime, Func<IServiceProvider, Action<ExecutionOptions>>>((ServiceLifetime, func) =>
                 {
                     var action = func(null);
-                    //test null
+                    //test null requestservices
+                    Should.Throw<InvalidOperationException>(() => action(new ExecutionOptions()));
+                    //test null complexityconfiguration
                     var opts = new ExecutionOptions();
                     var mockSp = new Mock<IServiceProvider>(MockBehavior.Strict);
                     mockSp.Setup(s => s.GetService(typeof(ComplexityConfiguration))).Returns(null).Verifiable();
@@ -48,7 +50,7 @@ namespace GraphQL.Tests.DI
                     action(opts);
                     mockSp.Verify();
                     opts.ComplexityConfiguration.ShouldBe(tempComplexityConfiguration);
-                    //test value
+                    //test value in complexityconfiguration
                     opts = new ExecutionOptions();
                     tempComplexityConfiguration = new ComplexityConfiguration();
                     mockSp = new Mock<IServiceProvider>(MockBehavior.Strict);

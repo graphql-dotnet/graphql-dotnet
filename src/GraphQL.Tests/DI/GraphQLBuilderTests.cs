@@ -309,7 +309,7 @@ namespace GraphQL.Tests.DI
 
         #region - AddComplexityAnalyzer -
         [Fact]
-        private void AddComplexityAnalyzer()
+        public void AddComplexityAnalyzer()
         {
             var action = MockSetupConfigure1<ComplexityConfiguration>();
             _builder.AddComplexityAnalyzer(action);
@@ -317,7 +317,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer2()
+        public  void AddComplexityAnalyzer2()
         {
             var action = MockSetupConfigure2<ComplexityConfiguration>();
             _builder.AddComplexityAnalyzer(action);
@@ -325,7 +325,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Null()
+        public void AddComplexityAnalyzer_Null()
         {
             _builder.AddComplexityAnalyzer();
             _builder.AddComplexityAnalyzer((Action<ComplexityConfiguration, IServiceProvider>)null);
@@ -333,7 +333,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Typed()
+        public void AddComplexityAnalyzer_Typed()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
             var action = MockSetupConfigure1<ComplexityConfiguration>();
@@ -342,7 +342,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Typed2()
+        public void AddComplexityAnalyzer_Typed2()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
             var action = MockSetupConfigure2<ComplexityConfiguration>();
@@ -351,7 +351,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Typed2_Null()
+        public void AddComplexityAnalyzer_Typed2_Null()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
             _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>();
@@ -360,7 +360,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Instance()
+        public void AddComplexityAnalyzer_Instance()
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
@@ -370,7 +370,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Instance2()
+        public void AddComplexityAnalyzer_Instance2()
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
@@ -380,7 +380,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Instance2_Null()
+        public void AddComplexityAnalyzer_Instance2_Null()
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
@@ -390,13 +390,13 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_InstanceNull()
+        public void AddComplexityAnalyzer_InstanceNull()
         {
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Factory()
+        public void AddComplexityAnalyzer_Factory()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
             var action = MockSetupConfigure1<ComplexityConfiguration>();
@@ -405,7 +405,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Factory2()
+        public void AddComplexityAnalyzer_Factory2()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
             var action = MockSetupConfigure2<ComplexityConfiguration>();
@@ -414,7 +414,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_Factory2_Null()
+        public void AddComplexityAnalyzer_Factory2_Null()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
             _builder.AddComplexityAnalyzer(factory);
@@ -423,15 +423,18 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddComplexityAnalyzer_FactoryNull()
+        public void AddComplexityAnalyzer_FactoryNull()
         {
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null, (_, _) => { }));
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null, (_, _) => { }));
         }
         #endregion
 
         #region - AddErrorInfoProvider -
         [Fact]
-        private void AddErrorInfoProvider_Default1()
+        public void AddErrorInfoProvider_Default1()
         {
             var action = MockSetupConfigure1<ErrorInfoProviderOptions>();
             MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
@@ -440,7 +443,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_Default2()
+        public void AddErrorInfoProvider_Default2()
         {
             var action = MockSetupConfigure2<ErrorInfoProviderOptions>();
             MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
@@ -449,7 +452,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_DefaultNull()
+        public void AddErrorInfoProvider_DefaultNull()
         {
             MockSetupConfigureNull<ErrorInfoProviderOptions>();
             MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
@@ -459,7 +462,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_Typed()
+        public void AddErrorInfoProvider_Typed()
         {
             MockSetupRegister<IErrorInfoProvider, TestErrorInfoProvider>();
             _builder.AddErrorInfoProvider<TestErrorInfoProvider>();
@@ -467,7 +470,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_Instance()
+        public void AddErrorInfoProvider_Instance()
         {
             var instance = new TestErrorInfoProvider();
             MockSetupRegister<IErrorInfoProvider>(instance);
@@ -476,7 +479,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_Factory()
+        public void AddErrorInfoProvider_Factory()
         {
             var factory = MockSetupRegister<IErrorInfoProvider>();
             _builder.AddErrorInfoProvider(factory);
@@ -484,7 +487,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        private void AddErrorInfoProvider_Null()
+        public void AddErrorInfoProvider_Null()
         {
             Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((IErrorInfoProvider)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((Func<IServiceProvider, IErrorInfoProvider>)null));
@@ -732,9 +735,11 @@ namespace GraphQL.Tests.DI
         }
 
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void AddMiddleware_Instance(bool install)
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        public void AddMiddleware_Instance(bool install, bool usePredicate)
         {
             var instance = new MyMiddleware();
             MockSetupRegister<IFieldMiddleware>(instance);
@@ -742,14 +747,18 @@ namespace GraphQL.Tests.DI
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             var schema = new TestSchema();
             Action runSchemaConfigs = null;
-            if (install)
+            if (install || usePredicate)
             {
                 runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
             }
-            if (install == true)
+            if (install == true && usePredicate == false)
             {
                 //verify that defaults parameters are configured appropriately
                 _builder.AddMiddleware(instance);
+            }
+            else if (usePredicate)
+            {
+                _builder.AddMiddleware(instance, (services, schema) => install);
             }
             else
             {
@@ -759,7 +768,9 @@ namespace GraphQL.Tests.DI
             FieldMiddlewareDelegate fieldResolver = _ => null;
             var middlewareTransform = schema.FieldMiddleware.Build();
             if (middlewareTransform != null)
+            {
                 fieldResolver = middlewareTransform(fieldResolver);
+            }
             fieldResolver(null);
             instance.RanMiddleware.ShouldBe(install);
             mockServiceProvider.Verify();
