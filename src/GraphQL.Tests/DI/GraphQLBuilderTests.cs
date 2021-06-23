@@ -976,7 +976,6 @@ namespace GraphQL.Tests.DI
             Verify();
         }
 
-
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
