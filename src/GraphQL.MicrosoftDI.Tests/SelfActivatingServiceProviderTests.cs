@@ -25,6 +25,12 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Fact]
+        public void requesting_iserviceprovider_returns_itself()
+        {
+            _selfActivatingServiceProvider2.GetRequiredService<IServiceProvider>().ShouldBe(_selfActivatingServiceProvider2);
+        }
+
+        [Fact]
         public void prefers_pulling_from_service_provider()
         {
             var obj1 = _scopedServiceProvider1.GetRequiredService<TestSingleton>();
