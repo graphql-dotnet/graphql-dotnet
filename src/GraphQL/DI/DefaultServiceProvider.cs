@@ -19,6 +19,9 @@ namespace GraphQL
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
 
+            if (serviceType == typeof(IServiceProvider))
+                return this;
+
             if (serviceType.IsInterface)
                 return null;
 
