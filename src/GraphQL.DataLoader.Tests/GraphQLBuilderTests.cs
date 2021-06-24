@@ -20,10 +20,9 @@ namespace GraphQL.DataLoader.Tests
             mockBuilder.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, serviceLifetime) =>
+            mockBuilder.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
+                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
                 {
-                    var action = (Action<ExecutionOptions>)func(mockServiceProvider.Object);
                     var options = new ExecutionOptions()
                     {
                         RequestServices = mockServiceProvider.Object
