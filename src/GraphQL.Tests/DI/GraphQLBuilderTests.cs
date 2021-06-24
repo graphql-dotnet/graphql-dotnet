@@ -128,7 +128,7 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        public void RegisterImplementation()
+        public void Register_Implementation()
         {
             _builderMock.Setup(x => x.Register(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilder)null).Verifiable();
             _builder.Register<Interface1, Class1>(ServiceLifetime.Transient);
@@ -150,6 +150,13 @@ namespace GraphQL.Tests.DI
             var factory = MockSetupRegister<Class1>(ServiceLifetime.Transient);
             _builder.Register(factory, ServiceLifetime.Transient);
             Verify();
+        }
+
+        [Fact]
+        public void Register_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.Register<Class1>(implementationInstance: null));
+            Should.Throw<ArgumentNullException>(() => _builder.Register<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
         }
 
         [Fact]
@@ -184,6 +191,13 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(b => b.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient)).Returns(_builder).Verifiable();
             _builder.TryRegister(factory, ServiceLifetime.Transient);
             Verify();
+        }
+
+        [Fact]
+        public void TryRegister_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.TryRegister<Class1>(implementationInstance: null));
+            Should.Throw<ArgumentNullException>(() => _builder.TryRegister<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
         }
 
         [Fact]

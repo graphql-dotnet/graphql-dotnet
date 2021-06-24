@@ -38,14 +38,14 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), implementationFactory, serviceLifetime);
+            => graphQLBuilder.Register(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime);
 
         /// <summary>
-        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
+        /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
         /// </summary>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService implementationInstance)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), instance);
+            => graphQLBuilder.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)));
 
         /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
@@ -68,15 +68,15 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
-            => graphQLBuilder.TryRegister(typeof(TService), implementationFactory, serviceLifetime);
+            => graphQLBuilder.TryRegister(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime);
 
         /// <summary>
-        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider
+        /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider
         /// if a service of the same type has not already been registered.
         /// </summary>
-        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
+        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, TService implementationInstance)
             where TService : class
-            => graphQLBuilder.TryRegister(typeof(TService), instance);
+            => graphQLBuilder.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)));
 
         /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
