@@ -37,7 +37,7 @@ namespace GraphQL.DI
             this.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
 
-            // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
+            // configure mapping for IOptions<ErrorInfoProviderOptions>
             Configure<ErrorInfoProviderOptions>();
         }
 
