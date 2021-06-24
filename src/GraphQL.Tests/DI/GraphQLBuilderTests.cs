@@ -328,10 +328,112 @@ namespace GraphQL.Tests.DI
         #endregion
 
         #region - AddComplexityAnalyzer -
+        private Action<ComplexityConfiguration> MockSetupComplexityConfiguration1()
+        {
+            bool ran = false;
+            ExecutionOptions opts = null;
+            Action<ComplexityConfiguration> configureAction = cc =>
+            {
+                cc.ShouldNotBeNull();
+                cc.ShouldBe(opts.ComplexityConfiguration);
+                ran = true;
+            };
+            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
+                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+                {
+                    //test with no complexity configuration
+                    ran = false;
+                    opts = new ExecutionOptions();
+                    action(opts);
+                    ran.ShouldBeTrue();
+
+                    //test with existing complexity configuration
+                    ran = false;
+                    var cc2 = new ComplexityConfiguration();
+                    opts = new ExecutionOptions()
+                    {
+                        ComplexityConfiguration = cc2,
+                    };
+                    action(opts);
+                    ran.ShouldBeTrue();
+                    opts.ComplexityConfiguration.ShouldBe(cc2);
+                    
+                    return _builder;
+                }).Verifiable();
+
+            return configureAction;
+        }
+
+        private Action<ComplexityConfiguration, IServiceProvider> MockSetupComplexityConfiguration2()
+        {
+            bool ran = false;
+            ExecutionOptions opts = null;
+            Action<ComplexityConfiguration, IServiceProvider> configureAction = (cc, sp) =>
+            {
+                sp.ShouldBe(opts.RequestServices);
+                cc.ShouldNotBeNull();
+                cc.ShouldBe(opts.ComplexityConfiguration);
+                ran = true;
+            };
+            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
+                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+                {
+                    //test with no complexity configuration
+                    ran = false;
+                    opts = new ExecutionOptions()
+                    {
+                        RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
+                    };
+                    action(opts);
+                    ran.ShouldBeTrue();
+
+                    //test with existing complexity configuration
+                    ran = false;
+                    var cc2 = new ComplexityConfiguration();
+                    opts = new ExecutionOptions()
+                    {
+                        RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
+                        ComplexityConfiguration = cc2,
+                    };
+                    action(opts);
+                    ran.ShouldBeTrue();
+                    opts.ComplexityConfiguration.ShouldBe(cc2);
+
+                    return _builder;
+                }).Verifiable();
+
+            return configureAction;
+        }
+
+        private void MockSetupComplexityConfigurationNull()
+        {
+            ExecutionOptions opts = null;
+            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
+                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+                {
+                    //test with no complexity configuration
+                    opts = new ExecutionOptions();
+                    opts.ComplexityConfiguration.ShouldBeNull();
+                    action(opts);
+                    opts.ComplexityConfiguration.ShouldNotBeNull();
+
+                    //test with existing complexity configuration
+                    var cc2 = new ComplexityConfiguration();
+                    opts = new ExecutionOptions()
+                    {
+                        ComplexityConfiguration = cc2,
+                    };
+                    action(opts);
+                    opts.ComplexityConfiguration.ShouldBe(cc2);
+
+                    return _builder;
+                }).Verifiable();
+        }
+
         [Fact]
         public void AddComplexityAnalyzer()
         {
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration1();
             _builder.AddComplexityAnalyzer(action);
             Verify();
         }
@@ -339,24 +441,32 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddComplexityAnalyzer2()
         {
-            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration2();
             _builder.AddComplexityAnalyzer(action);
             Verify();
         }
 
         [Fact]
-        public void AddComplexityAnalyzer_Null()
+        public void AddComplexityAnalyzer_Null1()
         {
+            MockSetupComplexityConfigurationNull();
             _builder.AddComplexityAnalyzer();
+            Verify();
+        }
+
+        [Fact]
+        public void AddComplexityAnalyzer_Null2()
+        {
+            MockSetupComplexityConfigurationNull();
             _builder.AddComplexityAnalyzer((Action<ComplexityConfiguration, IServiceProvider>)null);
             Verify();
         }
 
         [Fact]
-        public void AddComplexityAnalyzer_Typed()
+        public void AddComplexityAnalyzer_Typed1()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration1();
             _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
             Verify();
         }
@@ -365,8 +475,17 @@ namespace GraphQL.Tests.DI
         public void AddComplexityAnalyzer_Typed2()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration2();
             _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
+            Verify();
+        }
+
+        [Fact]
+        public void AddComplexityAnalyzer_Typed1_Null()
+        {
+            MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
+            MockSetupComplexityConfigurationNull();
+            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>();
             Verify();
         }
 
@@ -374,17 +493,17 @@ namespace GraphQL.Tests.DI
         public void AddComplexityAnalyzer_Typed2_Null()
         {
             MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-            _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>();
+            MockSetupComplexityConfigurationNull();
             _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>((Action<ComplexityConfiguration, IServiceProvider>)null);
             Verify();
         }
 
         [Fact]
-        public void AddComplexityAnalyzer_Instance()
+        public void AddComplexityAnalyzer_Instance1()
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration1();
             _builder.AddComplexityAnalyzer(instance, action);
             Verify();
         }
@@ -394,8 +513,18 @@ namespace GraphQL.Tests.DI
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
-            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration2();
             _builder.AddComplexityAnalyzer(instance, action);
+            Verify();
+        }
+
+        [Fact]
+        public void AddComplexityAnalyzer_Instance1_Null()
+        {
+            var instance = new TestComplexityAnalyzer();
+            MockSetupRegister<IComplexityAnalyzer>(instance);
+            MockSetupComplexityConfigurationNull();
+            _builder.AddComplexityAnalyzer(instance);
             Verify();
         }
 
@@ -404,7 +533,7 @@ namespace GraphQL.Tests.DI
         {
             var instance = new TestComplexityAnalyzer();
             MockSetupRegister<IComplexityAnalyzer>(instance);
-            _builder.AddComplexityAnalyzer(instance);
+            MockSetupComplexityConfigurationNull();
             _builder.AddComplexityAnalyzer(instance, (Action<ComplexityConfiguration, IServiceProvider>)null);
             Verify();
         }
@@ -413,13 +542,14 @@ namespace GraphQL.Tests.DI
         public void AddComplexityAnalyzer_InstanceNull()
         {
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null, (_, _) => { }));
         }
 
         [Fact]
-        public void AddComplexityAnalyzer_Factory()
+        public void AddComplexityAnalyzer_Factory1()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration1();
             _builder.AddComplexityAnalyzer(factory, action);
             Verify();
         }
@@ -428,8 +558,17 @@ namespace GraphQL.Tests.DI
         public void AddComplexityAnalyzer_Factory2()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
-            var action = MockSetupConfigure2<ComplexityConfiguration>();
+            var action = MockSetupComplexityConfiguration2();
             _builder.AddComplexityAnalyzer(factory, action);
+            Verify();
+        }
+
+        [Fact]
+        public void AddComplexityAnalyzer_Factory1_Null()
+        {
+            var factory = MockSetupRegister<IComplexityAnalyzer>();
+            MockSetupComplexityConfigurationNull();
+            _builder.AddComplexityAnalyzer(factory);
             Verify();
         }
 
@@ -437,7 +576,7 @@ namespace GraphQL.Tests.DI
         public void AddComplexityAnalyzer_Factory2_Null()
         {
             var factory = MockSetupRegister<IComplexityAnalyzer>();
-            _builder.AddComplexityAnalyzer(factory);
+            MockSetupComplexityConfigurationNull();
             _builder.AddComplexityAnalyzer(factory, (Action<ComplexityConfiguration, IServiceProvider>)null);
             Verify();
         }

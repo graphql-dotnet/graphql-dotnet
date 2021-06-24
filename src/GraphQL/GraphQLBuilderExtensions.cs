@@ -177,35 +177,36 @@ namespace GraphQL
 
         #region - AddComplexityAnalyzer -
         /// <summary>
-        /// Configures the default complexity analyzer with the specified configuration delegate.
+        /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
         /// </summary>
-        /// <remarks>
-        /// Calling this method with a configuration delegate will overwrite any value passed to
-        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
-        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
-        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
-            => action != null ? builder.Configure(action) : builder;
+            => builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration);
+            });
 
         /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider> action)
-            => action != null ? builder.Configure(action) : builder;
+            => builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
+            });
 
         /// <summary>
         /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-        /// dependency injection framework and configures it with the specified configuration delegate.
+        /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
-        /// <remarks>
-        /// Calling this method with a configuration delegate will overwrite any value passed to
-        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
-        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
-        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration);
+            });
             return builder;
         }
 
@@ -214,26 +215,27 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
+            });
             return builder;
         }
 
         /// <summary>
         /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-        /// dependency injection framework and configures it with the specified configuration delegate.
+        /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
-        /// <remarks>
-        /// Calling this method with a configuration delegate will overwrite any value passed to
-        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
-        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
-        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration);
+            });
             return builder;
         }
 
@@ -242,26 +244,27 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
+            });
             return builder;
         }
 
         /// <summary>
         /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
-        /// using the specified factory delegate, and configures it with the specified configuration delegate.
+        /// using the specified factory delegate, then enables and configures it with the specified configuration delegate.
         /// </summary>
-        /// <remarks>
-        /// Calling this method with a configuration delegate will overwrite any value passed to
-        /// <see cref="IDocumentExecuter.ExecuteAsync(ExecutionOptions)"/> within
-        /// <see cref="ExecutionOptions.ComplexityConfiguration"/> with a new instance configured by this call.
-        /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration);
+            });
             return builder;
         }
 
@@ -270,8 +273,11 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            if (action != null)
-                builder.Configure(action);
+            builder.ConfigureExecution(opts =>
+            {
+                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
+            });
             return builder;
         }
         #endregion
