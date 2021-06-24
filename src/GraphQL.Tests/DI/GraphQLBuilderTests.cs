@@ -357,7 +357,7 @@ namespace GraphQL.Tests.DI
                     action(opts);
                     ran.ShouldBeTrue();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
-                    
+
                     return _builder;
                 }).Verifiable();
 
