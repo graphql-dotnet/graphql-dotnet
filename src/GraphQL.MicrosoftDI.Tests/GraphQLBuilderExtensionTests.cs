@@ -27,7 +27,8 @@ namespace GraphQL.MicrosoftDI.Tests
             services.AddSingleton(Class2.Instance);
             var builder = services.AddGraphQL()
                 .AddSelfActivatingSchema<MySchema>(serviceLifetime);
-            services.Single(x => x.ServiceType == typeof(MySchema)).Lifetime.ShouldBe(serviceLifetime switch {
+            services.Single(x => x.ServiceType == typeof(MySchema)).Lifetime.ShouldBe(serviceLifetime switch
+            {
                 DI.ServiceLifetime.Singleton => ServiceLifetime.Singleton,
                 DI.ServiceLifetime.Scoped => ServiceLifetime.Scoped,
                 _ => throw new ApplicationException()
