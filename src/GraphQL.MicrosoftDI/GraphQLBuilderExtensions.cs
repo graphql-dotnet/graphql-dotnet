@@ -1,6 +1,7 @@
 using System;
 using GraphQL.DI;
 using GraphQL.Types;
+using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
@@ -16,12 +17,12 @@ namespace GraphQL.MicrosoftDI
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// <br/><br/>
-        /// Also configures <see cref="ExecutionOptions.ComplexityConfiguration"/> to be pulled from the
-        /// dependency injection provider, and if an instance has been registered, overwrite the value
-        /// in <see cref="ExecutionOptions.ComplexityConfiguration"/> with the registered instance.
+        /// Also configures <see cref="ComplexityConfiguration"/> to be pulled from the dependency
+        /// injection provider, overwriting values within <see cref="ExecutionOptions.ComplexityConfiguration"/>
+        /// with values configured within the registered instance if set there.
         /// </summary>
         public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
-            => new GraphQLBuilder(services); // call AddOptions here? probably the job of the caller.
+            => new GraphQLBuilder(services);
 
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also

@@ -18,6 +18,11 @@ namespace GraphQL.DI
         IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
 
         /// <summary>
+        /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider.
+        /// </summary>
+        IGraphQLBuilder Register(Type serviceType, object implementationInstance);
+
+        /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider if a service
         /// of the same type has not already been registered.
         /// </summary>
@@ -28,6 +33,12 @@ namespace GraphQL.DI
         /// of the same type has not already been registered.
         /// </summary>
         IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+
+        /// <summary>
+        /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider if a service
+        /// of the same type has not already been registered.
+        /// </summary>
+        IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
 
         /// <summary>
         /// Configures an options class of type <typeparamref name="TOptions"/>.

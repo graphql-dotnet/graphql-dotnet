@@ -8,8 +8,9 @@ namespace GraphQL.NewtonsoftJson
     public static class GraphQLBuilderExtensions
     {
         /// <summary>
-        /// Registers Newtonsoft.Json <see cref="DocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
-        /// dependency injection framework and configures it with the specified configuration delegate.
+        /// Registers the Newtonsoft.Json <see cref="DocumentWriter"/> as a singleton of type
+        /// <see cref="IDocumentWriter"/> within the dependency injection framework and configures
+        /// it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings> action = null)
             => builder.AddDocumentWriter<DocumentWriter>().Configure(action);

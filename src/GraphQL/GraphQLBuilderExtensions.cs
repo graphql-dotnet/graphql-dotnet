@@ -45,7 +45,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), _ => instance, ServiceLifetime.Singleton);
+            => graphQLBuilder.Register(typeof(TService), instance);
 
         /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
@@ -71,11 +71,12 @@ namespace GraphQL
             => graphQLBuilder.TryRegister(typeof(TService), implementationFactory, serviceLifetime);
 
         /// <summary>
-        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
+        /// Registers <paramref name="instance"/> as type <typeparamref name="TService"/> with the dependency injection provider
+        /// if a service of the same type has not already been registered.
         /// </summary>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, TService instance)
             where TService : class
-            => graphQLBuilder.TryRegister(typeof(TService), _ => instance, ServiceLifetime.Singleton);
+            => graphQLBuilder.TryRegister(typeof(TService), instance);
 
         /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder graphQLBuilder, Action<TOptions> action)
@@ -229,12 +230,22 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration> action = null)
             where TAnalyzer : class, IComplexityAnalyzer
-            => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
+        {
+            builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider> action)
             where TAnalyzer : class, IComplexityAnalyzer
-            => analyzer == null ? throw new ArgumentNullException(nameof(analyzer)) : AddComplexityAnalyzer(builder, _ => analyzer, action);
+        {
+            builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
+            if (action != null)
+                builder.Configure(action);
+            return builder;
+        }
 
         /// <summary>
         /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework

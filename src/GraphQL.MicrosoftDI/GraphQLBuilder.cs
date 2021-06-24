@@ -90,6 +90,18 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
+        public override IGraphQLBuilder Register(Type serviceType, object implementationInstance)
+        {
+            if (serviceType == null)
+                throw new ArgumentNullException(nameof(serviceType));
+            if (implementationInstance == null)
+                throw new ArgumentNullException(nameof(implementationInstance));
+
+            _services.AddSingleton(serviceType, implementationInstance);
+            return this;
+        }
+
+        /// <inheritdoc/>
         public override IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
@@ -136,6 +148,18 @@ namespace GraphQL.MicrosoftDI
                 default:
                     throw new ArgumentOutOfRangeException(nameof(serviceLifetime));
             }
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public override IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance)
+        {
+            if (serviceType == null)
+                throw new ArgumentNullException(nameof(serviceType));
+            if (implementationInstance == null)
+                throw new ArgumentNullException(nameof(implementationInstance));
+
+            _services.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
             return this;
         }
     }

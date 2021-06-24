@@ -27,17 +27,11 @@ namespace GraphQL.Tests.DI
             mock.Setup(b => b.TryRegister(typeof(IDocumentBuilder), typeof(GraphQLDocumentBuilder), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IComplexityAnalyzer), typeof(ComplexityAnalyzer), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IDocumentCache), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, serviceLifetime) =>
-                {
-                    func(null).ShouldBe(DefaultDocumentCache.Instance);
-                    return builder;
-                }).Verifiable();
+            mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance)).Returns(builder).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.Register(typeof(Action<ExecutionOptions>), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, lifetime) =>
+            mock.Setup(b => b.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
+                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
                 {
-                    var action = (Action<ExecutionOptions>)func(null);
                     //test null requestservices
                     Should.Throw<InvalidOperationException>(() => action(new ExecutionOptions()));
                     //test null complexityconfiguration
@@ -86,11 +80,17 @@ namespace GraphQL.Tests.DI
             public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
                 => MockBuilder.Object.Register(serviceType, implementationType, serviceLifetime);
 
+            public override IGraphQLBuilder Register(Type serviceType, object implementationInstance)
+                => MockBuilder.Object.Register(serviceType, implementationInstance);
+
             public override IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
                 => MockBuilder.Object.TryRegister(serviceType, implementationFactory, serviceLifetime);
 
             public override IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
                 => MockBuilder.Object.TryRegister(serviceType, implementationType, serviceLifetime);
+
+            public override IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance)
+                => MockBuilder.Object.TryRegister(serviceType, implementationInstance);
         }
     }
 }

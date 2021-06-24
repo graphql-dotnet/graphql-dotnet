@@ -17,11 +17,11 @@ namespace GraphQL.DI
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// <br/><br/>
-        /// Also configures <see cref="ExecutionOptions.ComplexityConfiguration"/> to be pulled from the
-        /// dependency injection provider, and if an instance has been registered, overwrite the value
-        /// in <see cref="ExecutionOptions.ComplexityConfiguration"/> with the registered instance.
+        /// Also configures <see cref="ComplexityConfiguration"/> to be pulled from the dependency
+        /// injection provider, overwriting values within <see cref="ExecutionOptions.ComplexityConfiguration"/>
+        /// with values configured within the registered instance if set there.
         /// </summary>
-        protected void Initialize()
+        protected virtual void Initialize()
         {
             // configure an error to be displayed when no IDocumentWriter is registered
             this.TryRegister<IDocumentWriter>(_ =>
@@ -38,13 +38,13 @@ namespace GraphQL.DI
             this.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
             this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
-            this.TryRegister<IDocumentCache>(_ => DefaultDocumentCache.Instance, ServiceLifetime.Singleton);
+            this.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
 
             // configure an error message to be displayed if RequestServices is null,
             // and configure the ComplexityAnalyzer to be pulled from DI and configured (but left unchanged if not configured in DI)
             var defaultMaxRecursionCount = new ComplexityConfiguration().MaxRecursionCount;
-            Action<ExecutionOptions> configureComplexityConfiguration = options =>
+            this.ConfigureExecution(options =>
             {
                 if (options.RequestServices == null)
                     throw new InvalidOperationException("Cannot execute request if RequestServices is null.");
@@ -70,8 +70,7 @@ namespace GraphQL.DI
                             options.ComplexityConfiguration.MaxRecursionCount = complexityConfiguration.MaxRecursionCount;
                     }
                 }
-            };
-            this.Register(_ => configureComplexityConfiguration, ServiceLifetime.Singleton);
+            });
 
             // configure mapping for IOptions<ComplexityConfiguation> and IOptions<ErrorInfoProviderOptions>
             Configure<ComplexityConfiguration>();
@@ -85,10 +84,16 @@ namespace GraphQL.DI
         public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
+        public abstract IGraphQLBuilder Register(Type serviceType, object implementationInstance);
+
+        /// <inheritdoc/>
         public abstract IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+
+        /// <inheritdoc/>
+        public abstract IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
