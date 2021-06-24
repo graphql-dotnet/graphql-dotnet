@@ -795,6 +795,7 @@ namespace GraphQL.Tests.DI
             Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware<MyMiddleware>(installPredicate: null));
             Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware((MyMiddleware)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware(new MyMiddleware(), installPredicate: null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware((MyMiddleware)null, (_, _) => true));
         }
         #endregion
 
