@@ -16,15 +16,6 @@ namespace GraphQL.MicrosoftDI.Tests
             Should.Throw<ArgumentNullException>(() => new GraphQLBuilder(null));
         }
 
-        [Fact]
-        public void AddGraphQL()
-        {
-            var services = new ServiceCollection();
-            var builder = services.AddGraphQL();
-            builder.ShouldBeOfType<GraphQLBuilder>();
-            services.BuildServiceProvider().GetService<IDocumentExecuter>().ShouldNotBeNull();
-        }
-
         [Theory]
         [InlineData(typeof(List<>), typeof(List<>), DI.ServiceLifetime.Singleton)]
         [InlineData(typeof(IList<>), typeof(List<>), DI.ServiceLifetime.Singleton)]
