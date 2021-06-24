@@ -136,6 +136,12 @@ namespace GraphQL
         /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
         /// the <see cref="DoNotMapClrTypeAttribute"/>.
         /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
+        /// the mappings prior to execution.
+        /// </remarks>
         public static void RegisterTypeMappings(this ISchema schema)
         => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
 
@@ -146,6 +152,12 @@ namespace GraphQL
         /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
         /// the <see cref="DoNotMapClrTypeAttribute"/>.
         /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder, Assembly)"/> as it will
+        /// precompute the mappings prior to execution.
+        /// </remarks>
         public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
         {
             if (assembly == null)
