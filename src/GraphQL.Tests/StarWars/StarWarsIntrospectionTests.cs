@@ -134,8 +134,8 @@ namespace GraphQL.Tests.StarWars
                     {
                       ""name"": ""friendsConnection"",
                       ""type"": {
-                          ""name"": null,
-                          ""kind"": ""NON_NULL""
+                        ""name"": null,
+                        ""kind"": ""NON_NULL""
                       }
                     },
                     {
