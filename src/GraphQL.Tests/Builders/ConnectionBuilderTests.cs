@@ -174,6 +174,59 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void can_define_nullable_connection_with_resolver()
+        {
+            var type = new ObjectGraphType();
+
+            type.Connection<NonNullGraphType<ObjectGraphType>>()
+                .Name("testConnection")
+                .Resolve(resArgs =>
+                    new Connection<Child>
+                    {
+                        TotalCount = 1,
+                        PageInfo = new PageInfo
+                        {
+                            HasNextPage = true,
+                            HasPreviousPage = false,
+                            StartCursor = "01",
+                            EndCursor = "01",
+                        },
+                        Edges = new List<Edge<Child>>
+                        {
+                            new Edge<Child>
+                            {
+                                Cursor = "01",
+                                Node = new Child
+                                {
+                                    Field1 = "abcd",
+                                },
+                            },
+                        },
+                    });
+
+            var field = type.Fields.Single();
+            field.Name.ShouldBe("testConnection");
+            field.Type.ShouldBe(typeof(ConnectionType<NonNullGraphType<ObjectGraphType>, EdgeType<NonNullGraphType<ObjectGraphType>>>));
+
+            var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
+
+            result.ShouldNotBeNull();
+            if (result != null)
+            {
+                result.TotalCount.ShouldBe(1);
+                result.PageInfo.HasNextPage.ShouldBe(true);
+                result.PageInfo.HasPreviousPage.ShouldBe(false);
+                result.PageInfo.StartCursor.ShouldBe("01");
+                result.PageInfo.EndCursor.ShouldBe("01");
+                result.Edges.Count.ShouldBe(1);
+                result.Edges.First().Cursor.ShouldBe("01");
+                result.Edges.First().Node.Field1.ShouldBe("abcd");
+                result.Items.Count.ShouldBe(1);
+                result.Items.First().Field1.ShouldBe("abcd");
+            }
+        }
+
+        [Fact]
         public async Task can_define_simple_connection_with__async_resolver()
         {
             var type = new ObjectGraphType();
