@@ -153,7 +153,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>>));
 
             var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
@@ -205,7 +205,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>>));
 
             var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
             var result = boxedResult as Connection<Child>;
@@ -259,7 +259,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<ConnectionType<ChildType, ParentChildrenEdgeType>>));
 
             var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
             var result = boxedResult as Connection<Child, ParentChildrenEdge>;
@@ -336,7 +336,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
+            field.Type.ShouldBe(typeof(NonNullGraphType<ParentChildrenConnectionType>));
 
             var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
             var result = boxedResult as ParentChildrenConnection;

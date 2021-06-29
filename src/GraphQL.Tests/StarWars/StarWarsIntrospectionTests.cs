@@ -134,8 +134,8 @@ namespace GraphQL.Tests.StarWars
                     {
                       ""name"": ""friendsConnection"",
                       ""type"": {
-                        ""name"": ""CharacterInterfaceConnection"",
-                        ""kind"": ""OBJECT""
+                          ""name"": null,
+                          ""kind"": ""NON_NULL""
                       }
                     },
                     {
