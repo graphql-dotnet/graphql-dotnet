@@ -34,11 +34,11 @@ namespace GraphQL.Types.Relay
                 .Name("pageInfo")
                 .Description("Information to aid in pagination.");
 
-            Field<ListGraphType<TEdgeType>>()
+            Field<NonNullGraphType<ListGraphType<TEdgeType>>>()
                 .Name("edges")
                 .Description("A list of all of the edges returned in the connection.");
 
-            Field<ListGraphType<TNodeType>>()
+            Field<NonNullGraphType<ListGraphType<TNodeType>>>()
                 .Name("items")
                 .Description(
                     "A list of all of the objects returned in the connection. This is a convenience field provided " +
