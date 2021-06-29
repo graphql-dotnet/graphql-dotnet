@@ -13,8 +13,8 @@ namespace GraphQL.Types.Relay
 
             Field<NonNullGraphType<BooleanGraphType>>("hasNextPage", "When paginating forwards, are there more items?");
             Field<NonNullGraphType<BooleanGraphType>>("hasPreviousPage", "When paginating backwards, are there more items?");
-            Field<NonNullGraphType<StringGraphType>>("startCursor", "When paginating backwards, the cursor to continue.");
-            Field<NonNullGraphType<StringGraphType>>("endCursor", "When paginating forwards, the cursor to continue.");
+            Field<StringGraphType>("startCursor", "When paginating backwards, the cursor to continue.");
+            Field<StringGraphType>("endCursor", "When paginating forwards, the cursor to continue.");
         }
     }
 }
