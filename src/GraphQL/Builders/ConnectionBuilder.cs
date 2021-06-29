@@ -113,7 +113,7 @@ namespace GraphQL.Builders
             var fieldType = new FieldType
             {
                 Name = name,
-                Type = typeof(NonNullGraphType<TConnectionType>),
+                Type = typeof(TConnectionType),
                 Arguments = new QueryArguments(),
             };
             fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
