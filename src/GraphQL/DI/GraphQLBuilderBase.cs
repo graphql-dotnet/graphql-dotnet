@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Caching;
 using GraphQL.Execution;
+using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
@@ -36,6 +37,15 @@ namespace GraphQL.DI
             this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+
+            // configure execution to use the default registered schema if none specified
+            this.ConfigureExecution(options =>
+            {
+                if (options.RequestServices != null && options.Schema == null)
+                {
+                    options.Schema = options.RequestServices.GetService(typeof(ISchema)) as ISchema;
+                }
+            });
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Configure<ErrorInfoProviderOptions>();
