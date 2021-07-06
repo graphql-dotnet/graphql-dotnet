@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Execution
             var sb = new StringBuilder();
             Func<IResolveFieldContext, object> resolver = context =>
             {
-                sb.AppendLine(string.Join(".", context.ResponsePath.Select(x => x.ToString())));
+                sb.AppendLine(string.Join(".", context.ResponsePath));
                 return "test";
             };
             var leaderGraphType = new ObjectGraphType()
@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Execution
                 resolver(context);
                 return new SimpleDataLoader<object>(ctx =>
                 {
-                    sb.AppendLine(string.Join(".", context.ResponsePath.Select(x => x.ToString())) + "-completed");
+                    sb.AppendLine(string.Join(".", context.ResponsePath) + "-completed");
                     return Task.FromResult<object>("test");
                 });
             });
