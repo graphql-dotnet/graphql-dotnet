@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class VariableDefinitions : IEnumerable<VariableDefinition>
     {
-        internal List<VariableDefinition> List { get; private set; }
+        internal List<VariableDefinition>? List { get; private set; }
 
         internal VariableDefinitions(int capacity)
         {

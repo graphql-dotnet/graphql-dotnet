@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -135,7 +137,7 @@ namespace GraphQL
             return namedType is GraphQLTypeReference;
         }
 
-        internal static (IGraphType resolvedType, Type type) GetNamedTypes(this IGraphType type)
+        internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType type)
         {
             return type switch
             {
@@ -151,7 +153,7 @@ namespace GraphQL
         public static IGraphType GetNamedType(this IGraphType type)
         {
             if (type == null)
-                return null;
+                return null!;
 
             var (namedType, _) = type.GetNamedTypes();
             return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
@@ -206,7 +208,7 @@ namespace GraphQL
         /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
         /// property is set to a new instance of the base (wrapped) type.
         /// </summary>
-        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
+        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType>? resolve = null)
         {
             resolve ??= t => (IGraphType)Activator.CreateInstance(t);
 
@@ -250,7 +252,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static string? DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.Description()
@@ -263,7 +265,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static string? DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.ObsoleteMessage()
@@ -276,7 +278,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static object DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static object? DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.DefaultValue()

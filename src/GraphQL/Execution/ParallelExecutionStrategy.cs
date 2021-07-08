@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -8,10 +10,10 @@ namespace GraphQL.Execution
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
-        private Queue<ExecutionNode> _reusablePendingNodes;
-        private Queue<ExecutionNode> _reusablePendingDataLoaders;
-        private List<Task> _reusableCurrentTasks;
-        private List<ExecutionNode> _reusableCurrentNodes;
+        private Queue<ExecutionNode>? _reusablePendingNodes;
+        private Queue<ExecutionNode>? _reusablePendingDataLoaders;
+        private List<Task>? _reusableCurrentTasks;
+        private List<ExecutionNode>? _reusableCurrentNodes;
 
         /// <summary>
         /// Gets a static instance of <see cref="ParallelExecutionStrategy"/> strategy.

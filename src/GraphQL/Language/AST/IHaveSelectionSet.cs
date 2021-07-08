@@ -1,3 +1,7 @@
+#nullable enable
+
+using System;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -8,6 +12,11 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets or sets a list of child field selection nodes for this node.
         /// </summary>
-        SelectionSet SelectionSet { get; set; }
+        SelectionSet? SelectionSet
+        {
+            get;
+            [Obsolete]
+            set;
+        }
     }
 }

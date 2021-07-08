@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL
 {
     /// <summary> Boolean values to avoid boxing. </summary>

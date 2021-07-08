@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -150,7 +152,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="key">The key to retrieve.</param>
         /// <param name="value">The value for the associated key or <c>default(TValue)</c>.</param>
-        public bool TryRetrieve(TKey key, out TValue value)
+        public bool TryRetrieve(TKey key, out TValue? value)
         {
             value = default;
 
@@ -213,7 +215,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="predicate">The search predicate.</param>
         /// <returns>The first matching value</returns>
-        public TValue Find(Predicate<TValue> predicate)
+        public TValue? Find(Predicate<TValue> predicate)
         {
             foreach (var pair in _values)
             {

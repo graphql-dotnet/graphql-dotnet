@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,6 +14,7 @@ namespace GraphQL.Execution
     /// </summary>
     public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         /// <inheritdoc/>
         public IExecutionStrategy ExecutionStrategy { get; set; }
 
@@ -22,7 +25,7 @@ namespace GraphQL.Execution
         public ISchema Schema { get; set; }
 
         /// <inheritdoc/>
-        public object RootValue { get; set; }
+        public object? RootValue { get; set; }
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; }
@@ -56,9 +59,10 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public Dictionary<string, object> Extensions { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <inheritdoc/>
-        public IServiceProvider RequestServices { get; set; }
+        public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
         public TElement[] Rent<TElement>(int minimumLength)
@@ -128,7 +132,7 @@ namespace GraphQL.Execution
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
         /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
-        internal ReadonlyResolveFieldContext ReusableReadonlyResolveFieldContext;
+        internal ReadonlyResolveFieldContext? ReusableReadonlyResolveFieldContext;
 
         /// <summary>
         /// Allows for an execution strategy to reuse an instance of <see cref="Dictionary{TKey, TValue}"/>.
@@ -136,6 +140,6 @@ namespace GraphQL.Execution
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
         /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
-        internal Dictionary<string, Field> ReusableFields;
+        internal Dictionary<string, Field>? ReusableFields;
     }
 }

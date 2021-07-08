@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace GraphQL
 
         public T this[int index] { get => _array[index]; set => throw new NotSupportedException(); }
 
-        object IList.this[int index] { get => _array[index]; set => throw new NotImplementedException(); }
+        object? IList.this[int index] { get => _array[index]; set => throw new NotImplementedException(); }
 
         public int Count { get; }
 

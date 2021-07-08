@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Variables : IEnumerable<Variable>
     {
-        private List<Variable> _variables;
+        private List<Variable>? _variables;
 
         /// <summary>
         /// Initializes a new instance.
@@ -33,7 +35,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
         /// </summary>
-        public object ValueFor(string name, object defaultValue = null)
+        public object? ValueFor(string name, object? defaultValue = null)
         {
             return ValueFor(name, out var value) ? value.Value : defaultValue;
         }

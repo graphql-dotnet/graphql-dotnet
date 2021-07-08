@@ -61,7 +61,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 FieldAst = new Field(default, new NameNode("test")),
                 FieldDefinition = new FieldType(),
                 Metrics = new Instrumentation.Metrics(),
-                Operation = new Operation(new NameNode()),
+                Operation = new Operation(new NameNode(), null!),
                 ParentType = Mock.Of<IObjectGraphType>(),
                 Path = new object[] { "5" },
                 RequestServices = Mock.Of<IServiceProvider>(),

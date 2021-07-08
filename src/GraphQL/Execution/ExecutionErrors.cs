@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ namespace GraphQL
     public class ExecutionErrors : IEnumerable<ExecutionError>
     {
         private readonly object _lock = new object();
-        internal List<ExecutionError> List;
+        internal List<ExecutionError>? List;
 
         internal ExecutionErrors(int capacity)
         {

@@ -1,3 +1,7 @@
+#nullable enable
+
+using System;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -5,10 +9,27 @@ namespace GraphQL.Language.AST
     /// </summary>
     public abstract class ValueNode<T> : AbstractNode, IValue<T>
     {
-        /// <inheritdoc/>
-        public T Value { get; protected set; }
+        [Obsolete]
+        public ValueNode() : this(default!)
+        {
+        }
 
-        object IValue.Value => Value;
+        public ValueNode(T value)
+        {
+#pragma warning disable CS0612 // Type or member is obsolete
+            Value = value;
+#pragma warning restore CS0612 // Type or member is obsolete
+        }
+
+        /// <inheritdoc/>
+        public T Value
+        {
+            get;
+            [Obsolete]
+            protected set;
+        }
+
+        object IValue.Value => Value!;
 
         /// <inheritdoc/>
         public override string ToString() => $"{GetType().Name}{{value={Value}}}";

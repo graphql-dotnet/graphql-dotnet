@@ -103,8 +103,8 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(source));
 
             // force sourceType to be IDictionary<string, object>
-            if (ValueConverter.TryConvertTo(source, type, out object result, typeof(IDictionary<string, object>)))
-                return result;
+            if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
+                return result!;
 
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
@@ -196,7 +196,7 @@ namespace GraphQL
                 return propertyValue;
             }
 
-            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object result))
+            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
                 return result;
 
             var enumerableInterface = fieldType.Name == "IEnumerable`1"

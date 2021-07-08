@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -8,8 +10,8 @@ namespace GraphQL.Execution
     public class SerialExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
-        private Stack<ExecutionNode> _reusableNodes;
-        private Queue<ExecutionNode> _reusableDataLoaderNodes;
+        private Stack<ExecutionNode>? _reusableNodes;
+        private Queue<ExecutionNode>? _reusableDataLoaderNodes;
 
         /// <summary>
         /// Gets a static instance of <see cref="SerialExecutionStrategy"/> strategy.
