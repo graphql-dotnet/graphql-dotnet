@@ -661,7 +661,7 @@ namespace GraphQL
 
         /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
         public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<ISchema, IServiceProvider> action)
-            => builder.Register(action ?? throw new ArgumentNullException(nameof(action)));
+            => builder.Register<IConfigureSchema>(new ConfigureSchema(action ?? throw new ArgumentNullException(nameof(action))));
 
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
@@ -673,7 +673,7 @@ namespace GraphQL
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
-            => builder.Register(action ?? throw new ArgumentNullException(nameof(action)));
+            => builder.Register<IConfigureExecution>(new ConfigureExecution(action ?? throw new ArgumentNullException(nameof(action))));
         #endregion
 
         #region - AddValidationRule -

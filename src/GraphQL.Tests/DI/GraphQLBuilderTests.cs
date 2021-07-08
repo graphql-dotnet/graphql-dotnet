@@ -79,14 +79,14 @@ namespace GraphQL.Tests.DI
         private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
         {
             Action<ExecutionOptions> actions = _ => { };
-            _builderMock.Setup(b => b.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
-                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+            _builderMock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<object>()))
+                .Returns<Type, IConfigureExecution>((_, action) =>
                 {
                     var actions2 = actions;
                     actions = opts =>
                     {
                         actions2(opts);
-                        action(opts);
+                        action.Configure(opts);
                     };
                     return _builder;
                 }).Verifiable();
@@ -104,14 +104,14 @@ namespace GraphQL.Tests.DI
         private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider serviceProvider = null)
         {
             Action<ISchema, IServiceProvider> actions = (_, _) => { };
-            _builderMock.Setup(b => b.Register(typeof(Action<ISchema, IServiceProvider>), It.IsAny<object>()))
-                .Returns<Type, Action<ISchema, IServiceProvider>>((_, action) =>
+            _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>()))
+                .Returns<Type, IConfigureSchema>((_, action) =>
                 {
                     var actions2 = actions;
                     actions = (opts, services) =>
                     {
                         actions2(opts, services);
-                        action(opts, services);
+                        action.Configure(opts, services);
                     };
                     return _builder;
                 }).Verifiable();
@@ -338,13 +338,13 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
-                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>()))
+                .Returns<Type, IConfigureExecution>((_, action) =>
                 {
                     //test with no complexity configuration
                     ran = false;
                     opts = new ExecutionOptions();
-                    action(opts);
+                    action.Configure(opts);
                     ran.ShouldBeTrue();
 
                     //test with existing complexity configuration
@@ -354,7 +354,7 @@ namespace GraphQL.Tests.DI
                     {
                         ComplexityConfiguration = cc2,
                     };
-                    action(opts);
+                    action.Configure(opts);
                     ran.ShouldBeTrue();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
@@ -375,8 +375,8 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
-                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>()))
+                .Returns<Type, IConfigureExecution>((_, action) =>
                 {
                     //test with no complexity configuration
                     ran = false;
@@ -384,7 +384,7 @@ namespace GraphQL.Tests.DI
                     {
                         RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
                     };
-                    action(opts);
+                    action.Configure(opts);
                     ran.ShouldBeTrue();
 
                     //test with existing complexity configuration
@@ -395,7 +395,7 @@ namespace GraphQL.Tests.DI
                         RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
                         ComplexityConfiguration = cc2,
                     };
-                    action(opts);
+                    action.Configure(opts);
                     ran.ShouldBeTrue();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
@@ -408,13 +408,13 @@ namespace GraphQL.Tests.DI
         private void MockSetupComplexityConfigurationNull()
         {
             ExecutionOptions opts = null;
-            _builderMock.Setup(x => x.Register(typeof(Action<ExecutionOptions>), It.IsAny<object>()))
-                .Returns<Type, Action<ExecutionOptions>>((_, action) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>()))
+                .Returns<Type, IConfigureExecution>((_, action) =>
                 {
                     //test with no complexity configuration
                     opts = new ExecutionOptions();
                     opts.ComplexityConfiguration.ShouldBeNull();
-                    action(opts);
+                    action.Configure(opts);
                     opts.ComplexityConfiguration.ShouldNotBeNull();
 
                     //test with existing complexity configuration
@@ -423,7 +423,7 @@ namespace GraphQL.Tests.DI
                     {
                         ComplexityConfiguration = cc2,
                     };
-                    action(opts);
+                    action.Configure(opts);
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
                     return _builder;
@@ -753,10 +753,10 @@ namespace GraphQL.Tests.DI
                 mockSchema.Setup(s => s.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType)).Verifiable();
             }
 
-            _builderMock.Setup(b => b.Register(typeof(Action<ISchema, IServiceProvider>), It.IsAny<object>()))
-                .Returns<Type, Action<ISchema, IServiceProvider>>((_, action) =>
+            _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>()))
+                .Returns<Type, IConfigureSchema>((_, action) =>
                 {
-                    action(mockSchema.Object, null);
+                    action.Configure(mockSchema.Object, null);
                     return _builder;
                 }).Verifiable();
 

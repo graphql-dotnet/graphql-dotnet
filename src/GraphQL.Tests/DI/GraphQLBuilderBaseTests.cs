@@ -2,6 +2,7 @@ using System;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
+using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Moq;
@@ -30,6 +31,26 @@ namespace GraphQL.Tests.DI
             mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance)).Returns(builder).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
             mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder).Verifiable();
+            mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>())).Returns<Type, IConfigureExecution>((_, action) =>
+            {
+                var schema = Mock.Of<ISchema>(MockBehavior.Strict);
+
+                //verify no action if schema is set
+                action.Configure(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) });
+
+                //verify schema is pulled from service provider if schema is not set
+                var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+                mockServiceProvider.Setup(s => s.GetService(typeof(ISchema))).Returns(schema).Verifiable();
+                var opts = new ExecutionOptions()
+                {
+                    RequestServices = mockServiceProvider.Object,
+                };
+                action.Configure(opts);
+                opts.Schema.ShouldBe(schema);
+                mockServiceProvider.Verify();
+
+                return builder;
+            }).Verifiable();
 
             builder.CallInitialize();
             mock.Verify();
