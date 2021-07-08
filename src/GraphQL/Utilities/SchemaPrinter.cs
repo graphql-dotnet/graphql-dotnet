@@ -308,7 +308,8 @@ namespace GraphQL.Utilities
         {
             if (Options.IncludeDescriptions)
             {
-                if (Options.PrintDescriptionsAsComments) {
+                if (Options.PrintDescriptionsAsComments)
+                {
                     return PrintComment(description, indentation);
                 }
                 else
