@@ -48,7 +48,7 @@ namespace GraphQL
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
             string GetPropertyName(string key, out FieldType? field)
             {
-                var complexType = mappedType.GetNamedType() as IComplexGraphType;
+                var complexType = mappedType?.GetNamedType() as IComplexGraphType;
 
                 // type may not contain mapping information
                 field = complexType?.GetField(key);

@@ -185,7 +185,7 @@ namespace GraphQL
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static bool DoTypesOverlap(GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
-        public static GraphQL.Types.IGraphType? GetNamedType(this GraphQL.Types.IGraphType? type) { }
+        public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
@@ -2512,8 +2512,8 @@ namespace GraphQL.Utilities
         public MetadataProvider() { }
         public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
         public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
-        public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
-        public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
+        public TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory) { }
+        public TType? GetMetadata<TType>(string key, TType? defaultValue = default) { }
         public bool HasMetadata(string key) { }
     }
     public static class NameValidator

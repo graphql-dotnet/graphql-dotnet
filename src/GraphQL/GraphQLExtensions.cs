@@ -150,10 +150,10 @@ namespace GraphQL
         /// <summary>
         /// Unwraps any list/non-null graph type wrappers from a graph type and returns the base graph type.
         /// </summary>
-        public static IGraphType? GetNamedType(this IGraphType? type)
+        public static IGraphType GetNamedType(this IGraphType type)
         {
             if (type == null)
-                return null;
+                return null!;
 
             var (namedType, _) = type.GetNamedTypes();
             return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
