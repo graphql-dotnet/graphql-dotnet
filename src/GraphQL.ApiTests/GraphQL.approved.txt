@@ -188,19 +188,19 @@ namespace GraphQL
     {
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration> action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration> action = null)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider> action)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider>? action)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration> action = null)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider> action)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider>? action)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration> action = null)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider> action)
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider>? action)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
@@ -226,7 +226,7 @@ namespace GraphQL
             where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
-        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions> action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider> action) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
@@ -259,7 +259,7 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions> action)
+        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }

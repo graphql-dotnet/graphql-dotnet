@@ -47,7 +47,7 @@ namespace GraphQL.Caching
         protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _options = options?.Value;
+            _options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             _memoryCacheIsOwned = disposeMemoryCache;
         }
 
@@ -62,7 +62,7 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public virtual Document this[string query]
+        public virtual Document? this[string query]
         {
             get => _memoryCache.TryGetValue<Document>(query, out var value) ? value : null;
             set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));

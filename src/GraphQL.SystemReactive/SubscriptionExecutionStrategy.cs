@@ -40,13 +40,16 @@ namespace GraphQL.Execution
                 if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
-                streams[node.Name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+                var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+
+                if (stream != null)
+                    streams[node.Name] = stream;
             }
 
             return streams;
         }
 
-        protected virtual async Task<IObservable<ExecutionResult>> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task<IObservable<ExecutionResult>?> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -171,7 +174,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode? parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
@@ -191,6 +194,6 @@ namespace GraphQL.Execution
             string message,
             Field field,
             IEnumerable<object> path,
-            Exception ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
+            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }
 }

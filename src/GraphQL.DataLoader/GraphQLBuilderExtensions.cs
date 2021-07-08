@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.DI;
 
 namespace GraphQL.DataLoader

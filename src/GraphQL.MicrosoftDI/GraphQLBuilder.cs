@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +30,7 @@ namespace GraphQL.MicrosoftDI
             Initialize();
         }
 
-        private MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)
+        private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)
             => serviceLifetime switch
             {
                 ServiceLifetime.Singleton => MSServiceLifetime.Singleton,
@@ -38,7 +40,7 @@ namespace GraphQL.MicrosoftDI
             };
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+        public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
         {
             this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), DI.ServiceLifetime.Singleton);
             if (action != null)
