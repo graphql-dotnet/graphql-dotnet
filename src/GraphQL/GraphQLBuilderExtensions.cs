@@ -666,7 +666,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{Action{ExecutionOptions}})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
