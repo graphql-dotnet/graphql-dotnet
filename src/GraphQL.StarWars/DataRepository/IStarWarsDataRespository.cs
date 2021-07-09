@@ -15,5 +15,7 @@ namespace GraphQL.StarWars.DataRepository
         Task<Droid> GetDroidByIdAsync(string id);
 
         Task<List<StarWarsCharacter>> GetCharactersAsync(List<string> guids);
+
+        Task<List<StarWarsCharacter>> GetAllCharactersAsync();
     }
 }

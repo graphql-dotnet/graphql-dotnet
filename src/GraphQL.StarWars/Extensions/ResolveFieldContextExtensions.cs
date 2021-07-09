@@ -9,13 +9,15 @@ namespace GraphQL.StarWars.Extensions
 {
     public static class ResolveFieldContextExtensions
     {
-        public static Connection<U> GetPagedResults<T, U>(this IResolveConnectionContext<T> context, StarWarsData data, List<string> ids) where U : StarWarsCharacter
+        public static Connection<U> GetPagedResults<T, U>(this IResolveConnectionContext<T> context,
+            IEnumerable<StarWarsCharacter> starWarsCharacters,
+            List<string> ids) where U : StarWarsCharacter
         {
             List<string> idList;
             List<U> list;
             string cursor;
             string endCursor;
-            var pageSize = context.PageSize ?? 20;
+            int pageSize = context.PageSize ?? 20;
 
             if (context.IsUnidirectional || context.After != null || context.Before == null)
             {
@@ -46,7 +48,8 @@ namespace GraphQL.StarWars.Extensions
                 }
             }
 
-            list = data.GetCharactersAsync(idList).Result as List<U> ?? throw new InvalidOperationException($"GetCharactersAsync method should return list of '{typeof(U).Name}' items.");
+            list = starWarsCharacters.Where(x => idList.Contains(x.Id)).ToList() as List<U>
+                ?? throw new InvalidOperationException($"GetCharactersAsync method should return list of '{typeof(U).Name}' items.");
             cursor = list.Count > 0 ? list.Last().Cursor : null;
             endCursor = ids.Count > 0 ? Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(ids.Last())) : null;
 

@@ -92,5 +92,12 @@ namespace GraphQL.StarWars.DataRepository
 
             return Task.FromResult(results);
         }
+
+        public async Task<List<StarWarsCharacter>> GetAllCharactersAsync()
+        {
+            var results = await Task.FromResult(_characters.ToList());
+
+            return results;
+        }
     }
 }

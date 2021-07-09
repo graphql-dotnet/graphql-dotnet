@@ -39,7 +39,7 @@ namespace GraphQL.Harness
             });
 
             // add something like repository
-            services.AddSingleton<StarWarsData>();
+            // services.AddSingleton<StarWarsData>();
             services.AddScoped<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add graph types
