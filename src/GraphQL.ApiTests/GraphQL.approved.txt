@@ -2565,6 +2565,7 @@ namespace GraphQL.Utilities
         public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
         public string Print() { }
         public string PrintArgs(GraphQL.Types.FieldType field) { }
+        public virtual string PrintComment(string comment, string indentation = "", bool firstInBlock = true) { }
         public string PrintDeprecation(string reason) { }
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true) { }
         public string PrintDirective(GraphQL.Types.DirectiveGraphType directive) { }
@@ -2591,6 +2592,7 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }
+        public bool PrintDescriptionsAsComments { get; set; }
     }
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
