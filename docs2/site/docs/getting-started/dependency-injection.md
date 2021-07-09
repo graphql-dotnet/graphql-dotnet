@@ -159,11 +159,10 @@ lifetimes are as follows:
 * **Scoped** services are created per scope. In a web application, every web request creates a new unique service scope. That means scoped services are generally created per web request.
 * **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
-> It is _highly_ recommended that the schema is registered as a singleton. This provides the best performance as
-the schema does not need to be built for every request. This also means that your server is doing way less work and 
-hence reduced CPU utilization. As all graph types are constructed at the
+> It is _highly_ recommended that the schema is registered as a singleton. As all graph types are constructed at the
 same time as the schema, all graph types will effectively have a singleton lifetime, regardless
-of how it is registered with the DI framework.
+of how it is registered with the DI framework. This is most performant appraoch. Having a scoped schema can degrade performance
+by a huge margin. For instance, even a small schema execution can slow down by 100x, and much more with a large schema.
 
 Scoped lifetime can be used to allow the schema and all its graph types access to the current DI scope.
 This is not recommended; please see [Scoped Services](#scoped-services-with-a-singleton-schema-lifetime)
@@ -257,15 +256,13 @@ public class MyGraphType : ObjectGraphType<Category>
 }
 ```
 
-> Be aware that using the service locator in this fashion described in this section could be considered an
+Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
-However, the performance benefits far outweigh the anti-pattern aspect so prefer going ahead with this approach to avoid heavy performance costs.
+However, the performance benefits far outweigh the anti-pattern idealogy. 
 
-> Another approach to resolve scoped services is to use the SteroidsDI project, as described below. Whlie
-StreoidsDI approach also uses service locator pattern, it does provide a clear dependency visibility via constructor injection, 
-which can be mocked if you ever want to write unit tests on type generation and set up process.
-
-Within the GraphQL.MicrosoftDI package, there is also a builder approach to adding scoped dependencies:
+Within the `GraphQL.MicrosoftDI` package, there is also a builder approach to adding scoped dependencies.
+This makes for a concise and declarative approach. Each field clearly states the service it needs
+and thereby, the anti-pattern argument does not apply anymore.
 
 ```csharp
 public class MyGraphType : ObjectGraphType<Category>
@@ -281,6 +278,8 @@ public class MyGraphType : ObjectGraphType<Category>
     }
 }
 ```
+
+Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
 
 ## Using SteroidsDI
 
