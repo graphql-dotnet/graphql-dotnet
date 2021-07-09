@@ -77,12 +77,13 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void MergeFieldAndFragment()
         {
-            var fragment = new FragmentDefinition(new NameNode("fragment"));
             var fragmentSelection = new SelectionSet();
             fragmentSelection.Add(FirstTestField);
-            fragment.SelectionSet = fragmentSelection;
-            fragment.Type = new GraphQL.Language.AST.NamedType(
-                new NameNode("Person"));
+            var fragment = new FragmentDefinition(
+                new NameNode("fragment"),
+                new GraphQL.Language.AST.NamedType(
+                    new NameNode("Person")),
+                fragmentSelection);
 
             var document = new Document();
             document.Fragments.Add(fragment);

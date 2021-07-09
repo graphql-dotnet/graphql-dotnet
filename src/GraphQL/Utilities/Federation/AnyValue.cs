@@ -4,9 +4,8 @@ namespace GraphQL.Utilities.Federation
 {
     public class AnyValue : ValueNode<object>
     {
-        public AnyValue(object value)
+        public AnyValue(object value) : base(value)
         {
-            Value = value;
         }
     }
 }

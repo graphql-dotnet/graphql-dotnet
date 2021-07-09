@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Validation;
 
 namespace GraphQL.Execution

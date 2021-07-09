@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
@@ -14,7 +16,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue> GetArgumentValues(QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, Arguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
@@ -38,7 +40,7 @@ namespace GraphQL.Execution
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static ArgumentValue CoerceValue(IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
+        public static ArgumentValue CoerceValue(IGraphType type, IValue? input, Variables? variables = null, object? fieldDefault = null)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -84,7 +86,7 @@ namespace GraphQL.Execution
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
-                    var values = new object[count];
+                    var values = new object?[count];
                     for (int i = 0; i < count; ++i)
                         values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
@@ -102,7 +104,7 @@ namespace GraphQL.Execution
                     throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
                 }
 
-                var obj = new Dictionary<string, object>();
+                var obj = new Dictionary<string, object?>();
 
                 foreach (var field in inputObjectGraphType.Fields.List)
                 {

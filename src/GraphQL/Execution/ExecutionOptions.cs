@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,37 +19,37 @@ namespace GraphQL
         /// <br/><br/>
         /// Schema will be initialized if it has not yet been initialized.
         /// </summary>
-        public ISchema Schema { get; set; }
+        public ISchema? Schema { get; set; }
 
         /// <summary>Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers</summary>
-        public object Root { get; set; }
+        public object? Root { get; set; }
 
         /// <summary>GraphQL query to parse and execute; required</summary>
-        public string Query { get; set; }
+        public string? Query { get; set; }
 
         /// <summary>GraphQL query operation name; optional, defaults to first (if any) operation defined in query</summary>
-        public string OperationName { get; set; }
+        public string? OperationName { get; set; }
 
         /// <summary>Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed GraphQL requests (a <see cref="Language.AST.Document"/>). If not set, it will be parsed from <see cref="Query"/></summary>
-        public Document Document { get; set; }
+        public Document? Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
-        public Inputs Inputs { get; set; }
+        public Inputs? Inputs { get; set; }
 
         /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }
 
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/> when a cached document is used. Since documents are only cached after they are validated, this defaults to an empty set so no validation is performed.</summary>
-        public IEnumerable<IValidationRule> CachedDocumentValidationRules { get; set; }
+        public IEnumerable<IValidationRule>? CachedDocumentValidationRules { get; set; }
 
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
-        public IEnumerable<IValidationRule> ValidationRules { get; set; }
+        public IEnumerable<IValidationRule>? ValidationRules { get; set; }
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
 
         /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
-        public ComplexityConfiguration ComplexityConfiguration { get; set; }
+        public ComplexityConfiguration? ComplexityConfiguration { get; set; }
 
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
@@ -72,6 +74,6 @@ namespace GraphQL
         /// The service provider for the executing request. Typically this is set to a scoped service provider
         /// from your dependency injection framework.
         /// </summary>
-        public IServiceProvider RequestServices { get; set; }
+        public IServiceProvider? RequestServices { get; set; }
     }
 }

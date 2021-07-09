@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -21,7 +23,7 @@ namespace GraphQL.Execution
         /// within <see cref="ExecutionStrategy.CompleteNode(ExecutionContext, ExecutionNode)"/> or
         /// <see cref="ExecutionStrategy.SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)"/>.
         /// </summary>
-        public override object ToValue() => Result;
+        public override object? ToValue() => Result;
 
         /// <inheritdoc cref="ExecutionNode.GraphType"/>
         public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType;

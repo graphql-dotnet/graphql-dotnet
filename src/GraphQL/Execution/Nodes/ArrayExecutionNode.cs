@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a list of child execution nodes.
         /// </summary>
-        public List<ExecutionNode> Items { get; set; }
+        public List<ExecutionNode>? Items { get; set; }
 
         /// <summary>
         /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
@@ -28,12 +30,12 @@ namespace GraphQL.Execution
         /// Returns an object array containing the results of the child execution nodes.
         /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
-        public override object ToValue()
+        public override object? ToValue()
         {
             if (Items == null)
                 return null;
 
-            var items = new object[Items.Count];
+            var items = new object?[Items.Count];
             for (int i = 0; i < Items.Count; ++i)
             {
                 items[i] = Items[i].ToValue();

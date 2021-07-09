@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
-        private List<Argument> _arguments;
+        private List<Argument>? _arguments;
         // for internal use only, do not modify this instance
         internal static readonly Arguments Empty = new Arguments();
 
@@ -31,7 +33,7 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override IEnumerable<INode> Children => _arguments;
+        public override IEnumerable<INode>? Children => _arguments;
 
         /// <inheritdoc/>
         public override void Visit<TState>(Action<INode, TState> action, TState state)
@@ -51,7 +53,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the value of an argument node, searching the list of argument nodes by the name of the argument.
         /// </summary>
-        public IValue ValueFor(string name)
+        public IValue? ValueFor(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (_arguments != null)

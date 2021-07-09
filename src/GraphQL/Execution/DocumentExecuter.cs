@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -67,8 +69,8 @@ namespace GraphQL
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
-            ExecutionResult result = null;
-            ExecutionContext context = null;
+            ExecutionResult? result = null;
+            ExecutionContext? context = null;
             bool executionOccurred = false;
 
             try
@@ -219,7 +221,7 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
-                UnhandledExceptionContext exceptionContext = null;
+                UnhandledExceptionContext? exceptionContext = null;
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
@@ -249,7 +251,7 @@ namespace GraphQL
             var context = new ExecutionContext
             {
                 Document = document,
-                Schema = options.Schema,
+                Schema = options.Schema!,
                 RootValue = options.Root,
                 UserContext = options.UserContext,
 
@@ -278,11 +280,11 @@ namespace GraphQL
         /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual Operation GetOperation(string operationName, Document document)
+        protected virtual Operation? GetOperation(string? operationName, Document document)
         {
             return string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.FirstOrDefault()
-                : document.Operations.WithName(operationName);
+                : document.Operations.WithName(operationName!);
         }
 
         /// <summary>

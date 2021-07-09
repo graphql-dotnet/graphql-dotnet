@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,7 +48,7 @@ namespace GraphQL.Execution
             if (executionError == null)
                 throw new ArgumentNullException(nameof(executionError));
 
-            IDictionary<string, object> extensions = null;
+            IDictionary<string, object>? extensions = null;
 
             if (_options.ExposeExtensions)
             {

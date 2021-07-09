@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -55,7 +57,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers
         /// </summary>
-        object RootValue { get; }
+        object? RootValue { get; }
 
         /// <summary>
         /// Schema of the graph to use
@@ -89,6 +91,6 @@ namespace GraphQL.Execution
         /// The service provider for the executing request. Typically this is a scoped service provider
         /// from your dependency injection framework.
         /// </summary>
-        IServiceProvider RequestServices { get; }
+        IServiceProvider? RequestServices { get; }
     }
 }

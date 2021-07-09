@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Language.AST;
 
 namespace GraphQL.Caching
@@ -15,6 +17,6 @@ namespace GraphQL.Caching
         /// </summary>
         public static readonly DefaultDocumentCache Instance = new DefaultDocumentCache();
 
-        Document IDocumentCache.this[string query] { get => null; set { } }
+        Document? IDocumentCache.this[string query] { get => null; set { } }
     }
 }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Utilities;
 
 namespace GraphQL.Language.AST
@@ -29,7 +31,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the string representation of the enumeration value.
         /// </summary>
-        public string Name => NameNode.Name;
+        public string Name => NameNode.Name!;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the string representation of the enumeration value.
