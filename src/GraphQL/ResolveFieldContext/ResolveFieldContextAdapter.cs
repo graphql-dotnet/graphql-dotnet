@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,14 +19,16 @@ namespace GraphQL
         /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             Set(baseContext);
         }
 
         internal void Reset()
         {
-            _baseContext = null;
+            _baseContext = null!;
             Source = default;
         }
 
@@ -40,7 +44,7 @@ namespace GraphQL
             {
                 try
                 {
-                    Source = (T)baseContext.Source;
+                    Source = (T?)baseContext.Source;
                 }
                 catch (InvalidCastException)
                 {
@@ -51,7 +55,7 @@ namespace GraphQL
             return this;
         }
 
-        public T Source { get; private set; }
+        public T? Source { get; private set; }
 
         public Field FieldAst => _baseContext.FieldAst;
 
@@ -59,11 +63,11 @@ namespace GraphQL
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IResolveFieldContext Parent => _baseContext.Parent;
+        public IResolveFieldContext? Parent => _baseContext.Parent;
 
         public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 
-        public object RootValue => _baseContext.RootValue;
+        public object? RootValue => _baseContext.RootValue;
 
         public ISchema Schema => _baseContext.Schema;
 
@@ -83,15 +87,15 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Dictionary<string, Field> SubFields => _baseContext.SubFields;
+        public Dictionary<string, Field>? SubFields => _baseContext.SubFields;
 
-        public IDictionary<string, object> UserContext => _baseContext.UserContext;
+        public IDictionary<string, object?> UserContext => _baseContext.UserContext;
 
-        public IDictionary<string, object> Extensions => _baseContext.Extensions;
+        public IDictionary<string, object?> Extensions => _baseContext.Extensions;
 
-        object IResolveFieldContext.Source => Source;
+        object? IResolveFieldContext.Source => Source;
 
-        public IServiceProvider RequestServices => _baseContext.RequestServices;
+        public IServiceProvider? RequestServices => _baseContext.RequestServices;
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;

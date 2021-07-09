@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -32,7 +34,7 @@ namespace GraphQL
         /// Provides access to the parent context (up to the root). This may be needed to get the parameters of parent nodes.
         /// Returns <see langword="null"/> when called on the root.
         /// </summary>
-        IResolveFieldContext Parent { get; }
+        IResolveFieldContext? Parent { get; }
 
         /// <summary>
         /// A dictionary of arguments passed to the field. It is recommended to use the
@@ -43,10 +45,10 @@ namespace GraphQL
         IDictionary<string, ArgumentValue> Arguments { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
-        object RootValue { get; }
+        object? RootValue { get; }
 
         /// <summary>The value of the parent object in the graph.</summary>
-        object Source { get; }
+        object? Source { get; }
 
         /// <summary>The graph schema.</summary>
         ISchema Schema { get; }
@@ -76,7 +78,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        Dictionary<string, Field> SubFields { get; }
+        Dictionary<string, Field>? SubFields { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
@@ -85,10 +87,10 @@ namespace GraphQL
         /// and <see cref="ResolveFieldContextExtensions.SetExtension(IResolveFieldContext, string, object)">SetExtension</see>
         /// methods.
         /// </summary>
-        IDictionary<string, object> Extensions { get; }
+        IDictionary<string, object?> Extensions { get; }
 
         /// <summary>The service provider for the executing request.</summary>
-        IServiceProvider RequestServices { get; }
+        IServiceProvider? RequestServices { get; }
 
         /// <summary>
         /// Returns a resource pool from which arrays can be rented during the current execution.
@@ -101,6 +103,6 @@ namespace GraphQL
     public interface IResolveFieldContext<out TSource> : IResolveFieldContext
     {
         /// <inheritdoc cref="IResolveFieldContext.Source"/>
-        new TSource Source { get; }
+        new TSource? Source { get; }
     }
 }

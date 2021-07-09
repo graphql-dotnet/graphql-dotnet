@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -9,20 +11,20 @@ namespace GraphQL.Resolvers
     /// </summary>
     public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
     {
-        private readonly Func<IResolveFieldContext, TReturnType> _resolver;
+        private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
 
         /// <summary>
         /// Initializes a new instance that runs the specified delegate when resolving a field.
         /// </summary>
-        public FuncFieldResolver(Func<IResolveFieldContext, TReturnType> resolver)
+        public FuncFieldResolver(Func<IResolveFieldContext, TReturnType?> resolver)
         {
             _resolver = resolver;
         }
 
         /// <inheritdoc/>
-        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context);
+        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 
     /// <summary>
@@ -32,18 +34,18 @@ namespace GraphQL.Resolvers
     /// </summary>
     public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
     {
-        private readonly Func<IResolveFieldContext, TReturnType> _resolver;
-        private static ResolveFieldContextAdapter<TSourceType> _sharedAdapter;
+        private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
+        private static ResolveFieldContextAdapter<TSourceType>? _sharedAdapter;
 
         /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
-        public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
             _resolver = GetResolverFor(resolver);
         }
 
-        private Func<IResolveFieldContext, TReturnType> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        private Func<IResolveFieldContext, TReturnType?> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             if (typeof(TSourceType) == typeof(object))
             {
@@ -104,7 +106,7 @@ namespace GraphQL.Resolvers
                     var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
                     adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
                     var ret = resolver(adapter);
-                    var t = (Task)(object)ret;
+                    var t = (Task)(object)ret!;
                     if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion)
                     {
                         adapter.Reset();
@@ -128,8 +130,8 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context);
+        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 }

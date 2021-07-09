@@ -85,7 +85,7 @@ namespace GraphQL.Execution
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents.
         /// </summary>
-        Dictionary<string, object> Extensions { get; }
+        Dictionary<string, object?> Extensions { get; }
 
         /// <summary>
         /// The service provider for the executing request. Typically this is a scoped service provider

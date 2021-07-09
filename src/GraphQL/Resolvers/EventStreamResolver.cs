@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using GraphQL.Reflection;
 using GraphQL.Subscription;
@@ -46,14 +48,14 @@ namespace GraphQL.Resolvers
             _serviceProvider = serviceProvider;
         }
 
-        public IObservable<object> Subscribe(IResolveEventStreamContext context)
+        public IObservable<object?> Subscribe(IResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;
-            object[] arguments = ReflectionHelper.BuildArguments(parameters, context);
+            object?[]? arguments = ReflectionHelper.BuildArguments(parameters, context);
             object target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
-            return (IObservable<object>)_accessor.GetValue(target, arguments);
+            return (IObservable<object?>)_accessor.GetValue(target, arguments)!;
         }
 
-        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => Subscribe(context);
+        IObservable<object?> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => Subscribe(context);
     }
 }

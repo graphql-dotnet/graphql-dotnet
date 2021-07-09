@@ -28,7 +28,7 @@ namespace GraphQL.Execution
         public object? RootValue { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> UserContext { get; set; }
+        public IDictionary<string, object?> UserContext { get; set; }
 
         /// <inheritdoc/>
         public Operation Operation { get; set; }
@@ -58,7 +58,7 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, object> Extensions { get; set; }
+        public Dictionary<string, object?> Extensions { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <inheritdoc/>

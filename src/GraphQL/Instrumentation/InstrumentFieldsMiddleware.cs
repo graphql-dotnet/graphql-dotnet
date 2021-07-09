@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,7 +11,7 @@ namespace GraphQL.Instrumentation
     public class InstrumentFieldsMiddleware : IFieldMiddleware
     {
         /// <inheritdoc/>
-        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async Task<object?> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             var metadata = new Dictionary<string, object>
             {

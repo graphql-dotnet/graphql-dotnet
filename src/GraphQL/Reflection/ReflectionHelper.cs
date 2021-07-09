@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +14,7 @@ namespace GraphQL.Reflection
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
         /// <param name="resolverType">defaults to Resolver</param>
-        public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
+        public static IAccessor? ToAccessor(this Type type, string field, ResolverType resolverType)
         {
             if (type == null)
                 return null;
@@ -76,12 +78,12 @@ namespace GraphQL.Reflection
             return property;
         }
 
-        public static object[] BuildArguments(ParameterInfo[] parameters, IResolveFieldContext context)
+        public static object?[]? BuildArguments(ParameterInfo[]? parameters, IResolveFieldContext context)
         {
             if (parameters == null || parameters.Length == 0)
                 return null;
 
-            object[] arguments = new object[parameters.Length];
+            object?[] arguments = new object?[parameters.Length];
 
             var index = 0;
             if (parameters[index].ParameterType.IsAssignableFrom(context.GetType()))

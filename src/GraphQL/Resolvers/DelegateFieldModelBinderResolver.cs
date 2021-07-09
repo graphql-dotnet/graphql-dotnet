@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -24,7 +26,7 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public object Resolve(IResolveFieldContext context)
+        public object? Resolve(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             try

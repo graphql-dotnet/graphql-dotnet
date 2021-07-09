@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,7 @@ namespace GraphQL.Instrumentation
         {
             var perf = result?.Perf;
             if (perf != null)
-                (result.Extensions ??= new Dictionary<string, object>())["tracing"] = CreateTrace(perf, start);
+                (result!.Extensions ??= new Dictionary<string, object>())["tracing"] = CreateTrace(perf, start);
         }
 
         /// <summary>
