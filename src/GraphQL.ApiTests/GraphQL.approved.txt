@@ -1890,7 +1890,7 @@ namespace GraphQL.Types
         public FieldType() { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public object DefaultValue { get; set; }
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
@@ -1920,7 +1920,7 @@ namespace GraphQL.Types
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }

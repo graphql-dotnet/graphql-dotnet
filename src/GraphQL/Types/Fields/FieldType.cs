@@ -36,7 +36,7 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         /// <inheritdoc/>
-        public string DeprecationReason
+        public string? DeprecationReason
         {
             get => this.GetDeprecationReason();
             set => this.SetDeprecationReason(value);
