@@ -3,6 +3,7 @@ using Example;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
+using GraphQL.StarWars.DataRepository;
 using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -39,6 +40,7 @@ namespace GraphQL.Harness
 
             // add something like repository
             services.AddSingleton<StarWarsData>();
+            services.AddScoped<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add graph types
             services.AddSingleton<StarWarsQuery>();

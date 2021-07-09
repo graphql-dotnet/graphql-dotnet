@@ -3,15 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.StarWars.Types;
 
-namespace GraphQL.StarWars
+namespace GraphQL.StarWars.DataRepository
 {
-    public class StarWarsData
+    public class StarWarsDataRespository : IStarWarsDataRespository
     {
-        private readonly List<StarWarsCharacter> _characters = new List<StarWarsCharacter>();
-
-        public StarWarsData()
+        private static readonly List<StarWarsCharacter> _characters = new()
         {
-            _characters.Add(new Human
+            new Human
             {
                 Id = "1",
                 Name = "Luke",
@@ -19,18 +17,16 @@ namespace GraphQL.StarWars
                 AppearsIn = new[] { 4, 5, 6 },
                 HomePlanet = "Tatooine",
                 Cursor = "MQ=="
-            });
-
-            _characters.Add(new Human
+            },
+            new Human
             {
                 Id = "2",
                 Name = "Vader",
                 AppearsIn = new[] { 4, 5, 6 },
                 HomePlanet = "Tatooine",
                 Cursor = "Mg=="
-            });
-
-            _characters.Add(new Droid
+            },
+            new Droid
             {
                 Id = "3",
                 Name = "R2-D2",
@@ -38,17 +34,16 @@ namespace GraphQL.StarWars
                 AppearsIn = new[] { 4, 5, 6 },
                 PrimaryFunction = "Astromech",
                 Cursor = "Mw=="
-            });
-
-            _characters.Add(new Droid
+            },
+            new Droid
             {
                 Id = "4",
                 Name = "C-3PO",
                 AppearsIn = new[] { 4, 5, 6 },
                 PrimaryFunction = "Protocol",
                 Cursor = "NA=="
-            });
-        }
+            }
+        };
 
         public IEnumerable<StarWarsCharacter> GetFriends(StarWarsCharacter character)
         {
@@ -57,13 +52,13 @@ namespace GraphQL.StarWars
                 return null;
             }
 
-            var friends = new List<StarWarsCharacter>();
             var lookup = character.Friends;
-            if (lookup != null)
+            if (lookup == null)
             {
-                foreach (var c in _characters.Where(h => lookup.Contains(h.Id)))
-                    friends.Add(c);
+                return Enumerable.Empty<StarWarsCharacter>();
             }
+
+            var friends = _characters.Where(h => lookup.Contains(h.Id));
             return friends;
         }
 
@@ -71,22 +66,31 @@ namespace GraphQL.StarWars
         {
             character.Id = _characters.Count.ToString();
             _characters.Add(character);
+
             return character;
         }
 
         public Task<Human> GetHumanByIdAsync(string id)
         {
-            return Task.FromResult(_characters.FirstOrDefault(h => h.Id == id && h is Human) as Human);
+            var match = _characters.FirstOrDefault(h => h.Id == id);
+            var human = match is Human asHuman ? asHuman : null;
+
+            return Task.FromResult(human);
         }
 
         public Task<Droid> GetDroidByIdAsync(string id)
         {
-            return Task.FromResult(_characters.FirstOrDefault(h => h.Id == id && h is Droid) as Droid);
+            var match = _characters.FirstOrDefault(h => h.Id == id);
+            var droid = match is Droid asHuman ? asHuman : null;
+
+            return Task.FromResult(droid);
         }
 
         public Task<List<StarWarsCharacter>> GetCharactersAsync(List<string> guids)
         {
-            return Task.FromResult(_characters.Where(c => guids.Contains(c.Id)).ToList());
+            var results = _characters.Where(c => guids.Contains(c.Id)).ToList();
+
+            return Task.FromResult(results);
         }
     }
 }
