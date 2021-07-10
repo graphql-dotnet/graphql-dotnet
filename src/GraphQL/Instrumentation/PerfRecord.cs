@@ -64,7 +64,7 @@ namespace GraphQL.Instrumentation
         public T? MetaField<T>(string key)
         {
             var local = Metadata;
-            return local != null && local.TryGetValue(key, out var value) ? (T)value : default;
+            return local != null && local.TryGetValue(key, out var value) ? (T?)value : default;
         }
     }
 }
