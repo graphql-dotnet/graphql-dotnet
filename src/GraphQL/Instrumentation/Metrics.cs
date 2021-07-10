@@ -69,7 +69,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Records an performance metric.
         /// </summary>
-        public Marker Subject(string category, string? subject, Dictionary<string, object>? metadata = null)
+        public Marker Subject(string category, string? subject, Dictionary<string, object?>? metadata = null)
         {
             if (!Enabled)
                 return Marker.Empty;

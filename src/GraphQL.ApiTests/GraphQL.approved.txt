@@ -1127,7 +1127,7 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.PerfRecord[]? Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(string? name) { }
         public GraphQL.Instrumentation.Metrics Start(string? operationName) { }
-        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
+        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
         public readonly struct Marker : System.IDisposable
         {
             public static readonly GraphQL.Instrumentation.Metrics.Marker Empty;
@@ -1137,11 +1137,11 @@ namespace GraphQL.Instrumentation
     }
     public class PerfRecord
     {
-        public PerfRecord(string category, string? subject, double start, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
+        public PerfRecord(string category, string? subject, double start, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
         public string Category { get; set; }
         public double Duration { get; }
         public double End { get; set; }
-        public System.Collections.Generic.Dictionary<string, object>? Metadata { get; set; }
+        public System.Collections.Generic.Dictionary<string, object?>? Metadata { get; set; }
         public double Start { get; set; }
         public string? Subject { get; set; }
         public void MarkEnd(double end) { }

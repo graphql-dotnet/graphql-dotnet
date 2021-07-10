@@ -14,7 +14,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public PerfRecord(string category, string? subject, double start, Dictionary<string, object>? metadata = null)
+        public PerfRecord(string category, string? subject, double start, Dictionary<string, object?>? metadata = null)
         {
             Category = category;
             Subject = subject;
@@ -40,7 +40,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Gets or sets a dictionary of additional metadata.
         /// </summary>
-        public Dictionary<string, object>? Metadata { get; set; }
+        public Dictionary<string, object?>? Metadata { get; set; }
 
         /// <summary>
         /// Gets or sets the start time, represented as an offset in milliseconds from starting the GraphQL operation's execution.
