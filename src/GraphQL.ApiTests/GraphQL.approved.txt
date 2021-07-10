@@ -127,7 +127,7 @@ namespace GraphQL
         public GraphQL.Types.ISchema? Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
-        public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
+        public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? ValidationRules { get; set; }
     }
     public class ExecutionResult
@@ -332,7 +332,7 @@ namespace GraphQL
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
-        System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> Arguments { get; }
+        System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
         GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
@@ -406,7 +406,7 @@ namespace GraphQL
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> Arguments { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
         public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
@@ -432,7 +432,7 @@ namespace GraphQL
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> Arguments { get; set; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; set; }
         public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
@@ -586,7 +586,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
         public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object> resolver) { }
-        public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object>> resolver) { }
+        public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         [System.Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
@@ -620,7 +620,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize) { }
         public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
-        public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
@@ -1125,9 +1125,9 @@ namespace GraphQL.Instrumentation
         public bool Enabled { get; }
         public static GraphQL.Instrumentation.Metrics None { get; }
         public GraphQL.Instrumentation.PerfRecord[]? Finish() { }
-        public GraphQL.Instrumentation.Metrics SetOperationName(string name) { }
-        public GraphQL.Instrumentation.Metrics Start(string operationName) { }
-        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string subject, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
+        public GraphQL.Instrumentation.Metrics SetOperationName(string? name) { }
+        public GraphQL.Instrumentation.Metrics Start(string? operationName) { }
+        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
         public readonly struct Marker : System.IDisposable
         {
             public static readonly GraphQL.Instrumentation.Metrics.Marker Empty;
@@ -1137,13 +1137,13 @@ namespace GraphQL.Instrumentation
     }
     public class PerfRecord
     {
-        public PerfRecord(string category, string subject, double start, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
+        public PerfRecord(string category, string? subject, double start, System.Collections.Generic.Dictionary<string, object>? metadata = null) { }
         public string Category { get; set; }
         public double Duration { get; }
         public double End { get; set; }
         public System.Collections.Generic.Dictionary<string, object>? Metadata { get; set; }
         public double Start { get; set; }
-        public string Subject { get; set; }
+        public string? Subject { get; set; }
         public void MarkEnd(double end) { }
         public T? MetaField<T>(string key) { }
     }
