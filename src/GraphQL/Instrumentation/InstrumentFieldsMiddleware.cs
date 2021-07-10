@@ -13,7 +13,7 @@ namespace GraphQL.Instrumentation
         /// <inheritdoc/>
         public async Task<object?> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
-            var metadata = new Dictionary<string, object>
+            var metadata = new Dictionary<string, object?>
             {
                 { "typeName", context.ParentType.Name },
                 { "fieldName", context.FieldAst.Name },
