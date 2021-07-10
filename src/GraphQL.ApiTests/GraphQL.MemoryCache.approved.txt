@@ -2,8 +2,8 @@ namespace GraphQL.Caching
 {
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions> action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
     }
     public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
     {
