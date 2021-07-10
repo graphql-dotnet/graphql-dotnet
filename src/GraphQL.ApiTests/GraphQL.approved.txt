@@ -89,7 +89,7 @@ namespace GraphQL
     {
         public ExecutionError(string message) { }
         public ExecutionError(string message, System.Collections.IDictionary data) { }
-        public ExecutionError(string message, System.Exception exception) { }
+        public ExecutionError(string message, System.Exception? exception) { }
         public string? Code { get; set; }
         public System.Collections.Generic.List<GraphQL.ErrorLocation>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
@@ -874,10 +874,10 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Language.AST.Field? Field { get; }
         public GraphQL.Types.FieldType? FieldDefinition { get; }
-        public GraphQL.Types.IGraphType GraphType { get; }
+        public GraphQL.Types.IGraphType? GraphType { get; }
         public int? IndexInParentNode { get; }
         public string? Name { get; }
         public GraphQL.Execution.ExecutionNode? Parent { get; }
@@ -990,7 +990,7 @@ namespace GraphQL.Execution
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
         public virtual GraphQL.Language.AST.SelectionSet? SelectionSet { get; }
         public GraphQL.Execution.ExecutionNode[]? SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
@@ -1007,8 +1007,8 @@ namespace GraphQL.Execution
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
-        public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType, GraphQL.Language.AST.SelectionSet selectionSet) { }
-        public override GraphQL.Language.AST.SelectionSet SelectionSet { get; }
+        public RootExecutionNode(GraphQL.Types.IObjectGraphType? graphType, GraphQL.Language.AST.SelectionSet? selectionSet) { }
+        public override GraphQL.Language.AST.SelectionSet? SelectionSet { get; }
     }
     public class SerialExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {

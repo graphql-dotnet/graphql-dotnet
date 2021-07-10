@@ -20,7 +20,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields!).ConfigureAwait(false);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -43,7 +43,7 @@ namespace GraphQL.Execution
                 var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
 
                 if (stream != null)
-                    streams[node.Name] = stream;
+                    streams[node.Name!] = stream;
             }
 
             return streams;
@@ -54,11 +54,11 @@ namespace GraphQL.Execution
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var arguments = ExecutionHelper.GetArgumentValues(
-                node.FieldDefinition.Arguments,
-                node.Field.Arguments,
+                node.FieldDefinition!.Arguments,
+                node.Field!.Arguments,
                 context.Variables);
 
-            object source = (node.Parent != null)
+            object? source = (node.Parent != null)
                 ? node.Parent.Result
                 : context.RootValue;
 
@@ -103,7 +103,7 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value => BuildSubscriptionExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
+                    .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
                     .SelectMany(async executionNode =>
                     {
                         if (context.Listeners != null)
@@ -174,7 +174,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode? parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
