@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,15 +36,18 @@ namespace GraphQL.Language
         /// </summary>
         private static void AddDefinitions(GraphQLDocument source, Document target)
         {
-            foreach (var def in source.Definitions)
+            if (source.Definitions != null)
             {
-                if (def is GraphQLOperationDefinition op)
+                foreach (var def in source.Definitions)
                 {
-                    target.Operations.Add(Operation(op));
-                }
-                else if (def is GraphQLFragmentDefinition frag)
-                {
-                    target.Fragments.Add(Fragment(frag));
+                    if (def is GraphQLOperationDefinition op)
+                    {
+                        target.Operations.Add(Operation(op));
+                    }
+                    else if (def is GraphQLFragmentDefinition frag)
+                    {
+                        target.Fragments.Add(Fragment(frag));
+                    }
                 }
             }
         }
@@ -52,12 +57,11 @@ namespace GraphQL.Language
         /// </summary>
         private static Operation Operation(GraphQLOperationDefinition source)
         {
-            return new Operation(Name(source.Name))
+            return new Operation(Name(source.Name), SelectionSet(source.SelectionSet))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
                 OperationType = ToOperationType(source.Operation),
-                SelectionSet = SelectionSet(source.SelectionSet),
                 Variables = VariableDefinitions(source.VariableDefinitions),
                 Directives = Directives(source.Directives)
             };
@@ -68,12 +72,10 @@ namespace GraphQL.Language
         /// </summary>
         private static FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
-            return new FragmentDefinition(Name(source.Name))
+            return new FragmentDefinition(Name(source.Name), NamedType(source.TypeCondition!), SelectionSet(source.SelectionSet))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Type = NamedType(source.TypeCondition),
-                SelectionSet = SelectionSet(source.SelectionSet),
                 Directives = Directives(source.Directives)
             };
         }
@@ -96,22 +98,21 @@ namespace GraphQL.Language
         /// </summary>
         private static InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
-            return new InlineFragment
+            return new InlineFragment(SelectionSet(source.SelectionSet))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
                 Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null,
                 Directives = Directives(source.Directives),
-                SelectionSet = SelectionSet(source.SelectionSet)
             };
         }
 
         /// <summary>
         /// Converts a list of variable definition nodes and their children.
         /// </summary>
-        private static VariableDefinitions VariableDefinitions(List<GraphQLVariableDefinition> source)
+        private static VariableDefinitions? VariableDefinitions(List<GraphQLVariableDefinition>? source)
         {
-            VariableDefinitions defs = null;
+            VariableDefinitions? defs = null;
 
             if (source?.Count > 0)
             {
@@ -128,11 +129,10 @@ namespace GraphQL.Language
         /// </summary>
         private static VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
-            var def = new VariableDefinition(Name(source.Variable.Name))
+            var def = new VariableDefinition(Name(source.Variable!.Name), Type(source.Type!))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Type = Type(source.Type)
             };
             if (source.DefaultValue is GraphQLValue val)
             {
@@ -148,16 +148,19 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a selection set node and its children.
         /// </summary>
-        private static SelectionSet SelectionSet(GraphQLSelectionSet source)
+        private static SelectionSet SelectionSet(GraphQLSelectionSet? source)
         {
             var set = new SelectionSet();
 
             if (source != null)
             {
                 set.SourceLocation = Convert(source.Location);
-                foreach (var s in source.Selections)
+                if (source.Selections != null)
                 {
-                    set.Add(Selection(s));
+                    foreach (var s in source.Selections)
+                    {
+                        set.Add(Selection(s));
+                    }
                 }
             }
 
@@ -193,9 +196,9 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of directive nodes and their children.
         /// </summary>
-        private static Directives Directives(List<GraphQLDirective> source)
+        private static Directives? Directives(List<GraphQLDirective>? source)
         {
-            Directives target = null;
+            Directives? target = null;
 
             if (source?.Count > 0)
             {
@@ -222,9 +225,9 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of argument nodes and their children.
         /// </summary>
-        private static Arguments Arguments(List<GraphQLArgument> source)
+        private static Arguments? Arguments(List<GraphQLArgument>? source)
         {
-            Arguments target = null;
+            Arguments? target = null;
 
             if (source?.Count > 0)
             {
@@ -232,9 +235,9 @@ namespace GraphQL.Language
 
                 foreach (var a in source)
                 {
-                    var arg = new Argument(Name(a.Name), Value(a.Value))
+                    var arg = new Argument(Name(a.Name), Value(a.Value!))
                     {
-                        SourceLocation = Convert(a.Name.Location),
+                        SourceLocation = Convert(a.Name!.Location),
                         CommentNode = Comment(a.Comment),
                     };
                     target.Add(arg);
@@ -360,7 +363,7 @@ namespace GraphQL.Language
         /// </summary>
         private static ObjectField ObjectField(GraphQLObjectField source)
         {
-            return new ObjectField(Name(source.Name), Value(source.Value)) { SourceLocation = Convert(source.Location) };
+            return new ObjectField(Name(source.Name), Value(source.Value!)) { SourceLocation = Convert(source.Location) };
         }
 
         /// <summary>
@@ -387,13 +390,13 @@ namespace GraphQL.Language
                 case ASTNodeKind.NonNullType:
                 {
                     var nonNull = (GraphQLNonNullType)type;
-                    return new NonNullType(Type(nonNull.Type)) { SourceLocation = Convert(nonNull.Location) };
+                    return new NonNullType(Type(nonNull.Type!)) { SourceLocation = Convert(nonNull.Location) };
                 }
 
                 case ASTNodeKind.ListType:
                 {
                     var list = (GraphQLListType)type;
-                    return new ListType(Type(list.Type)) { SourceLocation = Convert(list.Location) };
+                    return new ListType(Type(list.Type!)) { SourceLocation = Convert(list.Location) };
                 }
             }
 
@@ -403,7 +406,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a name node.
         /// </summary>
-        private static NameNode Name(GraphQLName name)
+        private static NameNode Name(GraphQLName? name)
         {
             return name == null
                 ? default
@@ -413,7 +416,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a comment node.
         /// </summary>
-        private static CommentNode Comment(GraphQLComment comment)
+        private static CommentNode? Comment(GraphQLComment? comment)
         {
             return comment == null
                 ? null

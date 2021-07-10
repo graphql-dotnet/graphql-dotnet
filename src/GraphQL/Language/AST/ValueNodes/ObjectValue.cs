@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,9 +56,9 @@ namespace GraphQL.Language.AST
         {
             get
             {
-                var obj = new Dictionary<string, object>(ObjectFieldsList.Count);
+                var obj = new Dictionary<string, object?>(ObjectFieldsList.Count);
                 foreach (var item in ObjectFieldsList)
-                    obj.Add(item.Name, Field(item.Name).Value.Value);
+                    obj.Add(item.Name, item.Value.Value);
                 return obj;
             }
         }
@@ -74,7 +76,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first matching field node contained within this object value node that matches the specified name, or <see langword="null"/> otherwise.
         /// </summary>
-        public ObjectField Field(string name)
+        public ObjectField? Field(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var field in ObjectFieldsList)

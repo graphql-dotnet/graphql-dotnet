@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Fragments : IEnumerable<FragmentDefinition>
     {
-        internal List<FragmentDefinition> List { get; private set; }
+        internal List<FragmentDefinition>? List { get; private set; }
 
         /// <summary>
         /// Adds a fragment definition node to the list.
@@ -25,7 +27,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Searches the list by name and returns the first matching fragment definition, or <see langword="null"/> if none is found.
         /// </summary>
-        public FragmentDefinition FindDefinition(string name)
+        public FragmentDefinition? FindDefinition(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)

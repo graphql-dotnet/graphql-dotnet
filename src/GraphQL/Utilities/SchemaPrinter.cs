@@ -304,7 +304,21 @@ namespace GraphQL.Utilities
             return string.Join(" | ", locations.Select(x => __DirectiveLocation.Instance.Serialize(x))); //TODO: remove allocations
         }
 
-        protected string FormatDescription(string description, string indentation = "") => Options.IncludeDescriptions ? PrintDescription(description, indentation) : "";
+        protected string FormatDescription(string description, string indentation = "")
+        {
+            if (Options.IncludeDescriptions)
+            {
+                if (Options.PrintDescriptionsAsComments)
+                {
+                    return PrintComment(description, indentation);
+                }
+                else
+                {
+                    return PrintDescription(description, indentation);
+                }
+            }
+            return "";
+        }
 
         public string FormatDefaultValue(object value, IGraphType graphType)
         {
@@ -353,17 +367,17 @@ namespace GraphQL.Utilities
             return sb.ToString();
         }
 
-        public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
+        public virtual string PrintComment(string comment, string indentation = "", bool firstInBlock = true)
         {
-            if (string.IsNullOrWhiteSpace(description))
+            if (string.IsNullOrWhiteSpace(comment))
                 return "";
 
             indentation ??= "";
 
             // normalize newlines
-            description = description.Replace("\r", "");
+            comment = comment.Replace("\r", "");
 
-            var lines = description.Split('\n');
+            var lines = comment.Split('\n');
 
             var desc = !string.IsNullOrWhiteSpace(indentation) && !firstInBlock ? Environment.NewLine : "";
 
@@ -382,6 +396,48 @@ namespace GraphQL.Utilities
                         desc += $"{indentation}# {sub}{Environment.NewLine}";
                 }
             }
+
+            return desc;
+        }
+
+        public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+                return "";
+
+            indentation ??= "";
+
+            // escape """ with \"""
+            description = description.Replace("\"\"\"", "\\\"\"\"");
+
+            // normalize newlines
+            description = description.Replace("\r", "");
+
+            // remove control characters besides newline and tab
+            if (description.Any(c => c < ' ' && c != '\t' & c != '\n'))
+            {
+                description = new string(description.Where(c => c >= ' ' || c == '\t' || c == '\n').ToArray());
+            }
+
+            var lines = description.Split('\n');
+
+            var desc = !string.IsNullOrWhiteSpace(indentation) && !firstInBlock ? Environment.NewLine : "";
+
+            desc += indentation + "\"\"\"\n";
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    desc += Environment.NewLine;
+                }
+                else
+                {
+                    desc += indentation + line + Environment.NewLine;
+                }
+            }
+
+            desc += indentation + "\"\"\"\n";
 
             return desc;
         }

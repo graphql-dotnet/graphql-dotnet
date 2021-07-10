@@ -195,7 +195,10 @@ namespace GraphQL.Tests.Utilities
         {
             var definitions = @"
                 type Query {
-                  post(id: ID = 1): String
+                  """"""
+                  Post description
+                  """"""
+                  post(""ID description"" id: ID = 1, ""Val description"" val: String): String
                 }
             ";
 
@@ -207,21 +210,33 @@ namespace GraphQL.Tests.Utilities
 
             var field = query.Fields.Single();
             field.Name.ShouldBe("post");
-            field.Arguments.Count.ShouldBe(1);
+            field.Arguments.Count.ShouldBe(2);
             field.ResolvedType.Name.ShouldBe("String");
+            field.Description.ShouldBe("Post description");
 
-            var arg = field.Arguments.Single();
+            var arg = field.Arguments.First();
             arg.Name.ShouldBe("id");
             arg.DefaultValue.ShouldBe(1);
             arg.ResolvedType.Name.ShouldBe("ID");
             arg.Description.ShouldBe("Some argument");
+
+            arg = field.Arguments.Last();
+            arg.Name.ShouldBe("val");
+            arg.ResolvedType.Name.ShouldBe("String");
+            arg.Description.ShouldBe("Val description");
         }
 
         [Fact]
         public void builds_interface()
         {
             var definitions = @"
+                """"""
+                Example description
+                """"""
                 interface Pet {
+                    """"""
+                    ID description
+                    """"""
                     id: ID
                 }
             ";
@@ -231,18 +246,26 @@ namespace GraphQL.Tests.Utilities
 
             var type = schema.AllTypes["Pet"] as InterfaceGraphType;
             type.ShouldNotBeNull();
+            type.Description.ShouldBe("Example description");
             type.Fields.Count.ShouldBe(1);
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("id");
             field.ResolvedType.Name.ShouldBe("ID");
+            field.Description.ShouldBe("ID description");
         }
 
         [Fact]
         public void builds_enum()
         {
             var definitions = @"
+                """"""
+                Example description
+                """"""
                 enum PetKind {
+                    """"""
+                    Cat description
+                    """"""
                     CAT
                     DOG
                 }
@@ -253,9 +276,11 @@ namespace GraphQL.Tests.Utilities
 
             var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
             type.ShouldNotBeNull();
+            type.Description.ShouldBe("Example description");
 
             type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
             type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
+            type.Values.Select(x => x.Description).ShouldBe(new[] { "Cat description", null });
         }
 
         private enum PetKind
@@ -363,6 +388,9 @@ namespace GraphQL.Tests.Utilities
                     name: String
                 }
 
+                """"""
+                Example description
+                """"""
                 union SearchResult = Human | Droid";
 
             var schema = Schema.For(definitions, _ =>
@@ -374,6 +402,7 @@ namespace GraphQL.Tests.Utilities
             schema.Initialize();
 
             var searchResult = schema.AllTypes["SearchResult"] as UnionGraphType;
+            searchResult.Description.ShouldBe("Example description");
             searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] { "Human", "Droid" });
         }
 
@@ -381,7 +410,13 @@ namespace GraphQL.Tests.Utilities
         public void builds_input_types()
         {
             var definitions = @"
+                """"""
+                Example description
+                """"""
                 input ReviewInput {
+                  """"""
+                  Stars description
+                  """"""
                   stars: Int!
                   commentary: String
                 }
@@ -392,13 +427,18 @@ namespace GraphQL.Tests.Utilities
 
             var input = schema.AllTypes["ReviewInput"] as InputObjectGraphType;
             input.ShouldNotBeNull();
+            input.Description.ShouldBe("Example description");
             input.Fields.Count.ShouldBe(2);
+            input.Fields.First().Description.ShouldBe("Stars description");
         }
 
         [Fact]
         public void builds_directives()
         {
             var definitions = @"
+                """"""
+                Example description
+                """"""
                 directive @myDirective(
                   if: Boolean!
                 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
@@ -409,6 +449,7 @@ namespace GraphQL.Tests.Utilities
 
             var directive = schema.Directives.Find("myDirective");
             directive.ShouldNotBeNull();
+            directive.Description.ShouldBe("Example description");
 
             directive.Arguments.Count.ShouldBe(1);
             var argument = directive.Arguments.Find("if");

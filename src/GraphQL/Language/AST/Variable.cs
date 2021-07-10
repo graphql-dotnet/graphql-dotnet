@@ -1,3 +1,7 @@
+#nullable enable
+
+using System;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -5,16 +9,33 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Variable
     {
+        [Obsolete]
+        public Variable() : this(null!)
+        {
+        }
+
+        public Variable(string name)
+        {
+#pragma warning disable CS0612 // Type or member is obsolete
+            Name = name;
+#pragma warning restore CS0612 // Type or member is obsolete
+        }
+
         /// <summary>
         /// Gets or sets the name of the variable.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get;
+            [Obsolete]
+            set;
+        }
 
-        private object _value;
+        private object? _value;
         /// <summary>
         /// Gets or sets the value of the variable.
         /// </summary>
-        public object Value
+        public object? Value
         {
             get => _value;
             set

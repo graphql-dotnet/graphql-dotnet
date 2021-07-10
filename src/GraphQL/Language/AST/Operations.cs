@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Operations : IEnumerable<Operation>
     {
-        internal List<Operation> List { get; private set; }
+        internal List<Operation>? List { get; private set; }
 
         /// <summary>
         /// Returns the number of operation nodes the list contains.
@@ -25,7 +27,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first operation in the list that matches the specified name, or <see langword="null"/> if none are matched.
         /// </summary>
-        public Operation WithName(string operationName)
+        public Operation? WithName(string operationName)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)
@@ -41,7 +43,7 @@ namespace GraphQL.Language.AST
         }
 
         // This method avoids LINQ and 'List+Enumerator<Operation>' allocation
-        internal Operation FirstOrDefault() => List?[0];
+        internal Operation? FirstOrDefault() => List?[0];
 
         /// <inheritdoc/>
         public IEnumerator<Operation> GetEnumerator() => (List ?? Enumerable.Empty<Operation>()).GetEnumerator();

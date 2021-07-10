@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -8,8 +10,9 @@ namespace GraphQL.Execution
     public class SerialExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
-        private Stack<ExecutionNode> _reusableNodes;
-        private Queue<ExecutionNode> _reusableDataLoaderNodes;
+        private Stack<ExecutionNode>? _reusableNodes;
+        private Queue<ExecutionNode>? _reusableDataLoaderNodes;
+        private Stack<ExecutionNode>? _reusableAddlNodes;
 
         /// <summary>
         /// Gets a static instance of <see cref="SerialExecutionStrategy"/> strategy.
@@ -26,6 +29,7 @@ namespace GraphQL.Execution
             var nodes = System.Threading.Interlocked.Exchange(ref _reusableNodes, null) ?? new Stack<ExecutionNode>();
             nodes.Push(rootNode);
             var dataLoaderNodes = System.Threading.Interlocked.Exchange(ref _reusableDataLoaderNodes, null) ?? new Queue<ExecutionNode>();
+            var addlNodes = System.Threading.Interlocked.Exchange(ref _reusableAddlNodes, null) ?? new Stack<ExecutionNode>();
 
             try
             {
@@ -75,9 +79,15 @@ namespace GraphQL.Execution
                         }
                         else if (node is IParentExecutionNode parentNode)
                         {
-                            // Add in reverse order so fields are executed in the correct order
-                            parentNode.ApplyToChildren((node, state) => state.Push(node), nodes, reverse: true);
+                            // Do not reverse the order of the nodes here
+                            parentNode.ApplyToChildren((node, state) => state.Push(node), addlNodes, reverse: false);
                         }
+                    }
+
+                    // Reverse order of queued nodes from data loader nodes so they are executed in the correct order
+                    while (addlNodes.Count > 0)
+                    {
+                        nodes.Push(addlNodes.Pop());
                     }
                 }
             }
@@ -85,9 +95,11 @@ namespace GraphQL.Execution
             {
                 nodes.Clear();
                 dataLoaderNodes.Clear();
+                addlNodes.Clear();
 
                 System.Threading.Interlocked.CompareExchange(ref _reusableNodes, nodes, null);
                 System.Threading.Interlocked.CompareExchange(ref _reusableDataLoaderNodes, dataLoaderNodes, null);
+                System.Threading.Interlocked.CompareExchange(ref _reusableAddlNodes, addlNodes, null);
             }
         }
     }
