@@ -68,7 +68,7 @@ namespace GraphQL.Execution
                 {
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
-                    ParentType = node.GetParentType(context.Schema),
+                    ParentType = node.GetParentType(context.Schema)!,
                     Arguments = arguments,
                     Source = source,
                     Schema = context.Schema,
@@ -87,7 +87,7 @@ namespace GraphQL.Execution
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
 
 
-                IObservable<object> subscription;
+                IObservable<object?> subscription;
 
                 if (eventStreamField?.Subscriber != null)
                 {
@@ -103,7 +103,7 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
+                    .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!))
                     .SelectMany(async executionNode =>
                     {
                         if (context.Listeners != null)

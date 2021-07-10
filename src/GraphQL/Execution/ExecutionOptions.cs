@@ -46,7 +46,7 @@ namespace GraphQL
         public IEnumerable<IValidationRule>? ValidationRules { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object?> UserContext { get; set; } = new Dictionary<string, object?>();
 
         /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
         public ComplexityConfiguration? ComplexityConfiguration { get; set; }

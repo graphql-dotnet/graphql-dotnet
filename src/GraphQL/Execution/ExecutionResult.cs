@@ -53,7 +53,7 @@ namespace GraphQL
         /// <summary>
         /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is serialized as part of the GraphQL json response.
         /// </summary>
-        public Dictionary<string, object>? Extensions { get; set; }
+        public Dictionary<string, object?>? Extensions { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all properties set to their defaults.

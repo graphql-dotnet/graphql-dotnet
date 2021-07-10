@@ -188,7 +188,7 @@ namespace GraphQL
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object? GetPropertyValue(this object propertyValue, Type fieldType, IGraphType? mappedType = null)
+        public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType? mappedType = null)
         {
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))

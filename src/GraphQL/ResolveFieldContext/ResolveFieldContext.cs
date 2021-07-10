@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,19 +26,19 @@ namespace GraphQL
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
-        public IResolveFieldContext Parent { get; set; }
+        public IResolveFieldContext? Parent { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue> Arguments { get; set; }
+        public IDictionary<string, ArgumentValue>? Arguments { get; set; }
 
         /// <inheritdoc/>
-        public object RootValue { get; set; }
+        public object? RootValue { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> UserContext { get; set; }
+        public IDictionary<string, object?> UserContext { get; set; }
 
         /// <inheritdoc/>
-        public object Source { get; set; }
+        public object? Source { get; set; }
 
         /// <inheritdoc/>
         public ISchema Schema { get; set; }
@@ -66,13 +68,13 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, Field> SubFields { get; set; }
+        public Dictionary<string, Field>? SubFields { get; set; }
 
         /// <inheritdoc/>
-        public IServiceProvider RequestServices { get; set; }
+        public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Extensions { get; set; }
+        public IDictionary<string, object?> Extensions { get; set; }
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool { get; set; }
@@ -80,7 +82,9 @@ namespace GraphQL
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
         /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ResolveFieldContext() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <summary>
         /// Clone the specified <see cref="IResolveFieldContext"/>.
@@ -130,9 +134,9 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="ResolveFieldContext.Source"/>
-        public new TSource Source
+        public new TSource? Source
         {
-            get => (TSource)base.Source;
+            get => (TSource?)base.Source;
             set => base.Source = value;
         }
     }

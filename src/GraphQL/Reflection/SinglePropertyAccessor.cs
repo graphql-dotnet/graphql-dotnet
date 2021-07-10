@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -20,13 +22,13 @@ namespace GraphQL.Reflection
 
         public Type DeclaringType => _property.DeclaringType;
 
-        public ParameterInfo[] Parameters => null;
+        public ParameterInfo[]? Parameters => null;
 
         public MethodInfo MethodInfo => _property.GetMethod;
 
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => _property.GetCustomAttributes<T>();
 
-        public object GetValue(object target, object[] arguments)
+        public object? GetValue(object target, object?[]? arguments)
         {
             try
             {

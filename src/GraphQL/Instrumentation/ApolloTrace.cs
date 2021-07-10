@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -95,22 +97,22 @@ namespace GraphQL.Instrumentation
             /// <summary>
             /// Gets or sets the path of the field.
             /// </summary>
-            public List<object> Path { get; set; }
+            public List<object>? Path { get; set; }
 
             /// <summary>
             /// Gets or sets the parent graph type name.
             /// </summary>
-            public string ParentType { get; set; }
+            public string? ParentType { get; set; }
 
             /// <summary>
             /// Gets or sets the field name.
             /// </summary>
-            public string FieldName { get; set; }
+            public string? FieldName { get; set; }
 
             /// <summary>
             /// Gets or sets the returned graph type name.
             /// </summary>
-            public string ReturnType { get; set; }
+            public string? ReturnType { get; set; }
         }
     }
 }
