@@ -26,6 +26,6 @@ namespace GraphQL.Execution
         public override object? ToValue() => Result;
 
         /// <inheritdoc cref="ExecutionNode.GraphType"/>
-        public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType;
+        public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType!;
     }
 }

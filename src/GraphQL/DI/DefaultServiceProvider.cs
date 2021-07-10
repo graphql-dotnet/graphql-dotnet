@@ -16,7 +16,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="serviceType">Desired type</param>
         /// <returns>An instance of <paramref name="serviceType"/>.</returns>
-        public object GetService(Type serviceType)
+        public object? GetService(Type serviceType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));

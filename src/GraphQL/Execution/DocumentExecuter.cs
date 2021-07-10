@@ -24,7 +24,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
-        private readonly IEnumerable<IConfigureExecution> _configurations;
+        private readonly IEnumerable<IConfigureExecution>? _configurations;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -59,7 +59,7 @@ namespace GraphQL
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution> configurations)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
             : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
         {
             _configurations = configurations;
