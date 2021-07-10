@@ -40,7 +40,7 @@ namespace GraphQL.Instrumentation
         /// Logs the start of the execution.
         /// </summary>
         /// <param name="operationName">The name of the GraphQL operation.</param>
-        public Metrics Start(string operationName)
+        public Metrics Start(string? operationName)
         {
             if (Enabled)
             {
@@ -58,7 +58,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Sets the name of the GraphQL operation.
         /// </summary>
-        public Metrics SetOperationName(string name)
+        public Metrics SetOperationName(string? name)
         {
             if (Enabled && _main != null)
                 _main.Subject = name;
@@ -69,7 +69,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Records an performance metric.
         /// </summary>
-        public Marker Subject(string category, string subject, Dictionary<string, object>? metadata = null)
+        public Marker Subject(string category, string? subject, Dictionary<string, object>? metadata = null)
         {
             if (!Enabled)
                 return Marker.Empty;

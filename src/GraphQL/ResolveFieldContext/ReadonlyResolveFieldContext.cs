@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -43,11 +42,8 @@ namespace GraphQL
             return this;
         }
 
-        private static readonly IDictionary<string, ArgumentValue> _emptyDictionary = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
-
-        private IDictionary<string, ArgumentValue> GetArguments()
-            => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables)
-            ?? _emptyDictionary;
+        private IDictionary<string, ArgumentValue>? GetArguments()
+            => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
 
         /// <inheritdoc/>
         public object? Source => _executionNode.Source;
@@ -81,7 +77,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue> Arguments => _arguments ??= GetArguments();
+        public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= GetArguments();
 
         /// <inheritdoc/>
         public object? RootValue => _executionContext.RootValue;

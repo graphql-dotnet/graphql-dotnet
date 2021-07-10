@@ -178,7 +178,7 @@ namespace GraphQL
                description: $"Directives applied to the {element}",
                resolve: async context =>
                {
-                   if (context.Source.HasAppliedDirectives())
+                   if (context.Source!.HasAppliedDirectives())
                    {
                        var appliedDirectives = context.Source.GetAppliedDirectives();
                        var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives!.Count);

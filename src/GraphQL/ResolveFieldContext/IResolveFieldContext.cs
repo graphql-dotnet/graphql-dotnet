@@ -37,12 +37,12 @@ namespace GraphQL
         IResolveFieldContext? Parent { get; }
 
         /// <summary>
-        /// A dictionary of arguments passed to the field. It is recommended to use the
-        /// <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// A dictionary of arguments passed to the field, or <see langword="null"/> if no arguments were defined for the field.
+        /// It is recommended to use the <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
         /// and <see cref="ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, ArgumentValue> Arguments { get; }
+        IDictionary<string, ArgumentValue>? Arguments { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object? RootValue { get; }

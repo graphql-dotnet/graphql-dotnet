@@ -29,7 +29,7 @@ namespace GraphQL
         public IResolveFieldContext? Parent { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue> Arguments { get; set; }
+        public IDictionary<string, ArgumentValue>? Arguments { get; set; }
 
         /// <inheritdoc/>
         public object? RootValue { get; set; }
