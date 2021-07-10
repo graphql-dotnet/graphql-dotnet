@@ -31,7 +31,7 @@ namespace GraphQL
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
-        public object GetService(System.Type serviceType) { }
+        public object? GetService(System.Type serviceType) { }
     }
     public static class DirectivesExtensions
     {
@@ -49,11 +49,17 @@ namespace GraphQL
         public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    public sealed class DoNotMapClrTypeAttribute : System.Attribute
+    {
+        public DoNotMapClrTypeAttribute() { }
+    }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution>? configurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQL.Language.AST.Document document, GraphQL.Language.AST.Operation operation, GraphQL.Language.AST.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQL.Language.AST.Operation? GetOperation(string? operationName, GraphQL.Language.AST.Document document) { }
@@ -83,7 +89,7 @@ namespace GraphQL
     {
         public ExecutionError(string message) { }
         public ExecutionError(string message, System.Collections.IDictionary data) { }
-        public ExecutionError(string message, System.Exception exception) { }
+        public ExecutionError(string message, System.Exception? exception) { }
         public string? Code { get; set; }
         public System.Collections.Generic.List<GraphQL.ErrorLocation>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
@@ -177,6 +183,105 @@ namespace GraphQL
         public string Policy { get; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+    }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentCache> documentCacheFactory)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentCache documentCache)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
+            where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
+            where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentListener documentListener)
+            where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentListener> documentListenerFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentWriter> documentWriterFactory)
+            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentWriter documentWriter)
+            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> errorInfoProviderFactory)
+            where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider errorInfoProvider)
+            where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate) { }
+        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
+            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
+            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
+            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
+            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
+            where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchema> schemaFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false)
+            where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
+        public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
+            where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
+        public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
+            where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
+        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions>? action)
+            where TOptions :  class, new () { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class
+            where TImplementation :  class, TService { }
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class { }
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+            where TService :  class
+            where TImplementation :  class, TService { }
     }
     public static class GraphQLExtensions
     {
@@ -383,6 +488,8 @@ namespace GraphQL
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
             where TGraphType : GraphQL.Types.IGraphType { }
+        public static void RegisterTypeMappings(this GraphQL.Types.ISchema schema) { }
+        public static void RegisterTypeMappings(this GraphQL.Types.ISchema schema, System.Reflection.Assembly assembly) { }
         public static void RegisterTypes<TSchema>(this TSchema schema, params GraphQL.Types.IGraphType[] types)
             where TSchema : GraphQL.Types.ISchema { }
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
@@ -618,6 +725,47 @@ namespace GraphQL.Conversion
         public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
 }
+namespace GraphQL.DI
+{
+    public abstract class GraphQLBuilderBase : GraphQL.DI.IGraphQLBuilder
+    {
+        protected GraphQLBuilderBase() { }
+        public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
+            where TOptions :  class, new ();
+        protected virtual void Initialize() { }
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
+        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+    }
+    public interface IConfigureExecution
+    {
+        void Configure(GraphQL.ExecutionOptions executionOptions);
+    }
+    public interface IConfigureSchema
+    {
+        void Configure(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider);
+    }
+    public interface IGraphQLBuilder
+    {
+        GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
+            where TOptions :  class, new ();
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
+        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+    }
+    public enum ServiceLifetime
+    {
+        Singleton = 0,
+        Scoped = 1,
+        Transient = 2,
+    }
+}
 namespace GraphQL.DataLoader
 {
     public interface IDataLoaderResult
@@ -726,10 +874,10 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Language.AST.Field? Field { get; }
         public GraphQL.Types.FieldType? FieldDefinition { get; }
-        public GraphQL.Types.IGraphType GraphType { get; }
+        public GraphQL.Types.IGraphType? GraphType { get; }
         public int? IndexInParentNode { get; }
         public string? Name { get; }
         public GraphQL.Execution.ExecutionNode? Parent { get; }
@@ -842,7 +990,7 @@ namespace GraphQL.Execution
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQL.Language.AST.Field? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
         public virtual GraphQL.Language.AST.SelectionSet? SelectionSet { get; }
         public GraphQL.Execution.ExecutionNode[]? SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
@@ -859,8 +1007,8 @@ namespace GraphQL.Execution
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
-        public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType, GraphQL.Language.AST.SelectionSet selectionSet) { }
-        public override GraphQL.Language.AST.SelectionSet SelectionSet { get; }
+        public RootExecutionNode(GraphQL.Types.IObjectGraphType? graphType, GraphQL.Language.AST.SelectionSet? selectionSet) { }
+        public override GraphQL.Language.AST.SelectionSet? SelectionSet { get; }
     }
     public class SerialExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
@@ -2208,6 +2356,8 @@ namespace GraphQL.Types
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
+        public Schema(System.IServiceProvider services, bool runConfigurations = true) { }
+        public Schema(System.IServiceProvider services, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureSchema> configurations) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public GraphQL.Types.SchemaTypes AllTypes { get; }

@@ -22,7 +22,7 @@ namespace GraphQL.Execution
         /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
         /// Array nodes will be a <see cref="ListGraphType"/> instance.
         /// </summary>
-        public IGraphType GraphType { get; }
+        public IGraphType? GraphType { get; }
 
         /// <summary>
         /// Returns the AST field of this node.
@@ -50,7 +50,7 @@ namespace GraphQL.Execution
             {
                 if (IndexInParentNode.HasValue)
                 {
-                    return ((ListGraphType)Parent!.GraphType).ResolvedType;
+                    return ((ListGraphType?)Parent!.GraphType)?.ResolvedType;
                 }
                 else
                 {
@@ -83,7 +83,7 @@ namespace GraphQL.Execution
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
-        protected ExecutionNode(ExecutionNode? parent, IGraphType graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;

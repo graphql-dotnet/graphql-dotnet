@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
+using GraphQL.DI;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
@@ -34,13 +35,58 @@ namespace GraphQL.Types
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
         /// to create required objects.
+        /// Pulls registered <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and
+        /// executes them.
         /// </summary>
         public Schema(IServiceProvider services)
+            : this(services, true)
+        {
+        }
+
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
+        /// to create required objects.
+        /// If <paramref name="runConfigurations"/> is <see langword="true"/>, pulls registered
+        /// <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and executes them.
+        /// </summary>
+        public Schema(IServiceProvider services, bool runConfigurations = true)
         {
             _services = services;
 
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
+
+            if (runConfigurations)
+            {
+                if (services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
+                {
+                    foreach (var configuration in configurations)
+                    {
+                        configuration.Configure(this, services);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
+        /// to create required objects.
+        /// Executes the specified <see cref="IConfigureSchema"/> instances on the schema, if any.
+        /// </summary>
+        public Schema(IServiceProvider services, IEnumerable<IConfigureSchema> configurations)
+        {
+            _services = services;
+
+            Directives = new SchemaDirectives();
+            Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
+
+            if (configurations != null)
+            {
+                foreach (var configuration in configurations)
+                {
+                    configuration.Configure(this, services);
+                }
+            }
         }
 
         /// <summary>

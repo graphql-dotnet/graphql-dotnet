@@ -21,7 +21,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
         /// </summary>
-        public ObjectExecutionNode(ExecutionNode? parent, IGraphType graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        public ObjectExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
