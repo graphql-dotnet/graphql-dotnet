@@ -20,7 +20,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields!).ConfigureAwait(false);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -40,22 +40,25 @@ namespace GraphQL.Execution
                 if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
-                streams[node.Name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+                var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+
+                if (stream != null)
+                    streams[node.Name!] = stream;
             }
 
             return streams;
         }
 
-        protected virtual async Task<IObservable<ExecutionResult>> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task<IObservable<ExecutionResult>?> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var arguments = ExecutionHelper.GetArgumentValues(
-                node.FieldDefinition.Arguments,
-                node.Field.Arguments,
+                node.FieldDefinition!.Arguments,
+                node.Field!.Arguments,
                 context.Variables);
 
-            object source = (node.Parent != null)
+            object? source = (node.Parent != null)
                 ? node.Parent.Result
                 : context.RootValue;
 
@@ -100,7 +103,7 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value => BuildSubscriptionExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
+                    .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value))
                     .SelectMany(async executionNode =>
                     {
                         if (context.Listeners != null)
@@ -191,6 +194,6 @@ namespace GraphQL.Execution
             string message,
             Field field,
             IEnumerable<object> path,
-            Exception ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
+            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }
 }

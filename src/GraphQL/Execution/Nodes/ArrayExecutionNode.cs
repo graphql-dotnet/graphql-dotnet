@@ -62,7 +62,7 @@ namespace GraphQL.Execution
 
                 if (valueIsNull && !isNullableType)
                 {
-                    if (((ListGraphType)GraphType).ResolvedType is NonNullGraphType)
+                    if (((ListGraphType)GraphType!).ResolvedType is NonNullGraphType)
                     {
                         Items = null;
                         return true;

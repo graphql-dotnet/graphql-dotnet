@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -125,6 +126,47 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
             schema.AutoRegister(typeof(TClrType), mode);
+        }
+
+
+        /// <summary>
+        /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
+        /// the mappings prior to execution.
+        /// </remarks>
+        public static void RegisterTypeMappings(this ISchema schema)
+        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+
+        /// <summary>
+        /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder, Assembly)"/> as it will
+        /// precompute the mappings prior to execution.
+        /// </remarks>
+        public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
+            foreach (var typeMapping in assembly.GetClrTypeMappings())
+            {
+                schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
+            }
         }
 
         /// <summary>

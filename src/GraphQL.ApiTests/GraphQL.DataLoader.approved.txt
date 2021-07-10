@@ -91,6 +91,10 @@ namespace GraphQL.DataLoader
         public DataLoaderResult(T result) { }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
     }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
+    }
     public interface IDataLoader
     {
         System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default);

@@ -37,6 +37,19 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ActivatorUtilities.GetServiceOrCreateInstance(IServiceProvider, Type)"/>
-        public object GetService(Type serviceType) => ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, serviceType);
+        public object GetService(Type serviceType)
+        {
+            // if the type is an interface, attempt to retrieve the interface registration from the
+            // underlying service provider or else return null. (May trigger an exception in a method
+            // calling GetRequiredService, of course.) But for concrete classes, attempt to
+            // create the instance if it is not able to be returned from the service provider.
+            // Note: this does not intelligently choose the constructor but rather tries the first one it encounters.
+            if (serviceType == typeof(IServiceProvider))
+                return this;
+            else if (!serviceType.IsAbstract && serviceType.IsClass && !serviceType.IsGenericTypeDefinition)
+                return ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, serviceType);
+            else
+                return _serviceProvider.GetService(serviceType);
+        }
     }
 }

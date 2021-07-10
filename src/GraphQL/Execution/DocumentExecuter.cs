@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Caching;
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -23,6 +24,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
+        private readonly IEnumerable<IConfigureExecution>? _configurations;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -57,6 +59,12 @@ namespace GraphQL
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
         }
 
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
+        {
+            _configurations = configurations;
+        }
+
         /// <inheritdoc/>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
@@ -66,6 +74,14 @@ namespace GraphQL
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
             if (options.Query == null)
                 throw new InvalidOperationException("Cannot execute request if no query is specified");
+
+            if (_configurations != null)
+            {
+                foreach (var configuration in _configurations)
+                {
+                    configuration.Configure(options);
+                }
+            }
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 

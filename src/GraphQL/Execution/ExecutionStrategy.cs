@@ -335,7 +335,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
-            var listType = (ListGraphType)parent.GraphType;
+            var listType = (ListGraphType)parent.GraphType!;
             var itemType = listType.ResolvedType;
 
             if (itemType is NonNullGraphType nonNullGraphType)
@@ -582,7 +582,7 @@ namespace GraphQL.Execution
                 {
                     throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
-                        $"runtime for field {node.Parent?.GraphType.Name}.{node.Name} " +
+                        $"runtime for field {node.Parent?.GraphType?.Name}.{node.Name} " +
                         $"with value '{result}', received 'null'.");
                 }
 

@@ -37,7 +37,7 @@ namespace GraphQL
         /// <see cref="Code"/> property based on the inner exception. Loads any exception data
         /// from the inner exception into this instance.
         /// </summary>
-        public ExecutionError(string message, Exception exception)
+        public ExecutionError(string message, Exception? exception)
             : base(message, exception)
         {
             SetCode(exception);
@@ -67,13 +67,13 @@ namespace GraphQL
             (Locations ??= new List<ErrorLocation>()).Add(new ErrorLocation(line, column));
         }
 
-        private void SetCode(Exception exception)
+        private void SetCode(Exception? exception)
         {
             if (exception != null)
                 Code = ErrorInfoProvider.GetErrorCode(exception);
         }
 
-        private void SetData(Exception exception)
+        private void SetData(Exception? exception)
         {
             if (exception?.Data != null)
                 SetData(exception.Data);

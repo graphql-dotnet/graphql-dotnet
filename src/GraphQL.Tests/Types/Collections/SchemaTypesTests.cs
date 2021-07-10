@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
@@ -32,6 +34,7 @@ namespace GraphQL.Tests.Types.Collections
             mock.Verify(x => x.GetService(typeof(HumanInputType)), Times.Once);
             mock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
             mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
             mock.VerifyNoOtherCalls();
         }
     }
