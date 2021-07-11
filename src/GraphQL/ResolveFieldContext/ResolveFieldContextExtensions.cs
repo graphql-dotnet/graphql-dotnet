@@ -45,7 +45,7 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg.Value is IDictionary<string, object> inputObject)
+            if (arg.Value is IDictionary<string, object?> inputObject)
             {
                 if (argumentType == typeof(object))
                 {

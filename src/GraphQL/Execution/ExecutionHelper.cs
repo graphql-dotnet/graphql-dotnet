@@ -25,7 +25,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.List)
+            foreach (var arg in definitionArguments.List!)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -49,7 +49,7 @@ namespace GraphQL.Execution
             {
                 // validation rules have verified that this is not null; if the validation rule was not executed, it
                 // is assumed that the caller does not wish this check to be executed
-                return CoerceValue(nonNull.ResolvedType, input, variables, fieldDefault);
+                return CoerceValue(nonNull.ResolvedType!, input, variables, fieldDefault);
             }
 
             if (input == null)
@@ -78,7 +78,7 @@ namespace GraphQL.Execution
 
             if (type is ListGraphType listType)
             {
-                var listItemType = listType.ResolvedType;
+                var listItemType = listType.ResolvedType!;
 
                 if (input is ListValue list)
                 {
@@ -124,7 +124,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType, objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {

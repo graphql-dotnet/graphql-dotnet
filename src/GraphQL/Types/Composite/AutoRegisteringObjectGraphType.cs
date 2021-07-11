@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +27,7 @@ namespace GraphQL.Types
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
-        public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
+        public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[]? excludedProperties)
         {
             AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
         }
@@ -54,7 +56,7 @@ namespace GraphQL.Types
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
-        public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
+        public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object>>[]? excludedProperties)
         {
             AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
         }
@@ -67,7 +69,7 @@ namespace GraphQL.Types
 
     internal static class AutoRegisteringHelper
     {
-        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object>>[] excludedProperties)
+        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object>>[]? excludedProperties)
         {
             type.Name = typeof(TSourceType).GraphQLName();
 

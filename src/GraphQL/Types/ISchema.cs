@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Conversion;
@@ -54,12 +56,12 @@ namespace GraphQL.Types
         /// <summary>
         /// The 'mutation' base graph type; optional.
         /// </summary>
-        IObjectGraphType Mutation { get; set; }
+        IObjectGraphType? Mutation { get; set; }
 
         /// <summary>
         /// The 'subscription' base graph type; optional.
         /// </summary>
-        IObjectGraphType Subscription { get; set; }
+        IObjectGraphType? Subscription { get; set; }
 
         /// <summary>
         /// Returns a list of directives supported by the schema.

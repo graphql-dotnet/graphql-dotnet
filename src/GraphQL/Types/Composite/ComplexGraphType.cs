@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -33,7 +35,7 @@ namespace GraphQL.Types
         /// Returns the <see cref="FieldType"/> for the field matching the specified name that
         /// is configured for this graph type, or <see langword="null"/> if none is found.
         /// </summary>
-        FieldType GetField(string name);
+        FieldType? GetField(string name);
     }
 
     /// <summary>
@@ -70,7 +72,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public FieldType GetField(string name)
+        public FieldType? GetField(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (!string.IsNullOrWhiteSpace(name))
@@ -147,10 +149,10 @@ namespace GraphQL.Types
         public FieldType Field(
             Type type,
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            string? deprecationReason = null)
         {
             return AddField(new FieldType
             {
@@ -177,10 +179,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType Field<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -208,10 +210,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldDelegate<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Delegate resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Delegate? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -240,10 +242,10 @@ namespace GraphQL.Types
         public FieldType FieldAsync(
             Type type,
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
+            string? deprecationReason = null)
         {
             return AddField(new FieldType
             {
@@ -270,10 +272,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -302,10 +304,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType, TReturnType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -323,11 +325,11 @@ namespace GraphQL.Types
 
         public FieldType FieldSubscribe<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<IResolveEventStreamContext, IObservable<object>> subscribe = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveEventStreamContext, IObservable<object?>>? subscribe = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new EventStreamFieldType
@@ -348,11 +350,11 @@ namespace GraphQL.Types
 
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<IResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveEventStreamContext, Task<IObservable<object?>>>? subscribeAsync = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new EventStreamFieldType
@@ -409,7 +411,7 @@ namespace GraphQL.Types
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
            bool nullable = false,
-           Type type = null)
+           Type? type = null)
         {
             try
             {
@@ -451,7 +453,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
-            Type type = null)
+            Type? type = null)
         {
             string name;
             try

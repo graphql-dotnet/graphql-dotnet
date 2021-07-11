@@ -24,7 +24,7 @@ namespace GraphQL
         /// <typeparam name="T">The type to create.</typeparam>
         /// <param name="source">The source of values.</param>
         /// <returns>T.</returns>
-        public static T ToObject<T>(this IDictionary<string, object> source)
+        public static T ToObject<T>(this IDictionary<string, object?> source)
             where T : class
             => (T)ToObject(source, typeof(T));
 
@@ -43,7 +43,7 @@ namespace GraphQL
         /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
-        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType? mappedType = null)
+        public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType? mappedType = null)
         {
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
             string GetPropertyName(string key, out FieldType? field)
@@ -271,7 +271,7 @@ namespace GraphQL
                 fieldType = nullableFieldType;
             }
 
-            if (propertyValue is IDictionary<string, object> objects)
+            if (propertyValue is IDictionary<string, object?> objects)
             {
                 return ToObject(objects, fieldType, mappedType);
             }

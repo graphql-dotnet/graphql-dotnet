@@ -131,18 +131,18 @@ namespace GraphQL
                    typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
         }
 
-        internal static bool IsGraphQLTypeReference(this IGraphType type)
+        internal static bool IsGraphQLTypeReference(this IGraphType? type)
         {
             var (namedType, _) = type.GetNamedTypes();
             return namedType is GraphQLTypeReference;
         }
 
-        internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType type)
+        internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType? type)
         {
             return type switch
             {
-                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type)),
-                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type)),
+                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type!)),
+                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type!)),
                 _ => (type, null)
             };
         }
@@ -316,14 +316,14 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType);
+                    return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType, superType);
+                return IsSubtypeOf(sub.ResolvedType!, superType);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -331,7 +331,7 @@ namespace GraphQL
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType);
+                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!);
                 }
 
                 return false;
@@ -408,7 +408,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType.IsValidDefault(value);
+                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)
@@ -420,7 +420,7 @@ namespace GraphQL
             // the value is not an IEnumerable, convert the value using the list's item type.
             if (type is ListGraphType listType)
             {
-                var itemType = listType.ResolvedType;
+                var itemType = listType.ResolvedType!;
 
                 if (!(value is string) && value is IEnumerable list)
                 {
@@ -459,7 +459,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonnull)
             {
-                var astValue = ToAST(nonnull.ResolvedType, value);
+                var astValue = ToAST(nonnull.ResolvedType!, value);
 
                 if (astValue is NullValue)
                     throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
@@ -481,7 +481,7 @@ namespace GraphQL
             // the value is not an IEnumerable, convert the value using the list's item type.
             if (type is ListGraphType listType)
             {
-                var itemType = listType.ResolvedType;
+                var itemType = listType.ResolvedType!;
 
                 if (!(value is string) && value is IEnumerable list)
                 {

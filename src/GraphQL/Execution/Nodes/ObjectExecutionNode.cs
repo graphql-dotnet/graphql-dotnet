@@ -36,7 +36,7 @@ namespace GraphQL.Execution
             var objectGraphType = GraphType as IObjectGraphType;
 
             if (GraphType is IAbstractGraphType abstractGraphType)
-                objectGraphType = abstractGraphType.GetObjectType(Result, schema);
+                objectGraphType = abstractGraphType.GetObjectType(Result!, schema);
 
             return objectGraphType;
         }

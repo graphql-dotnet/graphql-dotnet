@@ -113,7 +113,7 @@ namespace GraphQL.Execution
                 return objectType;
 
             if (parentType is IAbstractGraphType abstractType)
-                return abstractType.GetObjectType(Parent!.Result, schema);
+                return abstractType.GetObjectType(Parent!.Result!, schema);
 
             return null;
         }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +16,14 @@ namespace GraphQL.Types
     {
         private bool _disposed;
         private IServiceProvider _services;
-        private SchemaTypes _allTypes;
+        private SchemaTypes? _allTypes;
         private readonly object _allTypesInitializationLock = new object();
 
-        private List<Type> _additionalTypes;
-        private List<IGraphType> _additionalInstances;
+        private List<Type>? _additionalTypes;
+        private List<IGraphType>? _additionalInstances;
 
-        private List<Type> _visitorTypes;
-        private List<ISchemaNodeVisitor> _visitors;
+        private List<Type>? _visitorTypes;
+        private List<ISchemaNodeVisitor>? _visitors;
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
@@ -95,7 +97,7 @@ namespace GraphQL.Types
         /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
         /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
         /// <returns>Created schema.</returns>
-        public static Schema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        public static Schema For(string typeDefinitions, Action<SchemaBuilder>? configure = null)
             => For<SchemaBuilder>(typeDefinitions, configure);
 
         /// <summary>
@@ -105,7 +107,7 @@ namespace GraphQL.Types
         /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
         /// <param name="configure">Optional configuration delegate to setup <see cref="SchemaBuilder"/>.</param>
         /// <returns>Created schema.</returns>
-        public static Schema For<TSchemaBuilder>(string typeDefinitions, Action<TSchemaBuilder> configure = null)
+        public static Schema For<TSchemaBuilder>(string typeDefinitions, Action<TSchemaBuilder>? configure = null)
             where TSchemaBuilder : SchemaBuilder, new()
         {
             var builder = new TSchemaBuilder();
@@ -152,16 +154,16 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <inheritdoc/>
-        public IObjectGraphType Query { get; set; }
+        public IObjectGraphType Query { get; set; } = null!;
 
         /// <inheritdoc/>
-        public IObjectGraphType Mutation { get; set; }
+        public IObjectGraphType? Mutation { get; set; }
 
         /// <inheritdoc/>
-        public IObjectGraphType Subscription { get; set; }
+        public IObjectGraphType? Subscription { get; set; }
 
         /// <summary>
         /// Gets the service object of the specified type. Schema itself acts as a service provider used to
@@ -201,7 +203,7 @@ namespace GraphQL.Types
                 if (_allTypes == null)
                     Initialize();
 
-                return _allTypes;
+                return _allTypes!;
             }
         }
 
@@ -293,7 +295,7 @@ namespace GraphQL.Types
             }
         }
 
-        private List<(Type clrType, Type graphType)> _clrToGraphTypeMappings;
+        private List<(Type clrType, Type graphType)>? _clrToGraphTypeMappings;
 
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType, Type graphType)
@@ -328,11 +330,11 @@ namespace GraphQL.Types
             {
                 if (!_disposed)
                 {
-                    _services = null;
-                    Query = null;
+                    _services = null!;
+                    Query = null!;
                     Mutation = null;
                     Subscription = null;
-                    Filter = null;
+                    Filter = null!;
 
                     _additionalInstances?.Clear();
                     _additionalTypes?.Clear();

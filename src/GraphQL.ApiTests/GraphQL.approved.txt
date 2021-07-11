@@ -11,7 +11,7 @@ namespace GraphQL
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
-        public static System.Collections.Generic.List<string> GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
+        public static System.Collections.Generic.List<string>? GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
     }
     [System.Flags]
@@ -399,8 +399,8 @@ namespace GraphQL
     {
         public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType? mappedType = null) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
-        public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
+        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
+        public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
@@ -901,7 +901,7 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
-        protected GraphQL.Types.FieldType GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
+        protected GraphQL.Types.FieldType? GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
         protected virtual GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Execution.ExecutionContext context) { }
         public virtual System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field>? GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         [System.Obsolete]
@@ -1725,13 +1725,13 @@ namespace GraphQL.Resolvers
     }
     public class EventStreamResolver<T> : GraphQL.Resolvers.IEventStreamResolver, GraphQL.Resolvers.IEventStreamResolver<T>
     {
-        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<T>> subscriber) { }
-        public System.IObservable<T> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
+        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<T?>> subscriber) { }
+        public System.IObservable<T?> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class EventStreamResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IEventStreamResolver, GraphQL.Resolvers.IEventStreamResolver<TReturnType>
     {
-        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscriber) { }
-        public System.IObservable<TReturnType> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
+        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType?>> subscriber) { }
+        public System.IObservable<TReturnType?> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class ExpressionFieldResolver<TSourceType, TProperty> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TProperty>
     {
@@ -1799,14 +1799,14 @@ namespace GraphQL.Subscription
     {
         public SubscriptionExecutionResult() { }
         public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
-        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>> Streams { get; set; }
+        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>>? Streams { get; set; }
     }
 }
 namespace GraphQL.Types
 {
     public static class AbstractGraphTypeExtensions
     {
-        public static GraphQL.Types.IObjectGraphType GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value, GraphQL.Types.ISchema schema) { }
+        public static GraphQL.Types.IObjectGraphType? GetObjectType(this GraphQL.Types.IAbstractGraphType abstractType, object value, GraphQL.Types.ISchema schema) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
     public class AppliedDirective : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveArgument>, System.Collections.IEnumerable
@@ -1815,7 +1815,7 @@ namespace GraphQL.Types
         public int ArgumentsCount { get; }
         public string Name { get; set; }
         public GraphQL.Types.AppliedDirective AddArgument(GraphQL.Types.DirectiveArgument argument) { }
-        public GraphQL.Types.DirectiveArgument FindArgument(string argumentName) { }
+        public GraphQL.Types.DirectiveArgument? FindArgument(string argumentName) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveArgument> GetEnumerator() { }
     }
     public class AppliedDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.AppliedDirective>, System.Collections.IEnumerable
@@ -1830,13 +1830,13 @@ namespace GraphQL.Types
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }
-        public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
+        public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
         public AutoRegisteringObjectGraphType() { }
-        public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
+        public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
@@ -1876,27 +1876,27 @@ namespace GraphQL.Types
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
-        public GraphQL.Types.FieldType Field(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType Field(System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type type = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type type = null) { }
-        public GraphQL.Types.FieldType Field<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type? type = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type? type = null) { }
+        public GraphQL.Types.FieldType Field<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null) { }
-        public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>>? resolve = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldDelegate<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Delegate resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldDelegate<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Delegate? resolve = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<object>> subscribe = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<object?>>? subscribe = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldSubscribeAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<object>>> subscribeAsync = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldSubscribeAsync<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<object?>>>? subscribeAsync = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType GetField(string name) { }
+        public GraphQL.Types.FieldType? GetField(string name) { }
         public bool HasField(string name) { }
     }
     public class DateGraphType : GraphQL.Types.ScalarGraphType
@@ -1942,8 +1942,8 @@ namespace GraphQL.Types
     {
         public DirectiveGraphType(string name, params GraphQL.Types.DirectiveLocation[] locations) { }
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
-        public GraphQL.Types.QueryArguments Arguments { get; set; }
-        public string Description { get; set; }
+        public GraphQL.Types.QueryArguments? Arguments { get; set; }
+        public string? Description { get; set; }
         public virtual bool? Introspectable { get; }
         public System.Collections.Generic.List<GraphQL.Types.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
@@ -2030,20 +2030,20 @@ namespace GraphQL.Types
     public class EventStreamFieldType : GraphQL.Types.FieldType
     {
         public EventStreamFieldType() { }
-        public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
-        public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
+        public GraphQL.Resolvers.IAsyncEventStreamResolver? AsyncSubscriber { get; set; }
+        public GraphQL.Resolvers.IEventStreamResolver? Subscriber { get; set; }
     }
     public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
-        public GraphQL.Types.QueryArguments Arguments { get; set; }
-        public object DefaultValue { get; set; }
+        public GraphQL.Types.QueryArguments? Arguments { get; set; }
+        public object? DefaultValue { get; set; }
         public string? DeprecationReason { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string Name { get; set; }
-        public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public GraphQL.Resolvers.IFieldResolver Resolver { get; set; }
-        public System.Type Type { get; set; }
+        public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
+        public System.Type? Type { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2058,7 +2058,7 @@ namespace GraphQL.Types
     {
         public GraphQLTypeReference(string typeName) { }
         public GraphQL.Types.Interfaces Interfaces { get; }
-        public System.Func<object, bool> IsTypeOf { get; set; }
+        public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public string TypeName { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
@@ -2069,7 +2069,7 @@ namespace GraphQL.Types
     {
         protected GraphType() { }
         public string? DeprecationReason { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object obj) { }
@@ -2088,25 +2088,25 @@ namespace GraphQL.Types
     public interface IAbstractGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
+        System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         void AddPossibleType(GraphQL.Types.IObjectGraphType type);
     }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.TypeFields Fields { get; }
         GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType);
-        GraphQL.Types.FieldType GetField(string name);
+        GraphQL.Types.FieldType? GetField(string name);
         bool HasField(string name);
     }
     public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
-        GraphQL.Types.QueryArguments Arguments { get; set; }
+        GraphQL.Types.QueryArguments? Arguments { get; set; }
         string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
-        object DefaultValue { get; }
+        object? DefaultValue { get; }
     }
     public interface IImplementInterfaces
     {
@@ -2116,8 +2116,8 @@ namespace GraphQL.Types
     public interface IInputObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         bool IsValidDefault(object value);
-        object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value);
-        GraphQL.Language.AST.IValue ToAST(object value);
+        object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
+        GraphQL.Language.AST.IValue? ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
@@ -2126,7 +2126,7 @@ namespace GraphQL.Types
     }
     public interface IObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
-        System.Func<object, bool> IsTypeOf { get; set; }
+        System.Func<object, bool>? IsTypeOf { get; set; }
         void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IProvideDeprecationReason
@@ -2139,14 +2139,14 @@ namespace GraphQL.Types
     }
     public interface IProvideMetadata
     {
-        System.Collections.Generic.Dictionary<string, object> Metadata { get; }
-        TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
-        TType GetMetadata<TType>(string key, TType defaultValue = default);
+        System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
+        TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory);
+        TType? GetMetadata<TType>(string key, TType? defaultValue = default);
         bool HasMetadata(string key);
     }
     public interface IProvideResolvedType
     {
-        GraphQL.Types.IGraphType ResolvedType { get; set; }
+        GraphQL.Types.IGraphType? ResolvedType { get; set; }
     }
     public interface ISchema : GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2163,11 +2163,11 @@ namespace GraphQL.Types
         GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         bool Initialized { get; }
-        GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         GraphQL.Conversion.INameConverter NameConverter { get; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
@@ -2201,8 +2201,8 @@ namespace GraphQL.Types
     {
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
-        public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object> value) { }
-        public virtual GraphQL.Language.AST.IValue ToAST(object value) { }
+        public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
+        public virtual GraphQL.Language.AST.IValue? ToAST(object value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2219,7 +2219,7 @@ namespace GraphQL.Types
     {
         public InterfaceGraphType() { }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
+        public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
@@ -2240,9 +2240,9 @@ namespace GraphQL.Types
     }
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public ListGraphType(GraphQL.Types.IGraphType type) { }
-        public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public virtual System.Type Type { get; }
+        public ListGraphType(GraphQL.Types.IGraphType? type) { }
+        public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public virtual System.Type? Type { get; }
         public override string ToString() { }
     }
     public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
@@ -2260,9 +2260,9 @@ namespace GraphQL.Types
     }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public NonNullGraphType(GraphQL.Types.IGraphType type) { }
-        public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public virtual System.Type Type { get; }
+        public NonNullGraphType(GraphQL.Types.IGraphType? type) { }
+        public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public virtual System.Type? Type { get; }
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
@@ -2277,14 +2277,14 @@ namespace GraphQL.Types
     }
     public static class ObjectGraphTypeExtensions
     {
-        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext, object> resolve = null) { }
-        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve = null) { }
+        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, object?>? resolve = null) { }
+        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object?>>? resolve = null) { }
     }
     public class ObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public ObjectGraphType() { }
         public GraphQL.Types.Interfaces Interfaces { get; }
-        public System.Func<object, bool> IsTypeOf { get; set; }
+        public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public void Interface(System.Type type) { }
@@ -2320,7 +2320,7 @@ namespace GraphQL.Types
         public int Count { get; }
         public GraphQL.Types.QueryArgument this[int index] { get; set; }
         public void Add(GraphQL.Types.QueryArgument argument) { }
-        public GraphQL.Types.QueryArgument Find(string name) { }
+        public GraphQL.Types.QueryArgument? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
     public class ResolvedInterfaces : System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType>, System.Collections.IEnumerable
@@ -2366,17 +2366,17 @@ namespace GraphQL.Types
                 "graphType"})]
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> BuiltInTypeMappings { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
         public GraphQL.ExperimentalFeatures Features { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
-        public GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        public GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        public GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        public GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
@@ -2393,8 +2393,8 @@ namespace GraphQL.Types
         public void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor) { }
         public void RegisterVisitor(System.Type type) { }
         protected virtual void Validate() { }
-        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
-        public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder> configure = null)
+        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder>? configure = null) { }
+        public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder>? configure = null)
             where TSchemaBuilder : GraphQL.Utilities.SchemaBuilder, new () { }
     }
     public class SchemaDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType>, System.Collections.IEnumerable
@@ -2404,7 +2404,7 @@ namespace GraphQL.Types
         public virtual GraphQL.Types.DeprecatedDirective Deprecated { get; }
         public virtual GraphQL.Types.IncludeDirective Include { get; }
         public virtual GraphQL.Types.SkipDirective Skip { get; }
-        public GraphQL.Types.DirectiveGraphType Find(string name) { }
+        public GraphQL.Types.DirectiveGraphType? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveGraphType> GetEnumerator() { }
         public void Register(GraphQL.Types.DirectiveGraphType directive) { }
         public void Register(params GraphQL.Types.DirectiveGraphType[] directives) { }
@@ -2415,7 +2415,7 @@ namespace GraphQL.Types
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> Dictionary { get; }
-        public GraphQL.Types.IGraphType this[string typeName] { get; }
+        public GraphQL.Types.IGraphType? this[string typeName] { get; }
         protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
@@ -2459,9 +2459,9 @@ namespace GraphQL.Types
     public static class TypeExtensions
     {
         public static string FullName(this GraphQL.Language.AST.IType type) { }
-        public static GraphQL.Types.IGraphType GraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
+        public static GraphQL.Types.IGraphType? GraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
         public static string Name(this GraphQL.Language.AST.IType type) { }
-        public static GraphQL.Types.IGraphType NamedGraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
+        public static GraphQL.Types.IGraphType? NamedGraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
     }
     public class TypeFields : System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType>, System.Collections.IEnumerable
     {
@@ -2469,7 +2469,7 @@ namespace GraphQL.Types
         public int Count { get; }
         public bool Contains(GraphQL.Types.FieldType field) { }
         public bool Contains(GraphQL.Types.IFieldType field) { }
-        public GraphQL.Types.FieldType Find(string name) { }
+        public GraphQL.Types.FieldType? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
     }
     public class UIntGraphType : GraphQL.Types.ScalarGraphType
@@ -2497,7 +2497,7 @@ namespace GraphQL.Types
     {
         public UnionGraphType() { }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
+        public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
         public void Type(System.Type type) { }
@@ -2660,7 +2660,7 @@ namespace GraphQL.Utilities
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
-        public System.Collections.Generic.Dictionary<string, object> Metadata { get; }
+        public System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
         public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
         public TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory) { }
         public TType? GetMetadata<TType>(string key, TType? defaultValue = default) { }

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +30,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Searches the list for a field specified by its name and returns it.
         /// </summary>
-        public FieldType Find(string name)
+        public FieldType? Find(string name)
         {
             foreach (var field in List)
             {
