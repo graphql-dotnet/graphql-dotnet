@@ -17,7 +17,7 @@ namespace GraphQL.Instrumentation
             {
                 { "typeName", context.ParentType.Name },
                 { "fieldName", context.FieldAst.Name },
-                { "returnTypeName", context.FieldDefinition.ResolvedType.ToString() },
+                { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
                 { "path", context.Path },
             };
 

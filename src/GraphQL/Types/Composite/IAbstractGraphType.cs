@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace GraphQL.Types
@@ -11,7 +13,7 @@ namespace GraphQL.Types
         /// Gets or sets a delegate that can be used to determine the proper graph type for the specified object value. See
         /// <see cref="AbstractGraphTypeExtensions.GetObjectType(IAbstractGraphType, object, ISchema)"/> for more details.
         /// </summary>
-        Func<object, IObjectGraphType> ResolveType { get; set; }
+        Func<object, IObjectGraphType?>? ResolveType { get; set; }
 
         /// <summary>
         /// Returns a set of possible types for this abstract graph type.
@@ -49,7 +51,7 @@ namespace GraphQL.Types
         /// the best graph type to use. Otherwise, <see cref="IObjectGraphType.IsTypeOf"/> is called on each possible
         /// graph type supported by the abstract graph type to determine if a match can be found.
         /// </summary>
-        public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
+        public static IObjectGraphType? GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
         {
             var result = abstractType.ResolveType != null
                 ? abstractType.ResolveType(value)
@@ -60,7 +62,7 @@ namespace GraphQL.Types
 
             return result;
 
-            static IObjectGraphType GetTypeOf(IAbstractGraphType abstractType, object value)
+            static IObjectGraphType? GetTypeOf(IAbstractGraphType abstractType, object value)
             {
                 foreach (var possible in abstractType.PossibleTypes.List)
                 {

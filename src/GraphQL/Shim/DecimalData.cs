@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL
 {
     // * DESCRIPTION TAKEN FROM MS REFERENCE SOURCE *

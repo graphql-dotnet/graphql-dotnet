@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using GraphQL.Resolvers;
@@ -11,11 +13,11 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class FieldType : MetadataProvider, IFieldType
     {
-        private string _name;
+        private string? _name;
         /// <inheritdoc/>
         public string Name
         {
-            get => _name;
+            get => _name ?? throw new InvalidOperationException("Name has not yet been set on this field definition.");
             set => SetName(value, validate: true);
         }
 
@@ -33,7 +35,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <inheritdoc/>
         public string? DeprecationReason
@@ -45,13 +47,13 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the default value of the field. Only applies to fields of input object graph types.
         /// </summary>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
-        private Type _type;
+        private Type? _type;
         /// <summary>
         /// Gets or sets the graph type of this field.
         /// </summary>
-        public Type Type
+        public Type? Type
         {
             get => _type;
             set
@@ -67,14 +69,14 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the graph type of this field.
         /// </summary>
-        public IGraphType ResolvedType { get; set; }
+        public IGraphType? ResolvedType { get; set; }
 
         /// <inheritdoc/>
-        public QueryArguments Arguments { get; set; }
+        public QueryArguments? Arguments { get; set; }
 
         /// <summary>
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
         /// </summary>
-        public IFieldResolver Resolver { get; set; }
+        public IFieldResolver? Resolver { get; set; }
     }
 }

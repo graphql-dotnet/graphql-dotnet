@@ -12,23 +12,23 @@ namespace GraphQL.Utilities
     /// </summary>
     public class MetadataProvider : IProvideMetadata
     {
-        private Dictionary<string, object>? _metadata;
+        private Dictionary<string, object?>? _metadata;
 
         /// <inheritdoc />
-        public Dictionary<string, object> Metadata => _metadata ??= new Dictionary<string, object>();
+        public Dictionary<string, object?> Metadata => _metadata ??= new Dictionary<string, object?>();
 
         /// <inheritdoc />
         public TType? GetMetadata<TType>(string key, TType? defaultValue = default)
         {
             var local = _metadata;
-            return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValue;
+            return local != null && local.TryGetValue(key, out object? item) ? (TType?)item : defaultValue;
         }
 
         /// <inheritdoc />
         public TType? GetMetadata<TType>(string key, Func<TType?> defaultValueFactory)
         {
             var local = _metadata;
-            return local != null && local.TryGetValue(key, out object item) ? (TType)item : defaultValueFactory();
+            return local != null && local.TryGetValue(key, out object? item) ? (TType?)item : defaultValueFactory();
         }
 
         /// <inheritdoc />

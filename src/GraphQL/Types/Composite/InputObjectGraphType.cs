@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
@@ -14,7 +16,7 @@ namespace GraphQL.Types
         /// much like a field resolver does for output objects. For example, you can set some 'computed'
         /// properties for your input object which were not passed in the GraphQL request.
         /// </summary>
-        object ParseDictionary(IDictionary<string, object> value);
+        object ParseDictionary(IDictionary<string, object?> value);
 
         /// <summary>
         /// Returns a boolean indicating if the provided value is valid as a default value for a
@@ -27,7 +29,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return <see langword="null"/> for a failed conversion.
         /// </summary>
-        IValue ToAST(object value);
+        IValue? ToAST(object value);
     }
 
     /// <inheritdoc/>
@@ -46,10 +48,10 @@ namespace GraphQL.Types
         /// much like a field resolver does for output objects. For example, you can set some 'computed'
         /// properties for your input object which were not passed in the GraphQL request.
         /// </summary>
-        public virtual object ParseDictionary(IDictionary<string, object> value)
+        public virtual object ParseDictionary(IDictionary<string, object?> value)
         {
             if (value == null)
-                return null;
+                return null!;
 
             // for InputObjectGraphType just return the dictionary
             if (typeof(TSourceType) == typeof(object))
@@ -71,7 +73,7 @@ namespace GraphQL.Types
         /// overridden to support introspection of fields of this type that have default values. This method
         /// is not otherwise needed to be implemented.
         /// </summary>
-        public virtual IValue ToAST(object value)
+        public virtual IValue? ToAST(object value)
         {
             throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
         }

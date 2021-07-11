@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Reflection;
 using GraphQL.Utilities;
@@ -14,7 +16,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance of the graph type.
         /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         protected GraphType()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
             {
@@ -35,7 +39,7 @@ namespace GraphQL.Types
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
-                return attr.Name;
+                return attr!.Name;
             }
 
             string name = type.Name;
@@ -80,7 +84,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <inheritdoc/>
         public string? DeprecationReason

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.ComponentModel;
 
 namespace GraphQL.Types

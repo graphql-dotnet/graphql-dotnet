@@ -177,7 +177,7 @@ namespace GraphQL.Execution
         protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
-                graphType = nonNullFieldType.ResolvedType;
+                graphType = nonNullFieldType.ResolvedType!;
 
             return graphType switch
             {

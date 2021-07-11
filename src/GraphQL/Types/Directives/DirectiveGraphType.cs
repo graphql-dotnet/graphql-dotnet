@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Utilities;
@@ -61,7 +63,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the description of the directive.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Indicates whether the directive and its usages for schema elements should return in response
@@ -83,7 +85,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets a list of arguments for the directive.
         /// </summary>
-        public QueryArguments Arguments { get; set; }
+        public QueryArguments? Arguments { get; set; }
 
         /// <summary>
         /// Returns a list of locations where the directive can be applied.

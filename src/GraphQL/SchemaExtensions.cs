@@ -233,7 +233,7 @@ namespace GraphQL
 
                 if (directive.Arguments?.Count > 0)
                 {
-                    foreach (var argument in directive.Arguments.List)
+                    foreach (var argument in directive.Arguments.List!)
                         visitor.VisitDirectiveArgumentDefinition(argument, directive, schema);
                 }
             }
@@ -263,7 +263,7 @@ namespace GraphQL
                             visitor.VisitInterfaceFieldDefinition(field, iface, schema);
                             if (field.Arguments?.Count > 0)
                             {
-                                foreach (var argument in field.Arguments.List)
+                                foreach (var argument in field.Arguments.List!)
                                     visitor.VisitInterfaceFieldArgumentDefinition(argument, field, iface, schema);
                             }
                         }
@@ -276,7 +276,7 @@ namespace GraphQL
                             visitor.VisitObjectFieldDefinition(field, output, schema);
                             if (field.Arguments?.Count > 0)
                             {
-                                foreach (var argument in field.Arguments.List)
+                                foreach (var argument in field.Arguments.List!)
                                     visitor.VisitObjectFieldArgumentDefinition(argument, field, output, schema);
                             }
                         }

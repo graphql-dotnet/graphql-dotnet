@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Diagnostics;
 
@@ -25,7 +27,7 @@ namespace GraphQL.Types
         public string TypeName { get; private set; }
 
         /// <inheritdoc/>
-        public Func<object, bool> IsTypeOf
+        public Func<object, bool>? IsTypeOf
         {
             get => throw Invalid();
             set => throw Invalid();

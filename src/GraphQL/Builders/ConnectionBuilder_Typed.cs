@@ -15,7 +15,7 @@ namespace GraphQL.Builders
     /// </summary>
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        private bool IsBidirectional => FieldType.Arguments.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
+        private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
         private int? PageSizeFromMetadata
         {
@@ -145,7 +145,7 @@ namespace GraphQL.Builders
                 Name = name,
             };
             configure?.Invoke(arg);
-            FieldType.Arguments.Add(arg);
+            FieldType.Arguments!.Add(arg);
             return this;
         }
 

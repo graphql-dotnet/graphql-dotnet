@@ -54,7 +54,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual IObjectGraphType GetOperationRootType(ExecutionContext context)
         {
-            IObjectGraphType type;
+            IObjectGraphType? type;
 
             switch (context.Operation.OperationType)
             {
@@ -102,7 +102,7 @@ namespace GraphQL.Execution
         protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
-                graphType = nonNullFieldType.ResolvedType;
+                graphType = nonNullFieldType.ResolvedType!;
 
             return graphType switch
             {
@@ -131,7 +131,7 @@ namespace GraphQL.Execution
                 var directive = directives.Find(context.Schema.Directives.Skip.Name);
                 if (directive != null)
                 {
-                    var arg = context.Schema.Directives.Skip.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Skip.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
                     if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
@@ -142,7 +142,7 @@ namespace GraphQL.Execution
                 directive = directives.Find(context.Schema.Directives.Include.Name);
                 if (directive != null)
                 {
-                    var arg = context.Schema.Directives.Include.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Include.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
                     return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
@@ -177,7 +177,7 @@ namespace GraphQL.Execution
                 if (fieldDefinition == null)
                     throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{parentType.Name}'.");
 
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
+                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
 
                 subFields[i++] = node;
             }
@@ -192,7 +192,7 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -219,7 +219,7 @@ namespace GraphQL.Execution
         public virtual Dictionary<string, Field>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
-                ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType, node.Field.SelectionSet, null)
+                ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
                 : null;
         }
 
@@ -336,10 +336,10 @@ namespace GraphQL.Execution
         protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType!;
-            var itemType = listType.ResolvedType;
+            var itemType = listType.ResolvedType!;
 
             if (itemType is NonNullGraphType nonNullGraphType)
-                itemType = nonNullGraphType.ResolvedType;
+                itemType = nonNullGraphType.ResolvedType!;
 
             if (!(parent.Result is IEnumerable data))
             {
