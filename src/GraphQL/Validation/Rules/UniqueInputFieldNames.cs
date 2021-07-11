@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -28,10 +30,10 @@ namespace GraphQL.Validation.Rules
                     {
                         var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
 
-                        knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames);
+                        knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                     },
-                    leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack.Pop()),
+                    leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop()),
 
                 new MatchingNodeVisitor<ObjectField>(
                     leave: (objField, context) =>

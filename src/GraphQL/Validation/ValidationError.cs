@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
@@ -16,7 +18,7 @@ namespace GraphQL.Validation
 
         /// <inheritdoc cref="ValidationError(string, string, string, INode[])"/>
         public ValidationError(string originalQuery, string number, string message, INode node)
-            : this(originalQuery, number, message, (Exception)null, node)
+            : this(originalQuery, number, message, (Exception?)null, node)
         {
         }
 
@@ -34,7 +36,7 @@ namespace GraphQL.Validation
             string originalQuery,
             string number,
             string message,
-            Exception innerException,
+            Exception? innerException,
             INode node)
             : base(message, innerException)
         {
@@ -58,8 +60,8 @@ namespace GraphQL.Validation
             string originalQuery,
             string number,
             string message,
-            Exception innerException,
-            params INode[] nodes)
+            Exception? innerException,
+            params INode[]? nodes)
             : base(message, innerException)
         {
             Code = GetValidationErrorCode(GetType());

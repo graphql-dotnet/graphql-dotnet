@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using GraphQL.Language.AST;
 
@@ -10,13 +12,13 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : INodeVisitor
         where TNode : INode
     {
-        private readonly Action<TNode, ValidationContext> _enter;
-        private readonly Action<TNode, ValidationContext> _leave;
+        private readonly Action<TNode, ValidationContext>? _enter;
+        private readonly Action<TNode, ValidationContext>? _leave;
 
         /// <summary>
         /// Returns a new instance configured with the specified enter/leave delegates.
         /// </summary>
-        public MatchingNodeVisitor(Action<TNode, ValidationContext> enter = null, Action<TNode, ValidationContext> leave = null)
+        public MatchingNodeVisitor(Action<TNode, ValidationContext>? enter = null, Action<TNode, ValidationContext>? leave = null)
         {
             if (enter == null && leave == null)
             {
@@ -52,14 +54,14 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode, TState> : INodeVisitor
         where TNode : INode
     {
-        private readonly Action<TNode, ValidationContext, TState> _enter;
-        private readonly Action<TNode, ValidationContext, TState> _leave;
-        private readonly TState _state;
+        private readonly Action<TNode, ValidationContext, TState?>? _enter;
+        private readonly Action<TNode, ValidationContext, TState?>? _leave;
+        private readonly TState? _state;
 
         /// <summary>
         /// Returns a new instance configured with the specified enter/leave delegates and arbitrary state.
         /// </summary>
-        public MatchingNodeVisitor(TState state, Action<TNode, ValidationContext, TState> enter = null, Action<TNode, ValidationContext, TState> leave = null)
+        public MatchingNodeVisitor(TState? state, Action<TNode, ValidationContext, TState?>? enter = null, Action<TNode, ValidationContext, TState?>? leave = null)
         {
             if (enter == null && leave == null)
             {
