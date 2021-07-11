@@ -39,7 +39,7 @@ namespace GraphQL.Types
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
-                return attr!.Name;
+                return attr!.Name!;
             }
 
             string name = type.Name;
