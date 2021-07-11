@@ -17,7 +17,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public string Name
         {
-            get => _name ?? throw new InvalidOperationException("Name has not yet been set on this field definition.");
+            get => _name!;
             set => SetName(value, validate: true);
         }
 
