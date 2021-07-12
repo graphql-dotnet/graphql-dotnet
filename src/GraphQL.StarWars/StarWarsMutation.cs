@@ -31,17 +31,6 @@ namespace GraphQL.StarWars
                 .WithScope()
                 .WithService<IStarWarsDataRespository>()
                 .Resolve((context, starWarsDataRespository) => starWarsDataRespository.AddCharacter(context.GetArgument<Human>("human")));
-
-            //Field<HumanType>(
-            //    "createHuman",
-            //    arguments: new QueryArguments(
-            //        new QueryArgument<NonNullGraphType<HumanInputType>> { Name = "human" }
-            //    ),
-            //    resolve: context =>
-            //    {
-            //        var human = context.GetArgument<Human>("human");
-            //        return data.AddCharacter(human);
-            //    });
         }
     }
 }
