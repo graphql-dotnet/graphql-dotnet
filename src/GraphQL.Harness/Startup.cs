@@ -3,6 +3,7 @@ using Example;
 using GraphQL.Instrumentation;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
+using GraphQL.StarWars.DataRepository;
 using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,8 +51,11 @@ namespace GraphQL.Harness
                     }
                 });
 
-            // add something like repository
+            // register static data
             services.AddSingleton<StarWarsData>();
+
+            // register repository
+            services.AddSingleton<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add infrastructure stuff
             services.AddHttpContextAccessor();

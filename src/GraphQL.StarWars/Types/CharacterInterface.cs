@@ -11,7 +11,6 @@ namespace GraphQL.StarWars.Types
 
             Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.", resolve: context => context.Source.Id);
             Field<StringGraphType>("name", "The name of the character.", resolve: context => context.Source.Name);
-
             Field<ListGraphType<CharacterInterface>>("friends");
             Field<ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>>("friendsConnection");
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
