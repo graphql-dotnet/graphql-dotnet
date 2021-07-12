@@ -54,7 +54,7 @@ namespace GraphQL.Harness
             // register static data
             services.AddSingleton<StarWarsData>();
 
-            //reister repository
+            // register repository
             services.AddSingleton<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add infrastructure stuff
