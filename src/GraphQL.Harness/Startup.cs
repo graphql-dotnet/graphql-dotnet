@@ -38,8 +38,10 @@ namespace GraphQL.Harness
                 return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions });
             });
 
-            // add something like repository
-            // services.AddSingleton<StarWarsData>();
+            // register static data
+            services.AddSingleton<StarWarsData>();
+
+            // register repository
             services.AddScoped<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add graph types
