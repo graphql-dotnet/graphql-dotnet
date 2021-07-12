@@ -70,20 +70,20 @@ namespace GraphQL.StarWars.DataRepository
             return character;
         }
 
-        public Task<Human> GetHumanByIdAsync(string id)
+        public async Task<Human> GetHumanByIdAsync(string id)
         {
             var match = _characters.FirstOrDefault(h => h.Id == id);
             var human = match is Human asHuman ? asHuman : null;
 
-            return Task.FromResult(human);
+            return await Task.FromResult(human);
         }
 
-        public Task<Droid> GetDroidByIdAsync(string id)
+        public async Task<Droid> GetDroidByIdAsync(string id)
         {
             var match = _characters.FirstOrDefault(h => h.Id == id);
             var droid = match is Droid asHuman ? asHuman : null;
 
-            return Task.FromResult(droid);
+            return await Task.FromResult(droid);
         }
 
         public Task<List<StarWarsCharacter>> GetCharactersAsync(List<string> guids)

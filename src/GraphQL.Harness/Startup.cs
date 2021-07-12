@@ -4,9 +4,7 @@ using GraphQL.Instrumentation;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.DataRepository;
-using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -56,31 +54,8 @@ namespace GraphQL.Harness
             // register static data
             services.AddSingleton<StarWarsData>();
 
-            // register repository
-            services.AddScoped<IStarWarsDataRespository, StarWarsDataRespository>();
-
-            // add graph types
-            services.AddSingleton<StarWarsQuery>();
-            services.AddSingleton<StarWarsMutation>();
-            services.AddSingleton<HumanType>();
-            services.AddSingleton<HumanInputType>();
-            services.AddSingleton<DroidType>();
-            services.AddSingleton<CharacterInterface>();
-            services.AddSingleton<EpisodeEnum>();
-
-            // add schema
-            services.AddSingleton<ISchema, StarWarsSchema>(services =>
-            {
-                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                var schema = new StarWarsSchema(services);
-                if (settings.Value.EnableMetrics)
-                {
-                    var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
-                    foreach (var middleware in middlewares)
-                        schema.FieldMiddleware.Use(middleware);
-                }
-                return schema;
-            });
+            //reister repository
+            services.AddSingleton<IStarWarsDataRespository, StarWarsDataRespository>();
 
             // add infrastructure stuff
             services.AddHttpContextAccessor();
