@@ -1,8 +1,8 @@
 using System;
-using GraphQL.StarWars.Types;
-using GraphQL.Types;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars.DataRepository;
+using GraphQL.StarWars.Types;
+using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.StarWars
