@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +18,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns a list of children nodes. If the node doesn't have children, returns <see langword="null"/>.
         /// </summary>
-        IEnumerable<INode> Children { get; }
+        IEnumerable<INode>? Children { get; }
 
         /// <summary>
         /// Visits every child node with the specified delegate and state. If the node doesn't have children, does nothing.

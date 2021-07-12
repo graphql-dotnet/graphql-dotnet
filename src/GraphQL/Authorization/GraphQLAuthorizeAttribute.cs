@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Utilities;
 
 namespace GraphQL

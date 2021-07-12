@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +30,7 @@ namespace GraphQL.Execution
             await ExecuteNodeTreeAsync(context, rootNode).ConfigureAwait(false);
 
             // After the entire node tree has been executed, get the values
-            object data = rootNode.PropagateNull() ? null : rootNode;
+            object? data = rootNode.PropagateNull() ? null : rootNode;
 
             return new ExecutionResult
             {
@@ -52,7 +54,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual IObjectGraphType GetOperationRootType(ExecutionContext context)
         {
-            IObjectGraphType type;
+            IObjectGraphType? type;
 
             switch (context.Operation.OperationType)
             {
@@ -100,7 +102,7 @@ namespace GraphQL.Execution
         protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
-                graphType = nonNullFieldType.ResolvedType;
+                graphType = nonNullFieldType.ResolvedType!;
 
             return graphType switch
             {
@@ -129,18 +131,22 @@ namespace GraphQL.Execution
                 var directive = directives.Find(context.Schema.Directives.Skip.Name);
                 if (directive != null)
                 {
-                    var arg = context.Schema.Directives.Skip.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Skip.Arguments!.Find("if")!;
 
+#pragma warning disable CS8605 // Unboxing a possibly null value.
                     if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
+#pragma warning restore CS8605 // Unboxing a possibly null value.
                         return false;
                 }
 
                 directive = directives.Find(context.Schema.Directives.Include.Name);
                 if (directive != null)
                 {
-                    var arg = context.Schema.Directives.Include.Arguments.Find("if");
+                    var arg = context.Schema.Directives.Include.Arguments!.Find("if")!;
 
+#pragma warning disable CS8605 // Unboxing a possibly null value.
                     return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
                 }
             }
 
@@ -155,9 +161,9 @@ namespace GraphQL.Execution
         {
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
 
-            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema), parent.SelectionSet, fields);
+            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema)!, parent.SelectionSet!, fields);
 
-            var parentType = parent.GetObjectGraphType(context.Schema);
+            var parentType = parent.GetObjectGraphType(context.Schema)!;
 
             var subFields = new ExecutionNode[fields.Count];
 
@@ -171,7 +177,7 @@ namespace GraphQL.Execution
                 if (fieldDefinition == null)
                     throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{parentType.Name}'.");
 
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
+                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
 
                 subFields[i++] = node;
             }
@@ -186,7 +192,7 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -210,10 +216,10 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<string, Field> GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, Field>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
-                ? CollectFieldsFrom(context, node.FieldDefinition.ResolvedType, node.Field.SelectionSet, null)
+                ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
                 : null;
         }
 
@@ -230,14 +236,14 @@ namespace GraphQL.Execution
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Dictionary<string, Field> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields)
+        protected virtual Dictionary<string, Field> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field>? fields)
         {
             fields ??= new Dictionary<string, Field>();
-            List<string> visitedFragmentNames = null;
+            List<string>? visitedFragmentNames = null;
             CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields, ref List<string> visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields, ref List<string>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
             {
                 if (selectionSet != null)
                 {
@@ -280,7 +286,7 @@ namespace GraphQL.Execution
                     fields[name] = new Field(original.AliasNode, original.NameNode)
                     {
                         Arguments = original.Arguments,
-                        SelectionSet = original.SelectionSet.Merge(field.SelectionSet),
+                        SelectionSet = original.SelectionSet!.Merge(field.SelectionSet!),
                         Directives = original.Directives,
                         SourceLocation = original.SourceLocation,
                     };
@@ -329,11 +335,11 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
-            var listType = (ListGraphType)parent.GraphType;
-            var itemType = listType.ResolvedType;
+            var listType = (ListGraphType)parent.GraphType!;
+            var itemType = listType.ResolvedType!;
 
             if (itemType is NonNullGraphType nonNullGraphType)
-                itemType = nonNullGraphType.ResolvedType;
+                itemType = nonNullGraphType.ResolvedType!;
 
             if (!(parent.Result is IEnumerable data))
             {
@@ -361,7 +367,7 @@ namespace GraphQL.Execution
             // local function uses 'struct closure' without heap allocation
             void SetArrayItemNode(object d)
             {
-                var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                var node = BuildExecutionNode(parent, itemType, parent.Field!, parent.FieldDefinition!, index++);
                 node.Result = d;
 
                 if (!(d is IDataLoaderResult))
@@ -387,10 +393,10 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                ReadonlyResolveFieldContext? resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
-                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
+                var resolver = node.FieldDefinition!.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
 
                 if (result is Task task)
@@ -522,7 +528,7 @@ namespace GraphQL.Execution
             if (context.ThrowOnUnhandledException)
                 return true;
 
-            UnhandledExceptionContext exceptionContext = null;
+            UnhandledExceptionContext? exceptionContext = null;
             if (context.UnhandledExceptionDelegate != null)
             {
                 // be sure not to re-use this instance of `IResolveFieldContext`
@@ -549,7 +555,7 @@ namespace GraphQL.Execution
         {
             var result = node.Result;
 
-            IGraphType fieldType = node.ResolvedType;
+            IGraphType? fieldType = node.ResolvedType;
             var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is NonNullGraphType nonNullType)
@@ -576,7 +582,7 @@ namespace GraphQL.Execution
                 {
                     throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
-                        $"runtime for field {node.Parent.GraphType.Name}.{node.Name} " +
+                        $"runtime for field {node.Parent?.GraphType?.Name}.{node.Name} " +
                         $"with value '{result}', received 'null'.");
                 }
 

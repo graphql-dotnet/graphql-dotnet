@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -29,12 +31,12 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the contained name.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; }
 
-        IEnumerable<INode> INode.Children => null;
+        IEnumerable<INode>? INode.Children => null;
 
         /// <inheritdoc/>
         public void Visit<TState>(Action<INode, TState> action, TState state) { }

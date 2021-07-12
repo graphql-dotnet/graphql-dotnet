@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 
 namespace GraphQL.Execution
@@ -13,6 +15,6 @@ namespace GraphQL.Execution
         /// A custom implementation of <see cref="IDictionary{TKey, TValue}">IDictionary</see> may be
         /// used in place of the default <see cref="Dictionary{TKey, TValue}">Dictionary</see>.
         /// </summary>
-        IDictionary<string, object> UserContext { get; }
+        IDictionary<string, object?> UserContext { get; }
     }
 }

@@ -42,6 +42,69 @@ public class StarWarsSchema : GraphQL.Types.Schema
 
 How you integrate this into your system will depend on the dependency injection framework you are using. `FuncServiceProvider` is provided for easy integration with multiple containers.
 
+## Dependency Injection Registration Helpers
+
+GraphQL.NET provides an `IGraphQLBuilder` interface which encapsulates the configuration methods of a dependency injection framework, to provide an
+abstract method of configuring a dependency injection framework to work with GraphQL.NET. This interface is returned from a DI-provider-specific
+setup method (typically called `AddGraphQL()`), at which point you can call extension methods on the interface to configure this library. A simple
+example is below:
+
+```csharp
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<MySchema>();
+```
+
+The interface also allows configuration of the schema during initialization, and configuration of the execution at runtime. In this manner, adding
+middleware, for example, is as simple as calling `.AddMiddleware<MyMiddlware>()` and does not require the middleware to be added into the schema
+configuration.
+
+The `AddGraphQL()` method will register default implementations of the following services within the dependency injection framework:
+
+* `IDocumentExecuter` - which does not support subscriptions
+* `IDocumentBuilder`
+* `IDocumentValidator`
+* `IComplexityAnalyzer` - which is not used unless configured within `ExecutionOptions`
+* `IErrorInfoProvider`
+* `IDocumentCache` - an implemenation which does not cache documents
+
+A list of the available extension methods is below:
+
+| Method    | Description / Notes | Library |
+|-----------|---------------------|---------|
+| `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
+| `AddComplexityAnalyzer` | Enables the complexity analyzer and configures its options | |
+| `AddDataLoader`         | Registers classes necessary for data loader support | GraphQL.DataLoader |
+| `AddDocumentCache<>`    | Registers the specified document caching service | |
+| `AddDocumentExecuter<>` | Registers the specified document executer; useful when needed to change the execution strategy utilized | |
+| `AddDocumentListener<>` | Registers the specified document listener and configures execution to use it | |
+| `AddDocumentWriter<>`   | Registers the specified document writer | |
+| `AddErrorInfoProvider`  | Registers a custom error info provider or configures the default error info provider | |
+| `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
+| `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
+| `AddMetrics`            | Registers and enables metrics depending on the supplied arguments | |
+| `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
+| `AddNewtonsoftJson`     | Registers the document writer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
+| `AddSchema<>`           | Registers the specified schema | |
+| `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
+| `AddSubscriptionDocumentExecuter` | Registers the document executer that has subscription support | GraphQL.SystemReactive | |
+| `AddSystemTextJson`     | Registers the document writer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
+| `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
+| `ConfigureExecution`    | Configures execution options at runtime | |
+| `ConfigureSchema`       | Configures schema options when the schema is initialized | |
+| `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
+| `Register`              | Used by extension methods to register services within the DI framework | |
+| `TryRegister`           | Used by extension methods to register services within the DI framework when they have not already been registered | |
+
+The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware is registered
+as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
+
+To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:
+
+| DI Provider | Nuget Package |
+|-------------|---------------|
+| Microsoft.Extensions.DependencyInjection | GraphQL.MicrosoftDI |
+
 ## ASP.NET Core
 
 [See this example.](https://github.com/graphql-dotnet/examples/blob/8d5b7544006902f45b818010585b1ffa86ef446b/src/AspNetCoreCustom/Example/Startup.cs#L16-L34)
@@ -159,10 +222,10 @@ lifetimes are as follows:
 * **Scoped** services are created per scope. In a web application, every web request creates a new unique service scope. That means scoped services are generally created per web request.
 * **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
-It is highly recommended that the schema is registered as a singleton. This provides the best performance as
-the schema does not need to be built for every request. As all graph types are constructed at the
+> It is _highly_ recommended that the schema is registered as a singleton. As all graph types are constructed at the
 same time as the schema, all graph types will effectively have a singleton lifetime, regardless
-of how it is registered with the DI framework.
+of how it is registered with the DI framework. This is most performant appraoch. Having a scoped schema can degrade performance
+by a huge margin. For instance, even a small schema execution can slow down by 100x, and much more with a large schema.
 
 Scoped lifetime can be used to allow the schema and all its graph types access to the current DI scope.
 This is not recommended; please see [Scoped Services](#scoped-services-with-a-singleton-schema-lifetime)
@@ -258,8 +321,11 @@ public class MyGraphType : ObjectGraphType<Category>
 
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
-Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
-Within the GraphQL.MicrosoftDI package, there is also a builder approach to adding scoped dependencies:
+However, the performance benefits far outweigh the anti-pattern idealogy. 
+
+Within the `GraphQL.MicrosoftDI` package, there is also a builder approach to adding scoped dependencies.
+This makes for a concise and declarative approach. Each field clearly states the service it needs
+and thereby, the anti-pattern argument does not apply anymore.
 
 ```csharp
 public class MyGraphType : ObjectGraphType<Category>
@@ -275,6 +341,8 @@ public class MyGraphType : ObjectGraphType<Category>
     }
 }
 ```
+
+Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
 
 ## Using SteroidsDI
 

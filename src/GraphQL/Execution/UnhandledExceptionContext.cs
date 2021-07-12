@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace GraphQL.Execution
@@ -10,7 +12,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UnhandledExceptionContext(IExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
+        public UnhandledExceptionContext(IExecutionContext? context, IResolveFieldContext? fieldContext, Exception originalException)
         {
             Context = context;
             FieldContext = fieldContext;
@@ -21,14 +23,14 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the execution context.
         /// </summary>
-        public IExecutionContext Context { get; }
+        public IExecutionContext? Context { get; }
 
         /// <summary>
         /// Field context whose resolver generated an error. Will be <c>null</c> if the error came from
         /// <see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)"/>, for example, validation stage.
         /// Also will be <c>null</c> between resolvers execution if <c>cancellationToken</c> is canceled.
         /// </summary>
-        public IResolveFieldContext FieldContext { get; }
+        public IResolveFieldContext? FieldContext { get; }
 
         /// <summary>
         /// Original exception from field resolver or <see cref="DocumentExecuter"/>.
@@ -43,6 +45,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Allows to change resulting error message from default one.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 }

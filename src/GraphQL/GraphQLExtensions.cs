@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -129,18 +131,18 @@ namespace GraphQL
                    typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
         }
 
-        internal static bool IsGraphQLTypeReference(this IGraphType type)
+        internal static bool IsGraphQLTypeReference(this IGraphType? type)
         {
             var (namedType, _) = type.GetNamedTypes();
             return namedType is GraphQLTypeReference;
         }
 
-        internal static (IGraphType resolvedType, Type type) GetNamedTypes(this IGraphType type)
+        internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType? type)
         {
             return type switch
             {
-                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type)),
-                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type)),
+                NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type!)),
+                ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type!)),
                 _ => (type, null)
             };
         }
@@ -151,7 +153,7 @@ namespace GraphQL
         public static IGraphType GetNamedType(this IGraphType type)
         {
             if (type == null)
-                return null;
+                return null!;
 
             var (namedType, _) = type.GetNamedTypes();
             return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
@@ -206,7 +208,7 @@ namespace GraphQL
         /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
         /// property is set to a new instance of the base (wrapped) type.
         /// </summary>
-        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
+        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType>? resolve = null)
         {
             resolve ??= t => (IGraphType)Activator.CreateInstance(t);
 
@@ -250,7 +252,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static string? DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.Description()
@@ -263,7 +265,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static string? DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.ObsoleteMessage()
@@ -276,7 +278,7 @@ namespace GraphQL
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
         /// </summary>
-        public static object DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        public static object? DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
                 ? expr.Member.DefaultValue()
@@ -291,7 +293,7 @@ namespace GraphQL
         /// <param name="key"> String key. </param>
         /// <param name="value"> Arbitrary value. </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
-        public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
+        public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : IProvideMetadata
         {
             provider.Metadata[key] = value;
@@ -314,14 +316,14 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType);
+                    return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType, superType);
+                return IsSubtypeOf(sub.ResolvedType!, superType);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -329,7 +331,7 @@ namespace GraphQL
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType);
+                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!);
                 }
 
                 return false;
@@ -406,7 +408,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType.IsValidDefault(value);
+                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)
@@ -418,7 +420,7 @@ namespace GraphQL
             // the value is not an IEnumerable, convert the value using the list's item type.
             if (type is ListGraphType listType)
             {
-                var itemType = listType.ResolvedType;
+                var itemType = listType.ResolvedType!;
 
                 if (!(value is string) && value is IEnumerable list)
                 {
@@ -457,7 +459,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonnull)
             {
-                var astValue = ToAST(nonnull.ResolvedType, value);
+                var astValue = ToAST(nonnull.ResolvedType!, value);
 
                 if (astValue is NullValue)
                     throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
@@ -479,7 +481,7 @@ namespace GraphQL
             // the value is not an IEnumerable, convert the value using the list's item type.
             if (type is ListGraphType listType)
             {
-                var itemType = listType.ResolvedType;
+                var itemType = listType.ResolvedType!;
 
                 if (!(value is string) && value is IEnumerable list)
                 {

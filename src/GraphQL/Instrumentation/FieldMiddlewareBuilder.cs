@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
@@ -9,7 +11,7 @@ namespace GraphQL.Instrumentation
     /// </summary>
     public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
     {
-        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> _middleware;
+        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? _middleware;
 
         /// <inheritdoc/>
         public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
@@ -33,7 +35,7 @@ namespace GraphQL.Instrumentation
         private static readonly FieldMiddlewareDelegate _defaultDelegate = context => Task.FromResult(NameFieldResolver.Instance.Resolve(context));
 
         /// <inheritdoc/>
-        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
+        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
         {
             if (_middleware == null)
                 return null;

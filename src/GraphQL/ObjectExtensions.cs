@@ -24,7 +24,7 @@ namespace GraphQL
         /// <typeparam name="T">The type to create.</typeparam>
         /// <param name="source">The source of values.</param>
         /// <returns>T.</returns>
-        public static T ToObject<T>(this IDictionary<string, object> source)
+        public static T ToObject<T>(this IDictionary<string, object?> source)
             where T : class
             => (T)ToObject(source, typeof(T));
 
@@ -43,12 +43,12 @@ namespace GraphQL
         /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
-        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType? mappedType = null)
+        public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType? mappedType = null)
         {
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
             string GetPropertyName(string key, out FieldType? field)
             {
-                var complexType = mappedType.GetNamedType() as IComplexGraphType;
+                var complexType = mappedType?.GetNamedType() as IComplexGraphType;
 
                 // type may not contain mapping information
                 field = complexType?.GetField(key);
@@ -103,8 +103,8 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(source));
 
             // force sourceType to be IDictionary<string, object>
-            if (ValueConverter.TryConvertTo(source, type, out object result, typeof(IDictionary<string, object>)))
-                return result;
+            if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
+                return result!;
 
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
@@ -188,7 +188,7 @@ namespace GraphQL
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object? GetPropertyValue(this object propertyValue, Type fieldType, IGraphType? mappedType = null)
+        public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType? mappedType = null)
         {
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
@@ -196,7 +196,7 @@ namespace GraphQL
                 return propertyValue;
             }
 
-            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object result))
+            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
                 return result;
 
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
@@ -271,7 +271,7 @@ namespace GraphQL
                 fieldType = nullableFieldType;
             }
 
-            if (propertyValue is IDictionary<string, object> objects)
+            if (propertyValue is IDictionary<string, object?> objects)
             {
                 return ToObject(objects, fieldType, mappedType);
             }

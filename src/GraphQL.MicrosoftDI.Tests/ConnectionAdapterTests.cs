@@ -39,7 +39,7 @@ namespace GraphQL.MicrosoftDI.Tests
             rccMock.SetupGet(x => x.FieldAst).Returns(new Field(default, new NameNode("test")));
             rccMock.SetupGet(x => x.FieldDefinition).Returns(new FieldType());
             rccMock.SetupGet(x => x.Metrics).Returns(new Instrumentation.Metrics());
-            rccMock.SetupGet(x => x.Operation).Returns(new Operation(new NameNode()));
+            rccMock.SetupGet(x => x.Operation).Returns(new Operation(new NameNode(), null!));
             rccMock.SetupGet(x => x.ParentType).Returns(Mock.Of<IObjectGraphType>());
             rccMock.SetupGet(x => x.Path).Returns(new object[] { "5" });
             rccMock.SetupGet(x => x.RequestServices).Returns(Mock.Of<IServiceProvider>());

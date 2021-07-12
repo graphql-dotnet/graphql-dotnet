@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -27,7 +29,7 @@ namespace GraphQL.Reflection
         /// <summary>
         /// For methods, returns a list of parameters defined for the method, otherwise <see langword="null"/>.
         /// </summary>
-        ParameterInfo[] Parameters { get; }
+        ParameterInfo[]? Parameters { get; }
 
         /// <summary>
         /// Returns a <see cref="MethodInfo"/> instance that points to the member.
@@ -41,7 +43,7 @@ namespace GraphQL.Reflection
         /// <param name="target">Target object.</param>
         /// <param name="arguments">Arguments for method; not used for property.</param>
         /// <returns>Return value.</returns>
-        object GetValue(object target, object[] arguments);
+        object? GetValue(object target, object?[]? arguments);
 
         /// <summary>
         /// Returns a list of attributes of the specified type defined on the member.

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,7 +64,7 @@ namespace GraphQL.Types
         /// Searches the directive by its name and returns it.
         /// </summary>
         /// <param name="name">Directive name.</param>
-        public DirectiveGraphType Find(string name)
+        public DirectiveGraphType? Find(string name)
         {
             foreach (var directive in List)
             {

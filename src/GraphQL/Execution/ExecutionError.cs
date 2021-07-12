@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,7 +37,7 @@ namespace GraphQL
         /// <see cref="Code"/> property based on the inner exception. Loads any exception data
         /// from the inner exception into this instance.
         /// </summary>
-        public ExecutionError(string message, Exception exception)
+        public ExecutionError(string message, Exception? exception)
             : base(message, exception)
         {
             SetCode(exception);
@@ -45,17 +47,17 @@ namespace GraphQL
         /// <summary>
         /// Returns a list of locations within the document that this error applies to.
         /// </summary>
-        public List<ErrorLocation> Locations { get; private set; }
+        public List<ErrorLocation>? Locations { get; private set; }
 
         /// <summary>
         /// Gets or sets a code for this error.
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// Gets or sets the path within the GraphQL document where this error applies to.
         /// </summary>
-        public IEnumerable<object> Path { get; set; }
+        public IEnumerable<object>? Path { get; set; }
 
         /// <summary>
         /// Adds a location to the list of locations that this error applies to.
@@ -65,13 +67,13 @@ namespace GraphQL
             (Locations ??= new List<ErrorLocation>()).Add(new ErrorLocation(line, column));
         }
 
-        private void SetCode(Exception exception)
+        private void SetCode(Exception? exception)
         {
             if (exception != null)
                 Code = ErrorInfoProvider.GetErrorCode(exception);
         }
 
-        private void SetData(Exception exception)
+        private void SetData(Exception? exception)
         {
             if (exception?.Data != null)
                 SetData(exception.Data);
@@ -141,10 +143,10 @@ namespace GraphQL
         /// <summary>
         /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
         /// </summary>
-        public static TError AddLocation<TError>(this TError error, AbstractNode abstractNode, Document document)
+        public static TError AddLocation<TError>(this TError error, AbstractNode? abstractNode, Document? document)
             where TError : ExecutionError
         {
-            if (abstractNode == null || document == null)
+            if (abstractNode == null || document == null || document.OriginalQuery == null)
                 return error;
 
             var location = new Location(document.OriginalQuery, abstractNode.SourceLocation.Start);

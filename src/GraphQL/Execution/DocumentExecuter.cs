@@ -1,7 +1,10 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Caching;
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -21,6 +24,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
+        private readonly IEnumerable<IConfigureExecution>? _configurations;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -55,6 +59,12 @@ namespace GraphQL
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
         }
 
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
+        {
+            _configurations = configurations;
+        }
+
         /// <inheritdoc/>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
@@ -65,10 +75,18 @@ namespace GraphQL
             if (options.Query == null)
                 throw new InvalidOperationException("Cannot execute request if no query is specified");
 
+            if (_configurations != null)
+            {
+                foreach (var configuration in _configurations)
+                {
+                    configuration.Configure(options);
+                }
+            }
+
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
-            ExecutionResult result = null;
-            ExecutionContext context = null;
+            ExecutionResult? result = null;
+            ExecutionContext? context = null;
             bool executionOccurred = false;
 
             try
@@ -219,7 +237,7 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
-                UnhandledExceptionContext exceptionContext = null;
+                UnhandledExceptionContext? exceptionContext = null;
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
@@ -249,14 +267,14 @@ namespace GraphQL
             var context = new ExecutionContext
             {
                 Document = document,
-                Schema = options.Schema,
+                Schema = options.Schema!,
                 RootValue = options.Root,
                 UserContext = options.UserContext,
 
                 Operation = operation,
                 Variables = variables,
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>(),
+                Extensions = new Dictionary<string, object?>(),
                 CancellationToken = options.CancellationToken,
 
                 Metrics = metrics,
@@ -278,11 +296,11 @@ namespace GraphQL
         /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual Operation GetOperation(string operationName, Document document)
+        protected virtual Operation? GetOperation(string? operationName, Document document)
         {
             return string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.FirstOrDefault()
-                : document.Operations.WithName(operationName);
+                : document.Operations.WithName(operationName!);
         }
 
         /// <summary>

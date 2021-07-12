@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -28,7 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name => NameNode.Name;
+        public string Name => NameNode.Name!;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of the field, if initialized with the <see cref="ObjectField.ObjectField(NameNode, IValue)"/> constructor.

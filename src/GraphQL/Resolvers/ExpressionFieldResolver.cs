@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq.Expressions;
 
@@ -23,8 +25,8 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TProperty Resolve(IResolveFieldContext context) => _property((TSourceType)context.Source);
+        public TProperty? Resolve(IResolveFieldContext context) => _property((TSourceType)context.Source!);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 }

@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -8,7 +10,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the value of the node.
         /// </summary>
-        object Value { get; }
+        object? Value { get; }
     }
 
     /// <inheritdoc cref="IValue"/>

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using GraphQL.Language.AST;
 
@@ -15,7 +17,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="type">The AST type to search for.</param>
         /// <param name="schema">The schema to search within.</param>
-        public static IGraphType NamedGraphTypeFromType(this IType type, ISchema schema) => type switch
+        public static IGraphType? NamedGraphTypeFromType(this IType type, ISchema schema) => type switch
         {
             NonNullType nonnull => NamedGraphTypeFromType(nonnull.Type, schema),
             ListType list => NamedGraphTypeFromType(list.Type, schema),
@@ -29,7 +31,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="type">The AST type to search for.</param>
         /// <param name="schema">The schema to search within.</param>
-        public static IGraphType GraphTypeFromType(this IType type, ISchema schema)
+        public static IGraphType? GraphTypeFromType(this IType type, ISchema schema)
         {
             if (type is NonNullType nonnull)
             {

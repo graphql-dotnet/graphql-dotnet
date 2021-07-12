@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -127,6 +128,47 @@ namespace GraphQL
             schema.AutoRegister(typeof(TClrType), mode);
         }
 
+
+        /// <summary>
+        /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
+        /// the mappings prior to execution.
+        /// </remarks>
+        public static void RegisterTypeMappings(this ISchema schema)
+        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+
+        /// <summary>
+        /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
+        /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
+        /// registers clr type mappings on the schema between that class and the source type or underlying enum type.
+        /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
+        /// the <see cref="DoNotMapClrTypeAttribute"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses reflection and therefor is inheritly slow, especially with a large assembly.
+        /// When using a scoped schema, it is faster to call
+        /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder, Assembly)"/> as it will
+        /// precompute the mappings prior to execution.
+        /// </remarks>
+        public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
+            foreach (var typeMapping in assembly.GetClrTypeMappings())
+            {
+                schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
+            }
+        }
+
         /// <summary>
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
@@ -191,7 +233,7 @@ namespace GraphQL
 
                 if (directive.Arguments?.Count > 0)
                 {
-                    foreach (var argument in directive.Arguments.List)
+                    foreach (var argument in directive.Arguments.List!)
                         visitor.VisitDirectiveArgumentDefinition(argument, directive, schema);
                 }
             }
@@ -221,7 +263,7 @@ namespace GraphQL
                             visitor.VisitInterfaceFieldDefinition(field, iface, schema);
                             if (field.Arguments?.Count > 0)
                             {
-                                foreach (var argument in field.Arguments.List)
+                                foreach (var argument in field.Arguments.List!)
                                     visitor.VisitInterfaceFieldArgumentDefinition(argument, field, iface, schema);
                             }
                         }
@@ -234,7 +276,7 @@ namespace GraphQL
                             visitor.VisitObjectFieldDefinition(field, output, schema);
                             if (field.Arguments?.Count > 0)
                             {
-                                foreach (var argument in field.Arguments.List)
+                                foreach (var argument in field.Arguments.List!)
                                     visitor.VisitObjectFieldArgumentDefinition(argument, field, output, schema);
                             }
                         }

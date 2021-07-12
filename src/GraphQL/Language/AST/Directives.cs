@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Directives : AbstractNode, ICollection<Directive>
     {
-        private List<Directive> _directives;
+        private List<Directive>? _directives;
 
         internal Directives(int capacity)
         {
@@ -24,7 +26,7 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override IEnumerable<INode> Children => _directives;
+        public override IEnumerable<INode>? Children => _directives;
 
         /// <inheritdoc/>
         public override void Visit<TState>(Action<INode, TState> action, TState state)
@@ -47,7 +49,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Searches the list for a directive node specified by name and returns first match.
         /// </summary>
-        public Directive Find(string name)
+        public Directive? Find(string name)
         {
             if (_directives != null)
             {
@@ -77,17 +79,17 @@ namespace GraphQL.Language.AST
         /// <inheritdoc/>
         public void Clear()
         {
-            _directives.Clear();
+            _directives?.Clear();
         }
 
         /// <inheritdoc/>
-        public bool Contains(Directive item) => _directives.Contains(item);
+        public bool Contains(Directive item) => _directives?.Contains(item) ?? false;
 
         /// <inheritdoc/>
-        public void CopyTo(Directive[] array, int arrayIndex) => _directives.CopyTo(array, arrayIndex);
+        public void CopyTo(Directive[] array, int arrayIndex) => _directives?.CopyTo(array, arrayIndex);
 
         /// <inheritdoc/>
-        public bool Remove(Directive item) => _directives.Remove(item);
+        public bool Remove(Directive item) => _directives?.Remove(item) ?? false;
 
         /// <inheritdoc />
         public override string ToString() => _directives?.Count > 0 ? $"Directives{{{string.Join(", ", _directives)}}}" : "Directives(Empty)";

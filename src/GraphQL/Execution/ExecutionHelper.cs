@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
@@ -14,7 +16,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue> GetArgumentValues(QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, Arguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
@@ -23,7 +25,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.List)
+            foreach (var arg in definitionArguments.List!)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -38,7 +40,7 @@ namespace GraphQL.Execution
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static ArgumentValue CoerceValue(IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
+        public static ArgumentValue CoerceValue(IGraphType type, IValue? input, Variables? variables = null, object? fieldDefault = null)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -47,7 +49,7 @@ namespace GraphQL.Execution
             {
                 // validation rules have verified that this is not null; if the validation rule was not executed, it
                 // is assumed that the caller does not wish this check to be executed
-                return CoerceValue(nonNull.ResolvedType, input, variables, fieldDefault);
+                return CoerceValue(nonNull.ResolvedType!, input, variables, fieldDefault);
             }
 
             if (input == null)
@@ -76,7 +78,7 @@ namespace GraphQL.Execution
 
             if (type is ListGraphType listType)
             {
-                var listItemType = listType.ResolvedType;
+                var listItemType = listType.ResolvedType!;
 
                 if (input is ListValue list)
                 {
@@ -84,7 +86,7 @@ namespace GraphQL.Execution
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
-                    var values = new object[count];
+                    var values = new object?[count];
                     for (int i = 0; i < count; ++i)
                         values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
@@ -102,7 +104,7 @@ namespace GraphQL.Execution
                     throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
                 }
 
-                var obj = new Dictionary<string, object>();
+                var obj = new Dictionary<string, object?>();
 
                 foreach (var field in inputObjectGraphType.Fields.List)
                 {
@@ -122,7 +124,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType, objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {

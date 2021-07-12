@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace GraphQL.Types
@@ -16,7 +18,7 @@ namespace GraphQL.Types
         public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 
         /// <inheritdoc/>
-        public Func<object, IObjectGraphType> ResolveType { get; set; }
+        public Func<object, IObjectGraphType?>? ResolveType { get; set; }
 
         /// <inheritdoc/>
         public void AddPossibleType(IObjectGraphType type)

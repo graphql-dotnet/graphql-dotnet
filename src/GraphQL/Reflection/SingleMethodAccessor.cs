@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -24,7 +26,7 @@ namespace GraphQL.Reflection
 
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => MethodInfo.GetCustomAttributes<T>();
 
-        public object GetValue(object target, object[] arguments)
+        public object? GetValue(object target, object?[]? arguments)
         {
             try
             {

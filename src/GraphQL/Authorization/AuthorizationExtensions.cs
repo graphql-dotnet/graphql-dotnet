@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Builders;
@@ -25,7 +27,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> List of authorization policy names applied to this metadata provider. </returns>
-        public static List<string> GetPolicies(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(POLICY_KEY);
+        public static List<string>? GetPolicies(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(POLICY_KEY);
 
         /// <summary>
         /// Gets a boolean value that determines whether any authorization policy is applied to this metadata provider.

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
@@ -15,27 +17,27 @@ namespace GraphQL
         /// Returns the value of the specified field argument, or <paramref name="defaultValue"/> when unspecified or when specified as <see langword="null"/>.
         /// Field and variable default values take precedence over the <paramref name="defaultValue"/> parameter.
         /// </summary>
-        public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
+        public static TType? GetArgument<TType>(this IResolveFieldContext context, string name, TType? defaultValue = default)
         {
-            bool exists = context.TryGetArgument(typeof(TType), name, out object result);
+            bool exists = context.TryGetArgument(typeof(TType), name, out object? result);
             return exists
-                ? result == null ? defaultValue : (TType)result
+                ? result == null ? defaultValue : (TType?)result
                 : defaultValue;
         }
 
         /// <inheritdoc cref="GetArgument{TType}(IResolveFieldContext, string, TType)"/>
-        public static object GetArgument(this IResolveFieldContext context, Type argumentType, string name, object defaultValue = null)
+        public static object? GetArgument(this IResolveFieldContext context, Type argumentType, string name, object? defaultValue = null)
         {
-            bool exists = context.TryGetArgument(argumentType, name, out object result);
+            bool exists = context.TryGetArgument(argumentType, name, out object? result);
             return exists
                 ? result ?? defaultValue
                 : defaultValue;
         }
 
-        private static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object result)
+        private static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
-            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
@@ -43,7 +45,7 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg.Value is IDictionary<string, object> inputObject)
+            if (arg.Value is IDictionary<string, object?> inputObject)
             {
                 if (argumentType == typeof(object))
                 {
@@ -63,7 +65,7 @@ namespace GraphQL
         public static bool HasArgument(this IResolveFieldContext context, string name)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
-            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
             return context.Arguments != null && context.Arguments.TryGetValue(argumentName, out var value) && value.Source != ArgumentSource.FieldDefault;
         }
 
@@ -100,7 +102,7 @@ namespace GraphQL
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
-        public static object GetExtension(this IResolveFieldContext context, string path)
+        public static object? GetExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -118,17 +120,17 @@ namespace GraphQL
 
                     for (int i = 0; i < keys.Length - 1; ++i)
                     {
-                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
                             values = d;
                         else
                             return null;
                     }
 
-                    return values.TryGetValue(keys[keys.Length - 1], out object result) ? result : null;
+                    return values.TryGetValue(keys[keys.Length - 1], out object? result) ? result : null;
                 }
                 else
                 {
-                    return values.TryGetValue(path, out object result) ? result : null;
+                    return values.TryGetValue(path, out object? result) ? result : null;
                 }
             }
         }
@@ -140,7 +142,7 @@ namespace GraphQL
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <param name="value">Value to set.</param>
-        public static void SetExtension(this IResolveFieldContext context, string path, object value)
+        public static void SetExtension(this IResolveFieldContext context, string path, object? value)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -158,13 +160,13 @@ namespace GraphQL
 
                     for (int i = 0; i < keys.Length - 1; ++i)
                     {
-                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
                         {
                             values = d;
                         }
                         else
                         {
-                            var temp = new Dictionary<string, object>();
+                            var temp = new Dictionary<string, object?>();
                             values[keys[i]] = temp; // overwrite value if any
                             values = temp;
                         }
