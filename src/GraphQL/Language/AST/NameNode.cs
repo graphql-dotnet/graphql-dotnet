@@ -31,7 +31,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the contained name.
         /// </summary>
-        public string? Name { get; }
+        public string Name { get; }
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; }

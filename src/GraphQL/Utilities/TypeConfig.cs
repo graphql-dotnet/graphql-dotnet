@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Reflection;
 using GraphQL.Types;
@@ -12,7 +14,7 @@ namespace GraphQL.Utilities
         private readonly LightweightCache<string, FieldConfig> _fields =
             new LightweightCache<string, FieldConfig>(f => new FieldConfig(f));
 
-        private Type _type;
+        private Type? _type;
 
         /// <summary>
         /// Creates an instance of <see cref="TypeConfig"/> with the specified name.
@@ -23,7 +25,7 @@ namespace GraphQL.Utilities
             Name = name;
         }
 
-        public Type Type
+        public Type? Type
         {
             get => _type;
             set
@@ -41,17 +43,17 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Gets or sets the description of the GraphType.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the reason this GraphType has been deprecated;
         /// <see langword="null"/> if this element has not been deprecated.
         /// </summary>
-        public string DeprecationReason { get; set; }
+        public string? DeprecationReason { get; set; }
 
-        public Func<object, IObjectGraphType> ResolveType { get; set; }
+        public Func<object, IObjectGraphType>? ResolveType { get; set; }
 
-        public Func<object, bool> IsTypeOfFunc { get; set; }
+        public Func<object, bool>? IsTypeOfFunc { get; set; }
 
         public void IsTypeOf<T>()
         {
@@ -64,7 +66,7 @@ namespace GraphQL.Utilities
         /// <param name="fieldName">Name of the field.</param>
         public FieldConfig FieldFor(string fieldName) => _fields[fieldName];
 
-        private void ApplyMetadata(Type type)
+        private void ApplyMetadata(Type? type)
         {
             var attributes = type?.GetCustomAttributes<GraphQLAttribute>();
 

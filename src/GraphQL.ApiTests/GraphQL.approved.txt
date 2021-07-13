@@ -1505,7 +1505,7 @@ namespace GraphQL.Language.AST
     {
         public NameNode(string name) { }
         public NameNode(string name, GraphQL.Language.AST.SourceLocation location) { }
-        public string? Name { get; }
+        public string Name { get; }
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; }
         public void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
@@ -2589,8 +2589,8 @@ namespace GraphQL.Utilities
     public class ArgumentConfig : GraphQL.Utilities.MetadataProvider
     {
         public ArgumentConfig(string name) { }
-        public object DefaultValue { get; set; }
-        public string Description { get; set; }
+        public object? DefaultValue { get; set; }
+        public string? Description { get; set; }
         public string Name { get; }
     }
     public static class AstPrinter
@@ -2628,15 +2628,15 @@ namespace GraphQL.Utilities
     public class FieldConfig : GraphQL.Utilities.MetadataProvider
     {
         public FieldConfig(string name) { }
-        public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
-        public object DefaultValue { get; set; }
-        public string DeprecationReason { get; set; }
-        public string Description { get; set; }
+        public GraphQL.Resolvers.IAsyncEventStreamResolver? AsyncSubscriber { get; set; }
+        public object? DefaultValue { get; set; }
+        public string? DeprecationReason { get; set; }
+        public string? Description { get; set; }
         public string Name { get; }
-        public GraphQL.Resolvers.IFieldResolver Resolver { get; set; }
-        public GraphQL.Reflection.IAccessor ResolverAccessor { get; set; }
-        public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
-        public GraphQL.Reflection.IAccessor SubscriberAccessor { get; set; }
+        public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
+        public GraphQL.Reflection.IAccessor? ResolverAccessor { get; set; }
+        public GraphQL.Resolvers.IEventStreamResolver? Subscriber { get; set; }
+        public GraphQL.Reflection.IAccessor? SubscriberAccessor { get; set; }
         public GraphQL.Utilities.ArgumentConfig ArgumentFor(string argumentName) { }
     }
     public interface ISchemaNodeVisitor
@@ -2705,19 +2705,19 @@ namespace GraphQL.Utilities
     }
     public class SchemaPrinter
     {
-        public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions options = null) { }
+        public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
         public string[] BreakLine(string line, int len) { }
         public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
-        protected string FormatDescription(string description, string indentation = "") { }
+        protected string FormatDescription(string? description, string indentation = "") { }
         protected virtual bool IsDefinedDirective(string directiveName) { }
         protected virtual bool IsDefinedType(string typeName) { }
         public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
         public string Print() { }
         public string PrintArgs(GraphQL.Types.FieldType field) { }
-        public virtual string PrintComment(string comment, string indentation = "", bool firstInBlock = true) { }
-        public string PrintDeprecation(string reason) { }
-        public string PrintDescription(string description, string indentation = "", bool firstInBlock = true) { }
+        public virtual string PrintComment(string? comment, string indentation = "", bool firstInBlock = true) { }
+        public string PrintDeprecation(string? reason) { }
+        public string PrintDescription(string? description, string indentation = "", bool firstInBlock = true) { }
         public string PrintDirective(GraphQL.Types.DirectiveGraphType directive) { }
         public string PrintEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
@@ -2729,7 +2729,7 @@ namespace GraphQL.Utilities
         public string PrintIntrospectionSchema() { }
         public virtual string PrintObject(GraphQL.Types.IObjectGraphType type) { }
         public string PrintScalar(GraphQL.Types.ScalarGraphType type) { }
-        public string PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
+        public string? PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
         public string PrintType(GraphQL.Types.IGraphType type) { }
         public string PrintUnion(GraphQL.Types.UnionGraphType type) { }
         protected static bool IsBuiltInDirective(string directiveName) { }
@@ -2769,12 +2769,12 @@ namespace GraphQL.Utilities
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {
         public TypeConfig(string name) { }
-        public string DeprecationReason { get; set; }
-        public string Description { get; set; }
-        public System.Func<object, bool> IsTypeOfFunc { get; set; }
+        public string? DeprecationReason { get; set; }
+        public string? Description { get; set; }
+        public System.Func<object, bool>? IsTypeOfFunc { get; set; }
         public string Name { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
-        public System.Type Type { get; set; }
+        public System.Func<object, GraphQL.Types.IObjectGraphType>? ResolveType { get; set; }
+        public System.Type? Type { get; set; }
         public GraphQL.Utilities.FieldConfig FieldFor(string fieldName) { }
         public void IsTypeOf<T>() { }
     }
@@ -2807,19 +2807,19 @@ namespace GraphQL.Utilities.Federation
     }
     public class AnyValue : GraphQL.Language.AST.ValueNode<object>
     {
-        public AnyValue(object value) { }
+        public AnyValue(object? value) { }
     }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
-        public System.Collections.Generic.Dictionary<string, object> Arguments { get; set; }
+        public System.Collections.Generic.Dictionary<string, object?> Arguments { get; set; }
         public GraphQL.IResolveFieldContext ParentFieldContext { get; set; }
     }
     public class FederatedSchema
     {
         public FederatedSchema() { }
-        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.Federation.FederatedSchemaBuilder> configure = null) { }
-        public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder> configure = null)
+        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.Federation.FederatedSchemaBuilder>? configure = null) { }
+        public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder>? configure = null)
             where TFederatedSchemaBuilder : GraphQL.Utilities.Federation.FederatedSchemaBuilder, new () { }
     }
     public class FederatedSchemaBuilder : GraphQL.Utilities.SchemaBuilder
@@ -2830,7 +2830,7 @@ namespace GraphQL.Utilities.Federation
     }
     public class FederatedSchemaPrinter : GraphQL.Utilities.SchemaPrinter
     {
-        public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions options = null) { }
+        public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         public bool IsFederatedDirective(string directiveName) { }
         public bool IsFederatedType(string typeName) { }
         public string PrintAstDirective(GraphQLParser.AST.GraphQLDirective directive) { }
@@ -2843,12 +2843,12 @@ namespace GraphQL.Utilities.Federation
     }
     public class FuncFederatedResolver<T> : GraphQL.Utilities.Federation.IFederatedResolver
     {
-        public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T>> func) { }
-        public System.Threading.Tasks.Task<object> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context) { }
+        public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> func) { }
+        public System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context) { }
     }
     public interface IFederatedResolver
     {
-        System.Threading.Tasks.Task<object> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
+        System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
@@ -2857,7 +2857,7 @@ namespace GraphQL.Utilities.Federation
     public static class TypeConfigExtensions
     {
         public static void ResolveReferenceAsync(this GraphQL.Utilities.TypeConfig config, GraphQL.Utilities.Federation.IFederatedResolver resolver) { }
-        public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T>> resolver) { }
+        public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
     }
 }
 namespace GraphQL.Validation

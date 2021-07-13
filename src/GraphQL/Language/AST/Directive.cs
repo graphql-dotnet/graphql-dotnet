@@ -21,7 +21,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of this directive.
         /// </summary>
-        public string Name => NameNode.Name!;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> which contains the name of this directive.

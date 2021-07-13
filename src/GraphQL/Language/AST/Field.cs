@@ -22,7 +22,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name => NameNode.Name!;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of this field.

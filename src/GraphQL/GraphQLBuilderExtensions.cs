@@ -436,7 +436,7 @@ namespace GraphQL
         {
             builder.Register<TDocumentListener>(serviceLifetime);
             builder.Register<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -474,7 +474,7 @@ namespace GraphQL
         {
             builder.Register(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
             builder.Register<IDocumentExecutionListener>(documentListenerFactory, serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices.GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
         #endregion
@@ -697,7 +697,7 @@ namespace GraphQL
             builder.Register<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
             builder.ConfigureExecution(options =>
             {
-                var rule = options.RequestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -751,7 +751,7 @@ namespace GraphQL
             builder.Register<IValidationRule>(validationRuleFactory, ServiceLifetime.Singleton);
             builder.ConfigureExecution(options =>
             {
-                var rule = options.RequestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {

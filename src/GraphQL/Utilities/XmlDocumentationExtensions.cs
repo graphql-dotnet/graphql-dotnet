@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -13,11 +15,11 @@ namespace GraphQL.Utilities
     /// </summary>
     internal static class XmlDocumentationExtensions
     {
-        private static readonly ConcurrentDictionary<string, XDocument> _cachedXml = new ConcurrentDictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, XDocument?> _cachedXml = new ConcurrentDictionary<string, XDocument?>(StringComparer.OrdinalIgnoreCase);
 
         private static string GetParameterName(this ParameterInfo parameter) => GetTypeName(parameter.ParameterType);
 
-        private static string NullIfEmpty(this string text) => text == string.Empty ? null : text;
+        private static string? NullIfEmpty(this string? text) => text == string.Empty ? null : text;
 
         private static string GetTypeName(Type type)
         {
@@ -87,10 +89,10 @@ namespace GraphQL.Utilities
             return $"{prefixCode}:{memberName}";
         }
 
-        private static XDocument GetDocument(Assembly asm, string pathToXmlFile)
+        private static XDocument? GetDocument(Assembly asm, string pathToXmlFile)
         {
             string assemblyName = asm.GetName().FullName;
-            XDocument doc = null;
+            XDocument? doc = null;
 
             return _cachedXml.GetOrAdd(assemblyName, key =>
             {
@@ -120,7 +122,7 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member) => GetXmlDocumentation(member, member.Module.Assembly.GetName().Name + ".xml");
+        public static string? GetXmlDocumentation(this MemberInfo member) => GetXmlDocumentation(member, member.Module.Assembly.GetName().Name + ".xml");
 
         /// <summary>
         /// Returns the XML documentation (summary tag) for the specified member.
@@ -128,7 +130,7 @@ namespace GraphQL.Utilities
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">Path to the XML documentation file.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member, string pathToXmlFile) => GetXmlDocumentation(member, GetDocument(member.Module.Assembly, pathToXmlFile));
+        public static string? GetXmlDocumentation(this MemberInfo member, string pathToXmlFile) => GetXmlDocumentation(member, GetDocument(member.Module.Assembly, pathToXmlFile));
 
         /// <summary>
         /// Returns the XML documentation (summary tag) for the specified member.
@@ -136,7 +138,7 @@ namespace GraphQL.Utilities
         /// <param name="member">The reflected member.</param>
         /// <param name="xml">XML documentation.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member, XDocument xml) => xml?.XPathEvaluate(
+        public static string? GetXmlDocumentation(this MemberInfo member, XDocument? xml) => xml?.XPathEvaluate(
             $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString().Trim().NullIfEmpty();
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="parameter">The reflected parameter (or return value).</param>
         /// <returns>The contents of the returns/param tag for the parameter.</returns>
-        public static string GetXmlDocumentation(this ParameterInfo parameter) => GetXmlDocumentation(parameter, parameter.Member.Module.Assembly.GetName().Name + ".xml");
+        public static string? GetXmlDocumentation(this ParameterInfo parameter) => GetXmlDocumentation(parameter, parameter.Member.Module.Assembly.GetName().Name + ".xml");
 
         /// <summary>
         /// Returns the XML documentation (returns/param tag) for the specified parameter.
@@ -152,7 +154,7 @@ namespace GraphQL.Utilities
         /// <param name="parameter">The reflected parameter (or return value).</param>
         /// <param name="pathToXmlFile">Path to the XML documentation file.</param>
         /// <returns>The contents of the returns/param tag for the parameter.</returns>
-        public static string GetXmlDocumentation(this ParameterInfo parameter, string pathToXmlFile) => GetXmlDocumentation(parameter, GetDocument(parameter.Member.Module.Assembly, pathToXmlFile));
+        public static string? GetXmlDocumentation(this ParameterInfo parameter, string pathToXmlFile) => GetXmlDocumentation(parameter, GetDocument(parameter.Member.Module.Assembly, pathToXmlFile));
 
         /// <summary>
         /// Returns the XML documentation (returns/param tag) for the specified parameter.
@@ -160,7 +162,7 @@ namespace GraphQL.Utilities
         /// <param name="parameter">The reflected parameter (or return value).</param>
         /// <param name="xml">XML documentation.</param>
         /// <returns>The contents of the returns/param tag for the parameter.</returns>
-        public static string GetXmlDocumentation(this ParameterInfo parameter, XDocument xml) =>
+        public static string? GetXmlDocumentation(this ParameterInfo parameter, XDocument? xml) =>
             parameter.IsRetval || string.IsNullOrEmpty(parameter.Name)
                 ? xml?.XPathEvaluate(
                     $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString().Trim().NullIfEmpty()

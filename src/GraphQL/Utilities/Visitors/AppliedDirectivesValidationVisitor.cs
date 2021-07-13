@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq;
 using GraphQL.Types;
@@ -64,7 +66,7 @@ namespace GraphQL.Utilities
         public void VisitUnion(UnionGraphType type, ISchema schema) => ValidateAppliedDirectives(type, null, null, schema, DirectiveLocation.Union);
 
         /// <inheritdoc/>
-        private void ValidateAppliedDirectives(IProvideMetadata provider, object parent1, object parent2, ISchema schema, DirectiveLocation? location)
+        private void ValidateAppliedDirectives(IProvideMetadata provider, object? parent1, object? parent2, ISchema schema, DirectiveLocation? location)
         {
             //TODO: switch to the schema coordinates?
             string GetElementDescription() => (provider, parent1, parent2) switch
@@ -85,7 +87,7 @@ namespace GraphQL.Utilities
 
             if (provider.HasAppliedDirectives())
             {
-                var appliedDirectives = provider.GetAppliedDirectives().List;
+                var appliedDirectives = provider.GetAppliedDirectives()!.List!;
 
                 foreach (var directive in schema.Directives.List)
                 {
@@ -109,7 +111,7 @@ namespace GraphQL.Utilities
 
                     if (schemaDirective.Arguments?.Count > 0)
                     {
-                        foreach (var definedArg in schemaDirective.Arguments.List)
+                        foreach (var definedArg in schemaDirective.Arguments!.List!)
                         {
                             var appliedArg = appliedDirective.FindArgument(definedArg.Name);
                             if (appliedArg == null)
@@ -131,7 +133,7 @@ namespace GraphQL.Utilities
 
                     if (appliedDirective.ArgumentsCount > 0)
                     {
-                        foreach (var arg in appliedDirective.List)
+                        foreach (var arg in appliedDirective.List!)
                         {
                             if (schemaDirective.Arguments?.Find(arg.Name) == null)
                                 throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
