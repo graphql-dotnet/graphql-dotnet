@@ -2,6 +2,7 @@ using System;
 using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
@@ -14,6 +15,8 @@ namespace GraphQL.DI
     {
         /// <summary>
         /// Register the default services required by GraphQL if they have not already been registered.
+        /// Includes graph types required for connection builders (GraphQL Relay) and generic graph types
+        /// such as <see cref="EnumerationGraphType{TEnum}"/> and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
         /// <br/><br/>
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
@@ -37,6 +40,18 @@ namespace GraphQL.DI
             this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
             this.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+
+            // configure relay graph types
+            TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
+            TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
+            TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
+            this.TryRegister<PageInfoType>(ServiceLifetime.Transient);
+
+            // configure generic graph types
+            TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
+            TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
+            TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
+            TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
 
             // configure execution to use the default registered schema if none specified
             this.ConfigureExecution(options =>
