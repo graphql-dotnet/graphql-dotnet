@@ -14,9 +14,13 @@ namespace GraphQL.MicrosoftDI
     /// An implementation of <see cref="IGraphQLBuilder"/> which uses the Microsoft dependency injection framework
     /// to register services and configure options.
     /// </summary>
-    internal class GraphQLBuilder : GraphQLBuilderBase
+    public class GraphQLBuilder : GraphQLBuilderBase
     {
-        private readonly IServiceCollection _services;
+        /// <summary>
+        /// Returns the underlying <see cref="IServiceCollection"/> of this builder.
+        /// </summary>
+        public IServiceCollection Services { get; }
+
         /// <summary>
         /// Initializes a new instance for the specified service collection.
         /// </summary>
@@ -25,7 +29,7 @@ namespace GraphQL.MicrosoftDI
         /// </remarks>
         public GraphQLBuilder(IServiceCollection services)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            Services = services ?? throw new ArgumentNullException(nameof(services));
             services.AddOptions();
             Initialize();
         }
@@ -59,7 +63,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
-            _services.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            Services.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
@@ -71,7 +75,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationType == null)
                 throw new ArgumentNullException(nameof(implementationType));
 
-            _services.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            Services.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
@@ -83,7 +87,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationInstance == null)
                 throw new ArgumentNullException(nameof(implementationInstance));
 
-            _services.Add(new ServiceDescriptor(serviceType, implementationInstance));
+            Services.Add(new ServiceDescriptor(serviceType, implementationInstance));
             return this;
         }
 
@@ -95,7 +99,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
-            _services.TryAdd(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            Services.TryAdd(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
@@ -107,7 +111,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationType == null)
                 throw new ArgumentNullException(nameof(implementationType));
 
-            _services.TryAdd(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            Services.TryAdd(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
@@ -119,7 +123,7 @@ namespace GraphQL.MicrosoftDI
             if (implementationInstance == null)
                 throw new ArgumentNullException(nameof(implementationInstance));
 
-            _services.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
+            Services.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
             return this;
         }
     }

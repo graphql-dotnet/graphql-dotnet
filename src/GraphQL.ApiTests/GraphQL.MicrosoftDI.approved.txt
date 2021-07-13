@@ -51,6 +51,19 @@ namespace GraphQL.MicrosoftDI
         public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType>> resolver) { }
         public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
     }
+    public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase
+    {
+        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public Microsoft.Extensions.DependencyInjection.IServiceCollection Services { get; }
+        public override GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
+            where TOptions :  class, new () { }
+        public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance) { }
+        public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime) { }
+        public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime) { }
+        public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance) { }
+        public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime) { }
+        public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime) { }
+    }
     public static class GraphQLBuilderExtensions
     {
         public static GraphQL.DI.IGraphQLBuilder AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
