@@ -632,7 +632,7 @@ namespace GraphQL.Validation.Rules
         {
             // normalize values prior to comparison by using AstPrinter.Print rather than INode.ToString(document)
             return arg1.Value == null && arg2.Value == null ||
-                AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
+                arg1.Value != null && arg2.Value != null && AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
         }
 
         private static CachedField GetFieldsAndFragmentNames(
