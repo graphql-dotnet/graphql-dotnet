@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -20,7 +22,7 @@ namespace GraphQL.Validation.Rules
         {
             public static readonly FieldVisitor Instance = new FieldVisitor();
 
-            public override void VisitField(ValidationContext context, VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object variableValue, object parsedValue)
+            public override void VisitField(ValidationContext context, VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
             {
                 var lengthDirective = field.FindAppliedDirective("length");
                 if (lengthDirective == null)
@@ -63,7 +65,7 @@ namespace GraphQL.Validation.Rules
             })
         ).ToTask();
 
-        private static void CheckLength(IHaveValue node, IProvideMetadata provider, ValidationContext context)
+        private static void CheckLength(IHaveValue node, IProvideMetadata? provider, ValidationContext context)
         {
             var lengthDirective = provider?.FindAppliedDirective("length");
             if (lengthDirective == null)

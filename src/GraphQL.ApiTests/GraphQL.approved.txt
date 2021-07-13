@@ -312,12 +312,12 @@ namespace GraphQL
     {
         public GraphQLMetadataAttribute() { }
         public GraphQLMetadataAttribute(string name) { }
-        public string DeprecationReason { get; set; }
-        public string Description { get; set; }
-        public System.Type InputType { get; set; }
-        public System.Type IsTypeOf { get; set; }
-        public string Name { get; set; }
-        public System.Type OutputType { get; set; }
+        public string? DeprecationReason { get; set; }
+        public string? Description { get; set; }
+        public System.Type? InputType { get; set; }
+        public System.Type? IsTypeOf { get; set; }
+        public string? Name { get; set; }
+        public System.Type? OutputType { get; set; }
         public GraphQL.ResolverType ResolverType { get; set; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
@@ -805,7 +805,7 @@ namespace GraphQL.Execution
     public abstract class DocumentError : GraphQL.ExecutionError
     {
         public DocumentError(string message) { }
-        public DocumentError(string message, System.Exception innerException) { }
+        public DocumentError(string message, System.Exception? innerException) { }
     }
     public abstract class DocumentExecutionListenerBase : GraphQL.Execution.IDocumentExecutionListener
     {
@@ -2865,10 +2865,10 @@ namespace GraphQL.Validation
     public class BaseVariableVisitor : GraphQL.Validation.IVariableVisitor
     {
         public BaseVariableVisitor() { }
-        public virtual void VisitField(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.FieldType field, object variableValue, object parsedValue) { }
-        public virtual void VisitList(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ListGraphType type, object variableValue, System.Collections.Generic.IList<object> parsedValue) { }
-        public virtual void VisitObject(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, object variableValue, object parsedValue) { }
-        public virtual void VisitScalar(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ScalarGraphType type, object variableValue, object parsedValue) { }
+        public virtual void VisitField(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.FieldType field, object? variableValue, object? parsedValue) { }
+        public virtual void VisitList(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ListGraphType type, object? variableValue, System.Collections.Generic.IList<object?>? parsedValue) { }
+        public virtual void VisitObject(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, object? variableValue, object? parsedValue) { }
+        public virtual void VisitScalar(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ScalarGraphType type, object? variableValue, object? parsedValue) { }
     }
     public readonly struct BasicVisitor
     {
@@ -2883,14 +2883,14 @@ namespace GraphQL.Validation
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null) { }
+        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? inputs = null) { }
     }
     public interface IDocumentValidator
     {
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null);
+        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? inputs = null);
     }
     public interface INodeVisitor
     {
@@ -2904,14 +2904,14 @@ namespace GraphQL.Validation
     }
     public interface IValidationRule
     {
-        System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context);
+        System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor>? ValidateAsync(GraphQL.Validation.ValidationContext context);
     }
     public interface IVariableVisitor
     {
-        void VisitField(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.FieldType field, object variableValue, object parsedValue);
-        void VisitList(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ListGraphType type, object variableValue, System.Collections.Generic.IList<object> parsedValue);
-        void VisitObject(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, object variableValue, object parsedValue);
-        void VisitScalar(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ScalarGraphType type, object variableValue, object parsedValue);
+        void VisitField(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.FieldType field, object? variableValue, object? parsedValue);
+        void VisitList(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ListGraphType type, object? variableValue, System.Collections.Generic.IList<object?>? parsedValue);
+        void VisitObject(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, object? variableValue, object? parsedValue);
+        void VisitScalar(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ScalarGraphType type, object? variableValue, object? parsedValue);
     }
     public interface IVariableVisitorProvider
     {
@@ -2926,12 +2926,12 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQL.Language.AST.INode
     {
-        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
+        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext>? enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext>? leave = null) { }
     }
     public class MatchingNodeVisitor<TNode, TState> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQL.Language.AST.INode
     {
-        public MatchingNodeVisitor(TState state, System.Action<TNode, GraphQL.Validation.ValidationContext, TState> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext, TState> leave = null) { }
+        public MatchingNodeVisitor(TState? state, System.Action<TNode, GraphQL.Validation.ValidationContext, TState?>? enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext, TState?>? leave = null) { }
     }
     public sealed class NodeVisitors : GraphQL.Validation.INodeVisitor
     {
@@ -2947,13 +2947,13 @@ namespace GraphQL.Validation
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
         public void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
-        public GraphQL.Language.AST.INode GetAncestor(int index) { }
-        public GraphQL.Types.QueryArgument GetArgument() { }
-        public GraphQL.Types.DirectiveGraphType GetDirective() { }
-        public GraphQL.Types.FieldType GetFieldDef(int index = 0) { }
-        public GraphQL.Types.IGraphType GetInputType(int index = 0) { }
-        public GraphQL.Types.IGraphType GetLastType(int index = 0) { }
-        public GraphQL.Types.IGraphType GetParentType(int index = 0) { }
+        public GraphQL.Language.AST.INode? GetAncestor(int index) { }
+        public GraphQL.Types.QueryArgument? GetArgument() { }
+        public GraphQL.Types.DirectiveGraphType? GetDirective() { }
+        public GraphQL.Types.FieldType? GetFieldDef(int index = 0) { }
+        public GraphQL.Types.IGraphType? GetInputType(int index = 0) { }
+        public GraphQL.Types.IGraphType? GetLastType(int index = 0) { }
+        public GraphQL.Types.IGraphType? GetParentType(int index = 0) { }
         public void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
@@ -2962,18 +2962,18 @@ namespace GraphQL.Validation
         public GraphQL.Language.AST.Document Document { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public bool HasErrors { get; }
-        public GraphQL.Inputs Inputs { get; set; }
-        public string OperationName { get; set; }
+        public GraphQL.Inputs? Inputs { get; set; }
+        public string? OperationName { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
-        public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
-        public GraphQL.Language.AST.FragmentDefinition GetFragment(string name) { }
+        public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
+        public GraphQL.Language.AST.FragmentDefinition? GetFragment(string name) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentSpread> GetFragmentSpreads(GraphQL.Language.AST.SelectionSet node) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQL.Language.AST.Operation operation) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
-        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions variableDefinitions, GraphQL.Inputs inputs, GraphQL.Validation.IVariableVisitor visitor = null) { }
+        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, GraphQL.Inputs inputs, GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQL.Language.AST.IHaveSelectionSet node) { }
-        public string IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst) { }
+        public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
     [System.Serializable]
@@ -2981,8 +2981,8 @@ namespace GraphQL.Validation
     {
         public ValidationError(string originalQuery, string number, string message, GraphQL.Language.AST.INode node) { }
         public ValidationError(string originalQuery, string number, string message, params GraphQL.Language.AST.INode[] nodes) { }
-        public ValidationError(string originalQuery, string number, string message, System.Exception innerException, GraphQL.Language.AST.INode node) { }
-        public ValidationError(string originalQuery, string number, string message, System.Exception innerException, params GraphQL.Language.AST.INode[] nodes) { }
+        public ValidationError(string originalQuery, string number, string message, System.Exception? innerException, GraphQL.Language.AST.INode node) { }
+        public ValidationError(string originalQuery, string number, string message, System.Exception? innerException, params GraphQL.Language.AST.INode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Nodes { get; }
         public string Number { get; set; }
     }
@@ -3244,7 +3244,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.NoFragmentCycles Instance;
         public NoFragmentCycles() { }
-        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor>? ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class NoUndefinedVariables : GraphQL.Validation.IValidationRule
     {
@@ -3256,7 +3256,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.NoUnusedFragments Instance;
         public NoUnusedFragments() { }
-        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor>? ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class NoUnusedVariables : GraphQL.Validation.IValidationRule
     {
@@ -3285,8 +3285,8 @@ namespace GraphQL.Validation.Rules
         public class Message
         {
             public Message() { }
-            public string Msg { get; set; }
-            public System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.ConflictReason> Msgs { get; set; }
+            public string? Msg { get; set; }
+            public System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.ConflictReason>? Msgs { get; set; }
         }
     }
     public class PossibleFragmentSpreads : GraphQL.Validation.IValidationRule
@@ -3329,7 +3329,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.UniqueFragmentNames Instance;
         public UniqueFragmentNames() { }
-        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor>? ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueInputFieldNames : GraphQL.Validation.IValidationRule
     {
@@ -3341,7 +3341,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.UniqueOperationNames Instance;
         public UniqueOperationNames() { }
-        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor>? ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueVariableNames : GraphQL.Validation.IValidationRule
     {

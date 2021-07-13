@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -29,7 +31,7 @@ namespace GraphQL.Validation.Rules
 
                 if (fieldDef?.Arguments?.Count > 0)
                 {
-                    foreach (var arg in fieldDef.Arguments.List)
+                    foreach (var arg in fieldDef.Arguments.List!)
                     {
                         if (arg.DefaultValue == null &&
                             arg.ResolvedType is NonNullGraphType &&
@@ -47,7 +49,7 @@ namespace GraphQL.Validation.Rules
 
                 if (directive?.Arguments?.Count > 0)
                 {
-                    foreach (var arg in directive.Arguments.List)
+                    foreach (var arg in directive.Arguments.List!)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;

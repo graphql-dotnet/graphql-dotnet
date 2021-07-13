@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -63,7 +65,7 @@ namespace GraphQL.Validation.Rules
                 FragmentSpread _ => DirectiveLocation.FragmentSpread,
                 InlineFragment _ => DirectiveLocation.InlineFragment,
                 FragmentDefinition _ => DirectiveLocation.FragmentDefinition,
-                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo.StringFrom(context.Document)}'.")
+                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.StringFrom(context.Document)}'.")
             };
         }
     }

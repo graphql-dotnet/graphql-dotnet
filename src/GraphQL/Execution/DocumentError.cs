@@ -19,6 +19,6 @@ namespace GraphQL.Execution
         /// <see cref="ExecutionError.Code">Code</see> property based on the inner exception.
         /// Loads any exception data from the inner exception into this instance.
         /// </summary>
-        public DocumentError(string message, Exception innerException) : base(message, innerException) { }
+        public DocumentError(string message, Exception? innerException) : base(message, innerException) { }
     }
 }

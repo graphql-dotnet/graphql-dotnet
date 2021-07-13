@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
@@ -12,13 +14,13 @@ namespace GraphQL.Validation
     public class TypeInfo : INodeVisitor
     {
         private readonly ISchema _schema;
-        private readonly Stack<IGraphType> _typeStack = new Stack<IGraphType>();
-        private readonly Stack<IGraphType> _inputTypeStack = new Stack<IGraphType>();
+        private readonly Stack<IGraphType?> _typeStack = new Stack<IGraphType?>();
+        private readonly Stack<IGraphType?> _inputTypeStack = new Stack<IGraphType?>();
         private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
-        private readonly Stack<FieldType> _fieldDefStack = new Stack<FieldType>();
+        private readonly Stack<FieldType?> _fieldDefStack = new Stack<FieldType?>();
         private readonly Stack<INode> _ancestorStack = new Stack<INode>();
-        private DirectiveGraphType _directive;
-        private QueryArgument _argument;
+        private DirectiveGraphType? _directive;
+        private QueryArgument? _argument;
 
         /// <summary>
         /// Initializes a new instance for the specified schema.
@@ -29,7 +31,7 @@ namespace GraphQL.Validation
             _schema = schema;
         }
 
-        private static T PeekElement<T>(Stack<T> from, int index)
+        private static T? PeekElement<T>(Stack<T> from, int index)
         {
             if (index == 0)
             {
@@ -57,41 +59,41 @@ namespace GraphQL.Validation
         /// Returns an ancestor of the current node.
         /// </summary>
         /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
-        public INode GetAncestor(int index) => PeekElement(_ancestorStack, index);
+        public INode? GetAncestor(int index) => PeekElement(_ancestorStack, index);
 
         /// <summary>
         /// Returns the last graph type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
-        public IGraphType GetLastType(int index = 0) => PeekElement(_typeStack, index);
+        public IGraphType? GetLastType(int index = 0) => PeekElement(_typeStack, index);
 
         /// <summary>
         /// Returns the last input graph type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
-        public IGraphType GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
+        public IGraphType? GetInputType(int index = 0) => PeekElement(_inputTypeStack, index);
 
         /// <summary>
         /// Returns the parent graph type of the current node, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the type; 0 for the top-most type, 1 for the direct ancestor and so on.</param>
-        public IGraphType GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
+        public IGraphType? GetParentType(int index = 0) => PeekElement(_parentTypeStack, index);
 
         /// <summary>
         /// Returns the last field type matched, or <see langword="null"/> if none.
         /// </summary>
         /// <param name="index">Index of the field; 0 for the top-most field, 1 for the direct ancestor and so on.</param>
-        public FieldType GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
+        public FieldType? GetFieldDef(int index = 0) => PeekElement(_fieldDefStack, index);
 
         /// <summary>
         /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
-        public DirectiveGraphType GetDirective() => _directive;
+        public DirectiveGraphType? GetDirective() => _directive;
 
         /// <summary>
         /// Returns the last query argument matched, or <see langword="null"/> if none.
         /// </summary>
-        public QueryArgument GetArgument() => _argument;
+        public QueryArgument? GetArgument() => _argument;
 
         /// <inheritdoc/>
         public void Enter(INode node, ValidationContext context)
@@ -100,7 +102,7 @@ namespace GraphQL.Validation
 
             if (node is SelectionSet)
             {
-                _parentTypeStack.Push(GetLastType());
+                _parentTypeStack.Push(GetLastType()!);
                 return;
             }
 
@@ -121,7 +123,7 @@ namespace GraphQL.Validation
 
             if (node is Operation op)
             {
-                IGraphType type = null;
+                IGraphType? type = null;
                 if (op.OperationType == OperationType.Query)
                 {
                     type = _schema.Query;
@@ -161,8 +163,8 @@ namespace GraphQL.Validation
 
             if (node is Argument argAst)
             {
-                QueryArgument argDef = null;
-                IGraphType argType = null;
+                QueryArgument? argDef = null;
+                IGraphType? argType = null;
 
                 var args = GetDirective() != null ? GetDirective()?.Arguments : GetFieldDef()?.Arguments;
 
@@ -178,14 +180,14 @@ namespace GraphQL.Validation
 
             if (node is ListValue)
             {
-                var type = GetInputType().GetNamedType();
+                var type = GetInputType()?.GetNamedType();
                 _inputTypeStack.Push(type);
             }
 
             if (node is ObjectField objectField)
             {
-                var objectType = GetInputType().GetNamedType();
-                IGraphType fieldType = null;
+                var objectType = GetInputType()?.GetNamedType();
+                IGraphType? fieldType = null;
 
                 if (objectType is IInputObjectGraphType complexType)
                 {
@@ -235,7 +237,7 @@ namespace GraphQL.Validation
             }
         }
 
-        private FieldType GetFieldDef(ISchema schema, IGraphType parentType, Field field)
+        private FieldType? GetFieldDef(ISchema schema, IGraphType parentType, Field field)
         {
             var name = field.Name;
 
@@ -268,34 +270,34 @@ namespace GraphQL.Validation
         /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
         /// are not redundantly reported.
         /// </summary>
-        internal HashSet<string> NoFragmentCycles_VisitedFrags;
+        internal HashSet<string>? NoFragmentCycles_VisitedFrags;
         /// <summary>
         /// Array of AST nodes used to produce meaningful errors
         /// </summary>
-        internal Stack<FragmentSpread> NoFragmentCycles_SpreadPath;
+        internal Stack<FragmentSpread>? NoFragmentCycles_SpreadPath;
         /// <summary>
         /// Position in the spread path
         /// </summary>
-        internal Dictionary<string, int> NoFragmentCycles_SpreadPathIndexByName;
+        internal Dictionary<string, int>? NoFragmentCycles_SpreadPathIndexByName;
 
-        internal HashSet<string> NoUndefinedVariables_VariableNameDefined;
+        internal HashSet<string>? NoUndefinedVariables_VariableNameDefined;
 
-        internal List<Operation> NoUnusedFragments_OperationDefs;
-        internal List<FragmentDefinition> NoUnusedFragments_FragmentDefs;
+        internal List<Operation>? NoUnusedFragments_OperationDefs;
+        internal List<FragmentDefinition>? NoUnusedFragments_FragmentDefs;
 
-        internal List<VariableDefinition> NoUnusedVariables_VariableDefs;
+        internal List<VariableDefinition>? NoUnusedVariables_VariableDefs;
 
-        internal Dictionary<string, Argument> UniqueArgumentNames_KnownArgs;
+        internal Dictionary<string, Argument>? UniqueArgumentNames_KnownArgs;
 
-        internal Dictionary<string, FragmentDefinition> UniqueFragmentNames_KnownFragments;
+        internal Dictionary<string, FragmentDefinition>? UniqueFragmentNames_KnownFragments;
 
-        internal Stack<Dictionary<string, IValue>> UniqueInputFieldNames_KnownNameStack;
-        internal Dictionary<string, IValue> UniqueInputFieldNames_KnownNames;
+        internal Stack<Dictionary<string, IValue>>? UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<string, IValue>? UniqueInputFieldNames_KnownNames;
 
-        internal HashSet<string> UniqueOperationNames_Frequency;
+        internal HashSet<string>? UniqueOperationNames_Frequency;
 
-        internal Dictionary<string, VariableDefinition> UniqueVariableNames_KnownVariables;
+        internal Dictionary<string, VariableDefinition>? UniqueVariableNames_KnownVariables;
 
-        internal Dictionary<string, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
+        internal Dictionary<string, VariableDefinition>? VariablesInAllowedPosition_VarDefMap;
     }
 }
