@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -44,7 +46,7 @@ namespace GraphQL.Validation.Rules
             if (fragment is FragmentSpread fragmentSpread)
             {
                 var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
-                rootFields = fragmentDefinition.SelectionSet.Selections.Count;
+                rootFields = fragmentDefinition?.SelectionSet.Selections.Count ?? 0;
             }
             else if (fragment is InlineFragment fragmentSelectionSet)
             {
