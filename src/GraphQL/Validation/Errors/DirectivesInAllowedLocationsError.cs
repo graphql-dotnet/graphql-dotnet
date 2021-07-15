@@ -12,7 +12,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public DirectivesInAllowedLocationsError(ValidationContext context, Directive node, DirectiveLocation candidateLocation)
-            : base(context.Document.OriginalQuery, "5.7.2", $"Directive '{node.Name}' may not be used on {candidateLocation}.", node)
+            : base(context.Document.OriginalQuery!, "5.7.2", $"Directive '{node.Name}' may not be used on {candidateLocation}.", node)
         {
         }
     }

@@ -8,8 +8,6 @@ using System.Reflection;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
-#nullable enable
-
 namespace GraphQL.Types
 {
     /// <summary>

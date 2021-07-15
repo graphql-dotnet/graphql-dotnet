@@ -1,7 +1,5 @@
 using GraphQL.Types;
 
-#nullable enable
-
 namespace GraphQL.Introspection
 {
     /// <summary>

@@ -18,11 +18,11 @@ namespace GraphQL.Types.Relay.DataObjects
         /// <summary>
         /// The cursor of the first node in the result data set.
         /// </summary>
-        public string StartCursor { get; set; }
+        public string? StartCursor { get; set; }
 
         /// <summary>
         /// The cursor of the last node in the result data set.
         /// </summary>
-        public string EndCursor { get; set; }
+        public string? EndCursor { get; set; }
     }
 }

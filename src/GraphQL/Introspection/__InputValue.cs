@@ -25,7 +25,7 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description");
 
-            Field<NonNullGraphType<__Type>>("type", resolve: context => ((IProvideResolvedType)context.Source).ResolvedType);
+            Field<NonNullGraphType<__Type>>("type", resolve: context => ((IProvideResolvedType)context.Source!).ResolvedType);
 
             Field<StringGraphType>(
                 "defaultValue",
@@ -36,7 +36,7 @@ namespace GraphQL.Introspection
                     if (hasDefault?.DefaultValue == null)
                         return null;
 
-                    var ast = hasDefault.ResolvedType.ToAST(hasDefault.DefaultValue);
+                    var ast = hasDefault.ResolvedType!.ToAST(hasDefault.DefaultValue);
                     string result = AstPrinter.Print(ast);
                     return string.IsNullOrWhiteSpace(result) ? null : result;
                 });

@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +29,7 @@ namespace GraphQL.Utilities
         /// Given an invalid input string and a list of valid options, returns a filtered
         /// list of valid options sorted based on their similarity with the input.
         /// </summary>
-        public static string[] SuggestionList(string input, IEnumerable<string> options)
+        public static string[] SuggestionList(string input, IEnumerable<string>? options)
         {
             if (options == null)
             {

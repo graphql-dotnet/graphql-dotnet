@@ -35,7 +35,7 @@ namespace GraphQL.DI
         /// <br/><br/>
         /// Passing <see langword="null"/> as the delegate is allowed and will skip this registration.
         /// </summary>
-        IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+        IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
     }
 }

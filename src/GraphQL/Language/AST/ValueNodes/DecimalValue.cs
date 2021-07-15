@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GraphQL.Language.AST
 {
     /// <summary>

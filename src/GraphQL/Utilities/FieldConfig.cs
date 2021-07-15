@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 

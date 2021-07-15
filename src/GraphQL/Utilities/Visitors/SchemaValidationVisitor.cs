@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 using System.Linq;
 using GraphQL.Types;
@@ -285,9 +283,9 @@ namespace GraphQL.Utilities
         {
             if (argument.DefaultValue is GraphQLValue value)
             {
-                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
             }
-            else if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+            else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
             {
                 throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
             }

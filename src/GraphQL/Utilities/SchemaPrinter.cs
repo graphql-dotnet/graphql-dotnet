@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,7 +261,7 @@ namespace GraphQL.Utilities
 
         public string PrintInputValue(QueryArgument argument)
         {
-            var argumentType = argument.ResolvedType;
+            var argumentType = argument.ResolvedType!;
             var desc = "{0}: {1}".ToFormat(argument.Name, argumentType);
 
             if (argument.DefaultValue != null)

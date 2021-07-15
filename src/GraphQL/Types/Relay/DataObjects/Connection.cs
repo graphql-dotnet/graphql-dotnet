@@ -19,17 +19,17 @@ namespace GraphQL.Types.Relay.DataObjects
         /// <summary>
         /// Additional pagination information for this result data set.
         /// </summary>
-        public PageInfo PageInfo { get; set; }
+        public PageInfo? PageInfo { get; set; }
 
         /// <summary>
         /// The result data set, stored as a list of edges containing a node (the data) and a cursor (a unique identifier for the data).
         /// </summary>
-        public List<TEdge> Edges { get; set; }
+        public List<TEdge>? Edges { get; set; }
 
         /// <summary>
         /// The result data set.
         /// </summary>
-        public List<TNode> Items => Edges?.Select(edge => edge.Node).ToList();
+        public List<TNode?>? Items => Edges?.Select(edge => edge.Node).ToList();
     }
 
     /// <summary>

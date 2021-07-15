@@ -19,12 +19,12 @@ namespace GraphQL.Introspection
             Field<NonNullGraphType<StringGraphType>>(
                 "name",
                 "Directive name",
-                resolve: context => context.Source.Name);
+                resolve: context => context.Source!.Name);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>(
                 "args",
                 "Values of explicitly specified directive arguments",
-                resolve: context => context.Source.List ?? Enumerable.Empty<DirectiveArgument>());
+                resolve: context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
         }
     }
 }

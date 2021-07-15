@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueVariableNamesError(ValidationContext context, VariableDefinition node, VariableDefinition altNode)
-            : base(context.Document.OriginalQuery, NUMBER, DuplicateVariableMessage(node.Name), node, altNode)
+            : base(context.Document.OriginalQuery!, NUMBER, DuplicateVariableMessage(node.Name), node, altNode)
         {
         }
 

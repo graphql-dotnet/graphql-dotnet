@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Resolvers;
 
 namespace GraphQL.Types

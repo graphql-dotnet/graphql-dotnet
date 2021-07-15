@@ -2,8 +2,6 @@ using System;
 using System.Globalization;
 using GraphQL.Language.AST;
 
-#nullable enable
-
 namespace GraphQL.Types
 {
     /// <summary>
