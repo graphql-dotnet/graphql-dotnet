@@ -20,7 +20,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the variable being referenced.
         /// </summary>
-        public string Name => NameNode.Name!;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the name of the variable being referenced.

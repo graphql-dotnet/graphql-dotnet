@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace GraphQL.Utilities
 {
     /// <summary>
@@ -22,11 +24,11 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Gets or sets the argument description.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the default value of the field argument.
         /// </summary>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
     }
 }

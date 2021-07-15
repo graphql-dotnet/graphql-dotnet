@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq;
 using GraphQL.Types;

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -26,7 +28,7 @@ namespace GraphQL.Utilities
             };
         }
 
-        public static T GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
+        public static T? GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
         {
             return type.GetMetadata<T>(AST_METAFIELD);
         }
@@ -39,14 +41,14 @@ namespace GraphQL.Utilities
 
             if (node is IHasDirectivesNode ast && ast.Directives?.Count > 0)
             {
-                foreach (var directive in ast.Directives)
+                foreach (var directive in ast.Directives!)
                 {
-                    provider.ApplyDirective((string)directive.Name.Value, d =>
+                    provider.ApplyDirective((string)directive!.Name!.Value, d =>
                     {
                         if (directive.Arguments?.Count > 0)
                         {
                             foreach (var arg in directive.Arguments)
-                                d.AddArgument(new DirectiveArgument((string)arg.Name.Value) { Value = arg.Value.ToValue() });
+                                d.AddArgument(new DirectiveArgument((string)arg.Name!.Value) { Value = arg.Value!.ToValue() });
                         }
                     });
                 }
@@ -69,7 +71,7 @@ namespace GraphQL.Utilities
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>());
+            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>())!;
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode

@@ -180,7 +180,7 @@ namespace GraphQL
                {
                    if (context.Source!.HasAppliedDirectives())
                    {
-                       var appliedDirectives = context.Source.GetAppliedDirectives();
+                       var appliedDirectives = context.Source!.GetAppliedDirectives();
                        var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives!.Count);
 
                        int index = 0;

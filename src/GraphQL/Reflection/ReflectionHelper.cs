@@ -14,7 +14,7 @@ namespace GraphQL.Reflection
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
         /// <param name="resolverType">defaults to Resolver</param>
-        public static IAccessor? ToAccessor(this Type type, string field, ResolverType resolverType)
+        public static IAccessor? ToAccessor(this Type? type, string field, ResolverType resolverType)
         {
             if (type == null)
                 return null;
