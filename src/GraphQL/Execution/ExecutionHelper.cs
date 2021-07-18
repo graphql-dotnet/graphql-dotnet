@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
@@ -28,7 +26,7 @@ namespace GraphQL.Execution
             foreach (var arg in definitionArguments.List!)
             {
                 var value = astArguments?.ValueFor(arg.Name);
-                var type = arg.ResolvedType;
+                var type = arg.ResolvedType!;
 
                 values[arg.Name] = CoerceValue(type, value, variables, arg.DefaultValue);
             }

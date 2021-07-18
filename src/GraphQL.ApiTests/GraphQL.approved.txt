@@ -635,34 +635,34 @@ namespace GraphQL.Builders
     public static class FieldBuilder
     {
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(GraphQL.Types.IGraphType type) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(System.Type type = null) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(System.Type? type = null) { }
     }
     public class FieldBuilder<TSourceType, TReturnType>
     {
         public GraphQL.Types.EventStreamFieldType FieldType { get; }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, System.Action<GraphQL.Types.QueryArgument> configure = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument> configure = null)
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType? defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType? defaultValue = default) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string? description) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object argumentValue) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType> resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscribe) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscribeAsync) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType?>> subscribe) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> subscribeAsync) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(System.Type type = null, string name = "default") { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(System.Type? type = null, string name = "default") { }
     }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
@@ -730,7 +730,7 @@ namespace GraphQL.DI
     public abstract class GraphQLBuilderBase : GraphQL.DI.IGraphQLBuilder
     {
         protected GraphQLBuilderBase() { }
-        public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
+        public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
         protected virtual void Initialize() { }
         public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
@@ -750,7 +750,7 @@ namespace GraphQL.DI
     }
     public interface IGraphQLBuilder
     {
-        GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider> action = null)
+        GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
         GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
         GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
@@ -1168,11 +1168,11 @@ namespace GraphQL.Introspection
     public class DefaultSchemaComparer : GraphQL.Introspection.ISchemaComparer
     {
         public DefaultSchemaComparer() { }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent) { }
     }
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
@@ -1193,11 +1193,11 @@ namespace GraphQL.Introspection
     }
     public interface ISchemaComparer
     {
-        System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
-        System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
-        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field);
-        System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
-        System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent);
+        System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field);
+        System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
+        System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent);
     }
     public interface ISchemaFilter
     {
@@ -1823,7 +1823,7 @@ namespace GraphQL.Types
         public AppliedDirectives() { }
         public int Count { get; }
         public void Add(GraphQL.Types.AppliedDirective directive) { }
-        public GraphQL.Types.AppliedDirective Find(string name) { }
+        public GraphQL.Types.AppliedDirective? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.AppliedDirective> GetEnumerator() { }
         public int Remove(string name) { }
     }
@@ -2302,11 +2302,11 @@ namespace GraphQL.Types
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
-        public object DefaultValue { get; set; }
-        public string Description { get; set; }
+        public object? DefaultValue { get; set; }
+        public string? Description { get; set; }
         public string Name { get; set; }
-        public GraphQL.Types.IGraphType ResolvedType { get; set; }
-        public System.Type Type { get; }
+        public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public System.Type? Type { get; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType
@@ -2545,24 +2545,24 @@ namespace GraphQL.Types.Relay.DataObjects
         where TEdge : GraphQL.Types.Relay.DataObjects.Edge<TNode>
     {
         public Connection() { }
-        public System.Collections.Generic.List<TEdge> Edges { get; set; }
-        public System.Collections.Generic.List<TNode> Items { get; }
-        public GraphQL.Types.Relay.DataObjects.PageInfo PageInfo { get; set; }
+        public System.Collections.Generic.List<TEdge>? Edges { get; set; }
+        public System.Collections.Generic.List<TNode?>? Items { get; }
+        public GraphQL.Types.Relay.DataObjects.PageInfo? PageInfo { get; set; }
         public int? TotalCount { get; set; }
     }
     public class Edge<TNode>
     {
         public Edge() { }
-        public string Cursor { get; set; }
+        public string? Cursor { get; set; }
         public TNode Node { get; set; }
     }
     public class PageInfo
     {
         public PageInfo() { }
-        public string EndCursor { get; set; }
+        public string? EndCursor { get; set; }
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
-        public string StartCursor { get; set; }
+        public string? StartCursor { get; set; }
     }
 }
 namespace GraphQL.Utilities
@@ -2764,7 +2764,7 @@ namespace GraphQL.Utilities
     {
         public static int DamerauLevenshteinDistance(string source, string target, int threshold) { }
         public static string QuotedOrList(System.Collections.Generic.IEnumerable<string> items, int maxLength = 5) { }
-        public static string[] SuggestionList(string input, System.Collections.Generic.IEnumerable<string> options) { }
+        public static string[] SuggestionList(string input, System.Collections.Generic.IEnumerable<string>? options) { }
     }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {

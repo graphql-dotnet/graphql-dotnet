@@ -59,7 +59,7 @@ namespace GraphQL.Introspection
                         var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
 
                         int index = 0;
-                        foreach (var argument in source.Arguments.List)
+                        foreach (var argument in source.Arguments.List!)
                         {
                             if (await context.Schema.Filter.AllowArgument(source, argument).ConfigureAwait(false))
                                 arguments[index++] = argument;

@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -30,7 +28,7 @@ namespace GraphQL.Validation.Rules
 
             if (type == null || !type.IsInputType())
             {
-                context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
+                context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)!));
             }
         }).ToTask();
     }

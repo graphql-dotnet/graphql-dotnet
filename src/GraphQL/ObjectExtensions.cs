@@ -7,8 +7,6 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
-#nullable enable
-
 namespace GraphQL
 {
     /// <summary>

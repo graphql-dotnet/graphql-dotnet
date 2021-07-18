@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Types;
 
 namespace GraphQL.Conversion

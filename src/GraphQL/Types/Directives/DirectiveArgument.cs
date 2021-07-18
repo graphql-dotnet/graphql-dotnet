@@ -1,7 +1,5 @@
 using GraphQL.Utilities;
 
-#nullable enable
-
 namespace GraphQL.Types
 {
     /// <summary>

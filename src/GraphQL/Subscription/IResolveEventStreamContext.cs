@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : IResolveFieldContext

@@ -5,8 +5,6 @@ using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-#nullable enable
-
 namespace GraphQL
 {
     /// <summary>

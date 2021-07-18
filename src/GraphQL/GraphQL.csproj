@@ -6,6 +6,7 @@
     <Authors>Joe McBride</Authors>
     <Copyright>Copyright (c) 2015-2021 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>
     <PackageTags>GraphQL;json;api</PackageTags>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

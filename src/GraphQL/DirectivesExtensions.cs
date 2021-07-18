@@ -2,8 +2,6 @@ using System;
 using GraphQL.Introspection;
 using GraphQL.Types;
 
-#nullable enable
-
 namespace GraphQL
 {
     /// <summary>
@@ -184,7 +182,7 @@ namespace GraphQL
                        var result = context.ArrayPool.Rent<AppliedDirective>(appliedDirectives!.Count);
 
                        int index = 0;
-                       foreach (var applied in appliedDirectives.List)
+                       foreach (var applied in appliedDirectives.List!)
                        {
                            // return only registered directives allowed by filter
                            var schemaDirective = context.Schema.Directives.Find(applied.Name);

@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -631,7 +629,7 @@ Make sure that your ServiceProvider is configured correctly.");
                     {
                         foreach (var arg in field.Arguments.List!)
                         {
-                            arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
+                            arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType!);
                         }
                     }
                 }

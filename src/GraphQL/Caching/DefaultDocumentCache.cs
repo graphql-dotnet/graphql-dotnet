@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Language.AST;
 
 namespace GraphQL.Caching

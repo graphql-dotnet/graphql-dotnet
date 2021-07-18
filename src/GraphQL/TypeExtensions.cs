@@ -9,8 +9,6 @@ using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-#nullable enable
-
 namespace GraphQL
 {
     /// <summary>
