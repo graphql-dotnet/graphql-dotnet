@@ -1,5 +1,7 @@
 # GraphQL for .NET
 
+![License](https://img.shields.io/github/license/graphql-dotnet/graphql-dotnet)
+
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Test code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml)
