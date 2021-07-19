@@ -51,7 +51,7 @@ namespace GraphQL.MicrosoftDI
         public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType>> resolver) { }
         public GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
     }
-    public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase
+    public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase, Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IEnumerable<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IList<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.IEnumerable
     {
         public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection Services { get; }
