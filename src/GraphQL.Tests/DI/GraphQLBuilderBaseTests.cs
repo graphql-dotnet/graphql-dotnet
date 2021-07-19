@@ -37,7 +37,7 @@ namespace GraphQL.Tests.DI
                 var schema = Mock.Of<ISchema>(MockBehavior.Strict);
 
                 //verify no action if schema is set
-                action.Configure(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) });
+                action.ConfigureAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }).Wait();
 
                 //verify schema is pulled from service provider if schema is not set
                 var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.DI
                 {
                     RequestServices = mockServiceProvider.Object,
                 };
-                action.Configure(opts);
+                action.ConfigureAsync(opts).Wait();
                 opts.Schema.ShouldBe(schema);
                 mockServiceProvider.Verify();
 

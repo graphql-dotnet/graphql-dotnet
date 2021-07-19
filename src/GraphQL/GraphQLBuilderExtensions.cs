@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -677,6 +678,18 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
             => builder.Register<IConfigureExecution>(new ConfigureExecution(action ?? throw new ArgumentNullException(nameof(action))));
+
+        /// <summary>
+        /// Configures an asynchronous action to run immediately prior to document execution.
+        /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecution})"/>
+        /// within the constructor.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
+            => builder.Register<IConfigureExecution>(new ConfigureExecutionAsync(action ?? throw new ArgumentNullException(nameof(action))));
         #endregion
 
         #region - AddValidationRule -

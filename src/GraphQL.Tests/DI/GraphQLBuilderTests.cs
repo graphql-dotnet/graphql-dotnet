@@ -86,7 +86,7 @@ namespace GraphQL.Tests.DI
                     actions = opts =>
                     {
                         actions2(opts);
-                        action.Configure(opts);
+                        action.ConfigureAsync(opts).Wait();
                     };
                     return _builder;
                 }).Verifiable();
@@ -344,7 +344,7 @@ namespace GraphQL.Tests.DI
                     //test with no complexity configuration
                     ran = false;
                     opts = new ExecutionOptions();
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     ran.ShouldBeTrue();
 
                     //test with existing complexity configuration
@@ -354,7 +354,7 @@ namespace GraphQL.Tests.DI
                     {
                         ComplexityConfiguration = cc2,
                     };
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     ran.ShouldBeTrue();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
@@ -384,7 +384,7 @@ namespace GraphQL.Tests.DI
                     {
                         RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
                     };
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     ran.ShouldBeTrue();
 
                     //test with existing complexity configuration
@@ -395,7 +395,7 @@ namespace GraphQL.Tests.DI
                         RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
                         ComplexityConfiguration = cc2,
                     };
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     ran.ShouldBeTrue();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
@@ -414,7 +414,7 @@ namespace GraphQL.Tests.DI
                     //test with no complexity configuration
                     opts = new ExecutionOptions();
                     opts.ComplexityConfiguration.ShouldBeNull();
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     opts.ComplexityConfiguration.ShouldNotBeNull();
 
                     //test with existing complexity configuration
@@ -423,7 +423,7 @@ namespace GraphQL.Tests.DI
                     {
                         ComplexityConfiguration = cc2,
                     };
-                    action.Configure(opts);
+                    action.ConfigureAsync(opts).Wait();
                     opts.ComplexityConfiguration.ShouldBe(cc2);
 
                     return _builder;

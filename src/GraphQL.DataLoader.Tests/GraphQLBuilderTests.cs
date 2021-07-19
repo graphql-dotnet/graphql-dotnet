@@ -27,7 +27,7 @@ namespace GraphQL.DataLoader.Tests
                     {
                         RequestServices = mockServiceProvider.Object
                     };
-                    action.Configure(options);
+                    action.ConfigureAsync(options).Wait();
                     options.Listeners.ShouldContain(instance);
                     return builder;
                 }).Verifiable();
