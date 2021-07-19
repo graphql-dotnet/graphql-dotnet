@@ -12,34 +12,34 @@ namespace GraphQL.Introspection
         /// Returns a comparer for GraphQL types.
         /// If this returns <see langword="null"/> then the original type ordering is preserved.
         /// </summary>
-        IComparer<IGraphType> TypeComparer { get; }
+        IComparer<IGraphType>? TypeComparer { get; }
 
         /// <summary>
         /// Returns a comparer for fields withing enclosing type.
         /// If this returns <see langword="null"/> then the original field ordering is preserved.
         /// </summary>
         /// <param name="parent"> Parent type to which the fields belong. </param>
-        IComparer<IFieldType> FieldComparer(IGraphType parent);
+        IComparer<IFieldType>? FieldComparer(IGraphType parent);
 
         /// <summary>
         /// Returns a comparer for field arguments.
         /// If this returns <see langword="null"/> then the original argument ordering is preserved.
         /// </summary>
         /// <param name="field"> The field to which the arguments belong. </param>
-        IComparer<QueryArgument> ArgumentComparer(IFieldType field);
+        IComparer<QueryArgument>? ArgumentComparer(IFieldType field);
 
         /// <summary>
         /// Returns a comparer for enum values.
         /// If this returns <see langword="null"/> then the original enum value ordering is preserved.
         /// </summary>
         /// <param name="parent"> The enumeration to which the enum values belong. </param>
-        IComparer<EnumValueDefinition> EnumValueComparer(EnumerationGraphType parent);
+        IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent);
 
         /// <summary>
         /// Returns a comparer for GraphQL directives.
         /// If this returns <see langword="null"/> then the original directive ordering is preserved.
         /// </summary>
-        IComparer<DirectiveGraphType> DirectiveComparer { get; }
+        IComparer<DirectiveGraphType>? DirectiveComparer { get; }
     }
 
     /// <summary>
@@ -48,19 +48,19 @@ namespace GraphQL.Introspection
     public class DefaultSchemaComparer : ISchemaComparer
     {
         /// <inheritdoc/>
-        public virtual IComparer<IGraphType> TypeComparer => null;
+        public virtual IComparer<IGraphType>? TypeComparer => null;
 
         /// <inheritdoc/>
-        public virtual IComparer<DirectiveGraphType> DirectiveComparer => null;
+        public virtual IComparer<DirectiveGraphType>? DirectiveComparer => null;
 
         /// <inheritdoc/>
-        public virtual IComparer<QueryArgument> ArgumentComparer(IFieldType field) => null;
+        public virtual IComparer<QueryArgument>? ArgumentComparer(IFieldType field) => null;
 
         /// <inheritdoc/>
-        public virtual IComparer<EnumValueDefinition> EnumValueComparer(EnumerationGraphType parent) => null;
+        public virtual IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent) => null;
 
         /// <inheritdoc/>
-        public virtual IComparer<IFieldType> FieldComparer(IGraphType parent) => null;
+        public virtual IComparer<IFieldType>? FieldComparer(IGraphType parent) => null;
     }
 
     /// <summary>

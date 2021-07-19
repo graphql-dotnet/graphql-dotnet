@@ -7,8 +7,6 @@ using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
 
-#nullable enable
-
 namespace GraphQL.Builders
 {
     /// <summary>

@@ -1,8 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
 
-#nullable enable
-
 namespace GraphQL.Types
 {
     /// <summary>

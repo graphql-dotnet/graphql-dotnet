@@ -1,8 +1,6 @@
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
-#nullable enable
-
 namespace GraphQL.Utilities.Federation
 {
     /// <summary>

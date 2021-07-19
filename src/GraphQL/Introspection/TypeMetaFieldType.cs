@@ -18,7 +18,7 @@ namespace GraphQL.Introspection
             Type = typeof(__Type);
             Description = "Request the type information of a single type.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" });
-            Resolver = new FuncFieldResolver<object>(context => context.Schema.AllTypes[context.GetArgument<string>("name")]);
+            Resolver = new FuncFieldResolver<object>(context => context.Schema.AllTypes[context.GetArgument<string>("name")!]);
         }
     }
 }

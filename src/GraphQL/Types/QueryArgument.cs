@@ -26,8 +26,8 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription
     {
-        private Type _type;
-        private IGraphType _resolvedType;
+        private Type? _type;
+        private IGraphType? _resolvedType;
 
         /// <summary>
         /// Initializes a new instance of the argument.
@@ -52,13 +52,13 @@ namespace GraphQL.Types
             Type = type;
         }
 
-        private string _name;
+        private string? _name;
         /// <summary>
         /// Gets or sets the name of the argument.
         /// </summary>
         public string Name
         {
-            get => _name;
+            get => _name!;
             set
             {
                 if (_name != value)
@@ -72,30 +72,30 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the description of the argument.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the default value of the argument.
         /// </summary>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// Returns the graph type of this argument.
         /// </summary>
-        public IGraphType ResolvedType
+        public IGraphType? ResolvedType
         {
             get => _resolvedType;
             set => _resolvedType = CheckResolvedType(value);
         }
 
         /// <inheritdoc/>
-        public Type Type
+        public Type? Type
         {
             get => _type;
             internal set => _type = CheckType(value);
         }
 
-        private Type CheckType(Type type)
+        private Type? CheckType(Type? type)
         {
             if (type?.IsInputType() == false)
                 throw Create(nameof(Type), type);
@@ -103,7 +103,7 @@ namespace GraphQL.Types
             return type;
         }
 
-        private IGraphType CheckResolvedType(IGraphType type)
+        private IGraphType? CheckResolvedType(IGraphType? type)
         {
             if (type != null && !type.IsGraphQLTypeReference() && type.IsInputType() == false)
                 throw Create(nameof(ResolvedType), type.GetType());

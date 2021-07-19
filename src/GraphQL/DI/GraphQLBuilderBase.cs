@@ -85,7 +85,7 @@ namespace GraphQL.DI
         public abstract IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+        public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
     }
 }

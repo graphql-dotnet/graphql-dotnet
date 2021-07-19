@@ -9,11 +9,11 @@ namespace GraphQL.Types.Relay.DataObjects
         /// <summary>
         /// The cursor of this edge's node. A cursor is a string representation of a unique identifier of this node.
         /// </summary>
-        public string Cursor { get; set; }
+        public string? Cursor { get; set; }
 
         /// <summary>
         /// The node. A node is a single row of data within the result data set.
         /// </summary>
-        public TNode Node { get; set; }
+        public TNode? Node { get; set; }
     }
 }

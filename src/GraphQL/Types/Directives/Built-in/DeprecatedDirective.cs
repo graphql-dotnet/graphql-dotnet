@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GraphQL.Types
 {
     /// <summary>

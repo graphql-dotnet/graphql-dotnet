@@ -57,7 +57,7 @@ namespace GraphQL.Introspection
                 "If this server supports mutation, the type that mutation operations will be rooted at.",
                 resolve: async context =>
                 {
-                    return await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
+                    return context.Schema.Mutation != null && await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
                         ? context.Schema.Mutation
                         : null;
                 });
@@ -67,7 +67,7 @@ namespace GraphQL.Introspection
                 "If this server supports subscription, the type that subscription operations will be rooted at.",
                 resolve: async context =>
                 {
-                    return await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
+                    return context.Schema.Subscription != null && await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
                         ? context.Schema.Subscription
                         : null;
                 });

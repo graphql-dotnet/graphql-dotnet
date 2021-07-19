@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public SingleRootFieldSubscriptionsError(ValidationContext context, Operation operation, params ISelection[] nodes)
-            : base(context.Document.OriginalQuery, NUMBER, InvalidNumberOfRootFieldMessage(operation.Name), nodes)
+            : base(context.Document.OriginalQuery!, NUMBER, InvalidNumberOfRootFieldMessage(operation.Name), nodes)
         {
         }
 

@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
-#nullable enable
-
 namespace GraphQL.Builders
 {
     /// <summary>

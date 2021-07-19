@@ -37,7 +37,7 @@ namespace GraphQL.Introspection
                     : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
 
-            Field<StringGraphType>("name", resolve: context => context.Source.Name);
+            Field<StringGraphType>("name", resolve: context => context.Source!.Name);
 
             Field<StringGraphType>("description");
 

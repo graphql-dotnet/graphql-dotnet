@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
 
-#nullable enable
-
 namespace GraphQL
 {
     /// <summary>

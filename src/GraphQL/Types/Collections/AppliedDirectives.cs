@@ -10,7 +10,7 @@ namespace GraphQL.Types
     /// </summary>
     public class AppliedDirectives : IEnumerable<AppliedDirective>
     {
-        internal List<AppliedDirective> List { get; private set; }
+        internal List<AppliedDirective>? List { get; private set; }
 
         /// <summary>
         /// Gets the count of applied directives.
@@ -36,7 +36,7 @@ namespace GraphQL.Types
         /// Finds a directive by its name from the list. If the list contains several
         /// directives with the given name, then the first one is returned.
         /// </summary>
-        public AppliedDirective Find(string name)
+        public AppliedDirective? Find(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)
