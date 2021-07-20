@@ -20,33 +20,36 @@ namespace GraphQL
     public static class GraphQLBuilderExtensions
     {
         #region - Additional overloads for Register, TryRegister, ConfigureDefaults and Configure -
-        /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime);
+            => graphQLBuilder.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
         /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
+        /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder Register<TService, TImplementation>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
-            => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime);
+            => graphQLBuilder.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
+        /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime);
+            => graphQLBuilder.Register(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime, replace);
 
         /// <summary>
         /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
+        /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, TService implementationInstance, bool replace = false)
             where TService : class
-            => graphQLBuilder.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)));
+            => graphQLBuilder.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
 
         /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime)
@@ -634,7 +637,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder)
             where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton);
+            => builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton, true);
 
         /// <summary>
         /// Registers <paramref name="documentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
@@ -642,7 +645,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter>(documentWriter ?? throw new ArgumentNullException(nameof(documentWriter)));
+            => builder.Register<IDocumentWriter>(documentWriter ?? throw new ArgumentNullException(nameof(documentWriter)), true);
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
@@ -650,7 +653,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentWriter> documentWriterFactory)
             where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton);
+            => builder.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton, true);
         #endregion
 
         #region - ConfigureSchema and ConfigureExecution -

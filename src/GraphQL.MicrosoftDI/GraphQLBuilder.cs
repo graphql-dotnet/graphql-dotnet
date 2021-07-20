@@ -58,38 +58,59 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
-            Services.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            if (replace)
+            {
+                Services.Replace(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            }
+            else
+            {
+                Services.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            }
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
+        public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationType == null)
                 throw new ArgumentNullException(nameof(implementationType));
 
-            Services.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            if (replace)
+            {
+                Services.Replace(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            }
+            else
+            {
+                Services.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            }
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, object implementationInstance)
+        public override IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationInstance == null)
                 throw new ArgumentNullException(nameof(implementationInstance));
 
-            Services.Add(new ServiceDescriptor(serviceType, implementationInstance));
+            if (replace)
+            {
+                Services.Replace(new ServiceDescriptor(serviceType, implementationInstance));
+            }
+            else
+            {
+                Services.Add(new ServiceDescriptor(serviceType, implementationInstance));
+            }
             return this;
         }
 

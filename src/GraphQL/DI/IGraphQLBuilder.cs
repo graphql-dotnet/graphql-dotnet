@@ -9,14 +9,15 @@ namespace GraphQL.DI
     {
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider.
+        /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+        IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 
-        /// <inheritdoc cref="Register(Type, Type, ServiceLifetime)"/>
-        IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
+        /// <inheritdoc cref="Register(Type, Type, ServiceLifetime, bool)"/>
+        IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false);
 
-        /// <inheritdoc cref="Register(Type, Type, ServiceLifetime)"/>
-        IGraphQLBuilder Register(Type serviceType, object implementationInstance);
+        /// <inheritdoc cref="Register(Type, Type, ServiceLifetime, bool)"/>
+        IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false);
 
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider if a service

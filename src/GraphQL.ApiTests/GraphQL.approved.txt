@@ -265,13 +265,13 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class
             where TImplementation :  class, TService { }
         public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
@@ -734,9 +734,9 @@ namespace GraphQL.DI
         public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
         protected virtual void Initialize() { }
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false);
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
@@ -753,9 +753,9 @@ namespace GraphQL.DI
     {
         GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance);
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false);
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
         GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
         GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
         GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);

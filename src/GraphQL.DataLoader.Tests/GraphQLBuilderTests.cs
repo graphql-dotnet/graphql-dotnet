@@ -15,12 +15,12 @@ namespace GraphQL.DataLoader.Tests
             var instance = new DataLoaderDocumentListener(new DataLoaderContextAccessor());
             var mockBuilder = new Mock<IGraphQLBuilder>(MockBehavior.Strict);
             var builder = mockBuilder.Object;
-            mockBuilder.Setup(x => x.Register(typeof(IDataLoaderContextAccessor), typeof(DataLoaderContextAccessor), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(IDocumentExecutionListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
+            mockBuilder.Setup(x => x.Register(typeof(IDataLoaderContextAccessor), typeof(DataLoaderContextAccessor), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
+            mockBuilder.Setup(x => x.Register(typeof(IDocumentExecutionListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
+            mockBuilder.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>()))
+            mockBuilder.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureExecution>((_, action) =>
                 {
                     var options = new ExecutionOptions()
