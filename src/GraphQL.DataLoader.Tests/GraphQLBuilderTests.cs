@@ -21,7 +21,7 @@ namespace GraphQL.DataLoader.Tests
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
             mockBuilder.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution>((_, action) =>
+                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
                 {
                     var options = new ExecutionOptions()
                     {
