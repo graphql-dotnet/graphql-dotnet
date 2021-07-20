@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace GraphQL.DI
 {
@@ -13,7 +14,7 @@ namespace GraphQL.DI
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used to resolve other services from the dependency injection framework.
         /// </remarks>
-        void Configure(ExecutionOptions executionOptions);
+        Task ConfigureAsync(ExecutionOptions executionOptions);
     }
 
     internal class ConfigureExecution : IConfigureExecution
@@ -25,9 +26,25 @@ namespace GraphQL.DI
             _action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
-        public void Configure(ExecutionOptions executionOptions)
+        public Task ConfigureAsync(ExecutionOptions executionOptions)
         {
             _action(executionOptions);
+            return Task.CompletedTask;
+        }
+    }
+
+    internal class ConfigureExecutionAsync : IConfigureExecution
+    {
+        private readonly Func<ExecutionOptions, Task> _action;
+
+        public ConfigureExecutionAsync(Func<ExecutionOptions, Task> action)
+        {
+            _action = action ?? throw new ArgumentNullException(nameof(action));
+        }
+
+        public Task ConfigureAsync(ExecutionOptions executionOptions)
+        {
+            return _action(executionOptions);
         }
     }
 }
