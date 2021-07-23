@@ -17,13 +17,15 @@ namespace GraphQL.MicrosoftDI.Tests
         }
 
         [Theory]
-        [InlineData(typeof(List<>), typeof(List<>), DI.ServiceLifetime.Singleton)]
-        [InlineData(typeof(IList<>), typeof(List<>), DI.ServiceLifetime.Singleton)]
-        [InlineData(typeof(Class1), typeof(Class1), DI.ServiceLifetime.Singleton)]
-        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Singleton)]
-        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Scoped)]
-        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Transient)]
-        public void Register(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime)
+        [InlineData(typeof(List<>), typeof(List<>), DI.ServiceLifetime.Singleton, false, false)]
+        [InlineData(typeof(IList<>), typeof(List<>), DI.ServiceLifetime.Singleton, false, false)]
+        [InlineData(typeof(Class1), typeof(Class1), DI.ServiceLifetime.Singleton, false, false)]
+        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Singleton, false, false)]
+        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Scoped, false, false)]
+        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Transient, false, false)]
+        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Scoped, true, false)]
+        [InlineData(typeof(Interface1), typeof(Class1), DI.ServiceLifetime.Scoped, true, true)]
+        public void Register(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime, bool replace, bool withExisting)
         {
             bool match = false;
             var descriptorList = new List<ServiceDescriptor>();
@@ -45,19 +47,27 @@ namespace GraphQL.MicrosoftDI.Tests
                 }
                 descriptorList.Add(d);
             }).Verifiable();
+            if (replace && withExisting)
+            {
+                var toRemove = new ServiceDescriptor(serviceType, implementationType, ServiceLifetime.Transient);
+                descriptorList.Add(toRemove);
+                mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
             var builder = new GraphQLBuilder(services);
-            builder.Register(serviceType, implementationType, serviceLifetime);
+            builder.Register(serviceType, implementationType, serviceLifetime, replace);
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
 
         [Theory]
-        [InlineData(DI.ServiceLifetime.Singleton)]
-        [InlineData(DI.ServiceLifetime.Scoped)]
-        [InlineData(DI.ServiceLifetime.Transient)]
-        public void Register_Factory(DI.ServiceLifetime serviceLifetime)
+        [InlineData(DI.ServiceLifetime.Singleton, false, false)]
+        [InlineData(DI.ServiceLifetime.Scoped, false, false)]
+        [InlineData(DI.ServiceLifetime.Transient, false, false)]
+        [InlineData(DI.ServiceLifetime.Scoped, true, false)]
+        [InlineData(DI.ServiceLifetime.Scoped, true, true)]
+        public void Register_Factory(DI.ServiceLifetime serviceLifetime, bool replace, bool withExisting)
         {
             bool match = false;
             Func<IServiceProvider, Class1> factory = _ => null;
@@ -80,16 +90,25 @@ namespace GraphQL.MicrosoftDI.Tests
                 }
                 descriptorList.Add(d);
             }).Verifiable();
+            if (replace && withExisting)
+            {
+                var toRemove = new ServiceDescriptor(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient);
+                descriptorList.Add(toRemove);
+                mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
             var builder = new GraphQLBuilder(services);
-            builder.Register<Interface1>(factory, serviceLifetime);
+            builder.Register<Interface1>(factory, serviceLifetime, replace);
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
 
-        [Fact]
-        public void Register_Instance()
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public void Register_Instance(bool replace, bool withExisting)
         {
             bool match = false;
             var descriptorList = new List<ServiceDescriptor>();
@@ -106,10 +125,16 @@ namespace GraphQL.MicrosoftDI.Tests
                 }
                 descriptorList.Add(d);
             }).Verifiable();
+            if (replace && withExisting)
+            {
+                var toRemove = new ServiceDescriptor(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient);
+                descriptorList.Add(toRemove);
+                mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
             var builder = new GraphQLBuilder(services);
-            builder.Register<Interface1>(instance);
+            builder.Register<Interface1>(instance, replace);
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }

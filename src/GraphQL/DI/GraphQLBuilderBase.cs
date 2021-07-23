@@ -67,13 +67,13 @@ namespace GraphQL.DI
         }
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
+        public abstract IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false);
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+        public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 
         /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, object implementationInstance);
+        public abstract IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false);
 
         /// <inheritdoc/>
         public abstract IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
