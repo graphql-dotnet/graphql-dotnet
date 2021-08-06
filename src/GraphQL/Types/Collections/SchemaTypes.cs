@@ -584,15 +584,38 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private object GetGraphType(Type clrType, bool input, List<(Type clr, Type graph)> typeMappings)
         {
+            var ret = GetGraphTypeFromClrType(clrType, input, typeMappings);
+
+            if (ret == null)
+                return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Returns a graph type for a specified input or output CLR type.
+        /// This method is called when a graph type is specified as a <see cref="GraphQLClrInputTypeReference{T}"/> or <see cref="GraphQLClrOutputTypeReference{T}"/>.
+        /// </summary>
+        /// <param name="clrType">The CLR type to be mapped.</param>
+        /// <param name="isInputType">Indicates if the CLR type should be mapped to an input or output graph type.</param>
+        /// <param name="typeMappings">The list of registered type mappings on the schema.</param>
+        /// <returns>The graph type to be used, or <see langword="null"/> if no match can be found.</returns>
+        /// <remarks>
+        /// This method should not return wrapped types such as <see cref="ListGraphType"/> or <see cref="NonNullGraphType"/>.
+        /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
+        /// and should already have been wrapped around the type reference.
+        /// </remarks>
+        protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, List<(Type ClrType, Type GraphType)> typeMappings)
+        {
             // check custom mappings first
             if (typeMappings != null)
             {
                 foreach (var mapping in typeMappings)
                 {
-                    if (mapping.clr == clrType)
+                    if (mapping.ClrType == clrType)
                     {
-                        if (input && mapping.graph.IsInputType() || !input && mapping.graph.IsOutputType())
-                            return mapping.graph;
+                        if (isInputType && mapping.GraphType.IsInputType() || !isInputType && mapping.GraphType.IsOutputType())
+                            return mapping.GraphType;
                     }
                 }
             }
@@ -605,7 +628,7 @@ Make sure that your ServiceProvider is configured correctly.");
             if (clrType.IsEnum)
                 return typeof(EnumerationGraphType<>).MakeGenericType(clrType);
 
-            return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
+            return null;
         }
 
         private void ApplyTypeReferences()
