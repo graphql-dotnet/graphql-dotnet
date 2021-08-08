@@ -145,7 +145,7 @@ namespace GraphQL.Types
                 if (Initialized)
                     return;
 
-                CreateSchemaTypes();
+                CreateAndInitializeSchemaTypes();
 
                 Initialized = true;
             }
@@ -354,7 +354,7 @@ namespace GraphQL.Types
                 throw new ObjectDisposedException(nameof(Schema));
         }
 
-        private void CreateSchemaTypes()
+        private void CreateAndInitializeSchemaTypes()
         {
             IEnumerable<ISchemaNodeVisitor> GetVisitors()
             {
@@ -371,16 +371,36 @@ namespace GraphQL.Types
                 }
             }
 
-            _allTypes = new SchemaTypes(this, _services);
+            _allTypes = CreateSchemaTypes();
 
-            // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
-            // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
-            _allTypes.ApplyMiddleware(FieldMiddleware);
+            try
+            {
+                // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
+                // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
+                _allTypes.ApplyMiddleware(FieldMiddleware);
 
-            foreach (var visitor in GetVisitors())
-                visitor.Run(this);
+                foreach (var visitor in GetVisitors())
+                    visitor.Run(this);
 
-            Validate();
+                Validate();
+            }
+            catch
+            {
+                _allTypes = null;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates and returns a new instance of <see cref="SchemaTypes"/> for this schema.
+        /// Does not apply middleware, apply schema visitors, or validate the schema.
+        /// </summary>
+        /// <remarks>
+        /// This executes within a lock in <see cref="Initialize"/>.
+        /// </remarks>
+        protected virtual SchemaTypes CreateSchemaTypes()
+        {
+            return new SchemaTypes(this, _services);
         }
 
         /// <summary>
