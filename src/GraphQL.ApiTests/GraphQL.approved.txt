@@ -2384,6 +2384,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        protected virtual GraphQL.Types.SchemaTypes CreateSchemaTypes() { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public void Initialize() { }
@@ -2423,6 +2424,9 @@ namespace GraphQL.Types
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
+        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "ClrType",
+                "GraphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {

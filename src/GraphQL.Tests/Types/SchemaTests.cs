@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
@@ -210,6 +211,57 @@ namespace GraphQL.Tests.Types
             schema.Initialize();
             field.ResolvedType.ShouldNotBeNull();
             field.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
+        }
+
+        [Fact]
+        public void can_have_unknown_input_types_mapped_to_auto_registering_graph()
+        {
+            var schema = new CustomTypesSchema();
+            var query = new ObjectGraphType();
+            var field = new FieldType()
+            {
+                Name = "test",
+                Type = typeof(IntGraphType),
+                Arguments = new QueryArguments
+                {
+                    new QueryArgument(typeof(GraphQLClrInputTypeReference<CustomData>)) { Name = "arg" }
+                }
+            };
+            query.AddField(field);
+            schema.Query = query;
+            schema.Initialize();
+            schema.Query.Fields.Find("test").Arguments[0].ResolvedType.ShouldBeOfType<AutoRegisteringInputObjectGraphType<CustomData>>();
+        }
+    }
+
+    public class CustomData
+    {
+        public string Value { get; set; }
+    }
+
+    public class CustomTypesSchema : Schema
+    {
+        protected override SchemaTypes CreateSchemaTypes()
+            => new CustomSchemaTypes(this, this);
+    }
+
+    public class CustomSchemaTypes : SchemaTypes
+    {
+        public CustomSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+            : base(schema, serviceProvider)
+        {
+        }
+
+        protected override Type GetGraphTypeFromClrType(Type clrType, bool isInputType, List<(Type ClrType, Type GraphType)> typeMappings)
+        {
+            var ret = base.GetGraphTypeFromClrType(clrType, isInputType, typeMappings);
+
+            if (ret == null && isInputType)
+            {
+                return typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(clrType);
+            }
+
+            return ret;
         }
     }
 
