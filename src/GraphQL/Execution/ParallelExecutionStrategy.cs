@@ -76,7 +76,7 @@ namespace GraphQL.Execution
 #pragma warning disable CS0612 // Type or member is obsolete
                         await OnBeforeExecutionStepAwaitedAsync(context)
 #pragma warning restore CS0612 // Type or member is obsolete
-                        .ConfigureAwait(false);
+                            .ConfigureAwait(false);
 
                         // Await tasks for this execution step
                         await Task.WhenAll(currentTasks)
@@ -107,6 +107,30 @@ namespace GraphQL.Execution
                         currentNodes.Add(dataLoaderNode);
                     }
                 }
+            }
+            catch
+            {
+                if (currentTasks.Count > 0)
+                {
+                    try
+                    {
+#pragma warning disable CS0612 // Type or member is obsolete
+                        await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
+                            .ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                    }
+                    try
+                    {
+                        await Task.WhenAll(currentTasks);
+                    }
+                    catch
+                    {
+                    }
+                }
+                throw;
             }
             finally
             {

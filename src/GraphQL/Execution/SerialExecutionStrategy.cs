@@ -39,10 +39,24 @@ namespace GraphQL.Execution
                         var node = nodes.Pop();
                         var task = ExecuteNodeAsync(context, node);
 
+                        try
+                        {
 #pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
+                            await OnBeforeExecutionStepAwaitedAsync(context)
 #pragma warning restore CS0612 // Type or member is obsolete
-                        .ConfigureAwait(false);
+                                .ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                await task.ConfigureAwait(false);
+                            }
+                            catch
+                            {
+                            }
+                            throw;
+                        }
 
                         await task.ConfigureAwait(false);
 
@@ -63,10 +77,24 @@ namespace GraphQL.Execution
                         var node = dataLoaderNodes.Dequeue();
                         var task = CompleteDataLoaderNodeAsync(context, node);
 
+                        try
+                        {
 #pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
+                            await OnBeforeExecutionStepAwaitedAsync(context)
 #pragma warning restore CS0612 // Type or member is obsolete
-                        .ConfigureAwait(false);
+                            .ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                await task.ConfigureAwait(false);
+                            }
+                            catch
+                            {
+                            }
+                            throw;
+                        }
 
                         await task.ConfigureAwait(false);
 
