@@ -7,7 +7,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    // https://github.com/graphql-dotnet/graphql-dotnet/issue/2635
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2635
     public class Bug2635 : QueryTestBase<Bug2635.MySchema>
     {
         public int Num;
