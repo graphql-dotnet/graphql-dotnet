@@ -58,7 +58,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Argument>((arg, context) => CheckLength(arg, context.TypeInfo.GetArgument(), context)),
             new MatchingNodeVisitor<ObjectField>((field, context) =>
             {
-                if (context.TypeInfo.GetInputType(1) is InputObjectGraphType input)
+                if (context.TypeInfo.GetInputType(1) is IInputObjectGraphType input)
                     CheckLength(field, input.GetField(field.Name), context);
             })
         ).ToTask();
