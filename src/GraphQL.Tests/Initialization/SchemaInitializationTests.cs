@@ -60,6 +60,12 @@ namespace GraphQL.Tests.Initialization
         {
             ShouldThrow<SchemaWithArgumentsOnInputField, InvalidOperationException>("The field 'id' of an Input Object type 'MyInput' must not have any arguments specified.");
         }
+
+        [Fact]
+        public void SchemaWithNotFullSpecifiedResolvedType_Should_Throw()
+        {
+            ShouldThrow<SchemaWithNotFullSpecifiedResolvedType, InvalidOperationException>("The field 'in' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
+        }
     }
 
     public class EmptyQuerySchema : Schema
@@ -204,6 +210,38 @@ namespace GraphQL.Tests.Initialization
                 ResolvedType = new StringGraphType(),
                 Arguments = new QueryArguments(new QueryArgument<MyInputGraphType> { Name = "arg" })
             });
+        }
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2675
+    public class SchemaWithNotFullSpecifiedResolvedType : Schema
+    {
+        public SchemaWithNotFullSpecifiedResolvedType()
+        {
+            var stringFilterInputType = new InputObjectGraphType { Name = "InputString" };
+
+            stringFilterInputType.AddField(new FieldType
+            {
+                Name = "eq",
+                ResolvedType = new StringGraphType()
+            });
+            stringFilterInputType.AddField(new FieldType
+            {
+                Name = "in",
+                ResolvedType = new ListGraphType<StringGraphType>()
+            });
+            stringFilterInputType.AddField(new FieldType
+            {
+                Name = "not",
+                ResolvedType = new NonNullGraphType<StringGraphType>()
+            });
+
+            Query = new ObjectGraphType();
+            Query.Field(
+                "test",
+                new StringGraphType(),
+                arguments: new QueryArguments(new QueryArgument(stringFilterInputType) { Name = "a" }),
+                resolve: context => "ok");
         }
     }
 }

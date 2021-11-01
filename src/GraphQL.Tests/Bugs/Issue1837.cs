@@ -70,7 +70,7 @@ namespace GraphQL.Tests.Bugs
 
             AddField(new FieldType
             {
-                ResolvedType = new ListGraphType<IntGraphType>(),
+                ResolvedType = new ListGraphType<IntGraphType> { ResolvedType = new IntGraphType() },
                 Name = "abc"
             });
         }

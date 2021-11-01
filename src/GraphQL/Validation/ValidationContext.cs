@@ -567,7 +567,7 @@ namespace GraphQL.Validation
                     : $"Expected type '{type.Name}', found {valueAst.StringFrom(Document)}.";
             }
 
-            throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name} is not a valid input graph type.");
+            throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name ?? "<NULL>"} is not a valid input graph type.");
         }
     }
 }
