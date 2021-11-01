@@ -54,8 +54,8 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (field.ResolvedType == null)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(field))
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (field.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -74,8 +74,8 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (argument.ResolvedType == null)
-                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(argument))
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (argument.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -116,8 +116,8 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (field.ResolvedType == null)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(field))
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (field.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -136,8 +136,8 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (argument.ResolvedType == null)
-                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(argument))
+                throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (argument.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -178,8 +178,8 @@ namespace GraphQL.Utilities
             if (field.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (field.ResolvedType == null)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(field))
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (field.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -258,8 +258,8 @@ namespace GraphQL.Utilities
             if (argument.Name.StartsWith("__"))
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
 
-            if (argument.ResolvedType == null)
-                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property.");
+            if (!HasFullSpecifiedResolvedType(argument))
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (argument.ResolvedType is GraphQLTypeReference)
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
@@ -313,6 +313,17 @@ namespace GraphQL.Utilities
                         throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{type.Name}'; no two directive arguments may share the same name.");
                 }
             }
+        }
+
+        private static bool HasFullSpecifiedResolvedType(IProvideResolvedType type)
+        {
+            return type.ResolvedType switch
+            {
+                null => false,
+                ListGraphType list => HasFullSpecifiedResolvedType(list),
+                NonNullGraphType nonNull => HasFullSpecifiedResolvedType(nonNull),
+                _ => true, // not null
+            };
         }
     }
 }
