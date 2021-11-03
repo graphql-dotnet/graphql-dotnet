@@ -1,8 +1,10 @@
 version: 2
 updates:
-- package-ecosystem: nuget
+- package-ecosystem: "nuget"
   directory: "/"
   schedule:
-    interval: daily
-    time: '02:00'
-  open-pull-requests-limit: 10
+    interval: "daily"
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "daily"
