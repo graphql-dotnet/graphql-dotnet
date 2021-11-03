@@ -77,7 +77,7 @@ jobs:
         run: dotnet test --no-restore --no-build -p:CollectCoverage=true
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        uses: codecov/codecov-action@v1.2.1
+        uses: codecov/codecov-action@v2.1.0
         with:
           files: .coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net5.opencover.xml
 
