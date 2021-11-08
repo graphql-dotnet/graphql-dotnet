@@ -28,7 +28,7 @@
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
     "axios": "^0.21.2",
-    "graphiql": "^0.11.11",
+    "graphiql": "^1.4.7",
     "graphql": "^0.13.2",
     "opencollective-postinstall": "^2.0.1",
     "react": "^16.2.0",
