@@ -1700,6 +1700,97 @@ enum __TypeKind {
             printer.PrintDescription("Th\\is \"is\" a \"\"\"test\n\tline2\n line3\u0003").ShouldBeCrossPlat("\"\"\"\nTh\\is \"is\" a \\\"\"\"test\n\tline2\n line3\n\"\"\"\n");
         }
 
+        [Fact]
+        public void sorts_schema_correctly()
+        {
+            var schema = Schema.For(@"
+# test sorting type names
+type Zebra {
+  # test sorting field names on object types
+  field3: String
+  field2: Int
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  # test sorting arguments
+  field2(arg2: Rutabaga, arg1: Beta): Tango
+  # test sorting fields of default values
+  field3(arg3: Rutabaga = { field3: ""hello"", field2: 2 }): String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+input Rutabaga {
+  # test sorting field names on input types
+  field3: String
+  field2: Int
+}
+
+# test sorting directives
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+  # test sorting directive locations -- does not work yet
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+directive @test1(
+  # test sorting fields within directives -- does not work yet
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+enum Beta {
+  # test sorting of enum value names
+  VALUE_3
+  VALUE_2
+}
+");
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
+            var ret = printer.Print();
+            var expected = @"directive @test1(
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+enum Beta {
+  VALUE_2
+  VALUE_3
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  field2(arg1: Beta, arg2: Rutabaga): Tango
+  field3(arg3: Rutabaga = { field2: 2, field3: ""hello"" }): String
+}
+
+input Rutabaga {
+  field2: Int
+  field3: String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+type Zebra {
+  field2: Int
+  field3: String
+}
+";
+            ret.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
+        }
+
+
         public class FooType : ObjectGraphType
         {
             public FooType()
