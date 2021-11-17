@@ -6,6 +6,7 @@ using GraphQL.DI;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -411,8 +412,41 @@ namespace GraphQL.Types
             //TODO: add different validations, also see SchemaBuilder.Validate
             //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
             // Do not change the order of these validations.
+            CoerceInputTypeDefaultValues();
             SchemaValidationVisitor.Instance.Run(this);
             AppliedDirectivesValidationVisitor.Instance.Run(this);
+        }
+
+        protected virtual void CoerceInputTypeDefaultValues()
+        {
+            var completed = new HashSet<IInputObjectGraphType>();
+            var inProcess = new Stack<IInputObjectGraphType>();
+            foreach (var type in AllTypes.Dictionary.Values)
+            {
+                if (type is IInputObjectGraphType inputType)
+                    ExamineType(inputType, completed, inProcess);
+            }
+
+            static void ExamineType(IInputObjectGraphType inputType, HashSet<IInputObjectGraphType> completed, Stack<IInputObjectGraphType> inProcess)
+            {
+                if (completed.Contains(inputType))
+                    return;
+                if (inProcess.Contains(inputType))
+                    throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
+                inProcess.Push(inputType);
+                foreach (var field in inputType.Fields)
+                {
+                    if (field.DefaultValue is GraphQLValue value)
+                    {
+                        var baseType = field.ResolvedType!.GetNamedType();
+                        if (baseType is IInputObjectGraphType inputFieldType)
+                            ExamineType(inputFieldType, completed, inProcess);
+                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
+                    }
+                }
+                inProcess.Pop();
+                completed.Add(inputType);
+            }
         }
     }
 }
