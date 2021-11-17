@@ -4,7 +4,7 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// Provides the ability to order the schema elements upon introspection.
+    /// Provides the ability to order the schema elements upon introspection or printing.
     /// </summary>
     public interface ISchemaComparer
     {
