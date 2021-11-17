@@ -4,7 +4,9 @@ using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
+using GraphQL.Types;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types.Collections
@@ -36,6 +38,27 @@ namespace GraphQL.Tests.Types.Collections
             mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
             mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
             mock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void cannot_call_initialize_more_than_once()
+        {
+            _ = new SchemaTypes_Test_Cannot_Initialize_More_Than_Once();
+        }
+
+        private class SchemaTypes_Test_Cannot_Initialize_More_Than_Once : SchemaTypes
+        {
+            public SchemaTypes_Test_Cannot_Initialize_More_Than_Once()
+            {
+                var serviceProvider = new DefaultServiceProvider();
+                var schema = new Schema(serviceProvider)
+                {
+                    Query = new ObjectGraphType()
+                };
+                schema.Query.AddField(new FieldType { Name = "field1", Type = typeof(IntGraphType) });
+                Initialize(schema, serviceProvider);
+                Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider));
+            }
         }
     }
 }
