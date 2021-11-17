@@ -2427,7 +2427,7 @@ namespace GraphQL.Types
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "ClrType",
                 "GraphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings) { }
-        protected virtual void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
+        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
