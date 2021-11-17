@@ -862,6 +862,7 @@ input SomeInput {
   age: Int!
   name: String!
   isDeveloper: Boolean!
+  unused: Boolean
 }
 
 type Query {
@@ -878,12 +879,44 @@ type Query {
   age: Int!
   name: String!
   isDeveloper: Boolean!
+  unused: Boolean
 }"
                 },
                                 {
                     "Query",
 @"type Query {
   str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_as_dictionary_null_values()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int = 2
+}
+
+type Query {
+  str(arg: SomeInput = { age: null }): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int = 2
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(arg: SomeInput = { age: null }): String!
 }"
                 },
             };

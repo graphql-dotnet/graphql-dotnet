@@ -351,7 +351,15 @@ namespace GraphQL.Utilities
             {
                 string propertyName = field.GetMetadata<string>(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? field.Name;
 
-                if (!(value is IDictionary<string, object?> dic && dic.TryGetValue(propertyName, out var propertyValue)))
+                // if 'value' is stored as a dictionary of key/value pairs, pull the field value from the dictionary by the property name
+                object? propertyValue;
+                if (value is IDictionary<string, object?> dic)
+                {
+                    // note: per spec, unspecified properties may not exist within the dictionary
+                    if (!dic.TryGetValue(propertyName, out propertyValue)) continue;
+                }
+                // if 'value' is stored as an object -- e.g. new MyObject { Value = "Test" } -- then pull from the property directly
+                else
                 {
                     PropertyInfo propertyInfo;
                     try
@@ -366,13 +374,10 @@ namespace GraphQL.Utilities
                     propertyValue = propertyInfo.GetValue(value);
                 }
 
-                if (propertyValue != null)
-                {
-                    sb.Append(field.Name)
-                       .Append(": ")
-                       .Append(FormatDefaultValue(propertyValue, field.ResolvedType!))
-                       .Append(", ");
-                }
+                sb.Append(field.Name)
+                   .Append(": ")
+                   .Append(FormatDefaultValue(propertyValue, field.ResolvedType!))
+                   .Append(", ");
             }
 
             sb.Length -= 2;
