@@ -104,18 +104,22 @@ namespace GraphQL.Types
             Initialize(schema, serviceProvider);
         }
 
+        private bool _initialized = false;
         /// <summary>
         /// Initializes the instance for the specified schema, and with the specified type resolver.
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
         /// </summary>
-        protected virtual void Initialize(ISchema schema, IServiceProvider serviceProvider)
+        protected void Initialize(ISchema schema, IServiceProvider serviceProvider)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
+            if (_initialized)
+                throw new InvalidOperationException("SchemaTypes has already been initialized.");
+            _initialized = true;
 
             var types = GetSchemaTypes(schema, serviceProvider);
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
