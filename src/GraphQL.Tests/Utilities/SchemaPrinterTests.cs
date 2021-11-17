@@ -855,6 +855,42 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_input_type_with_default_as_dictionary()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+}
+
+type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true },
+      argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_custom_scalar()
         {
             var root = new ObjectGraphType { Name = "Query" };
