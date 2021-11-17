@@ -356,7 +356,8 @@ namespace GraphQL.Utilities
                 if (value is IDictionary<string, object?> dic)
                 {
                     // note: per spec, unspecified properties may not exist within the dictionary
-                    if (!dic.TryGetValue(propertyName, out propertyValue)) continue;
+                    if (!dic.TryGetValue(propertyName, out propertyValue))
+                        continue;
                 }
                 // if 'value' is stored as an object -- e.g. new MyObject { Value = "Test" } -- then pull from the property directly
                 else
