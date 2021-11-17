@@ -1750,7 +1750,7 @@ enum Beta {
 }
 ");
             var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
-            var ret = printer.Print();
+            var actual = printer.Print();
             var expected = @"directive @test1(
   arg2: Boolean!
   arg1: Boolean!
@@ -1787,9 +1787,8 @@ type Zebra {
   field3: String
 }
 ";
-            ret.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
+            actual.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
         }
-
 
         public class FooType : ObjectGraphType
         {
