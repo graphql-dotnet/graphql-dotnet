@@ -2745,6 +2745,7 @@ namespace GraphQL.Utilities
     public class SchemaPrinterOptions
     {
         public SchemaPrinterOptions() { }
+        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }

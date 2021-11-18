@@ -10,6 +10,12 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
+    internal static class SchemaPrinterExtensions
+    {
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> list, IComparer<T>? comparer)
+            => comparer == null ? list : list.OrderBy(x => x, comparer);
+    }
+
     /// <summary>
     /// Enables printing schema as SDL (Schema Definition Language) document.
     /// <br/>
@@ -90,8 +96,8 @@ namespace GraphQL.Utilities
             {
                 PrintSchemaDefinition(Schema),
             }
-            .Concat(directives.Select(PrintDirective))
-            .Concat(types.Select(PrintType))
+            .Concat(directives.OrderBy(Options.Comparer?.DirectiveComparer).Select(PrintDirective))
+            .Concat(types.OrderBy(Options.Comparer?.TypeComparer).Select(PrintType))
             .Where(x => x != null)
             .ToList();
 
@@ -209,19 +215,20 @@ namespace GraphQL.Utilities
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var values = string.Join(Environment.NewLine, type.Values.Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name + (Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "")));
+            var values = string.Join(Environment.NewLine, type.Values.OrderBy(Options.Comparer?.EnumValueComparer(type)).Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name + (Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "")));
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
-            var fields = type.Fields.Select(x => PrintInputValue(x));
+            var fields = type.Fields.OrderBy<FieldType>(Options.Comparer?.FieldComparer(type)).Select(x => PrintInputValue(x));
             return FormatDescription(type.Description) + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
         public virtual string PrintFields(IComplexGraphType type)
         {
             var fields = type?.Fields
+                .OrderBy<FieldType>(Options.Comparer?.FieldComparer(type))
                 .Select(x =>
                 new
                 {
@@ -243,7 +250,7 @@ namespace GraphQL.Utilities
                 return string.Empty;
             }
 
-            return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue))); //TODO: iterator allocation
+            return "({0})".ToFormat(string.Join(", ", field.Arguments.OrderBy(Options.Comparer?.ArgumentComparer(field)).Select(PrintInputValue))); //TODO: iterator allocation
         }
 
         public string PrintInputValue(FieldType field)
@@ -296,11 +303,13 @@ namespace GraphQL.Utilities
         {
             if (arguments == null || arguments.Count == 0)
                 return null;
+            //v5 todo: sort directive arguments list via Options.Comparer -- needs ArgumentComparer(DirectiveGraphType directive)
             return string.Join(Environment.NewLine, arguments.Select(arg => $"  {PrintInputValue(arg)}"));
         }
 
         private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
         {
+            //v5 todo: sort DirectiveLocation list via Options.Comparer -- needs DirectiveLocationComparer(DirectiveGraphType directive)
             return string.Join(" | ", locations.Select(x => __DirectiveLocation.Instance.Serialize(x))); //TODO: remove allocations
         }
 
@@ -338,28 +347,38 @@ namespace GraphQL.Utilities
             var sb = new StringBuilder();
             sb.Append("{ ");
 
-            foreach (var field in input.Fields)
+            foreach (var field in input.Fields.OrderBy(Options.Comparer?.FieldComparer(input)))
             {
                 string propertyName = field.GetMetadata<string>(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? field.Name;
-                PropertyInfo propertyInfo;
 
-                try
+                // if 'value' is stored as a dictionary of key/value pairs, pull the field value from the dictionary by the property name
+                object? propertyValue;
+                if (value is IDictionary<string, object?> dic)
                 {
-                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    // note: per spec, unspecified properties may not exist within the dictionary
+                    if (!dic.TryGetValue(propertyName, out propertyValue))
+                        continue;
                 }
-                catch (AmbiguousMatchException)
+                // if 'value' is stored as an object -- e.g. new MyObject { Value = "Test" } -- then pull from the property directly
+                else
                 {
-                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                    PropertyInfo propertyInfo;
+                    try
+                    {
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    }
+                    catch (AmbiguousMatchException)
+                    {
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                    }
+
+                    propertyValue = propertyInfo.GetValue(value);
                 }
 
-                object propertyValue = propertyInfo.GetValue(value);
-                if (propertyValue != null)
-                {
-                    sb.Append(field.Name)
-                       .Append(": ")
-                       .Append(FormatDefaultValue(propertyValue, field.ResolvedType!))
-                       .Append(", ");
-                }
+                sb.Append(field.Name)
+                   .Append(": ")
+                   .Append(FormatDefaultValue(propertyValue, field.ResolvedType!))
+                   .Append(", ");
             }
 
             sb.Length -= 2;
