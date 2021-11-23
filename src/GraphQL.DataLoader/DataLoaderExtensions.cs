@@ -28,7 +28,9 @@ namespace GraphQL.DataLoader
 
             foreach (var key in keys)
             {
-                results.Add(dataLoader.LoadAsync(key));
+                results.Add(key != null
+                    ? dataLoader.LoadAsync(key)
+                    : new DataLoaderResult<T>(Task.FromResult<T>(default)));
             }
 
             return new DataLoaderResultWhenAll<T>(results);
