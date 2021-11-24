@@ -152,5 +152,19 @@ namespace GraphQL.DataLoader.Tests
             mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Once,
                 "The keys passed to the fetch delegate should be de-duplicated");
         }
+
+        [Fact]
+        public async Task Returns_Null_For_Null_Reference_Types()
+        {
+            var loader = new CollectionBatchDataLoader<object, string>((_, _) => throw new Exception());
+            (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task Returns_Null_For_Null_Value_Types()
+        {
+            var loader = new CollectionBatchDataLoader<int?, string>((_, _) => throw new Exception());
+            (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
+        }
     }
 }
