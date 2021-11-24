@@ -2714,7 +2714,7 @@ namespace GraphQL.Utilities
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
         public string[] BreakLine(string line, int len) { }
-        public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
+        public string FormatDefaultValue(object? value, GraphQL.Types.IGraphType graphType) { }
         protected string FormatDescription(string? description, string indentation = "") { }
         protected virtual bool IsDefinedDirective(string directiveName) { }
         protected virtual bool IsDefinedType(string typeName) { }
