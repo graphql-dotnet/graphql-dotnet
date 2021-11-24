@@ -15,11 +15,11 @@ namespace GraphQL
         /// Returns the value of the specified field argument, or <paramref name="defaultValue"/> when unspecified or when specified as <see langword="null"/>.
         /// Field and variable default values take precedence over the <paramref name="defaultValue"/> parameter.
         /// </summary>
-        public static TType? GetArgument<TType>(this IResolveFieldContext context, string name, TType? defaultValue = default)
+        public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
         {
             bool exists = context.TryGetArgument(typeof(TType), name, out object? result);
             return exists
-                ? result == null ? defaultValue : (TType?)result
+                ? result == null ? defaultValue : (TType)result
                 : defaultValue;
         }
 
