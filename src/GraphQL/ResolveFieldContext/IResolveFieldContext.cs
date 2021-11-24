@@ -101,6 +101,6 @@ namespace GraphQL
     public interface IResolveFieldContext<out TSource> : IResolveFieldContext
     {
         /// <inheritdoc cref="IResolveFieldContext.Source"/>
-        new TSource? Source { get; }
+        new TSource Source { get; }
     }
 }

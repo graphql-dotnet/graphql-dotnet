@@ -404,7 +404,7 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
-    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
+    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
@@ -429,7 +429,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
-    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
@@ -1787,7 +1787,7 @@ namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext { }
     public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>, GraphQL.Subscription.IResolveEventStreamContext { }
-    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
+    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object?>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }
     }
@@ -2272,7 +2272,7 @@ namespace GraphQL.Types
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }
-    public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object>
+    public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
     }

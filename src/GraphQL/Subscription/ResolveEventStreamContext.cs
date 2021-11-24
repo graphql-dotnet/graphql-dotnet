@@ -7,7 +7,7 @@ namespace GraphQL.Subscription
         public ResolveEventStreamContext(IResolveEventStreamContext context) : base(context) { }
     }
 
-    public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext
+    public class ResolveEventStreamContext : ResolveEventStreamContext<object?>, IResolveEventStreamContext
     {
     }
 }
