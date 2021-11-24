@@ -855,6 +855,36 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_input_type_with_default_null_value()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
+                "str",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
+                );
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput2",
+@"input SomeInput2 {
+  names: [String]!
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput2! = { names: null }): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_input_type_with_default_as_dictionary()
         {
             var schema = Schema.For(@"
@@ -1976,6 +2006,20 @@ type Zebra {
             public int Age { get; set; }
 
             public bool IsDeveloper { get; set; }
+        }
+
+        public class SomeInputType2 : InputObjectGraphType<SomeInput2>
+        {
+            public SomeInputType2()
+            {
+                Name = "SomeInput2";
+                Field(x => x.Names);
+            }
+        }
+
+        public class SomeInput2
+        {
+            public IList<string> Names { get; set; }
         }
 
         public class OddType : ScalarGraphType

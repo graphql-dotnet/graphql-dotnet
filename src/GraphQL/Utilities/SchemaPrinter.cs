@@ -329,8 +329,11 @@ namespace GraphQL.Utilities
             return "";
         }
 
-        public string FormatDefaultValue(object value, IGraphType graphType)
+        public string FormatDefaultValue(object? value, IGraphType graphType)
         {
+            if (value == null)
+                return "null";
+
             return graphType switch
             {
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
