@@ -61,7 +61,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.3
-            if (!field.ResolvedType.IsOutputType())
+            if (!field.ResolvedType!.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
 
             ValidateFieldArgumentsUniqueness(field, type);
@@ -81,7 +81,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
-            if (!argument.ResolvedType.IsInputType())
+            if (!argument.ResolvedType!.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
 
             // validate default value
@@ -123,7 +123,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.3
-            if (!field.ResolvedType.IsOutputType())
+            if (!field.ResolvedType!.IsOutputType())
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
 
             ValidateFieldArgumentsUniqueness(field, type);
@@ -143,7 +143,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.4.2
-            if (!argument.ResolvedType.IsInputType())
+            if (!argument.ResolvedType!.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
 
             // validate default value
@@ -185,15 +185,15 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 2.3
-            if (!field.ResolvedType.IsInputType())
+            if (!field.ResolvedType!.IsInputType())
                 throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
 
             // validate default value
             if (field.DefaultValue is GraphQLValue value)
             {
-                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
             }
-            else if (field.DefaultValue != null && !field.ResolvedType.IsValidDefault(field.DefaultValue))
+            else if (field.DefaultValue != null && !field.ResolvedType!.IsValidDefault(field.DefaultValue))
             {
                 throw new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid.");
             }
@@ -265,15 +265,15 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 4.2
-            if (!argument.ResolvedType.IsInputType())
+            if (!argument.ResolvedType!.IsInputType())
                 throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must be an input type.");
 
             // validate default
             if (argument.DefaultValue is GraphQLValue value)
             {
-                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType, Language.CoreToVanillaConverter.Value(value)).Value;
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
             }
-            else if (argument.DefaultValue != null && !argument.ResolvedType.IsValidDefault(argument.DefaultValue))
+            else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
             {
                 throw new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{type.Name}' is invalid.");
             }

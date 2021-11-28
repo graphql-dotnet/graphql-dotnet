@@ -110,7 +110,6 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-        /// </summary>
         protected void Initialize(ISchema schema, IServiceProvider serviceProvider)
         {
             if (schema == null)
