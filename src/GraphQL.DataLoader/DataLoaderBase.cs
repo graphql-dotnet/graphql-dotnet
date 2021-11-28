@@ -80,7 +80,7 @@ namespace GraphQL.DataLoader
         /// <summary>
         /// Asynchronously load data for the provided given key.
         /// If the key is <see langword="null"/> then a <see cref="DataLoaderResult{T}"/> containing
-        /// <see langword="null"/> will be immediately be returned.
+        /// <see langword="null"/> will be immediately returned.
         /// </summary>
         /// <param name="key">Key to use for loading data</param>
         /// <returns>
