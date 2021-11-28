@@ -871,7 +871,7 @@ union SingleUnion = Foo
                 {
                     "SomeInput2",
 @"input SomeInput2 {
-  names: [String]!
+  names: [String]
 }"
                 },
                                 {
@@ -2013,7 +2013,7 @@ type Zebra {
             public SomeInputType2()
             {
                 Name = "SomeInput2";
-                Field(x => x.Names);
+                Field(x => x.Names, true);
             }
         }
 
