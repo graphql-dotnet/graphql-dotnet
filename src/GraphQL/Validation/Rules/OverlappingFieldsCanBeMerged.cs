@@ -78,7 +78,7 @@ namespace GraphQL.Validation.Rules
             {
                 // (B) Then collect conflicts between these fields and those represented by
                 // each spread fragment name found.
-                var comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new HashSet<string>();
                 for (int i = 0; i < fragmentNames.Count; i++)
                 {
                     CollectConflictsBetweenFieldsAndFragment(
@@ -318,7 +318,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the second.
             if (fragmentNames2.Count != 0)
             {
-                var comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new HashSet<string>();
 
                 for (var j = 0; j < fragmentNames2.Count; j++)
                 {
@@ -338,7 +338,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the first.
             if (fragmentNames1.Count != 0)
             {
-                var comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new HashSet<string>();
 
                 for (var i = 0; i < fragmentNames1.Count; i++)
                 {
@@ -468,7 +468,7 @@ namespace GraphQL.Validation.Rules
             ValidationContext context,
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
-            ObjMap<bool> comparedFragments,
+            HashSet<string> comparedFragments,
             PairSet comparedFragmentPairs,
             bool areMutuallyExclusive,
             Dictionary<string, List<FieldDefPair>> fieldMap,
@@ -476,12 +476,12 @@ namespace GraphQL.Validation.Rules
         {
 
             // Memoize so a fragment is not compared for conflicts more than once.
-            if (comparedFragments.ContainsKey(fragmentName))
+            if (comparedFragments.Contains(fragmentName))
             {
                 return;
             }
 
-            comparedFragments[fragmentName] = true;
+            comparedFragments.Add(fragmentName);
 
             FragmentDefinition? fragment = context.GetFragment(fragmentName);
 
@@ -853,11 +853,11 @@ namespace GraphQL.Validation.Rules
 
         private sealed class PairSet
         {
-            private readonly ObjMap<ObjMap<bool>> _data;
+            private readonly Dictionary<string, Dictionary<string, bool>> _data;
 
             public PairSet()
             {
-                _data = new ObjMap<ObjMap<bool>>();
+                _data = new Dictionary<string, Dictionary<string, bool>>();
             }
 
             public bool Has(string a, string b, bool areMutuallyExclusive)
@@ -891,15 +891,11 @@ namespace GraphQL.Validation.Rules
 
                 if (map == null)
                 {
-                    map = new ObjMap<bool>();
+                    map = new Dictionary<string, bool>();
                     _data[a] = map;
                 }
                 map[b] = areMutuallyExclusive;
             }
-        }
-
-        private sealed class ObjMap<T> : Dictionary<string, T>
-        {
         }
     }
 
