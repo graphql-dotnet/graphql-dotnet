@@ -2,15 +2,15 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>net6;net5;netcoreapp3.1;net48</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
