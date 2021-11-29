@@ -1,0 +1,5 @@
+extraction:
+  csharp:
+    prepare:
+      packages:
+        - dotnet-sdk-6.0
