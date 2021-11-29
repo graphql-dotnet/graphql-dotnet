@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
-#if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
                 DefaultIgnoreCondition = JsonIgnoreCondition.Never,
 #else
                 IgnoreNullValues = false,
