@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
@@ -17,7 +18,11 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
+#if NET6_0_OR_GREATER
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+#else
                 IgnoreNullValues = false,
+#endif
                 Converters =
                 {
                     new ObjectDictionaryConverter(),

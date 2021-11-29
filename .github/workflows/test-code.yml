@@ -31,24 +31,13 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Setup .NET Core 2.1 SDK
+      - name: Setup .NET Core SDKs
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '2.1.x'
-          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Setup .NET Core 3.1 SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Setup .NET Core 5.0 SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '5.0.x'
+          dotnet-version: |
+            3.1.x
+            5.0.x
+            6.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -79,7 +68,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v2.1.0
         with:
-          files: .coverage/GraphQL.DataLoader.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.Tests/coverage.net5.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net5.opencover.xml
+          files: .coverage/GraphQL.DataLoader.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net6.opencover.xml
 
   buildcheck:
     needs:
