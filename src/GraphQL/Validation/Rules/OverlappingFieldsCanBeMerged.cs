@@ -642,7 +642,7 @@ namespace GraphQL.Validation.Rules
             if (cached == null)
             {
                 var nodeAndDef = new Dictionary<string, List<FieldDefPair>>();
-                var fragmentNames = new Dictionary<string, bool>();
+                var fragmentNames = new HashSet<string>();
 
                 CollectFieldsAndFragmentNames(
                     context,
@@ -651,7 +651,7 @@ namespace GraphQL.Validation.Rules
                     nodeAndDef,
                     fragmentNames);
 
-                cached = new CachedField { NodeAndDef = nodeAndDef, Names = fragmentNames.Keys.ToList() };
+                cached = new CachedField { NodeAndDef = nodeAndDef, Names = fragmentNames.ToList() };
                 cachedFieldsAndFragmentNames.Add(selectionSet, cached);
             }
             return cached;
@@ -684,7 +684,7 @@ namespace GraphQL.Validation.Rules
             IGraphType? parentType,
             SelectionSet selectionSet,
             Dictionary<string, List<FieldDefPair>> nodeAndDefs,
-            Dictionary<string, bool> fragments)
+            HashSet<string> fragments)
         {
             for (int i = 0; i < selectionSet.Selections.Count; i++)
             {
@@ -716,7 +716,7 @@ namespace GraphQL.Validation.Rules
                 }
                 else if (selection is FragmentSpread fragmentSpread)
                 {
-                    fragments[fragmentSpread.Name] = true;
+                    fragments.Add(fragmentSpread.Name);
 
                 }
                 else if (selection is InlineFragment inlineFragment)
