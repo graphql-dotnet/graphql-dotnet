@@ -476,12 +476,10 @@ namespace GraphQL.Validation.Rules
         {
 
             // Memoize so a fragment is not compared for conflicts more than once.
-            if (comparedFragments.Contains(fragmentName))
+            if (!comparedFragments.Add(fragmentName))
             {
                 return;
             }
-
-            comparedFragments.Add(fragmentName);
 
             FragmentDefinition? fragment = context.GetFragment(fragmentName);
 
