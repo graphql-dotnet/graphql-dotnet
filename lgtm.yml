@@ -1,8 +1,0 @@
-extraction:
-  csharp:
-    after_prepare:
-      - wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-      - dpkg -i packages-microsoft-prod.deb
-      - rm -f packages-microsoft-prod.deb
-      - apt update -y
-      - apt install -y dotnet-sdk-6.0 dotnet-sdk-5.0 dotnet-sdk-3.1
