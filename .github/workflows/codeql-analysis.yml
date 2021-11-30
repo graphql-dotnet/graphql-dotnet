@@ -13,15 +13,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
-    - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: |
-          3.1.x
-          5.0.x
-          6.0.x
-        source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     - uses: github/codeql-action/init@v1
       with:
         languages: csharp
