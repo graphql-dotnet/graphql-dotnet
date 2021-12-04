@@ -1,4 +1,5 @@
 # https://github.com/github/codeql
+# https://github.com/github/codeql-action
 name: CodeQL analysis
 
 on:
@@ -23,7 +24,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        queries: security-and-quality
+        config-file: ./.github/codeql-config.yml
         languages: csharp
 
     - name: Install dependencies

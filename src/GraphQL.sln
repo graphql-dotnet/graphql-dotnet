@@ -91,6 +91,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "Depe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2A7FA3F9-B04C-463E-80EF-144433458FAD}"
 	ProjectSection(SolutionItems) = preProject
+		..\.github\codeql-config.yml = ..\.github\codeql-config.yml
 		..\.github\dependabot.yml = ..\.github\dependabot.yml
 		..\.github\FUNDING.yml = ..\.github\FUNDING.yml
 		..\.github\labeler.yml = ..\.github\labeler.yml
