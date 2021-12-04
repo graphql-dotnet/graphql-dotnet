@@ -53,7 +53,7 @@ namespace GraphQL.DataLoader.Tests
         [Fact]
         public async Task Operation_Can_Be_Cancelled()
         {
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
 
             var mock = new Mock<IUsersStore>();
             var users = Fake.Users.Generate(2);
@@ -85,7 +85,7 @@ namespace GraphQL.DataLoader.Tests
         [Fact]
         public async Task Operation_Cancelled_Before_Dispatch_Does_Not_Execute()
         {
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var mock = new Mock<IUsersStore>();
             var users = Fake.Users.Generate(2);
 
