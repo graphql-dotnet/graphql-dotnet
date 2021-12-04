@@ -314,7 +314,7 @@ namespace GraphQL.DataLoader.Tests
 
             var actualException = Should.Throw<ArgumentException>(() =>
             {
-                var d = new Dictionary<int, int>
+                _ = new Dictionary<int, int>
                 {
                     { 1, 1 },
                     { 1, 1 }
