@@ -30,9 +30,7 @@ namespace GraphQL.Tests.Utilities
             var result = print(schema);
 
             // ensure schema isn't disposed before test finishes
-            if (schema.Query.Name == "")
-            {
-            }
+            schema.Query.Name.ShouldNotBeNull();
 
             return result;
         }
