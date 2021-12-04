@@ -1,3 +1,4 @@
+# https://github.com/github/codeql
 name: CodeQL analysis
 
 on:
@@ -9,12 +10,29 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
       with:
-        fetch-depth: 2
-    - uses: github/codeql-action/init@v1
+         dotnet-version: '5.0.x'
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
       with:
+        queries: security-and-quality
         languages: csharp
-    - uses: github/codeql-action/autobuild@v1
-    - uses: github/codeql-action/analyze@v1
+
+    - name: Install dependencies
+      working-directory: src
+      run: dotnet restore
+
+    - name: Build solution
+      working-directory: src
+      run: dotnet build --no-restore
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
