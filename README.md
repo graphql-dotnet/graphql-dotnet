@@ -271,6 +271,7 @@ var json = await schema.ExecuteAsync(_ =>
 - Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](https://graphql.github.io/graphql-spec/June2018/).
 
 ### Operation Execution
+
 - [x] Scalars
 - [x] Objects
 - [x] Lists of objects/interfaces
@@ -290,6 +291,7 @@ var json = await schema.ExecuteAsync(_ =>
 - [x] Async execution
 
 ### Validation
+
 - [x] Arguments of correct type
 - [x] Default values of correct type
 - [x] Fields on correct type
@@ -318,24 +320,9 @@ var json = await schema.ExecuteAsync(_ =>
 - [x] Single root field
 
 ### Schema Introspection
-- [x] __typename
-- [x] __type
-  - [x] name
-  - [x] kind
-  - [x] description
-  - [x] fields
-  - [x] interfaces
-  - [x] possibleTypes
-  - [x] enumValues
-  - [x] inputFields
-  - [x] ofType
-- [x] __schema
-  - [x] types
-  - [x] queryType
-  - [x] mutationType
-  - [x] subscriptionType
-  - [x] directives
 
+GraphQL.NET supports introspection schema from [June2018 spec](http://spec.graphql.org/June2018/#sec-Schema-Introspection)
+with some additional experimental introspection [extensions](https://graphql-dotnet.github.io/docs/getting-started/directives#directives-and-introspection).
 
 ## Publishing NuGet packages
 
