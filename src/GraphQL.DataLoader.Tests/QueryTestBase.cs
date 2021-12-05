@@ -146,7 +146,7 @@ namespace GraphQL.DataLoader.Tests
 
         public ExecutionResult CreateQueryResult(string result, bool executed = true)
         {
-            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToDictionary();
+            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToInputs();
             return new ExecutionResult { Data = expected, Executed = executed };
         }
     }

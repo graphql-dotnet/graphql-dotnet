@@ -28,10 +28,13 @@ namespace GraphQL.NewtonsoftJson
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var dictionary = json?.ToDictionary();
-#pragma warning restore CS0618 // Type or member is obsolete
-            return dictionary.ToInputs();
+            if (json == null)
+                return Inputs.Empty;
+
+            using var stringReader = new System.IO.StringReader(json);
+            using var jsonTextReader = new JsonTextReader(stringReader);
+            var values = _jsonSerializer.Deserialize(jsonTextReader);
+            return (GetValueInternal(values) as Dictionary<string, object>).ToInputs();
         }
 
         /// <summary>
@@ -44,23 +47,6 @@ namespace GraphQL.NewtonsoftJson
         {
             var variables = obj?.GetValueInternal() as Dictionary<string, object>;
             return variables.ToInputs();
-        }
-
-        /// <summary>
-        /// Converts a JSON-formatted string into a dictionary.
-        /// </summary>
-        /// <param name="json">The json.</param>
-        /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
-        [Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
-        public static Dictionary<string, object> ToDictionary(this string json)
-        {
-            if (json == null)
-                return null;
-
-            using var stringReader = new System.IO.StringReader(json);
-            using var jsonTextReader = new JsonTextReader(stringReader);
-            var values = _jsonSerializer.Deserialize(jsonTextReader);
-            return GetValueInternal(values) as Dictionary<string, object>;
         }
 
         /// <summary>
@@ -86,15 +72,6 @@ namespace GraphQL.NewtonsoftJson
             using var jsonTextReader = new JsonTextReader(streamReader);
             return _jsonSerializer.Deserialize<T>(jsonTextReader);
         }
-
-        /// <summary>
-        /// Gets the value contained in a JObject, JValue, JProperty or JArray.
-        /// </summary>
-        /// <param name="value">The object containing the value to extract.</param>
-        /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
-        [Obsolete("This method will be removed in a future version of GraphQL.NET.")]
-        public static object GetValue(this object value)
-            => GetValueInternal(value);
 
         private static object GetValueInternal(this object value)
         {

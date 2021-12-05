@@ -463,7 +463,6 @@ namespace GraphQL.Tests.Builders
 
                 Connection<ChildType>()
                     .Name("connection1")
-                    .Unidirectional()
                     .DeprecationReason("Deprecated")
                     .Resolve(context => context.Source.Connection1);
 

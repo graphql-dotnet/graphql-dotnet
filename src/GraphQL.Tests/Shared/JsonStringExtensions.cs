@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GraphQL.SystemTextJson;
 
 namespace GraphQL
@@ -19,5 +20,17 @@ namespace GraphQL
                 Errors = errors,
                 Executed = executed
             };
+
+        public static Dictionary<string, object> ToDictionary(this string json)
+        {
+            if (json == null)
+                return null;
+
+            var ret = json.ToInputs();
+            if (ret == null)
+                return null;
+
+            return new Dictionary<string, object>(ret);
+        }
     }
 }

@@ -37,28 +37,7 @@ namespace GraphQL.Execution
                     while (nodes.Count > 0)
                     {
                         var node = nodes.Pop();
-                        var task = ExecuteNodeAsync(context, node);
-
-                        try
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                await task.ConfigureAwait(false);
-                            }
-                            catch
-                            {
-                            }
-                            throw;
-                        }
-
-                        await task.ConfigureAwait(false);
+                        await ExecuteNodeAsync(context, node).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)
@@ -75,28 +54,7 @@ namespace GraphQL.Execution
                     while (dataLoaderNodes.Count > 0)
                     {
                         var node = dataLoaderNodes.Dequeue();
-                        var task = CompleteDataLoaderNodeAsync(context, node);
-
-                        try
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                await task.ConfigureAwait(false);
-                            }
-                            catch
-                            {
-                            }
-                            throw;
-                        }
-
-                        await task.ConfigureAwait(false);
+                        await CompleteDataLoaderNodeAsync(context, node).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)
