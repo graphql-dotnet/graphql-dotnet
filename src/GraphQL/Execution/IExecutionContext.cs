@@ -90,5 +90,7 @@ namespace GraphQL.Execution
         /// from your dependency injection framework.
         /// </summary>
         IServiceProvider? RequestServices { get; }
+
+        Inputs? InputExtensions { get; }
     }
 }

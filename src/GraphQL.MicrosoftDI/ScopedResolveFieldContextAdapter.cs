@@ -78,5 +78,7 @@ namespace GraphQL.MicrosoftDI
         object IResolveFieldContext.Source => _baseContext.Source;
 
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
+
+        public Inputs InputExtensions => _baseContext.InputExtensions;
     }
 }

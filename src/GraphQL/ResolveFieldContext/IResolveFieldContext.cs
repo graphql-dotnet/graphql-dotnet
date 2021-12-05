@@ -87,6 +87,8 @@ namespace GraphQL
         /// </summary>
         IDictionary<string, object?> Extensions { get; }
 
+        Inputs? InputExtensions { get; }
+
         /// <summary>The service provider for the executing request.</summary>
         IServiceProvider? RequestServices { get; }
 

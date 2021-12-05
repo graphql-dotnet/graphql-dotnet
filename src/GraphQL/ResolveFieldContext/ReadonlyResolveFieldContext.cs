@@ -123,5 +123,8 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool => _executionContext;
+
+        /// <inheritdoc/>
+        public Inputs? InputExtensions => _executionContext.InputExtensions;
     }
 }

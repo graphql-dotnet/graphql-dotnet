@@ -74,5 +74,7 @@ namespace GraphQL.MicrosoftDI
         public string Before => _baseContext.Before;
 
         public int? PageSize => _baseContext.PageSize;
+
+        public Inputs InputExtensions => _baseContext.InputExtensions;
     }
 }

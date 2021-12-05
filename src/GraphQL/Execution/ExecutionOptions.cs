@@ -73,5 +73,7 @@ namespace GraphQL
         /// from your dependency injection framework.
         /// </summary>
         public IServiceProvider? RequestServices { get; set; }
+
+        public Inputs? InputExtensions { get; set; }
     }
 }

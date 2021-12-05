@@ -274,6 +274,7 @@ namespace GraphQL
                 Variables = variables,
                 Errors = new ExecutionErrors(),
                 Extensions = new Dictionary<string, object?>(),
+                InputExtensions = options.InputExtensions,
                 CancellationToken = options.CancellationToken,
 
                 Metrics = metrics,

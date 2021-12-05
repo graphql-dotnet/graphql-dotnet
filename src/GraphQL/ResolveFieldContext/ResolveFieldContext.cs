@@ -75,6 +75,9 @@ namespace GraphQL
         public IDictionary<string, object?> Extensions { get; set; }
 
         /// <inheritdoc/>
+        public Inputs? InputExtensions { get; set; }
+
+        /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool { get; set; }
 
         /// <summary>
@@ -109,6 +112,7 @@ namespace GraphQL
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
             Extensions = context.Extensions;
+            InputExtensions = context.InputExtensions;
             ArrayPool = context.ArrayPool;
         }
     }
