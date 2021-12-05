@@ -20,9 +20,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public Task<INodeVisitor>? ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 0 ? _nodeVisitor : null;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Fragments.Count > 0 ? _nodeVisitor : null);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
         {
             var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<string>();
             var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<FragmentSpread>();
@@ -31,7 +31,7 @@ namespace GraphQL.Validation.Rules
             {
                 detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
             }
-        }).ToTask();
+        });
 
         private static void detectCycleRecursive(
             FragmentDefinition fragment,

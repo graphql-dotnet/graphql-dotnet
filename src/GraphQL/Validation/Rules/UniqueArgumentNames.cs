@@ -20,9 +20,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<Argument>((argument, context) =>
@@ -38,6 +38,6 @@ namespace GraphQL.Validation.Rules
                     knownArgs[argName] = argument;
                 }
             })
-        ).ToTask();
+        );
     }
 }
