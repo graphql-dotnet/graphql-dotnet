@@ -358,14 +358,14 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
-    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object>
+    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
         public static readonly GraphQL.Inputs Empty;
-        public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
+        public Inputs(System.Collections.Generic.IDictionary<string, object?> dictionary) { }
     }
     public static class InputsExtensions
     {
-        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object?> dictionary) { }
     }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
     {
