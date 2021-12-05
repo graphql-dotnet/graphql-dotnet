@@ -114,9 +114,7 @@ namespace GraphQL
             }
             else if (IsAnIEnumerable(type))
             {
-#pragma warning disable 0618
                 var clrElementType = GetEnumerableElementType(type);
-#pragma warning restore 0618
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
