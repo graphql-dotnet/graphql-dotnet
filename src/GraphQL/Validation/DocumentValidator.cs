@@ -29,7 +29,7 @@ namespace GraphQL.Validation
         private ValidationContext? _reusableValidationContext;
 
         /// <summary>
-        /// Returns the default set of validation rules: all except <see cref="OverlappingFieldsCanBeMerged"/>.
+        /// Returns the default set of validation rules.
         /// </summary>
         public static readonly IEnumerable<IValidationRule> CoreRules = new List<IValidationRule>
         {
@@ -57,7 +57,8 @@ namespace GraphQL.Validation
             ProvidedNonNullArguments.Instance,
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
-            UniqueInputFieldNames.Instance
+            UniqueInputFieldNames.Instance,
+            OverlappingFieldsCanBeMerged.Instance,
         };
 
         /// <inheritdoc/>
