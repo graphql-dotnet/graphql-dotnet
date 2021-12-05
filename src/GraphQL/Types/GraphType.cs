@@ -100,8 +100,8 @@ namespace GraphQL.Types
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         /// <summary>
-        /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
-        /// is equal to the name of this graph type.
+        /// Determines if the graph type is equal to the specified object,
+        /// or if the name of the specified graph type is equal to the name of this graph type.
         /// </summary>
         public override bool Equals(object obj)
         {

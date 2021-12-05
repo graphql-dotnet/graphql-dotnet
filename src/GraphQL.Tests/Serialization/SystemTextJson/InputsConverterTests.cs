@@ -13,7 +13,6 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
-            IgnoreNullValues = false,
             Converters =
             {
                 new InputsConverter(),
@@ -25,7 +24,6 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
-            IgnoreNullValues = false,
             Converters =
             {
                 new JsonConverterBigInteger(),
