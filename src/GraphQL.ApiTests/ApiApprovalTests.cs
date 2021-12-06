@@ -43,14 +43,14 @@ namespace GraphQL.ApiTests
             // your machine if a diff tool isn't configured/setup.
             if (publicApi.DistinctBy(item => item.content).Count() == 1)
             {
-                publicApi[0].content.ShouldMatchApproved(options => options.WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                publicApi[0].content.ShouldMatchApproved(options => options.NoDiff().WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
             }
             else
             {
                 var uniqueApi = publicApi.ToLookup(item => item.content);
                 foreach (var item in uniqueApi)
                 {
-                    item.Key.ShouldMatchApproved(options => options.SubFolder(string.Join("+", item.Select(x => x.tfm).OrderBy(x => x))).WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                    item.Key.ShouldMatchApproved(options => options.SubFolder(string.Join("+", item.Select(x => x.tfm).OrderBy(x => x))).NoDiff().WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
                 }
             }
         }
