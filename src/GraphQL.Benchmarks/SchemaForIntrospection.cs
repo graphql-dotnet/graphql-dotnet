@@ -186,8 +186,8 @@ namespace GraphQL.Benchmarks
                     SuppressNoUsageWarning(arg20);
                     SuppressNoUsageWarning(arg21);
 #if NET6_0_OR_GREATER
-                    SuppressNoUsageWarning(arg22);  
-                    SuppressNoUsageWarning(arg23);  
+                    SuppressNoUsageWarning(arg22);
+                    SuppressNoUsageWarning(arg23);
 #endif
 
                     return "";

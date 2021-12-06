@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                _type.ParseValue("01:02:03.0040000").ShouldBe(new TimeOnly(1,2,3,4));
+                _type.ParseValue("01:02:03.0040000").ShouldBe(new TimeOnly(1, 2, 3, 4));
             });
         }
     }
