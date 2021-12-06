@@ -160,8 +160,8 @@ namespace GraphQL.Benchmarks
                     var arg20 = ctx.GetArgument<Uri>("arg20");
                     var arg21 = ctx.GetArgument<ushort>("arg21");
 #if NET6_0_OR_GREATER
-                    var arg22 = ctx.GetArgument<DateOnly>("arg22");              
-                    var arg23 = ctx.GetArgument<TimeOnly>("arg23");              
+                    var arg22 = ctx.GetArgument<DateOnly>("arg22");
+                    var arg23 = ctx.GetArgument<TimeOnly>("arg23");
 #endif
 
                     SuppressNoUsageWarning(arg01);

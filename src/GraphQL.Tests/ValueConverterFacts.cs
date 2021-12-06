@@ -79,11 +79,11 @@ namespace GraphQL.Tests
         }
 
 #if NET6_0_OR_GREATER
-        
+
         [Fact]
         public void StringConversionToDateOnly()
         {
-            var date = new DateOnly(2000,10,10);
+            var date = new DateOnly(2000, 10, 10);
             string source = date.ToString("O", DateTimeFormatInfo.InvariantInfo);
             var actual = ValueConverter.ConvertTo(source, typeof(DateOnly));
 
@@ -95,7 +95,7 @@ namespace GraphQL.Tests
         [Fact]
         public void StringConversionToTimeOnly()
         {
-            var time = new TimeOnly(1,10,10);
+            var time = new TimeOnly(1, 10, 10);
             string source = time.ToString("O", DateTimeFormatInfo.InvariantInfo);
             var actual = ValueConverter.ConvertTo(source, typeof(TimeOnly));
 
