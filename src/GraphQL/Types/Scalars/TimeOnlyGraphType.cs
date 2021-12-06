@@ -53,7 +53,7 @@ namespace GraphQL.Types
                 return date;
             }
 
-            throw new FormatException($"Could not parse time. Expected HH:mm:ss.fffffff. Value: {stringValue}");
+            throw new FormatException($"Could not parse time. Expected HH:mm:ss.FFFFFFF. Value: {stringValue}");
         }
     }
 }
