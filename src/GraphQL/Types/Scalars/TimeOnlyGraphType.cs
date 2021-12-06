@@ -18,7 +18,7 @@ namespace GraphQL.Types
         public TimeOnlyGraphType()
         {
             Description = "The `Time` scalar type represents a time in accordance with the " +
-                "[ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard. Format is `HH:mm:ss.fffffff`.";
+                "[ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard. Format is `HH:mm:ss.FFFFFFF`.";
         }
 
         /// <inheritdoc/>
