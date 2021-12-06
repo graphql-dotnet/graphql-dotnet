@@ -48,7 +48,7 @@ namespace GraphQL.Types
 
         private static TimeOnly ParseTime(string stringValue)
         {
-            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.fffffff", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
+            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
             {
                 return date;
             }
