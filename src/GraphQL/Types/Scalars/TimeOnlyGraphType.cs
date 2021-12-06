@@ -41,7 +41,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? Serialize(object? value) => value switch
         {
-            TimeOnly d => d.ToString("HH:mm:ss.fffffff", DateTimeFormatInfo.InvariantInfo),
+            TimeOnly d => d.ToString("HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo),
             null => null,
             _ => ThrowSerializationError(value)
         };
