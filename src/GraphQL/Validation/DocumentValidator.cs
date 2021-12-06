@@ -81,7 +81,6 @@ namespace GraphQL.Validation
             try
             {
                 Variables? variables = null;
-                bool useOnlyStandardRules = rules == null;
 
                 rules ??= CoreRules;
 
