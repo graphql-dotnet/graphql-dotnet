@@ -130,7 +130,7 @@ namespace GraphQL.Benchmarks
                 }
                 , new QueryArgument<TimeOnlyGraphType>
                 {
-                    Name = "arg22",
+                    Name = "arg23",
                     DefaultValue = new TimeOnly(1, 1, 3)
                 }
 #endif
