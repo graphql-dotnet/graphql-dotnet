@@ -32,7 +32,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch
         {
-            TimeOnly d => d, // no boxing
+            TimeOnly _ => value, // no boxing
             string stringValue => ParseTime(stringValue),
             null => null,
             _ => throw new FormatException($"Could not parse time. Expected either a string or a TimeOnly. Value: {value}")
