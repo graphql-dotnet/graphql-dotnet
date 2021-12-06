@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
 using PublicApiGenerator;
@@ -24,27 +25,32 @@ namespace GraphQL.ApiTests
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string asmName = type.Assembly.GetName().Name;
-            string tfmsDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..", asmName, "bin", "Debug");
-            Debug.Assert(Directory.Exists(tfmsDir), $"Directory '{tfmsDir}' doesn't exist");
-            string[] tfms = Directory.GetDirectories(tfmsDir);
-            Debug.Assert(tfms.Length > 0, $"Directory '{tfmsDir}' doesn't contain subdirectories");
+            string libDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..", asmName, "bin", "Debug");
+            Debug.Assert(Directory.Exists(libDir), $"Directory '{libDir}' doesn't exist");
+            string[] tfmDirs = Directory.GetDirectories(libDir);
+            Debug.Assert(tfmDirs.Length > 0, $"Directory '{libDir}' doesn't contain subdirectories");
 
-            foreach (string tfmDir in tfms)
+            (string tfm, string content)[] publicApi = tfmDirs.Select(tfmDir => (new DirectoryInfo(tfmDir).Name.Replace(".", ""), Assembly.LoadFile(Path.Combine(tfmDir, asmName + ".dll")).GeneratePublicApi(new ApiGeneratorOptions
             {
-                var asm = Assembly.LoadFile(Path.Combine(tfmDir, asmName + ".dll"));
-                string publicApi = asm.GeneratePublicApi(new ApiGeneratorOptions
-                {
-                    IncludeAssemblyAttributes = false,
-                    //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
-                    ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
-                }) + Environment.NewLine;
+                IncludeAssemblyAttributes = false,
+                //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
+                ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute", "System.Diagnostics.CodeAnalysis.AllowNullAttribute" }
+            }) + Environment.NewLine)).ToArray();
 
-                // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
-                // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,
-                // this call will try to launch a diff tool to help you out but that can fail on
-                // your machine if a diff tool isn't configured/setup.
-                string tfm = new DirectoryInfo(tfmDir).Name.Replace(".", "");
-                publicApi.ShouldMatchApproved(options => options.SubFolder(tfm).WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+            // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
+            // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,
+            // this call will try to launch a diff tool to help you out but that can fail on
+            // your machine if a diff tool isn't configured/setup.
+            if (publicApi.DistinctBy(item => item.content).Count() == 1)
+            {
+                publicApi[0].content.ShouldMatchApproved(options => options.WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+            }
+            else
+            {
+                foreach (var (tfm, content) in publicApi)
+                {
+                    content.ShouldMatchApproved(options => options.SubFolder(tfm).WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                }
             }
         }
     }
