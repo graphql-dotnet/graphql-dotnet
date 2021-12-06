@@ -35,7 +35,7 @@ namespace GraphQL.Types
             DateOnly _ => value, // no boxing
             string stringValue => ParseDate(stringValue),
             null => null,
-            _ => throw new FormatException($"Could not parse date. Expected either a string or a DateOnly. Value: {value}")
+            _ => ThrowValueConversionError(value)
         };
 
         /// <inheritdoc/>
