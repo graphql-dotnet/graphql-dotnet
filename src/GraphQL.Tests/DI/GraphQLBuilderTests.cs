@@ -1435,7 +1435,7 @@ namespace GraphQL.Tests.DI
 
         private class MyValidationRule : IValidationRule
         {
-            public Task<INodeVisitor> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
+            public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
         }
     }
 }

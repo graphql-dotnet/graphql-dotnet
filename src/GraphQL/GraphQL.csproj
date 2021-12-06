@@ -16,6 +16,7 @@
     <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
 
 </Project>

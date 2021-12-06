@@ -21,9 +21,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownTypeNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
         {
             var type = context.Schema.AllTypes[node.Name];
             if (type == null)
@@ -32,6 +32,6 @@ namespace GraphQL.Validation.Rules
                 var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }
-        }).ToTask();
+        });
     }
 }

@@ -22,9 +22,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedVariablesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<VariableDefinition>((def, context) =>
             {
                 var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<VariableDefinition>();
@@ -52,6 +52,6 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 })
-        ).ToTask();
+        );
     }
 }

@@ -22,9 +22,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownDirectivesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
         {
             var directiveDef = context.Schema.Directives.Find(node.Name);
             if (directiveDef == null)
@@ -39,7 +39,7 @@ namespace GraphQL.Validation.Rules
                     context.ReportError(new DirectivesInAllowedLocationsError(context, node, candidateLocation));
                 }
             }
-        }).ToTask();
+        });
 
         private static DirectiveLocation DirectiveLocationForAstPath(ValidationContext context)
         {

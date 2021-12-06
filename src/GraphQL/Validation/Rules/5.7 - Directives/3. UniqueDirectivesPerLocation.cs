@@ -19,9 +19,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueDirectivesPerLocationError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<Operation>((f, context) => CheckDuplicates(context, f.Directives)),
 
             new MatchingNodeVisitor<Field>((f, context) => CheckDuplicates(context, f.Directives)),
@@ -31,7 +31,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<FragmentSpread>((f, context) => CheckDuplicates(context, f.Directives)),
 
             new MatchingNodeVisitor<InlineFragment>((f, context) => CheckDuplicates(context, f.Directives))
-        ).ToTask();
+        );
 
         private static void CheckDuplicates(ValidationContext context, Directives? directives)
         {

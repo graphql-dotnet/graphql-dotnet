@@ -25,13 +25,13 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
             //TODO: make static instance when enabling this rule
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 
-            return new MatchingNodeVisitor<SelectionSet>((selectionSet, context) =>
+            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<SelectionSet>((selectionSet, context) =>
             {
                 List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                         context,
@@ -44,7 +44,7 @@ namespace GraphQL.Validation.Rules
                 {
                     context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
                 }
-            }).ToTask();
+            }));
         }
 
         private static List<Conflict> FindConflictsWithinSelectionSet(
