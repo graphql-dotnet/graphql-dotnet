@@ -19,7 +19,8 @@ namespace GraphQL.Validation
             VariableDefinitions? variableDefinitions,
             IEnumerable<IValidationRule>? rules = null,
             IDictionary<string, object?> userContext = null!,
-            Inputs? inputs = null);
+            Inputs? inputs = null,
+            string? operationName = null);
     }
 
     /// <inheritdoc/>
@@ -67,7 +68,8 @@ namespace GraphQL.Validation
             VariableDefinitions? variableDefinitions,
             IEnumerable<IValidationRule>? rules = null,
             IDictionary<string, object?> userContext = null!,
-            Inputs? inputs = null)
+            Inputs? inputs = null,
+            string? operationName = null)
         {
             schema.Initialize();
 
@@ -77,6 +79,7 @@ namespace GraphQL.Validation
             context.TypeInfo = new TypeInfo(schema);
             context.UserContext = userContext;
             context.Inputs = inputs;
+            context.OperationName = operationName;
 
             try
             {
