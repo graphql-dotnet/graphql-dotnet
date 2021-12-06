@@ -78,6 +78,34 @@ namespace GraphQL.Tests
             actual.ShouldBe(expected);
         }
 
+#if NET6_0_OR_GREATER
+
+        [Fact]
+        public void StringConversionToDateOnly()
+        {
+            var date = new DateOnly(2000, 10, 10);
+            string source = date.ToString("O", DateTimeFormatInfo.InvariantInfo);
+            var actual = ValueConverter.ConvertTo(source, typeof(DateOnly));
+
+            actual.ShouldNotBeNull();
+            actual.ShouldBeOfType<DateOnly>();
+            actual.ShouldBe(date);
+        }
+
+        [Fact]
+        public void StringConversionToTimeOnly()
+        {
+            var time = new TimeOnly(1, 10, 10);
+            string source = time.ToString("O", DateTimeFormatInfo.InvariantInfo);
+            var actual = ValueConverter.ConvertTo(source, typeof(TimeOnly));
+
+            actual.ShouldNotBeNull();
+            actual.ShouldBeOfType<TimeOnly>();
+            actual.ShouldBe(time);
+        }
+
+#endif
+
         [Fact]
         public void StringConversionToDateTimeOffset()
         {
