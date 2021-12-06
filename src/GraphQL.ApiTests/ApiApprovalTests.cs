@@ -25,9 +25,9 @@ namespace GraphQL.ApiTests
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string asmName = type.Assembly.GetName().Name;
             string tfmsDir = Path.Combine(baseDir, "..\\..\\..\\..", asmName, "bin", "Debug");
-            Debug.Assert(Directory.Exists(tfmsDir));
+            Debug.Assert(Directory.Exists(tfmsDir), $"Directory '{tfmsDir}' doesn't exist");
             string[] tfms = Directory.GetDirectories(tfmsDir);
-            Debug.Assert(tfms.Length > 0);
+            Debug.Assert(tfms.Length > 0, $"Directory '{tfmsDir}' doesn't contain subdirectories");
 
             foreach (string tfmDir in tfms)
             {
