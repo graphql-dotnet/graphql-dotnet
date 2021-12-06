@@ -32,28 +32,28 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch
         {
-            TimeOnly d => d, // no boxing
+            TimeOnly _ => value, // no boxing
             string stringValue => ParseTime(stringValue),
             null => null,
-            _ => throw new FormatException($"Could not parse time. Expected either a string or a TimeOnly. Value: {value}")
+            _ => ThrowValueConversionError(value)
         };
 
         /// <inheritdoc/>
         public override object? Serialize(object? value) => value switch
         {
-            TimeOnly d => d.ToString("HH:mm:ss.fffffff", DateTimeFormatInfo.InvariantInfo),
+            TimeOnly d => d.ToString("HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo),
             null => null,
             _ => ThrowSerializationError(value)
         };
 
         private static TimeOnly ParseTime(string stringValue)
         {
-            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.fffffff", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
+            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
             {
                 return date;
             }
 
-            throw new FormatException($"Could not parse time. Expected HH:mm:ss.fffffff. Value: {stringValue}");
+            throw new FormatException($"Could not parse time. Expected HH:mm:ss.FFFFFFF. Value: {stringValue}");
         }
     }
 }
