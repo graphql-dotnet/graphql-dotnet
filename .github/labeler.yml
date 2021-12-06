@@ -2,11 +2,13 @@ test:
   - src/GraphQL.DataLoader.Tests/**/*
   - src/GraphQL.Dummy/**/*
   - src/GraphQL.Harness.Tests/**/*
+  - src/GraphQL.MicrosoftDI.Tests/**/*
   - src/GraphQL.Tests/**/*
 
 CI:
   - .github/workflows/**/*
   - .github/dependabot.yml
+  - .github/labeler.yml
 
 code style:
   - .editorconfig
@@ -17,3 +19,4 @@ documentation:
 
 performance:
   - src/GraphQL.Benchmarks/**/*
+  - src/GraphQL.Benchmarks.Merge/**/*
