@@ -1907,6 +1907,13 @@ namespace GraphQL.Types
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
     }
+    public class DateOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public DateOnlyGraphType() { }
+        public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+    }
     public class DateTimeGraphType : GraphQL.Types.ScalarGraphType
     {
         public DateTimeGraphType() { }
@@ -2447,6 +2454,13 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object? ParseValue(object? value) { }
+    }
+    public class TimeOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public TimeOnlyGraphType() { }
+        public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
     }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {
