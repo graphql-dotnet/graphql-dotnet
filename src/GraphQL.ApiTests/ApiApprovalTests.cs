@@ -47,9 +47,10 @@ namespace GraphQL.ApiTests
             }
             else
             {
-                foreach (var (tfm, content) in publicApi)
+                var uniqueApi = publicApi.ToLookup(item => item.content);
+                foreach (var item in uniqueApi)
                 {
-                    content.ShouldMatchApproved(options => options.SubFolder(tfm).WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                    item.Key.ShouldMatchApproved(options => options.SubFolder(string.Join("+", item.Select(x => x.tfm))).WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
                 }
             }
         }
