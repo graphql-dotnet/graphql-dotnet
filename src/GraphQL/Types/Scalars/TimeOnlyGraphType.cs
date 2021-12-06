@@ -8,7 +8,7 @@ namespace GraphQL.Types
 {
     /// <summary>
     /// The Time scalar graph type represents a time in accordance with the ISO-8601 standard.
-    /// Format is `HH:mm:ss.fffffff`.
+    /// Format is `HH:mm:ss.FFFFFFF`.
     /// </summary>
     public class TimeOnlyGraphType : ScalarGraphType
     {
