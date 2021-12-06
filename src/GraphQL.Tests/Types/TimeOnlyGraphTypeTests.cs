@@ -35,7 +35,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalidly_formatted_time_to_exception()
         {
-            CultureTestHelper.UseCultures(() => Should.Throw<FormatException>(() => _type.ParseValue("11 AM")));
+            CultureTestHelper.UseCultures(() =>
+            {
+                Should.Throw<FormatException>(() => _type.ParseValue("11 AM"));
+                Should.Throw<FormatException>(() => _type.ParseValue("01:02:03.00400009"));
+            });
         }
 
         [Fact]
@@ -44,6 +48,7 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() =>
             {
                 _type.ParseValue("01:02:03.0040000").ShouldBe(new TimeOnly(1, 2, 3, 4));
+                _type.ParseValue("01:02:03.0040009").ShouldBe(new TimeOnly(37230040009));
             });
         }
     }
