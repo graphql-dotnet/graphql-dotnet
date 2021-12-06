@@ -35,7 +35,7 @@ namespace GraphQL.Types
             TimeOnly _ => value, // no boxing
             string stringValue => ParseTime(stringValue),
             null => null,
-            _ => throw new FormatException($"Could not parse time. Expected either a string or a TimeOnly. Value: {value}")
+            _ => ThrowValueConversionError(value)
         };
 
         /// <inheritdoc/>
