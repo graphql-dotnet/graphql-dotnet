@@ -8,7 +8,7 @@ namespace GraphQL.Types
 {
     /// <summary>
     /// The Time scalar graph type represents a time in accordance with the ISO-8601 standard.
-    /// Format is `HH:mm:ss.fffffff`.
+    /// Format is `HH:mm:ss.FFFFFFF`.
     /// </summary>
     public class TimeOnlyGraphType : ScalarGraphType
     {
@@ -48,9 +48,9 @@ namespace GraphQL.Types
 
         private static TimeOnly ParseTime(string stringValue)
         {
-            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
+            if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var time))
             {
-                return date;
+                return time;
             }
 
             throw new FormatException($"Could not parse time. Expected HH:mm:ss.FFFFFFF. Value: {stringValue}");
