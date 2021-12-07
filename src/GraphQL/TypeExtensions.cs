@@ -75,6 +75,12 @@ namespace GraphQL
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
 
+            return typeName;
+        }
+
+        public static string GraphQLRelayName(this Type type)
+        {
+            var typeName = GraphQLName(type);
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
             return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)

@@ -16,7 +16,7 @@ namespace GraphQL.Types.Relay
         /// <inheritdoc/>
         public ConnectionType()
         {
-            string graphQLTypeName = typeof(TNodeType).GraphQLName();
+            string graphQLTypeName = typeof(TNodeType).GraphQLRelayName();
             Name = $"{graphQLTypeName}Connection";
             Description =
                 $"A connection from an object to a list of objects of type `{graphQLTypeName}`.";

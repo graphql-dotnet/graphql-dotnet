@@ -32,6 +32,19 @@ namespace GraphQL.Tests
             TypeExtensions.IsNullable(type).ShouldBeTrue();
         }
 
+        [Theory]
+        [InlineData(typeof(TestEnum))]
+        [InlineData(typeof(FooType))]
+        [InlineData(typeof(FooTypes))]
+        [InlineData(typeof(Foo))]
+        public void allow_non_relay_types_to_have_type_in_name(Type type)
+        {
+            Assert.Equal(type.Name, TypeExtensions.GraphQLName(type));
+        }
+
         private enum TestEnum { }
+        private enum FooType { }
+        private enum FooTypes { }
+        private class Foo { }
     }
 }
