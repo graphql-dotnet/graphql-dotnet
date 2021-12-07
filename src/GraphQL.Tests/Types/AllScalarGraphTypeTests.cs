@@ -48,6 +48,10 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(BigIntGraphType))]
         [InlineData(typeof(DateGraphType))]
         [InlineData(typeof(DateTimeGraphType))]
+#if NET6_0_OR_GREATER
+        [InlineData(typeof(DateOnlyGraphType))]
+        [InlineData(typeof(TimeOnlyGraphType))]
+#endif
         [InlineData(typeof(DateTimeOffsetGraphType))]
         [InlineData(typeof(TimeSpanSecondsGraphType))]
         [InlineData(typeof(TimeSpanMillisecondsGraphType))]
@@ -81,6 +85,10 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(ULongGraphType))]
         [InlineData(typeof(BigIntGraphType))]
         [InlineData(typeof(DateGraphType))]
+#if NET6_0_OR_GREATER
+        [InlineData(typeof(DateOnlyGraphType))]
+        [InlineData(typeof(TimeOnlyGraphType))]
+#endif
         [InlineData(typeof(DateTimeGraphType))]
         [InlineData(typeof(DateTimeOffsetGraphType))]
         [InlineData(typeof(TimeSpanSecondsGraphType))]

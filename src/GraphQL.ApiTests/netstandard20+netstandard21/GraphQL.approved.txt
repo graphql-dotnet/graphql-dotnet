@@ -573,9 +573,9 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
@@ -609,7 +609,7 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }

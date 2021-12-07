@@ -37,6 +37,10 @@ namespace GraphQL
             Register<string, float>(value => float.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
             Register<string, double>(value => double.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
             Register<string, decimal>(value => decimal.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+#if NET6_0_OR_GREATER
+            Register<string, DateOnly>(value => DateOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));      
+            Register<string, TimeOnly>(value => TimeOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));      
+#endif
             Register<string, DateTime>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal).UtcDateTime);
             Register<string, DateTimeOffset>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(bool), value =>
