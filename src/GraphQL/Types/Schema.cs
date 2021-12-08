@@ -418,8 +418,8 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Coerces input types' default values when those values are GraphQLValue nodes.
-        /// This is applicable when the SchemaBuilder is used to build the schema.
+        /// Coerces input types' default values when those values are <see cref="GraphQLValue"/> nodes.
+        /// This is applicable when the <see cref="SchemaBuilder"/> is used to build the schema.
         /// </summary>
         protected virtual void CoerceInputTypeDefaultValues()
         {
