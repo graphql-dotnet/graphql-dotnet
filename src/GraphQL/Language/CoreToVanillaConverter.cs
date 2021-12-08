@@ -136,7 +136,7 @@ namespace GraphQL.Language
             {
                 def.DefaultValue = Value(val);
             }
-            else if (source.DefaultValue != null && !(source.DefaultValue is GraphQLValue))
+            else if (source.DefaultValue != null && source.DefaultValue is not GraphQLValue)
             {
                 throw new InvalidOperationException($"Unknown default value: {source.DefaultValue}");
             }
