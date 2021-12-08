@@ -9,6 +9,7 @@ CI:
   - .github/workflows/**/*
   - .github/dependabot.yml
   - .github/labeler.yml
+  - .github/codecov.yml
 
 code style:
   - .editorconfig
