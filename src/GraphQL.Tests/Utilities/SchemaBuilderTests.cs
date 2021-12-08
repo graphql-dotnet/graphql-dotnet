@@ -548,6 +548,21 @@ namespace GraphQL.Tests.Utilities
             Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType3', 'SomeInputType2', 'SomeInputType1'.");
         }
 
+        [Fact(Skip = "Not yet supported")]
+        public void input_types_default_value_loops_pass()
+        {
+            // see: https://github.com/graphql-dotnet/graphql-dotnet/pull/2696#discussion_r764975585
+
+            var definitions = @"
+                input SomeInputType1 {
+                  test: SomeInputType1 = { test: null }
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+        }
+
         [Fact]
         public void builds_directives()
         {
