@@ -32,6 +32,10 @@ namespace GraphQL.Types
             [typeof(string)] = typeof(StringGraphType),
             [typeof(bool)] = typeof(BooleanGraphType),
             [typeof(DateTime)] = typeof(DateTimeGraphType),
+#if NET6_0_OR_GREATER
+            [typeof(DateOnly)] = typeof(DateOnlyGraphType),
+            [typeof(TimeOnly)] = typeof(TimeOnlyGraphType),
+#endif
             [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
             [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
             [typeof(Guid)] = typeof(IdGraphType),
@@ -45,7 +49,7 @@ namespace GraphQL.Types
         };
 
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-        private readonly Dictionary<Type, IGraphType> _introspectionTypes;
+        private Dictionary<Type, IGraphType> _introspectionTypes;
 
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
         private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
@@ -62,6 +66,10 @@ namespace GraphQL.Types
         private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
         {
             new DateGraphType(),
+            #if NET6_0_OR_GREATER
+            new DateOnlyGraphType(),
+            new TimeOnlyGraphType(),
+            #endif
             new DateTimeGraphType(),
             new DateTimeOffsetGraphType(),
             new TimeSpanSecondsGraphType(),
@@ -80,8 +88,8 @@ namespace GraphQL.Types
         }
         .ToDictionary(t => t.GetType());
 
-        private readonly TypeCollectionContext _context;
-        private readonly INameConverter _nameConverter;
+        private TypeCollectionContext _context;
+        private INameConverter _nameConverter;
 
         /// <summary>
         /// Initializes a new instance with no types registered.
@@ -97,12 +105,28 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public SchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        {
+            Initialize(schema, serviceProvider);
+        }
+
+        private bool _initialized = false;
+        /// <summary>
+        /// Initializes the instance for the specified schema, and with the specified type resolver.
+        /// </summary>
+        /// <param name="schema">A schema for which this instance is created.</param>
+        /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+        protected void Initialize(ISchema schema, IServiceProvider serviceProvider)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
+            if (_initialized)
+                throw new InvalidOperationException("SchemaTypes has already been initialized.");
+            _initialized = true;
 
             var types = GetSchemaTypes(schema, serviceProvider);
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
@@ -234,7 +258,7 @@ namespace GraphQL.Types
         /// Returns a dictionary that relates type names to graph types.
         /// </summary>
         protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
-        private readonly Dictionary<Type, IGraphType> _typeDictionary;
+        private Dictionary<Type, IGraphType> _typeDictionary;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();

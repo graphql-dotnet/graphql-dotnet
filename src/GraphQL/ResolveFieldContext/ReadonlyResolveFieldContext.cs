@@ -11,7 +11,7 @@ namespace GraphQL
     /// <summary>
     /// A readonly implementation of <see cref="IResolveFieldContext"/>.
     /// </summary>
-    public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
+    public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
     {
         // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
         private ExecutionNode _executionNode;

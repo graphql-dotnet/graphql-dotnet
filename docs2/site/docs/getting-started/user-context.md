@@ -1,10 +1,10 @@
 # User Context
 
-You can pass a `UserContext` (any `IDictionary<string, object>`) to provide access to
+You can pass a `UserContext` (any `IDictionary<string, object?>`) to provide access to
 your specific data. The `UserContext` is accessible in field resolvers and validation rules.
 
 ```csharp
-public class MyGraphQLUserContext : Dictionary<string, object>
+public class MyGraphQLUserContext : Dictionary<string, object?>
 {
 }
 

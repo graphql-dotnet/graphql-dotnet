@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
@@ -46,10 +46,10 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
-      - name: Setup .NET Core 5.0 SDK
+      - name: Setup .NET Core 6.0 SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: '6.0.x'
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}

@@ -13,6 +13,11 @@ namespace GraphQL.DataLoader
         private readonly Task<T> _result;
 
         /// <summary>
+        /// Returns an instance which always returns the default value.
+        /// </summary>
+        internal static readonly DataLoaderResult<T> DefaultValue = new(default(T));
+
+        /// <summary>
         /// Initializes a DataLoaderResult with the given asynchronous task
         /// </summary>
         public DataLoaderResult(Task<T> result)

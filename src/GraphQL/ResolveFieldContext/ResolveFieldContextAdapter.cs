@@ -27,7 +27,7 @@ namespace GraphQL
         internal void Reset()
         {
             _baseContext = null!;
-            Source = default;
+            Source = default!;
         }
 
         internal ResolveFieldContextAdapter<T> Set(IResolveFieldContext baseContext)
@@ -42,7 +42,7 @@ namespace GraphQL
             {
                 try
                 {
-                    Source = (T?)baseContext.Source;
+                    Source = (T)baseContext.Source!;
                 }
                 catch (InvalidCastException)
                 {
@@ -53,7 +53,7 @@ namespace GraphQL
             return this;
         }
 
-        public T? Source { get; private set; }
+        public T Source { get; private set; }
 
         public Field FieldAst => _baseContext.FieldAst;
 

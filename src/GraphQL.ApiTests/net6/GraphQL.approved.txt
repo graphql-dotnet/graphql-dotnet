@@ -358,14 +358,14 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
-    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object>
+    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
         public static readonly GraphQL.Inputs Empty;
-        public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
+        public Inputs(System.Collections.Generic.IDictionary<string, object?> dictionary) { }
     }
     public static class InputsExtensions
     {
-        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object?> dictionary) { }
     }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
     {
@@ -404,7 +404,7 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
-    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
+    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
@@ -429,7 +429,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
-    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
@@ -462,7 +462,7 @@ namespace GraphQL
         public static GraphQL.IResolveFieldContext Copy(this GraphQL.IResolveFieldContext context) { }
         public static GraphQL.IResolveFieldContext<TSource> Copy<TSource>(this GraphQL.IResolveFieldContext<TSource> context) { }
         public static object? GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object? defaultValue = null) { }
-        public static TType? GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType? defaultValue = default) { }
+        public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
         public static object? GetExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
         public static void SetExtension(this GraphQL.IResolveFieldContext context, string path, object? value) { }
@@ -573,9 +573,9 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
@@ -609,7 +609,7 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
@@ -1787,7 +1787,7 @@ namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext { }
     public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>, GraphQL.Subscription.IResolveEventStreamContext { }
-    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
+    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object?>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }
     }
@@ -1903,6 +1903,13 @@ namespace GraphQL.Types
     public class DateGraphType : GraphQL.Types.ScalarGraphType
     {
         public DateGraphType() { }
+        public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+    }
+    public class DateOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public DateOnlyGraphType() { }
         public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
@@ -2272,7 +2279,7 @@ namespace GraphQL.Types
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }
-    public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object>
+    public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
     }
@@ -2384,7 +2391,6 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        protected virtual void CoerceInputTypeDefaultValues() { }
         protected virtual GraphQL.Types.SchemaTypes CreateSchemaTypes() { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
@@ -2428,6 +2434,7 @@ namespace GraphQL.Types
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "ClrType",
                 "GraphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings) { }
+        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2447,6 +2454,13 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object? ParseValue(object? value) { }
+    }
+    public class TimeOnlyGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public TimeOnlyGraphType() { }
+        public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
     }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2714,7 +2728,7 @@ namespace GraphQL.Utilities
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
         public string[] BreakLine(string line, int len) { }
-        public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
+        public string FormatDefaultValue(object? value, GraphQL.Types.IGraphType graphType) { }
         protected string FormatDescription(string? description, string indentation = "") { }
         protected virtual bool IsDefinedDirective(string directiveName) { }
         protected virtual bool IsDefinedType(string typeName) { }
@@ -2745,6 +2759,7 @@ namespace GraphQL.Utilities
     public class SchemaPrinterOptions
     {
         public SchemaPrinterOptions() { }
+        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }

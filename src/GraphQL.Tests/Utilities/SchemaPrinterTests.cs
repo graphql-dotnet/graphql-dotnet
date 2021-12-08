@@ -30,9 +30,7 @@ namespace GraphQL.Tests.Utilities
             var result = print(schema);
 
             // ensure schema isn't disposed before test finishes
-            if (schema.Query.Name == "")
-            {
-            }
+            schema.Query.Name.ShouldNotBeNull();
 
             return result;
         }
@@ -848,6 +846,105 @@ union SingleUnion = Foo
                     "Query",
 @"type Query {
   str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_null_value()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
+                "str",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
+                );
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput2",
+@"input SomeInput2 {
+  names: [String]
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput2! = { names: null }): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_as_dictionary()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+  unused: Boolean
+}
+
+type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true },
+      argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+  unused: Boolean
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_as_dictionary_null_values()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int = 2
+}
+
+type Query {
+  str(arg: SomeInput = { age: null }): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int = 2
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(arg: SomeInput = { age: null }): String!
 }"
                 },
             };
@@ -1700,6 +1797,96 @@ enum __TypeKind {
             printer.PrintDescription("Th\\is \"is\" a \"\"\"test\n\tline2\n line3\u0003").ShouldBeCrossPlat("\"\"\"\nTh\\is \"is\" a \\\"\"\"test\n\tline2\n line3\n\"\"\"\n");
         }
 
+        [Fact]
+        public void sorts_schema_correctly()
+        {
+            var schema = Schema.For(@"
+# test sorting type names
+type Zebra {
+  # test sorting field names on object types
+  field3: String
+  field2: Int
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  # test sorting arguments
+  field2(arg2: Rutabaga, arg1: Beta): Tango
+  # test sorting fields of default values
+  field3(arg3: Rutabaga = { field3: ""hello"", field2: 2 }): String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+input Rutabaga {
+  # test sorting field names on input types
+  field3: String
+  field2: Int
+}
+
+# test sorting directives
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+  # test sorting directive locations -- does not work yet
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+directive @test1(
+  # test sorting fields within directives -- does not work yet
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+enum Beta {
+  # test sorting of enum value names
+  VALUE_3
+  VALUE_2
+}
+");
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
+            var actual = printer.Print();
+            var expected = @"directive @test1(
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+enum Beta {
+  VALUE_2
+  VALUE_3
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  field2(arg1: Beta, arg2: Rutabaga): Tango
+  field3(arg3: Rutabaga = { field2: 2, field3: ""hello"" }): String
+}
+
+input Rutabaga {
+  field2: Int
+  field3: String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+type Zebra {
+  field2: Int
+  field3: String
+}
+";
+            actual.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
+        }
+
         public class FooType : ObjectGraphType
         {
             public FooType()
@@ -1817,6 +2004,20 @@ enum __TypeKind {
             public int Age { get; set; }
 
             public bool IsDeveloper { get; set; }
+        }
+
+        public class SomeInputType2 : InputObjectGraphType<SomeInput2>
+        {
+            public SomeInputType2()
+            {
+                Name = "SomeInput2";
+                Field(x => x.Names, true);
+            }
+        }
+
+        public class SomeInput2
+        {
+            public IList<string> Names { get; set; }
         }
 
         public class OddType : ScalarGraphType

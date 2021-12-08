@@ -79,6 +79,8 @@ namespace GraphQL.DataLoader
 
         /// <summary>
         /// Asynchronously load data for the provided given key.
+        /// If the key is <see langword="null"/> then a <see cref="DataLoaderResult{T}"/> containing
+        /// <see langword="null"/> will be immediately returned.
         /// </summary>
         /// <param name="key">Key to use for loading data</param>
         /// <returns>
@@ -86,6 +88,11 @@ namespace GraphQL.DataLoader
         /// </returns>
         public virtual IDataLoaderResult<T> LoadAsync(TKey key)
         {
+            // dictionaries do not support keys with null values (null reference values or null value types),
+            // so in this case bypass the data loader and return null
+            if (key == null)
+                return DataLoaderResult<T>.DefaultValue;
+
             lock (_sync)
             {
                 //once it enters the lock, it is guaranteed to exit the lock, as it does not depend on external code
@@ -115,6 +122,7 @@ namespace GraphQL.DataLoader
 
         /// <summary>
         /// An abstract asynchronous function to load the values for a given list of keys.
+        /// None of the keys will be <see langword="null"/>.
         /// </summary>
         /// <remarks>
         /// This may be called on multiple threads if IDataLoader.LoadAsync is called on multiple threads.

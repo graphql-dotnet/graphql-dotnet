@@ -66,7 +66,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
-    public class ObjectGraphType : ObjectGraphType<object>
+    public class ObjectGraphType : ObjectGraphType<object?>
     {
     }
 }

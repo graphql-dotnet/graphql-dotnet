@@ -12,7 +12,7 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext<object>
+    public class ResolveFieldContext : IResolveFieldContext<object?>
     {
         /// <inheritdoc/>
         public Field FieldAst { get; set; }
@@ -132,9 +132,9 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="ResolveFieldContext.Source"/>
-        public new TSource? Source
+        public new TSource Source
         {
-            get => (TSource?)base.Source;
+            get => (TSource)base.Source!;
             set => base.Source = value;
         }
     }
