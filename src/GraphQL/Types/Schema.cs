@@ -417,6 +417,10 @@ namespace GraphQL.Types
             AppliedDirectivesValidationVisitor.Instance.Run(this);
         }
 
+        /// <summary>
+        /// Coerces input types' default values when those values are GraphQLValue nodes.
+        /// This is applicable when the SchemaBuilder is used to build the schema.
+        /// </summary>
         protected virtual void CoerceInputTypeDefaultValues()
         {
             var completed = new HashSet<IInputObjectGraphType>();
