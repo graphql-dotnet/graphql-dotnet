@@ -13,8 +13,6 @@ using Xunit;
 
 namespace GraphQL.Tests.Types
 {
-#pragma warning disable 618
-
     public class ComplexGraphTypeTests
     {
         internal class ComplexType<T> : ObjectGraphType<T>
@@ -159,7 +157,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new Schema();
             var type = new ComplexType<Droid>();
-            var field = type.Field(d => d.Name);
+            _ = type.Field(d => d.Name);
             schema.Query = type;
             schema.Initialize();
 
@@ -171,7 +169,7 @@ namespace GraphQL.Tests.Types
         public void allows_custom_name()
         {
             var type = new ComplexType<Droid>();
-            var field = type.Field(d => d.Name)
+            _ = type.Field(d => d.Name)
                 .Name("droid");
 
             type.Fields.Last().Name.ShouldBe("droid");
@@ -217,7 +215,7 @@ namespace GraphQL.Tests.Types
         public void infers_field_description_from_expression()
         {
             var type = new ComplexType<TestObject>();
-            var field = type.Field(d => d.someString);
+            _ = type.Field(d => d.someString);
 
             type.Fields.Last().Description.ShouldBe("Super secret");
         }
@@ -226,7 +224,7 @@ namespace GraphQL.Tests.Types
         public void infers_field_deprecation_from_expression()
         {
             var type = new ComplexType<TestObject>();
-            var field = type.Field(d => d.someBoolean);
+            _ = type.Field(d => d.someBoolean);
 
             type.Fields.Last().DeprecationReason.ShouldBe("Use someInt");
         }
@@ -235,7 +233,7 @@ namespace GraphQL.Tests.Types
         public void infers_field_default_from_expression()
         {
             var type = new ComplexType<TestObject>();
-            var field = type.Field(d => d.someDate);
+            _ = type.Field(d => d.someDate);
 
             type.Fields.Last().DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
         }
@@ -277,7 +275,7 @@ namespace GraphQL.Tests.Types
         public void create_field_with_func_resolver()
         {
             var type = new ComplexType<Droid>();
-            var field = type.Field<StringGraphType>("name", resolve: context => context.Source.Name);
+            _ = type.Field<StringGraphType>("name", resolve: context => context.Source.Name);
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
         }
@@ -318,7 +316,7 @@ namespace GraphQL.Tests.Types
             exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
-        private Exception test_field_name(string fieldName)
+        private static Exception test_field_name(string fieldName)
         {
             // test failure
             return Should.Throw<ArgumentOutOfRangeException>(() =>
@@ -464,6 +462,4 @@ namespace GraphQL.Tests.Types
             type.Fields.Last().Name.ShouldBe(fieldName);
         }
     }
-
-#pragma warning restore 618
 }
