@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 using GraphQL.Types;
 using PublicApiGenerator;
 using Shouldly;
@@ -24,13 +25,19 @@ namespace GraphQL.ApiTests
         public void PublicApi(Type type)
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string asmName = type.Assembly.GetName().Name;
-            string libDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..", asmName, "bin", "Debug");
-            Debug.Assert(Directory.Exists(libDir), $"Directory '{libDir}' doesn't exist");
-            string[] tfmDirs = Directory.GetDirectories(libDir);
-            Debug.Assert(tfmDirs.Length > 0, $"Directory '{libDir}' doesn't contain subdirectories");
+            string projectName = type.Assembly.GetName().Name;
+            string projectDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..");
+            string buildDir = Path.Combine(projectDir, projectName, "bin", "Debug");
+            Debug.Assert(Directory.Exists(buildDir), $"Directory '{buildDir}' doesn't exist");
+            string csProject = Path.Combine(projectDir, projectName, projectName + ".csproj");
+            var project = XDocument.Load(csProject);
+            string[] tfms = project.Descendants("TargetFrameworks").Union(project.Descendants("TargetFramework")).First().Value.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
-            (string tfm, string content)[] publicApi = tfmDirs.Select(tfmDir => (new DirectoryInfo(tfmDir).Name.Replace(".", ""), Assembly.LoadFile(Path.Combine(tfmDir, asmName + ".dll")).GeneratePublicApi(new ApiGeneratorOptions
+            // There may be old stuff from earlier builds like net45, netcoreapp3.0, etc. so filter it out
+            string[] actualTfmDirs = Directory.GetDirectories(buildDir).Where(dir => tfms.Any(tfm => dir.EndsWith(tfm))).ToArray();
+            Debug.Assert(actualTfmDirs.Length > 0, $"Directory '{buildDir}' doesn't contain subdirectories matching {string.Join(";", tfms)}");
+
+            (string tfm, string content)[] publicApi = actualTfmDirs.Select(tfmDir => (new DirectoryInfo(tfmDir).Name.Replace(".", ""), Assembly.LoadFile(Path.Combine(tfmDir, projectName + ".dll")).GeneratePublicApi(new ApiGeneratorOptions
             {
                 IncludeAssemblyAttributes = false,
                 //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
