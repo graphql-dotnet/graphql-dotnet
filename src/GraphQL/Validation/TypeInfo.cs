@@ -16,7 +16,6 @@ namespace GraphQL.Validation
         private readonly Stack<IGraphType?> _inputTypeStack = new Stack<IGraphType?>();
         private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
         private readonly Stack<FieldType?> _fieldDefStack = new Stack<FieldType?>();
-        private readonly Stack<INode> _ancestorStack = new Stack<INode>();
         private DirectiveGraphType? _directive;
         private QueryArgument? _argument;
 
@@ -28,6 +27,11 @@ namespace GraphQL.Validation
         {
             _schema = schema;
         }
+
+        /// <summary>
+        /// Ancestors stack of the currently traversed AST tree.
+        /// </summary>
+        public Stack<INode> Ancestors { get; } = new Stack<INode>();
 
         private static T? PeekElement<T>(Stack<T> from, int index)
         {
@@ -57,7 +61,7 @@ namespace GraphQL.Validation
         /// Returns an ancestor of the current node.
         /// </summary>
         /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
-        public INode? GetAncestor(int index) => PeekElement(_ancestorStack, index);
+        public INode? GetAncestor(int index) => PeekElement(Ancestors, index);
 
         /// <summary>
         /// Returns the last graph type matched, or <see langword="null"/> if none.
@@ -96,7 +100,7 @@ namespace GraphQL.Validation
         /// <inheritdoc/>
         public void Enter(INode node, ValidationContext context)
         {
-            _ancestorStack.Push(node);
+            Ancestors.Push(node);
 
             if (node is SelectionSet)
             {
@@ -201,7 +205,7 @@ namespace GraphQL.Validation
         /// <inheritdoc/>
         public void Leave(INode node, ValidationContext context)
         {
-            _ancestorStack.Pop();
+            Ancestors.Pop();
 
             if (node is SelectionSet)
             {
