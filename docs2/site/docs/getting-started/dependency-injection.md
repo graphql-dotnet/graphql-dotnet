@@ -321,7 +321,7 @@ public class MyGraphType : ObjectGraphType<Category>
 
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
-However, the ease of use benefits for not very complex project often far outweigh the anti-pattern idealogy. 
+However, the ease of use benefits for not very complex projects often far outweigh the anti-pattern idealogy. 
 
 Within the `GraphQL.MicrosoftDI` package, there is also a builder approach to adding scoped dependencies.
 This makes for a concise and declarative approach. Each field clearly states the services it needs
