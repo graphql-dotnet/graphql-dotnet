@@ -339,7 +339,7 @@ namespace GraphQL.Execution
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType!;
 
-            if (!(parent.Result is IEnumerable data))
+            if (parent.Result is not IEnumerable data)
             {
                 throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
@@ -368,7 +368,7 @@ namespace GraphQL.Execution
                 var node = BuildExecutionNode(parent, itemType, parent.Field!, parent.FieldDefinition!, index++);
                 node.Result = d;
 
-                if (!(d is IDataLoaderResult))
+                if (d is not IDataLoaderResult)
                 {
                     CompleteNode(context, node);
                 }
@@ -405,7 +405,7 @@ namespace GraphQL.Execution
 
                 node.Result = result;
 
-                if (!(result is IDataLoaderResult))
+                if (result is not IDataLoaderResult)
                 {
                     CompleteNode(context, node);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
@@ -434,14 +434,14 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
-            if (!(node.Result is IDataLoaderResult dataLoaderResult))
+            if (node.Result is not IDataLoaderResult dataLoaderResult)
                 throw new InvalidOperationException("This execution node is not pending completion");
 
             try
             {
                 node.Result = await dataLoaderResult.GetResultAsync(context.CancellationToken).ConfigureAwait(false);
 
-                if (!(node.Result is IDataLoaderResult))
+                if (node.Result is not IDataLoaderResult)
                 {
                     CompleteNode(context, node);
                 }
