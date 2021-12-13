@@ -32,14 +32,14 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedDirectives(IGraphType type)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             return type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
         }
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
             if (astDirectives == null)
@@ -57,14 +57,14 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintAstDirective(GraphQLDirective directive)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             return AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
         }
 
         public override string PrintObject(IObjectGraphType type)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             // Do not return an empty query type: "Query { }" as it is not valid as part of the sdl.
             if (type != null && string.Equals(type.Name, "Query", StringComparison.Ordinal) && !type.Fields.Any(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name)))
@@ -87,7 +87,7 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintInterface(IInterfaceGraphType type)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             var isExtension = type.IsExtensionType();
             var extended = isExtension ? "extend " : "";
@@ -97,7 +97,7 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintFields(IComplexGraphType type)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             var fields = type?.Fields
                 .Where(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name))
@@ -118,7 +118,7 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedSchema()
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             return PrintFilteredSchema(
                 directiveName => !IsBuiltInDirective(directiveName) && !IsFederatedDirective(directiveName),
