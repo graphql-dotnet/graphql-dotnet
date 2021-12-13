@@ -176,7 +176,7 @@ namespace GraphQL.Types
 
             foreach (var type in types)
             {
-                if (!(type is ScalarGraphType))
+                if (type is not ScalarGraphType)
                     AddType(type, ctx);
             }
 

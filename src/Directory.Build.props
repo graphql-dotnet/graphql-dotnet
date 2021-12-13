@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>4.6.0-preview</VersionPrefix>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
