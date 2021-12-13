@@ -6,11 +6,13 @@ namespace GraphQL.Tests.Utilities.Federation
 {
     public class FederatedSchemaPrinterTests
     {
-        [Fact]
-        public void PrintObject_ReturnsEmptyString_GivenQueryTypeHasOnlyFederatedFields()
+        [Theory]
+        [InlineData(@"type X @key(fields: ""id"") { id: ID! }")]
+        [InlineData(@"schema { query: MyQuery } type MyQuery type X @key(fields: ""id"") { id: ID! }")]
+        public void PrintObject_ReturnsEmptyString_GivenQueryTypeHasOnlyFederatedFields(string definitions)
         {
             // Arrange
-            var schema = FederatedSchema.For(@"type X @key(fields: ""id"") { id: ID! }");
+            var schema = FederatedSchema.For(definitions);
             SchemaPrinterOptions options = default;
 
             schema.Initialize();
