@@ -331,7 +331,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not <see langword="null"/>.
         /// </summary>
-        protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        protected virtual async Task SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType!;
             var itemType = listType.ResolvedType!;
@@ -352,25 +352,25 @@ namespace GraphQL.Execution
             if (data is IList list)
             {
                 for (int i = 0; i < list.Count; ++i)
-                    SetArrayItemNode(list[i]);
+                    await SetArrayItemNode(list[i]).ConfigureAwait(false);
             }
             else
             {
                 foreach (object d in data)
-                    SetArrayItemNode(d);
+                    await SetArrayItemNode(d).ConfigureAwait(false);
             }
 
             parent.Items = arrayItems;
 
             // local function uses 'struct closure' without heap allocation
-            void SetArrayItemNode(object d)
+            async Task SetArrayItemNode(object d)
             {
                 var node = BuildExecutionNode(parent, itemType, parent.Field!, parent.FieldDefinition!, index++);
                 node.Result = d;
 
                 if (!(d is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                 }
 
                 arrayItems.Add(node);
@@ -407,7 +407,7 @@ namespace GraphQL.Execution
 
                 if (!(result is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
                     resolveContext.Reset(null, null);
                     System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
@@ -423,7 +423,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledException(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
@@ -443,7 +443,7 @@ namespace GraphQL.Execution
 
                 if (!(node.Result is IDataLoaderResult))
                 {
-                    CompleteNode(context, node);
+                    await CompleteNode(context, node).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -456,7 +456,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledException(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
@@ -466,7 +466,7 @@ namespace GraphQL.Execution
         /// and <see cref="SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)">SetArrayItemNodes</see>, but does not execute them. For value
         /// execution nodes, it will run <see cref="ScalarGraphType.Serialize(object)"/> to serialize the result.
         /// </summary>
-        protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task CompleteNode(ExecutionContext context, ExecutionNode node)
         {
             try
             {
@@ -486,7 +486,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ArrayExecutionNode arrayNode)
                     {
-                        SetArrayItemNodes(context, arrayNode);
+                        await SetArrayItemNodes(context, arrayNode).ConfigureAwait(false);
                     }
                 }
             }
@@ -500,7 +500,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledException(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
@@ -521,7 +521,7 @@ namespace GraphQL.Execution
         /// Processes unhandled field resolver exceptions.
         /// </summary>
         /// <returns>A value that indicates when the exception should be rethrown.</returns>
-        protected virtual bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
+        protected virtual async Task<bool> ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
         {
             if (context.ThrowOnUnhandledException)
                 return true;
@@ -532,7 +532,7 @@ namespace GraphQL.Execution
                 // be sure not to re-use this instance of `IResolveFieldContext`
                 var resolveContext = new ReadonlyResolveFieldContext(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
-                context.UnhandledExceptionDelegate(exceptionContext);
+                await context.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                 ex = exceptionContext.Exception;
             }
 

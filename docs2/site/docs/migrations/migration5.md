@@ -10,6 +10,10 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## Breaking Changes
 
-###
+### UnhandledExceptionDelegate
+
+`ExecutionOptions.UnhandledExceptionDelegate` and `IExecutionContext.UnhandledExceptionDelegate`
+properties type was changed from `Action<UnhandledExceptionContext>` to `Func<UnhandledExceptionContext, Task>`
+so now you may use async/await for exception handling.
 
 ###

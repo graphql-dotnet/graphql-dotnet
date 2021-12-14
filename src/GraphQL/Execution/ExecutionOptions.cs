@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -63,7 +64,7 @@ namespace GraphQL
         /// within <see cref="ExecutionResult.Errors"/> as an <see cref="ExecutionError"/>.
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
-        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; } = context => { };
+        public Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; set; } = _ => Task.CompletedTask;
 
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }

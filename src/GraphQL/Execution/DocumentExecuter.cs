@@ -241,7 +241,7 @@ namespace GraphQL
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
-                    options.UnhandledExceptionDelegate(exceptionContext);
+                    await options.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                     ex = exceptionContext.Exception;
                 }
 
