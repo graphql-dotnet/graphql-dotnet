@@ -30,10 +30,17 @@ namespace GraphQL.Utilities.Federation
         {
         }
 
-        public string PrintFederatedDirectives(IGraphType type) => type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
+        public string PrintFederatedDirectives(IGraphType type)
+        {
+            Schema?.Initialize();
+
+            return type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
+        }
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
+            Schema?.Initialize();
+
             var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
             if (astDirectives == null)
                 return "";
@@ -48,10 +55,17 @@ namespace GraphQL.Utilities.Federation
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive) => AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+        public string PrintAstDirective(GraphQLDirective directive)
+        {
+            Schema?.Initialize();
+
+            return AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+        }
 
         public override string PrintObject(IObjectGraphType type)
         {
+            Schema?.Initialize();
+
             var isExtension = type!.IsExtensionType();
 
             var interfaces = type!.ResolvedInterfaces.List.Select(x => x.Name).ToList();
@@ -72,6 +86,8 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintInterface(IInterfaceGraphType type)
         {
+            Schema?.Initialize();
+
             var isExtension = type.IsExtensionType();
             var extended = isExtension ? "extend " : "";
 
@@ -80,6 +96,8 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintFields(IComplexGraphType type)
         {
+            Schema?.Initialize();
+
             var fields = type?.Fields
                 .Where(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name))
                 .Select(x =>
@@ -99,6 +117,8 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedSchema()
         {
+            Schema?.Initialize();
+
             return PrintFilteredSchema(
                 directiveName => !IsBuiltInDirective(directiveName) && !IsFederatedDirective(directiveName),
                 typeName => !IsFederatedType(typeName) && IsDefinedType(typeName));
