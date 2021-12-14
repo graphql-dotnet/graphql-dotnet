@@ -56,7 +56,7 @@ namespace GraphQL.Utilities
 
         protected static bool IsBuiltInDirective(string directiveName) => _builtInDirectives.Contains(directiveName);
 
-        private ISchema Schema { get; set; }
+        protected ISchema Schema { get; set; }
 
         protected SchemaPrinterOptions Options { get; }
 
@@ -82,7 +82,7 @@ namespace GraphQL.Utilities
         /// <returns>SDL document.</returns>
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
         {
-            Schema.Initialize();
+            Schema?.Initialize();
 
             var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
@@ -118,6 +118,8 @@ namespace GraphQL.Utilities
 
         public string? PrintSchemaDefinition(ISchema schema)
         {
+            Schema?.Initialize();
+
             if (IsSchemaOfCommonNames(Schema))
                 return null;
 
@@ -156,6 +158,8 @@ namespace GraphQL.Utilities
          */
         public bool IsSchemaOfCommonNames(ISchema schema)
         {
+            Schema?.Initialize();
+
             if (schema.Query != null && schema.Query.Name != "Query")
             {
                 return false;
@@ -176,6 +180,8 @@ namespace GraphQL.Utilities
 
         public string PrintType(IGraphType type)
         {
+            Schema?.Initialize();
+
             return type switch
             {
                 EnumerationGraphType graphType => PrintEnum(graphType),
@@ -189,10 +195,17 @@ namespace GraphQL.Utilities
             };
         }
 
-        public string PrintScalar(ScalarGraphType type) => $"{FormatDescription(type.Description)}scalar {type.Name}";
+        public string PrintScalar(ScalarGraphType type)
+        {
+            Schema?.Initialize();
+
+            return $"{FormatDescription(type.Description)}scalar {type.Name}";
+        }
 
         public virtual string PrintObject(IObjectGraphType type)
         {
+            Schema?.Initialize();
+
             var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
             var implementedInterfaces = interfaces.Count > 0
@@ -204,29 +217,39 @@ namespace GraphQL.Utilities
 
         public virtual string PrintInterface(IInterfaceGraphType type)
         {
+            Schema?.Initialize();
+
             return FormatDescription(type.Description) + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
 
         public string PrintUnion(UnionGraphType type)
         {
+            Schema?.Initialize();
+
             var possibleTypes = string.Join(" | ", type.PossibleTypes.Select(x => x.Name));
             return FormatDescription(type.Description) + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
         public string PrintEnum(EnumerationGraphType type)
         {
+            Schema?.Initialize();
+
             var values = string.Join(Environment.NewLine, type.Values.OrderBy(Options.Comparer?.EnumValueComparer(type)).Select(x => FormatDescription(x.Description, "  ") + "  " + x.Name + (Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "")));
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
+            Schema?.Initialize();
+
             var fields = type.Fields.OrderBy<FieldType>(Options.Comparer?.FieldComparer(type)).Select(x => PrintInputValue(x));
             return FormatDescription(type.Description) + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
         public virtual string PrintFields(IComplexGraphType type)
         {
+            Schema?.Initialize();
+
             var fields = type?.Fields
                 .OrderBy<FieldType>(Options.Comparer?.FieldComparer(type))
                 .Select(x =>
@@ -245,6 +268,8 @@ namespace GraphQL.Utilities
 
         public string PrintArgs(FieldType field)
         {
+            Schema?.Initialize();
+
             if (field.Arguments == null || field.Arguments.Count == 0)
             {
                 return string.Empty;
@@ -255,6 +280,8 @@ namespace GraphQL.Utilities
 
         public string PrintInputValue(FieldType field)
         {
+            Schema?.Initialize();
+
             var argumentType = field.ResolvedType!;
             var description = $"{FormatDescription(field.Description, "  ")}  {field.Name}: {argumentType}";
 
@@ -268,6 +295,8 @@ namespace GraphQL.Utilities
 
         public string PrintInputValue(QueryArgument argument)
         {
+            Schema?.Initialize();
+
             var argumentType = argument.ResolvedType!;
             var desc = "{0}: {1}".ToFormat(argument.Name, argumentType);
 
@@ -281,6 +310,8 @@ namespace GraphQL.Utilities
 
         public string PrintDirective(DirectiveGraphType directive)
         {
+            Schema?.Initialize();
+
             var builder = new StringBuilder();
             builder.Append(FormatDescription(directive.Description));
             builder.Append($"directive @{directive.Name}");
@@ -331,6 +362,8 @@ namespace GraphQL.Utilities
 
         public string FormatDefaultValue(object? value, IGraphType graphType)
         {
+            Schema?.Initialize();
+
             if (value == null)
                 return "null";
 
