@@ -957,7 +957,7 @@ namespace GraphQL.Execution
         object? RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         bool ThrowOnUnhandledException { get; }
-        System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; set; }
+        System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; }
         GraphQL.Language.AST.Variables Variables { get; }
     }
     public interface IExecutionStrategy

@@ -73,7 +73,7 @@ namespace GraphQL.Execution
         /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored
         /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
         /// </summary>
-        Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; set; }
+        Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
 
         /// <summary>
         /// Input variables to the GraphQL request
