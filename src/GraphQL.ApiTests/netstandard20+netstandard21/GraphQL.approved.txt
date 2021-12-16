@@ -821,7 +821,7 @@ namespace GraphQL.Execution
     }
     public struct ErrorInfo
     {
-        public System.Collections.Generic.IDictionary<string, object>? Extensions;
+        public System.Collections.Generic.IDictionary<string, object?>? Extensions;
         public string Message;
     }
     public class ErrorInfoProvider : GraphQL.Execution.IErrorInfoProvider
