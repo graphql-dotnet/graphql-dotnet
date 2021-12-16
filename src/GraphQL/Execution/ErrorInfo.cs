@@ -18,6 +18,6 @@ namespace GraphQL.Execution
         /// This entry, if set, must have a map as its value. This entry is reserved for implementors to add additional
         /// information to errors however they see fit, and there are no additional restrictions on its contents.
         /// </summary>
-        public IDictionary<string, object>? Extensions;
+        public IDictionary<string, object?>? Extensions;
     }
 }
