@@ -63,29 +63,6 @@ namespace GraphQL.SystemReactive
             }
         }
 
-        public static IObservable<TOut> Select<TIn, TOut>(this IObservable<TIn> observable, Func<TIn, TOut> transform)
-            => new ObservableSelectWrapper<TIn, TOut>(observable, transform);
-
-        private class ObservableSelectWrapper<TIn, TOut> : IObservable<TOut>
-        {
-            private readonly IObservable<TIn> _observable;
-            private readonly Func<TIn, TOut> _transform;
-
-            public ObservableSelectWrapper(IObservable<TIn> observable, Func<TIn, TOut> transform)
-            {
-                _observable = observable;
-                _transform = transform;
-            }
-
-            public IDisposable Subscribe(IObserver<TOut> observer)
-            {
-                return _observable.Subscribe(
-                    onNext: data => observer.OnNext(_transform(data)),
-                    onError: error => observer.OnError(error),
-                    onCompleted: () => observer.OnCompleted());
-            }
-        }
-
         public static IObservable<TOut> SelectAsync<TIn, TOut>(this IObservable<TIn> observable, Func<TIn, CancellationToken, Task<TOut>> func)
             => new ObservableSelectAsyncWrapper<TIn, TOut>(observable, func);
 
