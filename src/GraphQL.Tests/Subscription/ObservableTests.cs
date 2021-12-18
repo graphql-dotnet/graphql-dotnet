@@ -144,6 +144,7 @@ namespace GraphQL.Tests.Subscription
         [Fact]
         public async Task SelectAsync_NoEventsProducedAfterDispose()
         {
+            //also verifies that cancellation token passed to SelectAsync delegate works properly
             IObserver<string> observer = null;
             bool disposed = false;
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
@@ -154,9 +155,15 @@ namespace GraphQL.Tests.Subscription
                 observer = observer2;
                 return disposableMock.Object;
             });
+            var canceledEvents = new List<string>();
             var mappedObservable = observableMock.Object.SelectAsync(async (value, token) =>
             {
                 await Task.Delay(int.Parse(value));
+                if (token.IsCancellationRequested)
+                {
+                    lock (canceledEvents)
+                        canceledEvents.Add(value);
+                }
                 return value;
             });
             var events = new List<string>();
@@ -179,6 +186,10 @@ namespace GraphQL.Tests.Subscription
             events.ShouldBe(new string[]
             {
                 "OnNext: 50",
+            });
+            canceledEvents.ShouldBe(new string[]
+            {
+                "1500",
             });
         }
 
