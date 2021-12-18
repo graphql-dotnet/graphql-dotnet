@@ -147,7 +147,8 @@ namespace GraphQL.Execution
                                 }
                             },
                         }.With(context);
-                    }).Catch(exception => {
+                    }).Catch(exception =>
+                    {
                         return new ExecutionResult
                         {
                             Errors = new ExecutionErrors
