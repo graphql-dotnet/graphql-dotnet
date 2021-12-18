@@ -64,124 +64,138 @@ namespace GraphQL.SystemReactive
         }
 
         public static IObservable<TOut> SelectAsync<TIn, TOut>(this IObservable<TIn> observable, Func<TIn, CancellationToken, Task<TOut>> func)
-            => new ObservableSelectAsyncWrapper<TIn, TOut>(observable, func);
+            => new SelectAsyncObservable<TIn, TOut>(observable, func);
 
-        private class ObservableSelectAsyncWrapper<TIn, TOut> : IObservable<TOut>
+        private class SelectAsyncObservable<TIn, TOut> : IObservable<TOut>
         {
             private readonly IObservable<TIn> _observable;
             private readonly Func<TIn, CancellationToken, Task<TOut>> _transform;
 
-            public ObservableSelectAsyncWrapper(IObservable<TIn> observable, Func<TIn, CancellationToken, Task<TOut>> transform)
+            public SelectAsyncObservable(IObservable<TIn> observable, Func<TIn, CancellationToken, Task<TOut>> transform)
             {
                 _observable = observable;
-                //ensure that the transform cannot directly throw an exception without it being wrapped in a Task<TOut>
-                _transform = async (data, token) => await transform(data, token).ConfigureAwait(false);
+                _transform = transform;
             }
 
             public IDisposable Subscribe(IObserver<TOut> observer)
             {
-                //prevent async tasks from triggering after an observable sequence has been disposed
-                CancellationTokenSource? cancellationTokenSource = new();
-                var token = cancellationTokenSource.Token;
-                //create a queue so that events will be sent in order
-                object sync = new();
-                Queue<QueueData> queue = new();
+                IDisposable? disposable = null;
+                var newObserver = new SelectAsyncObserver<TIn, TOut>(observer, _transform, () => disposable?.Dispose());
+                disposable = _observable.Subscribe(newObserver);
+                return newObserver;
+            }
+        }
 
-                //subscribe to the underlying IObservable, and queue each event
-                var disposable = _observable.Subscribe(
-                    onNext: dataIn => QueueEvent(QueueType.Data, _transform(dataIn, token), null),
-                    onError: error => QueueEvent(QueueType.Error, null, error),
-                    onCompleted: () => QueueEvent(QueueType.Completion, null, null));
+        private class SelectAsyncObserver<TIn, TOut> : IObserver<TIn>, IDisposable
+        {
+            private CancellationTokenSource? _cancellationTokenSource = new();
+            private readonly CancellationToken _token;
+            //create a queue so that events will be sent in order
+            private readonly object _sync = new();
+            private readonly Queue<QueueData> _queue = new();
+            private readonly IObserver<TOut> _observer;
+            private readonly Func<TIn, CancellationToken, Task<TOut>> _transform;
+            private Action? _disposeAction;
 
-                //queues the specified event and if necessary starts watching for an event to complete
-                void QueueEvent(QueueType queueType, Task<TOut>? task, Exception? error)
+            public SelectAsyncObserver(IObserver<TOut> observer, Func<TIn, CancellationToken, Task<TOut>> transform, Action disposeAction)
+            {
+                _token = _cancellationTokenSource.Token;
+                _observer = observer;
+                //ensure that the transform cannot directly throw an exception without it being wrapped in a Task<TOut>
+                _transform = async (data, token) => await transform(data, token).ConfigureAwait(false);
+                _disposeAction = disposeAction;
+            }
+
+            public void OnNext(TIn value) => QueueEvent(QueueType.Data, _transform(value, _token), null);
+
+            public void OnError(Exception error) => QueueEvent(QueueType.Error, null, error);
+
+            public void OnCompleted() => QueueEvent(QueueType.Completion, null, null);
+
+            //queues the specified event and if necessary starts watching for an event to complete
+            private void QueueEvent(QueueType queueType, Task<TOut>? task, Exception? error)
+            {
+                var queueData = new QueueData { Type = queueType, Data = task, Error = error };
+                bool attach = false;
+                lock (_sync)
                 {
-                    var queueData = new QueueData { Type = queueType, Data = task, Error = error };
-                    bool attach = false;
-                    lock (sync)
+                    _queue.Enqueue(queueData);
+                    attach = _queue.Count == 1;
+                }
+                //start watching for an event to complete, if this is the first in the queue
+                if (attach)
+                {
+                    if (task != null)
+                        //start returning data once the first task has completed (or now if already completed)
+                        _ = task.ContinueWith(ReturnDataAsync);
+                    else
+                        //start returning data now
+                        _ = ReturnDataAsync(null);
+                }
+            }
+
+            //returns data from the queue in order (or raises errors or completed notifications)
+            //executes until the queue is empty
+            private async Task ReturnDataAsync(Task<TOut>? dummy)
+            {
+                QueueData? queueData;
+                lock (_sync)
+                {
+                    queueData = _queue.Count > 0 ? _queue.Peek() : null;
+                }
+                while (queueData != null)
+                {
+                    if (queueData.Type == QueueType.Data)
                     {
-                        queue.Enqueue(queueData);
-                        attach = queue.Count == 1;
+                        await ProcessDataAsync(queueData.Data!).ConfigureAwait(false);
                     }
-                    //start watching for an event to complete, if this is the first in the queue
-                    if (attach)
+                    else if (queueData.Type == QueueType.Error)
                     {
-                        if (task != null)
-                            //start returning data once the first task has completed (or now if already completed)
-                            _ = task.ContinueWith(ReturnData);
-                        else
-                            //start returning data now
-                            _ = ReturnData(null);
+                        _observer.OnError(queueData.Error);
+                    }
+                    else if (queueData.Type == QueueType.Completion)
+                    {
+                        _observer.OnCompleted();
+                    }
+                    lock (_sync)
+                    {
+                        _ = _queue.Dequeue();
+                        queueData = _queue.Count > 0 ? _queue.Peek() : null;
                     }
                 }
+            }
 
-                //returns data from the queue in order (or raises errors or completed notifications)
-                //executes until the queue is empty
-                async Task ReturnData(Task<TOut>? dummy)
+            //waits for the transform to complete and pushes the data (or error) back to the observer
+            //if the observer has been disposed, then data and errors are ignored
+            private async Task ProcessDataAsync(Task<TOut> dataTask)
+            {
+                TOut dataOut;
+                try
                 {
-                    QueueData? queueData;
-                    lock (sync)
-                    {
-                        queueData = queue.Count > 0 ? queue.Peek() : null;
-                    }
-                    while (queueData != null)
-                    {
-                        if (queueData.Type == QueueType.Data)
-                        {
-                            await ProcessData(queueData.Data!).ConfigureAwait(false);
-                        }
-                        else if (queueData.Type == QueueType.Error)
-                        {
-                            observer.OnError(queueData.Error);
-                        }
-                        else if (queueData.Type == QueueType.Completion)
-                        {
-                            observer.OnCompleted();
-                        }
-                        lock (sync)
-                        {
-                            _ = queue.Dequeue();
-                            queueData = queue.Count > 0 ? queue.Peek() : null;
-                        }
-                    }
+                    dataOut = await dataTask.ConfigureAwait(false);
                 }
-
-                //waits for the transform to complete and pushes the data (or error) back to the observer
-                //if the observer has been disposed, then data and errors are ignored
-                async Task ProcessData(Task<TOut> dataTask)
+                catch (Exception error)
                 {
-                    TOut dataOut;
-                    try
-                    {
-                        dataOut = await dataTask.ConfigureAwait(false);
-                    }
-                    catch (Exception error)
-                    {
-                        if (!token.IsCancellationRequested)
-                            observer.OnError(error);
-                        return;
-                    }
-                    if (!token.IsCancellationRequested)
-                        observer.OnNext(dataOut);
+                    if (!_token.IsCancellationRequested)
+                        _observer.OnError(error);
+                    return;
                 }
+                if (!_token.IsCancellationRequested)
+                    _observer.OnNext(dataOut);
+            }
 
-                //returns a disconnection 'delegate' that disposes the underlying observer,
-                //prevents any asynchronous tasks from returning data,
-                //and signals cancellation to any pending tasks
-                //note: pending tasks will execute to completion but will ignore data and transformation errors
-                return new Disposable(() =>
-                {
-                    //cancel pending operations and prevent pending operations
-                    //from returning data after the observable has been detatched
-                    cancellationTokenSource?.Cancel();
-                    //dispose the cancellation token source
-                    cancellationTokenSource?.Dispose();
-                    //detatch the observable sequence
-                    disposable?.Dispose();
-                    //release references to the degree possible
-                    cancellationTokenSource = null;
-                    disposable = null;
-                });
+            public void Dispose()
+            {
+                //cancel pending operations and prevent pending operations
+                //from returning data after the observable has been detatched
+                _cancellationTokenSource?.Cancel();
+                //dispose the cancellation token source
+                _cancellationTokenSource?.Dispose();
+                //detatch the observable sequence
+                _disposeAction?.Invoke();
+                //release references to the degree possible
+                _cancellationTokenSource = null;
+                _disposeAction = null;
             }
 
             private class QueueData
@@ -197,18 +211,6 @@ namespace GraphQL.SystemReactive
                 Error = 1,
                 Completion = 2,
             }
-        }
-
-        private class Disposable : IDisposable
-        {
-            private readonly Action _action;
-
-            public Disposable(Action action)
-            {
-                _action = action;
-            }
-
-            public void Dispose() => _action();
         }
     }
 }
