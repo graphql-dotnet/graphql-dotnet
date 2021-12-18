@@ -161,66 +161,6 @@ namespace GraphQL.Execution
                             }
                         }.With(context);
                     });
-                /*
-                    .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!))
-                    .SelectMany(async executionNode =>
-                    {
-                        if (context.Listeners != null)
-                        {
-                            foreach (var listener in context.Listeners)
-                            {
-                                await listener.BeforeExecutionAsync(context)
-                                    .ConfigureAwait(false);
-                            }
-                        }
-
-                        // Execute the whole execution tree and return the result
-                        await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
-
-                        if (context.Listeners != null)
-                        {
-                            foreach (var listener in context.Listeners)
-                            {
-                                await listener.AfterExecutionAsync(context)
-                                    .ConfigureAwait(false);
-                            }
-                        }
-
-                        // Set the execution node's value to null if necessary
-                        // Note: assumes that the subscription field is nullable, regardless of how it was defined
-                        // See https://github.com/graphql-dotnet/graphql-dotnet/pull/2240#discussion_r570631402
-                        //TODO: check if a non-null subscription field is allowed per the spec
-                        //TODO: check if errors should be returned along with the data
-                        executionNode.PropagateNull();
-
-                        // Return the result
-                        return new ExecutionResult
-                        {
-                            Executed = true,
-                            Data = new RootExecutionNode(null, null)
-                            {
-                                SubFields = new ExecutionNode[]
-                                {
-                                    executionNode,
-                                }
-                            },
-                        }.With(context);
-                    })
-                    .Catch<ExecutionResult, Exception>(exception =>
-                        Observable.Return(
-                            new ExecutionResult
-                            {
-                                Errors = new ExecutionErrors
-                                {
-                                    GenerateError(
-                                        context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'.",
-                                        node.Field,
-                                        node.ResponsePath,
-                                        exception)
-                                }
-                            }.With(context)));
-                */
             }
             catch (Exception ex)
             {
