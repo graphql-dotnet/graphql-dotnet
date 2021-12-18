@@ -140,11 +140,13 @@ namespace GraphQL.SystemReactive
                         }
                         else if (queueData.Type == QueueType.Error)
                         {
-                            _observer.OnError(queueData.Error);
+                            if (!_token.IsCancellationRequested)
+                                _observer.OnError(queueData.Error);
                         }
                         else if (queueData.Type == QueueType.Completion)
                         {
-                            _observer.OnCompleted();
+                            if (!_token.IsCancellationRequested)
+                                _observer.OnCompleted();
                         }
                         lock (_sync)
                         {

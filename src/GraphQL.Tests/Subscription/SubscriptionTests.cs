@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
 using Shouldly;
@@ -273,6 +274,27 @@ namespace GraphQL.Tests.Subscription
             var error = message.Errors.Single();
             error.InnerException.Message.ShouldBe("test");
             error.Path.ShouldBe(new[] { "messageAdded" });
+        }
+
+        [Fact]
+        public void CancellationTokensWorkAsExpected()
+        {
+            //create a cancellation token source
+            var cts = new CancellationTokenSource();
+            //grab the token
+            var token = cts.Token;
+            //signal tokens that they are canceled (performed synchronously, per docs)
+            cts.Cancel();
+            //dispose of the cancellation token source
+            cts.Dispose();
+            //at this point the token is still valid
+            bool executed = false;
+            //attempting to register a callback should immediately run the callback because the token is canceled,
+            //pursuant to MS docs. note that the docs also say that this can throw an InvalidOperationException
+            //if the source is disposed, but since the token has already been canceled, we should be fine
+            token.Register(() => executed = true).Dispose();
+            //the callback should run synchronously (per docs), so executed should equal true immediately
+            executed.ShouldBeTrue();
         }
     }
 }
