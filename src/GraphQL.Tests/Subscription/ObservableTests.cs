@@ -121,6 +121,8 @@ namespace GraphQL.Tests.Subscription
             observer.OnNext("500");
             observer.OnNext("50");
             await Task.Delay(1000);
+            observer.OnCompleted();
+            await Task.Delay(500);
             mappedDisposable.Dispose();
             disposed.ShouldBeTrue();
             //verify events were raised in order
@@ -130,6 +132,7 @@ namespace GraphQL.Tests.Subscription
                 "OnNext: 50",
                 "OnNext: 500",
                 "OnNext: 50",
+                "OnCompleted",
             });
             //verify that async operations were completed out of order
             finishedEvents.ShouldBe(new string[]
