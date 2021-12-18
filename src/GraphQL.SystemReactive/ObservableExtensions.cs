@@ -80,7 +80,6 @@ namespace GraphQL.SystemReactive
                 private CancellationTokenSource? _cancellationTokenSource = new();
                 private readonly CancellationToken _token;
                 //create a queue so that events will be sent in order
-                private readonly object _sync = new();
                 private readonly Queue<QueueData> _queue = new();
                 private readonly IObserver<TOut> _observer;
                 private readonly Func<TIn, CancellationToken, Task<TOut>> _transform;
@@ -106,7 +105,7 @@ namespace GraphQL.SystemReactive
                 {
                     var queueData = new QueueData { Type = queueType, Data = task, Error = error };
                     bool attach = false;
-                    lock (_sync)
+                    lock (_queue)
                     {
                         _queue.Enqueue(queueData);
                         attach = _queue.Count == 1;
@@ -128,7 +127,7 @@ namespace GraphQL.SystemReactive
                 private async Task ReturnDataAsync(Task<TOut>? dummy)
                 {
                     QueueData? queueData;
-                    lock (_sync)
+                    lock (_queue)
                     {
                         queueData = _queue.Count > 0 ? _queue.Peek() : null;
                     }
@@ -148,7 +147,7 @@ namespace GraphQL.SystemReactive
                             if (!_token.IsCancellationRequested)
                                 _observer.OnCompleted();
                         }
-                        lock (_sync)
+                        lock (_queue)
                         {
                             _ = _queue.Dequeue();
                             queueData = _queue.Count > 0 ? _queue.Peek() : null;
