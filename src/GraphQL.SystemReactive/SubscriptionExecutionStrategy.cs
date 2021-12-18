@@ -143,7 +143,7 @@ namespace GraphQL.Execution
                             {
                                 SubFields = new ExecutionNode[]
                                 {
-                                executionNode,
+                                    executionNode,
                                 }
                             },
                         }.With(context);
