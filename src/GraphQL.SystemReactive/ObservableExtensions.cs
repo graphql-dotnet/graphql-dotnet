@@ -48,7 +48,8 @@ namespace GraphQL.SystemReactive
             {
                 return _observable.Subscribe(
                     onNext: data => observer.OnNext(data),
-                    onError: error => {
+                    onError: error =>
+                    {
                         try
                         {
                             observer.OnNext(_transform(error));
@@ -145,7 +146,7 @@ namespace GraphQL.SystemReactive
                     lock (sync)
                     {
                         queueData = queue.Count > 0 ? queue.Peek() : null;
-                    } 
+                    }
                     while (queueData != null)
                     {
                         if (queueData.Type == QueueType.Data)
@@ -191,7 +192,8 @@ namespace GraphQL.SystemReactive
                 //prevents any asynchronous tasks from returning data,
                 //and signals cancellation to any pending tasks
                 //note: pending tasks will execute to completion but will ignore data and transformation errors
-                return new Disposable(() => {
+                return new Disposable(() =>
+                {
                     //cancel pending operations and prevent pending operations
                     //from returning data after the observable has been detatched
                     cancellationTokenSource?.Cancel();
