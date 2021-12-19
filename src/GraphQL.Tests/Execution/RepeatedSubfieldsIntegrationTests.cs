@@ -80,7 +80,7 @@ namespace GraphQL.Tests.Execution
             var schema = build_schema();
             AssertQuerySuccess(_ =>
             {
-                _.Schema = build_schema();
+                _.Schema = schema;
                 _.Query = @"
                 {
                   person {

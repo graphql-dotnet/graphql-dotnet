@@ -358,14 +358,14 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
-    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object>
+    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
         public static readonly GraphQL.Inputs Empty;
-        public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
+        public Inputs(System.Collections.Generic.IDictionary<string, object?> dictionary) { }
     }
     public static class InputsExtensions
     {
-        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object?> dictionary) { }
     }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
     {
@@ -573,9 +573,9 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue, System.Action<GraphQL.Types.QueryArgument>? configure)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
@@ -609,7 +609,7 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, [System.Diagnostics.CodeAnalysis.AllowNull] TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Bidirectional() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
@@ -821,7 +821,7 @@ namespace GraphQL.Execution
     }
     public struct ErrorInfo
     {
-        public System.Collections.Generic.IDictionary<string, object>? Extensions;
+        public System.Collections.Generic.IDictionary<string, object?>? Extensions;
         public string Message;
     }
     public class ErrorInfoProvider : GraphQL.Execution.IErrorInfoProvider
@@ -2384,6 +2384,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        protected virtual void CoerceInputTypeDefaultValues() { }
         protected virtual GraphQL.Types.SchemaTypes CreateSchemaTypes() { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
@@ -2713,6 +2714,7 @@ namespace GraphQL.Utilities
     {
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
+        protected GraphQL.Types.ISchema Schema { get; set; }
         public string[] BreakLine(string line, int len) { }
         public string FormatDefaultValue(object? value, GraphQL.Types.IGraphType graphType) { }
         protected string FormatDescription(string? description, string indentation = "") { }
