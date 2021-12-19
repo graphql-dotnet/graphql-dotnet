@@ -74,12 +74,12 @@ namespace GraphQL.Caching
             new(_memoryCache.TryGetValue<Document>(query, out var value) ? value : null);
 
         /// <inheritdoc/>
-        public virtual Task SetAsync(string query, Document? value)
+        public virtual ValueTask SetAsync(string query, Document? value)
         {
             _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value,
                 GetMemoryCacheEntryOptions(query));
 
-            return Task.CompletedTask;
+            return new ValueTask(Task.CompletedTask);
         }
     }
 }

@@ -18,6 +18,6 @@ namespace GraphQL.Caching
 
         public ValueTask<Document?> GetAsync(string query) => new((Document?)null);
 
-        public Task SetAsync(string query, Document? value) => Task.CompletedTask;
+        public ValueTask SetAsync(string query, Document? value) => new(Task.CompletedTask);
     }
 }
