@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Caching
@@ -8,8 +9,13 @@ namespace GraphQL.Caching
     public interface IDocumentCache
     {
         /// <summary>
-        /// Gets or sets a document in the cache. Must be thread-safe. Returns <see langword="null"/> if no entry is found.
+        /// Gets a document in the cache. Must be thread-safe. Returns <see langword="null"/> if no entry is found.
         /// </summary>
-        Document? this[string query] { get; set; }
+        Task<Document?> GetAsync(string query);
+
+        /// <summary>
+        /// Sets a document in the cache. Must be thread-safe.
+        /// </summary>
+        Task SetAsync(string query, Document? value);
     }
 }

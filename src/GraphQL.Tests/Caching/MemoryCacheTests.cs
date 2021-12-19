@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.Language.AST;
 using Shouldly;
@@ -8,14 +9,16 @@ namespace GraphQL.Tests.Caching
     public class MemoryCacheTests
     {
         [Fact]
-        public void ValidateEntryIsCached()
+        public async Task Validate_Entry_Is_Cached()
         {
             var doc = new Document();
             var query = "test";
             var memoryCache = new MemoryDocumentCache();
-            memoryCache[query].ShouldBeNull();
-            memoryCache[query] = doc;
-            memoryCache[query].ShouldBe(doc);
+
+            (await memoryCache.GetAsync(query)).ShouldBeNull();
+
+            await memoryCache.SetAsync(query, doc);
+            (await memoryCache.GetAsync(query)).ShouldBe(doc);
         }
     }
 }
