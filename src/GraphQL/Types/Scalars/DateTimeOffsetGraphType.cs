@@ -43,7 +43,7 @@ namespace GraphQL.Types
             // ISO-8601 format
             // Note that the "O" format is similar but always prints the fractional parts
             // of the second, which is not required by ISO-8601.
-            if (DateTimeOffset.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
+            if (DateTimeOffset.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var date))
             {
                 return date;
             }

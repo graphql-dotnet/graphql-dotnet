@@ -19,9 +19,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="DefaultValuesOfCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDefAst, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDefAst, context) =>
         {
             var defaultValue = varDefAst.DefaultValue;
             var inputType = context.TypeInfo.GetInputType();
@@ -34,6 +34,6 @@ namespace GraphQL.Validation.Rules
                     context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
                 }
             }
-        }).ToTask();
+        });
     }
 }

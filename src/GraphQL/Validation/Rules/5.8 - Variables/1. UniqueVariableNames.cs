@@ -19,9 +19,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueVariableNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
             new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
             {
@@ -38,6 +38,6 @@ namespace GraphQL.Validation.Rules
                     knownVariables[variableName] = variableDefinition;
                 }
             })
-        ).ToTask();
+        );
     }
 }
