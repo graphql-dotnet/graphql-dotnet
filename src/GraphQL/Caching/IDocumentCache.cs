@@ -11,7 +11,7 @@ namespace GraphQL.Caching
         /// <summary>
         /// Gets a document in the cache. Must be thread-safe. Returns <see langword="null"/> if no entry is found.
         /// </summary>
-        Task<Document?> GetAsync(string query);
+        ValueTask<Document?> GetAsync(string query);
 
         /// <summary>
         /// Sets a document in the cache. Must be thread-safe.

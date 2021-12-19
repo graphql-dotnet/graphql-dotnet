@@ -70,8 +70,8 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public virtual Task<Document?> GetAsync(string query) =>
-            Task.FromResult(_memoryCache.TryGetValue<Document>(query, out var value) ? value : null);
+        public virtual ValueTask<Document?> GetAsync(string query) =>
+            new(_memoryCache.TryGetValue<Document>(query, out var value) ? value : null);
 
         /// <inheritdoc/>
         public virtual Task SetAsync(string query, Document? value) =>
