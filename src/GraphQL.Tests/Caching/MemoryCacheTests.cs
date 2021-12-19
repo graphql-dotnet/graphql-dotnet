@@ -20,5 +20,19 @@ namespace GraphQL.Tests.Caching
             await memoryCache.SetAsync(query, doc);
             (await memoryCache.GetAsync(query)).ShouldBe(doc);
         }
+
+        [Fact]
+        public async Task Validate_Cache_Is_Removed()
+        {
+            var doc = new Document();
+            var query = "test";
+            var memoryCache = new MemoryDocumentCache();
+
+            await memoryCache.SetAsync(query, doc);
+            (await memoryCache.GetAsync(query)).ShouldBe(doc);
+
+            await memoryCache.SetAsync(query, null);
+            (await memoryCache.GetAsync(query)).ShouldBeNull();
+        }
     }
 }
