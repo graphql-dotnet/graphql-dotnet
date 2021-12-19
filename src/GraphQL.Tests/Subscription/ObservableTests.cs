@@ -51,12 +51,19 @@ namespace GraphQL.Tests.Subscription
 
             public async Task WaitForSequence(int value, Action beforeNext)
             {
-                await Task.Yield();
+                await Task.Delay(200);
                 if (await _semaphores[value - 1].WaitAsync(15000) == false)
                     throw new Exception($"Timeout while waiting for sequence {value}");
                 beforeNext();
                 if (value < _semaphores.Count)
-                    _semaphores[value].Release();
+                {
+                    Action next = async () =>
+                    {
+                        await Task.Delay(200);
+                        _semaphores[value].Release();
+                    };
+                    next();
+                }
             }
 
             public void Dispose()
@@ -83,7 +90,6 @@ namespace GraphQL.Tests.Subscription
             var finishedEvents = new List<string>();
             var mappedObservable = observableMock.Object.SelectAsync(async (value, token) =>
             {
-                await Task.Delay(200);
                 await order.WaitForSequence(int.Parse(value), () => finishedEvents.Add(value));
                 return value;
             });
