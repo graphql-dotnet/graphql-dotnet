@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Execution.Performance
                     _.Schema = Schema;
                     _.Query = query;
                     _.Root = null;
-                    _.Inputs = null;
+                    _.Variables = null;
                     _.UserContext = null;
                     _.CancellationToken = default;
                     _.ValidationRules = null;

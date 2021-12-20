@@ -110,7 +110,7 @@ namespace GraphQL.Tests
                 options.Schema = Schema;
                 options.Query = query;
                 options.Root = root;
-                options.Inputs = inputs;
+                options.Variables = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
@@ -150,7 +150,7 @@ namespace GraphQL.Tests
                 options.Schema = schema;
                 options.Query = query;
                 options.Root = root;
-                options.Inputs = inputs;
+                options.Variables = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;

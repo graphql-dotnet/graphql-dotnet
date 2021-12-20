@@ -105,12 +105,12 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Extensions == null || context.Extensions.Count == 0)
+            if (context.OutputExtensions == null || context.OutputExtensions.Count == 0)
                 return null;
 
-            lock (context.Extensions)
+            lock (context.OutputExtensions)
             {
-                var values = context.Extensions;
+                var values = context.OutputExtensions;
 
                 if (path.IndexOf('.') != -1)
                 {
@@ -145,12 +145,12 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Extensions == null)
+            if (context.OutputExtensions == null)
                 throw new ArgumentException("Extensions property is null", nameof(context));
 
-            lock (context.Extensions)
+            lock (context.OutputExtensions)
             {
-                var values = context.Extensions;
+                var values = context.OutputExtensions;
 
                 if (path.IndexOf('.') != -1)
                 {

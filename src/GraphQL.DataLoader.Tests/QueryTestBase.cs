@@ -132,7 +132,7 @@ namespace GraphQL.DataLoader.Tests
                 opts =>
                 {
                     opts.Query = query;
-                    opts.Inputs = inputs;
+                    opts.Variables = inputs;
                     opts.UserContext = userContext;
                     opts.CancellationToken = cancellationToken;
 

@@ -126,7 +126,7 @@ namespace GraphQL.Tests.Subscription
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
-                Inputs = new Inputs(new Dictionary<string, object>
+                Variables = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })
@@ -166,7 +166,7 @@ namespace GraphQL.Tests.Subscription
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
-                Inputs = new Inputs(new Dictionary<string, object>
+                Variables = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })

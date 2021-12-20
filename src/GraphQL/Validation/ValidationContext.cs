@@ -61,7 +61,7 @@ namespace GraphQL.Validation
         /// </summary>
         public bool HasErrors => _errors?.Count > 0;
 
-        /// <inheritdoc cref="ExecutionOptions.Inputs"/>
+        /// <inheritdoc cref="ExecutionOptions.Variables"/>
         public Inputs? Inputs { get; set; }
 
         /// <summary>

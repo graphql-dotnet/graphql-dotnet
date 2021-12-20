@@ -131,7 +131,7 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Inputs = benchmarkInfo.InputsString?.ToInputs();
+                        o.Variables = benchmarkInfo.InputsString?.ToInputs();
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
@@ -261,7 +261,8 @@ namespace GraphQL.Benchmarks
                     Operation = Operation,
                     Variables = Variables,
                     Errors = new ExecutionErrors(),
-                    Extensions = new Dictionary<string, object>(),
+                    InputExtensions = Inputs.Empty,
+                    OutputExtensions = new Dictionary<string, object>(),
                     CancellationToken = default,
 
                     Metrics = Instrumentation.Metrics.None,

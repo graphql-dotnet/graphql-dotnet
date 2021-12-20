@@ -72,7 +72,10 @@ namespace GraphQL
         public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object?> Extensions { get; set; }
+        public IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<string, object?> OutputExtensions { get; set; }
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool { get; set; }
@@ -108,7 +111,7 @@ namespace GraphQL
             Path = context.Path;
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
-            Extensions = context.Extensions;
+            OutputExtensions = context.OutputExtensions;
             ArrayPool = context.ArrayPool;
         }
     }

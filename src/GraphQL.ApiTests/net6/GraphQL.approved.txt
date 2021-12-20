@@ -117,7 +117,7 @@ namespace GraphQL
         public GraphQL.Validation.Complexity.ComplexityConfiguration? ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document? Document { get; set; }
         public bool EnableMetrics { get; set; }
-        public GraphQL.Inputs? Inputs { get; set; }
+        public GraphQL.Inputs? Extensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
         public string? OperationName { get; set; }
@@ -129,6 +129,7 @@ namespace GraphQL
         public System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? ValidationRules { get; set; }
+        public GraphQL.Inputs? Variables { get; set; }
     }
     public class ExecutionResult
     {
@@ -338,11 +339,12 @@ namespace GraphQL
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
-        System.Collections.Generic.IDictionary<string, object?> Extensions { get; }
         GraphQL.Language.AST.Field FieldAst { get; }
         GraphQL.Types.FieldType FieldDefinition { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
+        System.Collections.Generic.IDictionary<string, object?> OutputExtensions { get; }
         GraphQL.IResolveFieldContext? Parent { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
         System.Collections.Generic.IEnumerable<object> Path { get; }
@@ -412,11 +414,12 @@ namespace GraphQL
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
-        public System.Collections.Generic.IDictionary<string, object?> Extensions { get; }
         public GraphQL.Language.AST.Field FieldAst { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
+        public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
         public GraphQL.Instrumentation.Metrics Metrics { get; }
         public GraphQL.Language.AST.Operation Operation { get; }
+        public System.Collections.Generic.IDictionary<string, object?> OutputExtensions { get; }
         public GraphQL.IResolveFieldContext? Parent { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
@@ -438,11 +441,12 @@ namespace GraphQL
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
-        public System.Collections.Generic.IDictionary<string, object?> Extensions { get; set; }
         public GraphQL.Language.AST.Field FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
+        public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
+        public System.Collections.Generic.IDictionary<string, object?> OutputExtensions { get; set; }
         public GraphQL.IResolveFieldContext? Parent { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
@@ -855,11 +859,12 @@ namespace GraphQL.Execution
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; set; }
-        public System.Collections.Generic.Dictionary<string, object?> Extensions { get; set; }
+        public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
+        public System.Collections.Generic.Dictionary<string, object?> OutputExtensions { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public object? RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -951,11 +956,12 @@ namespace GraphQL.Execution
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
         GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; }
-        System.Collections.Generic.Dictionary<string, object?> Extensions { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
         System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         int? MaxParallelExecutionCount { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
+        System.Collections.Generic.Dictionary<string, object?> OutputExtensions { get; }
         System.IServiceProvider? RequestServices { get; }
         object? RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }

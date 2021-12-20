@@ -57,7 +57,9 @@ namespace GraphQL.MicrosoftDI
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 
-        public IDictionary<string, object> Extensions => _baseContext.Extensions;
+        public IReadOnlyDictionary<string, object> InputExtensions => _baseContext.InputExtensions;
+
+        public IDictionary<string, object> OutputExtensions => _baseContext.OutputExtensions;
 
         object IResolveFieldContext.Source => _baseContext.Source;
 

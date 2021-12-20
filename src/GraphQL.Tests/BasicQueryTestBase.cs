@@ -75,7 +75,7 @@ namespace GraphQL.Tests
                 _.Schema = schema;
                 _.Query = query;
                 _.Root = root;
-                _.Inputs = inputs;
+                _.Variables = inputs;
                 _.UserContext = userContext;
                 _.CancellationToken = cancellationToken;
                 _.ValidationRules = rules;

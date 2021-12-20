@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Utilities
                 {
                     _.Schema = schema;
                     _.Query = config.Query;
-                    _.Inputs = config.Variables.ToInputs();
+                    _.Variables = config.Variables.ToInputs();
                     _.Root = config.Root;
                     _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
                     _.Listeners.AddRange(config.Listeners);

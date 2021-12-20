@@ -142,7 +142,7 @@ namespace GraphQL
                         operation.Variables,
                         validationRules,
                         options.UserContext,
-                        options.Inputs,
+                        options.Variables,
                         options.OperationName);
                 }
 
@@ -274,7 +274,8 @@ namespace GraphQL
                 Operation = operation,
                 Variables = variables,
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object?>(),
+                InputExtensions = options.Extensions ?? Inputs.Empty,
+                OutputExtensions = new Dictionary<string, object?>(),
                 CancellationToken = options.CancellationToken,
 
                 Metrics = metrics,
