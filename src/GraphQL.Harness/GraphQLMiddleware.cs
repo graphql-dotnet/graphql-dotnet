@@ -16,17 +16,20 @@ namespace Example
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
+        private readonly IGraphQLRequestReader _reader;
 
         public GraphQLMiddleware(
             RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IDocumentWriter writer)
+            IDocumentWriter writer,
+            IGraphQLRequestReader reader)
         {
             _next = next;
             _settings = options.Value;
             _executer = executer;
             _writer = writer;
+            _reader = reader;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
@@ -51,7 +54,7 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = await context.Request.Body.FromJsonAsync<GraphQLRequest>(context.RequestAborted);
+            var request = await _reader.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted);
 
             var result = await _executer.ExecuteAsync(options =>
             {
