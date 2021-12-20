@@ -14,7 +14,7 @@ namespace GraphQL.SystemTextJson
         /// <inheritdoc/>
         public override bool CanConvert(Type typeToConvert)
         {
-            return 
+            return
                 typeToConvert == typeof(IEnumerable<GraphQLRequest>) ||
                 typeToConvert == typeof(ICollection<GraphQLRequest>) ||
                 typeToConvert == typeof(IReadOnlyCollection<GraphQLRequest>) ||
