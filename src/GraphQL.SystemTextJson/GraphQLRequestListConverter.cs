@@ -11,6 +11,7 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class GraphQLRequestListConverter : JsonConverter<IEnumerable<GraphQLRequest>>
     {
+        /// <inheritdoc/>
         public override bool CanConvert(Type typeToConvert)
         {
             return 
