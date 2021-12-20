@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Execution
             throw new InvalidOperationException($"Cannot change the number {number}");
         }
 
-        public async Task<NumberHolder> PromiseAndFailToChangeTheNumberAsync(int number)
+        public static async Task<NumberHolder> PromiseAndFailToChangeTheNumberAsync(int number)
         {
             await Task.Delay(100).ConfigureAwait(false);
             throw new InvalidOperationException($"Cannot change the number {number}");
@@ -70,7 +70,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
-        public async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
+        public static async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
         {
             await Task.Delay(100).ConfigureAwait(false);
             throw new InvalidOperationException("Cannot change the datetime");
@@ -191,9 +191,8 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var root = context.Source as Root;
                     var change = context.GetArgument<int>("newNumber");
-                    return root.PromiseAndFailToChangeTheNumberAsync(change);
+                    return Root.PromiseAndFailToChangeTheNumberAsync(change);
                 }
             );
 
@@ -240,7 +239,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var root = context.Source as Root;
-                    var change = context.GetArgument<DateTime>("newDateTime");
+                    _ = context.GetArgument<DateTime>("newDateTime");
                     return root.FailToChangeTheDateTime();
                 }
             );
@@ -255,9 +254,8 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var root = context.Source as Root;
                     var change = context.GetArgument<DateTime>("newDateTime");
-                    return root.PromiseAndFailToChangeTheDateTimeAsync(change);
+                    return Root.PromiseAndFailToChangeTheDateTimeAsync(change);
                 }
             );
 

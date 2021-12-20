@@ -333,7 +333,7 @@ namespace GraphQL.Validation
 
                 // note: a list can have a single child element which will automatically be interpreted as a list of 1 elements. (see below rule)
                 // so, to prevent a string as being interpreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
-                if (value is IEnumerable values && !(value is string))
+                if (value is IEnumerable values && value is not string)
                 {
                     // create a list containing the parsed elements in the input list
                     if (values is IList list)
@@ -374,7 +374,7 @@ namespace GraphQL.Validation
                 if (value == null)
                     return null;
 
-                if (!(value is IDictionary<string, object?> dic))
+                if (value is not IDictionary<string, object?> dic)
                 {
                     // RULE: The value for an input object should be an input object literal
                     // or an unordered map supplied by a variable, otherwise a query error
@@ -518,7 +518,7 @@ namespace GraphQL.Validation
 
             if (type is IInputObjectGraphType inputType)
             {
-                if (!(valueAst is ObjectValue objValue))
+                if (valueAst is not ObjectValue objValue)
                 {
                     return $"Expected '{inputType.Name}', found not an object.";
                 }

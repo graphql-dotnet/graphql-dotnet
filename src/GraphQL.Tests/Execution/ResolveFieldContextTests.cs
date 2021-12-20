@@ -124,7 +124,7 @@ namespace GraphQL.Tests.Execution
         {
             Should.Throw<ArgumentNullException>(() =>
             {
-                var adapter = new ResolveFieldContextAdapter<object>(null);
+                _ = new ResolveFieldContextAdapter<object>(null);
             });
         }
 
@@ -134,7 +134,7 @@ namespace GraphQL.Tests.Execution
             var context = new ResolveFieldContext { Source = "test" };
             Should.Throw<ArgumentException>(() =>
             {
-                var adapter = new ResolveFieldContextAdapter<int>(context);
+                _ = new ResolveFieldContextAdapter<int>(context);
             });
         }
 
@@ -160,7 +160,7 @@ namespace GraphQL.Tests.Execution
             var context = new ResolveFieldContext();
             Should.Throw<ArgumentException>(() =>
             {
-                var adapter = new ResolveFieldContextAdapter<int>(context);
+                _ = new ResolveFieldContextAdapter<int>(context);
             });
         }
 

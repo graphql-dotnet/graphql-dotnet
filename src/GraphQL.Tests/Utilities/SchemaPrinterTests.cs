@@ -35,12 +35,12 @@ namespace GraphQL.Tests.Utilities
             return result;
         }
 
-        private string print(ISchema schema)
+        private static string print(ISchema schema)
         {
             return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true, PrintDescriptionsAsComments = true });
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options)
+        private static string print(ISchema schema, SchemaPrinterOptions options)
         {
             var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();

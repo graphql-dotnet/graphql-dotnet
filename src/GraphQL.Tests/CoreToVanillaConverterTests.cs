@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Bugs
             //note: thousand separators and/or culture-specific characters are invalid graphql literals, and will not be returned by graphql-parser
             //uppercase TRUE and FALSE are also invalid graphql input data, and will not be returned by graphql-parser
             //whitespace will not be returned by graphql-parser
-            var ret = CoreToVanillaConverter.Value(new GraphQLScalarValue(kind) { Value = valueString });
+            _ = CoreToVanillaConverter.Value(new GraphQLScalarValue(kind) { Value = valueString });
         }
     }
 
