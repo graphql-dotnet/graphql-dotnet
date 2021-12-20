@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.Language.AST;
@@ -22,17 +23,20 @@ namespace GraphQL.Tests.Caching
         }
 
         [Fact]
-        public async Task Validate_Cache_Is_Removed()
+        public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
         {
             var doc = new Document();
             var query = "test";
             var memoryCache = new MemoryDocumentCache();
 
             await memoryCache.SetAsync(query, doc);
-            (await memoryCache.GetAsync(query)).ShouldBe(doc);
 
-            await memoryCache.SetAsync(query, null);
-            (await memoryCache.GetAsync(query)).ShouldBeNull();
+            await Should.ThrowAsync<ArgumentNullException>(async () =>
+            {
+                await memoryCache.SetAsync(query, null);
+            });
+
+            (await memoryCache.GetAsync(query)).ShouldBe(doc);
         }
     }
 }

@@ -18,6 +18,6 @@ namespace GraphQL.Caching
 
         public ValueTask<Document?> GetAsync(string query) => default;
 
-        public ValueTask SetAsync(string query, Document? value) => default;
+        public ValueTask SetAsync(string query, Document value) => default;
     }
 }
