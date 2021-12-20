@@ -17,4 +17,7 @@ properties type was changed from `Action<UnhandledExceptionContext>` to `Func<Un
 so now you may use async/await for exception handling. In this regard, some methods in `ExecutionStrategy` were
 renamed to have `Async` suffix.
 
-###
+### Redesign of [IDocumentCache](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/src/GraphQL/Caching/IDocumentCache.cs).
+
+1. Use async methods to get or set a cache.
+2. Cache items cannot be removed anymore.
