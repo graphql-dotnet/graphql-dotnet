@@ -8,7 +8,7 @@ namespace GraphQL.Tests
         public static readonly List<IGraphQLRequestReader> AllReaders = new List<IGraphQLRequestReader>
         {
             new SystemTextJson.GraphQLRequestReader(),
-            //new NewtonsoftJson.GraphQLRequestReader(),
+            new NewtonsoftJson.GraphQLRequestReader(),
         };
 
         public IEnumerator<object[]> GetEnumerator()

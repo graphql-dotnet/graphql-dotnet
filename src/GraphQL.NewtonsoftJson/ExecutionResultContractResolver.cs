@@ -21,6 +21,9 @@ namespace GraphQL.NewtonsoftJson
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider);
 
+            if (typeof(GraphQLRequest) == objectType)
+                return new GraphQLRequestConverter();
+
             return base.ResolveContractConverter(objectType);
         }
 
