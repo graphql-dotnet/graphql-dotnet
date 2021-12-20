@@ -23,6 +23,28 @@ namespace GraphQL.SystemTextJson
     {
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions> configureReader, System.Action<System.Text.Json.JsonSerializerOptions> configureWriter) { }
+    }
+    public class GraphQLRequestConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.GraphQLRequest>
+    {
+        public GraphQLRequestConverter() { }
+        public override GraphQL.GraphQLRequest Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.GraphQLRequest value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class GraphQLRequestListConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.IEnumerable<GraphQL.GraphQLRequest>>
+    {
+        public GraphQLRequestListConverter() { }
+        public override bool CanConvert(System.Type typeToConvert) { }
+        public override System.Collections.Generic.IEnumerable<GraphQL.GraphQLRequest> Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Collections.Generic.IEnumerable<GraphQL.GraphQLRequest> value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class GraphQLRequestReader : GraphQL.IGraphQLRequestReader
+    {
+        public GraphQLRequestReader() { }
+        public GraphQLRequestReader(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
+        public GraphQLRequestReader(System.Text.Json.JsonSerializerOptions serializerOptions) { }
+        public T Read<T>(string json) { }
+        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken) { }
     }
     public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
     {

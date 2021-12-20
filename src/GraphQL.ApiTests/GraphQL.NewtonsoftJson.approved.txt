@@ -30,6 +30,34 @@ namespace GraphQL.NewtonsoftJson
     {
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings> configureReader, System.Action<Newtonsoft.Json.JsonSerializerSettings> configureWriter) { }
+    }
+    public class GraphQLRequestConverter : Newtonsoft.Json.JsonConverter
+    {
+        public GraphQLRequestConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class GraphQLRequestListConverter : Newtonsoft.Json.JsonConverter
+    {
+        public GraphQLRequestListConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class GraphQLRequestReader : GraphQL.IGraphQLRequestReader
+    {
+        public GraphQLRequestReader() { }
+        public GraphQLRequestReader(Newtonsoft.Json.JsonSerializerSettings serializerOptions) { }
+        public GraphQLRequestReader(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerOptions) { }
+        public T Read<T>(System.IO.StringReader json) { }
+        public T Read<T>(string json) { }
+        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken) { }
     }
     public class InputsConverter : Newtonsoft.Json.JsonConverter
     {

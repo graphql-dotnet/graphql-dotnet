@@ -234,6 +234,12 @@ namespace GraphQL
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TGraphQLRequestReader :  class, GraphQL.IGraphQLRequestReader { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TGraphQLRequestReader> graphQLRequestReader)
+            where TGraphQLRequestReader :  class, GraphQL.IGraphQLRequestReader { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this GraphQL.DI.IGraphQLBuilder builder, TGraphQLRequestReader graphQLRequestReader)
+            where TGraphQLRequestReader :  class, GraphQL.IGraphQLRequestReader { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
@@ -323,6 +329,18 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
+    public class GraphQLRequest
+    {
+        public const string EXTENSIONS_KEY = "extensions";
+        public const string OPERATION_NAME_KEY = "operationName";
+        public const string QUERY_KEY = "query";
+        public const string VARIABLES_KEY = "variables";
+        public GraphQLRequest() { }
+        public GraphQL.Inputs? Extensions { get; set; }
+        public string? OperationName { get; set; }
+        public string Query { get; set; }
+        public GraphQL.Inputs? Variables { get; set; }
+    }
     public interface IDocumentExecuter
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
@@ -330,6 +348,10 @@ namespace GraphQL
     public interface IDocumentWriter
     {
         System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default);
+    }
+    public interface IGraphQLRequestReader
+    {
+        System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken);
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
