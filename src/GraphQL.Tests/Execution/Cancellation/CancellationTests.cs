@@ -88,7 +88,7 @@ namespace GraphQL.Tests.Execution.Cancellation
         public void unhandled_exception_delegate_is_not_called()
         {
             bool ranDelegate = false;
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = (context) => ranDelegate = true;
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = _ => { ranDelegate = true; return Task.CompletedTask; };
             using (var tokenSource = new CancellationTokenSource())
             {
                 Should.Throw<OperationCanceledException>(() =>

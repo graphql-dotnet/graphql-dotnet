@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
@@ -266,7 +267,7 @@ namespace GraphQL.Benchmarks
                     Metrics = Instrumentation.Metrics.None,
                     Listeners = new List<IDocumentExecutionListener>(),
                     ThrowOnUnhandledException = true,
-                    UnhandledExceptionDelegate = context => { },
+                    UnhandledExceptionDelegate = _ => Task.CompletedTask,
                     MaxParallelExecutionCount = int.MaxValue,
                     RequestServices = null
                 };

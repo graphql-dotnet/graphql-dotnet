@@ -10,6 +10,13 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## Breaking Changes
 
+### UnhandledExceptionDelegate
+
+`ExecutionOptions.UnhandledExceptionDelegate` and `IExecutionContext.UnhandledExceptionDelegate`
+properties type was changed from `Action<UnhandledExceptionContext>` to `Func<UnhandledExceptionContext, Task>`
+so now you may use async/await for exception handling. In this regard, some methods in `ExecutionStrategy` were
+renamed to have `Async` suffix.
+
 ### Redesign of [IDocumentCache](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/src/GraphQL/Caching/IDocumentCache.cs).
 
 1. Use async methods to get or set a cache.

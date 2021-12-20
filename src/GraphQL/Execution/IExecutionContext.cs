@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -72,7 +73,7 @@ namespace GraphQL.Execution
         /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored
         /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
         /// </summary>
-        Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
+        Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
 
         /// <summary>
         /// Input variables to the GraphQL request

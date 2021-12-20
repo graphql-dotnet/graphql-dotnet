@@ -18,8 +18,8 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Returns <see cref="ExecutionNode.Result"/>, which has already been serialized by <see cref="ScalarGraphType.Serialize(object)"/>
-        /// within <see cref="ExecutionStrategy.CompleteNode(ExecutionContext, ExecutionNode)"/> or
-        /// <see cref="ExecutionStrategy.SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)"/>.
+        /// within <see cref="ExecutionStrategy.CompleteNodeAsync(ExecutionContext, ExecutionNode)"/> or
+        /// <see cref="ExecutionStrategy.SetArrayItemNodesAsync(ExecutionContext, ArrayExecutionNode)"/>.
         /// </summary>
         public override object? ToValue() => Result;
 

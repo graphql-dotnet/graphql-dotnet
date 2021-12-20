@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.StarWars.IoC;
@@ -75,7 +76,7 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
             bool executed = true)
         {
             var queryResult = CreateQueryResult(expected, executed: executed);
@@ -102,7 +103,7 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
             {
@@ -113,7 +114,7 @@ namespace GraphQL.Tests
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
             }).GetAwaiter().GetResult();
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
@@ -138,7 +139,7 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
             INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
@@ -153,7 +154,7 @@ namespace GraphQL.Tests
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;

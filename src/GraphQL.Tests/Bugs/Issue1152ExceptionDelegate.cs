@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -26,6 +27,7 @@ query {
             {
                 list.Add(ctx.OriginalException);
                 ctx.Exception = new InvalidOperationException(ctx.OriginalException.Message);
+                return Task.CompletedTask;
             });
 
             list.Count.ShouldBe(1);
