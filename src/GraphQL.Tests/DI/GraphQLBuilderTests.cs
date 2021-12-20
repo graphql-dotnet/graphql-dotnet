@@ -1316,6 +1316,7 @@ namespace GraphQL.Tests.DI
         public void AddSystemTextJson()
         {
             MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, SystemTextJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             MockSetupConfigureNull<System.Text.Json.JsonSerializerOptions>();
             _builder.AddSystemTextJson();
             Verify();
@@ -1325,6 +1326,7 @@ namespace GraphQL.Tests.DI
         public void AddSystemTextJson_Options1()
         {
             MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, SystemTextJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             var options = MockSetupConfigure1<System.Text.Json.JsonSerializerOptions>();
             _builder.AddSystemTextJson(options);
             Verify();
@@ -1334,8 +1336,18 @@ namespace GraphQL.Tests.DI
         public void AddSystemTextJson_Options2()
         {
             MockSetupRegister<IDocumentWriter, SystemTextJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, SystemTextJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             var options = MockSetupConfigure2<System.Text.Json.JsonSerializerOptions>();
             _builder.AddSystemTextJson(options);
+            Verify();
+        }
+
+        [Fact]
+        public void AddSystemTextJson_Options3()
+        {
+            _builderMock.Setup(b => b.Register(typeof(IDocumentWriter), It.IsAny<SystemTextJson.DocumentWriter>(), true)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(IGraphQLRequestReader), It.IsAny<SystemTextJson.GraphQLRequestReader>(), true)).Returns(_builder).Verifiable();
+            _builder.AddSystemTextJson(_ => { }, _ => { });
             Verify();
         }
         #endregion
@@ -1345,6 +1357,7 @@ namespace GraphQL.Tests.DI
         public void AddNewtonsoftJson()
         {
             MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, NewtonsoftJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             MockSetupConfigureNull<Newtonsoft.Json.JsonSerializerSettings>();
             _builder.AddNewtonsoftJson();
             Verify();
@@ -1354,6 +1367,7 @@ namespace GraphQL.Tests.DI
         public void AddNewtonsoftJson_Options1()
         {
             MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, NewtonsoftJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             var options = MockSetupConfigure1<Newtonsoft.Json.JsonSerializerSettings>();
             _builder.AddNewtonsoftJson(options);
             Verify();
@@ -1363,8 +1377,18 @@ namespace GraphQL.Tests.DI
         public void AddNewtonsoftJson_Options2()
         {
             MockSetupRegister<IDocumentWriter, NewtonsoftJson.DocumentWriter>(ServiceLifetime.Singleton, true);
+            MockSetupRegister<IGraphQLRequestReader, NewtonsoftJson.GraphQLRequestReader>(ServiceLifetime.Singleton, true);
             var options = MockSetupConfigure2<Newtonsoft.Json.JsonSerializerSettings>();
             _builder.AddNewtonsoftJson(options);
+            Verify();
+        }
+
+        [Fact]
+        public void AddNewtonsoftJson_Options3()
+        {
+            _builderMock.Setup(b => b.Register(typeof(IDocumentWriter), It.IsAny<NewtonsoftJson.DocumentWriter>(), true)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(IGraphQLRequestReader), It.IsAny<NewtonsoftJson.GraphQLRequestReader>(), true)).Returns(_builder).Verifiable();
+            _builder.AddNewtonsoftJson(_ => { }, _ => { });
             Verify();
         }
         #endregion

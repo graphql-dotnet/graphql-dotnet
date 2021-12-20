@@ -15,10 +15,28 @@ namespace GraphQL.NewtonsoftJson
         /// it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings>? action = null)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.AddDocumentWriter<DocumentWriter>();
+            builder.AddGraphQLRequestReader<GraphQLRequestReader>();
+            builder.Configure(action);
+            return builder;
+        }
 
         /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings, IServiceProvider>? action)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.AddDocumentWriter<DocumentWriter>();
+            builder.AddGraphQLRequestReader<GraphQLRequestReader>();
+            builder.Configure(action);
+            return builder;
+        }
+
+        /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
+        public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings> configureReader, Action<JsonSerializerSettings> configureWriter)
+        {
+            builder.AddDocumentWriter(new DocumentWriter(configureWriter));
+            builder.AddGraphQLRequestReader(new GraphQLRequestReader(configureReader));
+            return builder;
+        }
     }
 }
