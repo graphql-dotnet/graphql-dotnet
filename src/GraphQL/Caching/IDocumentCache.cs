@@ -9,18 +9,17 @@ namespace GraphQL.Caching
     public interface IDocumentCache
     {
         /// <summary>
-        /// Gets a document in the cache. Must be thread-safe. Returns <see langword="null"/> if no entry is found.
+        /// Gets a document in the cache. Must be thread-safe.
         /// </summary>
+        /// <param name="query">As the cache key</param>
+        /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
         ValueTask<Document?> GetAsync(string query);
 
         /// <summary>
         /// Sets a document in the cache. Must be thread-safe.
         /// </summary>
-        ValueTask SetAsync(string query, Document value);
-
-        /// <summary>
-        /// Remove a document cache. Must be thread-safe.
-        /// </summary>
-        ValueTask RemoveAsync(string query);
+        /// <param name="query">As the cache key</param>
+        /// <param name="value">The document object to cache. The existing cache item will be removed if the value is <see langword="null"/>.</param>
+        ValueTask SetAsync(string query, Document? value);
     }
 }
