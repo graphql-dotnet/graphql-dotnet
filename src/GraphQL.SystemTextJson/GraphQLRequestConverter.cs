@@ -51,6 +51,7 @@ namespace GraphQL.SystemTextJson
 
                 string key = reader.GetString();
 
+                //unexpected end of data
                 if (!reader.Read())
                     throw new JsonException();
 

@@ -656,6 +656,32 @@ namespace GraphQL
             => builder.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton, true);
         #endregion
 
+        #region - AddGraphQLRequestReader -
+        /// <summary>
+        /// Registers <typeparamref name="TGraphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
+        /// dependency injection framework.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder)
+            where TGraphQLRequestReader : class, IGraphQLRequestReader
+            => builder.Register<IGraphQLRequestReader, TGraphQLRequestReader>(ServiceLifetime.Singleton, true);
+
+        /// <summary>
+        /// Registers <paramref name="graphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
+        /// dependency injection framework.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, TGraphQLRequestReader graphQLRequestReader)
+            where TGraphQLRequestReader : class, IGraphQLRequestReader
+            => builder.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), true);
+
+        /// <summary>
+        /// Registers <typeparamref name="TGraphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
+        /// dependency injection framework. The supplied factory method is used to create the GraphQL request reader.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, Func<IServiceProvider, TGraphQLRequestReader> graphQLRequestReader)
+            where TGraphQLRequestReader : class, IGraphQLRequestReader
+            => builder.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), ServiceLifetime.Singleton, true);
+        #endregion
+
         #region - ConfigureSchema and ConfigureExecution -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.

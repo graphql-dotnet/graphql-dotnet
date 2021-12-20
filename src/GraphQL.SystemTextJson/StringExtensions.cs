@@ -32,6 +32,8 @@ namespace GraphQL.SystemTextJson
             {
                 new InputsConverter(),
                 new JsonConverterBigInteger(),
+                new GraphQLRequestConverter(),
+                new GraphQLRequestListConverter(),
             }
         };
 
