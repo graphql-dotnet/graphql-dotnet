@@ -156,5 +156,80 @@ namespace GraphQL.Tests
 
             actual.ShouldBeCrossPlatJson(expected);
         }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_GraphQLRequest_Correctly_Simple(IDocumentWriter writer)
+        {
+            var request = new GraphQLRequest
+            {
+                Query = "hello",
+            };
+
+            var expected = @"{ ""query"": ""hello"" }";
+
+            var actual = await writer.WriteToStringAsync(request);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_GraphQLRequest_Correctly_Complex(IDocumentWriter writer)
+        {
+            var request = new GraphQLRequest
+            {
+                Query = "hello",
+                OperationName = "opname",
+                Variables = new Inputs(new Dictionary<string, object>
+                {
+                    { "arg1", 1 },
+                    { "arg2", "test" },
+                }),
+                Extensions = new Inputs(new Dictionary<string, object>
+                {
+                    { "arg1", 2 },
+                    { "arg2", "test2" },
+                }),
+            };
+
+            var expected = @"{ ""query"": ""hello"", ""operationName"": ""opname"", ""variables"": { ""arg1"": 1, ""arg2"": ""test"" }, ""extensions"": { ""arg1"": 2, ""arg2"": ""test2"" } }";
+
+            var actual = await writer.WriteToStringAsync(request);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_GraphQLRequest_List_Correctly(IDocumentWriter writer)
+        {
+            var request = new GraphQLRequest
+            {
+                Query = "hello",
+            };
+
+            var expected = @"[{ ""query"": ""hello"" }]";
+
+            var actual = await writer.WriteToStringAsync(new List<GraphQLRequest> { request });
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_GraphQLRequest_Array_Correctly(IDocumentWriter writer)
+        {
+            var request = new GraphQLRequest
+            {
+                Query = "hello",
+            };
+
+            var expected = @"[{ ""query"": ""hello"" }]";
+
+            var actual = await writer.WriteToStringAsync(new GraphQLRequest[] { request });
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
     }
 }

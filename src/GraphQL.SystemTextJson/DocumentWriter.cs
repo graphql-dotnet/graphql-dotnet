@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -127,6 +128,16 @@ namespace GraphQL.SystemTextJson
             if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
             {
                 _options.Converters.Add(new JsonConverterBigInteger());
+            }
+
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(GraphQLRequest))))
+            {
+                _options.Converters.Add(new GraphQLRequestConverter());
+            }
+
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(List<GraphQLRequest>))))
+            {
+                _options.Converters.Add(new GraphQLRequestListConverter());
             }
         }
 
