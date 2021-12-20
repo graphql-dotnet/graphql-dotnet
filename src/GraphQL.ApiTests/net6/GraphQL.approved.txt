@@ -692,13 +692,11 @@ namespace GraphQL.Caching
     {
         public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
         public System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query) { }
-        public System.Threading.Tasks.ValueTask RemoveAsync(string query) { }
         public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value) { }
     }
     public interface IDocumentCache
     {
         System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query);
-        System.Threading.Tasks.ValueTask RemoveAsync(string query);
         System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value);
     }
 }

@@ -13,7 +13,6 @@ namespace GraphQL.Caching
         public virtual void Dispose() { }
         public virtual System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query) { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
-        public virtual System.Threading.Tasks.ValueTask RemoveAsync(string query) { }
         public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value) { }
     }
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
