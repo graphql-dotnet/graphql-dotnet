@@ -4,7 +4,7 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
-### `IGraphQLRequestReader` interface to support deserialization
+### `IGraphQLRequestReader` interface to support JSON deserialization
 
 `IGraphQLRequestReader.ReadAsync` is implemented by the `GraphQL.SystemTextJson` and
 `GraphQL.NewtonsoftJson` libraries. It supports deserialization of any type, with
