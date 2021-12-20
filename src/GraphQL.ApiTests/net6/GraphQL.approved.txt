@@ -691,10 +691,13 @@ namespace GraphQL.Caching
     public sealed class DefaultDocumentCache : GraphQL.Caching.IDocumentCache
     {
         public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
+        public System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query) { }
+        public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value) { }
     }
     public interface IDocumentCache
     {
-        GraphQL.Language.AST.Document? this[string query] { get; set; }
+        System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query);
+        System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value);
     }
 }
 namespace GraphQL.Conversion

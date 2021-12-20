@@ -10,6 +10,7 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## Breaking Changes
 
-###
+### Redesign of [IDocumentCache](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/src/GraphQL/Caching/IDocumentCache.cs).
 
-###
+1. Use async methods to get or set a cache.
+2. Cache items cannot be removed anymore.
