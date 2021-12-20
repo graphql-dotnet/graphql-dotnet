@@ -16,10 +16,10 @@ namespace GraphQL.Caching
         /// </summary>
         public static readonly DefaultDocumentCache Instance = new DefaultDocumentCache();
 
-        public ValueTask<Document?> GetAsync(string query) => new((Document?)null);
+        public ValueTask<Document?> GetAsync(string query) => default;
 
-        public ValueTask SetAsync(string query, Document value) => new(Task.CompletedTask);
+        public ValueTask SetAsync(string query, Document value) => default;
 
-        public ValueTask RemoveAsync(string query) => new(Task.CompletedTask);
+        public ValueTask RemoveAsync(string query) => default;
     }
 }

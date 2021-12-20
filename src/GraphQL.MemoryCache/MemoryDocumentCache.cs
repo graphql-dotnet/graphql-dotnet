@@ -76,10 +76,9 @@ namespace GraphQL.Caching
         /// <inheritdoc/>
         public virtual ValueTask SetAsync(string query, Document value)
         {
-            _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value,
-                GetMemoryCacheEntryOptions(query));
+            _memoryCache.Set(query, value, GetMemoryCacheEntryOptions(query));
 
-            return new ValueTask(Task.CompletedTask);
+            return default;
         }
 
         /// <inheritdoc/>
@@ -87,7 +86,7 @@ namespace GraphQL.Caching
         {
             _memoryCache.Remove(query);
 
-            return new ValueTask(Task.CompletedTask);
+            return default;
         }
     }
 }
