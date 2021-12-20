@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Shouldly;
 using Xunit;
@@ -179,5 +180,11 @@ namespace GraphQL.Tests
             result[1].Variables.ShouldBeNull();
             result[1].Extensions.ShouldBeNull();
         }
+    }
+
+    internal static class GraphQLReaderExtensions
+    {
+        public static T Read<T>(this IGraphQLRequestReader reader, string json)
+            => reader.ReadAsync<T>(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json)), default).Result;
     }
 }
