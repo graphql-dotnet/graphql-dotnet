@@ -26,13 +26,13 @@ renamed to have `Async` suffix.
 1. Use async methods to get or set a cache.
 2. Cache items cannot be removed anymore.
 
-### `IResolveFieldContext.Extensions` property renamed to `OutputExtensions`
+### `IResolveFieldContext.Extensions` property renamed to `OutputExtensions` and related changes
 
 To clarify and differ output extensions from input extensions, `IResolveFieldContext.Extensions`
-has now been renamed to `OutputExtensions`. There has not been any change to the `GetExtension` and
-`SetExtension` thread-safe extension methods.
+has now been renamed to `OutputExtensions`. The `GetExtension` and `SetExtension` thread-safe
+extension methods have also been renamed to `GetOutputExtension` and `SetOutputExtension` respectively.
 
-### `ExecutionOptions.Inputs` property renamed to `Variables`
+### `ExecutionOptions.Inputs` and `ValidationContext.Inputs` properties renamed to `Variables`
 
-To better align the execution options with the specification, the `Inputs` property containing
-the execution variables has now been renamed to `Variables`.
+To better align the execution options and variable context with the specification, the `Inputs`
+property containing the execution variables has now been renamed to `Variables`.

@@ -19,14 +19,14 @@ namespace GraphQL.Tests
             ISchema schema,
             string query,
             string expected,
-            Inputs inputs = null,
+            Inputs variables = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(schema, query, queryResult, inputs, root, userContext, cancellationToken, rules);
+            return AssertQuery(schema, query, queryResult, variables, root, userContext, cancellationToken, rules);
         }
 
         public ExecutionResult AssertQuerySuccess(Action<ExecutionOptions> options, string expected)
@@ -64,7 +64,7 @@ namespace GraphQL.Tests
             ISchema schema,
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs,
+            Inputs variables,
             object root,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
@@ -75,7 +75,7 @@ namespace GraphQL.Tests
                 _.Schema = schema;
                 _.Query = query;
                 _.Root = root;
-                _.Variables = inputs;
+                _.Variables = variables;
                 _.UserContext = userContext;
                 _.CancellationToken = cancellationToken;
                 _.ValidationRules = rules;

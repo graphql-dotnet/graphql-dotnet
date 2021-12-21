@@ -58,13 +58,13 @@ namespace GraphQL.DataLoader.Tests
         public ExecutionResult AssertQuerySuccess<TSchema>(
             string query,
             string expected,
-            Inputs inputs = null,
+            Inputs variables = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery<TSchema>(query, queryResult, inputs, userContext, cancellationToken);
+            return AssertQuery<TSchema>(query, queryResult, variables, userContext, cancellationToken);
         }
 
         public ExecutionResult AssertQuerySuccess<TSchema>(Action<ExecutionOptions> options, string expected)
@@ -123,7 +123,7 @@ namespace GraphQL.DataLoader.Tests
         public ExecutionResult AssertQuery<TSchema>(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs = null,
+            Inputs variables = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
@@ -132,7 +132,7 @@ namespace GraphQL.DataLoader.Tests
                 opts =>
                 {
                     opts.Query = query;
-                    opts.Variables = inputs;
+                    opts.Variables = variables;
                     opts.UserContext = userContext;
                     opts.CancellationToken = cancellationToken;
 

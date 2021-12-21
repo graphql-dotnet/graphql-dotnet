@@ -95,12 +95,12 @@ namespace GraphQL
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
-        /// Thread safe method to get value by path (key1.key2.keyN) from extensions dictionary.
+        /// Thread safe method to get value by path (key1.key2.keyN) from output extensions dictionary.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
-        public static object? GetExtension(this IResolveFieldContext context, string path)
+        public static object? GetOutputExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -134,13 +134,13 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Thread safe method to set value by path (key1.key2.keyN) to extensions dictionary.
+        /// Thread safe method to set value by path (key1.key2.keyN) to output extensions dictionary.
         /// if the given path or its part contains values, then they will be overwritten.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <param name="value">Value to set.</param>
-        public static void SetExtension(this IResolveFieldContext context, string path, object? value)
+        public static void SetOutputExtension(this IResolveFieldContext context, string path, object? value)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));

@@ -467,9 +467,9 @@ namespace GraphQL
         public static GraphQL.IResolveFieldContext<TSource> Copy<TSource>(this GraphQL.IResolveFieldContext<TSource> context) { }
         public static object? GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object? defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
-        public static object? GetExtension(this GraphQL.IResolveFieldContext context, string path) { }
+        public static object? GetOutputExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
-        public static void SetExtension(this GraphQL.IResolveFieldContext context, string path, object? value) { }
+        public static void SetOutputExtension(this GraphQL.IResolveFieldContext context, string path, object? value) { }
     }
     public class ResolveFieldContext<TSource> : GraphQL.ResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>
     {
@@ -2901,14 +2901,14 @@ namespace GraphQL.Validation
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
                 "validationResult",
                 "variables"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? inputs = null, string? operationName = null) { }
+        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? variables = null, string? operationName = null) { }
     }
     public interface IDocumentValidator
     {
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
                 "validationResult",
                 "variables"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? inputs = null, string? operationName = null);
+        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Language.AST.Variables>> ValidateAsync(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules = null, System.Collections.Generic.IDictionary<string, object?> userContext = null, GraphQL.Inputs? variables = null, string? operationName = null);
     }
     public interface INodeVisitor
     {
@@ -2980,16 +2980,16 @@ namespace GraphQL.Validation
         public GraphQL.Language.AST.Document Document { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public bool HasErrors { get; }
-        public GraphQL.Inputs? Inputs { get; set; }
         public string? OperationName { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
+        public GraphQL.Inputs? Variables { get; set; }
         public GraphQL.Language.AST.FragmentDefinition? GetFragment(string name) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentSpread> GetFragmentSpreads(GraphQL.Language.AST.SelectionSet node) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQL.Language.AST.Operation operation) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
-        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, GraphQL.Inputs inputs, GraphQL.Validation.IVariableVisitor? visitor = null) { }
+        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions? variableDefinitions, GraphQL.Inputs variables, GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQL.Language.AST.IHaveSelectionSet node) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }

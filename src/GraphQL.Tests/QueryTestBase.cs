@@ -54,7 +54,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQuerySuccess(
             string query,
             string expected,
-            Inputs inputs = null,
+            Inputs variables = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
@@ -63,13 +63,13 @@ namespace GraphQL.Tests
             IDocumentWriter writer = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, nameConverter, writer);
+            return AssertQuery(query, queryResult, variables, root, userContext, cancellationToken, rules, null, nameConverter, writer);
         }
 
         public ExecutionResult AssertQueryWithErrors(
             string query,
             string expected,
-            Inputs inputs = null,
+            Inputs variables = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
@@ -83,7 +83,7 @@ namespace GraphQL.Tests
             return AssertQueryIgnoreErrors(
                 query,
                 queryResult,
-                inputs,
+                variables,
                 root,
                 userContext,
                 cancellationToken,
@@ -96,7 +96,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs = null,
+            Inputs variables = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
@@ -110,7 +110,7 @@ namespace GraphQL.Tests
                 options.Schema = Schema;
                 options.Query = query;
                 options.Root = root;
-                options.Variables = inputs;
+                options.Variables = variables;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
@@ -134,7 +134,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQuery(
             string query,
             object expectedExecutionResultOrJson,
-            Inputs inputs,
+            Inputs variables,
             object root,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
@@ -150,7 +150,7 @@ namespace GraphQL.Tests
                 options.Schema = schema;
                 options.Query = query;
                 options.Root = root;
-                options.Variables = inputs;
+                options.Variables = variables;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
