@@ -78,7 +78,7 @@ namespace GraphQL
                 foreach (var configuration in _configurations)
                 {
                     // allocation free when the configuration delegate is not asynchronous
-                    await configuration.ConfigureAsync(options);
+                    await configuration.ConfigureAsync(options).ConfigureAwait(false);
                 }
             }
 
@@ -104,7 +104,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && (document = await _documentCache.GetAsync(options.Query)) != null)
+                    if (document == null && (document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false)) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -143,7 +143,7 @@ namespace GraphQL
                         validationRules,
                         options.UserContext,
                         options.Inputs,
-                        options.OperationName);
+                        options.OperationName).ConfigureAwait(false);
                 }
 
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
@@ -154,7 +154,7 @@ namespace GraphQL
 
                 if (saveInCache && validationResult.IsValid)
                 {
-                    await _documentCache.SetAsync(options.Query, document);
+                    await _documentCache.SetAsync(options.Query, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);

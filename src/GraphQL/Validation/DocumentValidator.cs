@@ -108,7 +108,7 @@ namespace GraphQL.Validation
                             if (variableVisitor != null)
                                 (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
                         }
-                        var visitor = await rule.ValidateAsync(context);
+                        var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                         if (visitor != null)
                             visitors.Add(visitor);
                     }
