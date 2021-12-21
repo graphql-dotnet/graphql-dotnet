@@ -111,6 +111,7 @@ namespace GraphQL
             Path = context.Path;
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
+            InputExtensions = context.InputExtensions;
             OutputExtensions = context.OutputExtensions;
             ArrayPool = context.ArrayPool;
         }
