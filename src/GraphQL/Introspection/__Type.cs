@@ -105,7 +105,7 @@ namespace GraphQL.Introspection
                     int index = 0;
                     foreach (var possible in type.PossibleTypes.List)
                     {
-                        if (await context.Schema.Filter.AllowType(possible))
+                        if (await context.Schema.Filter.AllowType(possible).ConfigureAwait(false))
                             possibleTypes[index++] = possible;
                     }
 

@@ -47,7 +47,7 @@ namespace GraphQL.DataLoader
 
             _loader = async (keys, cancellationToken) =>
             {
-                var ret = await fetchDelegate(keys, cancellationToken);
+                var ret = await fetchDelegate(keys, cancellationToken).ConfigureAwait(false);
                 return ret.ToLookup(keySelector, keyComparer);
             };
         }
@@ -56,7 +56,7 @@ namespace GraphQL.DataLoader
         protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, IEnumerable<T>>> list, CancellationToken cancellationToken)
         {
             var keys = list.Select(x => x.Key);
-            var lookup = await _loader(keys, cancellationToken);
+            var lookup = await _loader(keys, cancellationToken).ConfigureAwait(false);
             foreach (var item in list)
             {
                 item.SetResult(lookup[item.Key]);

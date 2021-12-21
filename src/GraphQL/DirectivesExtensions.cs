@@ -186,7 +186,7 @@ namespace GraphQL
                        {
                            // return only registered directives allowed by filter
                            var schemaDirective = context.Schema.Directives.Find(applied.Name);
-                           if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective))
+                           if (schemaDirective != null && await context.Schema.Filter.AllowDirective(schemaDirective).ConfigureAwait(false))
                            {
                                result[index++] = applied;
                            }
