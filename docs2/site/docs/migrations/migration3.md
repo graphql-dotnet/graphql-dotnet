@@ -122,7 +122,7 @@ private static async Task ExecuteAsync(HttpContext context, ISchema schema)
         options.Schema = schema;
         options.Query = request.Query;
         options.OperationName = request.OperationName;
-        options.Inputs = request.Variables.ToInputs();
+        options.Variables = request.Variables.ToInputs();
     });
 
     context.Response.ContentType = "application/json";
@@ -158,7 +158,7 @@ private static async Task ExecuteAsync(HttpContext context, ISchema schema)
         options.Schema = schema;
         options.Query = request.Query;
         options.OperationName = request.OperationName;
-        options.Inputs = request.Variables.ToInputs();
+        options.Variables = request.Variables.ToInputs();
     });
 
     context.Response.ContentType = "application/json";
