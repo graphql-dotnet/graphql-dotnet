@@ -253,7 +253,7 @@ var result = await _executer.ExecuteAsync(options =>
 {
     options.Schema = schema;
     options.Query = request.Query;
-    options.Inputs = request.Variables.ToInputs();
+    options.Variables = request.Variables.ToInputs();
     options.RequestServices = context.RequestServices;
 });
 ```

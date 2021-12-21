@@ -33,7 +33,10 @@ namespace GraphQL
         public Document? Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
-        public Inputs? Inputs { get; set; }
+        public Inputs? Variables { get; set; }
+
+        /// <summary>Input extensions to GraphQL request</summary>
+        public Inputs? Extensions { get; set; }
 
         /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }

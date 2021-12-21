@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Bugs
                 {
                     ""example"": ""null""
                 }";
-            AssertQuerySuccess(query, expected, inputs: new Inputs(new Dictionary<string, object>
+            AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object>
             {
                 { "inputs", null }
             }));

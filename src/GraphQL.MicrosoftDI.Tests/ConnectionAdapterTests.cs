@@ -35,7 +35,8 @@ namespace GraphQL.MicrosoftDI.Tests
             rccMock.SetupGet(x => x.CancellationToken).Returns((CancellationToken)default);
             rccMock.SetupGet(x => x.Document).Returns(new Document());
             rccMock.SetupGet(x => x.Errors).Returns(new ExecutionErrors());
-            rccMock.SetupGet(x => x.Extensions).Returns(new Dictionary<string, object>() { { "1", new object() } });
+            rccMock.SetupGet(x => x.InputExtensions).Returns(new Dictionary<string, object>() { { "7", new object() } });
+            rccMock.SetupGet(x => x.OutputExtensions).Returns(new Dictionary<string, object>() { { "1", new object() } });
             rccMock.SetupGet(x => x.FieldAst).Returns(new Field(default, new NameNode("test")));
             rccMock.SetupGet(x => x.FieldDefinition).Returns(new FieldType());
             rccMock.SetupGet(x => x.Metrics).Returns(new Instrumentation.Metrics());
@@ -66,7 +67,8 @@ namespace GraphQL.MicrosoftDI.Tests
             mocked.CancellationToken.ShouldBe(rcc.CancellationToken);
             mocked.Document.ShouldBe(rcc.Document);
             mocked.Errors.ShouldBe(rcc.Errors);
-            mocked.Extensions.ShouldBe(rcc.Extensions);
+            mocked.InputExtensions.ShouldBe(rcc.InputExtensions);
+            mocked.OutputExtensions.ShouldBe(rcc.OutputExtensions);
             mocked.FieldAst.ShouldBe(rcc.FieldAst);
             mocked.FieldDefinition.ShouldBe(rcc.FieldDefinition);
             mocked.Metrics.ShouldBe(rcc.Metrics);

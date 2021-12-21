@@ -7,7 +7,7 @@ namespace GraphQL.Execution
             result.Query = context.Document.OriginalQuery;
             result.Document = context.Document;
             result.Operation = context.Operation;
-            result.Extensions = context.Extensions;
+            result.Extensions = context.OutputExtensions;
 
             return result;
         }

@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Bugs
             };
             error3.AddLocation(1, 7);
             var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2, error3 }, executed: false);
-            AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, inputs: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 3, renderErrors: true);
+            AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, variables: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 3, renderErrors: true);
         }
     }
 

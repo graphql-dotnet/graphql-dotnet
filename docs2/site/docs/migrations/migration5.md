@@ -6,7 +6,11 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ###
 
-###
+### Input Extensions support
+
+`Extensions` deserialized from GraphQL requests can now be set on the `ExecutionOptions.Extensions` property
+and passed through to field resolvers via `IResolveFieldContext.InputExtensions`. Note that standard .NET
+dictionaries (such as `Dictionary<TKey, TValue>`) are thread-safe for read-only operations.
 
 ## Breaking Changes
 
@@ -21,3 +25,14 @@ renamed to have `Async` suffix.
 
 1. Use async methods to get or set a cache.
 2. Cache items cannot be removed anymore.
+
+### `IResolveFieldContext.Extensions` property renamed to `OutputExtensions` and related changes
+
+To clarify and differ output extensions from input extensions, `IResolveFieldContext.Extensions`
+has now been renamed to `OutputExtensions`. The `GetExtension` and `SetExtension` thread-safe
+extension methods have also been renamed to `GetOutputExtension` and `SetOutputExtension` respectively.
+
+### `ExecutionOptions.Inputs` and `ValidationContext.Inputs` properties renamed to `Variables`
+
+To better align the execution options and variable context with the specification, the `Inputs`
+property containing the execution variables has now been renamed to `Variables`.

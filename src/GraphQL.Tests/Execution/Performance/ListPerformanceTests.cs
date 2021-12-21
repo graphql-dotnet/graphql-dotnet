@@ -112,7 +112,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
-                _.Inputs = null;
+                _.Variables = null;
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
@@ -147,7 +147,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
-                _.Inputs = null;
+                _.Variables = null;
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
@@ -194,7 +194,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
-                _.Inputs = null;
+                _.Variables = null;
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;

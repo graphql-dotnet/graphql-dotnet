@@ -37,7 +37,7 @@ namespace GraphQL.Execution
                 Query = context.Document.OriginalQuery,
                 Document = context.Document,
                 Operation = context.Operation,
-                Extensions = context.Extensions
+                Extensions = context.OutputExtensions
             };
         }
 

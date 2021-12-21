@@ -91,12 +91,12 @@ namespace GraphQL.Tests.Validation
             result.IsValid.ShouldBeTrue(message);
         }
 
-        private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules, Inputs inputs)
+        private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules, Inputs variables)
         {
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.ValidateAsync(schema, document, document.Operations.FirstOrDefault()?.Variables, rules, inputs: inputs).Result.validationResult;
+            return validator.ValidateAsync(schema, document, document.Operations.FirstOrDefault()?.Variables, rules, variables: variables).Result.validationResult;
         }
     }
 }
