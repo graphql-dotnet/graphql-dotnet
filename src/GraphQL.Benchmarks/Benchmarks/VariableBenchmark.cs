@@ -83,7 +83,7 @@ namespace GraphQL.Benchmarks
                 _.Schema = schema;
                 _.Query = query;
                 _.Document = document;
-                _.Inputs = inputs;
+                _.Variables = inputs;
                 _.ValidationRules = EnableValidation ? null : Array.Empty<IValidationRule>();
                 _.ThrowOnUnhandledException = true;
             }).GetAwaiter().GetResult();

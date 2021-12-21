@@ -116,7 +116,10 @@ namespace GraphQL
         object? IResolveFieldContext.Source => _executionNode.Source;
 
         /// <inheritdoc/>
-        public IDictionary<string, object?> Extensions => _executionContext.Extensions;
+        public IReadOnlyDictionary<string, object?> InputExtensions => _executionContext.InputExtensions;
+
+        /// <inheritdoc/>
+        public IDictionary<string, object?> OutputExtensions => _executionContext.OutputExtensions;
 
         /// <inheritdoc/>
         public IServiceProvider? RequestServices => _executionContext.RequestServices;

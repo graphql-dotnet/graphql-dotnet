@@ -57,7 +57,10 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, object?> Extensions { get; set; }
+        public IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
+
+        /// <inheritdoc/>
+        public Dictionary<string, object?> OutputExtensions { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <inheritdoc/>

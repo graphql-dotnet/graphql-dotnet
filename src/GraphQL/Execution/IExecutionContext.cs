@@ -81,10 +81,17 @@ namespace GraphQL.Execution
         Variables Variables { get; }
 
         /// <summary>
+        /// A dictionary of extra information supplied with the GraphQL request.
+        /// This is reserved for implementors to extend the protocol however they see fit, and
+        /// hence there are no additional restrictions on its contents.
+        /// </summary>
+        IReadOnlyDictionary<string, object?> InputExtensions { get; }
+
+        /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents.
         /// </summary>
-        Dictionary<string, object?> Extensions { get; }
+        Dictionary<string, object?> OutputExtensions { get; }
 
         /// <summary>
         /// The service provider for the executing request. Typically this is a scoped service provider

@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Execution
             {
                 Query = "query($arg: Byte!) { test(arg: $arg) }",
                 Schema = Schema,
-                Inputs = "{\"arg\":500}".ToInputs(),
+                Variables = "{\"arg\":500}".ToInputs(),
                 ThrowOnUnhandledException = true,
             });
             valid.ShouldNotBeNull();

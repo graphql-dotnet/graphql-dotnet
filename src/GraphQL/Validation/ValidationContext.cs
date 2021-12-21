@@ -31,7 +31,7 @@ namespace GraphQL.Validation
             Document = null!;
             TypeInfo = null!;
             UserContext = null!;
-            Inputs = null;
+            Variables = null;
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace GraphQL.Validation
         /// </summary>
         public bool HasErrors => _errors?.Count > 0;
 
-        /// <inheritdoc cref="ExecutionOptions.Inputs"/>
-        public Inputs? Inputs { get; set; }
+        /// <inheritdoc cref="ExecutionOptions.Variables"/>
+        public Inputs? Variables { get; set; }
 
         /// <summary>
         /// Adds a validation error to the list of validation errors.
@@ -192,16 +192,16 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Returns all of the variable values defined for the operation from the attached <see cref="Inputs"/> object.
+        /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// </summary>
-        public Variables GetVariableValues(ISchema schema, VariableDefinitions? variableDefinitions, Inputs inputs, IVariableVisitor? visitor = null)
+        public Variables GetVariableValues(ISchema schema, VariableDefinitions? variableDefinitions, Inputs variables, IVariableVisitor? visitor = null)
         {
             if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
-                return Variables.None;
+                return Language.AST.Variables.None;
             }
 
-            var variables = new Variables(variableDefinitions!.List!.Count);
+            var variablesObj = new Variables(variableDefinitions!.List!.Count);
 
             if (variableDefinitions != null)
             {
@@ -220,7 +220,7 @@ namespace GraphQL.Validation
                     var variable = new Variable(variableDef.Name);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (inputs.TryGetValue(variableDef.Name, out var variableValue))
+                    if (variables.TryGetValue(variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
@@ -240,7 +240,7 @@ namespace GraphQL.Validation
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variables, null).Value;
+                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
                         }
                         catch (Exception ex)
                         {
@@ -258,16 +258,16 @@ namespace GraphQL.Validation
                     // if the variable was not specified and no default was specified, do not set variable.Value
 
                     // add the variable to the list of parsed variables defined for the operation
-                    variables.Add(variable);
+                    variablesObj.Add(variable);
                 }
             }
 
             // return the list of parsed variables defined for the operation
-            return variables;
+            return variablesObj;
         }
 
         /// <summary>
-        /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// Return the specified variable's value for the document from the attached <see cref="Variables"/> object.
         /// <br/><br/>
         /// Validates and parses the supplied input object according to the variable's type, and converts the object
         /// with <see cref="ScalarGraphType.ParseValue(object)"/> and
