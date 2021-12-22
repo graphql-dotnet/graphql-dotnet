@@ -124,10 +124,40 @@ You can use `EnumerationGraphType<TEnum>` to automatically generate values by pr
 `enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in
 the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute`
 applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute`
-applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE.
-Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member
-to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL
-`DeprecationReason`.
+applied to the enum type.
+
+By default, the name of each enum member will be converted to CONSTANT_CASE. If you want to change
+this behavior, you can make it in two ways.
+1. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
+
+```sharp
+public class CamelCaseEnumerationGraphType<T> : EnumerationGraphType<T> where T : Enum
+{
+    protected override string ChangeEnumCase(string val) => val.ToCamelCase();
+}
+```
+
+and then inheriting this class instead of `EnumerationGraphType`
+
+```csharp
+public class MediaTypeEnum : CamelCaseEnumerationGraphType<MediaTypeViewModel>
+{
+}
+```
+ 
+2. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
+
+```csharp
+[CamelCase]
+public enum CamelCaseEnum
+{
+    FirstValue,
+    SecondValue
+}
+```
+
+Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.
+Apply an `ObsoleteAttribute` to an enum member to set the GraphQL `DeprecationReason`.
 
 ```csharp
 [Description("The Star Wars movies.")]
