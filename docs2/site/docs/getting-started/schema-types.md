@@ -120,8 +120,7 @@ The name of each member _is_ the value.
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-I. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET
-`enum` for `TEnum`.
+I. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.
 
 - The `Name` will default to the .NET type name, which you can override in the constructor.
 - The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.
