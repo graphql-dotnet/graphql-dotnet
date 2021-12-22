@@ -73,7 +73,7 @@ namespace GraphQL.StarWars.IoC
                 return creator();
             }
 
-            if (serviceType.IsAbstract || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
+            if (serviceType.IsInterface || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
             {
                 return null;
             }
