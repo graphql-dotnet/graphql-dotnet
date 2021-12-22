@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GraphQL.DI
 {
@@ -10,6 +11,8 @@ namespace GraphQL.DI
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider.
         /// Optionally removes any existing implementation of the same service type.
+        /// When not replacing existing registrations, requesting the service type should return the most recent registration,
+        /// and requesting an <see cref="IEnumerable{T}"/> of the service type should return all of the registrations.
         /// </summary>
         IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 

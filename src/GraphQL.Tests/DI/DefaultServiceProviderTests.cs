@@ -22,9 +22,39 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
+        public void returns_self_for_defaultserviceprovider()
+        {
+            _serviceProvider.GetService(typeof(DefaultServiceProvider)).ShouldBe(_serviceProvider);
+        }
+
+        [Fact]
         public void returns_null_for_interfaces()
         {
             _serviceProvider.GetService(typeof(IEnumerable<Class1>)).ShouldBeNull();
+        }
+
+        [Fact]
+        public void returns_null_for_abstract_classes()
+        {
+            _serviceProvider.GetService(typeof(System.IO.TextReader)).ShouldBeNull();
+        }
+
+        [Fact]
+        public void returns_null_for_static_classes()
+        {
+            _serviceProvider.GetService(typeof(Console)).ShouldBeNull();
+        }
+
+        [Fact]
+        public void returns_null_for_generic_type_definitions()
+        {
+            _serviceProvider.GetService(typeof(List<>)).ShouldBeNull();
+        }
+
+        [Fact]
+        public void returns_new_instance_for_generic_types()
+        {
+            _serviceProvider.GetService(typeof(List<int>)).ShouldBeOfType<List<int>>().ShouldNotBeNull();
         }
 
         [Fact]
