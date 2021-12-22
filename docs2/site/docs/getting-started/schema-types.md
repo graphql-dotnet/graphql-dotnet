@@ -132,7 +132,7 @@ By default, the name of each enum member will be converted to CONSTANT_CASE. If 
 this behavior, you can make it in two ways.
 1. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
 
-```sharp
+```csharp
 public class CamelCaseEnumerationGraphType<T> : EnumerationGraphType<T> where T : Enum
 {
     protected override string ChangeEnumCase(string val) => val.ToCamelCase();
