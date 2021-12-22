@@ -78,7 +78,7 @@ namespace GraphQL
                 foreach (var configuration in _configurations)
                 {
                     // allocation free when the configuration delegate is not asynchronous
-                    await configuration.ConfigureAsync(options);
+                    await configuration.ConfigureAsync(options).ConfigureAwait(false);
                 }
             }
 

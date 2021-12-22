@@ -53,7 +53,7 @@ namespace GraphQL.DataLoader
 
             _loader = async (keys, cancellationToken) =>
             {
-                var ret = await fetchDelegate(keys, cancellationToken);
+                var ret = await fetchDelegate(keys, cancellationToken).ConfigureAwait(false);
                 return ret.ToDictionary(keySelector, keyComparer);
             };
             _defaultValue = defaultValue;
@@ -63,7 +63,7 @@ namespace GraphQL.DataLoader
         protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken)
         {
             var keys = list.Select(x => x.Key);
-            var dictionary = await _loader(keys, cancellationToken);
+            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
             foreach (var item in list)
             {
                 if (!dictionary.TryGetValue(item.Key, out var value))
