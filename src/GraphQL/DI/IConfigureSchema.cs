@@ -6,7 +6,7 @@ namespace GraphQL.DI
     /// <summary>
     /// Allows configuration of a schema prior to the code in its constructor.
     /// <br/><br/>
-    /// Ttypically executes during the <see cref="Schema"/> constructor,
+    /// Typically executes during the <see cref="Schema"/> constructor,
     /// which executes prior to any descendant classes' constructors.
     /// </summary>
     public interface IConfigureSchema
