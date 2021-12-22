@@ -24,7 +24,7 @@ namespace GraphQL
         {
         }
 
-        public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
+        public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
             : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations)
         {
         }
