@@ -18,7 +18,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
         Task ConfigureAsync(ExecutionOptions executionOptions);
     }
 
-    internal class ConfigureExecutionOptions : IConfigureExecutionOptions
+    internal sealed class ConfigureExecutionOptions : IConfigureExecutionOptions
     {
         private readonly Func<ExecutionOptions, Task> _action;
 
