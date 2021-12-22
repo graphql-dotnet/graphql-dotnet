@@ -120,7 +120,7 @@ The name of each member _is_ the value.
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-I. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.
+1. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.
 
 - The `Name` will default to the .NET type name, which you can override in the constructor.
 - The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.
@@ -130,7 +130,8 @@ I. You can use `EnumerationGraphType<TEnum>` to automatically generate values by
 
 By default, the name of each enum member will be converted to CONSTANT_CASE. If you want to change
 this behavior, you can make it in two ways.
-1. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
+
+a. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
 
 ```csharp
 public class CamelCaseEnumerationGraphType<T> : EnumerationGraphType<T> where T : Enum
@@ -147,7 +148,7 @@ public class MediaTypeEnum : CamelCaseEnumerationGraphType<MediaTypeViewModel>
 }
 ```
  
-2. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
+b. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
 
 ```csharp
 [CamelCase]
@@ -190,7 +191,7 @@ mapped via `Schema.RegisterTypeMapping`:
 Field(x => x.MyEnum);
 ```
 
-II. You can also manually create the `EnumerationGraphType`. Advantages of this method:
+2. You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
 - The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
 - You can manually add descriptions and deprecation reasons. This may be useful if you do not control the source code for the enum.
