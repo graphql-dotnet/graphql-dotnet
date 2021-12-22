@@ -142,7 +142,7 @@ namespace GraphQL
                         operation.Variables,
                         validationRules,
                         options.UserContext,
-                        options.Inputs);
+                        options.Inputs).ConfigureAwait(false);
                 }
 
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
