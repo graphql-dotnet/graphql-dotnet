@@ -109,7 +109,7 @@ namespace GraphQL.Execution
                 {
                     try
                     {
-                        await Task.WhenAll(currentTasks);
+                        await Task.WhenAll(currentTasks).ConfigureAwait(false);
                     }
                     catch
                     {

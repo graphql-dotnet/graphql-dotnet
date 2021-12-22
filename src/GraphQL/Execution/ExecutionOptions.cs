@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -32,7 +33,10 @@ namespace GraphQL
         public Document? Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
-        public Inputs? Inputs { get; set; }
+        public Inputs? Variables { get; set; }
+
+        /// <summary>Input extensions to GraphQL request</summary>
+        public Inputs? Extensions { get; set; }
 
         /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }
@@ -63,7 +67,7 @@ namespace GraphQL
         /// within <see cref="ExecutionResult.Errors"/> as an <see cref="ExecutionError"/>.
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
-        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; } = context => { };
+        public Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; set; } = _ => Task.CompletedTask;
 
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }

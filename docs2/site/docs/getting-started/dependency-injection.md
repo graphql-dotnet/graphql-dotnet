@@ -224,7 +224,7 @@ lifetimes are as follows:
 
 > It is _highly_ recommended that the schema is registered as a singleton. As all graph types are constructed at the
 same time as the schema, all graph types will effectively have a singleton lifetime, regardless
-of how it is registered with the DI framework. This is most performant appraoch. Having a scoped schema can degrade performance
+of how it is registered with the DI framework. This is most performant approach. Having a scoped schema can degrade performance
 by a huge margin. For instance, even a small schema execution can slow down by 100x, and much more with a large schema.
 
 Scoped lifetime can be used to allow the schema and all its graph types access to the current DI scope.
@@ -253,7 +253,7 @@ var result = await _executer.ExecuteAsync(options =>
 {
     options.Schema = schema;
     options.Query = request.Query;
-    options.Inputs = request.Variables.ToInputs();
+    options.Variables = request.Variables.ToInputs();
     options.RequestServices = context.RequestServices;
 });
 ```
@@ -321,10 +321,10 @@ public class MyGraphType : ObjectGraphType<Category>
 
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
-However, the performance benefits far outweigh the anti-pattern idealogy. 
+However, the performance benefits far outweigh the anti-pattern idealogy, when compared to creating a scoped schema.
 
 Within the `GraphQL.MicrosoftDI` package, there is also a builder approach to adding scoped dependencies.
-This makes for a concise and declarative approach. Each field clearly states the service it needs
+This makes for a concise and declarative approach. Each field clearly states the services it needs
 and thereby, the anti-pattern argument does not apply anymore.
 
 ```csharp

@@ -17,9 +17,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="SingleRootFieldSubscriptionsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((operation, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Operation>((operation, context) =>
         {
             if (!IsSubscription(operation))
             {
@@ -56,7 +56,7 @@ namespace GraphQL.Validation.Rules
                 context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, fragment));
             }
 
-        }).ToTask();
+        });
 
         private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
 

@@ -79,13 +79,20 @@ namespace GraphQL
         Dictionary<string, Field>? SubFields { get; }
 
         /// <summary>
+        /// A dictionary of extra information supplied with the GraphQL request.
+        /// This is reserved for implementors to extend the protocol however they see fit, and
+        /// hence there are no additional restrictions on its contents.
+        /// </summary>
+        IReadOnlyDictionary<string, object?> InputExtensions { get; }
+
+        /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents. This dictionary is shared
-        /// by all running resolvers and is not thread safe. Also you may use <see cref="ResolveFieldContextExtensions.GetExtension(IResolveFieldContext, string)">GetExtension</see>
-        /// and <see cref="ResolveFieldContextExtensions.SetExtension(IResolveFieldContext, string, object)">SetExtension</see>
+        /// by all running resolvers and is not thread safe. Also you may use <see cref="ResolveFieldContextExtensions.GetOutputExtension(IResolveFieldContext, string)">GetExtension</see>
+        /// and <see cref="ResolveFieldContextExtensions.SetOutputExtension(IResolveFieldContext, string, object)">SetExtension</see>
         /// methods.
         /// </summary>
-        IDictionary<string, object?> Extensions { get; }
+        IDictionary<string, object?> OutputExtensions { get; }
 
         /// <summary>The service provider for the executing request.</summary>
         IServiceProvider? RequestServices { get; }

@@ -165,6 +165,12 @@ Fully-featured examples can be found [here](https://github.com/graphql-dotnet/ex
 ### Hello World
 
 ```csharp
+using System;
+using System.Threading.Tasks;
+using GraphQL;
+using GraphQL.Types;
+using GraphQL.SystemTextJson; // First add PackageReference to GraphQL.SystemTextJson
+
 var schema = Schema.For(@"
   type Query {
     hello: String

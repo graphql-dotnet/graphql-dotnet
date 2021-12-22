@@ -57,9 +57,9 @@ namespace GraphQL.Types
             set
             {
                 if (value != null && !value.IsGraphType())
-                    throw new ArgumentOutOfRangeException("value", $"Type '{value}' is not a graph type.");
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Type '{value}' is not a graph type.");
                 if (value != null && value.IsGenericTypeDefinition)
-                    throw new ArgumentOutOfRangeException("value", $"Type '{value}' should not be an open generic type definition.");
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Type '{value}' should not be an open generic type definition.");
                 _type = value;
             }
         }

@@ -61,6 +61,8 @@ namespace GraphQL.Tests.Utilities
                 stack = stack.Remove(0, 5);
             if (stack.StartsWith("   at "))
                 stack = stack.Remove(0, 6);
+            if (stack.StartsWith("   在 "))
+                stack = stack.Remove(0, 5);
 
             stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
         }
@@ -91,6 +93,8 @@ namespace GraphQL.Tests.Utilities
                 stack = stack.Remove(0, 5);
             if (stack.StartsWith("   at "))
                 stack = stack.Remove(0, 6);
+            if (stack.StartsWith("   在 "))
+                stack = stack.Remove(0, 5);
 
             stack.ShouldStartWith("GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
         }

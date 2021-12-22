@@ -36,6 +36,6 @@ var inputs = variablesJson.ToInputs();
 await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
-  _.Inputs = inputs;
+  _.Variables = inputs;
 });
 ```

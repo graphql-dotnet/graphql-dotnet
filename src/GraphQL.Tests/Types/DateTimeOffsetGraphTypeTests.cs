@@ -51,8 +51,10 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                _type.ParseValue("2015-11-21T19:59:32.987+0200").ShouldBe(
-                    new DateTimeOffset(2015, 11, 21, 19, 59, 32, 987, TimeSpan.FromHours(2)));
+                var dateTimeOffset = (DateTimeOffset)_type.ParseValue("2015-11-21T19:59:32.987+0200");
+                dateTimeOffset.Date.ShouldBe(new DateTime(2015, 11, 21));
+                dateTimeOffset.TimeOfDay.ShouldBe(new TimeSpan(0, 19, 59, 32, 987));
+                dateTimeOffset.Offset.ShouldBe(TimeSpan.FromHours(2));
             });
         }
 

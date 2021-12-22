@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
@@ -227,6 +229,39 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void builds_type_with_arguments_with_dependent_default_values()
+        {
+            var definitions = @"
+                type Query {
+                  post(arg: [SomeInputType] = [{ name: ""John"" }]): String
+                }
+                input SomeInputType {
+                  id: ID! = 1
+                  name: String!
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+
+            var query = schema.Query;
+            query.Fields.Count.ShouldBe(1);
+
+            var field = query.Fields.Single();
+            field.Name.ShouldBe("post");
+            field.Arguments.Count.ShouldBe(1);
+
+            var arg = field.Arguments.First();
+            arg.Name.ShouldBe("arg");
+            var list = arg.DefaultValue.ShouldBeAssignableTo<IEnumerable<object>>();
+            list.Count().ShouldBe(1);
+            var item = list.First().ShouldBeAssignableTo<IDictionary<string, object>>();
+            item.Count.ShouldBe(2);
+            item["name"].ShouldBeOfType<string>().ShouldBe("John");
+            item["id"].ShouldBeOfType<int>().ShouldBe(1);
+        }
+
+        [Fact]
         public void builds_interface()
         {
             var definitions = @"
@@ -430,6 +465,102 @@ namespace GraphQL.Tests.Utilities
             input.Description.ShouldBe("Example description");
             input.Fields.Count.ShouldBe(2);
             input.Fields.First().Description.ShouldBe("Stars description");
+        }
+
+        [Fact]
+        public void builds_input_types_with_default_values()
+        {
+            var definitions = @"
+                input ReviewInput {
+                  stars: Int! = 23
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+
+            var input = schema.AllTypes["ReviewInput"] as InputObjectGraphType;
+            input.ShouldNotBeNull();
+            input.Fields.Count.ShouldBe(1);
+            input.Fields.First().DefaultValue.ShouldBe(23);
+        }
+
+        [Fact]
+        public void builds_input_types_with_dependent_default_values()
+        {
+            var definitions = @"
+                input SomeInputType1 {
+                  test: SomeInputType2! = { arg1: 22 }
+                }
+                input SomeInputType2 {
+                  arg1: Int
+                  arg2: Int = 30
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+
+            var inputType1 = schema.AllTypes["SomeInputType1"] as InputObjectGraphType;
+            inputType1.ShouldNotBeNull();
+            inputType1.Fields.Count.ShouldBe(1);
+            inputType1.Fields.First().Name.ShouldBe("test");
+            var value1 = inputType1.Fields.First().DefaultValue.ShouldBeAssignableTo<IDictionary<string, object>>();
+            value1.ShouldContainKeyAndValue("arg1", 22);
+            value1.ShouldContainKeyAndValue("arg2", 30);
+
+            var inputType2 = schema.AllTypes["SomeInputType2"] as InputObjectGraphType;
+            inputType2.ShouldNotBeNull();
+            inputType2.Fields.Count.ShouldBe(2);
+            inputType2.Fields.Find("arg1").ShouldNotBeNull().DefaultValue.ShouldBeNull();
+            inputType2.Fields.Find("arg2").ShouldNotBeNull().DefaultValue.ShouldBe(30);
+        }
+
+        [Fact]
+        public void input_types_default_value_loops_throw1()
+        {
+            var definitions = @"
+                input SomeInputType1 {
+                  test: SomeInputType1 = { }
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType1'.");
+        }
+
+        [Fact]
+        public void input_types_default_value_loops_throw2()
+        {
+            var definitions = @"
+                input SomeInputType1 {
+                  test: SomeInputType2 = { }
+                }
+                input SomeInputType2 {
+                  test: SomeInputType3 = { }
+                }
+                input SomeInputType3 {
+                  test: SomeInputType1 = { }
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType3', 'SomeInputType2', 'SomeInputType1'.");
+        }
+
+        [Fact(Skip = "Not yet supported")]
+        public void input_types_default_value_loops_pass()
+        {
+            // see: https://github.com/graphql-dotnet/graphql-dotnet/pull/2696#discussion_r764975585
+
+            var definitions = @"
+                input SomeInputType1 {
+                  test: SomeInputType1 = { test: null }
+                }
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
         }
 
         [Fact]

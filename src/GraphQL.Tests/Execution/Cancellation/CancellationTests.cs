@@ -70,7 +70,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             tokenSource.Cancel();
             Should.Throw<OperationCanceledException>(() =>
             {
-                var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
+                _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
             });
         }
 
@@ -80,7 +80,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             using var tokenSource = new CancellationTokenSource();
             Should.Throw<OperationCanceledException>(() =>
             {
-                var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
+                _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
             });
         }
 
@@ -88,12 +88,12 @@ namespace GraphQL.Tests.Execution.Cancellation
         public void unhandled_exception_delegate_is_not_called()
         {
             bool ranDelegate = false;
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = (context) => ranDelegate = true;
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = _ => { ranDelegate = true; return Task.CompletedTask; };
             using (var tokenSource = new CancellationTokenSource())
             {
                 Should.Throw<OperationCanceledException>(() =>
                 {
-                    var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: unhandledExceptionDelegate);
+                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: unhandledExceptionDelegate);
                 });
             }
             ranDelegate.ShouldBeFalse();

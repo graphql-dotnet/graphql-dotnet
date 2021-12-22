@@ -20,9 +20,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUndefinedVariablesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
             {
                 var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<string>();
@@ -43,6 +43,6 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 })
-        ).ToTask();
+        );
     }
 }

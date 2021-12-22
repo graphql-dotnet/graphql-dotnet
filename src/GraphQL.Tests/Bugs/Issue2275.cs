@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = @"query($data:Input!) {
                                 request(data: $data)
                 }";
-                _.Inputs = @" {
+                _.Variables = @" {
                     ""data"": {
                         ""clientId"": 2,
                         ""filters"": [{

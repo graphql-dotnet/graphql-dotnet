@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29424.173
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
@@ -91,6 +91,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "Depe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2A7FA3F9-B04C-463E-80EF-144433458FAD}"
 	ProjectSection(SolutionItems) = preProject
+		..\.github\codecov.yml = ..\.github\codecov.yml
 		..\.github\dependabot.yml = ..\.github\dependabot.yml
 		..\.github\FUNDING.yml = ..\.github\FUNDING.yml
 		..\.github\labeler.yml = ..\.github\labeler.yml
@@ -120,6 +121,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\migration2.md = ..\docs2\site\docs\migrations\migration2.md
 		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
+		..\docs2\site\docs\migrations\migration5.md = ..\docs2\site\docs\migrations\migration5.md
 		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection

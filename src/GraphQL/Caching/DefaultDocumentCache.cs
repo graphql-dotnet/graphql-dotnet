@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Caching
@@ -15,6 +16,10 @@ namespace GraphQL.Caching
         /// </summary>
         public static readonly DefaultDocumentCache Instance = new DefaultDocumentCache();
 
-        Document? IDocumentCache.this[string query] { get => null; set { } }
+        /// <inheritdoc/>
+        public ValueTask<Document?> GetAsync(string query) => default;
+
+        /// <inheritdoc/>
+        public ValueTask SetAsync(string query, Document value) => default;
     }
 }

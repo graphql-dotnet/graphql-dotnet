@@ -860,7 +860,7 @@ namespace GraphQL.Tests.Validation
 
             ShouldPassRule(config =>
             {
-                config.Schema = Schema;
+                config.Schema = schema;
                 config.Query = query;
             });
         }
