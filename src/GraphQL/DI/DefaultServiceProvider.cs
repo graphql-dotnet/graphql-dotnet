@@ -19,10 +19,10 @@ namespace GraphQL
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
 
-            if (serviceType == typeof(IServiceProvider))
+            if (serviceType == typeof(IServiceProvider) || serviceType == typeof(DefaultServiceProvider))
                 return this;
 
-            if (serviceType.IsInterface)
+            if (serviceType.IsInterface || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
                 return null;
 
             try
