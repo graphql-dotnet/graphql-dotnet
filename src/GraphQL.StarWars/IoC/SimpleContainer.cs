@@ -61,7 +61,7 @@ namespace GraphQL.StarWars.IoC
 
         public T Get<T>() => (T)Get(typeof(T));
 
-        public object Get(Type serviceType) => GetService(serviceType) ?? (serviceType.IsInterface ? null : throw new InvalidOperationException("No registration for " + serviceType));
+        public object Get(Type serviceType) => GetService(serviceType) ?? (serviceType.IsInterface || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition ? null : throw new InvalidOperationException("No registration for " + serviceType));
 
         object IServiceProvider.GetService(Type serviceType) => GetService(serviceType);
 
@@ -73,12 +73,12 @@ namespace GraphQL.StarWars.IoC
                 return creator();
             }
 
-            if (!serviceType.IsAbstract)
+            if (serviceType.IsAbstract || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
             {
-                return CreateInstance(serviceType);
+                return null;
             }
 
-            return null;
+            return CreateInstance(serviceType);
         }
 
         public void Dispose()
