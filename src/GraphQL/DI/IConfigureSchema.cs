@@ -10,6 +10,8 @@ namespace GraphQL.DI
     {
         /// <summary>
         /// Configures a schema prior to the code in its constructor.
+        /// Specifically, executes during the <see cref="Schema"/> constructor, which
+        /// executes prior to any descendant classes' constructors.
         /// </summary>
         void Configure(ISchema schema, IServiceProvider serviceProvider);
     }
