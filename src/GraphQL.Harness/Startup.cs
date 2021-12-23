@@ -27,7 +27,7 @@ namespace GraphQL.Harness
         public void ConfigureServices(IServiceCollection services)
         {
             // add execution components
-            services.AddGraphQL(configure => configure
+            services.AddGraphQL(builder => builder
                 .AddSystemTextJson()
                 .AddErrorInfoProvider((opts, serviceProvider) =>
                 {

@@ -56,7 +56,7 @@ services.AddGraphQL()
     .AddSchema<StarWarsSchema>();
 
 // v5
-services.AddGraphQL(configure => configure
+services.AddGraphQL(builder => builder
     .AddSystemTextJson()
     .AddSchema<StarWarsSchema>());
 ```
