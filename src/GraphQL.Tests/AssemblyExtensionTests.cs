@@ -34,7 +34,7 @@ namespace GraphQL.Tests
                     (typeof(MyClass1), typeof(MyClass1OutputGraph)),
                     (typeof(ConsoleColor), typeof(MyEnumGraph)),
                     (typeof(MyClass1), typeof(DerivedGraph)),
-                    (typeof(int), typeof(MyGenericGraph<string>)),
+                    (typeof(int), typeof(MyGenericGraph<string>)), //ensure CLR type is pulled from dervied class's parent ObjectGraphType<int>
                 });
         }
 
