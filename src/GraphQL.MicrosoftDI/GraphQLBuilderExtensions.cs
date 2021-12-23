@@ -3,7 +3,6 @@
 using System;
 using GraphQL.DI;
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
