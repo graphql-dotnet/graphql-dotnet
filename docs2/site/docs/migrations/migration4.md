@@ -364,7 +364,7 @@ Also, any calls to the configured `UnhandledExceptionDelegate` will receive a fi
 so it is safe to preserve these instances without calling `.Copy()`.
 
 In version 4.7 and newer, the context will not be re-used if the result of the resolver is an `IEnumerable`, making it safe
-to return LINQ enumerables.
+to return LINQ enumerables that are based on the context source.
 
 ### Subscriptions Moved to Separate Project
 
