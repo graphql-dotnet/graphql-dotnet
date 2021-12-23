@@ -18,12 +18,10 @@
     <NoWarn>$(NoWarn);1591</NoWarn> <!--TODO: temporary solution-->
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" Condition="'$(IsPackable)' == 'true'" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" Condition="'$(IsPackable)' == 'true'"/>
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <Compile Include="..\CallerArgumentExpressionAttribute.cs" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

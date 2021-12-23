@@ -46,8 +46,8 @@ namespace GraphQL.Caching
         /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(string)"/>; optional.</param>
         protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
-            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+            _memoryCache = memoryCache.NotNull();
+            _options = options.NotNull().Value;
             _memoryCacheIsOwned = disposeMemoryCache;
         }
 
@@ -65,7 +65,7 @@ namespace GraphQL.Caching
         public virtual Document? this[string query]
         {
             get => _memoryCache.TryGetValue<Document>(query, out var value) ? value : null;
-            set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));
+            set => _memoryCache.Set(query.NotNull(), value, GetMemoryCacheEntryOptions(query));
         }
 
         /// <inheritdoc/>
