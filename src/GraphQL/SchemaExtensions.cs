@@ -126,7 +126,6 @@ namespace GraphQL
             schema.AutoRegister(typeof(TClrType), mode);
         }
 
-
         /// <summary>
         /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
         /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and

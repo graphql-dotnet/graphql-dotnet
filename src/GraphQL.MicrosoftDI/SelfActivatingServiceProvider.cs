@@ -44,7 +44,7 @@ namespace GraphQL.MicrosoftDI
             // calling GetRequiredService, of course.) But for concrete classes, attempt to
             // create the instance if it is not able to be returned from the service provider.
             // Note: this does not intelligently choose the constructor but rather tries the first one it encounters.
-            if (serviceType == typeof(IServiceProvider))
+            if (serviceType == typeof(IServiceProvider) || serviceType == typeof(SelfActivatingServiceProvider))
                 return this;
             else if (!serviceType.IsAbstract && serviceType.IsClass && !serviceType.IsGenericTypeDefinition)
                 return ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, serviceType);

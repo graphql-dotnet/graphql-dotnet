@@ -49,7 +49,7 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc/>
         public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
         {
-            this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), DI.ServiceLifetime.Singleton);
+            this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
             if (action != null)
             {
                 this.Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);

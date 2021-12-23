@@ -32,7 +32,7 @@ namespace GraphQL.Tests.DI
             mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance)).Returns(builder).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
             mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder).Verifiable();
-            mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false)).Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            mock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<IConfigureExecutionOptions>(), false)).Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
             {
                 var schema = Mock.Of<ISchema>(MockBehavior.Strict);
 
