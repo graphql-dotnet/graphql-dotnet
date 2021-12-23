@@ -51,6 +51,7 @@ namespace GraphQL.MicrosoftDI
             this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
             if (action != null)
             {
+                // This is used instead of "normal" services.Configure(configureOptions) to pass IServiceProvider to user code.
                 this.Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);
             }
 
