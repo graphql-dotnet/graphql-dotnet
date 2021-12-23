@@ -107,7 +107,8 @@ namespace GraphQL
                 // If it was requested from a scoped provider, then there is no reason to register it as transient.
                 // See following link:
                 // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
-                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+                throw new InvalidOperationException("A schema that implements IDisposable should not be registered as a transient service. " +
+                    "See https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container");
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
