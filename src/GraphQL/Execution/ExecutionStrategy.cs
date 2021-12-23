@@ -410,7 +410,7 @@ namespace GraphQL.Execution
                     CompleteNode(context, node);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context,
                     // except for enumerable lists - in case the user returned a value with LINQ that is based on the context source
-                    if (result is not IEnumerable)
+                    if (result is not IEnumerable || result is string)
                     {
                         resolveContext.Reset(null, null);
                         System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);

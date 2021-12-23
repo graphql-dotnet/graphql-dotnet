@@ -54,7 +54,7 @@ namespace GraphQL.Resolvers
             }
 
             // for return types of IDataLoaderResult or IEnumerable
-            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)) || typeof(IEnumerable).IsAssignableFrom(typeof(TReturnType)))
+            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)) || (typeof(IEnumerable).IsAssignableFrom(typeof(TReturnType)) && typeof(TReturnType) != typeof(string)))
             {
                 // Data loaders and IEnumerable results cannot use pooled contexts
                 return (context) => resolver(context.As<TSourceType>());
@@ -64,7 +64,7 @@ namespace GraphQL.Resolvers
             if (typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>))
             {
                 var returnType = typeof(TReturnType).GetGenericArguments()[0];
-                if (typeof(IDataLoaderResult).IsAssignableFrom(returnType) || typeof(IEnumerable).IsAssignableFrom(returnType))
+                if (typeof(IDataLoaderResult).IsAssignableFrom(returnType) || (typeof(IEnumerable).IsAssignableFrom(returnType) && returnType != typeof(string)))
                 {
                     // Data loaders and IEnumerable results cannot use pooled contexts
                     return (context) => resolver(context.As<TSourceType>());
@@ -90,13 +90,17 @@ namespace GraphQL.Resolvers
                     // only re-use contexts that completed synchronously and do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
                     if (ret is Task task)
                     {
-                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion && task.GetResult() is not IDataLoaderResult && task.GetResult() is not IEnumerable)
+                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion)
                         {
-                            adapter.Reset();
-                            System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                            var ret2 = task.GetResult();
+                            if (ret2 is not IDataLoaderResult && (ret2 is not IEnumerable || ret2 is string))
+                            {
+                                adapter.Reset();
+                                System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                            }
                         }
                     }
-                    else if (ret is not IDataLoaderResult && ret is not IEnumerable)
+                    else if (ret is not IDataLoaderResult && (ret is not IEnumerable || ret is string))
                     {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
