@@ -18,10 +18,6 @@ namespace GraphQL.MicrosoftDI
         /// <br/><br/>
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
-        /// <br/><br/>
-        /// Also configures <see cref="ComplexityConfiguration"/> to be pulled from the dependency
-        /// injection provider, overwriting values within <see cref="ExecutionOptions.ComplexityConfiguration"/>
-        /// with values configured within the registered instance if set there.
         /// </summary>
         public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
             => new GraphQLBuilder(services);
