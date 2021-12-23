@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 
@@ -78,16 +79,16 @@ namespace GraphQL.Resolvers
                         adapter.Set(context);
                     }
                     var ret = resolver(adapter);
-                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult
+                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult or an IEnumerable
                     if (ret is Task task)
                     {
-                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion && !(task.GetResult() is IDataLoaderResult))
+                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion && task.GetResult() is not IDataLoaderResult && task.GetResult() is not IEnumerable)
                         {
                             adapter.Reset();
                             System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                         }
                     }
-                    else if (!(ret is IDataLoaderResult))
+                    else if (ret is not IDataLoaderResult && ret is not IEnumerable)
                     {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
@@ -104,12 +105,6 @@ namespace GraphQL.Resolvers
                     var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
                     adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
                     var ret = resolver(adapter);
-                    var t = (Task)(object)ret!;
-                    if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion)
-                    {
-                        adapter.Reset();
-                        System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
-                    }
                     return ret;
                 };
             }
