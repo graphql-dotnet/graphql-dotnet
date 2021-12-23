@@ -24,7 +24,7 @@ namespace GraphQL
     internal static class NotNullExtensions
     {
         public static T NotNull<T>(this T value, [CallerArgumentExpression("value")] string name = "")
-            where T: class
+            where T : class
         {
             return value ?? throw new ArgumentNullException(name);
         }
