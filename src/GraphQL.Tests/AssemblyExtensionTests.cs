@@ -22,8 +22,8 @@ namespace GraphQL.Tests
                     typeof(ConsoleColor),
                     typeof(MyEnumGraph),
                     typeof(DontRegisterMeGraph),
-                    typeof(DontRegisterNestedGraph),
-                    typeof(NestedGraph),
+                    typeof(DontRegisterDerivedGraph),
+                    typeof(DerivedGraph),
                     typeof(MyObjectInputGraph),
                     typeof(MyObjectOutputGraph),
                     typeof(MyGenericGraph<string>),
@@ -33,7 +33,7 @@ namespace GraphQL.Tests
                     (typeof(MyClass1), typeof(MyClass1InputGraph)),
                     (typeof(MyClass1), typeof(MyClass1OutputGraph)),
                     (typeof(ConsoleColor), typeof(MyEnumGraph)),
-                    (typeof(MyClass1), typeof(NestedGraph)),
+                    (typeof(MyClass1), typeof(DerivedGraph)),
                     (typeof(int), typeof(MyGenericGraph<string>)),
                 });
         }
@@ -84,11 +84,11 @@ namespace GraphQL.Tests
         {
         }
 
-        public class NestedGraph : MyClass1OutputGraph
+        public class DerivedGraph : MyClass1OutputGraph
         {
         }
 
-        public class DontRegisterNestedGraph : DontRegisterMeGraph
+        public class DontRegisterDerivedGraph : DontRegisterMeGraph
         {
         }
 
