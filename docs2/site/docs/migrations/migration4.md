@@ -363,6 +363,9 @@ data loaders. Once the asynchronous field resolver or data loader returns its fi
 Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
 so it is safe to preserve these instances without calling `.Copy()`.
 
+In version 4.7 and newer, the context will not be re-used if the result of the resolver is an `IEnumerable`, making it safe
+to return LINQ enumerables.
+
 ### Subscriptions Moved to Separate Project
 
 The implementation for subscriptions, contained within `SubscriptionExecutionStrategy`, has been moved into the

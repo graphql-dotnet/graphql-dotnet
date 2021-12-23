@@ -408,9 +408,13 @@ namespace GraphQL.Execution
                 if (result is not IDataLoaderResult)
                 {
                     CompleteNode(context, node);
-                    // for non-dataloader nodes that completed without throwing an error, we can re-use the context
-                    resolveContext.Reset(null, null);
-                    System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                    // for non-dataloader nodes that completed without throwing an error, we can re-use the context,
+                    // except for enumerable lists - in case the user returned a value with LINQ that is based on the context source
+                    if (result is not IEnumerable)
+                    {
+                        resolveContext.Reset(null, null);
+                        System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                    }
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
