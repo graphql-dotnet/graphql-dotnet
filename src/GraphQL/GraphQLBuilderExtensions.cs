@@ -19,7 +19,7 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLBuilderExtensions
     {
-        #region - Additional overloads for Register, TryRegister, ConfigureDefaults and Configure -
+        #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
