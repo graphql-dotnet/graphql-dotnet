@@ -26,7 +26,7 @@ namespace GraphQL
         public static T NotNull<T>(this T value, [CallerArgumentExpression("value")] string name = "")
             where T: class
         {
-            return value ?? throw new ArgumentNullException(name, $"{name} must not be null");
+            return value ?? throw new ArgumentNullException(name);
         }
     }
 }
