@@ -27,7 +27,7 @@ namespace GraphQL.Harness
         public void ConfigureServices(IServiceCollection services)
         {
             // add execution components
-            services.AddGraphQL()
+            services.AddGraphQL(configure => configure
                 .AddSystemTextJson()
                 .AddErrorInfoProvider((opts, serviceProvider) =>
                 {
@@ -48,7 +48,7 @@ namespace GraphQL.Harness
                         foreach (var middleware in middlewares)
                             schema.FieldMiddleware.Use(middleware);
                     }
-                });
+                }));
 
             // add something like repository
             services.AddSingleton<StarWarsData>();

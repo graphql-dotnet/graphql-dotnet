@@ -23,8 +23,8 @@ namespace GraphQL.MicrosoftDI
         /// injection provider, overwriting values within <see cref="ExecutionOptions.ComplexityConfiguration"/>
         /// with values configured within the registered instance if set there.
         /// </summary>
-        public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
-            => new GraphQLBuilder(services);
+        public static void AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder> configure)
+            => new GraphQLBuilder(services, configure);
 
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also

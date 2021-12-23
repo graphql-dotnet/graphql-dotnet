@@ -12,9 +12,14 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void AddGraphQL()
         {
+            var executed = false;
             var services = new ServiceCollection();
-            var builder = services.AddGraphQL();
-            builder.ShouldBeOfType<GraphQLBuilder>();
+            services.AddGraphQL(builder =>
+            {
+                builder.ShouldBeOfType<GraphQLBuilder>();
+                executed = true;
+            });
+            executed.ShouldBeTrue();
             services.BuildServiceProvider().GetService<IDocumentExecuter>().ShouldNotBeNull();
         }
 
@@ -25,8 +30,7 @@ namespace GraphQL.MicrosoftDI.Tests
         {
             var services = new ServiceCollection();
             services.AddSingleton(Class2.Instance);
-            var builder = services.AddGraphQL()
-                .AddSelfActivatingSchema<MySchema>(serviceLifetime);
+            services.AddGraphQL(b => b.AddSelfActivatingSchema<MySchema>(serviceLifetime));
             services.Single(x => x.ServiceType == typeof(MySchema)).Lifetime.ShouldBe(serviceLifetime switch
             {
                 DI.ServiceLifetime.Singleton => ServiceLifetime.Singleton,
@@ -48,8 +52,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void AddSelfActivatingSchema_Transient()
         {
             var services = new ServiceCollection();
-            var builder = services.AddGraphQL();
-            Should.Throw<InvalidOperationException>(() => builder.AddSelfActivatingSchema<MySchema>(DI.ServiceLifetime.Transient));
+            services.AddGraphQL(builder => Should.Throw<InvalidOperationException>(() => builder.AddSelfActivatingSchema<MySchema>(DI.ServiceLifetime.Transient)));
         }
 
         private class MySchema : Schema

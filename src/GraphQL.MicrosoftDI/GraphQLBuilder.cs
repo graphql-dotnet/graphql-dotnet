@@ -29,10 +29,11 @@ namespace GraphQL.MicrosoftDI
         /// <remarks>
         /// Registers various default services via <see cref="GraphQLBuilderBase.Initialize"/>.
         /// </remarks>
-        public GraphQLBuilder(IServiceCollection services)
+        public GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder> configure)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             services.AddOptions();
+            configure?.Invoke(this);
             Initialize();
         }
 

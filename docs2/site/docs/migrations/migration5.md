@@ -36,3 +36,25 @@ extension methods have also been renamed to `GetOutputExtension` and `SetOutputE
 
 To better align the execution options and variable context with the specification, the `Inputs`
 property containing the execution variables has now been renamed to `Variables`.
+
+### `AddGraphQL` now accepts a configuration delegate instead of returning `IGraphQLBuilder`
+
+In order to prevent default implemenatations from ever being registered in the DI engine,
+the `AddGraphQL` method now accepts a configuration delegate where you can configure the
+GraphQL.NET DI components. To support this change, the `GraphQLBuilder` constructor now
+requires a configuration delegate parameter and will execute the delegate before calling
+`GraphQLBuilderBase.Initialize`.
+
+This requires a change similar to the following:
+
+```csharp
+// v4
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>();
+
+// v5
+services.AddGraphQL(configure => configure
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>());
+```
