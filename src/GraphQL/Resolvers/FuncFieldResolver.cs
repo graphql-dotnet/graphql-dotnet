@@ -79,7 +79,7 @@ namespace GraphQL.Resolvers
                         adapter.Set(context);
                     }
                     var ret = resolver(adapter);
-                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult or an IEnumerable
+                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
                     if (ret is Task task)
                     {
                         if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion && task.GetResult() is not IDataLoaderResult && task.GetResult() is not IEnumerable)
