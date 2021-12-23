@@ -79,8 +79,8 @@ namespace GraphQL.Tests.DI
         private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
         {
             Action<ExecutionOptions> actions = _ => { };
-            _builderMock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     var actions2 = actions;
                     actions = opts =>
@@ -346,8 +346,8 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     ran = false;
@@ -383,8 +383,8 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     ran = false;
@@ -416,8 +416,8 @@ namespace GraphQL.Tests.DI
         private void MockSetupComplexityConfigurationNull()
         {
             ExecutionOptions opts = null;
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     opts = new ExecutionOptions();

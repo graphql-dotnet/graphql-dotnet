@@ -59,7 +59,7 @@ namespace GraphQL
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution>? configurations) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQL.Language.AST.Document document, GraphQL.Language.AST.Operation operation, GraphQL.Language.AST.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQL.Language.AST.Operation? GetOperation(string? operationName, GraphQL.Language.AST.Document document) { }
@@ -748,7 +748,7 @@ namespace GraphQL.DI
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
     }
-    public interface IConfigureExecution
+    public interface IConfigureExecutionOptions
     {
         System.Threading.Tasks.Task ConfigureAsync(GraphQL.ExecutionOptions executionOptions);
     }
