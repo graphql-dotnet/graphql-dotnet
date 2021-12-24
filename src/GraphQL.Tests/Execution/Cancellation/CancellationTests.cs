@@ -88,12 +88,11 @@ namespace GraphQL.Tests.Execution.Cancellation
         public void unhandled_exception_delegate_is_not_called()
         {
             bool ranDelegate = false;
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = (context) => ranDelegate = true;
             using (var tokenSource = new CancellationTokenSource())
             {
                 Should.Throw<OperationCanceledException>(() =>
                 {
-                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: unhandledExceptionDelegate);
+                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: _ => ranDelegate = true);
                 });
             }
             ranDelegate.ShouldBeFalse();

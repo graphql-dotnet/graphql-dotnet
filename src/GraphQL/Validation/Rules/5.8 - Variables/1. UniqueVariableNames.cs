@@ -29,9 +29,9 @@ namespace GraphQL.Validation.Rules
 
                 var variableName = variableDefinition.Name;
 
-                if (knownVariables.ContainsKey(variableName))
+                if (knownVariables.TryGetValue(variableName, out var variable))
                 {
-                    context.ReportError(new UniqueVariableNamesError(context, knownVariables[variableName], variableDefinition));
+                    context.ReportError(new UniqueVariableNamesError(context, variable, variableDefinition));
                 }
                 else
                 {

@@ -29,9 +29,9 @@ namespace GraphQL.Validation.Rules
             {
                 var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
                 string argName = argument.Name;
-                if (knownArgs.ContainsKey(argName))
+                if (knownArgs.TryGetValue(argName, out var arg))
                 {
-                    context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));
+                    context.ReportError(new UniqueArgumentNamesError(context, arg, argument));
                 }
                 else
                 {
