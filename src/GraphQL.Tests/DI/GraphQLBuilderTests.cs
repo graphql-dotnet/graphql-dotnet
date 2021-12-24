@@ -1030,7 +1030,7 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecution -
+        #region - ConfigureSchema and ConfigureExecutionOptions -
         [Fact]
         public void ConfigureSchema()
         {
@@ -1064,11 +1064,11 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        public void ConfigureExecution()
+        public void ConfigureExecutionOptions()
         {
             bool ran = false;
             var execute = MockSetupConfigureExecution();
-            _builder.ConfigureExecution(opts =>
+            _builder.ConfigureExecutionOptions(opts =>
             {
                 opts.EnableMetrics.ShouldBeFalse();
                 opts.EnableMetrics = true;
@@ -1090,7 +1090,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void ConfigureExecution_Null()
         {
-            Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecution(null));
+            Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecutionOptions(null));
         }
         #endregion
 

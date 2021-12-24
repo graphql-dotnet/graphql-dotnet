@@ -37,4 +37,6 @@ extension methods have also been renamed to `GetOutputExtension` and `SetOutputE
 To better align the execution options and variable context with the specification, the `Inputs`
 property containing the execution variables has now been renamed to `Variables`.
 
-### `IConfigureExecution` interface renamed to `IConfigureExecutionOptions`
+### `ConfigureExecution` GraphQL builder method renamed to `ConfigureExecutionOptions`
+
+Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
