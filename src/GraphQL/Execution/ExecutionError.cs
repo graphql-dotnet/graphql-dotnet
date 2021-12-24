@@ -117,7 +117,7 @@ namespace GraphQL
         public bool Equals(ErrorLocation other) => Line == other.Line && Column == other.Column;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is Location loc && Equals(loc);
+        public override bool Equals(object? obj) => obj is Location loc && Equals(loc);
 
         /// <inheritdoc/>
         public override int GetHashCode() => (Line, Column).GetHashCode();

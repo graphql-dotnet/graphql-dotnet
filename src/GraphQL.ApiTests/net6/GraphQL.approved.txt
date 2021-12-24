@@ -79,7 +79,7 @@ namespace GraphQL
         public int Column { get; }
         public int Line { get; }
         public bool Equals(GraphQL.ErrorLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public static bool operator !=(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
         public static bool operator ==(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }

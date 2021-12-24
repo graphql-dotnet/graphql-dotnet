@@ -76,17 +76,17 @@ namespace GraphQL.Introspection
 
         private sealed class TypeByNameComparer : IComparer<IGraphType>
         {
-            public int Compare(IGraphType x, IGraphType y) => x.Name.CompareTo(y.Name);
+            public int Compare(IGraphType? x, IGraphType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         private sealed class DirectiveByNameComparer : IComparer<DirectiveGraphType>
         {
-            public int Compare(DirectiveGraphType x, DirectiveGraphType y) => x.Name.CompareTo(y.Name);
+            public int Compare(DirectiveGraphType? x, DirectiveGraphType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         private sealed class ArgumentByNameComparer : IComparer<QueryArgument>
         {
-            public int Compare(QueryArgument x, QueryArgument y) => x.Name.CompareTo(y.Name);
+            public int Compare(QueryArgument? x, QueryArgument? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         private sealed class EnumValueByNameComparer : IComparer<EnumValueDefinition>
