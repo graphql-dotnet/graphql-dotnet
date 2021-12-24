@@ -89,35 +89,35 @@ namespace GraphQL
         #endregion
 
         #region - RegisterAsBoth and TryRegisterAsBoth -
-        internal static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
             => builder.Register<TImplementation>(serviceLifetime).Register<TService, TImplementation>(serviceLifetime);
 
-        internal static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
             => builder.Register(implementationFactory, serviceLifetime).Register<TService>(implementationFactory, serviceLifetime);
 
-        internal static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
             where TService : class
             where TImplementation : class, TService
             => builder.Register(implementationInstance).Register<TService>(implementationInstance);
 
         /// <summary>Calls TryRegister for the service and Register for the implementation</summary>
-        internal static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
             => builder.Register<TImplementation>(serviceLifetime).TryRegister<TService, TImplementation>(serviceLifetime);
 
         /// <summary>Calls TryRegister for the service and Register for the implementation</summary>
-        internal static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
             => builder.Register(implementationFactory, serviceLifetime).TryRegister<TService>(implementationFactory, serviceLifetime);
 
         /// <summary>Calls TryRegister for the service and Register for the implementation</summary>
-        internal static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
             where TService : class
             where TImplementation : class, TService
             => builder.Register(implementationInstance).TryRegister<TService>(implementationInstance);
