@@ -296,7 +296,7 @@ namespace GraphQL
             => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
 
         /// <inheritdoc cref="AddErrorInfoProvider(IGraphQLBuilder, Action{ErrorInfoProviderOptions})"/>
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider>? action)
             => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
 
         /// <summary>
