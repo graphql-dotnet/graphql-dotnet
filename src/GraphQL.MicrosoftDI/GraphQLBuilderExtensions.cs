@@ -24,7 +24,7 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
         /// registered if it is not already registered within the dependency injection framework. Services required by
-        /// <typeparamref name="TSchema"/> are instianted directly if not registered within the dependency injection framework.
+        /// <typeparamref name="TSchema"/> are instantianted directly if not registered within the dependency injection framework.
         /// This can eliminate the need to register each of the graph types with the dependency injection framework, either
         /// manually or via <see cref="GraphQL.GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder)"/>. Singleton and scoped
         /// lifetimes are supported.
