@@ -8,7 +8,7 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 When using the `.AddClrTypeMappings()` builder extension method, GraphQL.NET scans the
 specified assembly for graph types that inherit from `ObjectGraphType<T>` and adds a
-mapping for the CLR type represented by T with the graph type it matched upon.
+mapping for the CLR type represented by `T` with the graph type it matched upon.
 It skips adding a mapping for any graph type marked with the `[DoNotMapClrType]` attribute.
 In v5, it will also skip adding the mapping if the CLR type is marked with the
 `[DoNotMapClrType]` attribute.
