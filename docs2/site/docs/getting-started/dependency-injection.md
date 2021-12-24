@@ -96,7 +96,7 @@ A list of the available extension methods is below:
 | `Register`              | Used by extension methods to register services within the DI framework | |
 | `TryRegister`           | Used by extension methods to register services within the DI framework when they have not already been registered | |
 
-The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware is registered
+The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
 
 To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:
