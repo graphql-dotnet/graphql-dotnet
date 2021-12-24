@@ -60,7 +60,7 @@ namespace GraphQL
                         var clrType = baseType.GetGenericArguments()[0];
 
                         //as long as it's not of type 'object', register it
-                        if (clrType != typeof(object))
+                        if (clrType != typeof(object) && !clrType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                             typeMappings.Add((clrType, graphType));
 
                         //skip to the next type
