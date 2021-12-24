@@ -412,6 +412,7 @@ namespace GraphQL.Execution
                     // except for enumerable lists - in case the user returned a value with LINQ that is based on the context source
                     if (result is not IEnumerable || result is string)
                     {
+                        // also see FuncFieldResolver.GetResolverFor as it relates to context re-use
                         resolveContext.Reset(null, null);
                         System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                     }

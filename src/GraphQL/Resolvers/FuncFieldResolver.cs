@@ -46,6 +46,8 @@ namespace GraphQL.Resolvers
 
         private Func<IResolveFieldContext, TReturnType?> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
+            // also see ExecutionStrategy.ExecuteNodeAsync as it relates to context re-use
+
             // when source type is object, just pass the context through
             if (typeof(TSourceType) == typeof(object))
             {
@@ -54,7 +56,7 @@ namespace GraphQL.Resolvers
             }
 
             // for return types of IDataLoaderResult or IEnumerable
-            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)) || (typeof(IEnumerable).IsAssignableFrom(typeof(TReturnType)) && typeof(TReturnType) != typeof(string)))
+            if (!CanReuseContextForType(typeof(TReturnType)))
             {
                 // Data loaders and IEnumerable results cannot use pooled contexts
                 return (context) => resolver(context.As<TSourceType>());
@@ -64,7 +66,7 @@ namespace GraphQL.Resolvers
             if (typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>))
             {
                 var returnType = typeof(TReturnType).GetGenericArguments()[0];
-                if (typeof(IDataLoaderResult).IsAssignableFrom(returnType) || (typeof(IEnumerable).IsAssignableFrom(returnType) && returnType != typeof(string)))
+                if (!CanReuseContextForType(returnType))
                 {
                     // Data loaders and IEnumerable results cannot use pooled contexts
                     return (context) => resolver(context.As<TSourceType>());
@@ -93,14 +95,14 @@ namespace GraphQL.Resolvers
                         if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion)
                         {
                             var ret2 = task.GetResult();
-                            if (ret2 is not IDataLoaderResult && (ret2 is not IEnumerable || ret2 is string))
+                            if (CanReuseContextForValue(ret2))
                             {
                                 adapter.Reset();
                                 System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                             }
                         }
                     }
-                    else if (ret is not IDataLoaderResult && (ret is not IEnumerable || ret is string))
+                    else if (CanReuseContextForValue(ret))
                     {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
@@ -139,6 +141,15 @@ namespace GraphQL.Resolvers
                     return ret;
                 };
             }
+
+            static bool CanReuseContextForType(Type type) => !IsDataLoaderType(type) && !IsEnumerableType(type);
+            static bool CanReuseContextForValue(object? value) => !IsDataLoaderValue(value) && !IsEnumerableValue(value);
+
+            static bool IsEnumerableType(Type type) => typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string);
+            static bool IsEnumerableValue(object? value) => value is IEnumerable && value is not string;
+
+            static bool IsDataLoaderType(Type type) => typeof(IDataLoaderResult).IsAssignableFrom(type);
+            static bool IsDataLoaderValue(object? value) => value is IDataLoaderResult;
         }
 
         /// <inheritdoc/>
