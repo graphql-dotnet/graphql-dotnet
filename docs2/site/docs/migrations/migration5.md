@@ -28,10 +28,10 @@ properties type was changed from `Action<UnhandledExceptionContext>` to `Func<Un
 so now you may use async/await for exception handling. In this regard, some methods in `ExecutionStrategy` were
 renamed to have `Async` suffix.
 
-### Redesign of [IDocumentCache](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/src/GraphQL/Caching/IDocumentCache.cs).
+### `IDocumentCache` now has asynchronous methods instead of synchronous methods.
 
-1. Use async methods to get or set a cache.
-2. Cache items cannot be removed anymore.
+The default get/set property of the interface has been replaced with `GetAsync` and `SetAsync` methods.
+Keys cannot be removed by setting a null value as they could before.
 
 ### `IResolveFieldContext.Extensions` property renamed to `OutputExtensions` and related changes
 
