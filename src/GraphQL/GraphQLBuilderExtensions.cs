@@ -19,7 +19,7 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLBuilderExtensions
     {
-        #region - Additional overloads for Register, TryRegister, ConfigureDefaults and Configure -
+        #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
         public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder graphQLBuilder, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
@@ -107,7 +107,8 @@ namespace GraphQL
                 // If it was requested from a scoped provider, then there is no reason to register it as transient.
                 // See following link:
                 // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
-                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+                throw new InvalidOperationException("A schema that implements IDisposable should not be registered as a transient service. " +
+                    "See https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container");
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
@@ -140,7 +141,8 @@ namespace GraphQL
                 // If it was requested from a scoped provider, then there is no reason to register it as transient.
                 // See following link:
                 // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
-                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+                throw new InvalidOperationException("A schema that implements IDisposable should not be registered as a transient service. " +
+                    "See https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container");
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
@@ -294,7 +296,7 @@ namespace GraphQL
             => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
 
         /// <inheritdoc cref="AddErrorInfoProvider(IGraphQLBuilder, Action{ErrorInfoProviderOptions})"/>
-        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider> action)
+        public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider>? action)
             => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
 
         /// <summary>
@@ -326,7 +328,7 @@ namespace GraphQL
         /// <summary>
         /// Scans the calling assembly for classes that implement <see cref="IGraphType"/> and registers
         /// them as transients within the dependency injection framework. A transient lifetime ensures
-        /// they are only instianted once each time the schema is built. If the schema is a scoped schema,
+        /// they are only instantiated once each time the schema is built. If the schema is a scoped schema,
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
@@ -341,7 +343,7 @@ namespace GraphQL
         /// <summary>
         /// Scans the supplied assembly for classes that implement <see cref="IGraphType"/> and registers
         /// them as transients within the dependency injection framework. A transient lifetime ensures
-        /// they are only instianted once each time the schema is built. If the schema is a scoped schema,
+        /// they are only instantiated once each time the schema is built. If the schema is a scoped schema,
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
@@ -352,7 +354,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder, Assembly assembly)
         {
-            // Graph types are always created with the transient lifetime, since they are only instianted once
+            // Graph types are always created with the transient lifetime, since they are only instantiated once
             // each time the schema is built. If the schema is a scoped schema, the graph types will effectively
             // be scoped graph types. If the schema is a singleton schema, the graph types will effectively be
             // singleton graph types. This is REQUIRED behavior and must not be changed.
@@ -748,6 +750,7 @@ namespace GraphQL
             });
             return builder;
         }
+
         /// <summary>
         /// Registers <typeparamref name="TValidationRule"/> as a singleton within the dependency injection framework
         /// as <typeparamref name="TValidationRule"/> and as <see cref="IValidationRule"/> using the specified factory delegate.
