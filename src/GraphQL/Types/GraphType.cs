@@ -103,7 +103,7 @@ namespace GraphQL.Types
         /// Determines if the graph type is equal to the specified object,
         /// or if the name of the specified graph type is equal to the name of this graph type.
         /// </summary>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
                 return false;

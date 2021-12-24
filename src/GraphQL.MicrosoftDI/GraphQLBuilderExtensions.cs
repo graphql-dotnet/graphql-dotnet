@@ -3,7 +3,6 @@
 using System;
 using GraphQL.DI;
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
@@ -19,10 +18,6 @@ namespace GraphQL.MicrosoftDI
         /// <br/><br/>
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
-        /// <br/><br/>
-        /// Also configures <see cref="ComplexityConfiguration"/> to be pulled from the dependency
-        /// injection provider, overwriting values within <see cref="ExecutionOptions.ComplexityConfiguration"/>
-        /// with values configured within the registered instance if set there.
         /// </summary>
         public static void AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder> configure)
             => new GraphQLBuilder(services, configure);
@@ -30,7 +25,7 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
         /// registered if it is not already registered within the dependency injection framework. Services required by
-        /// <typeparamref name="TSchema"/> are instianted directly if not registered within the dependency injection framework.
+        /// <typeparamref name="TSchema"/> are instantiated directly if not registered within the dependency injection framework.
         /// This can eliminate the need to register each of the graph types with the dependency injection framework, either
         /// manually or via <see cref="GraphQL.GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder)"/>. Singleton and scoped
         /// lifetimes are supported.
@@ -48,21 +43,22 @@ namespace GraphQL.MicrosoftDI
                 // If it was requested from a scoped provider, then there is no reason to register it as transient.
                 // See following link:
                 // https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container
-                throw new InvalidOperationException("A schema that implements IDisposable cannot be registered as a transient service.");
+                throw new InvalidOperationException("A schema that implements IDisposable should not be registered as a transient service. " +
+                    "See https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines#disposable-transient-services-captured-by-container");
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
-            builder.Register(services =>
+            builder.Register(provider =>
             {
-                var selfActivatingServices = new SelfActivatingServiceProvider(services);
+                var selfActivatingServices = new SelfActivatingServiceProvider(provider);
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
             }, serviceLifetime);
 
             // Now register the service as ISchema if not already registered.
-            builder.TryRegister<ISchema>(services =>
+            builder.TryRegister<ISchema>(provider =>
             {
-                var selfActivatingServices = new SelfActivatingServiceProvider(services);
+                var selfActivatingServices = new SelfActivatingServiceProvider(provider);
                 var schema = ActivatorUtilities.CreateInstance<TSchema>(selfActivatingServices);
                 return schema;
             }, serviceLifetime);

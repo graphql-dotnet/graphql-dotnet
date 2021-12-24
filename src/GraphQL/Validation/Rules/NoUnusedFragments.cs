@@ -31,7 +31,10 @@ namespace GraphQL.Validation.Rules
                 var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
                 if (fragmentDefs == null)
                     return;
+
                 var operationDefs = context.TypeInfo.NoUnusedFragments_OperationDefs;
+                if (operationDefs == null)
+                    return;
 
                 var fragmentNamesUsed = operationDefs
                     .SelectMany(context.GetRecursivelyReferencedFragments)

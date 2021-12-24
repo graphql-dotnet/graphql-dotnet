@@ -12,11 +12,11 @@ namespace GraphQL
         /// Contains a list of types that are scanned for, from which a clr type mapping will be matched
         /// </summary>
         private static readonly Type[] _typesToRegister = new Type[]
-            {
-                typeof(ObjectGraphType<>),
-                typeof(InputObjectGraphType<>),
-                typeof(EnumerationGraphType<>),
-            };
+        {
+            typeof(ObjectGraphType<>),
+            typeof(InputObjectGraphType<>),
+            typeof(EnumerationGraphType<>),
+        };
 
         /// <summary>
         /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
@@ -42,7 +42,7 @@ namespace GraphQL
                     continue;
 
                 //skip types marked with the DoNotRegister attribute
-                if (graphType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotMapClrTypeAttribute)))
+                if (graphType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                     continue;
 
                 //start with the base type
@@ -50,7 +50,7 @@ namespace GraphQL
                 while (baseType != null)
                 {
                     //skip types marked with the DoNotRegister attribute
-                    if (baseType.GetCustomAttributes(false).Any(y => y.GetType() == typeof(DoNotMapClrTypeAttribute)))
+                    if (baseType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                         break;
 
                     //look for generic types that match our list above
@@ -60,7 +60,7 @@ namespace GraphQL
                         var clrType = baseType.GetGenericArguments()[0];
 
                         //as long as it's not of type 'object', register it
-                        if (clrType != typeof(object))
+                        if (clrType != typeof(object) && !clrType.IsDefined(typeof(DoNotMapClrTypeAttribute)))
                             typeMappings.Add((clrType, graphType));
 
                         //skip to the next type

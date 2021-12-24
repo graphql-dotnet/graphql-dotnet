@@ -4,7 +4,14 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
-###
+### DoNotMapClrType attribute can now be placed on the graph type or the CLR type
+
+When using the `.AddClrTypeMappings()` builder extension method, GraphQL.NET scans the
+specified assembly for graph types that inherit from `ObjectGraphType<T>` and adds a
+mapping for the CLR type represented by `T` with the graph type it matched upon.
+It skips adding a mapping for any graph type marked with the `[DoNotMapClrType]` attribute.
+In v5, it will also skip adding the mapping if the CLR type is marked with the
+`[DoNotMapClrType]` attribute.
 
 ### Input Extensions support
 
@@ -37,7 +44,9 @@ extension methods have also been renamed to `GetOutputExtension` and `SetOutputE
 To better align the execution options and variable context with the specification, the `Inputs`
 property containing the execution variables has now been renamed to `Variables`.
 
-### `IConfigureExecution` interface renamed to `IConfigureExecutionOptions`
+### `ConfigureExecution` GraphQL builder method renamed to `ConfigureExecutionOptions`
+
+Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
 
 ### `AddGraphQL` now accepts a configuration delegate instead of returning `IGraphQLBuilder`
 
