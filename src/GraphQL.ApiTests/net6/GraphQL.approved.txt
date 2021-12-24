@@ -79,7 +79,7 @@ namespace GraphQL
         public int Column { get; }
         public int Line { get; }
         public bool Equals(GraphQL.ErrorLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public static bool operator !=(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
         public static bool operator ==(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
@@ -1600,7 +1600,7 @@ namespace GraphQL.Language.AST
         public int End { get; }
         public int Start { get; }
         public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
@@ -2070,7 +2070,7 @@ namespace GraphQL.Types
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public string TypeName { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
@@ -2080,7 +2080,7 @@ namespace GraphQL.Types
         public string? Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
