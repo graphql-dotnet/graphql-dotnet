@@ -750,6 +750,7 @@ namespace GraphQL
             });
             return builder;
         }
+
         /// <summary>
         /// Registers <typeparamref name="TValidationRule"/> as a singleton within the dependency injection framework
         /// as <typeparamref name="TValidationRule"/> and as <see cref="IValidationRule"/> using the specified factory delegate.
