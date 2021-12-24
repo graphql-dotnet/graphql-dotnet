@@ -259,28 +259,28 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions>? action)
+        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class
             where TImplementation :  class, TService { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class
             where TImplementation :  class, TService { }
     }
