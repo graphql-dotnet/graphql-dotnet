@@ -91,12 +91,12 @@ namespace GraphQL.Introspection
 
         private sealed class EnumValueByNameComparer : IComparer<EnumValueDefinition>
         {
-            public int Compare(EnumValueDefinition x, EnumValueDefinition y) => x.Name.CompareTo(y.Name);
+            public int Compare(EnumValueDefinition? x, EnumValueDefinition? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         private sealed class FieldByNameComparer : IComparer<IFieldType>
         {
-            public int Compare(IFieldType x, IFieldType y) => x.Name.CompareTo(y.Name);
+            public int Compare(IFieldType? x, IFieldType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         /// <inheritdoc/>
