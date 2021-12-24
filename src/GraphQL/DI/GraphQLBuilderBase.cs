@@ -54,7 +54,7 @@ namespace GraphQL.DI
             TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
 
             // configure execution to use the default registered schema if none specified
-            this.ConfigureExecution(options =>
+            this.ConfigureExecutionOptions(options =>
             {
                 if (options.RequestServices != null && options.Schema == null)
                 {

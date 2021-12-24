@@ -184,7 +184,7 @@ namespace GraphQL
         /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-            => builder.ConfigureExecution(opts =>
+            => builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration);
@@ -192,7 +192,7 @@ namespace GraphQL
 
         /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-            => builder.ConfigureExecution(opts =>
+            => builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
@@ -206,7 +206,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration);
@@ -219,7 +219,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
@@ -235,7 +235,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration);
@@ -248,7 +248,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
@@ -264,7 +264,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration);
@@ -277,7 +277,7 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.ConfigureExecutionOptions(opts =>
             {
                 opts.ComplexityConfiguration ??= new ComplexityConfiguration();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
@@ -439,7 +439,7 @@ namespace GraphQL
         {
             builder.Register<TDocumentListener>(serviceLifetime);
             builder.Register<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -459,7 +459,7 @@ namespace GraphQL
 
             builder.Register(documentListener);
             builder.Register<IDocumentExecutionListener>(documentListener);
-            builder.ConfigureExecution(options => options.Listeners.Add(documentListener));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(documentListener));
             return builder;
         }
 
@@ -477,7 +477,7 @@ namespace GraphQL
         {
             builder.Register(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
             builder.Register<IDocumentExecutionListener>(documentListenerFactory, serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
         #endregion
@@ -656,7 +656,7 @@ namespace GraphQL
             => builder.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton, true);
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecution -
+        #region - ConfigureSchema and ConfigureExecutionOptions -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.
         /// Assumes that the schema derives from <see cref="Schema"/>.
@@ -677,7 +677,7 @@ namespace GraphQL
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
+        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
             => builder.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
 
         /// <summary>
@@ -689,7 +689,7 @@ namespace GraphQL
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
+        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
             => builder.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
         #endregion
 
@@ -710,7 +710,7 @@ namespace GraphQL
         {
             builder.Register<TValidationRule>(ServiceLifetime.Singleton);
             builder.Register<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
@@ -738,7 +738,7 @@ namespace GraphQL
         {
             builder.Register(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
             builder.Register<IValidationRule>(validationRule);
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(validationRule);
                 if (useForCachedDocuments)
@@ -764,7 +764,7 @@ namespace GraphQL
         {
             builder.Register(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
             builder.Register<IValidationRule>(validationRuleFactory, ServiceLifetime.Singleton);
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
@@ -788,7 +788,7 @@ namespace GraphQL
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             if (enable)
-                builder.ConfigureExecution(options => options.EnableMetrics = true);
+                builder.ConfigureExecutionOptions(options => options.EnableMetrics = true);
             return builder;
         }
 
@@ -804,7 +804,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(enablePredicate));
 
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 if (enablePredicate(options))
                 {
@@ -828,7 +828,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(installPredicate));
 
             builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 if (enablePredicate(options))
                 {
