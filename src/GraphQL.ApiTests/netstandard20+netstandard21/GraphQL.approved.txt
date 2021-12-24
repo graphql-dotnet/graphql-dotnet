@@ -1600,7 +1600,7 @@ namespace GraphQL.Language.AST
         public int End { get; }
         public int Start { get; }
         public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
@@ -2073,7 +2073,7 @@ namespace GraphQL.Types
         public string? Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
