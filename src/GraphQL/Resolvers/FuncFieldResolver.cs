@@ -111,7 +111,7 @@ namespace GraphQL.Resolvers
                 };
             }
 
-            // not an IEnumerable, IDataLoaderResult, Task<IEnumerable>, Task<IDataLoaderResult>
+            // not an IEnumerable, IDataLoaderResult, Task<IEnumerable>, Task<IDataLoaderResult>, object or Task<object>
             // use a pooled context
             if (typeof(Task).IsAssignableFrom(typeof(TReturnType)))
             {
