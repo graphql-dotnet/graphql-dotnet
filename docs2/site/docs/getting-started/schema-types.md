@@ -20,24 +20,26 @@ These are the scalars provided by the [GraphQL Specification](https://graphql.gi
 
 These are additional scalars provided by this project.
 
-| GraphQL          | GraphQL.NET                    | .NET               | Format |
-|------------------|---------------------------------|--------------------|-------|
+| GraphQL          | GraphQL.NET                    | .NET               | Format | Remarks |
+|------------------|---------------------------------|--------------------|-------|---------|
+| `BigInt` | `BigIntGraphType` | `BigInteger` | number |
+| `Byte` | `ByteGraphType` | `byte` | number |
 | `Date`           | `DateGraphType`                 | `DateTime`         | ISO-8601: yyyy-MM-dd |
+| `DateOnly` | `DateOnlyGraphType` | `DateOnly`                           | ISO-8601: yyyy-MM-dd | .NET6 and higher |
 | `DateTime`       | `DateTimeGraphType`             | `DateTime`         | ISO-8601, assume UTC |
 | `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   | ISO-8601 |
-| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         | number |
-| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
 | `Decimal` | `DecimalGraphType` | `decimal` | number |
-| `Uri` | `UriGraphType` | `Uri` | RFC 2396/2732/3986/3987 |
 | `Guid` | `GuidGraphType` | `Guid` | string |
-| `Short` | `ShortGraphType` | `short` | number |
-| `UShort` | `UShortGraphType` | `ushort` | number |
-| `UInt` | `UIntGraphType` | `uint` | number |
 | `Long` | `LongGraphType` | `long` | number |
-| `ULong` | `ULongGraphType` | `ulong` | number |
-| `Byte` | `ByteGraphType` | `byte` | number |
+| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
 | `SByte` | `SByteGraphType` | `sbyte` | number |
-| `BigInt` | `BigIntGraphType` | `BigInteger` | number |
+| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         | number |
+| `Short` | `ShortGraphType` | `short` | number |
+| `TimeOnly` | `TimeOnlyGraphType` | `TimeOnly` | ISO-8601: HH:mm:ss.FFFFFFF | .NET6 and higher |
+| `UInt` | `UIntGraphType` | `uint` | number |
+| `ULong` | `ULongGraphType` | `ulong` | number |
+| `Uri` | `UriGraphType` | `Uri` | RFC 2396/2732/3986/3987 |
+| `UShort` | `UShortGraphType` | `ushort` | number |
 
 Lists of data are also supported with any Scalar or Object types.
 

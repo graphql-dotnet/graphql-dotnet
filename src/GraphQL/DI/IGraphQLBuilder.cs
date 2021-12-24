@@ -35,9 +35,11 @@ namespace GraphQL.DI
         IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
 
         /// <summary>
-        /// Configures an options class of type <typeparamref name="TOptions"/>.
+        /// Configures an options class of type <typeparamref name="TOptions"/>. Each registration call to this method
+        /// will be applied to instance of <typeparamref name="TOptions"/> returned from the DI engine.
         /// <br/><br/>
-        /// Passing <see langword="null"/> as the delegate is allowed and will skip this registration.
+        /// If <paramref name="action"/> is <see langword="null"/> then <typeparamref name="TOptions"/> is still configured and
+        /// will return a default instance (unless otherwise configured with a subsequent call to <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider}?)">Configure</see>).
         /// </summary>
         IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
