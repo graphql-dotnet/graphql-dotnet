@@ -594,6 +594,5 @@ namespace GraphQL.Tests.Execution
             rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
-
     }
 }
