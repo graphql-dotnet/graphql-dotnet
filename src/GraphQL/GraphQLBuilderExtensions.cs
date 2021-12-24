@@ -328,7 +328,7 @@ namespace GraphQL
         /// <summary>
         /// Scans the calling assembly for classes that implement <see cref="IGraphType"/> and registers
         /// them as transients within the dependency injection framework. A transient lifetime ensures
-        /// they are only instantianted once each time the schema is built. If the schema is a scoped schema,
+        /// they are only instantiated once each time the schema is built. If the schema is a scoped schema,
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
@@ -343,7 +343,7 @@ namespace GraphQL
         /// <summary>
         /// Scans the supplied assembly for classes that implement <see cref="IGraphType"/> and registers
         /// them as transients within the dependency injection framework. A transient lifetime ensures
-        /// they are only instantianted once each time the schema is built. If the schema is a scoped schema,
+        /// they are only instantiated once each time the schema is built. If the schema is a scoped schema,
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
@@ -354,7 +354,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder, Assembly assembly)
         {
-            // Graph types are always created with the transient lifetime, since they are only instantianted once
+            // Graph types are always created with the transient lifetime, since they are only instantiated once
             // each time the schema is built. If the schema is a scoped schema, the graph types will effectively
             // be scoped graph types. If the schema is a singleton schema, the graph types will effectively be
             // singleton graph types. This is REQUIRED behavior and must not be changed.
