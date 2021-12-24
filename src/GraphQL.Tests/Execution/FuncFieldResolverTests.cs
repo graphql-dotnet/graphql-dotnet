@@ -498,7 +498,6 @@ namespace GraphQL.Tests.Execution
             rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
-        //====
 
         [Fact]
         public void Does_Not_Share_Enumerable_Typed()
@@ -595,6 +594,5 @@ namespace GraphQL.Tests.Execution
             rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
-
     }
 }
