@@ -19,8 +19,11 @@ namespace GraphQL.MicrosoftDI
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-        public static void AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder>? configure)
-            => new GraphQLBuilder(services, configure);
+        public static IServiceCollection AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder>? configure)
+        {
+            _ = new GraphQLBuilder(services, configure);
+            return services;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
