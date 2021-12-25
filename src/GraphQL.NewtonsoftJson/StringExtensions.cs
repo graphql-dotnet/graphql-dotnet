@@ -34,7 +34,7 @@ namespace GraphQL.NewtonsoftJson
             using var stringReader = new System.IO.StringReader(json);
             using var jsonTextReader = new JsonTextReader(stringReader);
             var values = _jsonSerializer.Deserialize(jsonTextReader);
-            return (GetValueInternal(values) as Dictionary<string, object>).ToInputs();
+            return (GetValue(values) as Dictionary<string, object>).ToInputs();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace GraphQL.NewtonsoftJson
         /// </remarks>
         public static Inputs ToInputs(this JObject obj)
         {
-            var variables = obj?.GetValueInternal() as Dictionary<string, object>;
+            var variables = obj?.GetValue() as Dictionary<string, object>;
             return variables.ToInputs();
         }
 
@@ -73,14 +73,14 @@ namespace GraphQL.NewtonsoftJson
             return _jsonSerializer.Deserialize<T>(jsonTextReader);
         }
 
-        private static object GetValueInternal(this object value)
+        private static object GetValue(this object value)
         {
             if (value is JObject objectValue)
             {
                 var output = new Dictionary<string, object>();
                 foreach (var kvp in objectValue)
                 {
-                    output.Add(kvp.Key, GetValueInternal(kvp.Value));
+                    output.Add(kvp.Key, GetValue(kvp.Value));
                 }
                 return output;
             }
@@ -89,7 +89,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 return new Dictionary<string, object>
                 {
-                    { propertyValue.Name, GetValueInternal(propertyValue.Value) }
+                    { propertyValue.Name, GetValue(propertyValue.Value) }
                 };
             }
 
@@ -97,7 +97,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 return arrayValue.Children().Aggregate(new List<object>(), (list, token) =>
                 {
-                    list.Add(GetValueInternal(token));
+                    list.Add(GetValue(token));
                     return list;
                 });
             }
