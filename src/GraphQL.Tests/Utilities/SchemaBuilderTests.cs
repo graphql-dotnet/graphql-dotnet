@@ -702,7 +702,7 @@ namespace GraphQL.Tests.Utilities
 
             var schema = Schema.For(definitions);
             schema.Initialize();
-            var type = schema.AllTypes["Query"] as IObjectGraphType;
+            var type = (IObjectGraphType)schema.AllTypes["Query"];
             type.Fields.Count.ShouldBe(2);
         }
 

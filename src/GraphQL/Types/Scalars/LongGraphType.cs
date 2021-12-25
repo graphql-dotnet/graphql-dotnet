@@ -13,7 +13,7 @@ namespace GraphQL.Types
         public override object? ParseLiteral(IValue value) => value switch
         {
             IntValue intValue => checked((long)intValue.Value),
-            LongValue longValue => checked((long)longValue.Value),
+            LongValue longValue => longValue.Value,
             BigIntValue bigIntValue => checked((long)bigIntValue.Value),
             NullValue _ => null,
             _ => ThrowLiteralConversionError(value)

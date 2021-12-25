@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -108,7 +109,7 @@ namespace GraphQL.Execution
                     }
                 }
             }
-            catch
+            catch (Exception original)
             {
                 if (currentTasks.Count > 0)
                 {
@@ -119,15 +120,19 @@ namespace GraphQL.Execution
 #pragma warning restore CS0612 // Type or member is obsolete
                             .ConfigureAwait(false);
                     }
-                    catch
+                    catch (Exception temp)
                     {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_BEFORE_EXECUTION_STEP_AWAITED_EXCEPTION"] = temp;
                     }
                     try
                     {
                         await Task.WhenAll(currentTasks).ConfigureAwait(false);
                     }
-                    catch
+                    catch (Exception awaited)
                     {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_ALL_TASKS_AWAITED_EXCEPTION"] = awaited;
                     }
                 }
                 throw;

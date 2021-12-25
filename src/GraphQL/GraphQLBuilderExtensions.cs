@@ -88,6 +88,56 @@ namespace GraphQL
             => builder.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
 
+        #region - RegisterAsBoth and TryRegisterAsBoth -
+        /// <summary>
+        /// Calls Register for both the implementation and service
+        /// </summary>
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register<TImplementation>(serviceLifetime).Register<TService, TImplementation>(serviceLifetime);
+
+        /// <summary>
+        /// Calls Register for both the implementation and service
+        /// </summary>
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register(implementationFactory, serviceLifetime).Register<TService>(implementationFactory, serviceLifetime);
+
+        /// <summary>
+        /// Calls Register for both the implementation and service
+        /// </summary>
+        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register(implementationInstance).Register<TService>(implementationInstance);
+
+        /// <summary>
+        /// Calls Register for the implementation and TryRegister for the service
+        /// </summary>
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register<TImplementation>(serviceLifetime).TryRegister<TService, TImplementation>(serviceLifetime);
+
+        /// <summary>
+        /// Calls Register for the implementation and TryRegister for the service
+        /// </summary>
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register(implementationFactory, serviceLifetime).TryRegister<TService>(implementationFactory, serviceLifetime);
+
+        /// <summary>
+        /// Calls Register for the implementation and TryRegister for the service
+        /// </summary>
+        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+            where TService : class
+            where TImplementation : class, TService
+            => builder.Register(implementationInstance).TryRegister<TService>(implementationInstance);
+        #endregion
+
         #region - AddSchema -
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
@@ -112,10 +162,8 @@ namespace GraphQL
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
-            builder.Register<TSchema>(serviceLifetime);
-
-            // Now register the service as ISchema if not already registered.
-            builder.TryRegister<ISchema, TSchema>(serviceLifetime);
+            // Also register the service as ISchema if not already registered.
+            builder.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
 
             return builder;
         }
@@ -146,10 +194,8 @@ namespace GraphQL
             }
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
-            builder.Register(schemaFactory, serviceLifetime);
-
-            // Now register the service as ISchema if not already registered.
-            builder.TryRegister<ISchema>(schemaFactory, serviceLifetime);
+            // Also register the service as ISchema if not already registered.
+            builder.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
 
             return builder;
         }
@@ -439,8 +485,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.Register<TDocumentListener>(serviceLifetime);
-            builder.Register<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
+            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
             builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
@@ -459,8 +504,7 @@ namespace GraphQL
             if (documentListener == null)
                 throw new ArgumentNullException(nameof(documentListener));
 
-            builder.Register(documentListener);
-            builder.Register<IDocumentExecutionListener>(documentListener);
+            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListener);
             builder.ConfigureExecutionOptions(options => options.Listeners.Add(documentListener));
             return builder;
         }
@@ -477,8 +521,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentListener> documentListenerFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.Register(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
-            builder.Register<IDocumentExecutionListener>(documentListenerFactory, serviceLifetime);
+            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
             builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
             return builder;
         }
@@ -507,8 +550,7 @@ namespace GraphQL
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware, TMiddleware>(serviceLifetime);
+            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
             return builder;
@@ -539,8 +581,7 @@ namespace GraphQL
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.Register<TMiddleware>(serviceLifetime);
-            builder.Register<IFieldMiddleware, TMiddleware>(serviceLifetime);
+            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
@@ -567,8 +608,7 @@ namespace GraphQL
             if (middleware == null)
                 throw new ArgumentNullException(nameof(middleware));
 
-            builder.Register(middleware);
-            builder.Register<IFieldMiddleware>(middleware);
+            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(middleware));
             return builder;
@@ -595,8 +635,7 @@ namespace GraphQL
             if (installPredicate == null)
                 throw new ArgumentNullException(nameof(installPredicate));
 
-            builder.Register(middleware);
-            builder.Register<IFieldMiddleware>(middleware);
+            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
@@ -710,8 +749,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.Register<TValidationRule>(ServiceLifetime.Singleton);
-            builder.Register<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
+            builder.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
                 var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
@@ -738,8 +776,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.Register(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
-            builder.Register<IValidationRule>(validationRule);
+            builder.RegisterAsBoth<IValidationRule, TValidationRule>(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
             builder.ConfigureExecutionOptions(options =>
             {
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(validationRule);
@@ -765,8 +802,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.Register(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
-            builder.Register<IValidationRule>(validationRuleFactory, ServiceLifetime.Singleton);
+            builder.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
                 var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
