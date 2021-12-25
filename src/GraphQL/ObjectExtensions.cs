@@ -142,7 +142,7 @@ namespace GraphQL
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return ""; // never executed, necessary only for intellisense
             }
 

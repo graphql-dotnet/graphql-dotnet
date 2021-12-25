@@ -183,7 +183,7 @@ namespace GraphQL.Types
         /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
         /// object of type serviceType.
         /// </returns>
-        object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
+        object? IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
         /// <inheritdoc/>
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();

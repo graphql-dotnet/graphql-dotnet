@@ -302,7 +302,7 @@ namespace GraphQL
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
-        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
+        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static GraphQL.Language.AST.IValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
@@ -2157,8 +2157,8 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
-        TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory);
-        TType? GetMetadata<TType>(string key, TType? defaultValue = default);
+        TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
+        TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
     }
     public interface IProvideResolvedType
@@ -2692,8 +2692,8 @@ namespace GraphQL.Utilities
         public MetadataProvider() { }
         public System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
         public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
-        public TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory) { }
-        public TType? GetMetadata<TType>(string key, TType? defaultValue = default) { }
+        public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
     }
     public static class NameValidator

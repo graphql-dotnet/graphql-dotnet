@@ -399,7 +399,7 @@ namespace GraphQL
         /// Returns a value indicating whether the provided value is a valid default value
         /// for the specified input graph type.
         /// </summary>
-        public static bool IsValidDefault(this IGraphType type, object value)
+        public static bool IsValidDefault(this IGraphType type, object? value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));

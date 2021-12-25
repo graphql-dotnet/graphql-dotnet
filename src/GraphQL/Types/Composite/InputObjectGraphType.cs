@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -18,7 +19,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Returns a boolean indicating if the provided value is valid as a default value for a
-        /// field of this type.
+        /// field or argument of this type.
         /// </summary>
         bool IsValidDefault(object value);
 
@@ -60,7 +61,41 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidDefault(object value) => value is TSourceType;
+        public virtual bool IsValidDefault(object value)
+        {
+            if (value is not TSourceType)
+                return false;
+
+            foreach (var field in Fields)
+            {
+                if (!field.ResolvedType!.IsValidDefault(GetFieldValue(field, value)))
+                    return false;
+            }
+
+            return true;
+
+            object? GetFieldValue(FieldType field, object? value)
+            {
+                if (value == null)
+                    return null;
+
+                // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+                string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+                PropertyInfo? propertyInfo = null;
+                try
+                {
+                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                }
+
+                return propertyInfo?.CanRead == true
+                    ? propertyInfo.GetValue(value)
+                    : null;
+            }
+        }
 
         /// <summary>
         /// Converts a value to an AST representation. This is necessary for introspection queries
