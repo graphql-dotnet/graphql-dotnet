@@ -47,3 +47,10 @@ property containing the execution variables has now been renamed to `Variables`.
 ### `ConfigureExecution` GraphQL builder method renamed to `ConfigureExecutionOptions`
 
 Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
+
+### More strict `InputObjectGraphType<TSourceType>.IsValidDefault`
+
+This method began to perform more checks of the specified value. Current implementation
+can cause problems in some situations. Changes are made for earlier error detection - at
+the schema initialization stage. If you encountered that your code stopped working,
+then feel free to post an issue.
