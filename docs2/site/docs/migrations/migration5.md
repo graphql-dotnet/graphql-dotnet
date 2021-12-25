@@ -54,7 +54,7 @@ In order to prevent default implemenatations from ever being registered in the D
 the `AddGraphQL` method now accepts a configuration delegate where you can configure the
 GraphQL.NET DI components. To support this change, the `GraphQLBuilder` constructor now
 requires a configuration delegate parameter and will execute the delegate before calling
-`GraphQLBuilderBase.Initialize`.
+`GraphQLBuilderBase.RegisterDefaultServices`.
 
 This requires a change similar to the following:
 
