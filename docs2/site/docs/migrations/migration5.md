@@ -50,7 +50,7 @@ Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
 
 ### `AddGraphQL` now accepts a configuration delegate instead of returning `IGraphQLBuilder`
 
-In order to prevent default implemenatations from ever being registered in the DI engine,
+In order to prevent default implementations from ever being registered in the DI engine,
 the `AddGraphQL` method now accepts a configuration delegate where you can configure the
 GraphQL.NET DI components. To support this change, the `GraphQLBuilder` constructor now
 requires a configuration delegate parameter and will execute the delegate before calling
