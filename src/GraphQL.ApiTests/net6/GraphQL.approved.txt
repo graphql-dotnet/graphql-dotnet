@@ -740,10 +740,10 @@ namespace GraphQL.DI
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
-        protected virtual void Initialize() { }
         public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false);
         public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
         public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        protected virtual void RegisterDefaultServices() { }
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
         public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);

@@ -69,3 +69,4 @@ services.AddGraphQL(builder => builder
     .AddSystemTextJson()
     .AddSchema<StarWarsSchema>());
 ```
+### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`

@@ -53,7 +53,7 @@ namespace GraphQL.MicrosoftDI
     }
     public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase, Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IEnumerable<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IList<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.IEnumerable
     {
-        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder> configure) { }
+        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection Services { get; }
         public override GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new () { }
@@ -66,7 +66,7 @@ namespace GraphQL.MicrosoftDI
     }
     public static class GraphQLBuilderExtensions
     {
-        public static void AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder> configure) { }
+        public static void AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
     }
