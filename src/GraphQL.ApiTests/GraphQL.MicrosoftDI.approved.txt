@@ -60,6 +60,7 @@ namespace GraphQL.MicrosoftDI
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false) { }
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
+        protected override void RegisterDefaultServices() { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance) { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime) { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime) { }

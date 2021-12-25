@@ -33,9 +33,15 @@ namespace GraphQL.MicrosoftDI
         public GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
-            services.AddOptions();
             configure?.Invoke(this);
             RegisterDefaultServices();
+        }
+
+        /// <inheritdoc/>
+        protected override void RegisterDefaultServices()
+        {
+            Services.AddOptions();
+            base.RegisterDefaultServices();
         }
 
         private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)
