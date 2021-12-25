@@ -54,16 +54,16 @@ The following classes and members that were marked with `[Obsolete]` in v4 have 
 
 | Class or member | Notes |
 |-----------------|-------|
-| GraphQL.NewtonsoftJson.StringExtensions.GetValue     |                             |
-| GraphQL.NewtonsoftJson.StringExtensions.ToDictionary | Use ToInputs instead        |
-| GraphQL.SystemTextJson.ObjectDictionaryConverter     | Use InputsConverter instead |
-| GraphQL.SystemTextJson.StringExtensions.ToDictionary | Use ToInputs instead        |
-| GraphQL.TypeExtensions.GetEnumerableElementType      |                             |
-| GraphQL.TypeExtensions.IsNullable                    |                             |
-| GraphQL.Builders.ConnectionBuilder.Unidirectional    | Unidirectional is default and does not need to be called |
-| GraphQL.IDocumentExecutionListener.BeforeExecutionAwaitedAsync     | Use IDataLoaderResult interface instead |
-| GraphQL.IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync | Use IDataLoaderResult interface instead |
-| GraphQL.Utilities.DeprecatedDirectiveVisitor         |                             |
+| `GraphQL.NewtonsoftJson.StringExtensions.GetValue`     |                             |
+| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
+| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsConverter` instead |
+| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
+| `GraphQL.TypeExtensions.GetEnumerableElementType`      |                             |
+| `GraphQL.TypeExtensions.IsNullable`                    |                             |
+| `GraphQL.Builders.ConnectionBuilder.Unidirectional`    | `Unidirectional` is default and does not need to be called |
+| `GraphQL.IDocumentExecutionListener.BeforeExecutionAwaitedAsync`     | Use `IDataLoaderResult` interface instead |
+| `GraphQL.IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync` | Use `IDataLoaderResult` interface instead |
+| `GraphQL.Utilities.DeprecatedDirectiveVisitor`         |                             |
 
 Various classes' properties in the `GraphQL.Language.AST` namespace are now
 read-only instead of read-write, such as `Field.Alias`.
