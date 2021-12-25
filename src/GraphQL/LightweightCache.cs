@@ -150,18 +150,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="key">The key to retrieve.</param>
         /// <param name="value">The value for the associated key or <c>default(TValue)</c>.</param>
-        public bool TryRetrieve(TKey key, out TValue? value)
-        {
-            value = default;
-
-            if (_values.ContainsKey(key))
-            {
-                value = _values[key];
-                return true;
-            }
-
-            return false;
-        }
+        public bool TryRetrieve(TKey key, out TValue? value) => _values.TryGetValue(key, out value);
 
         /// <summary>
         /// Performs the specified action for each value.

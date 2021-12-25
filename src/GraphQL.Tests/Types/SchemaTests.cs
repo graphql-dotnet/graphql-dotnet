@@ -164,7 +164,7 @@ namespace GraphQL.Tests.Types
                 return async context =>
                 {
                     var res = await next(context);
-                    return "One " + res.ToString();
+                    return "One " + res;
                 };
             });
             schema.Initialize();

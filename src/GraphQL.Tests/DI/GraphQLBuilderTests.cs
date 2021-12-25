@@ -79,8 +79,8 @@ namespace GraphQL.Tests.DI
         private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
         {
             Action<ExecutionOptions> actions = _ => { };
-            _builderMock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     var actions2 = actions;
                     actions = opts =>
@@ -236,8 +236,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema()
         {
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>();
             Verify();
         }
@@ -252,8 +252,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema_Scoped()
         {
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
             Verify();
         }
@@ -262,8 +262,8 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Factory()
         {
             Func<IServiceProvider, TestSchema> factory = _ => null;
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema(factory);
             Verify();
         }
@@ -276,13 +276,13 @@ namespace GraphQL.Tests.DI
                 .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
                 {
                     factory(null).ShouldBe(schema);
-                    return null;
+                    return _builder;
                 }).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ISchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
                 .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, factory, _) =>
                 {
                     factory(null).ShouldBe(schema);
-                    return null;
+                    return _builder;
                 }).Verifiable();
             _builder.AddSchema(schema);
             Verify();
@@ -346,8 +346,8 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     ran = false;
@@ -383,8 +383,8 @@ namespace GraphQL.Tests.DI
                 cc.ShouldBe(opts.ComplexityConfiguration);
                 ran = true;
             };
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     ran = false;
@@ -416,8 +416,8 @@ namespace GraphQL.Tests.DI
         private void MockSetupComplexityConfigurationNull()
         {
             ExecutionOptions opts = null;
-            _builderMock.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+            _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+                .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     //test with no complexity configuration
                     opts = new ExecutionOptions();
@@ -1030,7 +1030,7 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecution -
+        #region - ConfigureSchema and ConfigureExecutionOptions -
         [Fact]
         public void ConfigureSchema()
         {
@@ -1064,11 +1064,11 @@ namespace GraphQL.Tests.DI
         }
 
         [Fact]
-        public void ConfigureExecution()
+        public void ConfigureExecutionOptions()
         {
             bool ran = false;
             var execute = MockSetupConfigureExecution();
-            _builder.ConfigureExecution(opts =>
+            _builder.ConfigureExecutionOptions(opts =>
             {
                 opts.EnableMetrics.ShouldBeFalse();
                 opts.EnableMetrics = true;
@@ -1090,7 +1090,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void ConfigureExecution_Null()
         {
-            Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecution(null));
+            Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecutionOptions(null));
         }
         #endregion
 

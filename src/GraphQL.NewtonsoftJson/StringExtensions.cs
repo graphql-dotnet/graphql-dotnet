@@ -105,12 +105,9 @@ namespace GraphQL.NewtonsoftJson
             if (value is JValue rawValue)
             {
                 object val = rawValue.Value;
-                if (val is long l)
+                if (val is long l && l >= int.MinValue && l <= int.MaxValue)
                 {
-                    if (l >= int.MinValue && l <= int.MaxValue)
-                    {
-                        return (int)l;
-                    }
+                    return (int)l;
                 }
                 return val;
             }

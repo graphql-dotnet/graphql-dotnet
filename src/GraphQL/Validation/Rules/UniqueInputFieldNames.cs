@@ -38,9 +38,9 @@ namespace GraphQL.Validation.Rules
                     {
                         var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
 
-                        if (knownNames.ContainsKey(objField.Name))
+                        if (knownNames.TryGetValue(objField.Name, out var value))
                         {
-                            context.ReportError(new UniqueInputFieldNamesError(context, knownNames[objField.Name], objField));
+                            context.ReportError(new UniqueInputFieldNamesError(context, value, objField));
                         }
                         else
                         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -103,7 +104,7 @@ namespace GraphQL.Execution
                     }
                 }
             }
-            catch
+            catch (Exception original)
             {
                 if (currentTasks.Count > 0)
                 {
@@ -111,8 +112,10 @@ namespace GraphQL.Execution
                     {
                         await Task.WhenAll(currentTasks).ConfigureAwait(false);
                     }
-                    catch
+                    catch (Exception awaited)
                     {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_ALL_TASKS_AWAITED_EXCEPTION"] = awaited;
                     }
                 }
                 throw;

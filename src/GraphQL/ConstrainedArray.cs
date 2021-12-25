@@ -35,11 +35,11 @@ namespace GraphQL
 
         public int IndexOf(T item) => throw new NotSupportedException();
 
-        public int IndexOf(object value) => throw new NotSupportedException();
+        public int IndexOf(object? value) => throw new NotSupportedException();
 
         public bool Contains(T item) => throw new NotSupportedException();
 
-        public bool Contains(object value) => throw new NotSupportedException();
+        public bool Contains(object? value) => throw new NotSupportedException();
 
         public void CopyTo(T[] array, int arrayIndex) => _array.CopyTo(array, arrayIndex);
 
@@ -51,11 +51,11 @@ namespace GraphQL
 
         public void Clear() => throw new NotSupportedException();
 
-        public void Insert(int index, object value) => throw new NotSupportedException();
+        public void Insert(int index, object? value) => throw new NotSupportedException();
 
         public bool Remove(T item) => throw new NotSupportedException();
 
-        public void Remove(object value) => throw new NotSupportedException();
+        public void Remove(object? value) => throw new NotSupportedException();
 
         public void RemoveAt(int index) => throw new NotSupportedException();
 
@@ -63,6 +63,6 @@ namespace GraphQL
 
         public void Add(T item) => throw new NotSupportedException();
 
-        public int Add(object value) => throw new NotSupportedException();
+        public int Add(object? value) => throw new NotSupportedException();
     }
 }

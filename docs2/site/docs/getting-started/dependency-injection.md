@@ -90,13 +90,13 @@ A list of the available extension methods is below:
 | `AddSubscriptionDocumentExecuter` | Registers the document executer that has subscription support | GraphQL.SystemReactive | |
 | `AddSystemTextJson`     | Registers the document writer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
-| `ConfigureExecution`    | Configures execution options at runtime | |
+| `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
 | `Register`              | Used by extension methods to register services within the DI framework | |
 | `TryRegister`           | Used by extension methods to register services within the DI framework when they have not already been registered | |
 
-The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware is registered
+The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
 
 To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:

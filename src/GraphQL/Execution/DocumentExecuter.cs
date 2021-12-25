@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
@@ -22,7 +23,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
-        private readonly IEnumerable<IConfigureExecution>? _configurations;
+        private readonly IConfigureExecutionOptions[]? _configurations;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -50,17 +51,22 @@ namespace GraphQL
         /// and <see cref="IDocumentCache"/> instances.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, null!)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
+        /// </summary>
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
-        }
-
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
-        {
-            _configurations = configurations;
+            _configurations = configurations?.ToArray();
         }
 
         /// <inheritdoc/>
@@ -104,7 +110,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && (document = await _documentCache.GetAsync(options.Query)) != null)
+                    if (document == null && (document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false)) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -143,7 +149,7 @@ namespace GraphQL
                         validationRules,
                         options.UserContext,
                         options.Variables,
-                        options.OperationName);
+                        options.OperationName).ConfigureAwait(false);
                 }
 
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
@@ -154,7 +160,7 @@ namespace GraphQL
 
                 if (saveInCache && validationResult.IsValid)
                 {
-                    await _documentCache.SetAsync(options.Query, document);
+                    await _documentCache.SetAsync(options.Query, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);

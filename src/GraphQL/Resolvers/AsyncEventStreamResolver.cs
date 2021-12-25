@@ -62,7 +62,7 @@ namespace GraphQL.Resolvers
             var target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
             var result = _accessor.GetValue(target, arguments);
 
-            if (!(result is Task task))
+            if (result is not Task task)
             {
                 throw new ArgumentException($"Return type of {_accessor.FieldName} should be Task<IObservable<T>>, instead of {_accessor.ReturnType}");
             }

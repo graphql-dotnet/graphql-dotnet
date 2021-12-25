@@ -4,7 +4,14 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
-###
+### DoNotMapClrType attribute can now be placed on the graph type or the CLR type
+
+When using the `.AddClrTypeMappings()` builder extension method, GraphQL.NET scans the
+specified assembly for graph types that inherit from `ObjectGraphType<T>` and adds a
+mapping for the CLR type represented by `T` with the graph type it matched upon.
+It skips adding a mapping for any graph type marked with the `[DoNotMapClrType]` attribute.
+In v5, it will also skip adding the mapping if the CLR type is marked with the
+`[DoNotMapClrType]` attribute.
 
 ### Input Extensions support
 
@@ -21,10 +28,10 @@ properties type was changed from `Action<UnhandledExceptionContext>` to `Func<Un
 so now you may use async/await for exception handling. In this regard, some methods in `ExecutionStrategy` were
 renamed to have `Async` suffix.
 
-### Redesign of [IDocumentCache](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/src/GraphQL/Caching/IDocumentCache.cs).
+### `IDocumentCache` now has asynchronous methods instead of synchronous methods.
 
-1. Use async methods to get or set a cache.
-2. Cache items cannot be removed anymore.
+The default get/set property of the interface has been replaced with `GetAsync` and `SetAsync` methods.
+Keys cannot be removed by setting a null value as they could before.
 
 ### `IResolveFieldContext.Extensions` property renamed to `OutputExtensions` and related changes
 
@@ -36,3 +43,7 @@ extension methods have also been renamed to `GetOutputExtension` and `SetOutputE
 
 To better align the execution options and variable context with the specification, the `Inputs`
 property containing the execution variables has now been renamed to `Variables`.
+
+### `ConfigureExecution` GraphQL builder method renamed to `ConfigureExecutionOptions`
+
+Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
