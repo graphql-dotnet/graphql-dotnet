@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -23,6 +24,32 @@ namespace GraphQL.Execution
         /// </summary>
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
+            async Task AwaitSafe(Task task)
+            {
+                try
+                {
+#pragma warning disable CS0612 // Type or member is obsolete
+                    await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
+                                .ConfigureAwait(false);
+                }
+                catch (Exception original)
+                {
+                    try
+                    {
+                        await task.ConfigureAwait(false);
+                    }
+                    catch (Exception awaited)
+                    {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_TASK_AWAITED_EXCEPTION"] = awaited;
+                    }
+                    throw;
+                }
+
+                await task.ConfigureAwait(false);
+            }
+
             // Use a stack to track all nodes in the tree that need to be executed
             var nodes = System.Threading.Interlocked.Exchange(ref _reusableNodes, null) ?? new Stack<ExecutionNode>();
             nodes.Push(rootNode);
@@ -39,26 +66,7 @@ namespace GraphQL.Execution
                         var node = nodes.Pop();
                         var task = ExecuteNodeAsync(context, node);
 
-                        try
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                await task.ConfigureAwait(false);
-                            }
-                            catch
-                            {
-                            }
-                            throw;
-                        }
-
-                        await task.ConfigureAwait(false);
+                        await AwaitSafe(task).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)
@@ -77,26 +85,7 @@ namespace GraphQL.Execution
                         var node = dataLoaderNodes.Dequeue();
                         var task = CompleteDataLoaderNodeAsync(context, node);
 
-                        try
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                await task.ConfigureAwait(false);
-                            }
-                            catch
-                            {
-                            }
-                            throw;
-                        }
-
-                        await task.ConfigureAwait(false);
+                        await AwaitSafe(task).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)
