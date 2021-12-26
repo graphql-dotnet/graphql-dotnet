@@ -206,7 +206,7 @@ namespace GraphQL
         /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
         /// property is set to a new instance of the base (wrapped) type.
         /// </summary>
-        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType>? resolve = null)
+        public static IGraphType BuildGraphQLType(this Type type, Func<Type, IGraphType>? resolve = null)
         {
             resolve ??= t => (IGraphType)Activator.CreateInstance(t);
 
@@ -215,14 +215,14 @@ namespace GraphQL
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
                     var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
-                    nonNull.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
                     return nonNull;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
                 {
                     var list = (ListGraphType)Activator.CreateInstance(type);
-                    list.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
                     return list;
                 }
             }

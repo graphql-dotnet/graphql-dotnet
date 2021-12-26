@@ -270,7 +270,7 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
-        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => FindGraphType(t) ?? resolver(t));
+        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildGraphQLType(t => FindGraphType(t) ?? resolver(t));
 
         /// <summary>
         /// Applies all delegates specified by the middleware builder to the schema.

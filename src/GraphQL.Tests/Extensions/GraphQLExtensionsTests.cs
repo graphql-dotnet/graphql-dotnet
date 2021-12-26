@@ -166,9 +166,9 @@ namespace GraphQL.Tests.Extensions
         }
 
         [Fact]
-        public void BuildNamedType_ResolveReturnNull_Throws()
+        public void BuildGraphQLType_ResolveReturnNull_Throws()
         {
-            Should.Throw<InvalidOperationException>(() => typeof(ListGraphType<ListGraphType<EpisodeEnum>>).BuildNamedType(_ => null));
+            Should.Throw<InvalidOperationException>(() => typeof(ListGraphType<ListGraphType<EpisodeEnum>>).BuildGraphQLType(_ => null));
         }
 
         [Fact]
