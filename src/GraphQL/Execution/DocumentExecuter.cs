@@ -205,17 +205,6 @@ namespace GraphQL
                     var task = (context.ExecutionStrategy ?? throw new InvalidOperationException("Execution strategy not specified")).ExecuteAsync(context)
                         .ConfigureAwait(false);
 
-                    if (context.Listeners != null)
-                    {
-                        foreach (var listener in context.Listeners)
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await listener.BeforeExecutionAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                        }
-                    }
-
                     result = await task;
 
                     if (context.Listeners != null)

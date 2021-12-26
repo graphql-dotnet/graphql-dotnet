@@ -54,3 +54,49 @@ This method began to perform more checks of the specified value. Current impleme
 can cause problems in some situations. Changes are made for earlier error detection - at
 the schema initialization stage. If you encountered that your code stopped working,
 then feel free to post an issue.
+
+### `AddGraphQL` now accepts a configuration delegate instead of returning `IGraphQLBuilder`
+
+In order to prevent default implementations from ever being registered in the DI engine,
+the `AddGraphQL` method now accepts a configuration delegate where you can configure the
+GraphQL.NET DI components. To support this change, the `GraphQLBuilder` constructor now
+requires a configuration delegate parameter and will execute the delegate before calling
+`GraphQLBuilderBase.RegisterDefaultServices`.
+
+This requires a change similar to the following:
+
+```csharp
+// v4
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>();
+
+// v5
+services.AddGraphQL(builder => builder
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>());
+```
+### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`
+
+### Classes and members marked as obsolete have been removed
+
+The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
+
+| Class or member | Notes |
+|-----------------|-------|
+| `GraphQL.NewtonsoftJson.StringExtensions.GetValue`     |                             |
+| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
+| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsConverter` instead |
+| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
+| `GraphQL.TypeExtensions.GetEnumerableElementType`      |                             |
+| `GraphQL.TypeExtensions.IsNullable`                    |                             |
+| `GraphQL.Builders.ConnectionBuilder.Unidirectional`    | `Unidirectional` is default and does not need to be called |
+| `GraphQL.IDocumentExecutionListener.BeforeExecutionAwaitedAsync`     | Use `IDataLoaderResult` interface instead |
+| `GraphQL.IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync` | Use `IDataLoaderResult` interface instead |
+| `GraphQL.Utilities.DeprecatedDirectiveVisitor`         |                             |
+
+Various classes' properties in the `GraphQL.Language.AST` namespace are now
+read-only instead of read-write, such as `Field.Alias`.
+
+Various classes' constructors in the `GraphQL.Language.AST` namespace have been
+removed in favor of other constructors.

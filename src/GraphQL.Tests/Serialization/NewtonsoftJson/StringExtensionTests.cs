@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,13 +43,6 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             var dw = new DocumentWriter();
             var actual = await dw.WriteToStringAsync(_example);
             actual.ShouldBe(_exampleJson);
-        }
-
-        [Fact]
-        public void StringToDictionary()
-        {
-            var actual = _exampleJson.ToDictionary();
-            Verify(actual);
         }
 
         [Fact]

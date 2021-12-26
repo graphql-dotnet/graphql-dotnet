@@ -30,12 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the alias for this field, if any.
         /// </summary>
-        public string? Alias
-        {
-            get => AliasNode.Name;
-            [Obsolete]
-            set => throw new InvalidOperationException();
-        }
+        public string? Alias => AliasNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the alias of this field, if any.

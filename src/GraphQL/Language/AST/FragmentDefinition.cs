@@ -9,23 +9,13 @@ namespace GraphQL.Language.AST
     public class FragmentDefinition : AbstractNode, IDefinition, IHaveSelectionSet
     {
         /// <summary>
-        /// Initializes a new fragment definition node with the specified <see cref="NameNode"/> containing the name of this fragment definition.
-        /// </summary>
-        [Obsolete]
-        public FragmentDefinition(NameNode node) : this(node, null!, null!)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new fragment definition node with the specified <see cref="NameNode"/> containing the name of this fragment definition and its selection set.
         /// </summary>
         public FragmentDefinition(NameNode node, NamedType type, SelectionSet selectionSet)
         {
             NameNode = node;
-#pragma warning disable CS0612 // Type or member is obsolete
             Type = type;
             SelectionSet = selectionSet;
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
@@ -41,7 +31,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets or sets the type node representing the graph type of this fragment definition.
         /// </summary>
-        public NamedType Type { get; [Obsolete] set; }
+        public NamedType Type { get; }
 
         /// <summary>
         /// Gets or sets a list of directives applied to this fragment definition node.
@@ -49,14 +39,7 @@ namespace GraphQL.Language.AST
         public Directives? Directives { get; set; }
 
         /// <inheritdoc/>
-        public SelectionSet SelectionSet
-        {
-            get;
-            [Obsolete]
-#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-            set;
-#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        }
+        public SelectionSet SelectionSet { get; }
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children

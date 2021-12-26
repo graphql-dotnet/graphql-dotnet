@@ -24,32 +24,6 @@ namespace GraphQL.Execution
         /// </summary>
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
-            async Task AwaitSafe(Task task)
-            {
-                try
-                {
-#pragma warning disable CS0612 // Type or member is obsolete
-                    await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                }
-                catch (Exception original)
-                {
-                    try
-                    {
-                        await task.ConfigureAwait(false);
-                    }
-                    catch (Exception awaited)
-                    {
-                        if (original.Data?.IsReadOnly == false)
-                            original.Data["GRAPHQL_TASK_AWAITED_EXCEPTION"] = awaited;
-                    }
-                    throw;
-                }
-
-                await task.ConfigureAwait(false);
-            }
-
             // Use a stack to track all nodes in the tree that need to be executed
             var nodes = System.Threading.Interlocked.Exchange(ref _reusableNodes, null) ?? new Stack<ExecutionNode>();
             nodes.Push(rootNode);
@@ -64,9 +38,7 @@ namespace GraphQL.Execution
                     while (nodes.Count > 0)
                     {
                         var node = nodes.Pop();
-                        var task = ExecuteNodeAsync(context, node);
-
-                        await AwaitSafe(task).ConfigureAwait(false);
+                        await ExecuteNodeAsync(context, node).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)
@@ -83,9 +55,7 @@ namespace GraphQL.Execution
                     while (dataLoaderNodes.Count > 0)
                     {
                         var node = dataLoaderNodes.Dequeue();
-                        var task = CompleteDataLoaderNodeAsync(context, node);
-
-                        await AwaitSafe(task).ConfigureAwait(false);
+                        await CompleteDataLoaderNodeAsync(context, node).ConfigureAwait(false);
 
                         // Push any child nodes on top of the stack
                         if (node.Result is IDataLoaderResult)

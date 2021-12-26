@@ -11,21 +11,10 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new variable definition node with the specified <see cref="NameNode"/> containing the name of the variable.
         /// </summary>
-        [Obsolete]
-        public VariableDefinition(NameNode node) : this(node, null!)
-        {
-            NameNode = node;
-        }
-
-        /// <summary>
-        /// Initializes a new variable definition node with the specified <see cref="NameNode"/> containing the name of the variable.
-        /// </summary>
         public VariableDefinition(NameNode node, IType type)
         {
             NameNode = node;
-#pragma warning disable CS0612 // Type or member is obsolete
             Type = type;
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
@@ -41,12 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the type node representing the graph type of the variable.
         /// </summary>
-        public IType Type
-        {
-            get;
-            [Obsolete]
-            set;
-        }
+        public IType Type { get; }
 
         /// <summary>
         /// Returns a value node representing the default value of the variable.

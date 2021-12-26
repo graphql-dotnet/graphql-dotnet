@@ -53,20 +53,21 @@ namespace GraphQL.MicrosoftDI
     }
     public class GraphQLBuilder : GraphQL.DI.GraphQLBuilderBase, Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IEnumerable<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.Generic.IList<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>, System.Collections.IEnumerable
     {
-        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public GraphQLBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection Services { get; }
         public override GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new () { }
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false) { }
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
         public override GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
+        protected override void RegisterDefaultServices() { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance) { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime) { }
         public override GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime) { }
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) { }
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
     }

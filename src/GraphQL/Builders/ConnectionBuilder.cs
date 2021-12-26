@@ -128,18 +128,6 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Configure the connection to be forward-only.
-        /// </summary>
-        [Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
-        public virtual ConnectionBuilder<TSourceType> Unidirectional()
-        {
-            if (IsBidirectional)
-                throw new InvalidOperationException("Cannot call Unidirectional after a call to Bidirectional.");
-
-            return this;
-        }
-
-        /// <summary>
         /// Configure the connection to be bi-directional.
         /// </summary>
         public ConnectionBuilder<TSourceType> Bidirectional()

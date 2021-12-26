@@ -32,17 +32,6 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Determines whether this instance is a subclass of Nullable&lt;T&gt;.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
-        /// </returns>
-        [Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static bool IsNullable(this Type type)
-            => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-
-        /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -125,9 +114,7 @@ namespace GraphQL
             }
             else if (IsAnIEnumerable(type))
             {
-#pragma warning disable 0618
                 var clrElementType = GetEnumerableElementType(type);
-#pragma warning restore 0618
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
@@ -217,8 +204,7 @@ namespace GraphQL
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
         /// as a one-dimensional container type.
         /// </summary>
-        [Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static Type GetEnumerableElementType(this Type type)
+        private static Type GetEnumerableElementType(this Type type)
         {
             // prefer a known type, just in case multiple enumerable interfaces are supported
             if (type.IsConstructedGenericType)

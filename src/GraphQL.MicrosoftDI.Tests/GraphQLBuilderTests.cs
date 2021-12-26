@@ -13,7 +13,7 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void NullConstructor()
         {
-            Should.Throw<ArgumentNullException>(() => new GraphQLBuilder(null));
+            Should.Throw<ArgumentNullException>(() => new GraphQLBuilder(null, _ => { }));
         }
 
         [Theory]
@@ -55,8 +55,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.Register(serviceType, implementationType, serviceLifetime, replace);
+            var builder = new GraphQLBuilder(services, b => b.Register(serviceType, implementationType, serviceLifetime, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -98,8 +97,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.Register<Interface1>(factory, serviceLifetime, replace);
+            var builder = new GraphQLBuilder(services, b => b.Register<Interface1>(factory, serviceLifetime, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -133,8 +131,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.Register<Interface1>(instance, replace);
+            var builder = new GraphQLBuilder(services, b => b.Register<Interface1>(instance, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -170,8 +167,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.TryRegister(serviceType, implementationType, serviceLifetime);
+            var builder = new GraphQLBuilder(services, b => b.TryRegister(serviceType, implementationType, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -202,9 +198,8 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
             services.AddTransient(serviceType, _ => null);
-            builder.TryRegister(serviceType, implementationType, serviceLifetime);
+            var builder = new GraphQLBuilder(services, b => b.TryRegister(serviceType, implementationType, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -238,8 +233,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.TryRegister<Interface1>(factory, serviceLifetime);
+            var builder = new GraphQLBuilder(services, b => b.TryRegister<Interface1>(factory, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -264,8 +258,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services);
-            builder.TryRegister<Interface1>(instance);
+            var builder = new GraphQLBuilder(services, b => b.TryRegister<Interface1>(instance));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -273,7 +266,7 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void Register_InvalidParameters()
         {
-            var builder = new GraphQLBuilder(new ServiceCollection());
+            var builder = new GraphQLBuilder(new ServiceCollection(), _ => { });
             Should.Throw<ArgumentNullException>(() => builder.Register(null, typeof(Class1), DI.ServiceLifetime.Singleton));
             Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), (Type)null, DI.ServiceLifetime.Singleton));
             Should.Throw<ArgumentNullException>(() => builder.Register(null, _ => null, DI.ServiceLifetime.Singleton));
@@ -287,7 +280,7 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void TryRegister_InvalidParameters()
         {
-            var builder = new GraphQLBuilder(new ServiceCollection());
+            var builder = new GraphQLBuilder(new ServiceCollection(), _ => { });
             Should.Throw<ArgumentNullException>(() => builder.TryRegister(null, typeof(Class1), DI.ServiceLifetime.Singleton));
             Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), (Type)null, DI.ServiceLifetime.Singleton));
             Should.Throw<ArgumentNullException>(() => builder.TryRegister(null, _ => null, DI.ServiceLifetime.Singleton));
@@ -302,8 +295,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL()
-                .Configure<TestOptions>();
+            services.AddGraphQL(b => b.Configure<TestOptions>());
             services.BuildServiceProvider().GetRequiredService<TestOptions>().Value.ShouldBe(0);
             services.BuildServiceProvider().GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(0);
         }
@@ -312,8 +304,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Value()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL()
-                .Configure<TestOptions>(o => o.Value += 1);
+            services.AddGraphQL(b => b.Configure<TestOptions>(o => o.Value += 1));
             var serviceProvider = services.BuildServiceProvider();
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1);
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1); //ensure execution only occurs once
@@ -324,9 +315,9 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Multiple()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL()
+            services.AddGraphQL(b => b
                 .Configure<TestOptions>(o => o.Value += 1)
-                .Configure<TestOptions>(o => o.Value += 2);
+                .Configure<TestOptions>(o => o.Value += 2));
             var serviceProvider = services.BuildServiceProvider();
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(3);
             serviceProvider.GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(3);
@@ -336,8 +327,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Options()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL()
-                .Configure<TestOptions>();
+            services.AddGraphQL(b => b.Configure<TestOptions>());
             services.Configure<TestOptions>(o => o.Value += 1);
             services.Configure<TestOptions>(o => o.Value += 2);
             var serviceProvider = services.BuildServiceProvider();
