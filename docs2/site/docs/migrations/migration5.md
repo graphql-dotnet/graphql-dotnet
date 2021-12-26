@@ -69,6 +69,9 @@ services.AddGraphQL(builder => builder
     .AddSystemTextJson()
     .AddSchema<StarWarsSchema>());
 ```
+
+### `GraphQLExtensions.BuildNamedType` renamed to `BuildGraphQLType`
+
 ### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`
 
 ### Classes and members marked as obsolete have been removed
