@@ -1,14 +1,13 @@
 using GraphQL.Types;
 
-namespace GraphQL.StarWars.Types
+namespace GraphQL.StarWars.Types;
+
+public class HumanInputType : InputObjectGraphType
 {
-    public class HumanInputType : InputObjectGraphType
+    public HumanInputType()
     {
-        public HumanInputType()
-        {
-            Name = "HumanInput";
-            Field<NonNullGraphType<StringGraphType>>("name");
-            Field<StringGraphType>("homePlanet");
-        }
+        Name = "HumanInput";
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Field<StringGraphType>("homePlanet");
     }
 }
