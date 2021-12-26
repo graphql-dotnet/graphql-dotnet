@@ -46,7 +46,7 @@ namespace GraphQL.Language.AST
         public bool Equals(SourceLocation other) => Start == other.Start && End == other.End;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is SourceLocation l && Equals(l);
+        public override bool Equals(object? obj) => obj is SourceLocation l && Equals(l);
 
         /// <inheritdoc/>
         public override int GetHashCode() => (Start, End).GetHashCode();

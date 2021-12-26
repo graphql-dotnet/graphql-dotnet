@@ -43,7 +43,7 @@ namespace GraphQL.Types
         private InvalidOperationException Invalid() => new InvalidOperationException($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is GraphQLTypeReference other
                 ? TypeName == other.TypeName

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GraphQL.DI
 {
@@ -10,6 +11,8 @@ namespace GraphQL.DI
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider.
         /// Optionally removes any existing implementation of the same service type.
+        /// When not replacing existing registrations, requesting the service type should return the most recent registration,
+        /// and requesting an <see cref="IEnumerable{T}"/> of the service type should return all of the registrations.
         /// </summary>
         IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 
@@ -32,9 +35,11 @@ namespace GraphQL.DI
         IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
 
         /// <summary>
-        /// Configures an options class of type <typeparamref name="TOptions"/>.
+        /// Configures an options class of type <typeparamref name="TOptions"/>. Each registration call to this method
+        /// will be applied to instance of <typeparamref name="TOptions"/> returned from the DI engine.
         /// <br/><br/>
-        /// Passing <see langword="null"/> as the delegate is allowed and will skip this registration.
+        /// If <paramref name="action"/> is <see langword="null"/> then <typeparamref name="TOptions"/> is still configured and
+        /// will return a default instance (unless otherwise configured with a subsequent call to <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider}?)">Configure</see>).
         /// </summary>
         IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
