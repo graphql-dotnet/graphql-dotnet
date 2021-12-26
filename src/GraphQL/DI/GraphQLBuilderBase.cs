@@ -21,7 +21,7 @@ namespace GraphQL.DI
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-        protected virtual void Initialize()
+        protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IDocumentWriter is registered
             this.TryRegister<IDocumentWriter>(_ =>

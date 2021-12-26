@@ -72,7 +72,7 @@ namespace GraphQL.Tests.DI
             public readonly Mock<IGraphQLBuilder> MockBuilder = new Mock<IGraphQLBuilder>(MockBehavior.Strict);
 
             public void CallInitialize()
-                => Initialize();
+                => RegisterDefaultServices();
 
             public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
                 => MockBuilder.Object.Configure(action);
