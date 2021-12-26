@@ -47,3 +47,26 @@ property containing the execution variables has now been renamed to `Variables`.
 ### `ConfigureExecution` GraphQL builder method renamed to `ConfigureExecutionOptions`
 
 Also, `IConfigureExecution` renamed to `IConfigureExecutionOptions`.
+
+### `AddGraphQL` now accepts a configuration delegate instead of returning `IGraphQLBuilder`
+
+In order to prevent default implementations from ever being registered in the DI engine,
+the `AddGraphQL` method now accepts a configuration delegate where you can configure the
+GraphQL.NET DI components. To support this change, the `GraphQLBuilder` constructor now
+requires a configuration delegate parameter and will execute the delegate before calling
+`GraphQLBuilderBase.RegisterDefaultServices`.
+
+This requires a change similar to the following:
+
+```csharp
+// v4
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>();
+
+// v5
+services.AddGraphQL(builder => builder
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>());
+```
+### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`

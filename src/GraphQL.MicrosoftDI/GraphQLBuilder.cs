@@ -27,13 +27,21 @@ namespace GraphQL.MicrosoftDI
         /// Initializes a new instance for the specified service collection.
         /// </summary>
         /// <remarks>
-        /// Registers various default services via <see cref="GraphQLBuilderBase.Initialize"/>.
+        /// Registers various default services via <see cref="GraphQLBuilderBase.RegisterDefaultServices"/>
+        /// after executing the configuration delegate.
         /// </remarks>
-        public GraphQLBuilder(IServiceCollection services)
+        public GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
-            services.AddOptions();
-            Initialize();
+            configure?.Invoke(this);
+            RegisterDefaultServices();
+        }
+
+        /// <inheritdoc/>
+        protected override void RegisterDefaultServices()
+        {
+            Services.AddOptions();
+            base.RegisterDefaultServices();
         }
 
         private static MSServiceLifetime TranslateLifetime(ServiceLifetime serviceLifetime)

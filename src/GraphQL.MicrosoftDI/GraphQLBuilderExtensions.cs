@@ -12,14 +12,18 @@ namespace GraphQL.MicrosoftDI
     public static class GraphQLBuilderExtensions
     {
         /// <summary>
-        /// Returns a new <see cref="IGraphQLBuilder"/> for the specified service collection and
+        /// Configures a GraphQL pipeline using the configuration delegate passed into
+        /// <paramref name="configure"/> for the specified service collection and
         /// registers a default set of services required by GraphQL if they have not already been registered.
         /// <br/><br/>
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-        public static IGraphQLBuilder AddGraphQL(this IServiceCollection services)
-            => new GraphQLBuilder(services);
+        public static IServiceCollection AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder>? configure)
+        {
+            _ = new GraphQLBuilder(services, configure);
+            return services;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
