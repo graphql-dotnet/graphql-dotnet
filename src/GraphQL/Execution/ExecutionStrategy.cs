@@ -600,25 +600,5 @@ namespace GraphQL.Execution
                 throw new InvalidOperationException($"'{result}' value of type '{result.GetType()}' is not allowed for '{objectType.Name}'. Either change IsTypeOf method of '{objectType.Name}' to accept this value or return another value from your resolver.");
             }
         }
-
-        /// <summary>
-        /// If there are any <see cref="IDocumentExecutionListener"/>s specified within the <see cref="ExecutionContext"/>,
-        /// runs the <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext)">BeforeExecutionStepAwaitedAsync</see>
-        /// method on each of the registered document execution listeners.
-        /// <br/><br/>
-        /// This method will be removed in version 5.
-        /// </summary>
-        [Obsolete]
-        protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
-        {
-            if (context.Listeners != null)
-            {
-                foreach (var listener in context.Listeners)
-                {
-                    await listener.BeforeExecutionStepAwaitedAsync(context)
-                        .ConfigureAwait(false);
-                }
-            }
-        }
     }
 }

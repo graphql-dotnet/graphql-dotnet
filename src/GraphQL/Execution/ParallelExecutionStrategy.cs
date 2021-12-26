@@ -74,11 +74,6 @@ namespace GraphQL.Execution
 
                         }
 
-#pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
-
                         // Await tasks for this execution step
                         await Task.WhenAll(currentTasks)
                             .ConfigureAwait(false);
@@ -113,18 +108,6 @@ namespace GraphQL.Execution
             {
                 if (currentTasks.Count > 0)
                 {
-                    try
-                    {
-#pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
-                    }
-                    catch (Exception temp)
-                    {
-                        if (original.Data?.IsReadOnly == false)
-                            original.Data["GRAPHQL_BEFORE_EXECUTION_STEP_AWAITED_EXCEPTION"] = temp;
-                    }
                     try
                     {
                         await Task.WhenAll(currentTasks).ConfigureAwait(false);

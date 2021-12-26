@@ -22,7 +22,7 @@ namespace GraphQL.SystemTextJson
         public override Inputs Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => ReadDictionary(ref reader).ToInputs();
 
-        internal static Dictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
+        private static Dictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
                 throw new JsonException();

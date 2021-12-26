@@ -516,15 +516,11 @@ namespace GraphQL
     {
         public static object? DefaultValue(this System.Reflection.MemberInfo memberInfo) { }
         public static string? Description(this System.Reflection.MemberInfo memberInfo) { }
-        [System.Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static System.Type GetEnumerableElementType(this System.Type type) { }
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
-        [System.Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static bool IsNullable(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
     public enum TypeMappingMode
@@ -594,8 +590,6 @@ namespace GraphQL.Builders
         public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        [System.Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Unidirectional() { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
@@ -821,10 +815,6 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
-        [System.Obsolete]
-        public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
-        [System.Obsolete]
-        public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
     public struct ErrorInfo
     {
@@ -913,8 +903,6 @@ namespace GraphQL.Execution
         protected GraphQL.Types.FieldType? GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
         protected virtual GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Execution.ExecutionContext context) { }
         public virtual System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field>? GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        [System.Obsolete]
-        protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task<bool> ProcessNodeUnhandledExceptionAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
         protected virtual System.Threading.Tasks.Task SetArrayItemNodesAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         protected virtual void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
@@ -937,10 +925,6 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult);
         System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context);
-        [System.Obsolete]
-        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
-        [System.Obsolete]
-        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
     public interface IErrorInfoProvider
     {
@@ -1387,8 +1371,7 @@ namespace GraphQL.Language.AST
     public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public Field(GraphQL.Language.AST.NameNode alias, GraphQL.Language.AST.NameNode name) { }
-        [set: System.Obsolete]
-        public string? Alias { get; set; }
+        public string? Alias { get; }
         public GraphQL.Language.AST.NameNode AliasNode { get; }
         public GraphQL.Language.AST.Arguments? Arguments { get; set; }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
@@ -1405,17 +1388,13 @@ namespace GraphQL.Language.AST
     }
     public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
-        [System.Obsolete]
-        public FragmentDefinition(GraphQL.Language.AST.NameNode node) { }
         public FragmentDefinition(GraphQL.Language.AST.NameNode node, GraphQL.Language.AST.NamedType type, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives? Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        [set: System.Obsolete]
-        public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
-        [set: System.Obsolete]
-        public GraphQL.Language.AST.NamedType Type { get; set; }
+        public GraphQL.Language.AST.SelectionSet SelectionSet { get; }
+        public GraphQL.Language.AST.NamedType Type { get; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
@@ -1449,8 +1428,7 @@ namespace GraphQL.Language.AST
     }
     public interface IHaveSelectionSet : GraphQL.Language.AST.INode
     {
-        [set: System.Obsolete]
-        GraphQL.Language.AST.SelectionSet? SelectionSet { get; set; }
+        GraphQL.Language.AST.SelectionSet? SelectionSet { get; }
     }
     public interface IHaveValue : GraphQL.Language.AST.INode
     {
@@ -1474,13 +1452,10 @@ namespace GraphQL.Language.AST
     }
     public class InlineFragment : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
-        [System.Obsolete]
-        public InlineFragment() { }
         public InlineFragment(GraphQL.Language.AST.SelectionSet selectionSet) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives? Directives { get; set; }
-        [set: System.Obsolete]
-        public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
+        public GraphQL.Language.AST.SelectionSet SelectionSet { get; }
         public GraphQL.Language.AST.NamedType? Type { get; set; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
@@ -1564,16 +1539,13 @@ namespace GraphQL.Language.AST
     }
     public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
-        [System.Obsolete]
-        public Operation(GraphQL.Language.AST.NameNode name) { }
         public Operation(GraphQL.Language.AST.NameNode name, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives? Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.OperationType OperationType { get; set; }
-        [set: System.Obsolete]
-        public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
+        public GraphQL.Language.AST.SelectionSet SelectionSet { get; }
         public GraphQL.Language.AST.VariableDefinitions? Variables { get; set; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
@@ -1619,35 +1591,26 @@ namespace GraphQL.Language.AST
     }
     public abstract class ValueNode<T> : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<T>
     {
-        [System.Obsolete]
-        public ValueNode() { }
         public ValueNode(T value) { }
-        [set: System.Obsolete]
-        public T Value { get; set; }
+        public T Value { get; }
         public override string ToString() { }
     }
     public class Variable
     {
-        [System.Obsolete]
-        public Variable() { }
         public Variable(string name) { }
         public bool IsDefault { get; set; }
-        [set: System.Obsolete]
-        public string Name { get; set; }
+        public string Name { get; }
         public object? Value { get; set; }
         public bool ValueSpecified { get; }
     }
     public class VariableDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode
     {
-        [System.Obsolete]
-        public VariableDefinition(GraphQL.Language.AST.NameNode node) { }
         public VariableDefinition(GraphQL.Language.AST.NameNode node, GraphQL.Language.AST.IType type) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IValue? DefaultValue { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        [set: System.Obsolete]
-        public GraphQL.Language.AST.IType Type { get; set; }
+        public GraphQL.Language.AST.IType Type { get; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
@@ -2631,15 +2594,6 @@ namespace GraphQL.Utilities
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
-    }
-    [System.Obsolete("This class is no longer required to set DeprecationReason property")]
-    public class DeprecatedDirectiveVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
-    {
-        public DeprecatedDirectiveVisitor() { }
-        public static GraphQL.Utilities.DeprecatedDirectiveVisitor Instance { get; }
-        public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public class FieldConfig : GraphQL.Utilities.MetadataProvider
     {

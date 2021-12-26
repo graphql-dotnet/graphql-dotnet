@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -7,27 +5,15 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Variable
     {
-        [Obsolete]
-        public Variable() : this(null!)
-        {
-        }
-
         public Variable(string name)
         {
-#pragma warning disable CS0612 // Type or member is obsolete
             Name = name;
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
         /// Gets or sets the name of the variable.
         /// </summary>
-        public string Name
-        {
-            get;
-            [Obsolete]
-            set;
-        }
+        public string Name { get; }
 
         private object? _value;
         /// <summary>

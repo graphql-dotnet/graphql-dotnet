@@ -280,7 +280,7 @@ namespace GraphQL.Tests.Types
 
             var g = Create(graphType);
             var valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
-            object converted = SystemTextJson.StringExtensions.ToDictionary($"{{ \"arg\": {valueString} }}")["arg"];
+            object converted = $"{{ \"arg\": {valueString} }}".ToDictionary()["arg"];
             g.CanParseValue(converted).ShouldBeTrue($"Converted value: {converted}, Type: {converted.GetType()}");
             var parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
