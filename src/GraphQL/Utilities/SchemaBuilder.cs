@@ -236,15 +236,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            ObjectGraphType type;
-            if (!_types.ContainsKey(name))
-            {
-                type = new ObjectGraphType { Name = name };
-            }
-            else
-            {
-                type = _types[name] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType");
-            }
+            var type = _types.TryGetValue(name, out var t)
+                ? t as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType")
+                : new ObjectGraphType { Name = name };
 
             if (!isExtensionType)
             {

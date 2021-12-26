@@ -4,7 +4,6 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    [Collection("Sequential_UseDeclaringTypeNames")]
     public class Bug_nested_type_names_dont_conflict :
         QueryTestBase<Bug_nested_type_names_dont_conflict.MutationSchema>
     {
