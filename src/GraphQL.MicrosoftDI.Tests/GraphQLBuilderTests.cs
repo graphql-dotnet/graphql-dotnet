@@ -55,7 +55,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.Register(serviceType, implementationType, serviceLifetime, replace));
+            var builder = new GraphQLBuilder(services, b => b.Services.Register(serviceType, implementationType, serviceLifetime, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -97,7 +97,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.Register<Interface1>(factory, serviceLifetime, replace));
+            var builder = new GraphQLBuilder(services, b => b.Services.Register<Interface1>(factory, serviceLifetime, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -131,7 +131,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.Register<Interface1>(instance, replace));
+            var builder = new GraphQLBuilder(services, b => b.Services.Register<Interface1>(instance, replace));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -167,7 +167,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.TryRegister(serviceType, implementationType, serviceLifetime));
+            var builder = new GraphQLBuilder(services, b => b.Services.TryRegister(serviceType, implementationType, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -199,7 +199,7 @@ namespace GraphQL.MicrosoftDI.Tests
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
             services.AddTransient(serviceType, _ => null);
-            var builder = new GraphQLBuilder(services, b => b.TryRegister(serviceType, implementationType, serviceLifetime));
+            var builder = new GraphQLBuilder(services, b => b.Services.TryRegister(serviceType, implementationType, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -233,7 +233,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.TryRegister<Interface1>(factory, serviceLifetime));
+            var builder = new GraphQLBuilder(services, b => b.Services.TryRegister<Interface1>(factory, serviceLifetime));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -258,7 +258,7 @@ namespace GraphQL.MicrosoftDI.Tests
             }).Verifiable();
             mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
             var services = mockServiceCollection.Object;
-            var builder = new GraphQLBuilder(services, b => b.TryRegister<Interface1>(instance));
+            var builder = new GraphQLBuilder(services, b => b.Services.TryRegister<Interface1>(instance));
             mockServiceCollection.Verify();
             match.ShouldBeTrue();
         }
@@ -295,7 +295,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL(b => b.Configure<TestOptions>());
+            services.AddGraphQL(b => b.Services.Configure<TestOptions>());
             services.BuildServiceProvider().GetRequiredService<TestOptions>().Value.ShouldBe(0);
             services.BuildServiceProvider().GetRequiredService<IOptions<TestOptions>>().Value.Value.ShouldBe(0);
         }
@@ -304,7 +304,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Value()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL(b => b.Configure<TestOptions>(o => o.Value += 1));
+            services.AddGraphQL(b => b.Services.Configure<TestOptions>(o => o.Value += 1));
             var serviceProvider = services.BuildServiceProvider();
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1);
             serviceProvider.GetRequiredService<TestOptions>().Value.ShouldBe(1); //ensure execution only occurs once
@@ -315,7 +315,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Multiple()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL(b => b
+            services.AddGraphQL(b => b.Services
                 .Configure<TestOptions>(o => o.Value += 1)
                 .Configure<TestOptions>(o => o.Value += 2));
             var serviceProvider = services.BuildServiceProvider();
@@ -327,7 +327,7 @@ namespace GraphQL.MicrosoftDI.Tests
         public void Configure_Options()
         {
             var services = new ServiceCollection();
-            services.AddGraphQL(b => b.Configure<TestOptions>());
+            services.AddGraphQL(b => b.Services.Configure<TestOptions>());
             services.Configure<TestOptions>(o => o.Value += 1);
             services.Configure<TestOptions>(o => o.Value += 2);
             var serviceProvider = services.BuildServiceProvider();

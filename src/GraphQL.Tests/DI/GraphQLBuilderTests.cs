@@ -19,8 +19,12 @@ namespace GraphQL.Tests.DI
 {
     public class GraphQLBuilderExtensionTests
     {
-        private readonly Mock<IGraphQLBuilder> _builderMock = new Mock<IGraphQLBuilder>(MockBehavior.Strict);
-        private IGraphQLBuilder _builder => _builderMock.Object;
+        public interface IGraphQLBuilderAndServiceRegister : IGraphQLBuilder, IServiceRegister
+        {
+        }
+
+        private readonly Mock<IGraphQLBuilderAndServiceRegister> _builderMock = new Mock<IGraphQLBuilderAndServiceRegister>(MockBehavior.Strict);
+        private IGraphQLBuilderAndServiceRegister _builder => _builderMock.Object;
 
         private void Verify()
         {
@@ -30,12 +34,14 @@ namespace GraphQL.Tests.DI
 
         private void MockSetupRegister<TService, TImplementation>(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, bool replace = false)
         {
+            _builderMock.Setup(b => b.Services).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace)).Returns(_builder).Verifiable();
         }
 
         private void MockSetupRegister<TService>(TService instance, bool replace = false)
             where TService : class
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(TService), instance, replace)).Returns(_builder).Verifiable();
         }
 
@@ -44,6 +50,7 @@ namespace GraphQL.Tests.DI
         {
             Func<IServiceProvider, TService> factory = _ => null;
             _builderMock.Setup(b => b.Register(typeof(TService), factory, serviceLifetime, replace)).Returns(_builder).Verifiable();
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             return factory;
         }
 
@@ -78,6 +85,7 @@ namespace GraphQL.Tests.DI
 
         private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Action<ExecutionOptions> actions = _ => { };
             _builderMock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
@@ -104,6 +112,7 @@ namespace GraphQL.Tests.DI
         private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider serviceProvider = null)
         {
             Action<ISchema, IServiceProvider> actions = (_, _) => { };
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureSchema, bool>((_, action, _) =>
                 {
@@ -124,8 +133,8 @@ namespace GraphQL.Tests.DI
         [InlineData(true)]
         public void Register(bool replace)
         {
-            _builderMock.Setup(x => x.Register(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builder.Register<Class1>(ServiceLifetime.Transient, replace);
+            _builderMock.Setup(x => x.Services.Register(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builder.Services.Register<Class1>(ServiceLifetime.Transient, replace);
             Verify();
         }
 
@@ -134,8 +143,8 @@ namespace GraphQL.Tests.DI
         [InlineData(true)]
         public void Register_Implementation(bool replace)
         {
-            _builderMock.Setup(x => x.Register(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builder.Register<Interface1, Class1>(ServiceLifetime.Transient, replace);
+            _builderMock.Setup(x => x.Services.Register(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builder.Services.Register<Interface1, Class1>(ServiceLifetime.Transient, replace);
             Verify();
         }
 
@@ -145,8 +154,8 @@ namespace GraphQL.Tests.DI
         public void Register_Instance(bool replace)
         {
             var instance = new Class1();
-            _builderMock.Setup(x => x.Register(typeof(Interface1), instance, replace)).Returns(_builder).Verifiable();
-            _builder.Register<Interface1>(instance, replace);
+            _builderMock.Setup(x => x.Services.Register(typeof(Interface1), instance, replace)).Returns(_builder).Verifiable();
+            _builder.Services.Register<Interface1>(instance, replace);
             Verify();
         }
 
@@ -156,30 +165,31 @@ namespace GraphQL.Tests.DI
         public void Register_Factory(bool replace)
         {
             var factory = MockSetupRegister<Class1>(ServiceLifetime.Transient, replace);
-            _builder.Register(factory, ServiceLifetime.Transient, replace);
+            _builder.Services.Register(factory, ServiceLifetime.Transient, replace);
             Verify();
         }
 
         [Fact]
         public void Register_Null()
         {
-            Should.Throw<ArgumentNullException>(() => _builder.Register<Class1>(implementationInstance: null));
-            Should.Throw<ArgumentNullException>(() => _builder.Register<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
+            Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationInstance: null));
+            Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
         }
 
         [Fact]
         public void TryRegister()
         {
-            _builderMock.Setup(x => x.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builder.TryRegister<Class1>(ServiceLifetime.Transient);
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builder.Services.TryRegister<Class1>(ServiceLifetime.Transient);
             Verify();
         }
 
         [Fact]
         public void TryRegisterImplementation()
         {
-            _builderMock.Setup(x => x.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builder.TryRegister<Interface1, Class1>(ServiceLifetime.Transient);
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builder.Services.TryRegister<Interface1, Class1>(ServiceLifetime.Transient);
             Verify();
         }
 
@@ -187,8 +197,8 @@ namespace GraphQL.Tests.DI
         public void TryRegister_Instance()
         {
             var instance = new Class1();
-            _builderMock.Setup(x => x.TryRegister(typeof(Interface1), instance)).Returns(_builder).Verifiable();
-            _builder.TryRegister<Interface1>(instance);
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), instance)).Returns(_builder).Verifiable();
+            _builder.Services.TryRegister<Interface1>(instance);
             Verify();
         }
 
@@ -196,38 +206,39 @@ namespace GraphQL.Tests.DI
         public void TryRegister_Factory()
         {
             Func<IServiceProvider, Class1> factory = _ => null;
-            _builderMock.Setup(b => b.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builder.TryRegister(factory, ServiceLifetime.Transient);
+            _builderMock.Setup(b => b.Services.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builder.Services.TryRegister(factory, ServiceLifetime.Transient);
             Verify();
         }
 
         [Fact]
         public void TryRegister_Null()
         {
-            Should.Throw<ArgumentNullException>(() => _builder.TryRegister<Class1>(implementationInstance: null));
-            Should.Throw<ArgumentNullException>(() => _builder.TryRegister<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
+            Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationInstance: null));
+            Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
         }
 
         [Fact]
         public void Configure()
         {
-            _builderMock.Setup(x => x.Configure(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
+            _builderMock.Setup(x => x.Services.Configure(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
             {
                 var c = new Class1();
                 a(c, null);
                 c.Value.ShouldBe(1);
                 return null;
             }).Verifiable();
-            _builder.Configure<Class1>(x => x.Value = 1);
+            _builder.Services.Configure<Class1>(x => x.Value = 1);
             Verify();
         }
 
         [Fact]
         public void ConfigureNull()
         {
-            _builderMock.Setup(x => x.Configure<Class1>(null)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(x => x.Services.Configure<Class1>(null)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
             Action<Class1> arg = null;
-            _builder.Configure(arg);
+            _builder.Services.Configure(arg);
             Verify();
         }
         #endregion
@@ -236,6 +247,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>();
@@ -252,6 +264,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema_Scoped()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
@@ -262,6 +275,7 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Factory()
         {
             Func<IServiceProvider, TestSchema> factory = _ => null;
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema(factory);
@@ -271,6 +285,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema_Instance()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             var schema = new TestSchema();
             _builderMock.Setup(b => b.Register(typeof(TestSchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
                 .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
@@ -330,6 +345,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddDocumentExecuter_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((TestDocumentExecuter)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((Func<IServiceProvider, TestDocumentExecuter>)null));
         }
@@ -416,6 +432,7 @@ namespace GraphQL.Tests.DI
         private void MockSetupComplexityConfigurationNull()
         {
             ExecutionOptions opts = null;
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
@@ -441,6 +458,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddComplexityAnalyzer()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             var action = MockSetupComplexityConfiguration1();
             _builder.AddComplexityAnalyzer(action);
             Verify();
@@ -449,6 +467,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddComplexityAnalyzer2()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             var action = MockSetupComplexityConfiguration2();
             _builder.AddComplexityAnalyzer(action);
             Verify();
@@ -549,6 +568,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddComplexityAnalyzer_InstanceNull()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null, (_, _) => { }));
         }
@@ -592,6 +612,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddComplexityAnalyzer_FactoryNull()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null, (_, _) => { }));
             Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
@@ -687,6 +708,8 @@ namespace GraphQL.Tests.DI
             _builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(MyScalar), typeof(MyScalar), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
 
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
+
             _builder.AddGraphTypes(assembly);
             Verify();
         }
@@ -694,6 +717,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddGraphTypes_StarWars()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
@@ -718,8 +742,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddGraphTypes_CallingAssembly()
         {
-            var builderMock = new Mock<IGraphQLBuilder>(MockBehavior.Loose);
-            builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(builderMock.Object).Verifiable();
+            var builderMock = new Mock<IGraphQLBuilderAndServiceRegister>(MockBehavior.Loose);
+            builderMock.Setup(b => b.Services.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(builderMock.Object).Verifiable();
             builderMock.Object.AddGraphTypes();
             builderMock.Verify();
         }
@@ -763,6 +787,7 @@ namespace GraphQL.Tests.DI
                 mockSchema.Setup(s => s.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType)).Verifiable();
             }
 
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureSchema, bool>((_, action, _) =>
                 {
@@ -828,6 +853,7 @@ namespace GraphQL.Tests.DI
         {
             var instance = new MyDocumentListener();
             Func<IServiceProvider, MyDocumentListener> factory = services => instance;
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(IDocumentExecutionListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(MyDocumentListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -845,6 +871,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddDocumentListener_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((MyDocumentListener)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((Func<IServiceProvider, MyDocumentListener>)null));
         }
@@ -991,6 +1018,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddDocumentCache_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((TestDocumentCache)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((Func<IServiceProvider, TestDocumentCache>)null));
         }
@@ -1025,6 +1053,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddDocumentWriter_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentWriter((SystemTextJson.DocumentWriter)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddDocumentWriter((Func<IServiceProvider, SystemTextJson.DocumentWriter>)null));
         }
@@ -1083,6 +1112,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void ConfigureSchema_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema>)null));
             Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema, IServiceProvider>)null));
         }
@@ -1090,6 +1120,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void ConfigureExecution_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecutionOptions(null));
         }
         #endregion
@@ -1174,6 +1205,7 @@ namespace GraphQL.Tests.DI
         {
             var instance = new MyValidationRule();
             Func<IServiceProvider, MyValidationRule> factory = _ => instance;
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(IValidationRule), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             _builderMock.Setup(b => b.Register(typeof(MyValidationRule), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -1207,6 +1239,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddValidationRule_Null()
         {
+            _builderMock.Setup(x => x.Services).Returns(_builderMock.Object).Verifiable();
             Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((MyValidationRule)null));
             Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((Func<IServiceProvider, MyValidationRule>)null));
         }

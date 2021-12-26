@@ -16,12 +16,15 @@ namespace GraphQL.MicrosoftDI
     /// An implementation of <see cref="IGraphQLBuilder"/> which uses the Microsoft dependency injection framework
     /// to register services and configure options.
     /// </summary>
-    public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection
+    public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRegister
     {
+        /// <inheritdoc />
+        public override IServiceRegister Services => this;
+
         /// <summary>
         /// Returns the underlying <see cref="IServiceCollection"/> of this builder.
         /// </summary>
-        public IServiceCollection Services { get; }
+        public IServiceCollection ServiceCollection { get; }
 
         /// <summary>
         /// Initializes a new instance for the specified service collection.
@@ -32,7 +35,7 @@ namespace GraphQL.MicrosoftDI
         /// </remarks>
         public GraphQLBuilder(IServiceCollection services, Action<IGraphQLBuilder>? configure)
         {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
+            ServiceCollection = services ?? throw new ArgumentNullException(nameof(services));
             configure?.Invoke(this);
             RegisterDefaultServices();
         }
@@ -40,7 +43,7 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc/>
         protected override void RegisterDefaultServices()
         {
-            Services.AddOptions();
+            ServiceCollection.AddOptions();
             base.RegisterDefaultServices();
         }
 
@@ -54,7 +57,8 @@ namespace GraphQL.MicrosoftDI
             };
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
+        public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
+            where TOptions : class, new()
         {
             this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
             if (action != null)
@@ -67,7 +71,7 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
+        public IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -76,17 +80,17 @@ namespace GraphQL.MicrosoftDI
 
             if (replace)
             {
-                Services.Replace(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+                ServiceCollection.Replace(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
             }
             else
             {
-                Services.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+                ServiceCollection.Add(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
             }
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
+        public IServiceRegister Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -95,17 +99,17 @@ namespace GraphQL.MicrosoftDI
 
             if (replace)
             {
-                Services.Replace(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+                ServiceCollection.Replace(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
             }
             else
             {
-                Services.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+                ServiceCollection.Add(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
             }
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false)
+        public IServiceRegister Register(Type serviceType, object implementationInstance, bool replace = false)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -114,63 +118,63 @@ namespace GraphQL.MicrosoftDI
 
             if (replace)
             {
-                Services.Replace(new ServiceDescriptor(serviceType, implementationInstance));
+                ServiceCollection.Replace(new ServiceDescriptor(serviceType, implementationInstance));
             }
             else
             {
-                Services.Add(new ServiceDescriptor(serviceType, implementationInstance));
+                ServiceCollection.Add(new ServiceDescriptor(serviceType, implementationInstance));
             }
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
+        public IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
-            Services.TryAdd(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime)
+        public IServiceRegister TryRegister(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationType == null)
                 throw new ArgumentNullException(nameof(implementationType));
 
-            Services.TryAdd(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
             return this;
         }
 
         /// <inheritdoc/>
-        public override IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance)
+        public IServiceRegister TryRegister(Type serviceType, object implementationInstance)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationInstance == null)
                 throw new ArgumentNullException(nameof(implementationInstance));
 
-            Services.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
+            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
             return this;
         }
 
-        int ICollection<ServiceDescriptor>.Count => Services.Count;
-        bool ICollection<ServiceDescriptor>.IsReadOnly => Services.IsReadOnly;
-        ServiceDescriptor IList<ServiceDescriptor>.this[int index] { get => Services[index]; set => Services[index] = value; }
-        int IList<ServiceDescriptor>.IndexOf(ServiceDescriptor item) => Services.IndexOf(item);
-        void IList<ServiceDescriptor>.Insert(int index, ServiceDescriptor item) => Services.Insert(index, item);
-        void IList<ServiceDescriptor>.RemoveAt(int index) => Services.RemoveAt(index);
-        void ICollection<ServiceDescriptor>.Add(ServiceDescriptor item) => Services.Add(item);
-        void ICollection<ServiceDescriptor>.Clear() => Services.Clear();
-        bool ICollection<ServiceDescriptor>.Contains(ServiceDescriptor item) => Services.Contains(item);
-        void ICollection<ServiceDescriptor>.CopyTo(ServiceDescriptor[] array, int arrayIndex) => Services.CopyTo(array, arrayIndex);
-        bool ICollection<ServiceDescriptor>.Remove(ServiceDescriptor item) => Services.Remove(item);
-        IEnumerator<ServiceDescriptor> IEnumerable<ServiceDescriptor>.GetEnumerator() => Services.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Services).GetEnumerator();
+        int ICollection<ServiceDescriptor>.Count => ServiceCollection.Count;
+        bool ICollection<ServiceDescriptor>.IsReadOnly => ServiceCollection.IsReadOnly;
+        ServiceDescriptor IList<ServiceDescriptor>.this[int index] { get => ServiceCollection[index]; set => ServiceCollection[index] = value; }
+        int IList<ServiceDescriptor>.IndexOf(ServiceDescriptor item) => ServiceCollection.IndexOf(item);
+        void IList<ServiceDescriptor>.Insert(int index, ServiceDescriptor item) => ServiceCollection.Insert(index, item);
+        void IList<ServiceDescriptor>.RemoveAt(int index) => ServiceCollection.RemoveAt(index);
+        void ICollection<ServiceDescriptor>.Add(ServiceDescriptor item) => ServiceCollection.Add(item);
+        void ICollection<ServiceDescriptor>.Clear() => ServiceCollection.Clear();
+        bool ICollection<ServiceDescriptor>.Contains(ServiceDescriptor item) => ServiceCollection.Contains(item);
+        void ICollection<ServiceDescriptor>.CopyTo(ServiceDescriptor[] array, int arrayIndex) => ServiceCollection.CopyTo(array, arrayIndex);
+        bool ICollection<ServiceDescriptor>.Remove(ServiceDescriptor item) => ServiceCollection.Remove(item);
+        IEnumerator<ServiceDescriptor> IEnumerable<ServiceDescriptor>.GetEnumerator() => ServiceCollection.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)ServiceCollection).GetEnumerator();
     }
 }

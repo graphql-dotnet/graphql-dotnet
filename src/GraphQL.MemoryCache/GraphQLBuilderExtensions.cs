@@ -11,10 +11,16 @@ namespace GraphQL.Caching
         /// dependency injection framework, and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions>? action = null)
-            => builder.AddDocumentCache<MemoryDocumentCache>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddDocumentCache<MemoryDocumentCache>();
+        }
 
         /// <inheritdoc cref="AddMemoryCache(IGraphQLBuilder, Action{MemoryDocumentCacheOptions})"/>
         public static IGraphQLBuilder AddMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions, IServiceProvider>? action)
-            => builder.AddDocumentCache<MemoryDocumentCache>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddDocumentCache<MemoryDocumentCache>();
+        }
     }
 }
