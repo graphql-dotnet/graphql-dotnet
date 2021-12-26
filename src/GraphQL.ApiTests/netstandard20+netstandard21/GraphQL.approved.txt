@@ -54,6 +54,11 @@ namespace GraphQL
     {
         public DoNotMapClrTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    public sealed class DoNotRegisterAttribute : System.Attribute
+    {
+        public DoNotRegisterAttribute() { }
+    }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
         public DocumentExecuter() { }

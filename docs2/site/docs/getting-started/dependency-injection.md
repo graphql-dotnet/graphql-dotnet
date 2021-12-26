@@ -163,8 +163,8 @@ injection provider, or their `Dispose` methods will not be called. Any dependenc
 
 You can also use the `services.AddGraphTypes()` extension method from the [server](https://github.com/graphql-dotnet/server)
 project to scan the calling assembly for classes that implement `IGraphType` and register them all as singletons
-within the service provider. For additional options and overloads of this method, see
-[GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
+within the service provider. Mark your class with `DoNotRegisterAttribute` if you want to skip registration.
+For additional options and overloads of this method, see [GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
 
 ## Nancy TinyIoCContainer
 
