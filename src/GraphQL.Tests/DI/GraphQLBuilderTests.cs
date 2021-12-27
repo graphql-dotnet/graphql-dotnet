@@ -272,18 +272,8 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Instance()
         {
             var schema = new TestSchema();
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
-                {
-                    factory(null).ShouldBe(schema);
-                    return _builder;
-                }).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, factory, _) =>
-                {
-                    factory(null).ShouldBe(schema);
-                    return _builder;
-                }).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), schema, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), schema)).Returns(_builder).Verifiable();
             _builder.AddSchema(schema);
             Verify();
         }
