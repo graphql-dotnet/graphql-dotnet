@@ -20,7 +20,7 @@ namespace GraphQL.Harness.Tests
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
             var expectedResult = CreateQueryResult(_result);
-            string actualResultJson = ex.ReadBody(context);
+            string actualResultJson = ex.Body;
 
             if (_ignoreExtensions)
             {
