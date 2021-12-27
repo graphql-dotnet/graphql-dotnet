@@ -215,7 +215,10 @@ namespace GraphQL.Utilities
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
-            return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            if (type.Fields.Count > 0)
+                return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            else
+                return FormatDescription(type.Description) + "type {0}{1}".ToFormat(type.Name, implementedInterfaces);
         }
 
         public virtual string PrintInterface(IInterfaceGraphType type)
