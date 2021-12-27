@@ -180,7 +180,7 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             // Also register the service as ISchema if not already registered.
-            builder.TryRegisterAsBoth<ISchema, TSchema>(schema);
+            builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schema);
 
             return builder;
         }
