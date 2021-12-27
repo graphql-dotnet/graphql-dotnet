@@ -174,7 +174,16 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema)
             where TSchema : class, ISchema
-            => schema == null ? throw new ArgumentNullException(nameof(schema)) : AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
+        {
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            // Register the service with the DI provider as TSchema, overwriting any existing registration
+            // Also register the service as ISchema if not already registered.
+            builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schema);
+
+            return builder;
+        }
 
         /// <inheritdoc cref="AddSchema{TSchema}(IGraphQLBuilder, ServiceLifetime)"/>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
@@ -423,6 +432,8 @@ namespace GraphQL
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
+        /// Skips classes where the class is marked with the <see cref="DoNotRegisterAttribute"/>.
+        /// <br/><br/>
         /// Also registers <see cref="EnumerationGraphType{TEnum}"/>, <see cref="ConnectionType{TNodeType}"/>,
         /// <see cref="ConnectionType{TNodeType, TEdgeType}"/>, <see cref="EdgeType{TNodeType}"/>,
         /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
@@ -439,7 +450,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(assembly));
 
             foreach (var type in assembly.GetTypes()
-                .Where(x => x.IsClass && !x.IsAbstract && typeof(IGraphType).IsAssignableFrom(x)))
+                .Where(x => x.IsClass && !x.IsAbstract && typeof(IGraphType).IsAssignableFrom(x) && !x.IsDefined(typeof(DoNotRegisterAttribute))))
             {
                 builder.Services.TryRegister(type, type, ServiceLifetime.Transient);
             }
