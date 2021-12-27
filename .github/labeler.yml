@@ -4,6 +4,7 @@ test:
   - src/GraphQL.Harness.Tests/**/*
   - src/GraphQL.MicrosoftDI.Tests/**/*
   - src/GraphQL.Tests/**/*
+  - src/GraphQL.ApiTests/**/*.cs
 
 CI:
   - .github/workflows/**/*
