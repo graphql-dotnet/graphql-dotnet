@@ -402,6 +402,8 @@ namespace GraphQL
         /// the graph types will effectively be scoped graph types. If the schema is a singleton schema,
         /// the graph types will effectively be singleton graph types.
         /// <br/><br/>
+        /// Skips classes where the class is marked with the <see cref="DoNotRegisterAttribute"/>.
+        /// <br/><br/>
         /// Also registers <see cref="EnumerationGraphType{TEnum}"/>, <see cref="ConnectionType{TNodeType}"/>,
         /// <see cref="ConnectionType{TNodeType, TEdgeType}"/>, <see cref="EdgeType{TNodeType}"/>,
         /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
@@ -418,7 +420,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(assembly));
 
             foreach (var type in assembly.GetTypes()
-                .Where(x => x.IsClass && !x.IsAbstract && typeof(IGraphType).IsAssignableFrom(x)))
+                .Where(x => x.IsClass && !x.IsAbstract && typeof(IGraphType).IsAssignableFrom(x) && !x.IsDefined(typeof(DoNotRegisterAttribute))))
             {
                 builder.TryRegister(type, type, ServiceLifetime.Transient);
             }

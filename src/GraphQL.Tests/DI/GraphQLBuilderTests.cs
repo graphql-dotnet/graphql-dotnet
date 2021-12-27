@@ -656,6 +656,7 @@ namespace GraphQL.Tests.DI
         public void AddGraphTypes()
         {
             var typeList = new Type[] {
+                typeof(MyGraphNotRegistered),
                 typeof(MyGraph),
                 typeof(MyScalar),
                 typeof(IGraphType),
@@ -1398,6 +1399,11 @@ namespace GraphQL.Tests.DI
         }
 
         private class MyGraph : ObjectGraphType
+        {
+        }
+
+        [DoNotRegister]
+        private class MyGraphNotRegistered : ObjectGraphType
         {
         }
 
