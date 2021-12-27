@@ -33,7 +33,7 @@ namespace GraphQL.DataLoader
         }
 
         /// <inheritdoc/>
-        public Task BeforeExecutionAwaitedAsync(IExecutionContext context)
+        public Task BeforeExecutionAwaitedAsync(IExecutionContext _)
             => Task.CompletedTask;
 
         /// <inheritdoc/>
@@ -45,7 +45,7 @@ namespace GraphQL.DataLoader
         }
 
         /// <inheritdoc/>
-        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context)
+        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext _)
             => Task.CompletedTask;
     }
 }

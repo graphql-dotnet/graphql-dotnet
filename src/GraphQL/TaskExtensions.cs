@@ -25,7 +25,7 @@ namespace GraphQL
             }
             else
             {
-                // Using dynamic is over 10x faster than reflection but works only for public types (or with InternalsVisibleTo attribute) 
+                // Using dynamic is over 10x faster than reflection but works only for public types (or with InternalsVisibleTo attribute)
                 try
                 {
                     return ((dynamic)task).Result;
@@ -33,7 +33,7 @@ namespace GraphQL
                 catch (RuntimeBinderException)
                 {
                     // it won't be any worse
-                    return task.GetType().GetProperty("Result").GetValue(task, null);
+                    return task.GetType().GetProperty("Result")!.GetValue(task, null);
                 }
             }
         }

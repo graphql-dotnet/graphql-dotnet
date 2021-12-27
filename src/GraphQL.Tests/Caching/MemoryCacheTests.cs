@@ -31,10 +31,7 @@ namespace GraphQL.Tests.Caching
 
             await memoryCache.SetAsync(query, doc);
 
-            await Should.ThrowAsync<ArgumentNullException>(async () =>
-            {
-                await memoryCache.SetAsync(query, null);
-            });
+            await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsync(query, null));
 
             (await memoryCache.GetAsync(query)).ShouldBe(doc);
         }

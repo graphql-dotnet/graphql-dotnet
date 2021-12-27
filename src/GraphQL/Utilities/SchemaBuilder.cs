@@ -199,8 +199,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual IGraphType GetType(string name)
         {
-            _types.TryGetValue(name, out IGraphType type);
-            return type;
+            _types.TryGetValue(name, out var type);
+            return type!;
         }
 
         private bool IsSubscriptionType(ObjectGraphType type)

@@ -109,7 +109,7 @@ namespace GraphQL
             if (type.IsArray)
             {
                 var clrElementType = type.GetElementType();
-                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
+                var elementType = GetGraphTypeFromType(clrElementType!, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else if (IsAnIEnumerable(type))
