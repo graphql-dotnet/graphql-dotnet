@@ -68,6 +68,11 @@ namespace GraphQL.Caching
             set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));
         }
 
+        /// <summary>
+        /// Do somme.
+        /// </summary>
+        public static void DoSomething() { }
+
         /// <inheritdoc/>
         public virtual void Dispose()
         {
