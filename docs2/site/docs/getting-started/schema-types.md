@@ -122,14 +122,44 @@ The name of each member _is_ the value.
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET
-`enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in
-the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute`
-applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute`
-applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE.
-Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member
-to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL
-`DeprecationReason`.
+1. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.
+
+- The `Name` will default to the .NET type name, which you can override in the constructor.
+- The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.
+- The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type.
+- Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.
+- Apply an `ObsoleteAttribute` to an enum member to set the GraphQL `DeprecationReason`.
+
+By default, the name of each enum member will be converted to CONSTANT_CASE. If you want to change
+this behavior, you can make it in two ways.
+
+a. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
+
+```csharp
+public class CamelCaseEnumerationGraphType<T> : EnumerationGraphType<T> where T : Enum
+{
+    protected override string ChangeEnumCase(string val) => val.ToCamelCase();
+}
+```
+
+and then inheriting this class instead of `EnumerationGraphType`
+
+```csharp
+public class MediaTypeEnum : CamelCaseEnumerationGraphType<MediaTypeViewModel>
+{
+}
+```
+ 
+b. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
+
+```csharp
+[CamelCase]
+public enum CamelCaseEnum
+{
+    FirstValue,
+    SecondValue
+}
+```
 
 ```csharp
 [Description("The Star Wars movies.")]
@@ -163,7 +193,7 @@ mapped via `Schema.RegisterTypeMapping`:
 Field(x => x.MyEnum);
 ```
 
-You can also manually create the `EnumerationGraphType`. Advantages of this method:
+2. You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
 - The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
 - You can manually add descriptions and deprecation reasons. This may be useful if you do not control the source code for the enum.
