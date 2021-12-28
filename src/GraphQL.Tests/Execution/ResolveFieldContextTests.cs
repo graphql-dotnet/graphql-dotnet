@@ -122,20 +122,14 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void resolveFieldContextAdapter_throws_error_when_null()
         {
-            Should.Throw<ArgumentNullException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<object>(null);
-            });
+            Should.Throw<ArgumentNullException>(() => _ = new ResolveFieldContextAdapter<object>(null));
         }
 
         [Fact]
         public void resolveFieldContextAdapter_throws_error_if_invalid_type()
         {
             var context = new ResolveFieldContext { Source = "test" };
-            Should.Throw<ArgumentException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<int>(context);
-            });
+            Should.Throw<ArgumentException>(() => _ = new ResolveFieldContextAdapter<int>(context));
         }
 
         [Fact]
@@ -158,10 +152,7 @@ namespace GraphQL.Tests.Execution
         public void resolveFieldContextAdapter_throws_error_for_null_values()
         {
             var context = new ResolveFieldContext();
-            Should.Throw<ArgumentException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<int>(context);
-            });
+            Should.Throw<ArgumentException>(() => _ = new ResolveFieldContextAdapter<int>(context));
         }
 
         [Fact]

@@ -18,11 +18,11 @@ namespace GraphQL.Reflection
 
         public Type ReturnType => _property.PropertyType;
 
-        public Type DeclaringType => _property.DeclaringType;
+        public Type DeclaringType => _property.DeclaringType!;
 
         public ParameterInfo[]? Parameters => null;
 
-        public MethodInfo MethodInfo => _property.GetMethod;
+        public MethodInfo MethodInfo => _property.GetMethod!;
 
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => _property.GetCustomAttributes<T>();
 
@@ -34,7 +34,7 @@ namespace GraphQL.Reflection
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return null; // never executed, necessary only for intellisense
             }
         }

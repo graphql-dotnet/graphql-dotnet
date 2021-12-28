@@ -77,7 +77,7 @@ namespace GraphQL.Instrumentation
 
             var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
             lock (_records!)
-                _records.Add(record);
+                _records!.Add(record);
             return new Marker(record, _stopwatch);
         }
 
@@ -90,7 +90,7 @@ namespace GraphQL.Instrumentation
                 return null;
 
             _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
-            return _records.OrderBy(x => x.Start).ToArray();
+            return _records!.OrderBy(x => x.Start).ToArray();
         }
 
         /// <summary>

@@ -2682,7 +2682,7 @@ namespace GraphQL.Utilities
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
-        protected virtual GraphQL.Types.IGraphType GetType(string name) { }
+        protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
