@@ -13,14 +13,17 @@ namespace GraphQL.DataLoader.Tests
         public void AddDataLoader()
         {
             var instance = new DataLoaderDocumentListener(new DataLoaderContextAccessor());
+            var mockRegister = new Mock<IServiceRegister>(MockBehavior.Strict);
             var mockBuilder = new Mock<IGraphQLBuilder>(MockBehavior.Strict);
+            var register = mockRegister.Object;
             var builder = mockBuilder.Object;
-            mockBuilder.Setup(x => x.Register(typeof(IDataLoaderContextAccessor), typeof(DataLoaderContextAccessor), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(IDocumentExecutionListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(builder).Verifiable();
+            mockBuilder.Setup(x => x.Services).Returns(register).Verifiable();
+            mockRegister.Setup(x => x.Register(typeof(IDataLoaderContextAccessor), typeof(DataLoaderContextAccessor), ServiceLifetime.Singleton, false)).Returns(register).Verifiable();
+            mockRegister.Setup(x => x.Register(typeof(IDocumentExecutionListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(register).Verifiable();
+            mockRegister.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(register).Verifiable();
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
-            mockBuilder.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
+            mockRegister.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
                 .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
                 {
                     var options = new ExecutionOptions()
@@ -29,11 +32,11 @@ namespace GraphQL.DataLoader.Tests
                     };
                     action.ConfigureAsync(options).Wait();
                     options.Listeners.ShouldContain(instance);
-                    return builder;
+                    return register;
                 }).Verifiable();
             builder.AddDataLoader();
             mockServiceProvider.Verify();
-            mockBuilder.Verify();
+            mockRegister.Verify();
         }
     }
 }

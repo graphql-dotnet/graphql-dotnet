@@ -74,6 +74,11 @@ services.AddGraphQL(builder => builder
 
 ### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`
 
+### All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
+
+Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
+If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
+
 ### Classes and members marked as obsolete have been removed
 
 The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
