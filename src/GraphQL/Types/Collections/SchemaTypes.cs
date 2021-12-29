@@ -281,21 +281,21 @@ namespace GraphQL.Types
         protected internal virtual IGraphType BuildGraphQLType(Type type, Func<Type, IGraphType> resolve)
         {
             var local = resolve;
-            local ??= t => (IGraphType)Activator.CreateInstance(t);
+            local ??= t => (IGraphType)Activator.CreateInstance(t)!;
             resolve = t => FindGraphType(t) ?? local(t);
 
             if (type.IsGenericType)
             {
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
-                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
+                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type)!;
                     nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
                     return nonNull;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
                 {
-                    var list = (ListGraphType)Activator.CreateInstance(type);
+                    var list = (ListGraphType)Activator.CreateInstance(type)!;
                     list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
                     return list;
                 }
