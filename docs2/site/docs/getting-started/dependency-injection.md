@@ -96,7 +96,7 @@ A list of the available extension methods is below:
 | `Register`              | Used by extension methods to register services within the DI framework | |
 | `TryRegister`           | Used by extension methods to register services within the DI framework when they have not already been registered | |
 
-The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware is registered
+The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
 
 To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:
@@ -163,8 +163,8 @@ injection provider, or their `Dispose` methods will not be called. Any dependenc
 
 You can also use the `services.AddGraphTypes()` extension method from the [server](https://github.com/graphql-dotnet/server)
 project to scan the calling assembly for classes that implement `IGraphType` and register them all as singletons
-within the service provider. For additional options and overloads of this method, see
-[GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
+within the service provider. Mark your class with `DoNotRegisterAttribute` if you want to skip registration.
+For additional options and overloads of this method, see [GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
 
 ## Nancy TinyIoCContainer
 

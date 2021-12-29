@@ -82,7 +82,10 @@ namespace GraphQL.Utilities
         /// <returns>SDL document.</returns>
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
         {
-            Schema?.Initialize();
+            if (Schema == null)
+                return "";
+
+            Schema.Initialize();
 
             var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
@@ -118,9 +121,9 @@ namespace GraphQL.Utilities
 
         public string? PrintSchemaDefinition(ISchema schema)
         {
-            Schema?.Initialize();
+            schema?.Initialize();
 
-            if (IsSchemaOfCommonNames(Schema))
+            if (schema == null || IsSchemaOfCommonNames(schema))
                 return null;
 
             var operationTypes = new List<string>();
@@ -212,7 +215,10 @@ namespace GraphQL.Utilities
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
-            return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            if (type.Fields.Count > 0)
+                return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            else
+                return FormatDescription(type.Description) + "type {0}{1}".ToFormat(type.Name, implementedInterfaces);
         }
 
         public virtual string PrintInterface(IInterfaceGraphType type)

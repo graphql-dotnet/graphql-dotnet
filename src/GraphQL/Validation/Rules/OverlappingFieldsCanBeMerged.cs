@@ -665,9 +665,9 @@ namespace GraphQL.Validation.Rules
             FragmentDefinition fragment)
         {
             // Short-circuit building a type from the node if possible.
-            if (cachedFieldsAndFragmentNames.ContainsKey(fragment.SelectionSet))
+            if (cachedFieldsAndFragmentNames.TryGetValue(fragment.SelectionSet, out var cached))
             {
-                return cachedFieldsAndFragmentNames[fragment.SelectionSet];
+                return cached;
             }
 
             var fragmentType = fragment.Type.GraphTypeFromType(context.Schema);
@@ -862,12 +862,10 @@ namespace GraphQL.Validation.Rules
             {
                 _data.TryGetValue(a, out var first);
 
-                if (first == null || !first.ContainsKey(b))
+                if (first == null || !first.TryGetValue(b, out bool result))
                 {
                     return false;
                 }
-
-                var result = first[b];
 
                 if (areMutuallyExclusive == false)
                 {

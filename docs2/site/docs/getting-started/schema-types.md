@@ -20,24 +20,26 @@ These are the scalars provided by the [GraphQL Specification](https://graphql.gi
 
 These are additional scalars provided by this project.
 
-| GraphQL          | GraphQL.NET                    | .NET               | Format |
-|------------------|---------------------------------|--------------------|-------|
+| GraphQL          | GraphQL.NET                    | .NET               | Format | Remarks |
+|------------------|---------------------------------|--------------------|-------|---------|
+| `BigInt` | `BigIntGraphType` | `BigInteger` | number |
+| `Byte` | `ByteGraphType` | `byte` | number |
 | `Date`           | `DateGraphType`                 | `DateTime`         | ISO-8601: yyyy-MM-dd |
+| `DateOnly` | `DateOnlyGraphType` | `DateOnly`                           | ISO-8601: yyyy-MM-dd | .NET6 and higher |
 | `DateTime`       | `DateTimeGraphType`             | `DateTime`         | ISO-8601, assume UTC |
 | `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   | ISO-8601 |
-| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         | number |
-| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
 | `Decimal` | `DecimalGraphType` | `decimal` | number |
-| `Uri` | `UriGraphType` | `Uri` | RFC 2396/2732/3986/3987 |
 | `Guid` | `GuidGraphType` | `Guid` | string |
-| `Short` | `ShortGraphType` | `short` | number |
-| `UShort` | `UShortGraphType` | `ushort` | number |
-| `UInt` | `UIntGraphType` | `uint` | number |
 | `Long` | `LongGraphType` | `long` | number |
-| `ULong` | `ULongGraphType` | `ulong` | number |
-| `Byte` | `ByteGraphType` | `byte` | number |
+| `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
 | `SByte` | `SByteGraphType` | `sbyte` | number |
-| `BigInt` | `BigIntGraphType` | `BigInteger` | number |
+| `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         | number |
+| `Short` | `ShortGraphType` | `short` | number |
+| `TimeOnly` | `TimeOnlyGraphType` | `TimeOnly` | ISO-8601: HH:mm:ss.FFFFFFF | .NET6 and higher |
+| `UInt` | `UIntGraphType` | `uint` | number |
+| `ULong` | `ULongGraphType` | `ulong` | number |
+| `Uri` | `UriGraphType` | `Uri` | RFC 2396/2732/3986/3987 |
+| `UShort` | `UShortGraphType` | `ushort` | number |
 
 Lists of data are also supported with any Scalar or Object types.
 
@@ -120,14 +122,44 @@ The name of each member _is_ the value.
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET
-`enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in
-the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute`
-applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute`
-applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE.
-Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member
-to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL
-`DeprecationReason`.
+1. You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.
+
+- The `Name` will default to the .NET type name, which you can override in the constructor.
+- The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.
+- The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type.
+- Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.
+- Apply an `ObsoleteAttribute` to an enum member to set the GraphQL `DeprecationReason`.
+
+By default, the name of each enum member will be converted to CONSTANT_CASE. If you want to change
+this behavior, you can make it in two ways.
+
+a. Inherit from `EnumerationGraphType<TEnum>` and override `ChangeEnumCase` method.
+
+```csharp
+public class CamelCaseEnumerationGraphType<T> : EnumerationGraphType<T> where T : Enum
+{
+    protected override string ChangeEnumCase(string val) => val.ToCamelCase();
+}
+```
+
+and then inheriting this class instead of `EnumerationGraphType`
+
+```csharp
+public class MediaTypeEnum : CamelCaseEnumerationGraphType<MediaTypeViewModel>
+{
+}
+```
+ 
+b. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
+
+```csharp
+[CamelCase]
+public enum CamelCaseEnum
+{
+    FirstValue,
+    SecondValue
+}
+```
 
 ```csharp
 [Description("The Star Wars movies.")]
@@ -161,7 +193,7 @@ mapped via `Schema.RegisterTypeMapping`:
 Field(x => x.MyEnum);
 ```
 
-You can also manually create the `EnumerationGraphType`. Advantages of this method:
+2. You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
 - The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
 - You can manually add descriptions and deprecation reasons. This may be useful if you do not control the source code for the enum.

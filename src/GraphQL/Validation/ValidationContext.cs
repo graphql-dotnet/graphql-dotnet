@@ -137,12 +137,9 @@ namespace GraphQL.Validation
                     {
                         spreads.Add(spread);
                     }
-                    else if (selection is IHaveSelectionSet hasSet)
+                    else if (selection is IHaveSelectionSet hasSet && hasSet.SelectionSet != null)
                     {
-                        if (hasSet.SelectionSet != null)
-                        {
-                            setsToVisit.Push(hasSet.SelectionSet);
-                        }
+                        setsToVisit.Push(hasSet.SelectionSet);
                     }
                 }
             }

@@ -236,8 +236,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema()
         {
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>();
             Verify();
         }
@@ -252,8 +252,8 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddSchema_Scoped()
         {
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
             Verify();
         }
@@ -262,8 +262,8 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Factory()
         {
             Func<IServiceProvider, TestSchema> factory = _ => null;
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns((IGraphQLBuilder)null).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns((IGraphQLBuilder)null).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
             _builder.AddSchema(factory);
             Verify();
         }
@@ -272,18 +272,8 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Instance()
         {
             var schema = new TestSchema();
-            _builderMock.Setup(b => b.Register(typeof(TestSchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
-                {
-                    factory(null).ShouldBe(schema);
-                    return null;
-                }).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, factory, _) =>
-                {
-                    factory(null).ShouldBe(schema);
-                    return null;
-                }).Verifiable();
+            _builderMock.Setup(b => b.Register(typeof(TestSchema), schema, false)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), schema)).Returns(_builder).Verifiable();
             _builder.AddSchema(schema);
             Verify();
         }
@@ -666,6 +656,7 @@ namespace GraphQL.Tests.DI
         public void AddGraphTypes()
         {
             var typeList = new Type[] {
+                typeof(MyGraphNotRegistered),
                 typeof(MyGraph),
                 typeof(MyScalar),
                 typeof(IGraphType),
@@ -1408,6 +1399,11 @@ namespace GraphQL.Tests.DI
         }
 
         private class MyGraph : ObjectGraphType
+        {
+        }
+
+        [DoNotRegister]
+        private class MyGraphNotRegistered : ObjectGraphType
         {
         }
 

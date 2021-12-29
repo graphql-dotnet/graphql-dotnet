@@ -26,9 +26,9 @@ namespace GraphQL.Validation.Rules
                 var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<string, FragmentDefinition>();
 
                 var fragmentName = fragmentDefinition.Name;
-                if (knownFragments.ContainsKey(fragmentName)) // .NET 2.2+ has TryAdd
+                if (knownFragments.TryGetValue(fragmentName, out var frag)) // .NET 2.2+ has TryAdd
                 {
-                    context.ReportError(new UniqueFragmentNamesError(context, knownFragments[fragmentName], fragmentDefinition));
+                    context.ReportError(new UniqueFragmentNamesError(context, frag, fragmentDefinition));
                 }
                 else
                 {

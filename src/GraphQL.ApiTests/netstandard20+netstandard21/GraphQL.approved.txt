@@ -54,6 +54,11 @@ namespace GraphQL
     {
         public DoNotMapClrTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    public sealed class DoNotRegisterAttribute : System.Attribute
+    {
+        public DoNotRegisterAttribute() { }
+    }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
         public DocumentExecuter() { }
@@ -79,7 +84,7 @@ namespace GraphQL
         public int Column { get; }
         public int Line { get; }
         public bool Equals(GraphQL.ErrorLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public static bool operator !=(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
         public static bool operator ==(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
@@ -227,7 +232,7 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentWriter documentWriter)
             where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> errorInfoProviderFactory)
@@ -259,28 +264,28 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Action<TOptions>? action)
+        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class
             where TImplementation :  class, TService { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, TService implementationInstance)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder graphQLBuilder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class
             where TImplementation :  class, TService { }
     }
@@ -1600,7 +1605,7 @@ namespace GraphQL.Language.AST
         public int End { get; }
         public int Start { get; }
         public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
@@ -1863,6 +1868,11 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class CamelCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public CamelCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
+    }
     public abstract class ComplexGraphType<TSourceType> : GraphQL.Types.GraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected ComplexGraphType() { }
@@ -1899,6 +1909,11 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(string name) { }
         public bool HasField(string name) { }
+    }
+    public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public ConstantCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
     }
     public class DateGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1991,6 +2006,12 @@ namespace GraphQL.Types
         [System.ComponentModel.Description("Location adjacent to an input object field definition.")]
         InputFieldDefinition = 17,
     }
+    [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.All, AllowMultiple=false)]
+    public abstract class EnumCaseAttribute : System.Attribute
+    {
+        protected EnumCaseAttribute() { }
+        public abstract string ChangeEnumCase(string val);
+    }
     public class EnumValueDefinition : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription
     {
         public EnumValueDefinition() { }
@@ -2063,7 +2084,7 @@ namespace GraphQL.Types
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public string TypeName { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
@@ -2073,7 +2094,7 @@ namespace GraphQL.Types
         public string? Description { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
-        public override bool Equals(object obj) { }
+        public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
     }
@@ -2291,6 +2312,11 @@ namespace GraphQL.Types
         public void Interface(System.Type type) { }
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
+    }
+    public class PascalCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public PascalCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
     }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {

@@ -198,7 +198,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public async Task ExecutionError_Should_Be_Thread_Safe()
         {
-            var e = new CountdownEvent(2);
+            using var e = new CountdownEvent(2);
 
             var t1 = Task.Run(() =>
             {
