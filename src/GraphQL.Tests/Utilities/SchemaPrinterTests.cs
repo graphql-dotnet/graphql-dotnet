@@ -74,13 +74,17 @@ namespace GraphQL.Tests.Utilities
             result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
         }
 
+        private class TestSchemaTypes : SchemaTypes
+        {
+        }
+
         [Fact]
         public void prints_directive()
         {
             var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
             var skip = new SkipDirective();
             var arg = skip.Arguments.First();
-            arg.ResolvedType = arg.Type.BuildNamedType();
+            arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
             var result = printer.PrintDirective(skip);
             const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
@@ -97,7 +101,7 @@ directive @skip(
             var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
             var skip = new SkipDirective();
             var arg = skip.Arguments.First();
-            arg.ResolvedType = arg.Type.BuildNamedType();
+            arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
             var result = printer.PrintDirective(skip);
             const string expected = @"""""""

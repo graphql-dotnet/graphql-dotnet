@@ -27,17 +27,17 @@ namespace GraphQL.Validation.Errors
 
         private static string BadValueMessage(INode node, int? length, int? minLength, int? maxLength)
         {
-            string len = length.HasValue ? length.ToString() : "null";
+            string len = length.HasValue ? length.ToString()! : "null";
             string min = (minLength ?? 0).ToString();
-            string max = maxLength.HasValue ? maxLength.ToString() : "unrestricted";
+            string max = maxLength.HasValue ? maxLength.ToString()! : "unrestricted";
             return $"{node.GetType().Name} '{((IHaveName)node).NameNode.Name}' has invalid length ({len}). Length must be in range [{min}, {max}].";
         }
 
         private static string BadValueMessage(VariableName variableName, int? length, int? minLength, int? maxLength)
         {
-            string len = length.HasValue ? length.ToString() : "null";
+            string len = length.HasValue ? length.ToString()! : "null";
             string min = (minLength ?? 0).ToString();
-            string max = maxLength.HasValue ? maxLength.ToString() : "unrestricted";
+            string max = maxLength.HasValue ? maxLength.ToString()! : "unrestricted";
             return $"Variable '{variableName}' has invalid length ({len}). Length must be in range [{min}, {max}].";
         }
     }

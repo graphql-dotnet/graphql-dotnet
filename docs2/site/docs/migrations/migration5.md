@@ -76,7 +76,15 @@ services.AddGraphQL(builder => builder
     .AddSystemTextJson()
     .AddSchema<StarWarsSchema>());
 ```
+
+### `GraphQLExtensions.BuildNamedType` renamed and moved to `SchemaTypes.BuildGraphQLType`
+
 ### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`
+
+### All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
+
+Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
+If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
 
 ### Classes and members marked as obsolete have been removed
 

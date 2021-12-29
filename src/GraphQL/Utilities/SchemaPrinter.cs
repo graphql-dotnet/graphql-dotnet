@@ -215,7 +215,10 @@ namespace GraphQL.Utilities
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
-            return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            if (type.Fields.Count > 0)
+                return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            else
+                return FormatDescription(type.Description) + "type {0}{1}".ToFormat(type.Name, implementedInterfaces);
         }
 
         public virtual string PrintInterface(IInterfaceGraphType type)
@@ -265,8 +268,10 @@ namespace GraphQL.Utilities
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "",
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
-                f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
+            return fields == null
+                ? ""
+                : string.Join(Environment.NewLine, fields.Select(
+                    f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)
@@ -404,11 +409,11 @@ namespace GraphQL.Utilities
                     PropertyInfo propertyInfo;
                     try
                     {
-                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)!;
                     }
                     catch (AmbiguousMatchException)
                     {
-                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
                     }
 
                     propertyValue = propertyInfo.GetValue(value);

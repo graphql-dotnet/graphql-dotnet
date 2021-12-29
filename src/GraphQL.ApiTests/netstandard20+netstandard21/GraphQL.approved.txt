@@ -54,6 +54,11 @@ namespace GraphQL
     {
         public DoNotMapClrTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    public sealed class DoNotRegisterAttribute : System.Attribute
+    {
+        public DoNotRegisterAttribute() { }
+    }
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
         public DocumentExecuter() { }
@@ -260,34 +265,33 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
-        public static GraphQL.DI.IGraphQLBuilder Configure<TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? action)
+        public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder Register<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
+        public static GraphQL.DI.IServiceRegister Register<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class
             where TImplementation :  class, TService { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, TService implementationInstance)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IGraphQLBuilder TryRegister<TService, TImplementation>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class
             where TImplementation :  class, TService { }
     }
     public static class GraphQLExtensions
     {
-        public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType>? resolve = null) { }
         public static object? DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -732,15 +736,8 @@ namespace GraphQL.DI
     public abstract class GraphQLBuilderBase : GraphQL.DI.IGraphQLBuilder
     {
         protected GraphQLBuilderBase() { }
-        public abstract GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
-            where TOptions :  class, new ();
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false);
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
-        public abstract GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        public abstract GraphQL.DI.IServiceRegister Services { get; }
         protected virtual void RegisterDefaultServices() { }
-        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
-        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
-        public abstract GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
     }
     public interface IConfigureExecutionOptions
     {
@@ -752,14 +749,18 @@ namespace GraphQL.DI
     }
     public interface IGraphQLBuilder
     {
-        GraphQL.DI.IGraphQLBuilder Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
+        GraphQL.DI.IServiceRegister Services { get; }
+    }
+    public interface IServiceRegister
+    {
+        GraphQL.DI.IServiceRegister Configure<TOptions>(System.Action<TOptions, System.IServiceProvider>? action = null)
             where TOptions :  class, new ();
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, object implementationInstance, bool replace = false);
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
-        GraphQL.DI.IGraphQLBuilder Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
-        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, object implementationInstance);
-        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
-        GraphQL.DI.IGraphQLBuilder TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IServiceRegister Register(System.Type serviceType, object implementationInstance, bool replace = false);
+        GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false);
+        GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, object implementationInstance);
+        GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime);
+        GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime);
     }
     public enum ServiceLifetime
     {
@@ -1835,6 +1836,11 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class CamelCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public CamelCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
+    }
     public abstract class ComplexGraphType<TSourceType> : GraphQL.Types.GraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected ComplexGraphType() { }
@@ -1871,6 +1877,11 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(string name) { }
         public bool HasField(string name) { }
+    }
+    public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public ConstantCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
     }
     public class DateGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1962,6 +1973,12 @@ namespace GraphQL.Types
         InputObject = 16,
         [System.ComponentModel.Description("Location adjacent to an input object field definition.")]
         InputFieldDefinition = 17,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.All, AllowMultiple=false)]
+    public abstract class EnumCaseAttribute : System.Attribute
+    {
+        protected EnumCaseAttribute() { }
+        public abstract string ChangeEnumCase(string val);
     }
     public class EnumValueDefinition : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription
     {
@@ -2264,6 +2281,11 @@ namespace GraphQL.Types
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
     }
+    public class PascalCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public PascalCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
+    }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {
         public PossibleTypes() { }
@@ -2396,6 +2418,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+        protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "ClrType",
@@ -2659,7 +2682,7 @@ namespace GraphQL.Utilities
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
-        protected virtual GraphQL.Types.IGraphType GetType(string name) { }
+        protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }

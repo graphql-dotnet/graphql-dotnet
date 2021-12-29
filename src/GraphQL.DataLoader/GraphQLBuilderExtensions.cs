@@ -14,9 +14,8 @@ namespace GraphQL.DataLoader
         /// </summary>
         public static IGraphQLBuilder AddDataLoader(this IGraphQLBuilder builder)
         {
-            builder.AddDocumentListener<DataLoaderDocumentListener>();
-            builder.Register<IDataLoaderContextAccessor, DataLoaderContextAccessor>(ServiceLifetime.Singleton);
-            return builder;
+            builder.Services.Register<IDataLoaderContextAccessor, DataLoaderContextAccessor>(ServiceLifetime.Singleton);
+            return builder.AddDocumentListener<DataLoaderDocumentListener>();
         }
     }
 }
