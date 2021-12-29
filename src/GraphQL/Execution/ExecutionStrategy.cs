@@ -278,7 +278,7 @@ namespace GraphQL.Execution
             {
                 string name = field.Alias ?? field.Name;
 
-                if (fields.TryGetValue(name, out Field original))
+                if (fields.TryGetValue(name, out var original))
                 {
                     // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     fields[name] = new Field(original.AliasNode, original.NameNode)

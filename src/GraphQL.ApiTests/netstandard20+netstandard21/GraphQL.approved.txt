@@ -292,7 +292,6 @@ namespace GraphQL
     }
     public static class GraphQLExtensions
     {
-        public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType>? resolve = null) { }
         public static object? DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -2419,6 +2418,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+        protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "ClrType",
@@ -2682,7 +2682,7 @@ namespace GraphQL.Utilities
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
-        protected virtual GraphQL.Types.IGraphType GetType(string name) { }
+        protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
