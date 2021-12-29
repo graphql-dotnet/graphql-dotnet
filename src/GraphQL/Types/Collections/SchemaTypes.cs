@@ -137,7 +137,7 @@ namespace GraphQL.Types
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
-               type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
+               type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
                (name, type, ctx) =>
                {
                    SetGraphType(name, type);
@@ -270,7 +270,41 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
-        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildGraphQLType(t => FindGraphType(t) ?? resolver(t));
+        /// <summary>
+        /// Returns a new instance of the specified graph type, using the specified resolver to
+        /// instantiate a new instance if the required type cannot be found from the lookup table.
+        /// Defaults to <see cref="Activator.CreateInstance(Type)"/> if no <paramref name="resolve"/>
+        /// parameter is specified. List and non-null graph types are instantiated and their
+        /// <see cref="IProvideResolvedType.ResolvedType"/> property is set to a new instance of
+        /// the base (wrapped) type.
+        /// </summary>
+        protected internal virtual IGraphType BuildGraphQLType(Type type, Func<Type, IGraphType> resolve)
+        {
+            var local = resolve;
+            local ??= t => (IGraphType)Activator.CreateInstance(t);
+            resolve = t => FindGraphType(t) ?? local(t);
+
+            if (type.IsGenericType)
+            {
+                if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
+                {
+                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
+                    nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
+                    return nonNull;
+                }
+
+                if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
+                {
+                    var list = (ListGraphType)Activator.CreateInstance(type);
+                    list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
+                    return list;
+                }
+            }
+
+            return resolve(type) ??
+                   throw new InvalidOperationException(
+                       $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
+        }
 
         /// <summary>
         /// Applies all delegates specified by the middleware builder to the schema.
@@ -336,7 +370,12 @@ namespace GraphQL.Types
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
-        private IGraphType? FindGraphType(Type type) => _typeDictionary.TryGetValue(type, out var value) ? value : null;
+        private IGraphType? FindGraphType(Type type)
+        {
+            return _typeDictionary == null
+                ? null
+                : _typeDictionary.TryGetValue(type, out var value) ? value : null;
+        }
 
         private void AddType(IGraphType type, TypeCollectionContext context)
         {
@@ -455,7 +494,7 @@ namespace GraphQL.Types
                 field.Type = (Type)typeOrError;
 
                 AddTypeIfNotRegistered(field.Type, context);
-                field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
+                field.ResolvedType = BuildGraphQLType(field.Type, context.ResolveType);
             }
             else
             {
@@ -483,7 +522,7 @@ namespace GraphQL.Types
                         arg.Type = (Type)typeOrError;
 
                         AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, context.ResolveType);
                     }
                     else
                     {
@@ -510,7 +549,7 @@ namespace GraphQL.Types
                         arg.Type = (Type)typeOrError;
 
                         AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, context.ResolveType);
                     }
                     else
                     {

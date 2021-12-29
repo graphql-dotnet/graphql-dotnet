@@ -292,7 +292,6 @@ namespace GraphQL
     }
     public static class GraphQLExtensions
     {
-        public static GraphQL.Types.IGraphType BuildGraphQLType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType>? resolve = null) { }
         public static object? DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -2419,6 +2418,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+        protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "ClrType",
