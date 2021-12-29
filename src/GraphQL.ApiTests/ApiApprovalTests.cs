@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Xml.Linq;
 using GraphQL.Types;
 using PublicApiGenerator;
@@ -27,7 +26,8 @@ namespace GraphQL.ApiTests
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string projectName = type.Assembly.GetName().Name!;
-            string projectDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..");
+            string testDir = Path.Combine(baseDir, $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..");
+            string projectDir = Path.Combine(testDir, "..");
             string buildDir = Path.Combine(projectDir, projectName, "bin", "Debug");
             Debug.Assert(Directory.Exists(buildDir), $"Directory '{buildDir}' doesn't exist");
             string csProject = Path.Combine(projectDir, projectName, projectName + ".csproj");
@@ -45,35 +45,43 @@ namespace GraphQL.ApiTests
                 ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute", "System.Diagnostics.CodeAnalysis.AllowNullAttribute" }
             }) + Environment.NewLine)).ToArray();
 
-            // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
-            // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,
-            // this call will try to launch a diff tool to help you out but that can fail on
-            // your machine if a diff tool isn't configured/setup.
             if (publicApi.DistinctBy(item => item.content).Count() == 1)
             {
-                publicApi[0].content.ShouldMatchApproved(options => options.NoDiff().WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                AutoApproveOrFail(publicApi[0].content, "");
             }
             else
             {
-                // https://github.com/graphql-dotnet/server/pull/675#issuecomment-1001283947
-                ExceptionDispatchInfo? error = null;
-
-                var uniqueApi = publicApi.ToLookup(item => item.content);
-                foreach (var item in uniqueApi)
+                foreach (var item in publicApi.ToLookup(item => item.content))
                 {
-                    try
+                    AutoApproveOrFail(item.Key, string.Join("+", item.Select(x => x.tfm).OrderBy(x => x)));
+                }
+            }
+
+            // Approval test should (re)generate approved.txt files locally if needed.
+            // Approval test should fail on CI.
+            // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+            void AutoApproveOrFail(string publicApi, string folder)
+            {
+                string file = null!;
+
+                try
+                {
+                    publicApi.ShouldMatchApproved(options => options.SubFolder(folder).NoDiff().WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => file = $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                }
+                catch (ShouldMatchApprovedException) when (Environment.GetEnvironmentVariable("CI") == null)
+                {
+                    string? received = Path.Combine(testDir, folder, file);
+                    string? approved = received.Replace(".received.txt", ".approved.txt");
+                    if (File.Exists(received) && File.Exists(approved))
                     {
-                        item.Key.ShouldMatchApproved(options => options.SubFolder(string.Join("+", item.Select(x => x.tfm).OrderBy(x => x))).NoDiff().WithFilenameGenerator((testMethodInfo, discriminator, fileType, fileExtension) => $"{type.Assembly.GetName().Name}.{fileType}.{fileExtension}"));
+                        File.Copy(received, approved, overwrite: true);
+                        File.Delete(received);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        error = ExceptionDispatchInfo.Capture(ex);
+                        throw;
                     }
                 }
-
-                // It's OK to throw any exception occurred.
-                if (error != null)
-                    error.Throw();
             }
         }
     }
