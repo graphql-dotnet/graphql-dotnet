@@ -142,7 +142,7 @@ namespace GraphQL
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return ""; // never executed, necessary only for intellisense
             }
 
@@ -213,7 +213,7 @@ namespace GraphQL
                 // Custom container
                 if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
-                    newCollection = (IList)Activator.CreateInstance(fieldType);
+                    newCollection = (IList)Activator.CreateInstance(fieldType)!;
                 }
                 // Array of known size is created immediately
                 else if (fieldType.IsArray && propertyValueAsIList != null)
@@ -224,7 +224,7 @@ namespace GraphQL
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
-                    newCollection = (IList)Activator.CreateInstance(genericListType);
+                    newCollection = (IList)Activator.CreateInstance(genericListType)!;
                 }
 
                 if (!(propertyValue is IEnumerable valueList))
@@ -248,7 +248,7 @@ namespace GraphQL
                     }
 
                     if (fieldType.IsArray)
-                        newCollection = ((dynamic)newCollection).ToArray();
+                        newCollection = ((dynamic)newCollection!).ToArray();
                 }
 
                 return newCollection;
@@ -287,7 +287,7 @@ namespace GraphQL
                     throw new InvalidOperationException($"Unknown value '{value}' for enum '{fieldType.Name}'.");
                 }
 
-                string str = value.ToString();
+                string str = value.ToString()!;
                 value = Enum.Parse(fieldType, str, true);
             }
 

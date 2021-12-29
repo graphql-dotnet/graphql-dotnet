@@ -75,7 +75,7 @@ namespace GraphQL.Utilities
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
         {
             var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
-            return types.SelectMany(x => x.Directives);
+            return types.SelectMany(x => x.Directives!);
         }
     }
 }

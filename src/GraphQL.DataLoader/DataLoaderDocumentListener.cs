@@ -33,19 +33,11 @@ namespace GraphQL.DataLoader
         }
 
         /// <inheritdoc/>
-        public Task BeforeExecutionAwaitedAsync(IExecutionContext context)
-            => Task.CompletedTask;
-
-        /// <inheritdoc/>
         public Task AfterExecutionAsync(IExecutionContext context)
         {
             _accessor.Context = null;
 
             return Task.CompletedTask;
         }
-
-        /// <inheritdoc/>
-        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context)
-            => Task.CompletedTask;
     }
 }
