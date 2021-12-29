@@ -70,6 +70,8 @@ services.AddGraphQL(builder => builder
     .AddSchema<StarWarsSchema>());
 ```
 
+### `GraphQLExtensions.BuildNamedType` renamed and moved to `SchemaTypes.BuildGraphQLType`
+
 ### `GraphQLBuilderBase.Initialize` renamed to `RegisterDefaultServices`
 
 ### All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface

@@ -165,10 +165,15 @@ namespace GraphQL.Tests.Extensions
             Should.Throw(() => type.ToAST(value), expected.GetType()).Message.ShouldBe(expected.Message);
         }
 
-        [Fact]
-        public void BuildNamedType_ResolveReturnNull_Throws()
+        private class TestSchemaTypes : SchemaTypes
         {
-            Should.Throw<InvalidOperationException>(() => typeof(ListGraphType<ListGraphType<EpisodeEnum>>).BuildNamedType(_ => null));
+        }
+
+        [Fact]
+        public void BuildGraphQLType_ResolveReturnNull_Throws()
+        {
+            var types = new TestSchemaTypes();
+            Should.Throw<InvalidOperationException>(() => types.BuildGraphQLType(typeof(ListGraphType<ListGraphType<EpisodeEnum>>), _ => null));
         }
 
         [Fact]
