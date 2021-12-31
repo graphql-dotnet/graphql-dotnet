@@ -248,15 +248,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             typeConfig.CopyMetadataTo(type);
 
-            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (IsSubscriptionType(type))
-            {
-                constructFieldType = ToSubscriptionFieldType;
-            }
-            else
-            {
-                constructFieldType = ToFieldType;
-            }
+            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType = IsSubscriptionType(type)
+                ? ToSubscriptionFieldType
+                : ToFieldType;
 
             if (astType.Fields != null)
             {

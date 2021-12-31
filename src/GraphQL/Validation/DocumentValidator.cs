@@ -117,7 +117,7 @@ namespace GraphQL.Validation
                             }
                             return rule.ValidateAsync(context);
                         }).Where(x => x != null);
-                        visitors = (await Task.WhenAll(awaitedVisitors).ConfigureAwait(false)).ToList();
+                        visitors = (await Task.WhenAll(awaitedVisitors!).ConfigureAwait(false)).ToList();
                     }
 
                     visitors.Insert(0, context.TypeInfo);

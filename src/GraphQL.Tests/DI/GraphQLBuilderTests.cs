@@ -1257,7 +1257,6 @@ namespace GraphQL.Tests.DI
             //verify
             runSchemaConfigs?.Invoke();
             var options = getOptions();
-            FieldMiddlewareDelegate fieldResolver = _ => null;
             (schema.FieldMiddleware.Build() != null).ShouldBe(install);
             options.EnableMetrics.ShouldBe(enable);
             mockServiceProvider.Verify();

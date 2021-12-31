@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Bugs
                 ),
                 resolve: ctx =>
                 {
-                    var arg = ctx.GetArgument<Issue1837ArrayInput>("input");
+                    _ = ctx.GetArgument<Issue1837ArrayInput>("input");
 
                     return null;
                 });
