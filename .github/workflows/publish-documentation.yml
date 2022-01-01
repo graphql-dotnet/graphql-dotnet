@@ -10,7 +10,7 @@ on:
       - yarn.lock
 
 env:
-  NODE_VERSION: '10.x'   # Node 10 LTS
+  NODE_VERSION: '16.x'   # Node 16 LTS, see https://nodejs.org/en/about/releases/
 
 jobs:
   build-docs:
