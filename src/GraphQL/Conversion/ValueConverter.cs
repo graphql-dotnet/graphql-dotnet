@@ -211,7 +211,7 @@ namespace GraphQL
         {
             if (!_valueConversions.TryGetValue(valueType, out var conversions) &&
                 !_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
-                    conversions = _valueConversions[valueType];
+                conversions = _valueConversions[valueType];
 
             if (conversion == null)
                 conversions.TryRemove(targetType, out var _);
