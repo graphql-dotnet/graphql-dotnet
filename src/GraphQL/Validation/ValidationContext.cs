@@ -26,18 +26,19 @@ namespace GraphQL.Validation
             _errors = null;
             _fragments.Clear();
             _variables.Clear();
-            OperationName = null;
+            Operation = null!;
             Schema = null!;
             Document = null!;
             TypeInfo = null!;
             UserContext = null!;
-            Variables = null;
+            Variables = null!;
+            Extensions = null!;
         }
 
         /// <summary>
-        /// Returns the operation name requested to be executed.
+        /// Returns the operation requested to be executed.
         /// </summary>
-        public string? OperationName { get; set; }
+        public Operation Operation { get; set; } = null!;
 
         /// <inheritdoc cref="ExecutionContext.Schema"/>
         public ISchema Schema { get; set; } = null!;
@@ -62,7 +63,10 @@ namespace GraphQL.Validation
         public bool HasErrors => _errors?.Count > 0;
 
         /// <inheritdoc cref="ExecutionOptions.Variables"/>
-        public Inputs? Variables { get; set; }
+        public Inputs Variables { get; set; } = null!;
+
+        /// <inheritdoc cref="ExecutionOptions.Extensions"/>
+        public Inputs Extensions { get; set; } = null!;
 
         /// <summary>
         /// Adds a validation error to the list of validation errors.
@@ -191,8 +195,10 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// </summary>
-        public Variables GetVariableValues(ISchema schema, VariableDefinitions? variableDefinitions, Inputs variables, IVariableVisitor? visitor = null)
+        public Variables GetVariableValues(IVariableVisitor? visitor = null)
         {
+            var variableDefinitions = Operation?.Variables;
+
             if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
                 return Language.AST.Variables.None;
@@ -205,7 +211,7 @@ namespace GraphQL.Validation
                 foreach (var variableDef in variableDefinitions.List)
                 {
                     // find the IGraphType instance for the variable type
-                    var graphType = variableDef.Type.GraphTypeFromType(schema);
+                    var graphType = variableDef.Type.GraphTypeFromType(Schema);
 
                     if (graphType == null)
                     {
@@ -217,7 +223,7 @@ namespace GraphQL.Validation
                     var variable = new Variable(variableDef.Name);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (variables.TryGetValue(variableDef.Name, out var variableValue))
+                    if (Variables.TryGetValue(variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
