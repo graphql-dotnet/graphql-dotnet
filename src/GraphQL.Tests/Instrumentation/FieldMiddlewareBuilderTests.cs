@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Instrumentation
                 return async context =>
                 {
                     var res = await next(context);
-                    return "Two " + res.ToString();
+                    return "Two " + res;
                 };
             });
 

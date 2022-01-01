@@ -108,7 +108,7 @@ namespace GraphQL
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
-                if (isNullable == false)
+                if (!isNullable)
                 {
                     throw new ArgumentOutOfRangeException(nameof(isNullable),
                         $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
