@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -13,14 +12,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions? variableDefinitions,
-            IEnumerable<IValidationRule>? rules = null,
-            IDictionary<string, object?> userContext = null!,
-            Inputs? variables = null,
-            string? operationName = null);
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options);
     }
 
     /// <inheritdoc/>
@@ -63,42 +55,31 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions? variableDefinitions,
-            IEnumerable<IValidationRule>? rules = null,
-            IDictionary<string, object?> userContext = null!,
-            Inputs? variables = null,
-            string? operationName = null)
+        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options)
         {
-            schema.Initialize();
+            options.Schema.Initialize();
 
             var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
-            context.Schema = schema;
-            context.Document = document;
-            context.TypeInfo = new TypeInfo(schema);
-            context.UserContext = userContext;
-            context.Variables = variables;
-            context.OperationName = operationName;
+            context.TypeInfo = new TypeInfo(options.Schema);
+            context.Schema = options.Schema;
+            context.Document = options.Document;
+            context.UserContext = options.UserContext;
+            context.Variables = options.Variables;
+            context.Extensions = options.Extensions;
+            context.Operation = options.Operation;
 
+            var rules = options.Rules ?? CoreRules;
             try
             {
-                Variables? variablesObj = null;
+                Variables? variables = null;
+                List<IVariableVisitor>? variableVisitors = null;
 
-                rules ??= CoreRules;
-
-                if (!rules.Any())
-                {
-                    variablesObj = context.GetVariableValues(schema, variableDefinitions, variables ?? Inputs.Empty); // can report errors even without rules enabled
-                }
-                else
+                if (rules.Any())
                 {
                     var visitors = new List<INodeVisitor>
                     {
                         context.TypeInfo
                     };
-                    List<IVariableVisitor>? variableVisitors = null;
 
                     foreach (var rule in rules)
                     {
@@ -113,15 +94,15 @@ namespace GraphQL.Validation
                             visitors.Add(visitor);
                     }
 
-                    new BasicVisitor(visitors).Visit(document, context);
-
-                    variablesObj = context.GetVariableValues(schema, variableDefinitions, variables ?? Inputs.Empty,
-                        variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                    new BasicVisitor(visitors).Visit(context.Document, context);
                 }
 
+                // can report errors even without rules enabled
+                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+
                 return context.HasErrors
-                    ? (new ValidationResult(context.Errors), variablesObj)
-                    : (SuccessfullyValidatedResult.Instance, variablesObj);
+                    ? (new ValidationResult(context.Errors), variables)
+                    : (SuccessfullyValidatedResult.Instance, variables);
             }
             finally
             {
