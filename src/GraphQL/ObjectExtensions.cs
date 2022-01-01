@@ -213,7 +213,7 @@ namespace GraphQL
                 // Custom container
                 if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
-                    newCollection = (IList)Activator.CreateInstance(fieldType);
+                    newCollection = (IList)Activator.CreateInstance(fieldType)!;
                 }
                 // Array of known size is created immediately
                 else if (fieldType.IsArray && propertyValueAsIList != null)
