@@ -143,13 +143,16 @@ namespace GraphQL
                 using (metrics.Subject("document", "Validating document"))
                 {
                     (validationResult, variables) = await _documentValidator.ValidateAsync(
-                        options.Schema,
-                        document,
-                        operation.Variables,
-                        validationRules,
-                        options.UserContext,
-                        options.Variables,
-                        options.OperationName).ConfigureAwait(false);
+                        new ValidationOptions
+                        {
+                            Document = document,
+                            Rules = validationRules,
+                            OperationName = options.OperationName,
+                            UserContext = options.UserContext,
+                            Schema = options.Schema,
+                            VariableDefinitions = operation.Variables,
+                            Variables = options.Variables,
+                        }).ConfigureAwait(false);
                 }
 
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)

@@ -64,7 +64,13 @@ namespace GraphQL.Benchmarks
             _ = Validate(_heroDocument);
         }
 
-        private IValidationResult Validate(Document document) => _validator.ValidateAsync(_schema, document, document.Operations.First().Variables).GetAwaiter().GetResult().validationResult;
+        private IValidationResult Validate(Document document) => _validator.ValidateAsync(
+            new ValidationOptions
+            {
+                Schema = _schema,
+                Document = document,
+                VariableDefinitions = document.Operations.First().Variables
+            }).GetAwaiter().GetResult().validationResult;
 
         void IBenchmark.RunProfiler() => Introspection();
     }

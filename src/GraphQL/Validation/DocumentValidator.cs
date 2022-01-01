@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -13,14 +12,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions? variableDefinitions,
-            IEnumerable<IValidationRule>? rules = null,
-            IDictionary<string, object?> userContext = null!,
-            Inputs? variables = null,
-            string? operationName = null);
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options);
     }
 
     /// <inheritdoc/>
@@ -63,34 +55,26 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions? variableDefinitions,
-            IEnumerable<IValidationRule>? rules = null,
-            IDictionary<string, object?> userContext = null!,
-            Inputs? variables = null,
-            string? operationName = null)
+        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options)
         {
-            schema.Initialize();
+            options.Schema.Initialize();
 
             var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
-            context.Schema = schema;
-            context.Document = document;
-            context.TypeInfo = new TypeInfo(schema);
-            context.UserContext = userContext;
-            context.Variables = variables;
-            context.OperationName = operationName;
+            context.Schema = options.Schema;
+            context.Document = options.Document;
+            context.TypeInfo = new TypeInfo(options.Schema);
+            context.UserContext = options.UserContext;
+            context.Variables = options.Variables;
+            context.OperationName = options.OperationName;
 
+            var rules = options.Rules ?? CoreRules;
             try
             {
                 Variables? variablesObj = null;
 
-                rules ??= CoreRules;
-
                 if (!rules.Any())
                 {
-                    variablesObj = context.GetVariableValues(schema, variableDefinitions, variables ?? Inputs.Empty); // can report errors even without rules enabled
+                    variablesObj = context.GetVariableValues(options.VariableDefinitions); // can report errors even without rules enabled
                 }
                 else
                 {
@@ -113,9 +97,9 @@ namespace GraphQL.Validation
                             visitors.Add(visitor);
                     }
 
-                    new BasicVisitor(visitors).Visit(document, context);
+                    new BasicVisitor(visitors).Visit(context.Document, context);
 
-                    variablesObj = context.GetVariableValues(schema, variableDefinitions, variables ?? Inputs.Empty,
+                    variablesObj = context.GetVariableValues(options.VariableDefinitions,
                         variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
                 }
 

@@ -191,7 +191,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// </summary>
-        public Variables GetVariableValues(ISchema schema, VariableDefinitions? variableDefinitions, Inputs variables, IVariableVisitor? visitor = null)
+        public Variables GetVariableValues(VariableDefinitions? variableDefinitions, IVariableVisitor? visitor = null)
         {
             if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
@@ -205,7 +205,7 @@ namespace GraphQL.Validation
                 foreach (var variableDef in variableDefinitions.List)
                 {
                     // find the IGraphType instance for the variable type
-                    var graphType = variableDef.Type.GraphTypeFromType(schema);
+                    var graphType = variableDef.Type.GraphTypeFromType(Schema);
 
                     if (graphType == null)
                     {
@@ -217,7 +217,7 @@ namespace GraphQL.Validation
                     var variable = new Variable(variableDef.Name);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (variables.TryGetValue(variableDef.Name, out var variableValue))
+                    if (Variables?.TryGetValue(variableDef.Name, out var variableValue) == true)
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
