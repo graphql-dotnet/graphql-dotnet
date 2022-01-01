@@ -31,7 +31,8 @@ namespace GraphQL.Validation
             Document = null!;
             TypeInfo = null!;
             UserContext = null!;
-            Variables = null;
+            Variables = null!;
+            Extensions = null!;
         }
 
         /// <summary>
@@ -62,7 +63,10 @@ namespace GraphQL.Validation
         public bool HasErrors => _errors?.Count > 0;
 
         /// <inheritdoc cref="ExecutionOptions.Variables"/>
-        public Inputs? Variables { get; set; }
+        public Inputs Variables { get; set; } = null!;
+
+        /// <inheritdoc cref="ExecutionOptions.Extensions"/>
+        public Inputs Extensions { get; set; } = null!;
 
         /// <summary>
         /// Adds a validation error to the list of validation errors.
@@ -217,7 +221,7 @@ namespace GraphQL.Validation
                     var variable = new Variable(variableDef.Name);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (Variables?.TryGetValue(variableDef.Name, out var variableValue) == true)
+                    if (Variables.TryGetValue(variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try

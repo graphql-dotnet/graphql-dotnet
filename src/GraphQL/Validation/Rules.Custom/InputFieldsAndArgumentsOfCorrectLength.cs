@@ -81,7 +81,7 @@ namespace GraphQL.Validation.Rules
             {
                 CheckStringLength(strLiteral.Value);
             }
-            else if (node.Value is VariableReference vRef && context.Variables != null)
+            else if (node.Value is VariableReference vRef)
             {
                 if (context.Variables.TryGetValue(vRef.Name, out var value))
                 {

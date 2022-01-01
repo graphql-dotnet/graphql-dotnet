@@ -17,7 +17,9 @@ namespace GraphQL.Validation
 
         public IDictionary<string, object?> UserContext { get; set; } = null!;
 
-        public Inputs? Variables { get; set; }
+        public Inputs Variables { get; set; } = null!;
+
+        public Inputs Extensions { get; set; } = null!;
 
         public VariableDefinitions? VariableDefinitions { get; set; }
 

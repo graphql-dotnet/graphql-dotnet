@@ -65,6 +65,7 @@ namespace GraphQL.Validation
             context.TypeInfo = new TypeInfo(options.Schema);
             context.UserContext = options.UserContext;
             context.Variables = options.Variables;
+            context.Extensions = options.Extensions;
             context.OperationName = options.OperationName;
 
             var rules = options.Rules ?? CoreRules;
