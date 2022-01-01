@@ -75,18 +75,20 @@ services.AddGraphQL(builder => builder
 
 ### 8. `GraphQLBuilderBase.Initialize` was renamed to `RegisterDefaultServices`
 
-### `schema` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
+### 9. `schema`, `variableDefinitions` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
 
-Use `ValidationContext.Schema` and `ValidationContext.Variables` properties
+Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `ValidationContext.Variables` properties
 
-### 9. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` class
+### 10. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
 
-### 10. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
+### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` class
+
+### 12. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
 
 Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
 If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
 
-### 11. Classes and members marked as obsolete have been removed
+### 13. Classes and members marked as obsolete have been removed
 
 The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
 

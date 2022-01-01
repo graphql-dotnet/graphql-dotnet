@@ -26,7 +26,7 @@ namespace GraphQL.Validation
             _errors = null;
             _fragments.Clear();
             _variables.Clear();
-            OperationName = null;
+            Operation = null!;
             Schema = null!;
             Document = null!;
             TypeInfo = null!;
@@ -36,9 +36,9 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Returns the operation name requested to be executed.
+        /// Returns the operation requested to be executed.
         /// </summary>
-        public string? OperationName { get; set; }
+        public Operation Operation { get; set; } = null!;
 
         /// <inheritdoc cref="ExecutionContext.Schema"/>
         public ISchema Schema { get; set; } = null!;
@@ -195,8 +195,10 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// </summary>
-        public Variables GetVariableValues(VariableDefinitions? variableDefinitions, IVariableVisitor? visitor = null)
+        public Variables GetVariableValues(IVariableVisitor? visitor = null)
         {
+            var variableDefinitions = Operation?.Variables;
+
             if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
                 return Language.AST.Variables.None;

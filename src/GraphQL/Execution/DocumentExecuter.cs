@@ -147,10 +147,9 @@ namespace GraphQL
                         {
                             Document = document,
                             Rules = validationRules,
-                            OperationName = options.OperationName,
+                            Operation = operation,
                             UserContext = options.UserContext,
                             Schema = options.Schema,
-                            VariableDefinitions = operation.Variables,
                             Variables = options.Variables ?? Inputs.Empty,
                             Extensions = options.Extensions ?? Inputs.Empty,
                         }).ConfigureAwait(false);

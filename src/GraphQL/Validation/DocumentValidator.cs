@@ -60,30 +60,26 @@ namespace GraphQL.Validation
             options.Schema.Initialize();
 
             var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
-            context.TypeInfo = new TypeInfo(options.Schema);
             context.UserContext = options.UserContext;
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
-            context.OperationName = options.OperationName;
+            context.Operation = options.Operation;
 
             var rules = options.Rules ?? CoreRules;
             try
             {
-                Variables? variablesObj = null;
+                Variables? variables = null;
+                List<IVariableVisitor>? variableVisitors = null;
 
-                if (!rules.Any())
-                {
-                    variablesObj = context.GetVariableValues(options.VariableDefinitions); // can report errors even without rules enabled
-                }
-                else
+                if (rules.Any())
                 {
                     var visitors = new List<INodeVisitor>
                     {
                         context.TypeInfo
                     };
-                    List<IVariableVisitor>? variableVisitors = null;
 
                     foreach (var rule in rules)
                     {
@@ -99,14 +95,14 @@ namespace GraphQL.Validation
                     }
 
                     new BasicVisitor(visitors).Visit(context.Document, context);
-
-                    variablesObj = context.GetVariableValues(options.VariableDefinitions,
-                        variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
                 }
 
+                // can report errors even without rules enabled
+                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+
                 return context.HasErrors
-                    ? (new ValidationResult(context.Errors), variablesObj)
-                    : (SuccessfullyValidatedResult.Instance, variablesObj);
+                    ? (new ValidationResult(context.Errors), variables)
+                    : (SuccessfullyValidatedResult.Instance, variables);
             }
             finally
             {

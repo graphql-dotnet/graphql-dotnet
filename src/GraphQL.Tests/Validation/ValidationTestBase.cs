@@ -101,7 +101,7 @@ namespace GraphQL.Tests.Validation
                 Schema = schema,
                 Document = document,
                 Rules = rules,
-                VariableDefinitions = document.Operations.FirstOrDefault()?.Variables,
+                Operation = document.Operations.FirstOrDefault(),
                 Variables = variables
             }).Result.validationResult;
         }

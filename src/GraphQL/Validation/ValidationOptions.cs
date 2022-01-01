@@ -21,8 +21,9 @@ namespace GraphQL.Validation
 
         public Inputs Extensions { get; set; } = null!;
 
-        public VariableDefinitions? VariableDefinitions { get; set; }
-
-        public string? OperationName { get; set; }
+        /// <summary>
+        /// Executed operation.
+        /// </summary>
+        public Operation Operation { get; set; } = null!;
     }
 }

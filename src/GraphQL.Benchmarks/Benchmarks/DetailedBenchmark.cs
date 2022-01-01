@@ -238,7 +238,8 @@ namespace GraphQL.Benchmarks
                 {
                     Schema = Schema,
                     Variables = Inputs,
-                }.GetVariableValues(Operation.Variables);
+                    Operation = Operation,
+                }.GetVariableValues();
             }
 
             private static readonly DocumentValidator _documentValidator = new DocumentValidator();

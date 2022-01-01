@@ -2958,7 +2958,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
-        public string? OperationName { get; set; }
+        public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
@@ -2967,7 +2967,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentSpread> GetFragmentSpreads(GraphQL.Language.AST.SelectionSet node) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQL.Language.AST.Operation operation) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
-        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Language.AST.VariableDefinitions? variableDefinitions, GraphQL.Validation.IVariableVisitor? visitor = null) { }
+        public GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQL.Language.AST.IHaveSelectionSet node) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
@@ -2987,11 +2987,10 @@ namespace GraphQL.Validation
         public ValidationOptions() { }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
-        public string? OperationName { get; set; }
+        public GraphQL.Language.AST.Operation Operation { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
-        public GraphQL.Language.AST.VariableDefinitions? VariableDefinitions { get; set; }
         public GraphQL.Inputs Variables { get; set; }
     }
     public class ValidationResult : GraphQL.Validation.IValidationResult

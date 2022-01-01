@@ -69,7 +69,7 @@ namespace GraphQL.Benchmarks
             {
                 Schema = _schema,
                 Document = document,
-                VariableDefinitions = document.Operations.First().Variables
+                Operation = document.Operations.First()
             }).GetAwaiter().GetResult().validationResult;
 
         void IBenchmark.RunProfiler() => Introspection();
