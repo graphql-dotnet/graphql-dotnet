@@ -22,7 +22,14 @@ namespace GraphQL.Types
                 throw new ArgumentNullException(nameof(type));
 
             if (!List.Contains(type))
-                List.Add(type);
+            {
+                // https://github.com/graphql-dotnet/graphql-dotnet/issues/2639
+                lock (List)
+                {
+                    if (!List.Contains(type))
+                        List.Add(type);
+                }
+            }
         }
 
         /// <summary>
