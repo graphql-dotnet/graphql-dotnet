@@ -253,7 +253,7 @@ namespace GraphQL
                         visitor.VisitUnion(union, schema);
                         break;
 
-                    case InterfaceGraphType iface:
+                    case IInterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
                         foreach (var field in iface.Fields.List) // List is always non-null
                         {

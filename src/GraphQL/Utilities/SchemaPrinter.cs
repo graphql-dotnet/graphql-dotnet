@@ -356,14 +356,9 @@ namespace GraphQL.Utilities
         {
             if (Options.IncludeDescriptions)
             {
-                if (Options.PrintDescriptionsAsComments)
-                {
-                    return PrintComment(description, indentation);
-                }
-                else
-                {
-                    return PrintDescription(description, indentation);
-                }
+                return Options.PrintDescriptionsAsComments
+                    ? PrintComment(description, indentation)
+                    : PrintDescription(description, indentation);
             }
             return "";
         }

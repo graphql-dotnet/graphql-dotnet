@@ -46,14 +46,9 @@ namespace GraphQL.Execution
         {
             get
             {
-                if (IndexInParentNode.HasValue)
-                {
-                    return ((ListGraphType?)Parent!.GraphType)?.ResolvedType;
-                }
-                else
-                {
-                    return FieldDefinition?.ResolvedType;
-                }
+                return IndexInParentNode.HasValue
+                    ? ((ListGraphType?)Parent!.GraphType)?.ResolvedType
+                    : FieldDefinition?.ResolvedType;
             }
         }
 
@@ -181,10 +176,9 @@ namespace GraphQL.Execution
             node = this;
             while (!(node is RootExecutionNode))
             {
-                if (node.IndexInParentNode.HasValue)
-                    pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
-                else
-                    pathList[--index] = preferAlias ? node.Name! : node.Field!.Name!;
+                pathList[--index] = node.IndexInParentNode.HasValue
+                    ? GetObjectIndex(node.IndexInParentNode.Value)
+                    : preferAlias ? node.Name! : node.Field!.Name!;
                 node = node.Parent!;
             }
 
