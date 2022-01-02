@@ -13,6 +13,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.None,
             Formatting = Formatting.Indented,
+            MaxDepth = 64, //default for Newtonsoft.Json v13, but for v12, unlimited is default
             Converters =
             {
                 new InputsConverter()
@@ -34,6 +35,13 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
                 _jsonSerializer.Serialize(jsonWriter, data);
             }
             return stringWriter.ToString();
+        }
+
+        [Fact]
+        public void Throws_For_Deep_Objects()
+        {
+            var value = "{\"a\":" + new string('[', 100) + new string(']', 100) + "}";
+            Should.Throw<JsonReaderException>(() => Deserialize<Inputs>(value));
         }
 
         [Fact]
