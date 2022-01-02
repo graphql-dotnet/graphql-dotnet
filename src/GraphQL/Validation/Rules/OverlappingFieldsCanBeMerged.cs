@@ -545,9 +545,7 @@ namespace GraphQL.Validation.Rules
 
             foreach (var responseName in fieldMap1.Keys)
             {
-                fieldMap2.TryGetValue(responseName, out List<FieldDefPair> fields2);
-
-                if (fields2 != null && fields2.Count != 0)
+                if (fieldMap2.TryGetValue(responseName, out var fields2) && fields2.Count != 0)
                 {
                     var fields1 = fieldMap1[responseName];
                     for (var i = 0; i < fields1.Count; i++)
@@ -635,9 +633,7 @@ namespace GraphQL.Validation.Rules
             IGraphType? parentType,
             SelectionSet selectionSet)
         {
-            cachedFieldsAndFragmentNames.TryGetValue(selectionSet, out CachedField cached);
-
-            if (cached == null)
+            if (!cachedFieldsAndFragmentNames.TryGetValue(selectionSet, out var cached))
             {
                 var nodeAndDef = new Dictionary<string, List<FieldDefPair>>();
                 var fragmentNames = new HashSet<string>();
@@ -663,9 +659,9 @@ namespace GraphQL.Validation.Rules
             FragmentDefinition fragment)
         {
             // Short-circuit building a type from the node if possible.
-            if (cachedFieldsAndFragmentNames.ContainsKey(fragment.SelectionSet))
+            if (cachedFieldsAndFragmentNames.TryGetValue(fragment.SelectionSet, out var cached))
             {
-                return cachedFieldsAndFragmentNames[fragment.SelectionSet];
+                return cached;
             }
 
             var fragmentType = fragment.Type.GraphTypeFromType(context.Schema);
@@ -860,12 +856,10 @@ namespace GraphQL.Validation.Rules
             {
                 _data.TryGetValue(a, out var first);
 
-                if (first == null || !first.ContainsKey(b))
+                if (first == null || !first.TryGetValue(b, out bool result))
                 {
                     return false;
                 }
-
-                var result = first[b];
 
                 if (areMutuallyExclusive == false)
                 {

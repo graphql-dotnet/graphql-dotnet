@@ -194,7 +194,7 @@ mutation {
         {
             var query = @"mutation AAA($val : Int!) { int(number: $val) }";
             var expected = @"{ ""int"": 100 }";
-            var result = AssertQueryWithErrors(query, expected, inputs: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
+            var result = AssertQueryWithErrors(query, expected, variables: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
             result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Int'");
         }
 
@@ -212,7 +212,7 @@ mutation {
         {
             var query = @"mutation AAA($val : Long!) { long(number: $val) }";
             var expected = @"{ ""long"": 100 }";
-            var result = AssertQueryWithErrors(query, expected, inputs: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
+            var result = AssertQueryWithErrors(query, expected, variables: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
             result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Long'");
         }
     }

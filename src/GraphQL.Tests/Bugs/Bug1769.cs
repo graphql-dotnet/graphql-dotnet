@@ -5,6 +5,7 @@ using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -33,6 +34,7 @@ namespace GraphQL.Tests.Bugs
                 Query = "{test}",
                 Schema = Schema,
             });
+            valid.Data.ShouldNotBeNull();
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 await de.ExecuteAsync(new ExecutionOptions()
@@ -60,8 +62,8 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void DocumentExecuter_cannot_have_null_constructor_parameters()
         {
-            var valid1 = new DocumentExecuter();
-            var valid2 = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+            _ = new DocumentExecuter();
+            _ = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
             Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null, new DocumentValidator(), new ComplexityAnalyzer()));
             Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null, new ComplexityAnalyzer()));
             Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null));

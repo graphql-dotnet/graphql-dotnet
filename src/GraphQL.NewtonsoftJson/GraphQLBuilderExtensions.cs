@@ -18,7 +18,7 @@ namespace GraphQL.NewtonsoftJson
         {
             builder.AddDocumentWriter<DocumentWriter>();
             builder.AddGraphQLRequestReader<GraphQLRequestReader>();
-            builder.Configure(action);
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -27,7 +27,7 @@ namespace GraphQL.NewtonsoftJson
         {
             builder.AddDocumentWriter<DocumentWriter>();
             builder.AddGraphQLRequestReader<GraphQLRequestReader>();
-            builder.Configure(action);
+            builder.Services.Configure(action);
             return builder;
         }
 

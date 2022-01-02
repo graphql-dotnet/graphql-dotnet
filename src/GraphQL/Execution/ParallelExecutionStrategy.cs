@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
@@ -73,11 +74,6 @@ namespace GraphQL.Execution
 
                         }
 
-#pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
-
                         // Await tasks for this execution step
                         await Task.WhenAll(currentTasks)
                             .ConfigureAwait(false);
@@ -108,26 +104,18 @@ namespace GraphQL.Execution
                     }
                 }
             }
-            catch
+            catch (Exception original)
             {
                 if (currentTasks.Count > 0)
                 {
                     try
                     {
-#pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                            .ConfigureAwait(false);
+                        await Task.WhenAll(currentTasks).ConfigureAwait(false);
                     }
-                    catch
+                    catch (Exception awaited)
                     {
-                    }
-                    try
-                    {
-                        await Task.WhenAll(currentTasks);
-                    }
-                    catch
-                    {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_ALL_TASKS_AWAITED_EXCEPTION"] = awaited;
                     }
                 }
                 throw;

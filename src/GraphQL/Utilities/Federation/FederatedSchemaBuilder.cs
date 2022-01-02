@@ -77,7 +77,7 @@ namespace GraphQL.Utilities.Federation
                     foreach (var rep in reps!)
                     {
                         var typeName = rep!["__typename"].ToString();
-                        var type = context.Schema.AllTypes[typeName];
+                        var type = context.Schema.AllTypes[typeName!];
                         if (type != null)
                         {
                             // execute resolver
@@ -157,12 +157,9 @@ namespace GraphQL.Utilities.Federation
 
             union.ResolveType = x =>
             {
-                if (x is Dictionary<string, object> dict)
+                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object typeName))
                 {
-                    if (dict.TryGetValue("__typename", out object typeName))
-                    {
-                        return new GraphQLTypeReference(typeName.ToString());
-                    }
+                    return new GraphQLTypeReference(typeName.ToString());
                 }
 
                 // TODO: Provide another way to give graph type name, such as an attribute

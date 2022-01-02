@@ -126,7 +126,6 @@ namespace GraphQL
             schema.AutoRegister(typeof(TClrType), mode);
         }
 
-
         /// <summary>
         /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
         /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
@@ -254,7 +253,7 @@ namespace GraphQL
                         visitor.VisitUnion(union, schema);
                         break;
 
-                    case InterfaceGraphType iface:
+                    case IInterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
                         foreach (var field in iface.Fields.List) // List is always non-null
                         {

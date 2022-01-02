@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
@@ -130,7 +131,7 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Inputs = benchmarkInfo.InputsString?.ToInputs();
+                        o.Variables = benchmarkInfo.InputsString?.ToInputs();
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
@@ -233,18 +234,23 @@ namespace GraphQL.Benchmarks
 
             public Language.AST.Variables ParseVariables()
             {
-                return Inputs == null ? null : new ValidationContext().GetVariableValues(Schema, Operation.Variables, Inputs);
+                return Inputs == null ? null : new ValidationContext
+                {
+                    Schema = Schema,
+                    Variables = Inputs,
+                    Operation = Operation,
+                }.GetVariableValues();
             }
 
             private static readonly DocumentValidator _documentValidator = new DocumentValidator();
             public IValidationResult Validate()
             {
-                return _documentValidator.ValidateAsync(
-                    Schema,
-                    Document,
-                    null,
-                    null,
-                    Inputs).Result.validationResult;
+                return _documentValidator.ValidateAsync(new ValidationOptions
+                {
+                    Schema = Schema,
+                    Document = Document,
+                    Variables = Inputs
+                }).Result.validationResult;
             }
 
             private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();
@@ -260,13 +266,14 @@ namespace GraphQL.Benchmarks
                     Operation = Operation,
                     Variables = Variables,
                     Errors = new ExecutionErrors(),
-                    Extensions = new Dictionary<string, object>(),
+                    InputExtensions = Inputs.Empty,
+                    OutputExtensions = new Dictionary<string, object>(),
                     CancellationToken = default,
 
                     Metrics = Instrumentation.Metrics.None,
                     Listeners = new List<IDocumentExecutionListener>(),
                     ThrowOnUnhandledException = true,
-                    UnhandledExceptionDelegate = context => { },
+                    UnhandledExceptionDelegate = _ => Task.CompletedTask,
                     MaxParallelExecutionCount = int.MaxValue,
                     RequestServices = null
                 };

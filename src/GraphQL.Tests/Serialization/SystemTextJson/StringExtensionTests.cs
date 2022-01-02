@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.Json;
@@ -128,7 +127,7 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         public async Task FromJsonAsync_Inputs()
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
+            using var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
             var actual = await testData.FromJsonAsync<TestClass3>();
             actual.Query.ShouldBe("hello");
             Verify(actual.Variables);

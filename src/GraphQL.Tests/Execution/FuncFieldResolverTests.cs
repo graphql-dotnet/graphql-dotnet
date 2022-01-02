@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Execution
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>(),
+                OutputExtensions = new Dictionary<string, object>(),
             };
         }
 
@@ -489,6 +489,102 @@ namespace GraphQL.Tests.Execution
             {
                 rfc2 = context;
                 return Task.FromResult(_okDataLoader);
+            });
+            ffr1.Resolve(_context);
+            ffr2.Resolve(_context);
+            rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
+            rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
+            rfc1.ShouldNotBe(rfc2);
+        }
+
+        [Fact]
+        public void Does_Not_Share_Enumerable_Typed()
+        {
+            IResolveFieldContext<int?> rfc1 = null;
+            IResolveFieldContext<int?> rfc2 = null;
+            var ffr1 = new FuncFieldResolver<int?, IEnumerable<int>>(context =>
+            {
+                rfc1 = context;
+                return new[] { 1, 2 };
+            });
+            var ffr2 = new FuncFieldResolver<int?, IEnumerable<int>>(context =>
+            {
+                rfc2 = context;
+                return new[] { 1, 2 };
+            });
+            ffr1.Resolve(_context);
+            ffr2.Resolve(_context);
+            rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
+            rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
+            rfc1.ShouldNotBe(rfc2);
+        }
+
+        [Fact]
+        public void Does_Not_Share_Enumerable_Untyped()
+        {
+            IResolveFieldContext<int?> rfc1 = null;
+            IResolveFieldContext<int?> rfc2 = null;
+            var ffr1 = new FuncFieldResolver<int?, object>(context =>
+            {
+                rfc1 = context;
+                return new[] { 1, 2 };
+            });
+            var ffr2 = new FuncFieldResolver<int?, object>(context =>
+            {
+                rfc2 = context;
+                return new[] { 1, 2 };
+            });
+            ffr1.Resolve(_context);
+            ffr2.Resolve(_context);
+            rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
+            rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
+            rfc1.ShouldNotBe(rfc2);
+        }
+
+        [Fact]
+        public void Does_Not_Share_Enumerable_Tasks_Typed()
+        {
+            IResolveFieldContext<int?> rfc1 = null;
+            IResolveFieldContext<int?> rfc2 = null;
+            var ffr1 = new FuncFieldResolver<int?, Task<IEnumerable<int>>>(context =>
+            {
+                rfc1 = context;
+                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
+            });
+            var ffr2 = new FuncFieldResolver<int?, Task<IEnumerable<int>>>(context =>
+            {
+                rfc2 = context;
+                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
+            });
+            ffr1.Resolve(_context);
+            ffr2.Resolve(_context);
+            rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
+            rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
+            rfc1.ShouldNotBe(rfc2);
+        }
+
+        [Fact]
+        public void Does_Not_Share_Enumerable_Tasks_Untyped()
+        {
+            IResolveFieldContext<int?> rfc1 = null;
+            IResolveFieldContext<int?> rfc2 = null;
+            var ffr1 = new FuncFieldResolver<int?, object>(context =>
+            {
+                rfc1 = context;
+                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
+            });
+            var ffr2 = new FuncFieldResolver<int?, object>(context =>
+            {
+                rfc2 = context;
+                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
             });
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);

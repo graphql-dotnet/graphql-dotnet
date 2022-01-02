@@ -17,9 +17,6 @@ namespace GraphQL.SystemTextJson
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters =
             {
-#pragma warning disable CS0618 // Type or member is obsolete
-                new ObjectDictionaryConverter(),
-#pragma warning restore CS0618 // Type or member is obsolete
                 new InputsConverter(),
                 new JsonConverterBigInteger(),
             }
@@ -44,15 +41,6 @@ namespace GraphQL.SystemTextJson
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
             => json != null ? JsonSerializer.Deserialize<Inputs>(json, _jsonOptions2) : Inputs.Empty;
-
-        /// <summary>
-        /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
-        /// </summary>
-        /// <param name="json">The json.</param>
-        /// <returns>Dictionary.</returns>
-        [Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the ToInputs method instead.")]
-        public static Dictionary<string, object> ToDictionary(this string json)
-            => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
 
         /// <summary>
         /// Deserializes a JSON-formatted string of data into the specified type.

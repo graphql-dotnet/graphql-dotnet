@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -68,33 +67,23 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             using var tokenSource = new CancellationTokenSource();
             tokenSource.Cancel();
-            Should.Throw<OperationCanceledException>(() =>
-            {
-                _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
-            });
+            Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1));
         }
 
         [Fact]
         public void cancellation_is_propagated_async()
         {
             using var tokenSource = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() =>
-            {
-                _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
-            });
+            Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource));
         }
 
         [Fact]
         public void unhandled_exception_delegate_is_not_called()
         {
             bool ranDelegate = false;
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = (context) => ranDelegate = true;
             using (var tokenSource = new CancellationTokenSource())
             {
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: unhandledExceptionDelegate);
-                });
+                Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: _ => { ranDelegate = true; return Task.CompletedTask; }));
             }
             ranDelegate.ShouldBeFalse();
         }

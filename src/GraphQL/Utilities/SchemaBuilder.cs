@@ -197,10 +197,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
         }
 
-        protected virtual IGraphType GetType(string name)
+        protected virtual IGraphType? GetType(string name)
         {
-            _types.TryGetValue(name, out IGraphType type);
-            return type;
+            return _types.TryGetValue(name, out var type) ? type : null;
         }
 
         private bool IsSubscriptionType(ObjectGraphType type)
@@ -236,15 +235,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            ObjectGraphType type;
-            if (!_types.ContainsKey(name))
-            {
-                type = new ObjectGraphType { Name = name };
-            }
-            else
-            {
-                type = _types[name] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType");
-            }
+            var type = _types.TryGetValue(name, out var t)
+                ? t as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType")
+                : new ObjectGraphType { Name = name };
 
             if (!isExtensionType)
             {
@@ -254,15 +247,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             typeConfig.CopyMetadataTo(type);
 
-            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (IsSubscriptionType(type))
-            {
-                constructFieldType = ToSubscriptionFieldType;
-            }
-            else
-            {
-                constructFieldType = ToFieldType;
-            }
+            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType = IsSubscriptionType(type)
+                ? ToSubscriptionFieldType
+                : ToFieldType;
 
             if (astType.Fields != null)
             {
@@ -676,11 +663,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    if (Double.TryParse(
+                    if (!Double.TryParse(
                         str!.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
-                        out double dbl) == false)
+                        out double dbl))
                     {
                         dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
                     }

@@ -8,21 +8,11 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Operation : AbstractNode, IDefinition, IHaveSelectionSet
     {
-        /// <summary>
-        /// Initializes a new operation node with the specified <see cref="NameNode"/> containing the name of the operation, if any.
-        /// </summary>
-        [Obsolete]
-        public Operation(NameNode name) : this(name, null!)
-        {
-        }
-
         public Operation(NameNode name, SelectionSet selectionSet)
         {
             NameNode = name;
             OperationType = OperationType.Query;
-#pragma warning disable CS0612 // Type or member is obsolete
             SelectionSet = selectionSet;
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
@@ -51,14 +41,7 @@ namespace GraphQL.Language.AST
         public VariableDefinitions? Variables { get; set; }
 
         /// <inheritdoc/>
-        public SelectionSet SelectionSet
-        {
-            get;
-#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-            [Obsolete]
-            set;
-#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        }
+        public SelectionSet SelectionSet { get; }
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children

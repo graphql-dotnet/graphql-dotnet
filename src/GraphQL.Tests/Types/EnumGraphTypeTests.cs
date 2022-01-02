@@ -6,8 +6,6 @@ using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
-#pragma warning disable 0618
-
 namespace GraphQL.Tests.Types
 {
     public class EnumGraphTypeTests
@@ -158,6 +156,46 @@ namespace GraphQL.Tests.Types
         {
             TestHello,
             Hello1
+        }
+
+        [Fact]
+        public void enum_names_from_attribute_tests()
+        {
+            EnumerationGraphType e = new EnumerationGraphType<ConstantCaseEnum>();
+            e.Values.Count.ShouldBe(2);
+            e.Values.FindByValue(ConstantCaseEnum.OneOne).Name.ShouldBe("ONE_ONE");
+            e.Values.FindByValue(ConstantCaseEnum.TwoTwo).Name.ShouldBe("TWO_TWO");
+
+            e = new EnumerationGraphType<CamelCaseEnum>();
+            e.Values.Count.ShouldBe(2);
+            e.Values.FindByValue(CamelCaseEnum.OneOne).Name.ShouldBe("oneOne");
+            e.Values.FindByValue(CamelCaseEnum.TwoTwo).Name.ShouldBe("twoTwo");
+
+            e = new EnumerationGraphType<PascalCaseEnum>();
+            e.Values.Count.ShouldBe(2);
+            e.Values.FindByValue(PascalCaseEnum.OneOne).Name.ShouldBe("OneOne");
+            e.Values.FindByValue(PascalCaseEnum.TwoTwo).Name.ShouldBe("TwoTwo");
+        }
+
+        [ConstantCase]
+        private enum ConstantCaseEnum
+        {
+            OneOne,
+            TwoTwo
+        }
+
+        [CamelCase]
+        private enum CamelCaseEnum
+        {
+            OneOne,
+            TwoTwo
+        }
+
+        [PascalCase]
+        private enum PascalCaseEnum
+        {
+            OneOne,
+            TwoTwo
         }
     }
 }

@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Instrumentation
                 return async context =>
                 {
                     var res = await next(context);
-                    return "One " + res.ToString();
+                    return "One " + res;
                 };
             });
             _builder.Use(next =>
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Instrumentation
                 return async context =>
                 {
                     var res = await next(context);
-                    return "Two " + res.ToString();
+                    return "Two " + res;
                 };
             });
 
@@ -82,7 +82,7 @@ namespace GraphQL.Tests.Instrumentation
                 return async context =>
                 {
                     var res = await next(context);
-                    return "One " + res.ToString();
+                    return "One " + res;
                 };
             });
 

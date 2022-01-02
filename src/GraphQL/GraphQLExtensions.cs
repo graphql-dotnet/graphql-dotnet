@@ -200,39 +200,6 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns a new instance of the specified graph type, using the specified resolver to
-        /// instantiate a new instance. Defaults to <see cref="Activator.CreateInstance(Type)"/>
-        /// if no <paramref name="resolve"/> parameter is specified. List and non-null graph
-        /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
-        /// property is set to a new instance of the base (wrapped) type.
-        /// </summary>
-        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType>? resolve = null)
-        {
-            resolve ??= t => (IGraphType)Activator.CreateInstance(t);
-
-            if (type.IsGenericType)
-            {
-                if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
-                {
-                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
-                    nonNull.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
-                    return nonNull;
-                }
-
-                if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
-                {
-                    var list = (ListGraphType)Activator.CreateInstance(type);
-                    list.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
-                    return list;
-                }
-            }
-
-            return resolve(type) ??
-                   throw new InvalidOperationException(
-                       $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
-        }
-
-        /// <summary>
         /// Examines a simple lambda expression and returns the name of the member it references.
         /// For instance, returns <c>Widget</c> given an expression of <c>x => x.Widget</c>.
         /// Unable to parse any expressions that are more complex than a simple member access.
@@ -406,7 +373,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
+                return value != null && nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)

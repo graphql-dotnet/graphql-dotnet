@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GraphQL.SystemTextJson;
 using Xunit;
 
 namespace GraphQL.Tests

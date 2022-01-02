@@ -81,15 +81,12 @@ namespace GraphQL.Validation.Rules
             {
                 CheckStringLength(strLiteral.Value);
             }
-            else if (node.Value is VariableReference vRef && context.Inputs != null)
+            else if (node.Value is VariableReference vRef && context.Variables != null && context.Variables.TryGetValue(vRef.Name, out var value))
             {
-                if (context.Inputs.TryGetValue(vRef.Name, out var value))
-                {
-                    if (value is string strVariable)
-                        CheckStringLength(strVariable);
-                    else if (value is null && min != null)
-                        context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
-                }
+                if (value is string strVariable)
+                    CheckStringLength(strVariable);
+                else if (value is null && min != null)
+                    context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
             }
 
             void CheckStringLength(string str)

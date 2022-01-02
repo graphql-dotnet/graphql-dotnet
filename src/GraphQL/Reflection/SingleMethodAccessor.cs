@@ -16,7 +16,7 @@ namespace GraphQL.Reflection
 
         public Type ReturnType => MethodInfo.ReturnType;
 
-        public Type DeclaringType => MethodInfo.DeclaringType;
+        public Type DeclaringType => MethodInfo.DeclaringType!;
 
         public ParameterInfo[] Parameters => MethodInfo.GetParameters();
 
@@ -32,7 +32,7 @@ namespace GraphQL.Reflection
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return null; // never executed, necessary only for intellisense
             }
         }

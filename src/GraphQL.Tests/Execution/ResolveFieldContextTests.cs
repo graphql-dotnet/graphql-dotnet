@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Execution
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>(),
+                OutputExtensions = new Dictionary<string, object>(),
             };
         }
 
@@ -122,20 +122,14 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void resolveFieldContextAdapter_throws_error_when_null()
         {
-            Should.Throw<ArgumentNullException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<object>(null);
-            });
+            Should.Throw<ArgumentNullException>(() => _ = new ResolveFieldContextAdapter<object>(null));
         }
 
         [Fact]
         public void resolveFieldContextAdapter_throws_error_if_invalid_type()
         {
             var context = new ResolveFieldContext { Source = "test" };
-            Should.Throw<ArgumentException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<int>(context);
-            });
+            Should.Throw<ArgumentException>(() => _ = new ResolveFieldContextAdapter<int>(context));
         }
 
         [Fact]
@@ -158,47 +152,44 @@ namespace GraphQL.Tests.Execution
         public void resolveFieldContextAdapter_throws_error_for_null_values()
         {
             var context = new ResolveFieldContext();
-            Should.Throw<ArgumentException>(() =>
-            {
-                _ = new ResolveFieldContextAdapter<int>(context);
-            });
+            Should.Throw<ArgumentException>(() => _ = new ResolveFieldContextAdapter<int>(context));
         }
 
         [Fact]
         public void GetSetExtension_Should_Throw_On_Null()
         {
             IResolveFieldContext context = null;
-            Should.Throw<ArgumentNullException>(() => context.GetExtension("e"));
-            Should.Throw<ArgumentNullException>(() => context.SetExtension("e", 1));
+            Should.Throw<ArgumentNullException>(() => context.GetOutputExtension("e"));
+            Should.Throw<ArgumentNullException>(() => context.SetOutputExtension("e", 1));
 
             context = new ResolveFieldContext();
-            context.GetExtension("a").ShouldBe(null);
-            context.GetExtension("a.b.c.d").ShouldBe(null);
-            Should.Throw<ArgumentException>(() => context.SetExtension("e", 1));
+            context.GetOutputExtension("a").ShouldBe(null);
+            context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+            Should.Throw<ArgumentException>(() => context.SetOutputExtension("e", 1));
         }
 
         [Fact]
         public void GetSetExtension_Should_Get_And_Set_Values()
         {
-            _context.GetExtension("a").ShouldBe(null);
-            _context.GetExtension("a.b.c.d").ShouldBe(null);
+            _context.GetOutputExtension("a").ShouldBe(null);
+            _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
 
-            _context.SetExtension("a", 5);
-            _context.GetExtension("a").ShouldBe(5);
+            _context.SetOutputExtension("a", 5);
+            _context.GetOutputExtension("a").ShouldBe(5);
 
-            _context.SetExtension("a.b.c.d", "value");
-            _context.GetExtension("a.b.c.d").ShouldBe("value");
-            var d = _context.GetExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
+            _context.SetOutputExtension("a.b.c.d", "value");
+            _context.GetOutputExtension("a.b.c.d").ShouldBe("value");
+            var d = _context.GetOutputExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
             d.Count.ShouldBe(1);
 
-            _context.SetExtension("a.b.c", "override");
-            _context.GetExtension("a.b.c.d").ShouldBe(null);
+            _context.SetOutputExtension("a.b.c", "override");
+            _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
         }
 
         [Fact]
         public async Task ExecutionError_Should_Be_Thread_Safe()
         {
-            var e = new CountdownEvent(2);
+            using var e = new CountdownEvent(2);
 
             var t1 = Task.Run(() =>
             {
