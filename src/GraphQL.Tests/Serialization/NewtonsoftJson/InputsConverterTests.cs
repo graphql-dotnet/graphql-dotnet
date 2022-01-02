@@ -13,7 +13,6 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.None,
             Formatting = Formatting.Indented,
-            MaxDepth = 64, //default for Newtonsoft.Json v13, but for v12, unlimited is default
             Converters =
             {
                 new InputsConverter()
