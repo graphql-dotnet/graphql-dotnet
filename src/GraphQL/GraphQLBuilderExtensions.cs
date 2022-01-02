@@ -763,7 +763,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder)
             where TGraphQLRequestReader : class, IGraphQLRequestReader
-            => builder.Register<IGraphQLRequestReader, TGraphQLRequestReader>(ServiceLifetime.Singleton, true);
+        {
+            builder.Services.Register<IGraphQLRequestReader, TGraphQLRequestReader>(ServiceLifetime.Singleton, true);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <paramref name="graphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
@@ -771,7 +774,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, TGraphQLRequestReader graphQLRequestReader)
             where TGraphQLRequestReader : class, IGraphQLRequestReader
-            => builder.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), true);
+        {
+            builder.Services.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), true);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TGraphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
@@ -779,7 +785,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, Func<IServiceProvider, TGraphQLRequestReader> graphQLRequestReader)
             where TGraphQLRequestReader : class, IGraphQLRequestReader
-            => builder.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), ServiceLifetime.Singleton, true);
+        {
+            builder.Services.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), ServiceLifetime.Singleton, true);
+            return builder;
+        }
         #endregion
 
         #region - ConfigureSchema and ConfigureExecutionOptions -
