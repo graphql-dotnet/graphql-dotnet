@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Bugs
             services.AddTransient<Bug2639Schema>();
             using var provider = services.BuildServiceProvider();
 
-            for (int i=0; i<10; ++i)
+            for (int i = 0; i < 10; ++i)
             {
                 using var schema = provider.GetRequiredService<Bug2639Schema>();
                 schema.Initialize();
