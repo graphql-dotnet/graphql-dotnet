@@ -15,6 +15,7 @@ namespace GraphQL.NewtonsoftJson
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.None,
+            //TODO: MaxDepth = 64,
             Converters =
             {
                 new InputsConverter()
