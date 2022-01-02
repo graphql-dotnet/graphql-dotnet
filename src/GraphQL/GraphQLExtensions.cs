@@ -406,7 +406,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
+                return value != null && nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)
