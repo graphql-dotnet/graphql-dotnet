@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Execution;
+using GraphQL.Transports.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -21,8 +23,20 @@ namespace GraphQL.NewtonsoftJson
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider);
 
+            if (typeof(Inputs) == objectType)
+                return new InputsConverter();
+
             if (typeof(GraphQLRequest) == objectType)
                 return new GraphQLRequestConverter();
+
+            if (objectType == typeof(IEnumerable<GraphQLRequest>) ||
+                objectType == typeof(ICollection<GraphQLRequest>) ||
+                objectType == typeof(IReadOnlyCollection<GraphQLRequest>) ||
+                objectType == typeof(IReadOnlyList<GraphQLRequest>) ||
+                objectType == typeof(IList<GraphQLRequest>) ||
+                objectType == typeof(List<GraphQLRequest>) ||
+                objectType == typeof(GraphQLRequest[]))
+                return new GraphQLRequestListConverter();
 
             return base.ResolveContractConverter(objectType);
         }

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace GraphQL.Tests
 {
-    public class DocumentWritersTestData : IEnumerable<object[]>
+    public class GraphQLSerializersTestData : IEnumerable<object[]>
     {
-        public static readonly List<IDocumentWriter> AllWriters = new List<IDocumentWriter>
+        public static readonly List<IGraphQLSerializer> AllWriters = new List<IGraphQLSerializer>
         {
-            new SystemTextJson.DocumentWriter(new System.Text.Json.JsonSerializerOptions
+            new SystemTextJson.GraphQLSerializer(new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true,
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
             }),
-            new NewtonsoftJson.DocumentWriter(indent: true)
+            new NewtonsoftJson.GraphQLSerializer(indent: true)
         };
 
         public IEnumerator<object[]> GetEnumerator()

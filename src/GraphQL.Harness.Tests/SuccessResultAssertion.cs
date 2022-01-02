@@ -9,7 +9,7 @@ namespace GraphQL.Harness.Tests
         private static readonly string extensionsKey = nameof(ExecutionResult.Extensions).ToLower();
         private readonly string _result;
         private readonly bool _ignoreExtensions;
-        private readonly IDocumentWriter _writer = new DocumentWriter();
+        private readonly IGraphQLSerializer _writer = new GraphQLSerializer();
 
         public SuccessResultAssertion(string result, bool ignoreExtensions)
         {

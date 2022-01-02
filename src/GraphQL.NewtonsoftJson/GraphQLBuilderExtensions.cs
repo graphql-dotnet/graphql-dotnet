@@ -10,14 +10,13 @@ namespace GraphQL.NewtonsoftJson
     public static class GraphQLBuilderExtensions
     {
         /// <summary>
-        /// Registers the Newtonsoft.Json <see cref="DocumentWriter"/> as a singleton of type
-        /// <see cref="IDocumentWriter"/> within the dependency injection framework and configures
+        /// Registers the Newtonsoft.Json <see cref="GraphQLSerializer"/> as a singleton of type
+        /// <see cref="IGraphQLSerializer"/> within the dependency injection framework and configures
         /// it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings>? action = null)
         {
-            builder.AddDocumentWriter<DocumentWriter>();
-            builder.AddGraphQLRequestReader<GraphQLRequestReader>();
+            builder.AddSerializer<GraphQLSerializer>();
             builder.Services.Configure(action);
             return builder;
         }
@@ -25,17 +24,8 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings, IServiceProvider>? action)
         {
-            builder.AddDocumentWriter<DocumentWriter>();
-            builder.AddGraphQLRequestReader<GraphQLRequestReader>();
+            builder.AddSerializer<GraphQLSerializer>();
             builder.Services.Configure(action);
-            return builder;
-        }
-
-        /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
-        public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings> configureReader, Action<JsonSerializerSettings> configureWriter)
-        {
-            builder.AddDocumentWriter(new DocumentWriter(configureWriter));
-            builder.AddGraphQLRequestReader(new GraphQLRequestReader(configureReader));
             return builder;
         }
     }

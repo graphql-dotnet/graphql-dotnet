@@ -49,6 +49,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bVariable;
         private BenchmarkInfo _bLiteral;
         private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
+        private static readonly GraphQLSerializer _serializer = new GraphQLSerializer();
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -131,7 +132,7 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Variables = benchmarkInfo.InputsString?.ToInputs();
+                        o.Variables = (benchmarkInfo.InputsString != null ? _serializer.Read<Inputs>(benchmarkInfo.InputsString) : null) ?? Inputs.Empty;
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
@@ -229,7 +230,7 @@ namespace GraphQL.Benchmarks
 
             public Inputs DeserializeInputs()
             {
-                return InputsString?.ToInputs();
+                return (InputsString != null ? _serializer.Read<Inputs>(InputsString) : null) ?? Inputs.Empty;
             }
 
             public Language.AST.Variables ParseVariables()
@@ -280,11 +281,10 @@ namespace GraphQL.Benchmarks
                 return _parallelExecutionStrategy.ExecuteAsync(context).Result;
             }
 
-            private static readonly DocumentWriter _documentWriter = new DocumentWriter();
             public System.IO.MemoryStream Serialize()
             {
                 var mem = new System.IO.MemoryStream();
-                _documentWriter.WriteAsync(mem, ExecutionResult).GetAwaiter().GetResult();
+                _serializer.WriteAsync(mem, ExecutionResult, default).GetAwaiter().GetResult();
                 mem.Position = 0;
                 return mem;
             }

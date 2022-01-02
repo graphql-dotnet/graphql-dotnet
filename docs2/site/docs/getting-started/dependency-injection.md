@@ -115,7 +115,7 @@ To use the `AddGraphQL` method, you will need to install the proper nuget packag
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-    services.AddSingleton<IDocumentWriter, DocumentWriter>();
+    services.AddSingleton<IGraphQLSerializer, DocumentWriter>();
     services.AddSingleton<StarWarsData>();
     services.AddSingleton<StarWarsQuery>();
     services.AddSingleton<StarWarsMutation>();

@@ -19,7 +19,7 @@ namespace GraphQL.Tests.DI
         {
             var builder = new TestBuilder();
             var mock = builder.ServiceRegister.MockBuilder;
-            mock.Setup(b => b.TryRegister(typeof(IDocumentWriter), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient))
+            mock.Setup(b => b.TryRegister(typeof(IGraphQLSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient))
                 .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, serviceLifetime) =>
                 {
                     Should.Throw<InvalidOperationException>(() => func(null));

@@ -8,8 +8,8 @@ namespace GraphQL.Tests.Introspection
     public class AppliedDirectivesTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task introspection_should_return_applied_directives(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task introspection_should_return_applied_directives(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>

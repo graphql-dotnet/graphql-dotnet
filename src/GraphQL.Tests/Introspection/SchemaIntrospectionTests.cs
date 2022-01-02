@@ -13,8 +13,8 @@ namespace GraphQL.Tests.Introspection
     public class SchemaIntrospectionTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_core_schema(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -32,8 +32,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema_pascal_case(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_core_schema_pascal_case(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -61,8 +61,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_that_default_schema_comparer_gives_original_order_of_fields_and_types(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_that_default_schema_comparer_gives_original_order_of_fields_and_types(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -97,8 +97,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_that_alphabetical_schema_comparer_gives_ordered_fields_and_types(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_that_alphabetical_schema_comparer_gives_ordered_fields_and_types(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -154,8 +154,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_non_null_schema(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_non_null_schema(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>

@@ -13,7 +13,7 @@ namespace GraphQL.Tests
     public class BasicQueryTestBase
     {
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
+        protected readonly IGraphQLSerializer Writer = new GraphQLSerializer(indent: true);
 
         public ExecutionResult AssertQuerySuccess(
             ISchema schema,

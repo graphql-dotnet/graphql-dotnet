@@ -8,8 +8,8 @@ namespace GraphQL.Tests.Execution
     public class LongTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task LongMaxValueShouldBeSerialized(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task LongMaxValueShouldBeSerialized(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>

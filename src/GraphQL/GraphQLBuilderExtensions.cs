@@ -721,72 +721,46 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddDocumentWriter -
+        #region - AddSerializer -
         /// <summary>
-        /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
+        /// Registers <typeparamref name="TSerializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
         /// dependency injection framework.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder)
-            where TDocumentWriter : class, IDocumentWriter
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder)
+            where TSerializer : class, IGraphQLSerializer
         {
-            builder.Services.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton, true);
+            builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);
+            if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
+                builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
             return builder;
         }
 
         /// <summary>
-        /// Registers <paramref name="documentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
+        /// Registers <paramref name="serializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
         /// dependency injection framework.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
-            where TDocumentWriter : class, IDocumentWriter
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder, TSerializer serializer)
+            where TSerializer : class, IGraphQLSerializer
         {
-            builder.Services.Register<IDocumentWriter>(documentWriter ?? throw new ArgumentNullException(nameof(documentWriter)), true);
+            builder.Services.Register<IGraphQLSerializer>(serializer ?? throw new ArgumentNullException(nameof(serializer)), true);
+            if (serializer is IGraphQLTextSerializer textSerializer)
+                builder.Services.Register(textSerializer);
             return builder;
         }
 
         /// <summary>
-        /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
-        /// dependency injection framework. The supplied factory method is used to create the document writer.
+        /// Registers <typeparamref name="TSerializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
+        /// dependency injection framework. The supplied factory method is used to create the serializer.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentWriter> documentWriterFactory)
-            where TDocumentWriter : class, IDocumentWriter
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder, Func<IServiceProvider, TSerializer> serializerFactory)
+            where TSerializer : class, IGraphQLSerializer
         {
-            builder.Services.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton, true);
-            return builder;
-        }
-        #endregion
-
-        #region - AddGraphQLRequestReader -
-        /// <summary>
-        /// Registers <typeparamref name="TGraphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
-        /// dependency injection framework.
-        /// </summary>
-        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder)
-            where TGraphQLRequestReader : class, IGraphQLRequestReader
-        {
-            builder.Services.Register<IGraphQLRequestReader, TGraphQLRequestReader>(ServiceLifetime.Singleton, true);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <paramref name="graphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
-        /// dependency injection framework.
-        /// </summary>
-        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, TGraphQLRequestReader graphQLRequestReader)
-            where TGraphQLRequestReader : class, IGraphQLRequestReader
-        {
-            builder.Services.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), true);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <typeparamref name="TGraphQLRequestReader"/> as a singleton of type <see cref="IGraphQLRequestReader"/> within the
-        /// dependency injection framework. The supplied factory method is used to create the GraphQL request reader.
-        /// </summary>
-        public static IGraphQLBuilder AddGraphQLRequestReader<TGraphQLRequestReader>(this IGraphQLBuilder builder, Func<IServiceProvider, TGraphQLRequestReader> graphQLRequestReader)
-            where TGraphQLRequestReader : class, IGraphQLRequestReader
-        {
-            builder.Services.Register<IGraphQLRequestReader>(graphQLRequestReader ?? throw new ArgumentNullException(nameof(graphQLRequestReader)), ServiceLifetime.Singleton, true);
+            builder.Services.Register<IGraphQLSerializer>(serializerFactory ?? throw new ArgumentNullException(nameof(serializerFactory)), ServiceLifetime.Singleton, true);
+            if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
+                builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
             return builder;
         }
         #endregion

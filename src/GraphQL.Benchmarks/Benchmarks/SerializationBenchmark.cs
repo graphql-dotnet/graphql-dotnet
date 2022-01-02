@@ -18,11 +18,11 @@ namespace GraphQL.Benchmarks
         private ISchema _schema;
         private DocumentExecuter _executer;
 
-        private SystemTextJson.DocumentWriter _stjWriter;
-        private SystemTextJson.DocumentWriter _stjWriterIndented;
+        private SystemTextJson.GraphQLSerializer _stjWriter;
+        private SystemTextJson.GraphQLSerializer _stjWriterIndented;
 
-        private NewtonsoftJson.DocumentWriter _nsjWriter;
-        private NewtonsoftJson.DocumentWriter _nsjWriterIndented;
+        private NewtonsoftJson.GraphQLSerializer _nsjWriter;
+        private NewtonsoftJson.GraphQLSerializer _nsjWriterIndented;
 
         private ExecutionResult _introspectionResult;
         private ExecutionResult _middleResult;
@@ -50,11 +50,11 @@ namespace GraphQL.Benchmarks
             _schema.Initialize();
             _executer = new DocumentExecuter();
 
-            _stjWriter = new SystemTextJson.DocumentWriter();
-            _stjWriterIndented = new SystemTextJson.DocumentWriter(indent: true);
+            _stjWriter = new SystemTextJson.GraphQLSerializer();
+            _stjWriterIndented = new SystemTextJson.GraphQLSerializer(indent: true);
 
-            _nsjWriter = new NewtonsoftJson.DocumentWriter();
-            _nsjWriterIndented = new NewtonsoftJson.DocumentWriter(indent: true);
+            _nsjWriter = new NewtonsoftJson.GraphQLSerializer();
+            _nsjWriterIndented = new NewtonsoftJson.GraphQLSerializer(indent: true);
 
             _introspectionResult = ExecuteQuery(_schema, Queries.Introspection);
             _smallResult = ExecuteQuery(_schema, Queries.Hero);
@@ -112,10 +112,10 @@ namespace GraphQL.Benchmarks
         public Task NewtonsoftJsonIndented() => _nsjWriterIndented.WriteAsync(_stream, Result);
 
         [Benchmark]
-        public Task SystemTextJson() => _stjWriter.WriteAsync(_stream, Result);
+        public Task SystemTextJson() => _stjWriter.WriteAsync(_stream, Result, default);
 
         [Benchmark]
-        public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result);
+        public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result, default);
 
         void IBenchmark.RunProfiler()
         {

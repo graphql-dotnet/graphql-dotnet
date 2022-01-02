@@ -18,17 +18,17 @@ namespace GraphQL.DI
         /// Includes graph types required for connection builders (GraphQL Relay) and generic graph types
         /// such as <see cref="EnumerationGraphType{TEnum}"/> and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
         /// <br/><br/>
-        /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
+        /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
         protected virtual void RegisterDefaultServices()
         {
-            // configure an error to be displayed when no IDocumentWriter is registered
-            Services.TryRegister<IDocumentWriter>(_ =>
+            // configure an error to be displayed when no IGraphQLSerializer is registered
+            Services.TryRegister<IGraphQLSerializer>(_ =>
             {
                 throw new InvalidOperationException(
-                    "IDocumentWriter not set in DI container. " +
-                    "Add a IDocumentWriter implementation, for example " +
+                    "IGraphQLSerializer not set in DI container. " +
+                    "Add a IGraphQLSerializer implementation, for example " +
                     "GraphQL.SystemTextJson.DocumentWriter or GraphQL.NewtonsoftJson.DocumentWriter. " +
                     "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md and https://github.com/graphql-dotnet/server/blob/develop/README.md.");
             }, ServiceLifetime.Transient);

@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -194,12 +195,13 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IDocumentWriter"/>, and returns the result
+        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IGraphQLSerializer"/>, and returns the result
         /// </summary>
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
         /// <param name="documentWriter">An instance of <see cref="IDocumentExecuter"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
-        public static async Task<string> ExecuteAsync(this ISchema schema, IDocumentWriter documentWriter, Action<ExecutionOptions> configure)
+        [Obsolete] //only here for tests...
+        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLSerializer documentWriter, Action<ExecutionOptions> configure, CancellationToken cancellationToken = default)
         {
             if (configure == null)
             {
@@ -213,7 +215,7 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
+            return await documentWriter.WriteToStringAsync(result, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

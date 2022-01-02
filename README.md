@@ -67,7 +67,7 @@ for GraphQL request processing.
 
 #### 2. Serialization
 
-For serialized results, you'll need an `IDocumentWriter` implementation.
+For serialized results, you'll need an `IGraphQLSerializer` implementation.
 We provide several serializers (or you can bring your own).
 
 ```

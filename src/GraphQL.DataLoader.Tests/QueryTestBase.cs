@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests
     public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new SubscriptionDocumentExecuter();
-        private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
+        private readonly IGraphQLSerializer writer = new GraphQLSerializer(indent: true);
 
         protected IServiceProvider Services { get; }
 
@@ -146,7 +146,7 @@ namespace GraphQL.DataLoader.Tests
 
         public ExecutionResult CreateQueryResult(string result, bool executed = true)
         {
-            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToInputs();
+            object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Read<Inputs>(result);
             return new ExecutionResult { Data = expected, Executed = executed };
         }
     }

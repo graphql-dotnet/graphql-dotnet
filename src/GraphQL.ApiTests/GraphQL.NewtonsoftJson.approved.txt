@@ -1,17 +1,5 @@
 namespace GraphQL.NewtonsoftJson
 {
-    public class DocumentWriter : GraphQL.IDocumentWriter
-    {
-        public DocumentWriter() { }
-        public DocumentWriter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
-        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
-        public DocumentWriter(bool indent) { }
-        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
-    }
     public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
         public ExecutionResultContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
@@ -30,7 +18,6 @@ namespace GraphQL.NewtonsoftJson
     {
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings> configureReader, System.Action<Newtonsoft.Json.JsonSerializerSettings> configureWriter) { }
     }
     public class GraphQLRequestConverter : Newtonsoft.Json.JsonConverter
     {
@@ -50,14 +37,23 @@ namespace GraphQL.NewtonsoftJson
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
-    public class GraphQLRequestReader : GraphQL.IGraphQLRequestReader
+    public class GraphQLSerializer : GraphQL.IGraphQLSerializer, GraphQL.IGraphQLTextSerializer
     {
-        public GraphQLRequestReader() { }
-        public GraphQLRequestReader(Newtonsoft.Json.JsonSerializerSettings serializerOptions) { }
-        public GraphQLRequestReader(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerOptions) { }
-        public T Read<T>(System.IO.StringReader json) { }
+        public GraphQLSerializer() { }
+        public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
+        public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
+        public GraphQLSerializer(bool indent) { }
+        public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public T Read<T>(Newtonsoft.Json.Linq.JObject jObject) { }
+        public T Read<T>(System.IO.TextReader json) { }
         public T Read<T>(string json) { }
         public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken) { }
+        public string Write<T>(T value) { }
+        public void Write<T>(System.IO.TextWriter textWriter, T value) { }
+        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class InputsConverter : Newtonsoft.Json.JsonConverter
     {
@@ -70,12 +66,5 @@ namespace GraphQL.NewtonsoftJson
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
-    }
-    public static class StringExtensions
-    {
-        public static T FromJson<T>(this System.IO.Stream stream) { }
-        public static T FromJson<T>(this string json) { }
-        public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
-        public static GraphQL.Inputs ToInputs(this string json) { }
     }
 }

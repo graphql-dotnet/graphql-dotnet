@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Execution
     public class Issue2275
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task should_map(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task should_map(IGraphQLSerializer documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>

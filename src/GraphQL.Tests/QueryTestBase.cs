@@ -35,7 +35,7 @@ namespace GraphQL.Tests
         {
             Services = new TIocContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
-            Writer = new DocumentWriter(indent: true);
+            Writer = new GraphQLSerializer(indent: true);
         }
 
         public ISimpleContainer Services { get; set; }
@@ -49,7 +49,7 @@ namespace GraphQL.Tests
 
         public IDocumentExecuter Executer { get; private set; }
 
-        public IDocumentWriter Writer { get; private set; }
+        public IGraphQLSerializer Writer { get; private set; }
 
         public ExecutionResult AssertQuerySuccess(
             string query,
@@ -60,7 +60,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
             INameConverter nameConverter = null,
-            IDocumentWriter writer = null)
+            IGraphQLSerializer writer = null)
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQuery(query, queryResult, variables, root, userContext, cancellationToken, rules, null, nameConverter, writer);
@@ -141,7 +141,7 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null,
             Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
             INameConverter nameConverter = null,
-            IDocumentWriter writer = null)
+            IGraphQLSerializer writer = null)
         {
             var schema = Schema;
             schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;

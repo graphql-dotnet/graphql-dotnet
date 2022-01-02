@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Transports.Json;
 using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson

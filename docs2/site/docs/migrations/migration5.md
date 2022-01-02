@@ -22,7 +22,7 @@ a `IList<GraphQLRequest>`, which will deserialize multiple requests or
 a single request (with or without the JSON array wrapper) into a list.
 
 When calling the `AddSystemTextJson` or `AddNewtonsoftJson` extension method to
-the `IGraphQLBuilder` interface, the method will register the `IDocumentWriter`
+the `IGraphQLBuilder` interface, the method will register the `IGraphQLSerializer`
 as usual, plus the `IGraphQLRequestReader` interfaces with the appropriate
 serialization engine. JSON configuration options will normally apply to both
 classes, but an additional overload is provided if you need to independently
