@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         [Fact]
         public void Throws_For_Deep_Objects()
         {
-            var value = "{\"a\":" + new string('[', 100) + new string(']', 100) + "}";
+            var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
             Should.Throw<JsonReaderException>(() => Deserialize<Inputs>(value));
         }
 
