@@ -90,7 +90,7 @@ A list of the available extension methods is below:
 | `AddSubscriptionDocumentExecuter` | Registers the document executer that has subscription support | GraphQL.SystemReactive | |
 | `AddSystemTextJson`     | Registers the document writer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
-| `ConfigureExecution`    | Configures execution options at runtime | |
+| `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
 | `Register`              | Used by extension methods to register services within the DI framework | |
@@ -253,7 +253,7 @@ var result = await _executer.ExecuteAsync(options =>
 {
     options.Schema = schema;
     options.Query = request.Query;
-    options.Inputs = request.Variables.ToInputs();
+    options.Variables = request.Variables.ToInputs();
     options.RequestServices = context.RequestServices;
 });
 ```

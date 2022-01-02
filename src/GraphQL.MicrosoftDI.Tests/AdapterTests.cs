@@ -57,7 +57,8 @@ namespace GraphQL.MicrosoftDI.Tests
                 CancellationToken = default,
                 Document = new Document(),
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>() { { "1", new object() } },
+                InputExtensions = new Dictionary<string, object>() { { "7", new object() } },
+                OutputExtensions = new Dictionary<string, object>() { { "1", new object() } },
                 FieldAst = new Field(default, new NameNode("test")),
                 FieldDefinition = new FieldType(),
                 Metrics = new Instrumentation.Metrics(),
@@ -80,7 +81,8 @@ namespace GraphQL.MicrosoftDI.Tests
             mocked.CancellationToken.ShouldBe(rfc.CancellationToken);
             mocked.Document.ShouldBe(rfc.Document);
             mocked.Errors.ShouldBe(rfc.Errors);
-            mocked.Extensions.ShouldBe(rfc.Extensions);
+            mocked.InputExtensions.ShouldBe(rfc.InputExtensions);
+            mocked.OutputExtensions.ShouldBe(rfc.OutputExtensions);
             mocked.FieldAst.ShouldBe(rfc.FieldAst);
             mocked.FieldDefinition.ShouldBe(rfc.FieldDefinition);
             mocked.Metrics.ShouldBe(rfc.Metrics);

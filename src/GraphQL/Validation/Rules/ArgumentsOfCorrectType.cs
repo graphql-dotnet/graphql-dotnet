@@ -19,9 +19,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentsOfCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Argument>((argAst, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Argument>((argAst, context) =>
         {
             var argDef = context.TypeInfo.GetArgument();
             if (argDef == null)
@@ -33,6 +33,6 @@ namespace GraphQL.Validation.Rules
             {
                 context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));
             }
-        }).ToTask();
+        });
     }
 }

@@ -15,10 +15,16 @@ namespace GraphQL.SystemTextJson
         /// it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions>? action = null)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddDocumentWriter<DocumentWriter>();
+        }
 
         /// <inheritdoc cref="AddSystemTextJson(IGraphQLBuilder, Action{JsonSerializerOptions})"/>
         public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions, IServiceProvider>? action)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddDocumentWriter<DocumentWriter>();
+        }
     }
 }

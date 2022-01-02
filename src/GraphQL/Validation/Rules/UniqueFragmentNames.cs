@@ -19,9 +19,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueFragmentNamesError"/>
-        public Task<INodeVisitor>? ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 1 ? _nodeVisitor : null;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Fragments.Count > 1 ? _nodeVisitor : null);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((fragmentDefinition, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((fragmentDefinition, context) =>
             {
                 var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<string, FragmentDefinition>();
 
@@ -34,6 +34,6 @@ namespace GraphQL.Validation.Rules
                 {
                     knownFragments[fragmentName] = fragmentDefinition;
                 }
-            }).ToTask();
+            });
     }
 }

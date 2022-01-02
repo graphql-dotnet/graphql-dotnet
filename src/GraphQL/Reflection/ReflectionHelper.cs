@@ -43,7 +43,7 @@ namespace GraphQL.Reflection
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
         /// <param name="resolverType">Indicates if a resolver or subscriber method is requested.</param>
-        public static MethodInfo MethodForField(this Type type, string field, ResolverType resolverType)
+        public static MethodInfo? MethodForField(this Type type, string field, ResolverType resolverType)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -62,7 +62,7 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        public static PropertyInfo PropertyForField(this Type type, string field)
+        public static PropertyInfo? PropertyForField(this Type type, string field)
         {
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

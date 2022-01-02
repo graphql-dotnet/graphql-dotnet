@@ -21,9 +21,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedFragmentsError"/>
-        public Task<INodeVisitor>? ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 0 ? _nodeVisitor : null;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Fragments.Count > 0 ? _nodeVisitor : null);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<Operation>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node)),
             new MatchingNodeVisitor<FragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>()).Add(node)),
             new MatchingNodeVisitor<Document>(leave: (document, context) =>
@@ -51,6 +51,6 @@ namespace GraphQL.Validation.Rules
                     }
                 }
             })
-        ).ToTask();
+        );
     }
 }

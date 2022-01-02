@@ -268,8 +268,10 @@ namespace GraphQL.Utilities
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "",
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
-                f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
+            return fields == null
+                ? ""
+                : string.Join(Environment.NewLine, fields.Select(
+                    f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)

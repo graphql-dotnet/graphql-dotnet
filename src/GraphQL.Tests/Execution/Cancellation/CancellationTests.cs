@@ -67,20 +67,14 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             using var tokenSource = new CancellationTokenSource();
             tokenSource.Cancel();
-            Should.Throw<OperationCanceledException>(() =>
-            {
-                _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
-            });
+            Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1));
         }
 
         [Fact]
         public void cancellation_is_propagated_async()
         {
             using var tokenSource = new CancellationTokenSource();
-            Should.Throw<OperationCanceledException>(() =>
-            {
-                _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
-            });
+            Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource));
         }
 
         [Fact]
@@ -89,10 +83,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             bool ranDelegate = false;
             using (var tokenSource = new CancellationTokenSource())
             {
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: _ => ranDelegate = true);
-                });
+                Should.Throw<OperationCanceledException>(() => _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: _ => { ranDelegate = true; return Task.CompletedTask; }));
             }
             ranDelegate.ShouldBeFalse();
         }

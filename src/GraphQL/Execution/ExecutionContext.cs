@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -50,13 +51,16 @@ namespace GraphQL.Execution
         public bool ThrowOnUnhandledException { get; set; }
 
         /// <inheritdoc/>
-        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
+        public Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; set; } = _ => Task.CompletedTask;
 
         /// <inheritdoc/>
         public int? MaxParallelExecutionCount { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, object?> Extensions { get; set; }
+        public IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
+
+        /// <inheritdoc/>
+        public Dictionary<string, object?> OutputExtensions { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <inheritdoc/>

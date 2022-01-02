@@ -112,7 +112,7 @@ namespace GraphQL.Tests.Bugs
             var json = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "query ($arg: Int!) { testInput(arg:$arg) }";
-                _.Inputs = "{\"arg\":123}".ToInputs();
+                _.Variables = "{\"arg\":123}".ToInputs();
             });
             json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
         }
@@ -140,7 +140,7 @@ namespace GraphQL.Tests.Bugs
             var json = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "query ($arg: String!) { testInputString(arg:$arg) }";
-                _.Inputs = "{\"arg\":\"hello\"}".ToInputs();
+                _.Variables = "{\"arg\":\"hello\"}".ToInputs();
             });
             json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
         }

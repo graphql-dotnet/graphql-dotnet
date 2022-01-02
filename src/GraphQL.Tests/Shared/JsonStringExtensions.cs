@@ -1,3 +1,6 @@
+#nullable enable
+
+using System.Collections.Generic;
 using GraphQL.SystemTextJson;
 
 namespace GraphQL
@@ -12,12 +15,24 @@ namespace GraphQL
         /// <param name="errors">Any errors.</param>
         /// <param name="executed">Indicates if the operation included execution.</param>
         /// <returns>ExecutionResult.</returns>
-        public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null, bool executed = true)
+        public static ExecutionResult ToExecutionResult(this string? json, ExecutionErrors? errors = null, bool executed = true)
             => new ExecutionResult
             {
                 Data = string.IsNullOrWhiteSpace(json) ? null : json.ToDictionary(),
                 Errors = errors,
                 Executed = executed
             };
+
+        public static Dictionary<string, object?>? ToDictionary(this string? json)
+        {
+            if (json == null)
+                return null;
+
+            var ret = json.ToInputs();
+            if (ret == null)
+                return null;
+
+            return new Dictionary<string, object?>(ret);
+        }
     }
 }

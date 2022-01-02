@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
@@ -22,7 +23,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
-        private readonly IEnumerable<IConfigureExecution>? _configurations;
+        private readonly IConfigureExecutionOptions[]? _configurations;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -50,17 +51,22 @@ namespace GraphQL
         /// and <see cref="IDocumentCache"/> instances.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, null!)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
+        /// </summary>
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
-        }
-
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
-        {
-            _configurations = configurations;
+            _configurations = configurations?.ToArray();
         }
 
         /// <inheritdoc/>
@@ -104,7 +110,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && (document = _documentCache[options.Query]) != null)
+                    if (document == null && (document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false)) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -137,12 +143,16 @@ namespace GraphQL
                 using (metrics.Subject("document", "Validating document"))
                 {
                     (validationResult, variables) = await _documentValidator.ValidateAsync(
-                        options.Schema,
-                        document,
-                        operation.Variables,
-                        validationRules,
-                        options.UserContext,
-                        options.Inputs).ConfigureAwait(false);
+                        new ValidationOptions
+                        {
+                            Document = document,
+                            Rules = validationRules,
+                            Operation = operation,
+                            UserContext = options.UserContext,
+                            Schema = options.Schema,
+                            Variables = options.Variables ?? Inputs.Empty,
+                            Extensions = options.Extensions ?? Inputs.Empty,
+                        }).ConfigureAwait(false);
                 }
 
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
@@ -153,7 +163,7 @@ namespace GraphQL
 
                 if (saveInCache && validationResult.IsValid)
                 {
-                    _documentCache[options.Query] = document;
+                    await _documentCache.SetAsync(options.Query, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);
@@ -198,17 +208,6 @@ namespace GraphQL
                     var task = (context.ExecutionStrategy ?? throw new InvalidOperationException("Execution strategy not specified")).ExecuteAsync(context)
                         .ConfigureAwait(false);
 
-                    if (context.Listeners != null)
-                    {
-                        foreach (var listener in context.Listeners)
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await listener.BeforeExecutionAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                        }
-                    }
-
                     result = await task;
 
                     if (context.Listeners != null)
@@ -240,7 +239,7 @@ namespace GraphQL
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
-                    options.UnhandledExceptionDelegate(exceptionContext);
+                    await options.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                     ex = exceptionContext.Exception;
                 }
 
@@ -273,7 +272,8 @@ namespace GraphQL
                 Operation = operation,
                 Variables = variables,
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object?>(),
+                InputExtensions = options.Extensions ?? Inputs.Empty,
+                OutputExtensions = new Dictionary<string, object?>(),
                 CancellationToken = options.CancellationToken,
 
                 Metrics = metrics,

@@ -15,8 +15,6 @@ namespace GraphQL.Validation.Rules
     /// the field and arguments to execute and the resulting value should be unambiguous. Therefore
     /// any two field selections which might both be encountered for the same object are only valid
     /// if they are equivalent.
-    /// <br/><br/>
-    /// Due to the complexity of the implementation, this validation rule is not part of the default set of validation rules.
     /// </summary>
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
@@ -27,13 +25,13 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
             //TODO: make static instance when enabling this rule
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 
-            return new MatchingNodeVisitor<SelectionSet>((selectionSet, context) =>
+            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<SelectionSet>((selectionSet, context) =>
             {
                 List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                         context,
@@ -46,7 +44,7 @@ namespace GraphQL.Validation.Rules
                 {
                     context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
                 }
-            }).ToTask();
+            }));
         }
 
         private static List<Conflict> FindConflictsWithinSelectionSet(
@@ -547,9 +545,7 @@ namespace GraphQL.Validation.Rules
 
             foreach (var responseName in fieldMap1.Keys)
             {
-                fieldMap2.TryGetValue(responseName, out List<FieldDefPair> fields2);
-
-                if (fields2 != null && fields2.Count != 0)
+                if (fieldMap2.TryGetValue(responseName, out var fields2) && fields2.Count != 0)
                 {
                     var fields1 = fieldMap1[responseName];
                     for (var i = 0; i < fields1.Count; i++)
@@ -637,9 +633,7 @@ namespace GraphQL.Validation.Rules
             IGraphType? parentType,
             SelectionSet selectionSet)
         {
-            cachedFieldsAndFragmentNames.TryGetValue(selectionSet, out CachedField cached);
-
-            if (cached == null)
+            if (!cachedFieldsAndFragmentNames.TryGetValue(selectionSet, out var cached))
             {
                 var nodeAndDef = new Dictionary<string, List<FieldDefPair>>();
                 var fragmentNames = new HashSet<string>();

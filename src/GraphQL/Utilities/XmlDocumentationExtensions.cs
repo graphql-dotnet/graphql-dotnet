@@ -28,7 +28,7 @@ namespace GraphQL.Utilities
                 return $"{baseName}{{{string.Join(",", type.GetGenericArguments().Select(GetTypeName))}}}";
             }
 
-            return type.FullName;
+            return type.FullName!;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace GraphQL.Utilities
         {
             char prefixCode;
             string memberName = member is Type t
-                ? t.FullName // member is a Type
+                ? t.FullName! // member is a Type
                 : member.DeclaringType.FullName + "." + member.Name;  // member belongs to a Type
             memberName = memberName.Replace('+', '.');
 
@@ -101,7 +101,7 @@ namespace GraphQL.Utilities
 
                     if (doc == null)
                     {
-                        string relativePath = Path.Combine(Path.GetDirectoryName(asm.Location), pathToXmlFile);
+                        string relativePath = Path.Combine(Path.GetDirectoryName(asm.Location)!, pathToXmlFile);
                         if (File.Exists(relativePath))
                             doc = XDocument.Load(relativePath);
                     }

@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Execution
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object>(),
+                OutputExtensions = new Dictionary<string, object>(),
             };
         }
 

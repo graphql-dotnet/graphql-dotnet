@@ -6,8 +6,6 @@ using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
-#pragma warning disable 0618
-
 namespace GraphQL.Tests.Types
 {
     public class EnumGraphTypeTests

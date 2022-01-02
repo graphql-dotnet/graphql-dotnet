@@ -8,17 +8,9 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class InlineFragment : AbstractNode, IFragment, IHaveSelectionSet
     {
-        [Obsolete]
-        public InlineFragment()
-        {
-            SelectionSet = null!;
-        }
-
         public InlineFragment(SelectionSet selectionSet)
         {
-#pragma warning disable CS0612 // Type or member is obsolete
             SelectionSet = selectionSet;
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
@@ -32,14 +24,7 @@ namespace GraphQL.Language.AST
         public Directives? Directives { get; set; }
 
         /// <inheritdoc/>
-        public SelectionSet SelectionSet
-        {
-            get;
-#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-            [Obsolete]
-            set;
-#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        }
+        public SelectionSet SelectionSet { get; }
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children

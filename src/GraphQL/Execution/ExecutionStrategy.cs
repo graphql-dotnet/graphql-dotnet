@@ -37,7 +37,7 @@ namespace GraphQL.Execution
                 Query = context.Document.OriginalQuery,
                 Document = context.Document,
                 Operation = context.Operation,
-                Extensions = context.Extensions
+                Extensions = context.OutputExtensions
             };
         }
 
@@ -325,7 +325,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not <see langword="null"/>.
         /// </summary>
-        protected virtual void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        protected virtual async Task SetArrayItemNodesAsync(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType!;
             var itemType = listType.ResolvedType!;
@@ -346,25 +346,25 @@ namespace GraphQL.Execution
             if (data is IList list)
             {
                 for (int i = 0; i < list.Count; ++i)
-                    SetArrayItemNode(list[i]);
+                    await SetArrayItemNode(list[i]).ConfigureAwait(false);
             }
             else
             {
                 foreach (object? d in data)
-                    SetArrayItemNode(d);
+                    await SetArrayItemNode(d).ConfigureAwait(false);
             }
 
             parent.Items = arrayItems;
 
             // local function uses 'struct closure' without heap allocation
-            void SetArrayItemNode(object? d)
+            async Task SetArrayItemNode(object? d)
             {
                 var node = BuildExecutionNode(parent, itemType, parent.Field!, parent.FieldDefinition!, index++);
                 node.Result = d;
 
                 if (d is not IDataLoaderResult)
                 {
-                    CompleteNode(context, node);
+                    await CompleteNodeAsync(context, node).ConfigureAwait(false);
                 }
 
                 arrayItems.Add(node);
@@ -373,7 +373,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
-        /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
+        /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
         protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
@@ -401,7 +401,7 @@ namespace GraphQL.Execution
 
                 if (result is not IDataLoaderResult)
                 {
-                    CompleteNode(context, node);
+                    await CompleteNodeAsync(context, node).ConfigureAwait(false);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context,
                     // except for enumerable lists - in case the user returned a value with LINQ that is based on the context source
                     if (result is not IEnumerable || result is string)
@@ -422,14 +422,14 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledExceptionAsync(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
 
         /// <summary>
         /// Completes a pending data loader node. If the node does not return an <see cref="IDataLoaderResult"/>,
-        /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
+        /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
@@ -442,7 +442,7 @@ namespace GraphQL.Execution
 
                 if (node.Result is not IDataLoaderResult)
                 {
-                    CompleteNode(context, node);
+                    await CompleteNodeAsync(context, node).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -455,17 +455,17 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledExceptionAsync(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
 
         /// <summary>
         /// Validates a node result. Builds child nodes via <see cref="SetSubFieldNodes(ExecutionContext, ObjectExecutionNode)">SetSubFieldNodes</see>
-        /// and <see cref="SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)">SetArrayItemNodes</see>, but does not execute them. For value
+        /// and <see cref="SetArrayItemNodesAsync(ExecutionContext, ArrayExecutionNode)">SetArrayItemNodes</see>, but does not execute them. For value
         /// execution nodes, it will run <see cref="ScalarGraphType.Serialize(object)"/> to serialize the result.
         /// </summary>
-        protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task CompleteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             try
             {
@@ -485,7 +485,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ArrayExecutionNode arrayNode)
                     {
-                        SetArrayItemNodes(context, arrayNode);
+                        await SetArrayItemNodesAsync(context, arrayNode).ConfigureAwait(false);
                     }
                 }
             }
@@ -499,7 +499,7 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (ProcessNodeUnhandledException(context, node, ex))
+                if (await ProcessNodeUnhandledExceptionAsync(context, node, ex).ConfigureAwait(false))
                     throw;
             }
         }
@@ -520,7 +520,7 @@ namespace GraphQL.Execution
         /// Processes unhandled field resolver exceptions.
         /// </summary>
         /// <returns>A value that indicates when the exception should be rethrown.</returns>
-        protected virtual bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
+        protected virtual async Task<bool> ProcessNodeUnhandledExceptionAsync(ExecutionContext context, ExecutionNode node, Exception ex)
         {
             if (context.ThrowOnUnhandledException)
                 return true;
@@ -531,7 +531,7 @@ namespace GraphQL.Execution
                 // be sure not to re-use this instance of `IResolveFieldContext`
                 var resolveContext = new ReadonlyResolveFieldContext(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
-                context.UnhandledExceptionDelegate(exceptionContext);
+                await context.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                 ex = exceptionContext.Exception;
             }
 
@@ -592,26 +592,6 @@ namespace GraphQL.Execution
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
                 throw new InvalidOperationException($"'{result}' value of type '{result.GetType()}' is not allowed for '{objectType.Name}'. Either change IsTypeOf method of '{objectType.Name}' to accept this value or return another value from your resolver.");
-            }
-        }
-
-        /// <summary>
-        /// If there are any <see cref="IDocumentExecutionListener"/>s specified within the <see cref="ExecutionContext"/>,
-        /// runs the <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext)">BeforeExecutionStepAwaitedAsync</see>
-        /// method on each of the registered document execution listeners.
-        /// <br/><br/>
-        /// This method will be removed in version 5.
-        /// </summary>
-        [Obsolete]
-        protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
-        {
-            if (context.Listeners != null)
-            {
-                foreach (var listener in context.Listeners)
-                {
-                    await listener.BeforeExecutionStepAwaitedAsync(context)
-                        .ConfigureAwait(false);
-                }
             }
         }
     }

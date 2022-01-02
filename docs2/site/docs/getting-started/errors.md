@@ -129,7 +129,7 @@ var result = executer.ExecuteAsync(options =>
 
     ...
 
-    options.UnhandledExceptionDelegate = context =>
+    options.UnhandledExceptionDelegate = async context =>
     {
         try
         {
@@ -140,7 +140,7 @@ var result = executer.ExecuteAsync(options =>
                 Details = context.Exception.ToString()
             };
             db.ErrorLogs.Add(errorLog);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             context.Exception.Data["errorLogId"] = errorLog.Id;
         }
         catch

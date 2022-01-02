@@ -21,10 +21,10 @@ namespace GraphQL.DI
         /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-        protected virtual void Initialize()
+        protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IDocumentWriter is registered
-            this.TryRegister<IDocumentWriter>(_ =>
+            Services.TryRegister<IDocumentWriter>(_ =>
             {
                 throw new InvalidOperationException(
                     "IDocumentWriter not set in DI container. " +
@@ -34,27 +34,27 @@ namespace GraphQL.DI
             }, ServiceLifetime.Transient);
 
             // configure service implementations to use the configured default services when not overridden by a user
-            this.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
-            this.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
-            this.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
-            this.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
-            this.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
-            this.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
+            Services.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
+            Services.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
+            Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
 
             // configure relay graph types
-            TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
-            TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
-            TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
-            this.TryRegister<PageInfoType>(ServiceLifetime.Transient);
+            Services.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
+            Services.TryRegister<PageInfoType>(ServiceLifetime.Transient);
 
             // configure generic graph types
-            TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
-            TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
-            TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
-            TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
 
             // configure execution to use the default registered schema if none specified
-            this.ConfigureExecution(options =>
+            this.ConfigureExecutionOptions(options =>
             {
                 if (options.RequestServices != null && options.Schema == null)
                 {
@@ -63,29 +63,10 @@ namespace GraphQL.DI
             });
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
-            Configure<ErrorInfoProviderOptions>();
+            Services.Configure<ErrorInfoProviderOptions>();
         }
 
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance);
-
-        /// <inheritdoc/>
-        public abstract IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
-            where TOptions : class, new();
+        /// <inheritdoc />
+        public abstract IServiceRegister Services { get; }
     }
 }

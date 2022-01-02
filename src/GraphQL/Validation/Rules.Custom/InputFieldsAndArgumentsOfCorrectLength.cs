@@ -52,16 +52,16 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="InputFieldsAndArgumentsOfCorrectLengthError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<Argument>((arg, context) => CheckLength(arg, context.TypeInfo.GetArgument(), context)),
             new MatchingNodeVisitor<ObjectField>((field, context) =>
             {
                 if (context.TypeInfo.GetInputType(1) is IInputObjectGraphType input)
                     CheckLength(field, input.GetField(field.Name), context);
             })
-        ).ToTask();
+        );
 
         private static void CheckLength(IHaveValue node, IProvideMetadata? provider, ValidationContext context)
         {
@@ -81,15 +81,12 @@ namespace GraphQL.Validation.Rules
             {
                 CheckStringLength(strLiteral.Value);
             }
-            else if (node.Value is VariableReference vRef && context.Inputs != null)
+            else if (node.Value is VariableReference vRef && context.Variables != null && context.Variables.TryGetValue(vRef.Name, out var value))
             {
-                if (context.Inputs.TryGetValue(vRef.Name, out var value))
-                {
-                    if (value is string strVariable)
-                        CheckStringLength(strVariable);
-                    else if (value is null && min != null)
-                        context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
-                }
+                if (value is string strVariable)
+                    CheckStringLength(strVariable);
+                else if (value is null && min != null)
+                    context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
             }
 
             void CheckStringLength(string str)
