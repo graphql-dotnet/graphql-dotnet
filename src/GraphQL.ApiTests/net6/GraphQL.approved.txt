@@ -501,7 +501,7 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         [System.Obsolete]
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLSerializer documentWriter, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
