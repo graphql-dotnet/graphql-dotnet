@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using Xunit;

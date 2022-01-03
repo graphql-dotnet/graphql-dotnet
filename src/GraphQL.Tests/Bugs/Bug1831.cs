@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
