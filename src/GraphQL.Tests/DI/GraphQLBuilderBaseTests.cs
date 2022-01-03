@@ -25,6 +25,12 @@ namespace GraphQL.Tests.DI
                     Should.Throw<InvalidOperationException>(() => func(null));
                     return builder.ServiceRegister;
                 }).Verifiable();
+            mock.Setup(b => b.TryRegister(typeof(IGraphQLTextSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient))
+                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, serviceLifetime) =>
+                {
+                    Should.Throw<InvalidOperationException>(() => func(null));
+                    return builder.ServiceRegister;
+                }).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter), typeof(DocumentExecuter), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IDocumentBuilder), typeof(GraphQLDocumentBuilder), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();

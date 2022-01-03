@@ -30,7 +30,16 @@ namespace GraphQL.DI
                     "IGraphQLSerializer not set in DI container. " +
                     "Add a IGraphQLSerializer implementation, for example " +
                     "GraphQL.SystemTextJson.GraphQLSerializer or GraphQL.NewtonsoftJson.GraphQLSerializer. " +
-                    "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md and https://github.com/graphql-dotnet/server/blob/develop/README.md.");
+                    "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md.");
+            }, ServiceLifetime.Transient);
+            // configure an error to be displayed when no IGraphQLTextSerializer is registered
+            Services.TryRegister<IGraphQLTextSerializer>(_ =>
+            {
+                throw new InvalidOperationException(
+                    "IGraphQLTextSerializer not set in DI container. " +
+                    "Add a IGraphQLTextSerializer implementation, for example " +
+                    "GraphQL.SystemTextJson.GraphQLSerializer or GraphQL.NewtonsoftJson.GraphQLSerializer. " +
+                    "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md.");
             }, ServiceLifetime.Transient);
 
             // configure service implementations to use the configured default services when not overridden by a user
