@@ -178,7 +178,9 @@ namespace GraphQL.NewtonsoftJson
             return new ValueTask<T>(_serializer.Deserialize<T>(jsonReader));
         }
 
-        /// <inheritdoc cref="IGraphQLTextSerializer.Read{T}(string)"/>
+        /// <summary>
+        /// Deserializes the specified string to the specified object type.
+        /// </summary>
         public T Read<T>(TextReader json)
         {
             using var jsonReader = new JsonTextReader(json);
@@ -186,7 +188,8 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public T Read<T>(string json) => Read<T>(new StringReader(json));
+        public T Read<T>(string json)
+            => json == null ? default : Read<T>(new StringReader(json));
 
         /// <summary>
         /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
