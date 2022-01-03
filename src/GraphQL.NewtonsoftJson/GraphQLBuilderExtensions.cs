@@ -16,17 +16,15 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings>? action = null)
         {
-            builder.AddSerializer<GraphQLSerializer>();
             builder.Services.Configure(action);
-            return builder;
+            return builder.AddSerializer<GraphQLSerializer>();
         }
 
         /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings, IServiceProvider>? action)
         {
-            builder.AddSerializer<GraphQLSerializer>();
             builder.Services.Configure(action);
-            return builder;
+            return builder.AddSerializer<GraphQLSerializer>();
         }
     }
 }
