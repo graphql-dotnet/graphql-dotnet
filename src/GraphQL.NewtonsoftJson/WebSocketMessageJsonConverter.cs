@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
-    /// A custom JsonConverter for reading or writing a <see cref="GraphQLRequest"/> object.
+    /// A custom JsonConverter for reading or writing a <see cref="WebSocketMessage"/> object.
     /// </summary>
     public class WebSocketMessageJsonConverter : JsonConverter
     {
