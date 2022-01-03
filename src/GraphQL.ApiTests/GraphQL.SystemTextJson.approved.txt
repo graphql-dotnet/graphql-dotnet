@@ -36,11 +36,11 @@ namespace GraphQL.SystemTextJson
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public T Read<T>(string json) { }
-        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
         public T ReadDocument<T>(System.Text.Json.JsonDocument jsonDocument) { }
         public T ReadNode<T>(System.Text.Json.JsonElement jsonElement) { }
         public string Write<T>(T value) { }
-        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
     {

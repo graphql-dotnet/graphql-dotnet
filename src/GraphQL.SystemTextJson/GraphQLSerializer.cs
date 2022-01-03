@@ -151,11 +151,11 @@ namespace GraphQL.SystemTextJson
             => new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         /// <inheritdoc/>
-        public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken)
+        public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
             => JsonSerializer.SerializeAsync(stream, value, _options, cancellationToken);
 
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken)
+        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
             => JsonSerializer.DeserializeAsync<T>(stream, _options, cancellationToken);
 
         /// <inheritdoc/>

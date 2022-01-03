@@ -49,7 +49,7 @@ namespace GraphQL.NewtonsoftJson
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public T Read<T>(System.IO.TextReader json) { }
         public T Read<T>(string json) { }
-        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
         public T ReadNode<T>(Newtonsoft.Json.Linq.JObject jObject) { }
         public string Write<T>(T value) { }
         public void Write<T>(System.IO.TextWriter textWriter, T value) { }

@@ -170,7 +170,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken)
+        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
             //note: do not dispose of stringReader or else the underlying stream will be disposed
             var stringReader = new StreamReader(stream, Encoding.UTF8);

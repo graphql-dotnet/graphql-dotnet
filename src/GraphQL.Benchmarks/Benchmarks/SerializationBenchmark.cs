@@ -112,10 +112,10 @@ namespace GraphQL.Benchmarks
         public Task NewtonsoftJsonIndented() => _nsjWriterIndented.WriteAsync(_stream, Result);
 
         [Benchmark]
-        public Task SystemTextJson() => _stjWriter.WriteAsync(_stream, Result, default);
+        public Task SystemTextJson() => _stjWriter.WriteAsync(_stream, Result);
 
         [Benchmark]
-        public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result, default);
+        public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result);
 
         void IBenchmark.RunProfiler()
         {
