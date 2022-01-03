@@ -176,8 +176,14 @@ namespace GraphQL.SystemTextJson
         /// <summary>
         /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// </summary>
-        public T Read<T>(JsonElement jsonElement)
+        public T ReadNode<T>(JsonElement jsonElement)
             => JsonSerializer.Deserialize<T>(jsonElement, _options);
+
+        T IGraphQLSerializer.ReadNode<T>(object value)
+            => ReadNode<T>((JsonElement)value);
+#else
+        T IGraphQLSerializer.ReadNode<T>(object value)
+            => throw new NotSupportedException();
 #endif
     }
 }

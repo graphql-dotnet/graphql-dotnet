@@ -79,7 +79,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
             var actual = serializer.Read<TestClass2>(test);
             actual.Query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.Variables);
+            var variables = serializer.ReadNode<Inputs>(actual.Variables);
             Verify(variables);
         }
 
@@ -131,7 +131,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
             actual.Query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.Variables);
+            var variables = serializer.ReadNode<Inputs>(actual.Variables);
             Verify(variables);
         }
 
@@ -143,7 +143,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var actual = System.Text.Json.JsonSerializer.Deserialize<TestClass2SystemTextJson>(test);
             actual.query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.variables);
+            var variables = serializer.ReadNode<Inputs>(actual.variables);
             Verify(variables);
         }
 #endif

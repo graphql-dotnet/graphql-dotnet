@@ -25,5 +25,10 @@ namespace GraphQL
         /// Typically used to parse <see cref="GraphQLRequest"/> instances from JSON.
         /// </summary>
         ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Deserializes the specified JSON element to the specified object type.
+        /// </summary>
+        T ReadNode<T>(object value);
     }
 }
