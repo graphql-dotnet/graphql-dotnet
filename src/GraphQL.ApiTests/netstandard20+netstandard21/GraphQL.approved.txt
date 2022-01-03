@@ -335,9 +335,9 @@ namespace GraphQL
     }
     public interface IGraphQLSerializer
     {
-        System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);
         T ReadNode<T>(object value);
-        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default);
     }
     public interface IGraphQLTextSerializer : GraphQL.IGraphQLSerializer
     {

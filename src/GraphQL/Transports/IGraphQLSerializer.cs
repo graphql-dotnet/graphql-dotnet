@@ -18,13 +18,13 @@ namespace GraphQL
         /// Asynchronously serializes the specified object to the specified stream.
         /// Typically used to write <see cref="ExecutionResult"/> instances to a JSON result.
         /// </summary>
-        Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken);
+        Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Asynchronously deserializes the specified stream to the specified object type.
         /// Typically used to parse <see cref="GraphQLRequest"/> instances from JSON.
         /// </summary>
-        ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken);
+        ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deserializes the specified JSON element to the specified object type.
