@@ -157,7 +157,7 @@ namespace GraphQL.Utilities.Federation
 
             union.ResolveType = x =>
             {
-                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object typeName))
+                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
                 {
                     return new GraphQLTypeReference(typeName.ToString());
                 }
