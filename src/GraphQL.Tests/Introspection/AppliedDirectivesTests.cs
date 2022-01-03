@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Introspection
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async Task introspection_should_return_applied_directives(IGraphQLSerializer documentWriter)
+        public async Task introspection_should_return_applied_directives(IGraphQLSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "AppliedDirectives".ReadGraphQLRequest();
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = await serializer.WriteToStringAsync(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe("AppliedDirectivesResult".ReadJsonResult());

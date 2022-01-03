@@ -29,7 +29,7 @@ namespace GraphQL.DI
                 throw new InvalidOperationException(
                     "IGraphQLSerializer not set in DI container. " +
                     "Add a IGraphQLSerializer implementation, for example " +
-                    "GraphQL.SystemTextJson.DocumentWriter or GraphQL.NewtonsoftJson.DocumentWriter. " +
+                    "GraphQL.SystemTextJson.GraphQLSerializer or GraphQL.NewtonsoftJson.GraphQLSerializer. " +
                     "For more information, see: https://github.com/graphql-dotnet/graphql-dotnet/blob/master/README.md and https://github.com/graphql-dotnet/server/blob/develop/README.md.");
             }, ServiceLifetime.Transient);
 

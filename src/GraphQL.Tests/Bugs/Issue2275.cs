@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -12,7 +11,7 @@ namespace GraphQL.Tests.Execution
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async Task should_map(IGraphQLSerializer documentWriter)
+        public async Task should_map(IGraphQLSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -32,7 +31,7 @@ namespace GraphQL.Tests.Execution
                 }".ToInputs();
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = await serializer.WriteToStringAsync(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe(@"{
