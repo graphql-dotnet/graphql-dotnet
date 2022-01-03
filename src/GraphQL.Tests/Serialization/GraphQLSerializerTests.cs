@@ -14,7 +14,7 @@ namespace GraphQL.Tests
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Can_Write_Execution_Result(IGraphQLTextSerializer writer)
+        public void Can_Write_Execution_Result(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
             {
@@ -60,7 +60,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult { Executed = true };
 
@@ -75,7 +75,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IGraphQLTextSerializer writer)
         {
             // "If an error was encountered before execution begins, the data entry should not be present in the result."
             // Source: https://github.com/graphql/graphql-spec/blob/master/spec/Section%207%20--%20Response.md#data
@@ -100,7 +100,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
             {
@@ -119,7 +119,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
             {
@@ -138,7 +138,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_Path_Property_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_Path_Property_Correctly(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
             {
@@ -161,7 +161,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_GraphQLRequest_Correctly_Simple(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Correctly_Simple(IGraphQLTextSerializer writer)
         {
             var request = new GraphQLRequest
             {
@@ -177,7 +177,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_GraphQLRequest_Correctly_Complex(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Correctly_Complex(IGraphQLTextSerializer writer)
         {
             var request = new GraphQLRequest
             {
@@ -204,7 +204,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_GraphQLRequest_List_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_List_Correctly(IGraphQLTextSerializer writer)
         {
             var request = new GraphQLRequest
             {
@@ -220,7 +220,7 @@ namespace GraphQL.Tests
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async void Writes_GraphQLRequest_Array_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Array_Correctly(IGraphQLTextSerializer writer)
         {
             var request = new GraphQLRequest
             {

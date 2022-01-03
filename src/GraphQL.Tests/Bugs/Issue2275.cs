@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Execution
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async Task should_map(IGraphQLSerializer serializer)
+        public async Task should_map(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = @"query($data:Input!) {
                                 request(data: $data)
                 }";
-                _.Variables = @" {
+                _.Variables = serializer.Read<Inputs>(@" {
                     ""data"": {
                         ""clientId"": 2,
                         ""filters"": [{
@@ -28,7 +28,7 @@ namespace GraphQL.Tests.Execution
                             ""value"": 25
                         }]
                     }
-                }".ToInputs();
+                }");
             });
 
             var json = await serializer.WriteToStringAsync(executionResult);
