@@ -1,5 +1,3 @@
-using GraphQL.SystemTextJson;
-
 namespace GraphQL.Tests.Execution
 {
     public class InputConversionSystemTextJsonTests : InputConversionTestsBase
