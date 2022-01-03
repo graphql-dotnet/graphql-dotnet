@@ -6,6 +6,13 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ### 1. DoNotMapClrType attribute can now be placed on the graph type or the CLR type
 
+When using the `.AddClrTypeMappings()` builder extension method, GraphQL.NET scans the
+specified assembly for graph types that inherit from `ObjectGraphType<T>` and adds a
+mapping for the CLR type represented by `T` with the graph type it matched upon.
+It skips adding a mapping for any graph type marked with the `[DoNotMapClrType]` attribute.
+In v5, it will also skip adding the mapping if the CLR type is marked with the
+`[DoNotMapClrType]` attribute.
+
 ### 2. Input Extensions support
 
 `Extensions` deserialized from GraphQL requests can now be set on the `ExecutionOptions.Extensions` property
@@ -13,9 +20,9 @@ and passed through to field resolvers via `IResolveFieldContext.InputExtensions`
 dictionaries (such as `Dictionary<TKey, TValue>`) are thread-safe for read-only operations. Also you can
 access these extensions from validation rules via `ValidationContext.Extensions`.
 
-### 3. `IGraphQLRequestReader` interface to support JSON deserialization
+### 3. `IGraphQLSerializer` interface to support JSON deserialization
 
-`IGraphQLRequestReader.ReadAsync` is implemented by the `GraphQL.SystemTextJson` and
+`IGraphQLSerializer.ReadAsync` is implemented by the `GraphQL.SystemTextJson` and
 `GraphQL.NewtonsoftJson` libraries. It supports deserialization of any type, with
 special support for the `GraphQLRequest` class. It also supports deserializing to
 a `IList<GraphQLRequest>`, which will deserialize multiple requests or
@@ -23,21 +30,13 @@ a single request (with or without the JSON array wrapper) into a list.
 
 When calling the `AddSystemTextJson` or `AddNewtonsoftJson` extension method to
 the `IGraphQLBuilder` interface, the method will register the `IGraphQLSerializer`
-as usual, plus the `IGraphQLRequestReader` interfaces with the appropriate
-serialization engine. JSON configuration options will normally apply to both
-classes, but an additional overload is provided if you need to independently
-configure the JSON serialization options for each class.
+and `IGraphQLTextSerializer` interfaces with the appropriate
+serialization engine. These interfaces handle both serialization and deserialization
+of objects.
 
 This makes it so that you can write JSON-based transport code independent of the
 JSON serialization engine used by your application, simplifying the most common use
 case, while still being configurable through your DI framework.
-
-When using the `.AddClrTypeMappings()` builder extension method, GraphQL.NET scans the
-specified assembly for graph types that inherit from `ObjectGraphType<T>` and adds a
-mapping for the CLR type represented by `T` with the graph type it matched upon.
-It skips adding a mapping for any graph type marked with the `[DoNotMapClrType]` attribute.
-In v5, it will also skip adding the mapping if the CLR type is marked with the
-`[DoNotMapClrType]` attribute.
 
 ## Breaking Changes
 
