@@ -68,7 +68,7 @@ namespace GraphQL.Tests.Types
         [InlineData("inputOutput", null, null, Response.Success)]                     // custom scalar coerces null to "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "internalNull", null, Response.Success)]           // custom scalar receives "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "externalNull", "externalNull", Response.Success)] // custom scalar coerces "externalNull" to null and then custom scalar coerces null to "externalNull"
-        [InlineData("nonNullOutput", "internalNull", null, Response.ErrorNoField)]    // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
+        [InlineData("nonNullOutput", "internalNull", null, Response.ErrorNoData)]     // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
         [InlineData("nonNullOutput", null, "externalNull", Response.Success)]         // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
         [InlineData("nonNullInput", "externalNull", null, Response.Success)]          // custom scalar coerces "externalNull" to null and string scalar returns null
         [InlineData("nonNullInput", null, "internalNull", Response.ErrorNoData)]      // custom scalar fails validation on null for non-null argument before execution begins
@@ -102,7 +102,7 @@ namespace GraphQL.Tests.Types
         [InlineData("inputOutput", null, null, "CustomScalar", Response.Success)]                     // custom scalar coerces null to "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "internalNull", null, "CustomScalar", Response.Success)]           // custom scalar receives "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "externalNull", "externalNull", "CustomScalar", Response.Success)] // custom scalar coerces "externalNull" to null and then custom scalar coerces null to "externalNull"
-        [InlineData("nonNullOutput", "internalNull", null, "String", Response.ErrorNoField)]          // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
+        [InlineData("nonNullOutput", "internalNull", null, "String", Response.ErrorNoData)]           // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
         [InlineData("nonNullOutput", null, "externalNull", "String", Response.Success)]               // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
         [InlineData("nonNullInput", "externalNull", null, "CustomScalar!", Response.Success)]         // custom scalar coerces "externalNull" to null and string scalar returns null
         [InlineData("nonNullInput", null, "internalNull", "CustomScalar!", Response.ErrorNoData)]     // custom scalar fails validation on null for non-null argument before execution begins
