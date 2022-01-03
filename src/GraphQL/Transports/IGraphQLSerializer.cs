@@ -18,7 +18,7 @@ namespace GraphQL
         /// Asynchronously serializes the specified object to the specified stream.
         /// Typically used to write <see cref="ExecutionResult"/> instances to a JSON result.
         /// </summary>
-        Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default);
+        Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Asynchronously deserializes the specified stream to the specified object type.
@@ -30,6 +30,6 @@ namespace GraphQL
         /// Deserializes the specified JSON element to the specified object type.
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        T ReadNode<T>(object value);
+        T ReadNode<T>(object? value);
     }
 }

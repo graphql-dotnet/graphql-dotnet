@@ -38,6 +38,6 @@ namespace GraphQL
         private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer();
 
         public static Inputs? ToInputs(this string? json)
-            => (json == null ? null : _serializer.Read<Inputs>(json)) ?? Inputs.Empty;
+            => _serializer.Read<Inputs>(json) ?? Inputs.Empty;
     }
 }
