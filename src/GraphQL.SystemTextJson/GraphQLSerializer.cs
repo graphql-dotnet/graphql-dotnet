@@ -169,7 +169,7 @@ namespace GraphQL.SystemTextJson
 
         /// <inheritdoc/>
         public T Read<T>(string json)
-            => JsonSerializer.Deserialize<T>(json, _options);
+            => json == null ? default : JsonSerializer.Deserialize<T>(json, _options);
 
         /// <summary>
         /// Converts the <see cref="JsonDocument"/> representing a single JSON value into a <typeparamref name="T"/>.
