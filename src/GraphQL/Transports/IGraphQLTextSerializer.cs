@@ -4,7 +4,8 @@ namespace GraphQL
 {
     /// <summary>
     /// Serializes and deserializes object hierarchies to/from a string.
-    /// Should include special support for <see cref="ExecutionResult"/> and transport-specific classes as necessary.
+    /// Should include special support for <see cref="ExecutionResult"/>, <see cref="Inputs"/>
+    /// and transport-specific classes as necessary.
     /// Typical JSON-specific classes are providied within <see cref="Transports.Json">GraphQL.Transports.Json</see>.
     /// </summary>
     public interface IGraphQLTextSerializer : IGraphQLSerializer

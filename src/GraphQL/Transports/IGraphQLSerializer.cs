@@ -8,7 +8,7 @@ namespace GraphQL
 {
     /// <summary>
     /// Serializes and deserializes object hierarchies to/from a stream.
-    /// Should include special support for <see cref="ExecutionResult"/>, <see cref="ErrorInfo"/>, <see cref="Inputs"/>
+    /// Should include special support for <see cref="ExecutionResult"/>, <see cref="Inputs"/>
     /// and transport-specific classes as necessary.
     /// Typical JSON-specific classes are providied within <see cref="Transports.Json">GraphQL.Transports.Json</see>.
     /// </summary>
