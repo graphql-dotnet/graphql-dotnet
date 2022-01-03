@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Errors
     public class VariablesInAllowedPositionError : ValidationError
     {
         internal const string NUMBER = "5.8.5";
-
+        
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
