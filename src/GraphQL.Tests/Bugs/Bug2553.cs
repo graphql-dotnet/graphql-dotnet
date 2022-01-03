@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug2553
     {
         [Fact]
-        public async Task ShouldSerializeErrorExtensionsAccordingToOptions()
+        public void ShouldSerializeErrorExtensionsAccordingToOptions()
         {
             var options = new JsonSerializerOptions
             {
@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Bugs
             executionResult.AddError(new ExecutionError("An error occurred."));
 
             var writer = new GraphQLSerializer(options);
-            string json = await writer.WriteToStringAsync(executionResult);
+            string json = writer.Write(executionResult);
 
             json.ShouldBeCrossPlatJson(@"{
                 ""errors"": [{
