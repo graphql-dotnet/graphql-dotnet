@@ -1,11 +1,5 @@
 namespace GraphQL.NewtonsoftJson
 {
-    public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
-    {
-        public ExecutionResultContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
-        protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
-    }
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
@@ -19,18 +13,24 @@ namespace GraphQL.NewtonsoftJson
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider>? action) { }
     }
-    public class GraphQLRequestConverter : Newtonsoft.Json.JsonConverter
+    public class GraphQLContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
-        public GraphQLRequestConverter() { }
+        public GraphQLContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
+        protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
+    }
+    public class GraphQLRequestJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public GraphQLRequestJsonConverter() { }
         public override bool CanRead { get; }
         public override bool CanWrite { get; }
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
-    public class GraphQLRequestListConverter : Newtonsoft.Json.JsonConverter
+    public class GraphQLRequestListJsonConverter : Newtonsoft.Json.JsonConverter
     {
-        public GraphQLRequestListConverter() { }
+        public GraphQLRequestListJsonConverter() { }
         public override bool CanRead { get; }
         public override bool CanWrite { get; }
         public override bool CanConvert(System.Type objectType) { }
@@ -55,9 +55,9 @@ namespace GraphQL.NewtonsoftJson
         public void Write<T>(System.IO.TextWriter textWriter, T value) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
-    public class InputsConverter : Newtonsoft.Json.JsonConverter
+    public class InputsJsonConverter : Newtonsoft.Json.JsonConverter
     {
-        public InputsConverter() { }
+        public InputsJsonConverter() { }
         public override bool CanWrite { get; }
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
@@ -67,5 +67,14 @@ namespace GraphQL.NewtonsoftJson
     {
         [System.Obsolete]
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+    }
+    public class WebSocketMessageJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public WebSocketMessageJsonConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
 }

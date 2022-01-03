@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.Transports.Json;
 
 namespace GraphQL

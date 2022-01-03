@@ -133,17 +133,22 @@ namespace GraphQL.SystemTextJson
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(Inputs))))
             {
-                _options.Converters.Add(new InputsConverter());
+                _options.Converters.Add(new InputsJsonConverter());
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(GraphQLRequest))))
             {
-                _options.Converters.Add(new GraphQLRequestConverter());
+                _options.Converters.Add(new GraphQLRequestJsonConverter());
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(List<GraphQLRequest>))))
             {
-                _options.Converters.Add(new GraphQLRequestListConverter());
+                _options.Converters.Add(new GraphQLRequestListJsonConverter());
+            }
+
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(WebSocketMessage))))
+            {
+                _options.Converters.Add(new WebSocketMessageJsonConverter());
             }
         }
 

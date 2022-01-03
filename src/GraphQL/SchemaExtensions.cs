@@ -200,6 +200,7 @@ namespace GraphQL
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
         /// <param name="serializer">An instance of <see cref="IGraphQLSerializer"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the execution</param>
         [Obsolete] //only here for tests...
         public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLSerializer serializer, Action<ExecutionOptions> configure, CancellationToken cancellationToken = default)
         {

@@ -8,7 +8,7 @@ namespace GraphQL.SystemTextJson
     /// <summary>
     /// A custom JsonConverter for reading or writing a <see cref="GraphQLRequest"/> object.
     /// </summary>
-    public class GraphQLRequestConverter : JsonConverter<GraphQLRequest>
+    public class GraphQLRequestJsonConverter : JsonConverter<GraphQLRequest>
     {
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, GraphQLRequest value, JsonSerializerOptions options)

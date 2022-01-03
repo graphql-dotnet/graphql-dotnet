@@ -12,15 +12,15 @@ namespace GraphQL.SystemTextJson
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
     }
-    public class GraphQLRequestConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transports.Json.GraphQLRequest>
+    public class GraphQLRequestJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transports.Json.GraphQLRequest>
     {
-        public GraphQLRequestConverter() { }
+        public GraphQLRequestJsonConverter() { }
         public override GraphQL.Transports.Json.GraphQLRequest Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Transports.Json.GraphQLRequest value, System.Text.Json.JsonSerializerOptions options) { }
     }
-    public class GraphQLRequestListConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.IEnumerable<GraphQL.Transports.Json.GraphQLRequest>>
+    public class GraphQLRequestListJsonConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.IEnumerable<GraphQL.Transports.Json.GraphQLRequest>>
     {
-        public GraphQLRequestListConverter() { }
+        public GraphQLRequestListJsonConverter() { }
         public override bool CanConvert(System.Type typeToConvert) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Transports.Json.GraphQLRequest> Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Collections.Generic.IEnumerable<GraphQL.Transports.Json.GraphQLRequest> value, System.Text.Json.JsonSerializerOptions options) { }
@@ -42,9 +42,9 @@ namespace GraphQL.SystemTextJson
         public string Write<T>(T value) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
-    public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
+    public class InputsJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
     {
-        public InputsConverter() { }
+        public InputsJsonConverter() { }
         public override GraphQL.Inputs Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Inputs value, System.Text.Json.JsonSerializerOptions options) { }
     }
@@ -59,5 +59,11 @@ namespace GraphQL.SystemTextJson
     {
         [System.Obsolete]
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+    }
+    public class WebSocketMessageJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transports.Json.WebSocketMessage>
+    {
+        public WebSocketMessageJsonConverter() { }
+        public override GraphQL.Transports.Json.WebSocketMessage Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Transports.Json.WebSocketMessage value, System.Text.Json.JsonSerializerOptions options) { }
     }
 }

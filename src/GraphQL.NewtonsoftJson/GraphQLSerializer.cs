@@ -114,7 +114,7 @@ namespace GraphQL.NewtonsoftJson
             return new JsonSerializerSettings
             {
                 Formatting = indent ? Formatting.Indented : Formatting.None,
-                ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
+                ContractResolver = new GraphQLContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
             };
         }
 
@@ -130,9 +130,9 @@ namespace GraphQL.NewtonsoftJson
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
             if (serializerSettings.ContractResolver == null)
-                serializer.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
-            else if (!(serializerSettings.ContractResolver is ExecutionResultContractResolver))
-                throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(ExecutionResultContractResolver)}");
+                serializer.ContractResolver = new GraphQLContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
+            else if (!(serializerSettings.ContractResolver is GraphQLContractResolver))
+                throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(GraphQLContractResolver)}");
 
             return serializer;
         }

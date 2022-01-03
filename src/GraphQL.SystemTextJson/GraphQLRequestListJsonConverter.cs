@@ -10,7 +10,7 @@ namespace GraphQL.SystemTextJson
     /// A custom JsonConverter for reading or writing a list of <see cref="GraphQLRequest"/> objects.
     /// Will deserialize a single request into a list containing one request.
     /// </summary>
-    public class GraphQLRequestListConverter : JsonConverter<IEnumerable<GraphQLRequest>>
+    public class GraphQLRequestListJsonConverter : JsonConverter<IEnumerable<GraphQLRequest>>
     {
         /// <inheritdoc/>
         public override bool CanConvert(Type typeToConvert)

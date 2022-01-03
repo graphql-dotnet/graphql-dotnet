@@ -8,12 +8,12 @@ using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
-    public class ExecutionResultContractResolver : DefaultContractResolver
+    public class GraphQLContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
         private readonly IErrorInfoProvider _errorInfoProvider;
 
-        public ExecutionResultContractResolver(IErrorInfoProvider errorInfoProvider)
+        public GraphQLContractResolver(IErrorInfoProvider errorInfoProvider)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
@@ -24,10 +24,10 @@ namespace GraphQL.NewtonsoftJson
                 return new ExecutionResultJsonConverter(_errorInfoProvider);
 
             if (typeof(Inputs) == objectType)
-                return new InputsConverter();
+                return new InputsJsonConverter();
 
             if (typeof(GraphQLRequest) == objectType)
-                return new GraphQLRequestConverter();
+                return new GraphQLRequestJsonConverter();
 
             if (objectType == typeof(IEnumerable<GraphQLRequest>) ||
                 objectType == typeof(ICollection<GraphQLRequest>) ||
@@ -36,7 +36,10 @@ namespace GraphQL.NewtonsoftJson
                 objectType == typeof(IList<GraphQLRequest>) ||
                 objectType == typeof(List<GraphQLRequest>) ||
                 objectType == typeof(GraphQLRequest[]))
-                return new GraphQLRequestListConverter();
+                return new GraphQLRequestListJsonConverter();
+
+            if (objectType == typeof(WebSocketMessage))
+                return new WebSocketMessageJsonConverter();
 
             return base.ResolveContractConverter(objectType);
         }

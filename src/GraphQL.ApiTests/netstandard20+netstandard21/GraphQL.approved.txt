@@ -1799,6 +1799,16 @@ namespace GraphQL.Transports.Json
         public string Query { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
     }
+    public class WebSocketMessage
+    {
+        public const string ID_KEY = "id";
+        public const string PAYLOAD_KEY = "payload";
+        public const string TYPE_KEY = "type";
+        public WebSocketMessage() { }
+        public string? Id { get; set; }
+        public object? Payload { get; set; }
+        public string? Type { get; set; }
+    }
 }
 namespace GraphQL.Types
 {

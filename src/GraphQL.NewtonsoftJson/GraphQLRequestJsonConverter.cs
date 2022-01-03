@@ -7,7 +7,7 @@ namespace GraphQL.NewtonsoftJson
     /// <summary>
     /// A custom JsonConverter for reading or writing a <see cref="GraphQLRequest"/> object.
     /// </summary>
-    public class GraphQLRequestConverter : JsonConverter
+    public class GraphQLRequestJsonConverter : JsonConverter
     {
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType) => objectType == typeof(GraphQLRequest);

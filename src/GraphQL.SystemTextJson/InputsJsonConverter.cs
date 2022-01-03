@@ -12,7 +12,7 @@ namespace GraphQL.SystemTextJson
     /// Unnecessary for writing, as <see cref="Inputs"/> implements
     /// <see cref="IReadOnlyDictionary{TKey, TValue}">IReadOnlyDictionary&lt;string, object&gt;</see>.
     /// </summary>
-    public class InputsConverter : JsonConverter<Inputs>
+    public class InputsJsonConverter : JsonConverter<Inputs>
     {
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, Inputs value, JsonSerializerOptions options)

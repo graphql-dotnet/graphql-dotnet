@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             Formatting = Formatting.Indented,
             Converters =
             {
-                new InputsConverter()
+                new InputsJsonConverter()
             },
         });
 

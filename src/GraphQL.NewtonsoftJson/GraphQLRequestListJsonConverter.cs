@@ -8,7 +8,7 @@ namespace GraphQL.NewtonsoftJson
     /// <summary>
     /// A custom JsonConverter for reading or writing a <see cref="GraphQLRequest"/> object.
     /// </summary>
-    public class GraphQLRequestListConverter : JsonConverter
+    public class GraphQLRequestListJsonConverter : JsonConverter
     {
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
