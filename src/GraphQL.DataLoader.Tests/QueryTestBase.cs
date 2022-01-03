@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests
     public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new SubscriptionDocumentExecuter();
-        private readonly IGraphQLSerializer writer = new GraphQLSerializer(indent: true);
+        private readonly IGraphQLTextSerializer writer = new GraphQLSerializer(indent: true);
 
         protected IServiceProvider Services { get; }
 
@@ -86,8 +86,8 @@ namespace GraphQL.DataLoader.Tests
                 opts.Schema = schema;
             }));
 
-            var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
-            var expectedResult = AsyncContext.Run(() => writer.WriteToStringAsync(expectedExecutionResult));
+            var writtenResult = writer.Write(runResult);
+            var expectedResult = writer.Write(expectedExecutionResult);
 
             string additionalInfo = null;
 

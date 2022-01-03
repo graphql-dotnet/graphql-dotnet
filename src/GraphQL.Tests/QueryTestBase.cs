@@ -49,7 +49,7 @@ namespace GraphQL.Tests
 
         public IDocumentExecuter Executer { get; private set; }
 
-        public IGraphQLSerializer Writer { get; private set; }
+        public IGraphQLTextSerializer Writer { get; private set; }
 
         public ExecutionResult AssertQuerySuccess(
             string query,
@@ -60,7 +60,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
             INameConverter nameConverter = null,
-            IGraphQLSerializer writer = null)
+            IGraphQLTextSerializer writer = null)
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQuery(query, queryResult, variables, root, userContext, cancellationToken, rules, null, nameConverter, writer);
@@ -119,8 +119,8 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-            var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var writtenResult = Writer.Write(renderResult);
+            var expectedResult = Writer.Write(expectedExecutionResult);
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
 
@@ -141,7 +141,7 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null,
             Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
             INameConverter nameConverter = null,
-            IGraphQLSerializer writer = null)
+            IGraphQLTextSerializer writer = null)
         {
             var schema = Schema;
             schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
@@ -159,8 +159,8 @@ namespace GraphQL.Tests
 
             writer ??= Writer;
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
+            var writtenResult = Writer.Write(runResult);
+            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.Write((ExecutionResult)expectedExecutionResultOrJson);
 
             string additionalInfo = null;
 

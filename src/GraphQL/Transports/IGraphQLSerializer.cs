@@ -28,6 +28,7 @@ namespace GraphQL
 
         /// <summary>
         /// Deserializes the specified JSON element to the specified object type.
+        /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         T ReadNode<T>(object value);
     }

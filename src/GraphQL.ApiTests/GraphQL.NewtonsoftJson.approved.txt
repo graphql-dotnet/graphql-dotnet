@@ -65,6 +65,7 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class SchemaExtensions
     {
+        [System.Obsolete]
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
 }

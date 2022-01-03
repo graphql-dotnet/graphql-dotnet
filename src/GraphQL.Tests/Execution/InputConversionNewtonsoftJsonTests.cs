@@ -1,5 +1,3 @@
-using GraphQL.NewtonsoftJson;
-
 namespace GraphQL.Tests.Execution
 {
     public class InputConversionNewtonsoftJsonTests : InputConversionTestsBase

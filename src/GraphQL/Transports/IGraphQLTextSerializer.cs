@@ -1,12 +1,9 @@
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Transports.Json;
 
 namespace GraphQL
 {
     /// <summary>
-    /// Serializes and deserializes object hierarchies to/from a stream.
+    /// Serializes and deserializes object hierarchies to/from a string.
     /// Should include special support for <see cref="ExecutionResult"/> and transport-specific classes as necessary.
     /// Typical JSON-specific classes are providied within <see cref="Transports.Json">GraphQL.Transports.Json</see>.
     /// </summary>
@@ -21,6 +18,7 @@ namespace GraphQL
         /// <summary>
         /// Deserializes the specified string to the specified object type.
         /// Typically used to parse <see cref="GraphQLRequest"/> instances from JSON.
+        /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         T Read<T>(string value);
     }

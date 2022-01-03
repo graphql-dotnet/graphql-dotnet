@@ -169,9 +169,10 @@ namespace GraphQL.SystemTextJson
 #if NET6_0_OR_GREATER
         /// <summary>
         /// Converts the <see cref="JsonDocument"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="jsonDocument"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        public T Read<T>(JsonDocument jsonDocument)
-            => JsonSerializer.Deserialize<T>(jsonDocument, _options);
+        public T ReadDocument<T>(JsonDocument jsonDocument)
+            => jsonDocument == null ? default : JsonSerializer.Deserialize<T>(jsonDocument, _options);
 
         /// <summary>
         /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
@@ -180,7 +181,7 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.Deserialize<T>(jsonElement, _options);
 
         T IGraphQLSerializer.ReadNode<T>(object value)
-            => ReadNode<T>((JsonElement)value);
+            => value == null ? default : ReadNode<T>((JsonElement)value);
 #else
         T IGraphQLSerializer.ReadNode<T>(object value)
             => throw new NotSupportedException();

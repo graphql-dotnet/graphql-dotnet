@@ -215,7 +215,9 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await serializer.WriteToStringAsync(result, cancellationToken).ConfigureAwait(false);
+            return serializer is IGraphQLTextSerializer textSerializer
+                ? textSerializer.Write(result)
+                : await serializer.WriteToStringAsync(result, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

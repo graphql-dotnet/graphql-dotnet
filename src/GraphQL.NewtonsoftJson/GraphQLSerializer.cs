@@ -190,9 +190,10 @@ namespace GraphQL.NewtonsoftJson
 
         /// <summary>
         /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="jObject"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         public T ReadNode<T>(JObject jObject)
-            => jObject.ToObject<T>(_serializer);
+            => jObject == null ? default : jObject.ToObject<T>(_serializer);
 
         T IGraphQLSerializer.ReadNode<T>(object value)
             => ReadNode<T>((JObject)value);

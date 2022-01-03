@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Execution
                 }");
             });
 
-            var json = await serializer.WriteToStringAsync(executionResult);
+            var json = serializer.Write(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe(@"{
