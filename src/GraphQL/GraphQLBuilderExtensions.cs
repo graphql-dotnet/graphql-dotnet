@@ -732,7 +732,8 @@ namespace GraphQL
         {
             builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);
             if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
-                builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
+                builder.Services.Register(typeof(IGraphQLTextSerializer), typeof(TSerializer), ServiceLifetime.Singleton, true);
+                //builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
             return builder;
         }
 
@@ -746,7 +747,7 @@ namespace GraphQL
         {
             builder.Services.Register<IGraphQLSerializer>(serializer ?? throw new ArgumentNullException(nameof(serializer)), true);
             if (serializer is IGraphQLTextSerializer textSerializer)
-                builder.Services.Register(textSerializer);
+                builder.Services.Register(textSerializer, true);
             return builder;
         }
 
@@ -760,7 +761,8 @@ namespace GraphQL
         {
             builder.Services.Register<IGraphQLSerializer>(serializerFactory ?? throw new ArgumentNullException(nameof(serializerFactory)), ServiceLifetime.Singleton, true);
             if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
-                builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
+                builder.Services.Register(typeof(IGraphQLTextSerializer), serializerFactory, ServiceLifetime.Singleton, true);
+                //builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
             return builder;
         }
         #endregion
