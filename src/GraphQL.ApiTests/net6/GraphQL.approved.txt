@@ -341,8 +341,8 @@ namespace GraphQL
     }
     public interface IGraphQLTextSerializer : GraphQL.IGraphQLSerializer
     {
-        T Read<T>(string? value);
-        string Write<T>(T? value);
+        T Deserialize<T>(string? value);
+        string Serialize<T>(T? value);
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {

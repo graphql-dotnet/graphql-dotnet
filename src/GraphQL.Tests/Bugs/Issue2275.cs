@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = @"query($data:Input!) {
                                 request(data: $data)
                 }";
-                _.Variables = serializer.Read<Inputs>(@" {
+                _.Variables = serializer.Deserialize<Inputs>(@" {
                     ""data"": {
                         ""clientId"": 2,
                         ""filters"": [{
@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Execution
                 }");
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe(@"{

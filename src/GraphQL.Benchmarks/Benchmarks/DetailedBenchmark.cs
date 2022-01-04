@@ -132,7 +132,7 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Variables = _serializer.Read<Inputs>(benchmarkInfo.InputsString) ?? Inputs.Empty;
+                        o.Variables = _serializer.Deserialize<Inputs>(benchmarkInfo.InputsString) ?? Inputs.Empty;
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
@@ -230,7 +230,7 @@ namespace GraphQL.Benchmarks
 
             public Inputs DeserializeInputs()
             {
-                return _serializer.Read<Inputs>(InputsString) ?? Inputs.Empty;
+                return _serializer.Deserialize<Inputs>(InputsString) ?? Inputs.Empty;
             }
 
             public Language.AST.Variables ParseVariables()

@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         [ClassData(typeof(GraphQLSerializersTestData))]
         public void StringToInputs(IGraphQLTextSerializer serializer)
         {
-            var actual = serializer.Read<Inputs>(_exampleJson);
+            var actual = serializer.Deserialize<Inputs>(_exampleJson);
             Verify(actual);
         }
 
@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         public void FromJson(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var actual = serializer.Read<TestClass1>(test);
+            var actual = serializer.Deserialize<TestClass1>(test);
             actual.Query.ShouldBe("hello");
             Verify(actual.Variables);
         }
@@ -54,7 +54,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         public void FromJson_Null(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-            var actual = serializer.Read<TestClass1>(test);
+            var actual = serializer.Deserialize<TestClass1>(test);
             actual.Query.ShouldBe("hello");
             actual.Variables.ShouldBeNull();
         }
@@ -64,7 +64,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         public void FromJson_Missing(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"query\":\"hello\"}}";
-            var actual = serializer.Read<TestClass1>(test);
+            var actual = serializer.Deserialize<TestClass1>(test);
             actual.Query.ShouldBe("hello");
             actual.Variables.ShouldBeNull();
         }
@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         {
             var serializer = new GraphQL.NewtonsoftJson.GraphQLSerializer();
             var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
-            var actual = serializer.Read<TestClass2>(test);
+            var actual = serializer.Deserialize<TestClass2>(test);
             actual.Query.ShouldBe("hello");
             var variables = serializer.ReadNode<Inputs>(actual.Variables);
             Verify(variables);

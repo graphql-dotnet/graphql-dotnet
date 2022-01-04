@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Bugs
             executionResult.AddError(new ExecutionError("An error occurred."));
 
             var writer = new GraphQLSerializer(options);
-            string json = writer.Write(executionResult);
+            string json = writer.Serialize(executionResult);
 
             json.ShouldBeCrossPlatJson(@"{
                 ""errors"": [{

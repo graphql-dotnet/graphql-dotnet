@@ -164,11 +164,11 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.DeserializeAsync<T>(stream, _options, cancellationToken);
 
         /// <inheritdoc/>
-        public string Write<T>(T value)
+        public string Serialize<T>(T value)
             => JsonSerializer.Serialize(value, _options);
 
         /// <inheritdoc/>
-        public T Read<T>(string json)
+        public T Deserialize<T>(string json)
             => json == null ? default : JsonSerializer.Deserialize<T>(json, _options);
 
         /// <summary>

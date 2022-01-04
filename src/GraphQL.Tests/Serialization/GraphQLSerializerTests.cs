@@ -53,7 +53,7 @@ namespace GraphQL.Tests
               }
             }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -68,7 +68,7 @@ namespace GraphQL.Tests
               ""data"": null
             }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -93,7 +93,7 @@ namespace GraphQL.Tests
               ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
             }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -112,7 +112,7 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""data"": {} }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -131,7 +131,7 @@ namespace GraphQL.Tests
 
             var expected = @"{ }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -154,7 +154,7 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
 
-            var actual = writer.Write(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -170,7 +170,7 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""query"": ""hello"" }";
 
-            var actual = writer.Write(request);
+            var actual = writer.Serialize(request);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -197,7 +197,7 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""query"": ""hello"", ""operationName"": ""opname"", ""variables"": { ""arg1"": 1, ""arg2"": ""test"" }, ""extensions"": { ""arg1"": 2, ""arg2"": ""test2"" } }";
 
-            var actual = writer.Write(request);
+            var actual = writer.Serialize(request);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -213,7 +213,7 @@ namespace GraphQL.Tests
 
             var expected = @"[{ ""query"": ""hello"" }]";
 
-            var actual = writer.Write(new List<GraphQLRequest> { request });
+            var actual = writer.Serialize(new List<GraphQLRequest> { request });
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -229,7 +229,7 @@ namespace GraphQL.Tests
 
             var expected = @"[{ ""query"": ""hello"" }]";
 
-            var actual = writer.Write(new GraphQLRequest[] { request });
+            var actual = writer.Serialize(new GraphQLRequest[] { request });
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -246,7 +246,7 @@ namespace GraphQL.Tests
   ""extensions"": { ""int"": 2, ""str"": ""VALUE"" }
 }";
 
-            var result = reader.Read<GraphQLRequest>(sample);
+            var result = reader.Deserialize<GraphQLRequest>(sample);
             result.Query.ShouldBe("test");
             result.OperationName.ShouldBe("hello");
             result.Variables.ShouldBe<IDictionary<string, object>>(new Dictionary<string, object>()
@@ -270,7 +270,7 @@ namespace GraphQL.Tests
   ""query"": ""test""
 }";
 
-            var result = reader.Read<GraphQLRequest>(sample);
+            var result = reader.Deserialize<GraphQLRequest>(sample);
             result.Query.ShouldBe("test");
             result.OperationName.ShouldBeNull();
             result.Variables.ShouldBeNull();
@@ -286,7 +286,7 @@ namespace GraphQL.Tests
   ""query"": ""test""
 }";
 
-            var result = reader.Read<List<GraphQLRequest>>(sample).ShouldHaveSingleItem();
+            var result = reader.Deserialize<List<GraphQLRequest>>(sample).ShouldHaveSingleItem();
             result.Query.ShouldBe("test");
             result.OperationName.ShouldBeNull();
             result.Variables.ShouldBeNull();
@@ -307,7 +307,7 @@ namespace GraphQL.Tests
   }
 ]";
 
-            var result = reader.Read<List<GraphQLRequest>>(sample);
+            var result = reader.Deserialize<List<GraphQLRequest>>(sample);
             result.Count.ShouldBe(2);
             result[0].Query.ShouldBe("test");
             result[0].OperationName.ShouldBeNull();
@@ -328,7 +328,7 @@ namespace GraphQL.Tests
   ""query"": ""test""
 }";
 
-            var result = reader.Read<GraphQLRequest[]>(sample).ShouldHaveSingleItem();
+            var result = reader.Deserialize<GraphQLRequest[]>(sample).ShouldHaveSingleItem();
             result.Query.ShouldBe("test");
             result.OperationName.ShouldBeNull();
             result.Variables.ShouldBeNull();
@@ -349,7 +349,7 @@ namespace GraphQL.Tests
   }
 ]";
 
-            var result = reader.Read<GraphQLRequest[]>(sample);
+            var result = reader.Deserialize<GraphQLRequest[]>(sample);
             result.Length.ShouldBe(2);
             result[0].Query.ShouldBe("test");
             result[0].OperationName.ShouldBeNull();
@@ -370,7 +370,7 @@ namespace GraphQL.Tests
   ""query"": ""test""
 }";
 
-            var result = reader.Read<IEnumerable<GraphQLRequest>>(sample).ShouldHaveSingleItem();
+            var result = reader.Deserialize<IEnumerable<GraphQLRequest>>(sample).ShouldHaveSingleItem();
             result.Query.ShouldBe("test");
             result.OperationName.ShouldBeNull();
             result.Variables.ShouldBeNull();
@@ -391,7 +391,7 @@ namespace GraphQL.Tests
   }
 ]";
 
-            var result = reader.Read<IEnumerable<GraphQLRequest>>(sample).ToList();
+            var result = reader.Deserialize<IEnumerable<GraphQLRequest>>(sample).ToList();
             result.Count.ShouldBe(2);
             result[0].Query.ShouldBe("test");
             result[0].OperationName.ShouldBeNull();

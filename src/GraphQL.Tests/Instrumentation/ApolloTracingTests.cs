@@ -87,7 +87,7 @@ query {
   }
 }";
 
-            var result = Writer.Write(trace);
+            var result = Writer.Serialize(trace);
 
             result.ShouldBeCrossPlat(expected);
         }

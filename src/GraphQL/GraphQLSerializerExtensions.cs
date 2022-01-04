@@ -20,7 +20,7 @@ namespace GraphQL
         public static async ValueTask<string> WriteToStringAsync<T>(this IGraphQLSerializer serializer, T value, CancellationToken cancellationToken = default)
         {
             if (serializer is IGraphQLTextSerializer textSerializer)
-                return textSerializer.Write(value);
+                return textSerializer.Serialize(value);
 
             using var stream = new MemoryStream();
             await serializer.WriteAsync(stream, value, cancellationToken).ConfigureAwait(false);

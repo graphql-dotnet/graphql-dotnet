@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "AppliedDirectives".ReadGraphQLRequest();
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe("AppliedDirectivesResult".ReadJsonResult());

@@ -86,8 +86,8 @@ namespace GraphQL.DataLoader.Tests
                 opts.Schema = schema;
             }));
 
-            var writtenResult = writer.Write(runResult);
-            var expectedResult = writer.Write(expectedExecutionResult);
+            var writtenResult = writer.Serialize(runResult);
+            var expectedResult = writer.Serialize(expectedExecutionResult);
 
             string additionalInfo = null;
 
@@ -146,7 +146,7 @@ namespace GraphQL.DataLoader.Tests
 
         public ExecutionResult CreateQueryResult(string result, bool executed = true)
         {
-            object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Read<Inputs>(result);
+            object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Deserialize<Inputs>(result);
             return new ExecutionResult { Data = expected, Executed = executed };
         }
     }

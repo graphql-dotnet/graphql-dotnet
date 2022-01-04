@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
 
             ShouldBe(json, "IntrospectionResult".ReadJsonResult());
         }
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
 
             ShouldBe(json, "IntrospectionResult".ReadJsonResult().Replace("\"test\"", "\"Test\""));
         }
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Introspection
 
             static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
-            var json = JsonDocument.Parse(serializer.Write(executionResult));
+            var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
             var types = json.RootElement
                 .GetProperty("data")
@@ -114,7 +114,7 @@ namespace GraphQL.Tests.Introspection
 
             static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
-            var json = JsonDocument.Parse(serializer.Write(executionResult));
+            var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
             var types = json.RootElement
                 .GetProperty("data")
@@ -164,7 +164,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = InputObjectBugQuery;
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             ShouldBe(json, InputObjectBugResult);

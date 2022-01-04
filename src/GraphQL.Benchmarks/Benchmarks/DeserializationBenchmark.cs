@@ -45,10 +45,10 @@ namespace GraphQL.Benchmarks
         private static readonly IGraphQLTextSerializer _systemTextJsonSerializer = new SystemTextJson.GraphQLSerializer();
 
         [Benchmark(Baseline = true)]
-        public Inputs NewtonsoftJson() => _newtonsoftJsonSerializer.Read<Inputs>(Json);
+        public Inputs NewtonsoftJson() => _newtonsoftJsonSerializer.Deserialize<Inputs>(Json);
 
         [Benchmark]
-        public Inputs SystemTextJson() => _systemTextJsonSerializer.Read<Inputs>(Json);
+        public Inputs SystemTextJson() => _systemTextJsonSerializer.Deserialize<Inputs>(Json);
 
         void IBenchmark.RunProfiler()
         {

@@ -31,10 +31,10 @@ namespace GraphQL.Harness.Tests
                 {
                     actualResult.Remove(extensionsKey);
                 }
-                actualResultJson = _writer.Write(actualResult);
+                actualResultJson = _writer.Serialize(actualResult);
             }
 
-            string expectedResultJson = _writer.Write(expectedResult);
+            string expectedResultJson = _writer.Serialize(expectedResult);
 
             if (!actualResultJson.Equals(expectedResultJson))
             {

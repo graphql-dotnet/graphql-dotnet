@@ -119,8 +119,8 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-            var writtenResult = Writer.Write(renderResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.Serialize(renderResult);
+            var expectedResult = Writer.Serialize(expectedExecutionResult);
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
 
@@ -159,8 +159,8 @@ namespace GraphQL.Tests
 
             writer ??= Writer;
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.Write((ExecutionResult)expectedExecutionResultOrJson);
+            var writtenResult = Writer.Serialize(runResult);
+            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.Serialize((ExecutionResult)expectedExecutionResultOrJson);
 
             string additionalInfo = null;
 

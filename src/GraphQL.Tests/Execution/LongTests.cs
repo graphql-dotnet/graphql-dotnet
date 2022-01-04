@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = "{ testField }";
             });
 
-            var json = serializer.Write(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe(@"{
