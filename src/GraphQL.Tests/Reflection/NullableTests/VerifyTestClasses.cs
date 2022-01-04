@@ -9,26 +9,27 @@ namespace GraphQL.Tests.Reflection.NullableTests
 {
     public class VerifyTestClasses
     {
-        // These tests verify that .NET is building the classes
+        // These tests verify that the .NET compiler is building the classes
         // with the expected attributes on them. Failure is not an
         // error, but simply indicates that the Method and Argument
-        // tests may not be testing the anticipated scenarios
+        // and Property tests may not be testing the anticipated scenarios.
         //
         // Note: Method and Argument and Property tests should always pass
+        // even if the compiler builds the code differently.
 
         [Theory]
         [InlineData(typeof(NullableClass1), 1, 0)] //default not nullable
         [InlineData(typeof(NullableClass2), 2, 0)] //default nullable
-        [InlineData(typeof(NullableClass5), null, null)]
+        [InlineData(typeof(NullableClass5), null, null)] //no default
         [InlineData(typeof(NullableClass6), null, null)]
-        [InlineData(typeof(NullableClass7), 1, 0)] //default not nullable
-        [InlineData(typeof(NullableClass8), 2, 0)] //default nullable
+        [InlineData(typeof(NullableClass7), 1, 0)]
+        [InlineData(typeof(NullableClass8), 2, 0)]
         [InlineData(typeof(NullableClass9), null, null)]
         [InlineData(typeof(NullableClass10), null, null)]
-        [InlineData(typeof(NullableClass11), 1, 0)] //default not nullable
+        [InlineData(typeof(NullableClass11), 1, 0)]
         [InlineData(typeof(NullableClass12), null, null)]
-        [InlineData(typeof(NullableClass13), 1, 0)] //default not nullable
-        [InlineData(typeof(NullableClass14), 2, 0)] //default nullable
+        [InlineData(typeof(NullableClass13), 1, 0)]
+        [InlineData(typeof(NullableClass14), 2, 0)]
         [InlineData(typeof(NullableClass15), null, null)]
         [InlineData(typeof(NullableClass16), 1, 0)]
         [InlineData(typeof(NullableClass16.NestedClass1), null, 0)]
@@ -60,9 +61,9 @@ namespace GraphQL.Tests.Reflection.NullableTests
         }
 
         [Theory]
-        [InlineData(typeof(NullableClass1), "Field1", 2, null)]
+        [InlineData(typeof(NullableClass1), "Field1", 2, null)] //method defaults as nullable
         [InlineData(typeof(NullableClass1), "Field2", 2, null)]
-        [InlineData(typeof(NullableClass1), "Field3", null, null)]
+        [InlineData(typeof(NullableClass1), "Field3", null, null)] //method inherits NRT annotation from class
         [InlineData(typeof(NullableClass1), "Field4", null, null)]
         [InlineData(typeof(NullableClass1), "Field5", null, null)]
         [InlineData(typeof(NullableClass1), "Field6", null, null)]
@@ -78,7 +79,7 @@ namespace GraphQL.Tests.Reflection.NullableTests
         [InlineData(typeof(NullableClass2), "Field6", null, null)]
         [InlineData(typeof(NullableClass2), "Field7", null, null)]
         [InlineData(typeof(NullableClass2), "Field8", null, null)]
-        [InlineData(typeof(NullableClass2), "Field9", 1, null)]
+        [InlineData(typeof(NullableClass2), "Field9", 1, null)] //method defaults as non-nullable
         [InlineData(typeof(NullableClass2), "Field10", 1, null)]
         [InlineData(typeof(NullableClass2), "Field11", null, null)]
         [InlineData(typeof(NullableClass5), "Test", 1, null)]
@@ -91,7 +92,7 @@ namespace GraphQL.Tests.Reflection.NullableTests
         [InlineData(typeof(NullableClass8), "Field2", null, null)]
         [InlineData(typeof(NullableClass8), "Field3", 1, null)]
         [InlineData(typeof(NullableClass8), "Field4", null, null)]
-        [InlineData(typeof(NullableClass9), "Field1", 2, "1")]
+        [InlineData(typeof(NullableClass9), "Field1", 2, "1")] //method including arguments defaults as nullable, but this method's return value is non-nullable
         [InlineData(typeof(NullableClass10), "Field1", 1, "2")]
         [InlineData(typeof(NullableClass11), "Field1", null, null)]
         [InlineData(typeof(NullableClass11), "Field2", null, "2")]
@@ -104,7 +105,7 @@ namespace GraphQL.Tests.Reflection.NullableTests
         [InlineData(typeof(NullableClass14), "Field1", null, null)]
         [InlineData(typeof(NullableClass14), "Field2", null, null)]
         [InlineData(typeof(NullableClass15), "Field1", 1, null)]
-        [InlineData(typeof(NullableClass15), "Field2", null, "12")]
+        [InlineData(typeof(NullableClass15), "Field2", null, "12")] //this method's return value has specific NRT annotations
         [InlineData(typeof(NullableClass15), "Field3", null, "21")]
         [InlineData(typeof(NullableClass15), "Field4", 2, null)]
         [InlineData(typeof(NullableClass16), "Field1", null, null)]
