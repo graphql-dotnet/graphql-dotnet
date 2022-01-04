@@ -37,6 +37,13 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         }
 
         [Fact]
+        public void Throws_For_Deep_Objects()
+        {
+            var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+            Should.Throw<JsonReaderException>(() => value.ToInputs());
+        }
+
+        [Fact]
         public void Deserialize_And_Serialize_Introspection()
         {
             string json = "IntrospectionResult".ReadJsonResult();
