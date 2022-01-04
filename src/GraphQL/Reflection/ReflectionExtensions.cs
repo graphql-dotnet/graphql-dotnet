@@ -149,21 +149,29 @@ namespace GraphQL.Reflection
         /// </summary>
         private static void Consider(Type type, bool nullableValueType, List<(Type, Nullability)> list, IList<CustomAttributeTypedArgument>? nullabilityBytes, Nullability nullableContext, ref int index)
         {
-            if (type.IsValueType) {
-                if (type.IsGenericType) {
-                    if (type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+            if (type.IsValueType)
+            {
+                if (type.IsGenericType)
+                {
+                    if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    {
                         //do not increment index for Nullable<T>
                         //do not add Nullable<T> to the list but rather just add underlying type
                         Consider(type.GenericTypeArguments[0], true, list, nullabilityBytes, nullableContext, ref index);
-                    } else {
+                    }
+                    else
+                    {
                         //generic structs that are not Nullable<T> will contain a 0 in the array
                         index++;
                         list.Add((type, nullableValueType ? Nullability.Nullable : Nullability.NonNullable));
-                        for (int i = 0; i < type.GenericTypeArguments.Length; i++) {
+                        for (int i = 0; i < type.GenericTypeArguments.Length; i++)
+                        {
                             Consider(type.GenericTypeArguments[i], false, list, nullabilityBytes, nullableContext, ref index);
                         }
                     }
-                } else {
+                }
+                else
+                {
                     //do not increment index for concrete value types
                     list.Add((type, nullableValueType ? Nullability.Nullable : Nullability.NonNullable));
                 }
