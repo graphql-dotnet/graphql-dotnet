@@ -132,7 +132,7 @@ namespace GraphQL.Reflection
                     }
                     else if (argType == typeof(byte[]))
                     {
-                        return (nullableContext, (IList<CustomAttributeTypedArgument>)attribute.ConstructorArguments[0].Value);
+                        return (nullableContext, (IList<CustomAttributeTypedArgument>)attribute.ConstructorArguments[0].Value!);
                     }
                     else
                     {
