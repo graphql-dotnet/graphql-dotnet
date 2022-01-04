@@ -1660,6 +1660,28 @@ namespace GraphQL.Reflection
             where T : System.Attribute;
         object? GetValue(object target, object?[]? arguments);
     }
+    public enum Nullability
+    {
+        Unknown = 0,
+        NonNullable = 1,
+        Nullable = 2,
+    }
+    public class NullabilityInterpretationException : System.Exception
+    {
+        public NullabilityInterpretationException(System.Reflection.MemberInfo member) { }
+        public NullabilityInterpretationException(System.Reflection.ParameterInfo parameter) { }
+    }
+    public static class ReflectionExtensions
+    {
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Type",
+                "Nullable"})]
+        public static System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, GraphQL.Reflection.Nullability>> GetNullabilityInformation(this System.Reflection.ParameterInfo parameter) { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "Type",
+                "Nullable"})]
+        public static System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, GraphQL.Reflection.Nullability>> GetNullabilityInformation(this System.Reflection.PropertyInfo property) { }
+    }
 }
 namespace GraphQL.Resolvers
 {
