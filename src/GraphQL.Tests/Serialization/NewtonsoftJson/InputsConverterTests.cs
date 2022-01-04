@@ -13,6 +13,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.None,
             Formatting = Formatting.Indented,
+            MaxDepth = 64,
             Converters =
             {
                 new InputsConverter()
@@ -34,6 +35,13 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
                 _jsonSerializer.Serialize(jsonWriter, data);
             }
             return stringWriter.ToString();
+        }
+
+        [Fact]
+        public void Throws_For_Deep_Objects()
+        {
+            var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+            Should.Throw<JsonReaderException>(() => value.ToInputs());
         }
 
         [Fact]

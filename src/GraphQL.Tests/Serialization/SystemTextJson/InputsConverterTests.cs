@@ -31,6 +31,13 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
         };
 
         [Fact]
+        public void Throws_For_Deep_Objects()
+        {
+            var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+            Should.Throw<JsonException>(() => JsonSerializer.Deserialize<Inputs>(value, _options));
+        }
+
+        [Fact]
         public void Deserialize_And_Serialize_Introspection()
         {
             string json = "IntrospectionResult".ReadJsonResult();
