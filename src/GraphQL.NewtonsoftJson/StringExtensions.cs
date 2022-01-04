@@ -15,7 +15,7 @@ namespace GraphQL.NewtonsoftJson
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.None,
-            MaxDepth = 64, // already default for Newtonsoft.Json v13 -- but for v12, unlimited was default
+            MaxDepth = 64, // already default since Newtonsoft.Json v13 -- but unlimited was default before
             Converters =
             {
                 new InputsConverter()
