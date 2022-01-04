@@ -23,7 +23,8 @@ namespace GraphQL.Tests.Reflection.NullableTests
             actual.Count.ShouldBe(expectedType2 == null ? 1 : 2);
             actual[0].Type.ShouldBe(expectedType);
             actual[0].Nullable.ShouldBe(expectedNullability);
-            if (expectedType2 != null) {
+            if (expectedType2 != null)
+            {
                 actual[1].Type.ShouldBe(expectedType2);
                 actual[1].Nullable.ShouldBe(expectedNullability2.Value);
             }

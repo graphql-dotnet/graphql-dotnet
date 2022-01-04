@@ -42,18 +42,24 @@ namespace GraphQL.Tests.Reflection.NullableTests
         {
             var actualHasNullableContext = type.CustomAttributes.FirstOrDefault(
                 x => x.AttributeType.Name == "NullableContextAttribute");
-            if (nullableContext == null) {
+            if (nullableContext == null)
+            {
                 actualHasNullableContext.ShouldBeNull();
-            } else {
+            }
+            else
+            {
                 actualHasNullableContext.ShouldNotBeNull();
                 actualHasNullableContext.ConstructorArguments[0].Value.ShouldBe(nullableContext);
             }
 
             var actualHasNullable = type.CustomAttributes.FirstOrDefault(
                 x => x.AttributeType.Name == "NullableAttribute");
-            if (nullable == null) {
+            if (nullable == null)
+            {
                 actualHasNullable.ShouldBeNull();
-            } else {
+            }
+            else
+            {
                 actualHasNullable.ShouldNotBeNull();
                 actualHasNullable.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte));
                 actualHasNullable.ConstructorArguments[0].Value.ShouldBe(nullable);
@@ -158,28 +164,37 @@ namespace GraphQL.Tests.Reflection.NullableTests
             methodNullableAttribute.ShouldBeNull(); //should not be possible to apply the attribute here
 
             var methodNullableContextAttribute = method.CustomAttributes.FirstOrDefault(x => x.AttributeType.Name == "NullableContextAttribute");
-            if (nullableContext.HasValue) {
+            if (nullableContext.HasValue)
+            {
                 methodNullableContextAttribute.ShouldNotBeNull();
                 methodNullableContextAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte));
                 methodNullableContextAttribute.ConstructorArguments[0].Value.ShouldBeOfType<byte>().ShouldBe((byte)nullableContext.Value);
-            } else {
+            }
+            else
+            {
                 methodNullableContextAttribute.ShouldBeNull();
             }
 
             var parameterNullableAttribute = method.ReturnParameter.CustomAttributes.FirstOrDefault(x => x.AttributeType.Name == "NullableAttribute");
-            if (nullableValues != null) {
+            if (nullableValues != null)
+            {
                 parameterNullableAttribute.ShouldNotBeNull();
                 var expectedValues = nullableValues.Select(x => (byte)int.Parse(x.ToString())).ToArray();
-                if (expectedValues.Length == 1) {
+                if (expectedValues.Length == 1)
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte));
                     var actualValue = parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<byte>().ToString();
                     actualValue.ShouldBe(nullableValues);
-                } else {
+                }
+                else
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte[]));
                     var actualValues = string.Join("", parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<ReadOnlyCollection<CustomAttributeTypedArgument>>().Select(x => x.Value.ToString()));
                     actualValues.ShouldBe(nullableValues);
                 }
-            } else {
+            }
+            else
+            {
                 parameterNullableAttribute.ShouldBeNull();
             }
         }
@@ -195,19 +210,25 @@ namespace GraphQL.Tests.Reflection.NullableTests
         {
             var property = type.GetProperty(propertyName);
             var parameterNullableAttribute = property.CustomAttributes.FirstOrDefault(x => x.AttributeType.Name == "NullableAttribute");
-            if (nullableValues != null) {
+            if (nullableValues != null)
+            {
                 parameterNullableAttribute.ShouldNotBeNull();
                 var expectedValues = nullableValues.Select(x => (byte)int.Parse(x.ToString())).ToArray();
-                if (expectedValues.Length == 1) {
+                if (expectedValues.Length == 1)
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte));
                     var actualValue = parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<byte>().ToString();
                     actualValue.ShouldBe(nullableValues);
-                } else {
+                }
+                else
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte[]));
                     var actualValues = string.Join("", parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<ReadOnlyCollection<CustomAttributeTypedArgument>>().Select(x => x.Value.ToString()));
                     actualValues.ShouldBe(nullableValues);
                 }
-            } else {
+            }
+            else
+            {
                 parameterNullableAttribute.ShouldBeNull();
             }
         }
@@ -242,19 +263,25 @@ namespace GraphQL.Tests.Reflection.NullableTests
             var method = type.GetMethod(methodName);
             var argument = method.GetParameters().Single(x => x.Name == argumentName);
             var parameterNullableAttribute = argument.CustomAttributes.FirstOrDefault(x => x.AttributeType.Name == "NullableAttribute");
-            if (nullableValues != null) {
+            if (nullableValues != null)
+            {
                 parameterNullableAttribute.ShouldNotBeNull();
                 var expectedValues = nullableValues.Select(x => (byte)int.Parse(x.ToString())).ToArray();
-                if (expectedValues.Length == 1) {
+                if (expectedValues.Length == 1)
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte));
                     var actualValue = parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<byte>().ToString();
                     actualValue.ShouldBe(nullableValues);
-                } else {
+                }
+                else
+                {
                     parameterNullableAttribute.ConstructorArguments[0].ArgumentType.ShouldBe(typeof(byte[]));
                     var actualValues = string.Join("", parameterNullableAttribute.ConstructorArguments[0].Value.ShouldBeOfType<ReadOnlyCollection<CustomAttributeTypedArgument>>().Select(x => x.Value.ToString()));
                     actualValues.ShouldBe(nullableValues);
                 }
-            } else {
+            }
+            else
+            {
                 parameterNullableAttribute.ShouldBeNull();
             }
         }
