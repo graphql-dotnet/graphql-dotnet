@@ -6,7 +6,7 @@ using System.Reflection;
 namespace GraphQL.Reflection
 {
     /// <summary>
-    /// Provides extension methods to <see cref="ParameterInfo"/> and <see cref="MemberInfo"/> instances to read nullabile type reference annotations.
+    /// Provides extension methods to <see cref="ParameterInfo"/> and <see cref="MemberInfo"/> instances to read nullable type reference annotations.
     /// </summary>
     public static class ReflectionExtensions
     {
