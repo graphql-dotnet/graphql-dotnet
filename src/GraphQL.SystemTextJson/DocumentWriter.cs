@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 
 namespace GraphQL.SystemTextJson
 {
@@ -122,6 +123,11 @@ namespace GraphQL.SystemTextJson
             if (!_options.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
                 _options.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
+            }
+
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))
+            {
+                _options.Converters.Add(new ApolloTraceJsonConverter());
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
