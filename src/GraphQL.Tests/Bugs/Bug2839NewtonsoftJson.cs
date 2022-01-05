@@ -30,7 +30,8 @@ namespace GraphQL.Tests.Bugs
             {
                 options.Converters.Add(new IsoDateTimeConverter()
                 {
-                    DateTimeFormat = "yyyy-MMM-dd"
+                    DateTimeFormat = "yyyy-MMM-dd",
+                    Culture = System.Globalization.CultureInfo.InvariantCulture,
                 });
 
                 options.ContractResolver = new ExecutionResultContractResolver(new ErrorInfoProvider())
