@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Reflection;
@@ -11,6 +12,13 @@ namespace GraphQL.Tests.Reflection.NullableTests
 {
     public class MethodTests
     {
+        [Fact]
+        public void NullThrows()
+        {
+            ParameterInfo parameter = null;
+            Should.Throw<ArgumentNullException>(() => parameter.GetNullabilityInformation());
+        }
+
         [Theory]
         [InlineData(typeof(NullableClass1), "Field1", typeof(string), Nullability.Nullable)]
         [InlineData(typeof(NullableClass1), "Field2", typeof(string), Nullability.Nullable)]

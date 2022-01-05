@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using GraphQL.Reflection;
 using Shouldly;
 using Xunit;
@@ -9,6 +10,13 @@ namespace GraphQL.Tests.Reflection.NullableTests
 {
     public class PropertyTests
     {
+        [Fact]
+        public void NullThrows()
+        {
+            PropertyInfo property = null;
+            Should.Throw<ArgumentNullException>(() => property.GetNullabilityInformation());
+        }
+
         [Theory]
         [InlineData(typeof(NullableClass20), "Field1", typeof(int), Nullability.NonNullable)]
         [InlineData(typeof(NullableClass20), "Field2", typeof(string), Nullability.NonNullable)]
