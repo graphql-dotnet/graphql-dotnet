@@ -1,10 +1,7 @@
 using System;
-using System.Buffers;
-using System.Buffers.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Xunit;

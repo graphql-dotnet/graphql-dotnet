@@ -18,14 +18,14 @@ namespace GraphQL.NewtonsoftJson
         /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/>.
         /// </summary>
         public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
-            : this(errorInfoProvider, new CamelCaseNamingStrategy())
+            : this(errorInfoProvider, null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/>.
+        /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/> and <see cref="NamingStrategy"/>.
         /// </summary>
-        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider, NamingStrategy? namingStrategy)
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider, NamingStrategy namingStrategy)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
             _namingStrategy = namingStrategy;
