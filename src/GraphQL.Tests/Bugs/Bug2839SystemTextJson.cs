@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -92,13 +93,13 @@ namespace GraphQL.Tests.Bugs
 
             public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
             {
-                writer.WriteStringValue(value.ToString("yyyy-MMM-dd"));
+                writer.WriteStringValue(value.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture));
             }
         }
 
         public class MyNamingPolicy : JsonNamingPolicy
         {
-            public override string ConvertName(string name) => name.ToUpper();
+            public override string ConvertName(string name) => name.ToUpper(CultureInfo.InvariantCulture);
         }
     }
 }
