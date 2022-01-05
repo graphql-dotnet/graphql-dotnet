@@ -4,7 +4,7 @@ using System.Reflection;
 namespace GraphQL.Reflection
 {
     /// <summary>
-    /// Exception when nullable reference annotations cannot be read from a parameter.
+    /// Exception when nullable reference annotations cannot be read from a member.
     /// </summary>
     public class NullabilityInterpretationException : Exception
     {
