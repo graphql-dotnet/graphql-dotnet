@@ -11,7 +11,7 @@ namespace GraphQL.Reflection
         Unknown = 0,
 
         /// <summary>
-        /// The member is a non-nullable value type or is a nullable refernce type marked as non-nullable.
+        /// The member is a non-nullable value type or is a nullable reference type marked as non-nullable.
         /// </summary>
         NonNullable = 1,
 
