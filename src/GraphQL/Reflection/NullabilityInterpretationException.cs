@@ -11,7 +11,7 @@ namespace GraphQL.Reflection
         /// <summary>
         /// Initializes a new instance for the specified <paramref name="parameter"/>.
         /// </summary>
-        public NullabilityInterpretationException(ParameterInfo parameter) : base($"Unable to interpret nullability attributes for argument '{parameter.Name}' on method '{parameter.Member.DeclaringType.Name}.{parameter.Member.Name}'.")
+        public NullabilityInterpretationException(ParameterInfo parameter) : base($"Unable to interpret nullability attributes for parameter '{parameter.Name}' on method '{parameter.Member.DeclaringType.Name}.{parameter.Member.Name}'.")
         {
         }
 
