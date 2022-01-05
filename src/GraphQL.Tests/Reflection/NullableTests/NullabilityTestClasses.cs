@@ -1,4 +1,5 @@
 #nullable enable
+#pragma warning disable IDE0060 // Remove unused parameter
 using System;
 using System.Collections;
 using System.Collections.Generic;
