@@ -168,6 +168,19 @@ namespace GraphQL.Tests.Reflection.NullableTests
                 (typeof(NullableClass18<>).GetGenericArguments()[0], Nullability.NonNullable),
                 (typeof(string), Nullability.Nullable),
             } },
+            new object[] { "Field11", new List<(Type, Nullability)>() {
+                (typeof(Tuple<string[][], string>), Nullability.NonNullable),
+                (typeof(string[][]), Nullability.NonNullable),
+                (typeof(string[]), Nullability.NonNullable),
+                (typeof(string), Nullability.NonNullable),
+                (typeof(string), Nullability.Nullable),
+            } },
+            new object[] { "Field12", new List<(Type, Nullability)>() {
+                (typeof(Tuple<string[,], string>), Nullability.NonNullable),
+                (typeof(string[,]), Nullability.NonNullable),
+                (typeof(string), Nullability.NonNullable),
+                (typeof(string), Nullability.Nullable),
+            } },
         };
         }
 

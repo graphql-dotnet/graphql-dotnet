@@ -133,6 +133,8 @@ namespace GraphQL.Tests.Reflection.NullableTests
         [InlineData(typeof(NullableClass18<>), "Field8", null, "1012")]
         [InlineData(typeof(NullableClass18<>), "Field9", null, "102")]
         [InlineData(typeof(NullableClass18<>), "Field10", null, "112")]
+        [InlineData(typeof(NullableClass18<>), "Field11", null, "11112")]
+        [InlineData(typeof(NullableClass18<>), "Field12", null, "1112")]
         [InlineData(typeof(NullableClass21), "Field1", null, null)]
         [InlineData(typeof(NullableClass21), "Field2", null, null)]
         [InlineData(typeof(NullableClass21), "Field3", null, null)]
