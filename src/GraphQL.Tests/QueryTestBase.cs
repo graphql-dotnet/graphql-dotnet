@@ -5,7 +5,6 @@ using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.StarWars.IoC;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
@@ -34,7 +33,6 @@ namespace GraphQL.Tests
         {
             Services = new TIocContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
-            Writer = new DocumentWriter(indent: true);
         }
 
         public ISimpleContainer Services { get; set; }
@@ -48,8 +46,6 @@ namespace GraphQL.Tests
 
         public IDocumentExecuter Executer { get; private set; }
 
-        public IDocumentWriter Writer { get; private set; }
-
         public ExecutionResult AssertQuerySuccess(
             string query,
             string expected,
@@ -58,11 +54,10 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            INameConverter nameConverter = null,
-            IDocumentWriter writer = null)
+            INameConverter nameConverter = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, nameConverter, writer);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, nameConverter);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -118,14 +113,17 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-            var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            foreach (var writer in DocumentWritersTestData.AllWriters)
+            {
+                var writtenResult = writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
+                var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
-            writtenResult.ShouldBeCrossPlat(expectedResult);
+                writtenResult.ShouldBeCrossPlat(expectedResult);
 
-            var errors = runResult.Errors ?? new ExecutionErrors();
+                var errors = runResult.Errors ?? new ExecutionErrors();
 
-            errors.Count.ShouldBe(expectedErrorCount);
+                errors.Count.ShouldBe(expectedErrorCount);
+            }
 
             return runResult;
         }
@@ -139,8 +137,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
-            INameConverter nameConverter = null,
-            IDocumentWriter writer = null)
+            INameConverter nameConverter = null)
         {
             var schema = Schema;
             schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
@@ -156,21 +153,22 @@ namespace GraphQL.Tests
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
-            writer ??= Writer;
-
-            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
-
-            string additionalInfo = null;
-
-            if (runResult.Errors?.Any() == true)
+            foreach (var writer in DocumentWritersTestData.AllWriters)
             {
-                additionalInfo = string.Join(Environment.NewLine, runResult.Errors
-                    .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                    .Select(x => x.InnerException.Message));
-            }
+                var writtenResult = writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
+                var expectedResult = expectedExecutionResultOrJson is string s ? s : writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
 
-            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
+                string additionalInfo = $"{writer.GetType().FullName} failed: ";
+
+                if (runResult.Errors?.Any() == true)
+                {
+                    additionalInfo += string.Join(Environment.NewLine, runResult.Errors
+                        .Where(x => x.InnerException is GraphQLSyntaxErrorException)
+                        .Select(x => x.InnerException.Message));
+                }
+
+                writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
+            }
 
             return runResult;
         }
