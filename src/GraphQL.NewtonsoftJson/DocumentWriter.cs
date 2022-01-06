@@ -110,11 +110,13 @@ namespace GraphQL.NewtonsoftJson
 
         private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider errorInfoProvider)
         {
-            return new JsonSerializerSettings
+            var settings = new JsonSerializerSettings
             {
                 Formatting = indent ? Formatting.Indented : Formatting.None,
                 ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
             };
+            settings.Converters.Add(new FixPrecisionConverter());
+            return settings;
         }
 
         private static JsonSerializer BuildSerializer(bool indent, Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)

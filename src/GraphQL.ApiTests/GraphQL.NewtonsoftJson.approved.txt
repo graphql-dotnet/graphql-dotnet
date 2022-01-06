@@ -27,6 +27,14 @@ namespace GraphQL.NewtonsoftJson
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
+    public class FixPrecisionConverter : Newtonsoft.Json.JsonConverter
+    {
+        public FixPrecisionConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanConvert(System.Type objType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter jWriter, object value, Newtonsoft.Json.JsonSerializer jSerializer) { }
+    }
     public static class GraphQLBuilderExtensions
     {
         public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
