@@ -10,7 +10,6 @@ namespace GraphQL.Tests
             new SystemTextJson.DocumentWriter(new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true,
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
             }),
             new NewtonsoftJson.DocumentWriter(indent: true)

@@ -21,6 +21,7 @@ namespace GraphQL.NewtonsoftJson
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider, Newtonsoft.Json.Serialization.NamingStrategy namingStrategy) { }
         public override bool CanRead { get; }
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }

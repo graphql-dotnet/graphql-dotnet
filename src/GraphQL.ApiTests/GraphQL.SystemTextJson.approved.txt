@@ -1,5 +1,11 @@
 namespace GraphQL.SystemTextJson
 {
+    public class ApolloTraceJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Instrumentation.ApolloTrace>
+    {
+        public ApolloTraceJsonConverter() { }
+        public override GraphQL.Instrumentation.ApolloTrace Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Instrumentation.ApolloTrace value, System.Text.Json.JsonSerializerOptions options) { }
+    }
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
