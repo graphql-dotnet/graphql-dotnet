@@ -101,7 +101,7 @@ namespace GraphQL.Execution
                     throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
-                // The IServiceProvider instance will be disposed at this point, set it to null insted of exposing the disposed object
+                // The IServiceProvider instance will be disposed at this point, set it to null instead of exposing the disposed object
                 resolveContext.RequestServices = null;
 
                 return subscription
