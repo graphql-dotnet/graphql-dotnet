@@ -13,14 +13,14 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoFragmentCyclesError(ValidationContext context, string fragName, string[] spreadNames, params INode[] nodes)
-            : base(context.OriginalQuery, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
+            : base(context.Document.OriginalQuery!, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
         {
         }
 
         internal static string CycleErrorMessage(string fragName, string[] spreadNames)
         {
             var via = spreadNames.Length > 0 ? " via " + string.Join(", ", spreadNames) : "";
-            return $"Cannot spread fragment \"{fragName}\" within itself{via}.";
+            return $"Cannot spread fragment '{fragName}' within itself{via}.";
         }
     }
 }

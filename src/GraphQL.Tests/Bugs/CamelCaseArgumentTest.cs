@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -20,7 +21,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object> { { "argumentValue", "42" } }
+                Arguments = new Dictionary<string, ArgumentValue> { { "argumentValue", new ArgumentValue("42", ArgumentSource.Literal) } }
             };
 
             var result = ctx.GetArgument("ArgumentValue", "defaultValue");

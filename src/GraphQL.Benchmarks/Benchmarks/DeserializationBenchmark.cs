@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
-using GraphQL.Tests.Introspection;
 
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter, CsvMeasurementsExporter]
-    public class DeserializationBenchmark
+    //[RPlotExporter, CsvMeasurementsExporter]
+    public class DeserializationBenchmark : IBenchmark
     {
         private const string SHORT_JSON = @"{
   ""key0"": null,
@@ -23,19 +22,10 @@ namespace GraphQL.Benchmarks
   }
 }";
 
-        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new SystemTextJson.ObjectDictionaryConverter(),
-                new SystemTextJson.JsonConverterBigInteger(),
-            }
-        };
-
         [GlobalSetup]
         public void GlobalSetup()
         {
+            var loadedFromFile = IntrospectionResult.Data;
         }
 
         public IEnumerable<string> Codes => new[] { "Empty", "Short", "Introspection" };
@@ -52,9 +42,15 @@ namespace GraphQL.Benchmarks
         };
 
         [Benchmark(Baseline = true)]
-        public Dictionary<string, object> NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToDictionary(Json);
+        public Inputs NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToInputs(Json);
 
         [Benchmark]
-        public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
+        public Inputs SystemTextJson() => GraphQL.SystemTextJson.StringExtensions.ToInputs(Json);
+
+        void IBenchmark.RunProfiler()
+        {
+            Code = "Introspection";
+            _ = SystemTextJson();
+        }
     }
 }

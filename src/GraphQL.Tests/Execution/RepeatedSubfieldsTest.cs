@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -10,14 +11,14 @@ namespace GraphQL.Tests.Execution
     {
         public RepeatedSubfieldsTests()
         {
-            FirstInnerField = new Field(null, new NameNode("first"));
+            FirstInnerField = new Field(default, new NameNode("first"));
             FirstFieldSelection = new SelectionSet();
             FirstFieldSelection.Add(FirstInnerField);
-            SecondInnerField = new Field(null, new NameNode("second"));
+            SecondInnerField = new Field(default, new NameNode("second"));
             SecondFieldSelection = new SelectionSet();
             SecondFieldSelection.Add(SecondInnerField);
-            FirstTestField = new Field(null, new NameNode("test"));
-            SecondTestField = new Field(null, new NameNode("test"));
+            FirstTestField = new Field(default, new NameNode("test"));
+            SecondTestField = new Field(default, new NameNode("test"));
             AliasedTestField = new Field(new NameNode("alias"), new NameNode("test"));
 
             FirstTestField.SelectionSet = FirstFieldSelection;
@@ -33,6 +34,17 @@ namespace GraphQL.Tests.Execution
         private Field SecondTestField { get; }
         private Field AliasedTestField { get; }
 
+        private Dictionary<string, Field> CollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+        {
+            return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
+        }
+
+        private class MyExecutionStrategy : ParallelExecutionStrategy
+        {
+            public Dictionary<string, Field> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+                => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
+        }
+
         [Fact]
         public void BeMergedCorrectlyInCaseOfFields()
         {
@@ -40,11 +52,11 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -54,32 +66,34 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(AliasedTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
             fields["alias"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["alias"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["alias"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
         public void MergeFieldAndFragment()
         {
-            var fragment = new FragmentDefinition(new NameNode("fragment"));
             var fragmentSelection = new SelectionSet();
             fragmentSelection.Add(FirstTestField);
-            fragment.SelectionSet = fragmentSelection;
-            fragment.Type = new GraphQL.Language.AST.NamedType(
-                new NameNode("Person"));
+            var fragment = new FragmentDefinition(
+                new NameNode("fragment"),
+                new GraphQL.Language.AST.NamedType(
+                    new NameNode("Person")),
+                fragmentSelection);
 
-            var fragments = new Fragments { fragment };
+            var document = new Document();
+            document.Fragments.Add(fragment);
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
 
             var context = new ExecutionContext
             {
-                Fragments = fragments,
+                Document = document,
                 Schema = schema
             };
 
@@ -88,14 +102,11 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(fragSpread);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(
-                context,
-                new PersonType(),
-                outerSelection);
+            var fields = CollectFrom(context, new PersonType(), outerSelection);
 
             fields.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
     }
 }

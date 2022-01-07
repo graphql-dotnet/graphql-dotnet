@@ -14,7 +14,7 @@ namespace GraphQL.Reflection
             _serviceProvider = serviceProvider;
         }
 
-        public object Resolve(IResolveFieldContext context)
+        public object? Resolve(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
@@ -25,7 +25,7 @@ namespace GraphQL.Reflection
             if (target == null)
             {
                 var parentType = context.ParentType != null ? $"{context.ParentType.Name}." : null;
-                throw new InvalidOperationException($"Could not resolve an instance of {_accessor.DeclaringType.Name} to execute {parentType}{context.FieldName}");
+                throw new InvalidOperationException($"Could not resolve an instance of {_accessor.DeclaringType.Name} to execute {parentType}{context.FieldAst.Name}");
             }
 
             return _accessor.GetValue(target, arguments);

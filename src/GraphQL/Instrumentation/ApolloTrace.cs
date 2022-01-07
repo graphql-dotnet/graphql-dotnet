@@ -11,12 +11,12 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
+        /// <param name="start">The date and time that the GraphQL document began execution. If not UTC, this value will be converted to UTC.</param>
         /// <param name="durationMs">The number of milliseconds that it took to execute the GraphQL document.</param>
         public ApolloTrace(DateTime start, double durationMs)
         {
-            StartTime = start;
-            EndTime = start.AddMilliseconds(durationMs);
+            StartTime = start.ToUniversalTime();
+            EndTime = StartTime.AddMilliseconds(durationMs);
             Duration = ConvertTime(durationMs);
         }
 
@@ -58,7 +58,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Converts a quantity of milliseconds to nanoseconds.
         /// </summary>
-        public static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
+        internal static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
 
         /// <summary>
         /// Represents the start offset and duration of an operation.
@@ -95,22 +95,22 @@ namespace GraphQL.Instrumentation
             /// <summary>
             /// Gets or sets the path of the field.
             /// </summary>
-            public List<object> Path { get; set; } = new List<object>();
+            public List<object>? Path { get; set; }
 
             /// <summary>
             /// Gets or sets the parent graph type name.
             /// </summary>
-            public string ParentType { get; set; }
+            public string? ParentType { get; set; }
 
             /// <summary>
             /// Gets or sets the field name.
             /// </summary>
-            public string FieldName { get; set; }
+            public string? FieldName { get; set; }
 
             /// <summary>
             /// Gets or sets the returned graph type name.
             /// </summary>
-            public string ReturnType { get; set; }
+            public string? ReturnType { get; set; }
         }
     }
 }

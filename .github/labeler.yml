@@ -2,10 +2,15 @@ test:
   - src/GraphQL.DataLoader.Tests/**/*
   - src/GraphQL.Dummy/**/*
   - src/GraphQL.Harness.Tests/**/*
+  - src/GraphQL.MicrosoftDI.Tests/**/*
   - src/GraphQL.Tests/**/*
+  - src/GraphQL.ApiTests/**/*.cs
 
 CI:
   - .github/workflows/**/*
+  - .github/dependabot.yml
+  - .github/labeler.yml
+  - .github/codecov.yml
 
 code style:
   - .editorconfig
@@ -16,3 +21,4 @@ documentation:
 
 performance:
   - src/GraphQL.Benchmarks/**/*
+  - src/GraphQL.Benchmarks.Merge/**/*

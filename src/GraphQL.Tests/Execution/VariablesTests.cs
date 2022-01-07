@@ -123,12 +123,7 @@ namespace GraphQL.Tests.Execution
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType> { Name = "input" }
                 ),
-                resolve: context =>
-                {
-                    var val = context.GetArgument<int>("input");
-                    var result = JsonSerializer.Serialize(val);
-                    return result;
-                });
+                resolve: context => context.GetArgument<int>("input"));
 
             Field<StringGraphType>(
                 "fieldWithNonNullableStringInput",
@@ -204,16 +199,18 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void does_not_use_incorrect_value()
+        public void fail_on_incorrect_value()
         {
             var query = @"
             {
               fieldWithObjectInput(input: [""foo"", ""bar"", ""baz""])
             }
             ";
-            var expected = "{ \"fieldWithObjectInput\": \"null\" }";
+            var expected = "{ \"fieldWithObjectInput\": null }";
 
-            AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
+            var result = AssertQueryWithErrors(query, expected, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: true);
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'fieldWithObjectInput'.");
+            result.Errors[0].InnerException.Message.ShouldStartWith("Expected object value for 'TestInputObject', found not an object 'ListValue{values=StringValue{value=foo}, StringValue{value=bar}, StringValue{value=baz}}'.");
         }
     }
 
@@ -286,7 +283,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": null } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -300,7 +297,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": ""foo bar"" }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
 
@@ -316,11 +313,11 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"" } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null variable.");
+            caughtError.Message.ShouldBe("Variable '$input.c' is invalid. No value provided for a non-null variable.");
         }
 
         [Fact]
@@ -330,7 +327,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"", ""e"": ""dog"" } }".ToInputs();
 
-            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -502,11 +499,11 @@ namespace GraphQL.Tests.Execution
 
             string expected = null;
 
-            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null variable.");
+            caughtError.Message.ShouldBe("Variable '$value' is invalid. No value provided for a non-null variable.");
         }
 
         [Fact]
@@ -522,7 +519,7 @@ namespace GraphQL.Tests.Execution
 
             var inputs = @"{""value"": null}".ToInputs();
 
-            var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1, executed: false);
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
@@ -638,7 +635,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.")
+            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0027input\u0027 has invalid value. Expected type \u0027String\u0027, found WRONG_TYPE.")
             {
                 Code = "ARGUMENTS_OF_CORRECT_TYPE",
             };

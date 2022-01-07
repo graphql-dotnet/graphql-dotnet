@@ -163,12 +163,12 @@ type User @key(fields: ""id"") {
                 _.Query = query;
             }).GetAwaiter().GetResult();
 
-            var data = (Dictionary<string, object>)executionResult.Data;
-            var schema = (Dictionary<string, object>)data["__schema"];
-            var types = (List<object>)schema["types"];
-            var entityType = (Dictionary<string, object>)types.Single(t => (string)((Dictionary<string, object>)t)["name"] == "_Entity");
-            var possibleTypes = (List<object>)entityType["possibleTypes"];
-            var possibleType = (Dictionary<string, object>)possibleTypes[0];
+            var data = executionResult.Data.ToDict();
+            var schema = data["__schema"].ToDict();
+            var types = (IEnumerable<object>)schema["types"];
+            var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
+            var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
+            var possibleType = possibleTypes.First().ToDict();
             var name = (string)possibleType["name"];
 
             Assert.Equal("User", name);

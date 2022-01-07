@@ -92,14 +92,14 @@ namespace GraphQL.Tests.StarWars
                }
             ";
             var errors = new ExecutionErrors();
-            var error = new ValidationError(query, KnownFragmentNamesError.NUMBER, @"Unknown fragment ""unknown_fragment"".")
+            var error = new ValidationError(query, KnownFragmentNamesError.NUMBER, "Unknown fragment 'unknown_fragment'.")
             {
                 Code = "KNOWN_FRAGMENT_NAMES"
             };
             error.AddLocation(4, 25);
             errors.Add(error);
 
-            AssertQuery(query, CreateQueryResult(null, errors), null, null);
+            AssertQuery(query, CreateQueryResult(null, errors, executed: false), null, null);
         }
     }
 }

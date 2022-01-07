@@ -1,6 +1,8 @@
 # Queries
 
-To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.  Queries are executed in parallel.
+To perform a query you need to have a root Query object that is an `ObjectGraphType`.
+Queries should only fetch data and never modify it.  You can only have a single root
+Query object. By default queries are executed in parallel.
 
 ```graphql
 query {
@@ -20,7 +22,8 @@ hero {
 }
 ```
 
-To provide an `Operation` name for your query, you add it after the `query` keyword.  An `Operation` name is optional if there is only a single operation in the request.
+To provide an `Operation` name for your query, you add it after the `query` keyword.
+An `Operation` name is optional if there is only a single operation in the request.
 
 ```graphql
 query MyHeroQuery {

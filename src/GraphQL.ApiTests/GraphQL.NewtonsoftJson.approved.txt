@@ -21,7 +21,29 @@ namespace GraphQL.NewtonsoftJson
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider, Newtonsoft.Json.Serialization.NamingStrategy namingStrategy) { }
         public override bool CanRead { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class FixPrecisionConverter : Newtonsoft.Json.JsonConverter
+    {
+        public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat) { }
+        public override bool CanRead { get; }
+        public override bool CanConvert(System.Type objType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter jWriter, object value, Newtonsoft.Json.JsonSerializer jSerializer) { }
+    }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider>? action) { }
+    }
+    public class InputsConverter : Newtonsoft.Json.JsonConverter
+    {
+        public InputsConverter() { }
+        public override bool CanWrite { get; }
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
@@ -32,7 +54,12 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class StringExtensions
     {
+        public static T FromJson<T>(this System.IO.Stream stream) { }
+        public static T FromJson<T>(this string json) { }
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static object GetValue(this object value) { }
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the To" +
+            "Inputs method instead.")]
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
         public static GraphQL.Inputs ToInputs(this string json) { }

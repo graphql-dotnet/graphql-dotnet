@@ -36,7 +36,7 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public override ISchema Build(string typeDefinitions)
+        public override Schema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
             schema.RegisterType(BuildEntityGraphType());
@@ -48,7 +48,6 @@ namespace GraphQL.Utilities.Federation
         {
             schema.RegisterType<AnyScalarGraphType>();
             schema.RegisterType<ServiceGraphType>();
-            schema.RegisterValueConverter(new AnyValueConverter());
         }
 
         private void AddRootEntityFields(ISchema schema)
@@ -73,12 +72,12 @@ namespace GraphQL.Utilities.Federation
 
                     var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
 
-                    var results = new List<object>();
+                    var results = new List<object?>();
 
-                    foreach (var rep in reps)
+                    foreach (var rep in reps!)
                     {
-                        var typeName = rep["__typename"].ToString();
-                        var type = context.Schema.FindType(typeName);
+                        var typeName = rep!["__typename"].ToString();
+                        var type = context.Schema.AllTypes[typeName];
                         if (type != null)
                         {
                             // execute resolver
@@ -87,7 +86,7 @@ namespace GraphQL.Utilities.Federation
                             {
                                 var resolveContext = new FederatedResolveContext
                                 {
-                                    Arguments = rep,
+                                    Arguments = rep!,
                                     ParentFieldContext = context
                                 };
                                 var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
@@ -111,15 +110,15 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
+            if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
             {
-                setToAlter.Prepend(new Field(null, new NameNode("__typename")));
+                setToAlter!.Prepend(new Field(default, new NameNode("__typename")));
             }
         }
 
-        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
+        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet? setToAlter)
         {
-            foreach (var selection in selectionSet.Selections)
+            foreach (var selection in selectionSet.SelectionsList)
             {
                 if (selection is Field childField && childField.Name == "__typename")
                 {
@@ -134,7 +133,7 @@ namespace GraphQL.Utilities.Federation
 
                 if (selection is FragmentSpread spread)
                 {
-                    var def = document.Fragments.FindDefinition(spread.Name);
+                    var def = document.Fragments.FindDefinition(spread.Name)!;
                     return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }
@@ -153,17 +152,14 @@ namespace GraphQL.Utilities.Federation
             var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
             foreach (var e in entities)
             {
-                union.AddPossibleType(e);
+                union.AddPossibleType(e!);
             }
 
             union.ResolveType = x =>
             {
-                if (x is Dictionary<string, object> dict)
+                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object typeName))
                 {
-                    if (dict.TryGetValue("__typename", out object typeName))
-                    {
-                        return new GraphQLTypeReference(typeName.ToString());
-                    }
+                    return new GraphQLTypeReference(typeName.ToString());
                 }
 
                 // TODO: Provide another way to give graph type name, such as an attribute
@@ -180,7 +176,7 @@ namespace GraphQL.Utilities.Federation
                 return false;
             }
 
-            var directive = type.GetExtensionDirectives<ASTNode>().Directive("key");
+            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
             if (directive != null)
                 return true;
 
@@ -188,8 +184,13 @@ namespace GraphQL.Utilities.Federation
             if (ast == null)
                 return false;
 
-            var keyDir = ast.Directives.Directive("key");
+            var keyDir = Directive(ast.Directives!, "key");
             return keyDir != null;
+        }
+
+        private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
+        {
+            return directives?.FirstOrDefault(x => x.Name!.Value == name);
         }
     }
 }

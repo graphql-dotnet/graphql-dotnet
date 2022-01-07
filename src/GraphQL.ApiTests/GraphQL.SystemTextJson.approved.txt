@@ -1,5 +1,11 @@
 namespace GraphQL.SystemTextJson
 {
+    public class ApolloTraceJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Instrumentation.ApolloTrace>
+    {
+        public ApolloTraceJsonConverter() { }
+        public override GraphQL.Instrumentation.ApolloTrace Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Instrumentation.ApolloTrace value, System.Text.Json.JsonSerializerOptions options) { }
+    }
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
@@ -19,6 +25,17 @@ namespace GraphQL.SystemTextJson
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
+    }
+    public class InputsConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
+    {
+        public InputsConverter() { }
+        public override GraphQL.Inputs Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Inputs value, System.Text.Json.JsonSerializerOptions options) { }
+    }
     public sealed class JsonConverterBigInteger : System.Text.Json.Serialization.JsonConverter<System.Numerics.BigInteger>
     {
         public JsonConverterBigInteger() { }
@@ -26,6 +43,8 @@ namespace GraphQL.SystemTextJson
         public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Numerics.BigInteger value, System.Text.Json.JsonSerializerOptions options) { }
         public static bool TryGetBigInteger(ref System.Text.Json.Utf8JsonReader reader, out System.Numerics.BigInteger bi) { }
     }
+    [System.Obsolete("This class will be removed in a future version of GraphQL.NET. Please use the Inp" +
+        "utsConverter instead.")]
     public class ObjectDictionaryConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.Dictionary<string, object>>
     {
         public ObjectDictionaryConverter() { }
@@ -38,7 +57,12 @@ namespace GraphQL.SystemTextJson
     }
     public static class StringExtensions
     {
+        public static T FromJson<T>(this string json) { }
+        public static System.Threading.Tasks.ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET. Please use the To" +
+            "Inputs method instead.")]
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
+        public static GraphQL.Inputs ToInputs(this System.Text.Json.JsonElement obj) { }
         public static GraphQL.Inputs ToInputs(this string json) { }
     }
 }

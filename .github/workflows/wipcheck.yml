@@ -2,7 +2,7 @@ name: Check if PR title contains [WIP]
 
 on:
   pull_request:
-    types: 
+    types:
       - opened        # when PR is opened
       - edited        # when PR is edited
       - synchronize   # when code is added
@@ -16,7 +16,7 @@ jobs:
       - name: Fail build if pull request title contains [WIP]
         env:
           TITLE: ${{ github.event.pull_request.title }}
-        if: ${{ contains(github.event.pull_request.title, '[WIP]') }} # This function is not case sensitive.
+        if: ${{ contains(github.event.pull_request.title, '[WIP]') }} # This function is case insensitive.
         run: |
           echo Warning! PR title "$TITLE" contains [WIP]. Remove [WIP] from the title when PR is ready.
           exit 1

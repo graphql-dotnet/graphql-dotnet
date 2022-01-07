@@ -1,6 +1,6 @@
 {
   "name": "graphql-dotnet",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "graphiql": "^0.11.11",
     "graphql": "^0.13.2",
     "opencollective-postinstall": "^2.0.1",

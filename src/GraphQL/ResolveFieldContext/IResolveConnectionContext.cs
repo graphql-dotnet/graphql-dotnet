@@ -27,12 +27,12 @@ namespace GraphQL.Builders
         /// <summary>
         /// For a forward pagination request, returned edges should start immediately after the edge identified by this cursor.
         /// </summary>
-        string After { get; }
+        string? After { get; }
 
         /// <summary>
         /// For a backwards pagination request, returned edges should end immediately prior to the edge identified by this cursor.
         /// </summary>
-        string Before { get; }
+        string? Before { get; }
 
         /// <summary>
         /// The maximum number of edges to be returned, or the specified default page size if <see cref="First"/> and

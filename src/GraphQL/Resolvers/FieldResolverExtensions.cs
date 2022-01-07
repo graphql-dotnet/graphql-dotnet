@@ -11,9 +11,9 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Executes a field resolver with a specified <see cref="IResolveFieldContext"/>.
         /// </summary>
-        public static async Task<object> ResolveAsync(this IFieldResolver resolver, IResolveFieldContext context)
+        public static async Task<object?> ResolveAsync(this IFieldResolver resolver, IResolveFieldContext context)
         {
-            object result = (resolver ?? throw new ArgumentNullException(nameof(resolver))).Resolve(context);
+            object? result = (resolver ?? throw new ArgumentNullException(nameof(resolver))).Resolve(context);
 
             if (result is Task task)
             {

@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -59,47 +58,40 @@ namespace GraphQL.Tests.Execution.Cancellation
         [Fact]
         public void cancellation_token_in_context()
         {
-            using (var tokenSource = new CancellationTokenSource())
-            {
-                AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
-            }
+            using var tokenSource = new CancellationTokenSource();
+            AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
         }
 
         [Fact]
         public void cancellation_is_propagated()
         {
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            tokenSource.Cancel();
+            Should.Throw<OperationCanceledException>(() =>
             {
-                tokenSource.Cancel();
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
-                });
-            }
+                _ = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
+            });
         }
 
         [Fact]
         public void cancellation_is_propagated_async()
         {
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            Should.Throw<OperationCanceledException>(() =>
             {
-                Should.Throw<OperationCanceledException>(() =>
-                {
-                    var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
-                });
-            }
+                _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource);
+            });
         }
 
         [Fact]
         public void unhandled_exception_delegate_is_not_called()
         {
             bool ranDelegate = false;
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate = (context) => ranDelegate = true;
             using (var tokenSource = new CancellationTokenSource())
             {
                 Should.Throw<OperationCanceledException>(() =>
                 {
-                    var result = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: unhandledExceptionDelegate);
+                    _ = AssertQueryWithErrors("{three}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1, root: tokenSource, unhandledExceptionDelegate: _ => ranDelegate = true);
                 });
             }
             ranDelegate.ShouldBeFalse();

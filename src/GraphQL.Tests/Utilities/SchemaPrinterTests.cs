@@ -30,19 +30,17 @@ namespace GraphQL.Tests.Utilities
             var result = print(schema);
 
             // ensure schema isn't disposed before test finishes
-            if (schema.Query.Name == "")
-            {
-            }
+            schema.Query.Name.ShouldNotBeNull();
 
             return result;
         }
 
-        private string print(ISchema schema)
+        private static string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true, PrintDescriptionsAsComments = true });
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options)
+        private static string print(ISchema schema, SchemaPrinterOptions options)
         {
             var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
@@ -79,17 +77,67 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void prints_directive()
         {
-            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
-            var arg = DirectiveGraphType.Skip.Arguments.First();
+            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+            var skip = new SkipDirective();
+            var arg = skip.Arguments.First();
             arg.ResolvedType = arg.Type.BuildNamedType();
 
-            var result = printer.PrintDirective(DirectiveGraphType.Skip);
+            var result = printer.PrintDirective(skip);
             const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
 directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
             AssertEqual(result, "directive", expected, excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_directive_2()
+        {
+            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
+            var skip = new SkipDirective();
+            var arg = skip.Arguments.First();
+            arg.ResolvedType = arg.Type.BuildNamedType();
+
+            var result = printer.PrintDirective(skip);
+            const string expected = @"""""""
+Directs the executor to skip this field or fragment when the 'if' argument is true.
+""""""
+directive @skip(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
+
+            AssertEqual(result, "directive", expected, excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_directive_without_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query);
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe("directive @my on FIELD | QUERY");
+        }
+
+        [Fact]
+        public void prints_repeatable_directive_without_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe("directive @my repeatable on FIELD | QUERY");
+        }
+
+        [Fact]
+        public void prints_repeatable_directive_with_arguments()
+        {
+            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query)
+            {
+                Repeatable = true,
+                Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
+            };
+            string result = new SchemaPrinter(null).PrintDirective(d);
+            result.ShouldBe(@"directive @my(
+  max: Int
+) repeatable on FIELD | QUERY");
         }
 
         [Fact]
@@ -164,7 +212,7 @@ type Foo {
   # This is of type String
   str: String
   # This is of type Integer
-  int: Int
+  int: Int @deprecated(reason: ""This field is now deprecated"")
 }"
                 },
                 {
@@ -187,7 +235,8 @@ type Foo {
 
             var options = new SchemaPrinterOptions
             {
-                IncludeDescriptions = true
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = true,
             };
 
             var expected = new Dictionary<string, string>
@@ -213,6 +262,48 @@ type Foo {
         }
 
         [Fact]
+        public void prints_object_field_with_field_descriptions_2()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<FooType>("foo");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = false,
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"""""""
+This is a Foo object type
+""""""
+type Foo {
+  """"""
+  This is of type String
+  """"""
+  str: String
+  """"""
+  This is of type Integer
+  """"""
+  int: Int
+}"
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            AssertEqual(print(schema, options), expected);
+        }
+
+        [Fact]
         public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -223,7 +314,8 @@ type Foo {
             var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true,
-                IncludeDeprecationReasons = true
+                IncludeDeprecationReasons = true,
+                PrintDescriptionsAsComments = true,
             };
 
             var expected = new Dictionary<string, string>
@@ -235,6 +327,50 @@ type Foo {
   # This is of type String
   str: String
   # This is of type Integer
+  int: Int
+}".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            var result = print(schema, options);
+            AssertEqual(result, expected);
+        }
+
+        [Fact]
+        public void prints_object_field_with_field_descriptions_and_deprecation_reasons_2()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<FooType>("foo");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true,
+                IncludeDeprecationReasons = true,
+                PrintDescriptionsAsComments = false,
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"""""""
+This is a Foo object type
+""""""
+type Foo {
+  """"""
+  This is of type String
+  """"""
+  str: String
+  """"""
+  This is of type Integer
+  """"""
   int: Int
 }".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
                 },
@@ -444,7 +580,8 @@ type Query {
             var options = new SchemaPrinterOptions
             {
                 OldImplementsSyntax = true,
-                IncludeDescriptions = true
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = true,
             };
 
             AssertEqual(print(schema, options), "", @"
@@ -473,6 +610,56 @@ type Query {
         }
 
         [Fact]
+        public void prints_multiple_interfaces_with_old_implements_syntax_2()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                OldImplementsSyntax = true,
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = false,
+            };
+
+            AssertEqual(print(schema, options), "", @"
+interface Baaz {
+  """"""
+  This is of type Integer
+  """"""
+  int: Int
+}
+
+type Bar implements IFoo, Baaz {
+  """"""
+  This is of type String
+  """"""
+  str: String
+  """"""
+  This is of type Integer
+  """"""
+  int: Int
+}
+
+""""""
+This is a Foo interface type
+""""""
+interface IFoo {
+  """"""
+  This is of type String
+  """"""
+  str: String
+}
+
+type Query {
+  bar: Bar
+}
+", excludeScalars: true);
+        }
+
+        [Fact]
         public void prints_multiple_interfaces_with_field_descriptions()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -482,7 +669,8 @@ type Query {
 
             var options = new SchemaPrinterOptions
             {
-                IncludeDescriptions = true
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = true,
             };
 
             var result = print(schema, options);
@@ -513,6 +701,57 @@ type Query {
         }
 
         [Fact]
+        public void prints_multiple_interfaces_with_field_descriptions_2()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true,
+                PrintDescriptionsAsComments = false,
+            };
+
+            var result = print(schema, options);
+
+            AssertEqual(result, "", @"
+interface Baaz {
+  """"""
+  This is of type Integer
+  """"""
+  int: Int
+}
+
+type Bar implements IFoo & Baaz {
+  """"""
+  This is of type String
+  """"""
+  str: String
+  """"""
+  This is of type Integer
+  """"""
+  int: Int
+}
+
+""""""
+This is a Foo interface type
+""""""
+interface IFoo {
+  """"""
+  This is of type String
+  """"""
+  str: String
+}
+
+type Query {
+  bar: Bar
+}
+", excludeScalars: true);
+        }
+
+        [Fact]
         public void prints_unions()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -532,7 +771,7 @@ type Foo {
   # This is of type String
   str: String
   # This is of type Integer
-  int: Int
+  int: Int @deprecated(reason: ""This field is now deprecated"")
 }
 
 # This is a Foo interface type
@@ -614,6 +853,105 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_input_type_with_default_null_value()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
+                "str",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
+                );
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput2",
+@"input SomeInput2 {
+  names: [String]
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput2! = { names: null }): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_as_dictionary()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+  unused: Boolean
+}
+
+type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true },
+      argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+  unused: Boolean
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_input_type_with_default_as_dictionary_null_values()
+        {
+            var schema = Schema.For(@"
+input SomeInput {
+  age: Int = 2
+}
+
+type Query {
+  str(arg: SomeInput = { age: null }): String!
+}
+");
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int = 2
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(arg: SomeInput = { age: null }): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_custom_scalar()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -685,7 +1023,8 @@ scalar Guid
 
 scalar Long
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+# The `Milliseconds` scalar type represents a period of time represented as the
+# total number of milliseconds in range [-922337203685477, 922337203685477].
 scalar Milliseconds
 
 type Query {
@@ -709,7 +1048,8 @@ type Query {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+# The `Seconds` scalar type represents a period of time represented as the total
+# number of seconds in range [-922337203685, 922337203685].
 scalar Seconds
 
 scalar Short
@@ -745,8 +1085,11 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
-  RED
+  # Red!
+  RED @deprecated(reason: ""Use green!"")
+  # Green!
   GREEN
+  # Blue!
   BLUE
 }"
                 },
@@ -765,7 +1108,7 @@ scalar Uri"
                 Arguments = new QueryArguments(new QueryArgument<RgbEnum>
                 {
                     Name = "color",
-                    DefaultValue = "RED"
+                    DefaultValue = 0 // 0 = red --- must be internal representation of enumeration value or validation will fail
                 }),
                 Type = typeof(RgbEnum)
             };
@@ -783,8 +1126,11 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
-  RED
+  # Red!
+  RED @deprecated(reason: ""Use green!"")
+  # Green!
   GREEN
+  # Blue!
   BLUE
 }"
                 },
@@ -793,7 +1139,7 @@ scalar Uri"
         }
 
         [Fact]
-        public void prints_introspection_schema()
+        public void prints_introspection_schema_with_descriptions_as_comments()
         {
             var schema = new Schema
             {
@@ -802,7 +1148,8 @@ scalar Uri"
                     Name = "Root"
                 }
             };
-            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
@@ -844,23 +1191,41 @@ type __Directive {
 # A Directive can be adjacent to many parts of the GraphQL language, a
 # __DirectiveLocation describes one such possible adjacencies.
 enum __DirectiveLocation {
+  # Location adjacent to a query operation.
   QUERY
+  # Location adjacent to a mutation operation.
   MUTATION
+  # Location adjacent to a subscription operation.
   SUBSCRIPTION
+  # Location adjacent to a field.
   FIELD
+  # Location adjacent to a fragment definition.
   FRAGMENT_DEFINITION
+  # Location adjacent to a fragment spread.
   FRAGMENT_SPREAD
+  # Location adjacent to an inline fragment.
   INLINE_FRAGMENT
+  # Location adjacent to a schema definition.
   SCHEMA
+  # Location adjacent to a scalar definition.
   SCALAR
+  # Location adjacent to an object type definition.
   OBJECT
+  # Location adjacent to a field definition.
   FIELD_DEFINITION
+  # Location adjacent to an argument definition.
   ARGUMENT_DEFINITION
+  # Location adjacent to an interface definition.
   INTERFACE
+  # Location adjacent to a union definition.
   UNION
+  # Location adjacent to an enum definition
   ENUM
+  # Location adjacent to an enum value definition
   ENUM_VALUE
+  # Location adjacent to an input object type definition.
   INPUT_OBJECT
+  # Location adjacent to an input object field definition.
   INPUT_FIELD_DEFINITION
 }
 
@@ -935,18 +1300,591 @@ type __Type {
 
 # An enum describing what kind of type a given __Type is.
 enum __TypeKind {
+  # Indicates this type is a scalar.
   SCALAR
+  # Indicates this type is an object. `fields` and `possibleTypes` are valid fields.
   OBJECT
+  # Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.
   INTERFACE
+  # Indicates this type is a union. `possibleTypes` is a valid field.
   UNION
+  # Indicates this type is an enum. `enumValues` is a valid field.
   ENUM
+  # Indicates this type is an input object. `inputFields` is a valid field.
   INPUT_OBJECT
+  # Indicates this type is a list. `ofType` is a valid field.
   LIST
+  # Indicates this type is a non-null. `ofType` is a valid field.
   NON_NULL
 }
 ";
 
             AssertEqual(result, "", expected, excludeScalars: true);
+        }
+        [Fact]
+        public void prints_introspection_schema_with_descriptions()
+        {
+            var schema = new Schema
+            {
+                Query = new ObjectGraphType
+                {
+                    Name = "Root"
+                }
+            };
+            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
+            var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+
+            const string expected = @"
+schema {
+  query: Root
+}
+
+""""""
+Marks an element of a GraphQL schema as no longer supported.
+""""""
+directive @deprecated(
+  reason: String = ""No longer supported""
+) on FIELD_DEFINITION | ENUM_VALUE
+
+""""""
+Directs the executor to include this field or fragment only when the 'if' argument is true.
+""""""
+directive @include(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+""""""
+Directs the executor to skip this field or fragment when the 'if' argument is true.
+""""""
+directive @skip(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+""""""
+A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
+
+In some cases, you need to provide options to alter GraphQL's execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.
+""""""
+type __Directive {
+  name: String!
+  description: String
+  locations: [__DirectiveLocation!]!
+  args: [__InputValue!]!
+  onOperation: Boolean!
+  onFragment: Boolean!
+  onField: Boolean!
+}
+
+""""""
+A Directive can be adjacent to many parts of the GraphQL language, a __DirectiveLocation describes one such possible adjacencies.
+""""""
+enum __DirectiveLocation {
+  """"""
+  Location adjacent to a query operation.
+  """"""
+  QUERY
+  """"""
+  Location adjacent to a mutation operation.
+  """"""
+  MUTATION
+  """"""
+  Location adjacent to a subscription operation.
+  """"""
+  SUBSCRIPTION
+  """"""
+  Location adjacent to a field.
+  """"""
+  FIELD
+  """"""
+  Location adjacent to a fragment definition.
+  """"""
+  FRAGMENT_DEFINITION
+  """"""
+  Location adjacent to a fragment spread.
+  """"""
+  FRAGMENT_SPREAD
+  """"""
+  Location adjacent to an inline fragment.
+  """"""
+  INLINE_FRAGMENT
+  """"""
+  Location adjacent to a schema definition.
+  """"""
+  SCHEMA
+  """"""
+  Location adjacent to a scalar definition.
+  """"""
+  SCALAR
+  """"""
+  Location adjacent to an object type definition.
+  """"""
+  OBJECT
+  """"""
+  Location adjacent to a field definition.
+  """"""
+  FIELD_DEFINITION
+  """"""
+  Location adjacent to an argument definition.
+  """"""
+  ARGUMENT_DEFINITION
+  """"""
+  Location adjacent to an interface definition.
+  """"""
+  INTERFACE
+  """"""
+  Location adjacent to a union definition.
+  """"""
+  UNION
+  """"""
+  Location adjacent to an enum definition
+  """"""
+  ENUM
+  """"""
+  Location adjacent to an enum value definition
+  """"""
+  ENUM_VALUE
+  """"""
+  Location adjacent to an input object type definition.
+  """"""
+  INPUT_OBJECT
+  """"""
+  Location adjacent to an input object field definition.
+  """"""
+  INPUT_FIELD_DEFINITION
+}
+
+""""""
+One possible value for a given Enum. Enum values are unique values, not a placeholder for a string or numeric value. However an Enum value is returned in a JSON response as a string.
+""""""
+type __EnumValue {
+  name: String!
+  description: String
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+""""""
+Object and Interface types are described by a list of Fields, each of which has a name, potentially a list of arguments, and a return type.
+""""""
+type __Field {
+  name: String!
+  description: String
+  args: [__InputValue!]!
+  type: __Type!
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+""""""
+Arguments provided to Fields or Directives and the input fields of an InputObject are represented as Input Values which describe their type and optionally a default value.
+""""""
+type __InputValue {
+  name: String!
+  description: String
+  type: __Type!
+  """"""
+  A GraphQL-formatted string representing the default value for this input value.
+  """"""
+  defaultValue: String
+}
+
+""""""
+A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.
+""""""
+type __Schema {
+  description: String
+  """"""
+  A list of all types supported by this server.
+  """"""
+  types: [__Type!]!
+  """"""
+  The type that query operations will be rooted at.
+  """"""
+  queryType: __Type!
+  """"""
+  If this server supports mutation, the type that mutation operations will be rooted at.
+  """"""
+  mutationType: __Type
+  """"""
+  If this server supports subscription, the type that subscription operations will be rooted at.
+  """"""
+  subscriptionType: __Type
+  """"""
+  A list of all directives supported by this server.
+  """"""
+  directives: [__Directive!]!
+}
+
+""""""
+The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.
+
+Depending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name and description, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.
+""""""
+type __Type {
+  kind: __TypeKind!
+  name: String
+  description: String
+  fields(includeDeprecated: Boolean = false): [__Field!]
+  interfaces: [__Type!]
+  possibleTypes: [__Type!]
+  enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
+  inputFields: [__InputValue!]
+  ofType: __Type
+}
+
+""""""
+An enum describing what kind of type a given __Type is.
+""""""
+enum __TypeKind {
+  """"""
+  Indicates this type is a scalar.
+  """"""
+  SCALAR
+  """"""
+  Indicates this type is an object. `fields` and `possibleTypes` are valid fields.
+  """"""
+  OBJECT
+  """"""
+  Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.
+  """"""
+  INTERFACE
+  """"""
+  Indicates this type is a union. `possibleTypes` is a valid field.
+  """"""
+  UNION
+  """"""
+  Indicates this type is an enum. `enumValues` is a valid field.
+  """"""
+  ENUM
+  """"""
+  Indicates this type is an input object. `inputFields` is a valid field.
+  """"""
+  INPUT_OBJECT
+  """"""
+  Indicates this type is a list. `ofType` is a valid field.
+  """"""
+  LIST
+  """"""
+  Indicates this type is a non-null. `ofType` is a valid field.
+  """"""
+  NON_NULL
+}
+";
+
+            AssertEqual(result, "", expected, excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_introspection_schema_with_experimental_features_enabled()
+        {
+            var schema = new Schema
+            {
+                Query = new ObjectGraphType
+                {
+                    Name = "Root"
+                }
+            }
+            .EnableExperimentalIntrospectionFeatures();
+            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+            var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+
+            const string expected = @"
+schema {
+  query: Root
+}
+
+# Marks an element of a GraphQL schema as no longer supported.
+directive @deprecated(
+  reason: String = ""No longer supported""
+) on FIELD_DEFINITION | ENUM_VALUE
+
+# Directs the executor to include this field or fragment only when the 'if' argument is true.
+directive @include(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+# Directs the executor to skip this field or fragment when the 'if' argument is true.
+directive @skip(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+# Directive applied to a schema element
+type __AppliedDirective {
+  # Directive name
+  name: String!
+  # Values of explicitly specified directive arguments
+  args: [__DirectiveArgument!]!
+}
+
+# A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
+#
+# In some cases, you need to provide options to alter GraphQL's execution behavior
+# in ways field arguments will not suffice, such as conditionally including or
+# skipping a field. Directives provide this by describing additional information
+# to the executor.
+type __Directive {
+  name: String!
+  description: String
+  locations: [__DirectiveLocation!]!
+  args: [__InputValue!]!
+  isRepeatable: Boolean!
+  onOperation: Boolean!
+  onFragment: Boolean!
+  onField: Boolean!
+  # Directives applied to the directive
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# Value of an argument provided to directive
+type __DirectiveArgument {
+  # Argument name
+  name: String!
+  # A GraphQL-formatted string representing the value for argument.
+  value: String!
+}
+
+# A Directive can be adjacent to many parts of the GraphQL language, a
+# __DirectiveLocation describes one such possible adjacencies.
+enum __DirectiveLocation {
+  # Location adjacent to a query operation.
+  QUERY
+  # Location adjacent to a mutation operation.
+  MUTATION
+  # Location adjacent to a subscription operation.
+  SUBSCRIPTION
+  # Location adjacent to a field.
+  FIELD
+  # Location adjacent to a fragment definition.
+  FRAGMENT_DEFINITION
+  # Location adjacent to a fragment spread.
+  FRAGMENT_SPREAD
+  # Location adjacent to an inline fragment.
+  INLINE_FRAGMENT
+  # Location adjacent to a schema definition.
+  SCHEMA
+  # Location adjacent to a scalar definition.
+  SCALAR
+  # Location adjacent to an object type definition.
+  OBJECT
+  # Location adjacent to a field definition.
+  FIELD_DEFINITION
+  # Location adjacent to an argument definition.
+  ARGUMENT_DEFINITION
+  # Location adjacent to an interface definition.
+  INTERFACE
+  # Location adjacent to a union definition.
+  UNION
+  # Location adjacent to an enum definition
+  ENUM
+  # Location adjacent to an enum value definition
+  ENUM_VALUE
+  # Location adjacent to an input object type definition.
+  INPUT_OBJECT
+  # Location adjacent to an input object field definition.
+  INPUT_FIELD_DEFINITION
+}
+
+# One possible value for a given Enum. Enum values are unique values, not a
+# placeholder for a string or numeric value. However an Enum value is returned in
+# a JSON response as a string.
+type __EnumValue {
+  name: String!
+  description: String
+  isDeprecated: Boolean!
+  deprecationReason: String
+  # Directives applied to the enum value
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# Object and Interface types are described by a list of Fields, each of which has
+# a name, potentially a list of arguments, and a return type.
+type __Field {
+  name: String!
+  description: String
+  args: [__InputValue!]!
+  type: __Type!
+  isDeprecated: Boolean!
+  deprecationReason: String
+  # Directives applied to the field
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# Arguments provided to Fields or Directives and the input fields of an
+# InputObject are represented as Input Values which describe their type and
+# optionally a default value.
+type __InputValue {
+  name: String!
+  description: String
+  type: __Type!
+  # A GraphQL-formatted string representing the default value for this input value.
+  defaultValue: String
+  # Directives applied to the input value
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all
+# available types and directives on the server, as well as the entry points for
+# query, mutation, and subscription operations.
+type __Schema {
+  description: String
+  # A list of all types supported by this server.
+  types: [__Type!]!
+  # The type that query operations will be rooted at.
+  queryType: __Type!
+  # If this server supports mutation, the type that mutation operations will be rooted at.
+  mutationType: __Type
+  # If this server supports subscription, the type that subscription operations will be rooted at.
+  subscriptionType: __Type
+  # A list of all directives supported by this server.
+  directives: [__Directive!]!
+  # Directives applied to the schema
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# The fundamental unit of any GraphQL Schema is the type. There are many kinds of
+# types in GraphQL as represented by the `__TypeKind` enum.
+#
+# Depending on the kind of a type, certain fields describe information about that
+# type. Scalar types provide no information beyond a name and description, while
+# Enum types provide their values. Object and Interface types provide the fields
+# they describe. Abstract types, Union and Interface, provide the Object types
+# possible at runtime. List and NonNull types compose other types.
+type __Type {
+  kind: __TypeKind!
+  name: String
+  description: String
+  fields(includeDeprecated: Boolean = false): [__Field!]
+  interfaces: [__Type!]
+  possibleTypes: [__Type!]
+  enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
+  inputFields: [__InputValue!]
+  ofType: __Type
+  # Directives applied to the type
+  appliedDirectives: [__AppliedDirective!]!
+}
+
+# An enum describing what kind of type a given __Type is.
+enum __TypeKind {
+  # Indicates this type is a scalar.
+  SCALAR
+  # Indicates this type is an object. `fields` and `possibleTypes` are valid fields.
+  OBJECT
+  # Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.
+  INTERFACE
+  # Indicates this type is a union. `possibleTypes` is a valid field.
+  UNION
+  # Indicates this type is an enum. `enumValues` is a valid field.
+  ENUM
+  # Indicates this type is an input object. `inputFields` is a valid field.
+  INPUT_OBJECT
+  # Indicates this type is a list. `ofType` is a valid field.
+  LIST
+  # Indicates this type is a non-null. `ofType` is a valid field.
+  NON_NULL
+}
+";
+
+            AssertEqual(result, "", expected, excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_descriptions_correctly()
+        {
+            var printer = new SchemaPrinter(new Schema());
+            printer.PrintDescription("This is a test").ShouldBeCrossPlat("\"\"\"\nThis is a test\n\"\"\"\n");
+            printer.PrintDescription("Th\\is \"is\" a \"\"\"test\n\tline2\n line3\u0003").ShouldBeCrossPlat("\"\"\"\nTh\\is \"is\" a \\\"\"\"test\n\tline2\n line3\n\"\"\"\n");
+        }
+
+        [Fact]
+        public void sorts_schema_correctly()
+        {
+            var schema = Schema.For(@"
+# test sorting type names
+type Zebra {
+  # test sorting field names on object types
+  field3: String
+  field2: Int
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  # test sorting arguments
+  field2(arg2: Rutabaga, arg1: Beta): Tango
+  # test sorting fields of default values
+  field3(arg3: Rutabaga = { field3: ""hello"", field2: 2 }): String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+input Rutabaga {
+  # test sorting field names on input types
+  field3: String
+  field2: Int
+}
+
+# test sorting directives
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+  # test sorting directive locations -- does not work yet
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+directive @test1(
+  # test sorting fields within directives -- does not work yet
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+enum Beta {
+  # test sorting of enum value names
+  VALUE_3
+  VALUE_2
+}
+");
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
+            var actual = printer.Print();
+            var expected = @"directive @test1(
+  arg2: Boolean!
+  arg1: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @test2(
+  arg1: Boolean!
+  arg2: Boolean!
+) on INLINE_FRAGMENT | FIELD | FRAGMENT_SPREAD
+
+enum Beta {
+  VALUE_2
+  VALUE_3
+}
+
+type Query {
+  field1(arg1: Rutabaga, arg2: Beta): Zebra
+  field2(arg1: Beta, arg2: Rutabaga): Tango
+  field3(arg3: Rutabaga = { field2: 2, field3: ""hello"" }): String
+}
+
+input Rutabaga {
+  field2: Int
+  field3: String
+}
+
+type Tango {
+  field1: Int
+  field2: Int
+}
+
+type Zebra {
+  field2: Int
+  field3: String
+}
+";
+            actual.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
         }
 
         public class FooType : ObjectGraphType
@@ -1068,6 +2006,20 @@ enum __TypeKind {
             public bool IsDeveloper { get; set; }
         }
 
+        public class SomeInputType2 : InputObjectGraphType<SomeInput2>
+        {
+            public SomeInputType2()
+            {
+                Name = "SomeInput2";
+                Field(x => x.Names, true);
+            }
+        }
+
+        public class SomeInput2
+        {
+            public IList<string> Names { get; set; }
+        }
+
         public class OddType : ScalarGraphType
         {
             public OddType()
@@ -1085,9 +2037,9 @@ enum __TypeKind {
             public RgbEnum()
             {
                 Name = "RGB";
-                AddValue("RED", "", 0);
-                AddValue("GREEN", "", 1);
-                AddValue("BLUE", "", 2);
+                AddValue("RED", "Red!", 0, "Use green!");
+                AddValue("GREEN", "Green!", 1);
+                AddValue("BLUE", "Blue!", 2);
             }
         }
     }

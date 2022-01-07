@@ -19,56 +19,52 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object Serialize(object value)
+        public override object? ParseLiteral(IValue value) => value switch
         {
-            var date = ParseValue(value);
-
-            if (date is DateTime dateTime)
-            {
-                return dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            }
-
-            return null;
-        }
+            NullValue _ => null,
+            StringValue stringValue => ParseDate(stringValue.Value),
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
+        public override object? ParseValue(object? value) => value switch
         {
-            if (value is DateTimeValue timeValue)
-            {
-                return timeValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
-        }
+            DateTime d => ValidateDate(d, value), // no boxing
+            string stringValue => ParseDate(stringValue),
+            null => null,
+            _ => throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}")
+        };
 
         /// <inheritdoc/>
-        public override object ParseValue(object value)
+        public override object? Serialize(object? value) => value switch
         {
-            if (value is DateTime dateTime)
+            DateTime d => ValidateDate(d).ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo),
+            null => null,
+            _ => ThrowSerializationError(value)
+        };
+
+        private static DateTime ParseDate(string stringValue)
+        {
+            if (DateTime.TryParseExact(stringValue, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
             {
-                if (dateTime.TimeOfDay == TimeSpan.Zero)
-                {
-                    return dateTime;
-                }
-                throw new FormatException($"Expected date to have no time component. Value: {value}");
+                return date;
             }
 
-            if (value is string valueAsString)
-            {
-                if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
-                {
-                    return date;
-                }
-                throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
-            }
+            throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {stringValue}");
+        }
 
-            throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}");
+        private static object ValidateDate(DateTime value, object date)
+        {
+            ValidateDate(value);
+            return date; // no boxing
+        }
+
+        private static DateTime ValidateDate(DateTime value)
+        {
+            if (value.TimeOfDay == TimeSpan.Zero)
+                return value;
+
+            throw new FormatException($"Expected date to have no time component. Value: {value}");
         }
     }
 }

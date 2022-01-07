@@ -25,7 +25,7 @@ namespace GraphQL
         /// <summary> This method avoids boxing boolean values. </summary>
         /// <param name="value"> Original boolean value. </param>
         /// <returns> Shared static boxed boolean value or <c>null</c>. </returns>
-        public static object Boxed(this bool? value) => value switch
+        public static object? Boxed(this bool? value) => value switch
         {
             true => True,
             false => False,

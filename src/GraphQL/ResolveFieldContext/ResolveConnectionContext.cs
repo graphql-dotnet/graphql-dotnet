@@ -61,10 +61,10 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc/>
-        public string After => this.GetArgument<string>("after");
+        public string? After => this.GetArgument<string>("after");
 
         /// <inheritdoc/>
-        public string Before => this.GetArgument<string>("before");
+        public string? Before => this.GetArgument<string>("before");
 
         /// <inheritdoc/>
         public int? PageSize => First ?? Last ?? _defaultPageSize;

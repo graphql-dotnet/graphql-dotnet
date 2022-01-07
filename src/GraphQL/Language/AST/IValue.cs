@@ -8,7 +8,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the value of the node.
         /// </summary>
-        object Value { get; }
+        object? Value { get; }
     }
 
     /// <inheritdoc cref="IValue"/>

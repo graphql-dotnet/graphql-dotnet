@@ -20,6 +20,7 @@ namespace GraphQL.Tests.Bugs
             error.Path = new object[] { "int" };
             var expected = new ExecutionResult
             {
+                Executed = true,
                 Errors = new ExecutionErrors { error },
                 Data = new { @int = (object)null }
             };
@@ -28,14 +29,14 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void Very_Long_Number_In_Input_Should_Return_Error_For_Int()
+        public void Very_Long_Number_In_Input_Should_Return_Error_Without_Data_For_Int()
         {
             var query = "{ int_with_arg(in:636474637870330463) }";
             var expected = new ExecutionResult
             {
                 Errors = new ExecutionErrors
                 {
-                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463.\nExpected type \"Int\", found 636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument 'in' has invalid value. Expected type 'Int', found 636474637870330463.")
                     {
                         Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }
@@ -51,7 +52,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = "{ long }";
             var expected = @"{
-  ""long"": 636474637870330463 
+  ""long"": 636474637870330463
 }";
             AssertQuerySuccess(query, expected);
         }
@@ -61,7 +62,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = "{ long_with_arg(in:636474637870330463) }";
             var expected = @"{
-  ""long_with_arg"": 636474637870330463 
+  ""long_with_arg"": 636474637870330463
 }";
             AssertQuerySuccess(query, expected);
         }
@@ -75,6 +76,7 @@ namespace GraphQL.Tests.Bugs
             error.Path = new object[] { "long_return_bigint" };
             var expected = new ExecutionResult
             {
+                Executed = true,
                 Errors = new ExecutionErrors { error },
                 Data = new { long_return_bigint = (object)null }
             };
@@ -90,7 +92,7 @@ namespace GraphQL.Tests.Bugs
             {
                 Errors = new ExecutionErrors
                 {
-                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463636474637870330463636474637870330463.\nExpected type \"Long\", found 636474637870330463636474637870330463636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument 'in' has invalid value. Expected type 'Long', found 636474637870330463636474637870330463636474637870330463.")
                     {
                         Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }
@@ -106,7 +108,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = "{ bigint }";
             var expected = @"{
-  ""bigint"": 636474637870330463636474637870330463636474637870330463 
+  ""bigint"": 636474637870330463636474637870330463636474637870330463
 }";
             AssertQuerySuccess(query, expected);
         }
@@ -116,7 +118,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = "{ bigint_with_arg(in:636474637870330463636474637870330463636474637870330463) }";
             var expected = @"{
-  ""bigint_with_arg"": 636474637870330463636474637870330463636474637870330463 
+  ""bigint_with_arg"": 636474637870330463636474637870330463636474637870330463
 }";
             AssertQuerySuccess(query, expected);
         }

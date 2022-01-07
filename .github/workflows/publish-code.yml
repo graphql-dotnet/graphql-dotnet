@@ -25,11 +25,11 @@ jobs:
         env:
           github_ref: ${{ github.ref }}
         run: |
-          ref="${github_ref:10}"
-          echo $ref
-          echo "ref=$ref" >> $GITHUB_ENV
+          version="${github_ref:10}"
+          echo version=$version
+          echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2.5.1
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
@@ -46,10 +46,10 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
-      - name: Use .NET Core 3.1 SDK
+      - name: Setup .NET Core 6.0 SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '3.1.x'
+          dotnet-version: '6.0.x'
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
@@ -58,10 +58,10 @@ jobs:
         run: dotnet restore
       - name: Build solution [Release]
         working-directory: src
-        run: dotnet build --no-restore -c Release -p:Version=$ref
+        run: dotnet build --no-restore -c Release -p:Version=$version
       - name: Pack solution [Release]
         working-directory: src
-        run: dotnet pack --no-restore -c Release -p:Version=$ref -o out
+        run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o out
       - name: Upload Nuget packages as workflow artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -75,7 +75,7 @@ jobs:
         working-directory: docs2/public
         run: zip -r ../../src/out/Documentation.zip .
       - name: Upload Nuget packages and documentation as release artifacts
-        uses: actions/github-script@v2
+        uses: actions/github-script@v5
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -86,7 +86,7 @@ jobs:
             for (let file of await fs.readdir('src/out')) {
               console.log('uploading', file);
 
-              await github.repos.uploadReleaseAsset({
+              await github.rest.repos.uploadReleaseAsset({
                 owner,
                 repo,
                 release_id: ${{ github.event.release.id }},

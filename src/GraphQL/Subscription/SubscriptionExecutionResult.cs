@@ -5,7 +5,7 @@ namespace GraphQL.Subscription
 {
     public class SubscriptionExecutionResult : ExecutionResult
     {
-        public IDictionary<string, IObservable<ExecutionResult>> Streams { get; set; }
+        public IDictionary<string, IObservable<ExecutionResult>>? Streams { get; set; }
 
         public SubscriptionExecutionResult()
         {

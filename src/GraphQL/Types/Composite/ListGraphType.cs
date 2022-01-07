@@ -2,17 +2,6 @@ using System;
 
 namespace GraphQL.Types
 {
-    /// <inheritdoc cref="ListGraphType"/>
-    public class ListGraphType<T> : ListGraphType
-        where T : IGraphType
-    {
-        /// <inheritdoc cref="ListGraphType.ListGraphType(Type)"/>
-        public ListGraphType()
-            : base(typeof(T))
-        {
-        }
-    }
-
     /// <summary>
     /// Represents a list of objects. A GraphQL schema may describe that a field represents a list of another type.
     /// The List type is provided for this reason, and wraps another type.
@@ -22,38 +11,53 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance for the specified inner graph type.
         /// </summary>
-        public ListGraphType(IGraphType type)
+        public ListGraphType(IGraphType? type)
         {
             ResolvedType = type;
-        }
-
-        /// <inheritdoc cref="ListGraphType.ListGraphType(IGraphType)"/>
-        protected ListGraphType(Type type)
-        {
-            Type = type;
         }
 
         /// <summary>
         /// Returns the .NET type of the inner (wrapped) graph type.
         /// </summary>
-        public Type Type { get; private set; }
+        public virtual Type? Type => null;
+
+        private IGraphType? _resolvedType;
 
         /// <summary>
         /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
-        public IGraphType ResolvedType { get; set; }
+        public IGraphType? ResolvedType
+        {
+            get => _resolvedType;
+            set
+            {
+                if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
+                    throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
+
+                _resolvedType = value;
+                _cachedString = null;
+            }
+        }
+
+        private string? _cachedString; // note, than Name always null for type wrappers
 
         /// <inheritdoc/>
-        public override string CollectTypes(TypeCollectionContext context)
+        public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
+    }
+
+    /// <inheritdoc cref="ListGraphType"/>
+    public sealed class ListGraphType<T> : ListGraphType
+        where T : IGraphType
+    {
+        /// <summary>
+        /// Initializes a new instance for the specified inner graph type.
+        /// </summary>
+        public ListGraphType()
+            : base(null)
         {
-            var innerType = context.ResolveType(Type);
-            ResolvedType = innerType;
-            var name = innerType.CollectTypes(context);
-            context.AddType(name, innerType, context);
-            return $"[{name}]";
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"[{ResolvedType}]";
+        public override Type Type => typeof(T);
     }
 }

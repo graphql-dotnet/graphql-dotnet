@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -12,7 +10,6 @@ namespace GraphQL.Language.AST
         /// </summary>
         public VariableReference(NameNode name)
         {
-            Name = name.Name;
             NameNode = name;
         }
 
@@ -21,7 +18,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the variable being referenced.
         /// </summary>
-        public string Name { get; }
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the name of the variable being referenced.
@@ -30,25 +27,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"VariableReference{{name={Name}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by comparing the name of the variable that is referenced.
-        /// </summary>
-        protected bool Equals(VariableReference other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((VariableReference)obj);
-        }
     }
 }

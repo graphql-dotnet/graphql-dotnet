@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Execution
 
             var userContext = new TestContext();
 
-            var breaker = new Timer(_ => userContext.Complete("timeout"), null, 5000, 5000);
+            using var breaker = new Timer(_ => userContext.Complete("timeout"), null, 5000, 5000);
 
             AssertQuerySuccess(opts =>
             {
@@ -26,8 +26,6 @@ namespace GraphQL.Tests.Execution
                 opts.UserContext = userContext;
                 opts.Listeners.Add(new TestExecutionListener());
             }, @"{ ""foo"": ""bar"" }");
-
-            breaker.Dispose();
         }
 
         public class AsyncGraphType : ObjectGraphType
@@ -37,7 +35,7 @@ namespace GraphQL.Tests.Execution
                 Name = "Query";
                 Field<StringGraphType>("foo", resolve: context =>
                 {
-                    var uc = context.UserContext.As<TestContext>();
+                    var uc = context.UserContext as TestContext;
                     return uc.ResolveAsync();
                 });
             }

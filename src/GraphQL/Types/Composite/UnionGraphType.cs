@@ -9,34 +9,18 @@ namespace GraphQL.Types
     /// </summary>
     public class UnionGraphType : GraphType, IAbstractGraphType
     {
-        private List<Type> _types;
-        private List<IObjectGraphType> _possibleTypes;
+        private List<Type>? _types;
 
         /// <inheritdoc/>
-        public IEnumerable<IObjectGraphType> PossibleTypes
-        {
-            get => _possibleTypes ?? Enumerable.Empty<IObjectGraphType>();
-            set
-            {
-                EnsurePossibleTypes();
-
-                _possibleTypes.Clear();
-                _possibleTypes.AddRange(value);
-            }
-        }
+        public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 
         /// <inheritdoc/>
-        public Func<object, IObjectGraphType> ResolveType { get; set; }
+        public Func<object, IObjectGraphType?>? ResolveType { get; set; }
 
         /// <inheritdoc/>
         public void AddPossibleType(IObjectGraphType type)
         {
-            EnsurePossibleTypes();
-
-            if (type != null && !_possibleTypes.Contains(type))
-            {
-                _possibleTypes.Add(type);
-            }
+            PossibleTypes.Add(type);
         }
 
         /// <summary>
@@ -49,7 +33,7 @@ namespace GraphQL.Types
             {
                 EnsureTypes();
 
-                _types.Clear();
+                _types!.Clear();
                 _types.AddRange(value);
             }
         }
@@ -62,7 +46,7 @@ namespace GraphQL.Types
         {
             EnsureTypes();
 
-            if (!_types.Contains(typeof(TType)))
+            if (!_types!.Contains(typeof(TType)))
                 _types.Add(typeof(TType));
         }
 
@@ -79,20 +63,10 @@ namespace GraphQL.Types
 
             EnsureTypes();
 
-            if (!_types.Contains(type))
+            if (!_types!.Contains(type))
                 _types.Add(type);
         }
 
-        private void EnsureTypes()
-        {
-            if (_types == null)
-                _types = new List<Type>();
-        }
-
-        private void EnsurePossibleTypes()
-        {
-            if (_possibleTypes == null)
-                _possibleTypes = new List<IObjectGraphType>();
-        }
+        private void EnsureTypes() => _types ??= new List<Type>();
     }
 }

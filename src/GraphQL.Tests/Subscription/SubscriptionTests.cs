@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Subscription
     {
         protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
-            var executer = new DocumentExecuter();
+            var executer = new SubscriptionDocumentExecuter();
 
             var result = await executer.ExecuteAsync(options);
 
@@ -54,7 +54,7 @@ namespace GraphQL.Tests.Subscription
             var message = await stream.FirstOrDefaultAsync();
 
             message.ShouldNotBeNull();
-            var data = (Dictionary<string, object>)message.Data;
+            var data = message.Data.ToDict();
             data.ShouldNotBeNull();
             data["messageGetAll"].ShouldNotBeNull();
         }
@@ -91,7 +91,7 @@ namespace GraphQL.Tests.Subscription
             var message = await stream.FirstOrDefaultAsync();
 
             message.ShouldNotBeNull();
-            var data = (Dictionary<string, object>)message.Data;
+            var data = message.Data.ToDict();
             data.ShouldNotBeNull();
             data["newMessageContent"].ShouldNotBeNull();
             data["newMessageContent"].ToString().ShouldBe("test");

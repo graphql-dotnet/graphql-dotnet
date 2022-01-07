@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation
 {
@@ -10,21 +9,18 @@ namespace GraphQL.Instrumentation
     public class InstrumentFieldsMiddleware : IFieldMiddleware
     {
         /// <inheritdoc/>
-        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async Task<object?> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
-            var metadata = new Dictionary<string, object>
+            var metadata = new Dictionary<string, object?>
             {
                 { "typeName", context.ParentType.Name },
-                { "fieldName", context.FieldName },
-                { "returnTypeName", SchemaPrinter.ResolveName(context.ReturnType) },
+                { "fieldName", context.FieldAst.Name },
+                { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
                 { "path", context.Path },
             };
 
-            using (context.Metrics.Subject("field", context.FieldName, metadata))
-            {
-                var result = await next(context).ConfigureAwait(false);
-                return result;
-            }
+            using (context.Metrics.Subject("field", context.FieldAst.Name, metadata))
+                return await next(context).ConfigureAwait(false);
         }
     }
 }

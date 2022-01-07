@@ -67,27 +67,10 @@ namespace GraphQL
             set => _onMissing = value;
         }
 
-        [Obsolete]
-        public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
-
         /// <summary>
         /// Gets the count.
         /// </summary>
         public int Count => _values.Count;
-
-        [Obsolete]
-        public TValue First
-        {
-            get
-            {
-                foreach (var pair in _values)
-                {
-                    return pair.Value;
-                }
-
-                return default;
-            }
-        }
 
         /// <summary>
         /// Gets or sets the <typeparamref name="TValue"/> with the specified key.
@@ -167,18 +150,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="key">The key to retrieve.</param>
         /// <param name="value">The value for the associated key or <c>default(TValue)</c>.</param>
-        public bool TryRetrieve(TKey key, out TValue value)
-        {
-            value = default;
-
-            if (_values.ContainsKey(key))
-            {
-                value = _values[key];
-                return true;
-            }
-
-            return false;
-        }
+        public bool TryRetrieve(TKey key, out TValue? value) => _values.TryGetValue(key, out value);
 
         /// <summary>
         /// Performs the specified action for each value.
@@ -230,7 +202,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="predicate">The search predicate.</param>
         /// <returns>The first matching value</returns>
-        public TValue Find(Predicate<TValue> predicate)
+        public TValue? Find(Predicate<TValue> predicate)
         {
             foreach (var pair in _values)
             {

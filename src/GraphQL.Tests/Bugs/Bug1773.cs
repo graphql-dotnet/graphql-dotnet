@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1773
     public class Bug1773 : QueryTestBase<Bug1773Schema>
     {
-        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
+        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, string localizedMessage = null)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
             if (line != 0)
@@ -21,6 +21,10 @@ namespace GraphQL.Tests.Bugs
             if (exception != null)
             {
                 Assert.Equal(exception.GetType(), actualResult.Errors[0].InnerException.GetType());
+
+                if (localizedMessage != null && actualResult.Errors[0].InnerException.Message == localizedMessage)
+                    return;
+
                 Assert.Equal(exception.Message, actualResult.Errors[0].InnerException.Message);
             }
         }
@@ -47,24 +51,22 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nonnull_list_throws_when_null()
         {
-            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new[] { "testListNullInvalid" },
-                new InvalidOperationException("Cannot return a null member within a non-null list for list index 0."));
+            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new object[] { "testListNullInvalid", 0 },
+                new InvalidOperationException("Cannot return null for a non-null type. Field: testListNullInvalid, Type: Int!."));
         }
 
         [Fact]
         public void list_throws_for_invalid_type()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new[] { "testListInvalidType" },
-                new FormatException("Input string was not in a correct format."));
+            AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new object[] { "testListInvalidType", 0 },
+                new InvalidOperationException("Unable to convert 'test' to the scalar type 'Int'"));
         }
 
         [Fact]
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
-            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new[] { "testListInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum' for list index 0."));
+            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [ null ]}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new object[] { "testListInvalidType2", 0 },
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
 
         [Fact]
@@ -72,15 +74,22 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the conversion threw a FormatException
             AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
-                new FormatException("Input string was not in a correct format."));
+                new InvalidOperationException("Unable to convert 'test' to the scalar type 'Int'"));
         }
 
         [Fact]
         public void throws_for_invalid_type_when_conversion_returns_null()
         {
-            // in this case, the converstion returned null, and GraphQL threw an InvalidOperationException
+            // in this case, the conversion returned null, and GraphQL threw an InvalidOperationException
             AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'."));
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
+        }
+
+        [Fact]
+        public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
+        {
+            AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": [null, \"HELLO\"]}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new object[] { "testListInvalidType3", 0 },
+                new InvalidOperationException("Unable to serialize 'test' to the scalar type 'Bug1773Enum'."));
         }
     }
 
@@ -100,6 +109,7 @@ namespace GraphQL.Tests.Bugs
             Field<ListGraphType<IntGraphType>>("testListInvalid", resolve: context => 123);
             Field<ListGraphType<IntGraphType>>("testListInvalidType", resolve: context => new object[] { "test" });
             Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2", resolve: context => new object[] { "test" });
+            Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType3", resolve: context => new object[] { "test", Bug1773Enum.Hello });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullValid", resolve: context => new object[] { 123 });
             Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullInvalid", resolve: context => new object[] { null });
             Field<IntGraphType>("testNullValid", resolve: context => null);

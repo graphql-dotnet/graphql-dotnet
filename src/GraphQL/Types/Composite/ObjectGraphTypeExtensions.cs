@@ -18,13 +18,13 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-        public static void Field(
+        public static void Field( //TODO: v5 - change void to T where T : IObjectGraphType
             this IObjectGraphType obj,
             string name,
             IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext, object> resolve = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext, object?>? resolve = null)
         {
             var field = new FieldType
             {
@@ -46,13 +46,13 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-        public static void FieldAsync(
+        public static void FieldAsync( //TODO: v5 - change void to T where T : IObjectGraphType
             this IObjectGraphType obj,
             string name,
             IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext, Task<object>> resolve = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext, Task<object?>>? resolve = null)
         {
             var field = new FieldType
             {

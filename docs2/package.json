@@ -22,7 +22,7 @@
     "gatsby-transformer-remark": "^1.7.44",
     "gatsby-transformer-yaml": "^1.5.18",
     "normalize.css": "^8.0.0",
-    "prismjs": "^1.21.0",
+    "prismjs": "^1.25.0",
     "prop-types": "^15.6.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.2",
@@ -34,7 +34,7 @@
     "gh-pages": "^3.1.0",
     "github-slugger": "^1.2.0",
     "js-yaml": "^3.13.1",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "prettier": "^1.12.0"
   }
 }

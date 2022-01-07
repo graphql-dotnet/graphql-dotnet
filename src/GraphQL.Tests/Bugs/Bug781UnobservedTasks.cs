@@ -18,13 +18,12 @@ namespace GraphQL.Tests.Bugs
         public async Task cancel_execution_with_different_error_types(string query, bool unobserved)
         {
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             ISchema schema = new Bug781Schema(cts);
-            string result = null;
 
             try
             {
-                result = await schema.ExecuteAsync(options =>
+                _ = await schema.ExecuteAsync(options =>
                 {
                     options.Query = query;
                     options.CancellationToken = cts.Token;

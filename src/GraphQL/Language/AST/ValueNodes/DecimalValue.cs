@@ -8,12 +8,8 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public DecimalValue(decimal value)
+        public DecimalValue(decimal value) : base(value)
         {
-            Value = value;
         }
-
-        /// <inheritdoc/>
-        protected override bool Equals(ValueNode<decimal> other) => Value == other.Value;
     }
 }

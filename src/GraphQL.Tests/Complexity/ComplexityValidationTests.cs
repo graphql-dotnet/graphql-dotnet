@@ -16,8 +16,7 @@ namespace GraphQL.Tests.Complexity
                   hero {
                     name
                   }
-                }
-            ";
+                }";
 
             var complexityConfiguration = new ComplexityConfiguration { FieldImpact = 2, MaxComplexity = 6, MaxDepth = 1 };
             var res = Execute(complexityConfiguration, query);
@@ -31,10 +30,8 @@ namespace GraphQL.Tests.Complexity
             var query = @"
                 query FriendsOfFriends {
                   hero {
-                    friends
-                    {
-                      friends
-                      {
+                    friends {
+                      friends {
                         id
                         name
                       }
@@ -76,13 +73,11 @@ namespace GraphQL.Tests.Complexity
             var query = @"
                 query FriendsOfFriends {
                   hero {
-                    friends
-                    {
+                    friends {
                       id
                       name
                       appearsIn
-                      friends
-                      {
+                      friends {
                         id
                         name
                       }

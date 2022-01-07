@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FieldsOnCorrectTypeError(ValidationContext context, Field node, IGraphType type, IEnumerable<string> suggestedTypeNames, IEnumerable<string> suggestedFieldNames)
-            : base(context.OriginalQuery, NUMBER, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
+            : base(context.Document.OriginalQuery!, NUMBER, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
         {
         }
 
@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Errors
             IEnumerable<string> suggestedTypeNames,
             IEnumerable<string> suggestedFieldNames)
         {
-            var message = $"Cannot query field \"{fieldName}\" on type \"{type}\".";
+            var message = $"Cannot query field '{fieldName}' on type '{type}'.";
 
             if (suggestedTypeNames != null)
             {

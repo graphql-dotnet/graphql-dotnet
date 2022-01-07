@@ -10,12 +10,8 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public StringValue(string value)
+        public StringValue(string value) : base(value ?? throw new ArgumentNullException(nameof(value)))
         {
-            Value = value;
         }
-
-        /// <inheritdoc/>
-        protected override bool Equals(ValueNode<string> other) => string.Equals(Value, other.Value, StringComparison.InvariantCulture);
     }
 }

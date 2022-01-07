@@ -5,7 +5,7 @@ namespace GraphQL.Utilities.Federation
 {
     public static class TypeConfigExtensions
     {
-        public static void ResolveReferenceAsync<T>(this TypeConfig config, Func<FederatedResolveContext, Task<T>> resolver)
+        public static void ResolveReferenceAsync<T>(this TypeConfig config, Func<FederatedResolveContext, Task<T?>> resolver)
         {
             ResolveReferenceAsync(config, new FuncFederatedResolver<T>(resolver));
         }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Utilities;
 
@@ -15,7 +14,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance of the graph type.
         /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         protected GraphType()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
             {
@@ -36,10 +37,21 @@ namespace GraphQL.Types
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
-                return attr.Name;
+                return attr!.Name!;
             }
 
-            var name = type.Name.Replace('`', '_');
+            string name = type.Name;
+            if (GlobalSwitches.UseDeclaringTypeNames)
+            {
+                var parent = type.DeclaringType;
+                while (parent != null)
+                {
+                    name = parent.Name + "_" + name;
+                    parent = parent.DeclaringType;
+                }
+            }
+
+            name = name.Replace('`', '_');
             if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
                 name = name.Substring(0, name.Length - nameof(GraphType).Length);
 
@@ -52,7 +64,7 @@ namespace GraphQL.Types
             {
                 if (validate)
                 {
-                    NameValidator.ValidateName(name, "type");
+                    NameValidator.ValidateName(name, NamedElement.Type);
 
                     if (IsTypeModifier)
                         throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
@@ -70,27 +82,17 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <inheritdoc/>
-        public string DeprecationReason { get; set; }
-
-        /// <inheritdoc/>
-        public virtual string CollectTypes(TypeCollectionContext context)
+        public string? DeprecationReason
         {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                Name = GetType().Name;
-            }
-
-            return Name;
+            get => this.GetDeprecationReason();
+            set => this.SetDeprecationReason(value);
         }
 
         /// <inheritdoc />
-        public override string ToString() =>
-            string.IsNullOrWhiteSpace(Name)
-                ? GetType().Name
-                : Name;
+        public override string ToString() => Name;
 
         /// <summary>
         /// Determines if the name of the specified graph type is equal to the name of this graph type.
@@ -98,10 +100,10 @@ namespace GraphQL.Types
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         /// <summary>
-        /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
-        /// is equal to the name of this graph type.
+        /// Determines if the graph type is equal to the specified object,
+        /// or if the name of the specified graph type is equal to the name of this graph type.
         /// </summary>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
                 return false;
@@ -115,36 +117,5 @@ namespace GraphQL.Types
 
         /// <inheritdoc />
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
-    }
-
-    /// <summary>
-    /// Provides a mechanism to resolve graph type instances from their .NET types,
-    /// and also to register new graph type instances with their name in the graph type lookup table.
-    /// (See <see cref="GraphTypesLookup"/>.)
-    /// </summary>
-    public class TypeCollectionContext
-    {
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="resolver">A delegate which returns an instance of a graph type from its .NET type.</param>
-        /// <param name="addType">A delegate which adds a graph type instance to the list of named graph types for the schema.</param>
-        public TypeCollectionContext(
-            Func<Type, IGraphType> resolver,
-            Action<string, IGraphType, TypeCollectionContext> addType)
-        {
-            ResolveType = resolver;
-            AddType = addType;
-        }
-
-        /// <summary>
-        /// Returns a delegate which returns an instance of a graph type from its .NET type.
-        /// </summary>
-        public Func<Type, IGraphType> ResolveType { get; }
-        /// <summary>
-        /// Returns a delegate which adds a graph type instance to the list of named graph types for the schema.
-        /// </summary>
-        public Action<string, IGraphType, TypeCollectionContext> AddType { get; }
-        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }

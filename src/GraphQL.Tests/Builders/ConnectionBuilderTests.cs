@@ -25,7 +25,17 @@ namespace GraphQL.Tests.Builders
         public void should_throw_error_if_name_is_null_or_empty(string fieldName)
         {
             var type = new ObjectGraphType();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            ArgumentOutOfRangeException exception;
+            // race condition with does_not_throw_with_filtering_nameconverter test
+            try
+            {
+                exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            }
+            catch (ShouldAssertException)
+            {
+                System.Threading.Thread.Sleep(100); // wait a bit and retry
+                exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            }
 
             exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
@@ -348,6 +358,62 @@ namespace GraphQL.Tests.Builders
                 result.HighestField2.ShouldBe(10);
                 result.ConnectionField1.ShouldBe(ConnectionField1Value);
             }
+        }
+
+        [Fact]
+        public void unidirectional_creates_proper_arguments()
+        {
+            var graph = new ParentType();
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "after").ShouldBe(1);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "first").ShouldBe(1);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "before").ShouldBe(0);
+            graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "last").ShouldBe(0);
+        }
+
+        [Fact]
+        public void bidirectional_creates_proper_arguments()
+        {
+            var graph = new ParentType();
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "after").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "first").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "before").ShouldBe(1);
+            graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        }
+
+        [Fact]
+        public void bidirectional_called_twice_creates_proper_arguments()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .Description("RandomDescription")
+                .Bidirectional()
+                .Bidirectional();
+
+            graph.Fields.Find("connection").Arguments.Count(x => x.Name == "before").ShouldBe(1);
+            graph.Fields.Find("connection").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        }
+
+        [Fact]
+        public void should_use_pagesize()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .PageSize(10)
+                .Resolve(context => context.First);
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBe(10);
+        }
+
+        [Fact]
+        public void should_use_pagesize_async()
+        {
+            var graph = new ObjectGraphType();
+            graph.Connection<ChildType>()
+                .Name("connection")
+                .PageSize(10)
+                .ResolveAsync(context => Task.FromResult<object>(context.First));
+            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBeOfType<Task<object>>().Result.ShouldBe(10);
         }
 
         public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>

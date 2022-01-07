@@ -25,19 +25,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            Should.Throw<FormatException>(() => _type.ParseValue("abcd"));
+            Should.Throw<InvalidOperationException>(() => _type.ParseValue("abcd"));
         }
 
         [Fact]
-        public void coerces_numeric_string_to_decimal_using_cultures()
+        public void coerces_numeric_string_to_decimal_throws()
         {
-            CultureTestHelper.UseCultures(coerces_numeric_string_to_decimal);
-        }
-
-        [Fact]
-        public void coerces_numeric_string_to_decimal()
-        {
-            _type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
+            Should.Throw<InvalidOperationException>(() => _type.ParseValue("12345.6579"));
         }
 
         [Fact]
@@ -60,7 +54,7 @@ namespace GraphQL.Tests.Types
 
             var number = 12.10m;
             for (int i = 0; i < 1000; i++)
-                _ = System.Runtime.CompilerServices.Unsafe.As<decimal, GraphQL.Language.DecimalData>(ref number);
+                _ = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref number);
 
             GC.GetAllocatedBytesForCurrentThread().ShouldBe(allocated);
         }

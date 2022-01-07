@@ -23,11 +23,12 @@ namespace GraphQL.Tests.Utilities
             ";
 
             Builder.Types.Include<PostWithExtraAttributesType>();
+            Builder.Types.Include<Post>();
 
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var query = schema.FindType("Query") as IObjectGraphType;
+            var query = schema.AllTypes["Query"] as IObjectGraphType;
             var field = query.Fields.Single(x => x.Name == "post");
             field.GetMetadata<string>("Authorize").ShouldBe("SomePolicy");
         }
@@ -58,7 +59,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var blog = schema.FindType("ABlog") as IObjectGraphType;
+            var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
             blog.IsTypeOf.ShouldNotBeNull();
             blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
@@ -90,7 +91,7 @@ namespace GraphQL.Tests.Utilities
             var schema = Builder.Build(defs);
             schema.Initialize();
 
-            var blog = schema.FindType("ABlog") as IObjectGraphType;
+            var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
             blog.IsTypeOf.ShouldNotBeNull();
             blog.IsTypeOf(new ABlog()).ShouldBeTrue();

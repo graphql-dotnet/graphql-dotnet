@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace GraphQL.StarWars.IoC
 {
-    public interface ISimpleContainer : IDisposable
+    public interface ISimpleContainer : IDisposable, IServiceProvider
     {
         object Get(Type serviceType);
         T Get<T>();
         void Register<TService>() where TService : class;
         void Register<TService>(Func<TService> instanceCreator) where TService : class;
         void Register<TService, TImpl>() where TService : class where TImpl : class, TService;
+        void Singleton<TService>() where TService : class;
         void Singleton<TService>(TService instance) where TService : class;
         void Singleton<TService>(Func<TService> instanceCreator) where TService : class;
     }
@@ -41,6 +42,12 @@ namespace GraphQL.StarWars.IoC
             _registrations.Add(typeof(TService), () => instanceCreator());
         }
 
+        public void Singleton<TService>() where TService : class
+        {
+            var lazy = new Lazy<TService>(() => (TService)CreateInstance(typeof(TService)));
+            Register(() => lazy.Value);
+        }
+
         public void Singleton<TService>(TService instance) where TService : class
         {
             _registrations.Add(typeof(TService), () => instance);
@@ -54,19 +61,24 @@ namespace GraphQL.StarWars.IoC
 
         public T Get<T>() => (T)Get(typeof(T));
 
-        public object Get(Type serviceType)
+        public object Get(Type serviceType) => GetService(serviceType) ?? (serviceType.IsInterface || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition ? null : throw new InvalidOperationException("No registration for " + serviceType));
+
+        object IServiceProvider.GetService(Type serviceType) => GetService(serviceType);
+
+        /// <inheritdoc cref="IServiceProvider.GetService(Type)"/>
+        private object GetService(Type serviceType)
         {
             if (_registrations.TryGetValue(serviceType, out var creator))
             {
                 return creator();
             }
 
-            if (!serviceType.IsAbstract)
+            if (serviceType.IsInterface || serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
             {
-                return CreateInstance(serviceType);
+                return null;
             }
 
-            throw new InvalidOperationException("No registration for " + serviceType);
+            return CreateInstance(serviceType);
         }
 
         public void Dispose()

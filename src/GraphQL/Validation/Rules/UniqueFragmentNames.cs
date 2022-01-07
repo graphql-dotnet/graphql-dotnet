@@ -19,25 +19,21 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueFragmentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var knownFragments = new Dictionary<string, FragmentDefinition>();
+        public Task<INodeVisitor>? ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 1 ? _nodeVisitor : null;
 
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((fragmentDefinition, context) =>
             {
-                _.Match<FragmentDefinition>(fragmentDefinition =>
+                var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<string, FragmentDefinition>();
+
+                var fragmentName = fragmentDefinition.Name;
+                if (knownFragments.TryGetValue(fragmentName, out var frag)) // .NET 2.2+ has TryAdd
                 {
-                    var fragmentName = fragmentDefinition.Name;
-                    if (knownFragments.ContainsKey(fragmentName))
-                    {
-                        context.ReportError(new UniqueFragmentNamesError(context, knownFragments[fragmentName], fragmentDefinition));
-                    }
-                    else
-                    {
-                        knownFragments[fragmentName] = fragmentDefinition;
-                    }
-                });
+                    context.ReportError(new UniqueFragmentNamesError(context, frag, fragmentDefinition));
+                }
+                else
+                {
+                    knownFragments[fragmentName] = fragmentDefinition;
+                }
             }).ToTask();
-        }
     }
 }

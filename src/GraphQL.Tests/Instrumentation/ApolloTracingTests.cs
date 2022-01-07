@@ -25,12 +25,12 @@ query {
 }";
 
             var start = DateTime.UtcNow;
+            Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
             var result = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
                 _.EnableMetrics = true;
-                _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
             }).Result;
             result.EnrichWithApolloTracing(start);
             var trace = (ApolloTrace)result.Extensions["tracing"];
@@ -66,8 +66,9 @@ query {
             new HashSet<List<object>>(paths).ShouldBe(expectedPaths);
         }
 
-        [Fact]
-        public async Task serialization_should_have_correct_case()
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task serialization_should_have_correct_case(IDocumentWriter writer)
         {
             var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
             var expected = @"{
@@ -88,7 +89,7 @@ query {
   }
 }";
 
-            var result = await Writer.WriteToStringAsync(trace);
+            var result = await writer.WriteToStringAsync(trace);
 
             result.ShouldBeCrossPlat(expected);
         }

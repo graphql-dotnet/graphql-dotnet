@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public OverlappingFieldsCanBeMergedError(ValidationContext context, Conflict conflict)
-            : base(context.OriginalQuery, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
+            : base(context.Document.OriginalQuery!, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
                   conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray())
         {
         }
@@ -29,12 +29,12 @@ namespace GraphQL.Validation.Errors
             {
                 return string.Join(
                     " and ",
-                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
+                    reasonMessage.Msgs.Select(x => $"subfields '{x.Name}' conflict because {ReasonMessage(x.Message)}").ToArray()
                 );
             }
             else
             {
-                return reasonMessage.Msg;
+                return reasonMessage.Msg!;
             }
         }
     }

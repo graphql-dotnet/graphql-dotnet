@@ -5,14 +5,18 @@ using System.Linq;
 namespace GraphQL.Instrumentation
 {
     /// <summary>
-    /// Records metrics during execution of a GraphQL document
+    /// Records metrics during execution of a GraphQL document.
     /// </summary>
     public class Metrics
     {
-        private readonly bool _enabled;
         private ValueStopwatch _stopwatch;
-        private readonly List<PerfRecord> _records;
-        private PerfRecord _main;
+        private readonly List<PerfRecord>? _records;
+        private PerfRecord? _main;
+
+        /// <summary>
+        /// Gets an instance of the metrics for which metrics collection is disabled.
+        /// </summary>
+        public static Metrics None { get; } = new Metrics(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Metrics"/> class.
@@ -20,24 +24,29 @@ namespace GraphQL.Instrumentation
         /// <param name="enabled">Indicates if metrics should be recorded for this execution.</param>
         public Metrics(bool enabled = true)
         {
-            _enabled = enabled;
+            Enabled = enabled;
             if (enabled)
                 _records = new List<PerfRecord>();
         }
 
         /// <summary>
+        /// Shows whether metrics collection is enabled.
+        /// </summary>
+        public bool Enabled { get; }
+
+        /// <summary>
         /// Logs the start of the execution.
         /// </summary>
         /// <param name="operationName">The name of the GraphQL operation.</param>
-        public Metrics Start(string operationName)
+        public Metrics Start(string? operationName)
         {
-            if (_enabled)
+            if (Enabled)
             {
                 if (_main != null)
                     throw new InvalidOperationException("Metrics.Start has already been called");
 
                 _main = new PerfRecord("operation", operationName, 0);
-                _records.Add(_main);
+                _records!.Add(_main);
                 _stopwatch = ValueStopwatch.StartNew();
             }
 
@@ -47,9 +56,9 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Sets the name of the GraphQL operation.
         /// </summary>
-        public Metrics SetOperationName(string name)
+        public Metrics SetOperationName(string? name)
         {
-            if (_enabled && _main != null)
+            if (Enabled && _main != null)
                 _main.Subject = name;
 
             return this;
@@ -58,16 +67,16 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Records an performance metric.
         /// </summary>
-        public Marker Subject(string category, string subject, Dictionary<string, object> metadata = null)
+        public Marker Subject(string category, string? subject, Dictionary<string, object?>? metadata = null)
         {
-            if (!_enabled)
+            if (!Enabled)
                 return Marker.Empty;
 
             if (_main == null)
                 throw new InvalidOperationException("Metrics.Start should be called before calling Metrics.Subject");
 
             var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
-            lock (_records)
+            lock (_records!)
                 _records.Add(record);
             return new Marker(record, _stopwatch);
         }
@@ -75,9 +84,9 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Returns the collected performance metrics.
         /// </summary>
-        public PerfRecord[] Finish()
+        public PerfRecord[]? Finish()
         {
-            if (!_enabled)
+            if (!Enabled)
                 return null;
 
             _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
@@ -111,8 +120,7 @@ namespace GraphQL.Instrumentation
             /// </summary>
             public void Dispose()
             {
-                if (_record != null)
-                    _record.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
+                _record?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             }
         }
     }

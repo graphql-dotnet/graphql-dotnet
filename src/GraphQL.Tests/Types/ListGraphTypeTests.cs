@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types
@@ -7,6 +9,20 @@ namespace GraphQL.Tests.Types
     // https://github.com/graphql/graphql-spec/issues/749
     public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
+        [Fact]
+        public void List_ResolvedType_And_Type_Should_Match()
+        {
+            var type = new NonNullGraphType<StringGraphType>();
+            Should.Throw<ArgumentOutOfRangeException>(() => type.ResolvedType = new IntGraphType()).Message.ShouldStartWith("Type 'StringGraphType' should be assignable from ResolvedType 'IntGraphType'.");
+        }
+
+        [Fact]
+        public void List_Name_Should_Be_Null()
+        {
+            new ListGraphType<StringGraphType>().Name.ShouldBeNull();
+            new ListGraphType(new StringGraphType()).Name.ShouldBeNull();
+        }
+
         [Fact]
         public void List_Should_Work()
         {

@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ScalarLeafsError(ValidationContext context, SelectionSet node, Field field, IGraphType type)
-            : base(context.OriginalQuery, NUMBER, NoSubselectionAllowedMessage(field.Name, context.Print(type)), node)
+            : base(context.Document.OriginalQuery!, NUMBER, NoSubselectionAllowedMessage(field.Name, type.ToString()), node)
         {
         }
 
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ScalarLeafsError(ValidationContext context, Field node, IGraphType type)
-            : base(context.OriginalQuery, NUMBER, RequiredSubselectionMessage(node.Name, context.Print(type)), node)
+            : base(context.Document.OriginalQuery!, NUMBER, RequiredSubselectionMessage(node.Name, type.ToString()), node)
         {
         }
 

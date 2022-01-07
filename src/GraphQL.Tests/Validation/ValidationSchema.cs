@@ -186,7 +186,7 @@ namespace GraphQL.Tests.Validation
             Name = "ComplexInput";
             Field<NonNullGraphType<BooleanGraphType>>("requiredField");
             Field<IntGraphType>("intField");
-            Field<StringGraphType>("stringField");
+            Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
             Field<BooleanGraphType>("booleanField");
             Field<ListGraphType<StringGraphType>>("stringListField");
         }
@@ -260,8 +260,8 @@ namespace GraphQL.Tests.Validation
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" },
-                    new QueryArgument<IntGraphType> { Name = "req1", DefaultValue = 0 },
-                    new QueryArgument<IntGraphType> { Name = "req2", DefaultValue = 0 }
+                    new QueryArgument<IntGraphType> { Name = "req3", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "req4", DefaultValue = 0 }
                 ));
         }
     }
@@ -277,6 +277,7 @@ namespace GraphQL.Tests.Validation
                     {
                         Name = "id"
                     }
+                    .ApplyDirective("length", "min", 2, "max", 5)
                 ));
             Field<Dog>("dog");
             Field<Cat>("cat");
@@ -292,35 +293,21 @@ namespace GraphQL.Tests.Validation
         public ValidationSchema()
         {
             Query = new ValidationQueryRoot();
-            RegisterType<Dog>();
-            RegisterType<Cat>();
-            RegisterType<Human>();
-            RegisterType<Alien>();
+            this.RegisterType<Dog>();
+            this.RegisterType<Cat>();
+            this.RegisterType<Human>();
+            this.RegisterType<Alien>();
 
-            Directives = new[]
-            {
-                DirectiveGraphType.Include,
-                DirectiveGraphType.Skip,
-                DirectiveGraphType.Deprecated,
-                new DirectiveGraphType("onQuery", new []{ DirectiveLocation.Query }),
-                new DirectiveGraphType("onMutation", new []{ DirectiveLocation.Mutation }),
-                new DirectiveGraphType("onSubscription", new []{ DirectiveLocation.Subscription }),
-                new DirectiveGraphType("onField", new []{ DirectiveLocation.Field }),
-                new DirectiveGraphType("onFragmentDefinition", new []{ DirectiveLocation.FragmentDefinition }),
-                new DirectiveGraphType("onFragmentSpread", new []{ DirectiveLocation.FragmentSpread }),
-                new DirectiveGraphType("onInlineFragment", new []{ DirectiveLocation.InlineFragment }),
-                new DirectiveGraphType("onSchema", new []{ DirectiveLocation.Schema }),
-                new DirectiveGraphType("onScalar", new []{ DirectiveLocation.Scalar }),
-                new DirectiveGraphType("onObject", new []{ DirectiveLocation.Object }),
-                new DirectiveGraphType("onFieldDefinition", new []{ DirectiveLocation.FieldDefinition }),
-                new DirectiveGraphType("onArgumentDefinition", new []{ DirectiveLocation.ArgumentDefinition }),
-                new DirectiveGraphType("onInterface", new []{ DirectiveLocation.Interface }),
-                new DirectiveGraphType("onUnion", new []{ DirectiveLocation.Union }),
-                new DirectiveGraphType("onEnum", new []{ DirectiveLocation.Enum }),
-                new DirectiveGraphType("onEnumValue", new []{ DirectiveLocation.EnumValue }),
-                new DirectiveGraphType("onInputObject", new []{ DirectiveLocation.InputObject }),
-                new DirectiveGraphType("onInputFieldDefinition", new []{ DirectiveLocation.InputFieldDefinition })
-            };
+            Directives.Register(
+                new DirectiveGraphType("onQuery", DirectiveLocation.Query),
+                new DirectiveGraphType("onMutation", DirectiveLocation.Mutation),
+                new DirectiveGraphType("directiveA", DirectiveLocation.Field),
+                new DirectiveGraphType("directiveB", DirectiveLocation.Field),
+                new DirectiveGraphType("directive", DirectiveLocation.Field),
+                new DirectiveGraphType("rep", DirectiveLocation.Field) { Repeatable = true },
+
+                new LengthDirective()
+            );
         }
     }
 }

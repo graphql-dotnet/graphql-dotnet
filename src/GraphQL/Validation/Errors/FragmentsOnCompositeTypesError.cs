@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, InlineFragment node)
-            : base(context.OriginalQuery, NUMBER, InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)), node.Type)
+            : base(context.Document.OriginalQuery!, NUMBER, InlineFragmentOnNonCompositeErrorMessage(node.Type!.StringFrom(context.Document)), node.Type!)
         {
         }
 
@@ -21,14 +21,14 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, FragmentDefinition node)
-            : base(context.OriginalQuery, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)), node.Type)
+            : base(context.Document.OriginalQuery!, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, node.Type.StringFrom(context.Document)), node.Type)
         {
         }
 
         internal static string InlineFragmentOnNonCompositeErrorMessage(string type)
-            => $"Fragment cannot condition on non composite type \"{type}\".";
+            => $"Fragment cannot condition on non composite type '{type}'.";
 
         internal static string FragmentOnNonCompositeErrorMessage(string fragName, string type)
-            => $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
+            => $"Fragment '{fragName}' cannot condition on non composite type '{type}'.";
     }
 }

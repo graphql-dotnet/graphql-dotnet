@@ -121,7 +121,20 @@ namespace GraphQL.Benchmarks
                 {
                     Name = "arg21",
                     DefaultValue = 17000
-                }),
+                }
+#if NET6_0_OR_GREATER
+                , new QueryArgument<DateOnlyGraphType>
+                {
+                    Name = "arg22",
+                    DefaultValue = new DateOnly(2018, 10, 10)
+                }
+                , new QueryArgument<TimeOnlyGraphType>
+                {
+                    Name = "arg23",
+                    DefaultValue = new TimeOnly(1, 1, 3)
+                }
+#endif
+                ),
 
                 resolve: ctx =>
                 {
@@ -146,6 +159,10 @@ namespace GraphQL.Benchmarks
                     var arg19 = ctx.GetArgument<ulong>("arg19");
                     var arg20 = ctx.GetArgument<Uri>("arg20");
                     var arg21 = ctx.GetArgument<ushort>("arg21");
+#if NET6_0_OR_GREATER
+                    var arg22 = ctx.GetArgument<DateOnly>("arg22");
+                    var arg23 = ctx.GetArgument<TimeOnly>("arg23");
+#endif
 
                     SuppressNoUsageWarning(arg01);
                     SuppressNoUsageWarning(arg02);
@@ -168,6 +185,10 @@ namespace GraphQL.Benchmarks
                     SuppressNoUsageWarning(arg19);
                     SuppressNoUsageWarning(arg20);
                     SuppressNoUsageWarning(arg21);
+#if NET6_0_OR_GREATER
+                    SuppressNoUsageWarning(arg22);
+                    SuppressNoUsageWarning(arg23);
+#endif
 
                     return "";
                 });

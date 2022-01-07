@@ -180,11 +180,92 @@ This is done within your database queries; it is not a function of the dataloade
 `CollectionBatchDataLoader` as you would for a one-to-many relationship; then when you are loading
 data from your database within the fetch delegate, use an inner join to retrieve the proper data.
 
+### How to authenticate subscriptions?
+
+> Note. This question has more to do with the transport layer, not GraphQL.NET itself.
+
+GraphQL subscriptions usually work over WebSockets at the transport level. If the subscription is over
+WebSockets, then the handshake is still over HTTP(HTTPS) and handshake does not allow authorization headers.
+You should instead use [GQL_CONNECTION_INIT](https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md#gql_connection_init)
+message to send additional data to the server. If you are using [server project](https://github.com/graphql-dotnet/server)
+then you can write your `IOperationMessageListener` and add the listener as a transient service:
+
+```csharp
+public class AuthListener : IOperationMessageListener
+{
+    private readonly IHttpContextAccessor _accessor;
+
+    public AuthListener(IHttpContextAccessor accessor)
+    {
+        _accessor = accessor;
+    }
+
+    public Task BeforeHandleAsync(MessageHandlingContext context)
+    {
+        if (context.Message.Type == MessageType.GQL_CONNECTION_INIT)
+        {
+            // Extract the auth header and validate it.
+            // Then get the user and store it in the HttpContext (or something).
+            dynamic payload = context.Message.Payload;
+            string auth = payload["Authorization"];
+            _accessor.HttpContext.User = new ...
+        }
+        return Task.FromResult(true);
+    }
+
+    public Task HandleAsync(MessageHandlingContext context) => Task.CompletedTask;
+
+    public Task AfterHandleAsync(MessageHandlingContext context) => Task.CompletedTask;
+}
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddHttpContextAccessor();
+    services.AddTransient<IOperationMessageListener, AuthListener>();
+}
+```
+
+`GQL_CONNECTION_INIT` message looks like this:
+```json
+{
+  "type": "connection_init",
+  "payload": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI..."
+  }
+}
+```
+
+### Why does my saved `IResolveFieldContext` instance "change" after the field resolver executes?
+
+The `IResolveFieldContext` instance passed to field resolvers is re-used at the completion of the resolver. Be sure not to
+use this instance once the resolver finishes executing. To preserve a copy of the context, call `.Copy()` on the context
+to create a copy that is not re-used. Note that it is safe to use the field context within asynchronous field resolvers and
+data loaders. Once the asynchronous field resolver or data loader returns its final result, the context may be re-used.
+Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
+so it is safe to preserve these instances without calling `.Copy()`.
+
 ## Known Issues
+
+### IResolveFieldContext.HasArgument issue
 
 `IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.
 It cannot identify which arguments have been provided a `null` value compared to arguments which were not provided.
 This issue should supposedly be resolved in version 4.
+
+### Serialization of decimals does not respect precision
+
+This one is `Newtonsoft.Json` specific issue. For more information see:
+- https://github.com/JamesNK/Newtonsoft.Json/issues/1726
+- https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
+
+As a workaround you may add `FixPrecisionConverter`:
+
+```csharp
+new NewtonsoftJson.DocumentWriter(settings =>
+{
+    settings.Converters.Add(new NewtonsoftJson.FixPrecisionConverter(true, true, true));
+})
+```
 
 ## Common Errors
 
@@ -223,14 +304,14 @@ schema, it is not possible to register the graph types as scoped services while 
 the schema as a singleton. Instead, you will need to pull your scoped services from within
 the field resolver via the `IResolveFieldContext.RequestServices` property. Detailed
 information on this technique, its configuration requirements, and alternatives are outlined
-in the [Dependency Injection](../getting-started/dependency-injection) documentation.
+in the [Dependency Injection](../getting-started/dependency-injection.md) documentation.
 
 It is also possible to register the schema and all its graph types as scoped services.
 This is not recommended due to the overhead of building the schema for each request.
 
 Note that concurrency issues typically arise when using scoped services with a parallel
 execution strategy. Please read the section on this in the
-[documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
+[documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
 
 ### Entity Framework concurrency issues
 
@@ -251,7 +332,7 @@ to this request, is shared between all field resolvers within this request.
 
 The easiest option is to change the execution strategy to `SerialExecutionStrategy`. Although
 this would solve concurrency issues in this case, there may be an objectionable performance
-degredation, since only a single field resolver can execute at a time.
+degradation, since only a single field resolver can execute at a time.
 
 A second option would be to change the database context lifetime to 'transient'. This means
 that each time the database context was requested, it would receive a different copy, solving
@@ -262,4 +343,6 @@ passed from another service. Therefore, the database context must remain scoped.
 
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
-[dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
+[dependency injection documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
+
+Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/issues/1310) with related issues.

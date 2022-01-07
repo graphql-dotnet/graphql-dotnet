@@ -8,14 +8,11 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Document : AbstractNode
     {
-        private readonly List<IDefinition> _definitions;
-
         /// <summary>
         /// Initializes a new instance with no children.
         /// </summary>
         public Document()
         {
-            _definitions = new List<IDefinition>();
             Operations = new Operations();
             Fragments = new Fragments();
         }
@@ -23,10 +20,42 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets or sets the query before being parsed into an AST document.
         /// </summary>
-        public string OriginalQuery { get; set; }
+        public string? OriginalQuery { get; set; }
 
         /// <inheritdoc/>
-        public override IEnumerable<INode> Children => _definitions;
+        public override IEnumerable<INode> Children
+        {
+            get
+            {
+                if (Operations.List != null)
+                {
+                    foreach (var o in Operations.List)
+                        yield return o;
+                }
+
+                if (Fragments.List != null)
+                {
+                    foreach (var f in Fragments.List)
+                        yield return f;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            if (Operations.List != null)
+            {
+                foreach (var definition in Operations.List)
+                    action(definition, state);
+            }
+
+            if (Fragments.List != null)
+            {
+                foreach (var definition in Fragments.List)
+                    action(definition, state);
+            }
+        }
 
         /// <summary>
         /// Returns a list of operation nodes for this document.
@@ -43,8 +72,6 @@ namespace GraphQL.Language.AST
         /// </summary>
         public void AddDefinition(IDefinition definition)
         {
-            _definitions.Add(definition ?? throw new ArgumentNullException(nameof(definition)));
-
             if (definition is FragmentDefinition fragmentDefinition)
             {
                 Fragments.Add(fragmentDefinition);
@@ -60,19 +87,6 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"Document{{definitions={string.Join(", ", _definitions)}}}";
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            if (node is null)
-                return false;
-            if (ReferenceEquals(this, node))
-                return true;
-            if (node.GetType() != GetType())
-                return false;
-
-            return true;
-        }
+        public override string ToString() => $"Document{{definitions={string.Join(", ", Children)}}}";
     }
 }

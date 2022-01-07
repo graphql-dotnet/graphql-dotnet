@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -20,15 +21,15 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void serializes_int_to_string()
+        public void serializes_int_to_string_throws()
         {
-            _type.Serialize(1).ShouldBe("1");
+            Should.Throw<InvalidOperationException>(() => _type.Serialize(1));
         }
 
         [Fact]
-        public void serializes_long_to_string()
+        public void serializes_long_to_string_throws()
         {
-            _type.Serialize(long.MaxValue).ShouldBe($"{long.MaxValue}");
+            Should.Throw<InvalidOperationException>(() => _type.Serialize(long.MaxValue));
         }
 
         [Fact]

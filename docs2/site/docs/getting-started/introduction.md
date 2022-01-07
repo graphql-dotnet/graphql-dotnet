@@ -1,12 +1,16 @@
 # Introduction
 
-[GraphQL.org](http://graphql.org/learn) is the best place to get started learning GraphQL.  Here is an excerpt from the introduction:
+[GraphQL.org](http://graphql.org/learn) is the best place to get started learning GraphQL.
+Here is an excerpt from the introduction:
 
-> GraphQL is a query language for your API, and a server-side runtime for executing queries by using a type system you define for your data. GraphQL isn't tied to any specific database or storage engine and is instead backed by your existing code and data.
+> GraphQL is a query language for your API, and a server-side runtime for executing queries
+> by using a type system you define for your data. GraphQL isn't tied to any specific database
+> or storage engine and is instead backed by your existing code and data.
 
-> A GraphQL service is created by defining types and fields on those types, then providing functions for each field on each type.
+> A GraphQL service is created by defining types and fields on those types, then providing
+> functions for each field on each type.
 
-Here is a "Hello World" example for GraphQL .NET using the System.Text.Json serialization engine.
+Here is a "Hello World" example for GraphQL.NET using the System.Text.Json serialization engine.
 
 ```csharp
 using System;
@@ -45,7 +49,10 @@ Output
 }
 ```
 
-There are two ways you can build your schema.  One is with a Schema first approach using the [GraphQL schema language](https://graphql.org/learn/schema/#type-language).  The other is a `GraphType` or Code first approach by writing `GraphType` classes.  The basics of both are demonstrated using the following schema definition.
+There are two ways you can build your schema.  One is with a Schema first approach using
+the [GraphQL schema language](https://graphql.org/learn/schema/#type-language). The other
+is a `GraphType` or Code first approach by writing `GraphType` classes. The basics of
+both are demonstrated using the following schema definition.
 
 > `!` signifies a field is non-nullable.
 
@@ -62,7 +69,9 @@ type Query {
 
 ## Schema First Approach
 
-The Schema first approach relies upon the [GraphQL schema language](https://graphql.org/learn/schema/#type-language), coding conventions, and tries to provide a minimal amount of syntax.  It is the easiest to get started though it does not currently support some advanced scenarios.
+The Schema first approach relies upon the [GraphQL schema language](https://graphql.org/learn/schema/#type-language),
+coding conventions, and tries to provide a minimal amount of syntax.  It is the easiest to get started though
+it does not currently support some advanced scenarios.
 
 > Use the optional `GraphQLMetadata` attribute to customize the mapping to the schema type.
 
@@ -115,13 +124,16 @@ Output
 
 ## GraphType First Approach
 
-The `GraphType` first approach can be more verbose, but gives you access to all of the provided properties of your `GraphType`'s and `Schema`.  You are required to use inheritance to leverage that functionality.
+The `GraphType` first approach can be more verbose, but gives you access to all of the
+provided properties of your `GraphType`'s and `Schema`. You are required to use
+inheritance to leverage that functionality.
 
 ```csharp
 using System;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+using GraphQL.SystemTextJson;
 
 public class Droid
 {
@@ -250,7 +262,8 @@ public class Program
 }
 ```
 
-Output
+Output:
+
 ```json
 {
   "data": {

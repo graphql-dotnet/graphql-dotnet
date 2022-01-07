@@ -9,54 +9,65 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
-        private List<Argument> _arguments;
+        private List<Argument>? _arguments;
         // for internal use only, do not modify this instance
         internal static readonly Arguments Empty = new Arguments();
 
+        internal Arguments(int capacity)
+        {
+            _arguments = new List<Argument>(capacity);
+        }
+
+        /// <summary>
+        /// Gets the count of argument nodes.
+        /// </summary>
+        public int Count => _arguments?.Count ?? 0;
+
+        /// <summary>
+        /// Creates an instance of a list of argument nodes.
+        /// </summary>
+        public Arguments()
+        {
+        }
+
         /// <inheritdoc/>
-        public override IEnumerable<INode> Children => _arguments;
+        public override IEnumerable<INode>? Children => _arguments;
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            if (_arguments != null)
+            {
+                foreach (var arg in _arguments)
+                    action(arg, state);
+            }
+        }
 
         /// <summary>
         /// Adds an argument node to the list.
         /// </summary>
-        public void Add(Argument arg)
-        {
-            if (arg == null)
-                throw new ArgumentNullException(nameof(arg));
-
-            if (_arguments == null)
-                _arguments = new List<Argument>();
-
-            _arguments.Add(arg);
-        }
+        public void Add(Argument arg) => (_arguments ??= new List<Argument>()).Add(arg ?? throw new ArgumentNullException(nameof(arg)));
 
         /// <summary>
         /// Returns the value of an argument node, searching the list of argument nodes by the name of the argument.
         /// </summary>
-        public IValue ValueFor(string name)
+        public IValue? ValueFor(string name)
         {
-            if (_arguments == null)
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _arguments)
-                if (x.Name == name)
-                    return x.Value;
+            if (_arguments != null)
+            {
+                foreach (var x in _arguments)
+                {
+                    if (x.Name == name)
+                        return x.Value;
+                }
+            }
 
             return null;
         }
 
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
-
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        public IEnumerator<Argument> GetEnumerator()
-        {
-            if (_arguments == null)
-                return System.Linq.Enumerable.Empty<Argument>().GetEnumerator();
-
-            return _arguments.GetEnumerator();
-        }
+        public IEnumerator<Argument> GetEnumerator() => (_arguments ?? System.Linq.Enumerable.Empty<Argument>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

@@ -10,7 +10,8 @@ namespace GraphQL.Introspection
         /// <summary>
         /// Initializes a new instance of the <c>__EnumValue</c> introspection type.
         /// </summary>
-        public __EnumValue()
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        public __EnumValue(bool allowAppliedDirectives = false)
         {
             Name = nameof(__EnumValue);
             Description =
@@ -18,11 +19,14 @@ namespace GraphQL.Introspection
                 "a placeholder for a string or numeric value. However an Enum value is " +
                 "returned in a JSON response as a string.";
 
-            Field(f => f.Name).Description(null);
-            Field(f => f.Description, nullable: true).Description(null);
+            Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source!.Name);
+            Field<StringGraphType>("description", resolve: context => context.Source!.Description);
 
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
-            Field(f => f.DeprecationReason, nullable: true).Description(null);
+            Field<StringGraphType>("deprecationReason", resolve: context => context.Source!.DeprecationReason);
+
+            if (allowAppliedDirectives)
+                this.AddAppliedDirectivesField("enum value");
         }
     }
 }

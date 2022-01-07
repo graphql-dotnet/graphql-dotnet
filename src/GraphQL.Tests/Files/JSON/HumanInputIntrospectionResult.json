@@ -1,0 +1,13 @@
+{
+  "__type": {
+    "fields": null,
+    "inputFields": [
+      {
+        "name": "name"
+      },
+      {
+        "name": "homePlanet"
+      }
+    ]
+  }
+}

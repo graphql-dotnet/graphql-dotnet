@@ -13,11 +13,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownFragmentNamesError(ValidationContext context, FragmentSpread node, string fragmentName)
-            : base(context.OriginalQuery, NUMBER, UnknownFragmentMessage(fragmentName), node)
+            : base(context.Document.OriginalQuery!, NUMBER, UnknownFragmentMessage(fragmentName), node)
         {
         }
 
         internal static string UnknownFragmentMessage(string fragName)
-            => $"Unknown fragment \"{fragName}\".";
+            => $"Unknown fragment '{fragName}'.";
     }
 }

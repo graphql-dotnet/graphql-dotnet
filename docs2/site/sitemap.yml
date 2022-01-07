@@ -1,4 +1,4 @@
-- title: GraphQL .NET
+- title: GraphQL.NET
   dir: ./
   url: /
   file: pages/landing.js
@@ -68,9 +68,13 @@
             file: authorization.md
           - title: Relay
             file: relay.md
+          - title: Global Switches
+            file: global-switches.md
       - title: Guides
         dir: guides
         items:
+          - title: Serialization
+            file: serialization.md
           - title: Dataloader
             file: dataloader.md
           - title: Schema Generation
@@ -79,9 +83,13 @@
             file: known-issues.md
           - title: Links
             file: links.md
+          - title: Document Caching
+            file: document-caching.md
       - title: Migration Guides
         dir: migrations
         items:
+          - title: Migration Guide [v3 -> v4]
+            file: migration4.md
           - title: Migration Guide [v2 -> v3]
             file: migration3.md
           - title: Migration Guide [v0.17.x -> v2]

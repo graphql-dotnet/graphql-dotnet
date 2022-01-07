@@ -13,6 +13,11 @@ namespace GraphQL.Execution
     public interface IExecutionContext : IProvideUserContext
     {
         /// <summary>
+        /// Execution strategy for the currently executing document.
+        /// </summary>
+        IExecutionStrategy ExecutionStrategy { get; }
+
+        /// <summary>
         /// Propagates notification that the GraphQL request should be canceled
         /// </summary>
         CancellationToken CancellationToken { get; }
@@ -26,11 +31,6 @@ namespace GraphQL.Execution
         /// A list of errors generated during GraphQL request processing
         /// </summary>
         ExecutionErrors Errors { get; }
-
-        /// <summary>
-        /// A list of <see cref="FragmentDefinition"/>s that pertain to the GraphQL request
-        /// </summary>
-        Fragments Fragments { get; }
 
         /// <summary>
         /// A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query
@@ -55,7 +55,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers
         /// </summary>
-        object RootValue { get; }
+        object? RootValue { get; }
 
         /// <summary>
         /// Schema of the graph to use
@@ -83,12 +83,12 @@ namespace GraphQL.Execution
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents.
         /// </summary>
-        Dictionary<string, object> Extensions { get; }
+        Dictionary<string, object?> Extensions { get; }
 
         /// <summary>
         /// The service provider for the executing request. Typically this is a scoped service provider
         /// from your dependency injection framework.
         /// </summary>
-        IServiceProvider RequestServices { get; }
+        IServiceProvider? RequestServices { get; }
     }
 }

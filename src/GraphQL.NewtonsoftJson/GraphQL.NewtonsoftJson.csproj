@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
+    <Compile Include="..\GraphQL\Shim\DecimalData.cs" Link="DecimalData.cs" />
   </ItemGroup>
 
   <ItemGroup>

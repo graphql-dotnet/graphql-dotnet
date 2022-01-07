@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GraphQL.Tests.Introspection;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -42,7 +41,7 @@ namespace GraphQL.Tests.Bugs
 
         private void VerifyIntrospection(ISchema schema)
         {
-            var result = ExecuteQuery(schema, SchemaIntrospection.IntrospectionQuery);
+            var result = ExecuteQuery(schema, "IntrospectionQuery".ReadGraphQLRequest());
             result.ShouldNotBeNull();
             result.Data.ShouldNotBeNull();
             result.Errors.ShouldBeNull();
@@ -138,7 +137,9 @@ namespace GraphQL.Tests.Bugs
 
         private static string DeriveGraphQlName(string name)
         {
-            return $"{char.ToUpperInvariant(name[0])}{name[1..]}";
+#pragma warning disable IDE0057 // Substring can be simplified
+            return $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
+#pragma warning restore IDE0057 // Substring can be simplified
         }
 
         private static string DeriveEnumValueName(string name)

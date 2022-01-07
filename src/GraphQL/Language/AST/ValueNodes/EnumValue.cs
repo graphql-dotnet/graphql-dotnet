@@ -1,4 +1,4 @@
-using System;
+using GraphQL.Utilities;
 
 namespace GraphQL.Language.AST
 {
@@ -12,7 +12,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public EnumValue(NameNode name)
         {
-            Name = name.Name;
+            NameValidator.ValidateDefault(name.Name, NamedElement.EnumValue);
             NameNode = name;
         }
 
@@ -20,8 +20,8 @@ namespace GraphQL.Language.AST
         /// Initializes a new instance with a specified string representation of the enumeration value.
         /// </summary>
         public EnumValue(string name)
+            : this(new NameNode(name))
         {
-            Name = name;
         }
 
         object IValue.Value => Name;
@@ -29,7 +29,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the string representation of the enumeration value.
         /// </summary>
-        public string Name { get; }
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the string representation of the enumeration value.
@@ -38,23 +38,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"EnumValue{{name={Name}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by comparing the string representation of the enumeration value.
-        /// </summary>
-        protected bool Equals(EnumValue other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-
-            return Equals((EnumValue)obj);
-        }
     }
 }

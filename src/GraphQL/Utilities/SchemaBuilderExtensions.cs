@@ -7,8 +7,8 @@ namespace GraphQL.Utilities
 {
     internal static class SchemaBuilderExtensions
     {
-        private const string AST_METAFIELD = "__AST_MetaField__";
-        private const string EXTENSION_AST_METAFIELD = "__EXTENSION_AST_MetaField__";
+        private const string AST_METAFIELD = "__AST_MetaField__"; // TODO: possible remove
+        private const string EXTENSION_AST_METAFIELD = "__EXTENSION_AST_MetaField__"; // TODO: possible remove
 
         public static bool IsExtensionType(this IProvideMetadata type)
         {
@@ -26,14 +26,34 @@ namespace GraphQL.Utilities
             };
         }
 
-        public static T GetAstType<T>(this IProvideMetadata type) where T : class
+        public static T? GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
         {
             return type.GetMetadata<T>(AST_METAFIELD);
         }
 
-        public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node)
+        public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node) // TODO: possible remove
             where TMetadataProvider : IProvideMetadata
-            => provider.WithMetadata(AST_METAFIELD, node);
+
+        {
+            provider.WithMetadata(AST_METAFIELD, node); //TODO: remove?
+
+            if (node is IHasDirectivesNode ast && ast.Directives?.Count > 0)
+            {
+                foreach (var directive in ast.Directives!)
+                {
+                    provider.ApplyDirective((string)directive!.Name!.Value, d =>
+                    {
+                        if (directive.Arguments?.Count > 0)
+                        {
+                            foreach (var arg in directive.Arguments)
+                                d.AddArgument(new DirectiveArgument((string)arg.Name!.Value) { Value = arg.Value!.ToValue() });
+                        }
+                    });
+                }
+            }
+
+            return provider;
+        }
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
@@ -49,7 +69,7 @@ namespace GraphQL.Utilities
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>());
+            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>())!;
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode

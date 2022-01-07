@@ -7,12 +7,12 @@ namespace GraphQL.Reflection
     internal static class ReflectionHelper
     {
         /// <summary>
-        /// Creates an Accessor for the indicated GraphQL field
+        /// Creates an <see cref="IAccessor"/> for the indicated GraphQL field
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
         /// <param name="resolverType">defaults to Resolver</param>
-        public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
+        public static IAccessor? ToAccessor(this Type? type, string field, ResolverType resolverType)
         {
             if (type == null)
                 return null;
@@ -51,7 +51,7 @@ namespace GraphQL.Reflection
             {
                 var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
                 var name = attr?.Name ?? m.Name;
-                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase) && resolverType == (attr?.Type ?? ResolverType.Resolver);
+                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase) && resolverType == (attr?.ResolverType ?? ResolverType.Resolver);
             });
 
             return method;
@@ -76,12 +76,12 @@ namespace GraphQL.Reflection
             return property;
         }
 
-        public static object[] BuildArguments(ParameterInfo[] parameters, IResolveFieldContext context)
+        public static object?[]? BuildArguments(ParameterInfo[]? parameters, IResolveFieldContext context)
         {
             if (parameters == null || parameters.Length == 0)
                 return null;
 
-            object[] arguments = new object[parameters.Length];
+            object?[] arguments = new object?[parameters.Length];
 
             var index = 0;
             if (parameters[index].ParameterType.IsAssignableFrom(context.GetType()))

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -9,14 +10,27 @@ namespace GraphQL
 {
     internal sealed class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
-        private readonly IResolveFieldContext _baseContext;
-        private static readonly bool _acceptNulls = !typeof(T).IsValueType || (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>));
+        private IResolveFieldContext _baseContext;
+        private static readonly bool _acceptNulls = !typeof(T).IsValueType || typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>);
 
         /// <summary>
         /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        {
+            Set(baseContext);
+        }
+
+        internal void Reset()
+        {
+            _baseContext = null!;
+            Source = default!;
+        }
+
+        internal ResolveFieldContextAdapter<T> Set(IResolveFieldContext baseContext)
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
 
@@ -28,38 +42,36 @@ namespace GraphQL
             {
                 try
                 {
-                    Source = (T)baseContext.Source;
+                    Source = (T)baseContext.Source!;
                 }
                 catch (InvalidCastException)
                 {
                     throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
                 }
             }
+
+            return this;
         }
 
-        public T Source { get; }
+        public T Source { get; private set; }
 
-        public string FieldName => _baseContext.FieldName;
-
-        public Language.AST.Field FieldAst => _baseContext.FieldAst;
+        public Field FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
 
-        public IGraphType ReturnType => _baseContext.ReturnType;
-
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IDictionary<string, object> Arguments => _baseContext.Arguments;
+        public IResolveFieldContext? Parent => _baseContext.Parent;
 
-        public object RootValue => _baseContext.RootValue;
+        public IDictionary<string, ArgumentValue>? Arguments => _baseContext.Arguments;
+
+        public object? RootValue => _baseContext.RootValue;
 
         public ISchema Schema => _baseContext.Schema;
 
         public Document Document => _baseContext.Document;
 
         public Operation Operation => _baseContext.Operation;
-
-        public Fragments Fragments => _baseContext.Fragments;
 
         public Variables Variables => _baseContext.Variables;
 
@@ -73,14 +85,17 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
+        public Dictionary<string, Field>? SubFields => _baseContext.SubFields;
 
-        public IDictionary<string, object> UserContext => _baseContext.UserContext;
+        public IDictionary<string, object?> UserContext => _baseContext.UserContext;
 
-        public IDictionary<string, object> Extensions => _baseContext.Extensions;
+        public IDictionary<string, object?> Extensions => _baseContext.Extensions;
 
-        object IResolveFieldContext.Source => Source;
+        object? IResolveFieldContext.Source => Source;
 
-        public IServiceProvider RequestServices => _baseContext.RequestServices;
+        public IServiceProvider? RequestServices => _baseContext.RequestServices;
+
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }

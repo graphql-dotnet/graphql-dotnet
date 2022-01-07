@@ -1,7 +1,7 @@
 # How do I use XYZ ORM/database with GraphQL.NET?
 
-This library will work with any data source that you provide.  Here are a few resources for specific data sources.
-
+The first thing you need to know is that GraphQL itself is not in any way a database access language.
+This library will work with any data source that you provide. Here are a few resources for specific data sources.
 
 ## Entity Framework
 * [Entity Framework Blog Series](https://fiyazhasan.me/tag/graphql/) by [Fiyaz Hasan](https://github.com/fiyazbinhasan)

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -25,12 +24,10 @@ namespace GraphQL.Types
     /// Represents an argument to a field or directive.
     /// </summary>
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class QueryArgument : MetadataProvider, IHaveDefaultValue
+    public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription
     {
-        private Type _type;
-        private IGraphType _resolvedType;
-        private object _defaultValue;
-        private IValue _defaultValueAST;
+        private Type? _type;
+        private IGraphType? _resolvedType;
 
         /// <summary>
         /// Initializes a new instance of the argument.
@@ -55,18 +52,18 @@ namespace GraphQL.Types
             Type = type;
         }
 
-        private string _name;
+        private string? _name;
         /// <summary>
         /// Gets or sets the name of the argument.
         /// </summary>
         public string Name
         {
-            get => _name;
+            get => _name!;
             set
             {
                 if (_name != value)
                 {
-                    NameValidator.ValidateName(value, "argument");
+                    NameValidator.ValidateName(value, NamedElement.Argument);
                     _name = value;
                 }
             }
@@ -75,39 +72,30 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the description of the argument.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the default value of the argument.
         /// </summary>
-        public object DefaultValue
-        {
-            get => _defaultValue;
-            set
-            {
-                if (!(ResolvedType?.GetNamedType() is GraphQLTypeReference))
-                    _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
+        public object? DefaultValue { get; set; }
 
-                _defaultValue = value;
-                _defaultValueAST = null;
-            }
-        }
-
-        /// <inheritdoc/>
-        public IGraphType ResolvedType
+        /// <summary>
+        /// Returns the graph type of this argument.
+        /// </summary>
+        public IGraphType? ResolvedType
         {
             get => _resolvedType;
             set => _resolvedType = CheckResolvedType(value);
         }
 
         /// <inheritdoc/>
-        public Type Type
+        public Type? Type
         {
             get => _type;
-            private set => _type = CheckType(value);
+            internal set => _type = CheckType(value);
         }
 
-        private Type CheckType(Type type)
+        private Type? CheckType(Type? type)
         {
             if (type?.IsInputType() == false)
                 throw Create(nameof(Type), type);
@@ -115,9 +103,9 @@ namespace GraphQL.Types
             return type;
         }
 
-        private IGraphType CheckResolvedType(IGraphType type)
+        private IGraphType? CheckResolvedType(IGraphType? type)
         {
-            if (!(type.GetNamedType() is GraphQLTypeReference) && type?.IsInputType() == false)
+            if (type != null && !type.IsGraphQLTypeReference() && !type.IsInputType())
                 throw Create(nameof(ResolvedType), type.GetType());
 
             return type;
@@ -125,13 +113,5 @@ namespace GraphQL.Types
 
         private ArgumentOutOfRangeException Create(string paramName, Type value) => new ArgumentOutOfRangeException(paramName,
             $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
-
-        internal IValue GetDefaultValueAST(ISchema schema)
-        {
-            if (_defaultValueAST == null && _defaultValue != null)
-                _defaultValueAST = _defaultValue.AstFromValue(schema, ResolvedType);
-
-            return _defaultValueAST;
-        }
     }
 }

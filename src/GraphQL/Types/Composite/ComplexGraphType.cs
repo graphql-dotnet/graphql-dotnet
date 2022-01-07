@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Builders;
@@ -19,7 +17,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of the fields configured for this graph type.
         /// </summary>
-        IEnumerable<FieldType> Fields { get; }
+        TypeFields Fields { get; }
 
         /// <summary>
         /// Adds a field to this graph type.
@@ -35,7 +33,7 @@ namespace GraphQL.Types
         /// Returns the <see cref="FieldType"/> for the field matching the specified name that
         /// is configured for this graph type, or <see langword="null"/> if none is found.
         /// </summary>
-        FieldType GetField(string name);
+        FieldType? GetField(string name);
     }
 
     /// <summary>
@@ -44,7 +42,6 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
-        private readonly List<FieldType> _fields = new List<FieldType>();
 
         /// <inheritdoc/>
         protected ComplexGraphType()
@@ -54,7 +51,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FieldType> Fields => _fields;
+        public TypeFields Fields { get; } = new TypeFields();
 
         /// <inheritdoc/>
         public bool HasField(string name)
@@ -62,19 +59,28 @@ namespace GraphQL.Types
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var field in Fields.List)
+            {
+                if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>
-        public FieldType GetField(string name)
+        public FieldType? GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _fields)
-                if (string.Equals(x.Name, name, StringComparison.Ordinal))
-                    return x;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                foreach (var field in Fields.List)
+                {
+                    if (string.Equals(field.Name, name, StringComparison.Ordinal))
+                        return field;
+                }
+            }
 
             return null;
         }
@@ -85,19 +91,19 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
-            NameValidator.ValidateNameNotNull(fieldType.Name);
+            NameValidator.ValidateNameNotNull(fieldType.Name, NamedElement.Field);
 
-            if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
+            if (!fieldType.ResolvedType.IsGraphQLTypeReference())
             {
                 if (this is IInputObjectGraphType)
                 {
-                    if (fieldType.ResolvedType?.IsInputType() == false || fieldType.Type?.IsInputType() == false)
+                    if (fieldType.ResolvedType != null ? fieldType.ResolvedType.IsInputType() == false : fieldType.Type?.IsInputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
                             $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field '{fieldType.Name}' has an output type.");
                 }
                 else
                 {
-                    if (fieldType.ResolvedType?.IsOutputType() == false || fieldType.Type?.IsOutputType() == false)
+                    if (fieldType.ResolvedType != null ? fieldType.ResolvedType.IsOutputType() == false : fieldType.Type?.IsOutputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
                             $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType. Field '{fieldType.Name}' has an input type.");
                 }
@@ -123,7 +129,7 @@ namespace GraphQL.Types
                 }
             }
 
-            _fields.Add(fieldType);
+            Fields.Add(fieldType);
 
             return fieldType;
         }
@@ -141,10 +147,10 @@ namespace GraphQL.Types
         public FieldType Field(
             Type type,
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            string? deprecationReason = null)
         {
             return AddField(new FieldType
             {
@@ -171,10 +177,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType Field<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -202,10 +208,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldDelegate<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Delegate resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Delegate? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -234,10 +240,10 @@ namespace GraphQL.Types
         public FieldType FieldAsync(
             Type type,
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
+            string? deprecationReason = null)
         {
             return AddField(new FieldType
             {
@@ -264,10 +270,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -296,10 +302,10 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType, TReturnType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>>? resolve = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new FieldType
@@ -317,11 +323,11 @@ namespace GraphQL.Types
 
         public FieldType FieldSubscribe<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<IResolveEventStreamContext, IObservable<object>> subscribe = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveEventStreamContext, IObservable<object?>>? subscribe = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new EventStreamFieldType
@@ -342,11 +348,11 @@ namespace GraphQL.Types
 
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<IResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
-            string deprecationReason = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveEventStreamContext, Task<IObservable<object?>>>? subscribeAsync = null,
+            string? deprecationReason = null)
             where TGraphType : IGraphType
         {
             return AddField(new EventStreamFieldType
@@ -368,10 +374,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
-        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
+            where TGraphType : IGraphType
         {
             var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
                 .Name(name);
@@ -382,34 +389,36 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
-        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+            where TGraphType : IGraphType
+            => Field<TGraphType, object>();
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="name">The name of this field.</param>
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
            bool nullable = false,
-           Type type = null)
+           Type? type = null)
         {
             try
             {
                 if (type == null)
-                    type = typeof(TProperty).GetGraphTypeFromType(nullable);
+                    type = typeof(TProperty).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
             }
             catch (ArgumentOutOfRangeException exp)
             {
-                throw new ArgumentException(
-                    $"The GraphQL type for Field: '{name}' on parent type: '{Name ?? GetType().Name}' could not be derived implicitly. \n",
-                    exp
-                 );
+                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'.", exp);
             }
 
             var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
@@ -431,15 +440,18 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
         /// The default name of this field is inferred by the property represented within the expression.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
-            Type type = null)
+            Type? type = null)
         {
             string name;
             try
@@ -449,7 +461,7 @@ namespace GraphQL.Types
             catch
             {
                 throw new ArgumentException(
-                    $"Cannot infer a Field name from the expression: '{expression.Body.ToString()}' " +
+                    $"Cannot infer a Field name from the expression: '{expression.Body}' " +
                     $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
             }
             return Field(name, expression, nullable, type);

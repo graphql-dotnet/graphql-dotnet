@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Prints a string representation of the specified AST document or node.
+    /// </summary>
     public static class AstPrinter
     {
         // new-ing AstPrintVisitor every time we called AstPrinter
@@ -17,6 +21,9 @@ namespace GraphQL.Utilities
         // so we cache one copy of it here - it's not changed ever anyway
         private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
+        /// <summary>
+        /// Returns a string representation of the specified node.
+        /// </summary>
         public static string Print(INode node)
         {
             var result = _visitor.Visit(node);
@@ -24,61 +31,70 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintConfig
+    internal abstract class AstPrintConfig
     {
         internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
         public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
-        public Func<INode, bool> Matches { get; set; }
-        public Func<IDictionary<string, object>, object> PrintAst { get; set; }
+        public Func<INode, bool> Matches { get; }
+        public Func<IDictionary<string, object?>, object>? PrintAst { get; set; }
+
+        public AstPrintConfig(Func<INode, bool> matches)
+        {
+            Matches = matches;
+        }
 
         public void Field(AstPrintFieldDefinition field)
         {
             if (FieldsList.Exists(x => x.Name == field.Name))
             {
-                throw new ArgumentException($"A field with name \"{field.Name}\" already exists!", nameof(field));
+                throw new ArgumentException($"A field with name '{field.Name}' already exists!", nameof(field));
             }
 
             FieldsList.Add(field);
         }
     }
 
-    public class PrintFormat<T>
+    internal class PrintFormat<T>
     {
-        private readonly IDictionary<string, object> _args;
+        private readonly IDictionary<string, object?> _args;
 
-        public PrintFormat(IDictionary<string, object> args)
+        public PrintFormat(IDictionary<string, object?> args)
         {
             _args = args;
         }
 
-        public object Arg(string key)
+        public object? Arg(string key)
         {
             _args.TryGetValue(key, out var arg);
             return arg;
         }
 
-        public TVal Arg<TVal>(string key)
+        public TVal? Arg<TVal>(string key)
         {
-            return (TVal)Arg(key);
+            return (TVal?)Arg(key);
         }
 
-        public object Arg<TProperty>(Expression<Func<T, TProperty>> argument)
+        public object? Arg<TProperty>(Expression<Func<T, TProperty>> argument)
         {
             var name = argument.NameOf();
             return Arg(name);
         }
 
-        public IEnumerable<object> ArgArray<TProperty>(Expression<Func<T, TProperty>> argument)
+        public IEnumerable<object?>? ArgArray<TProperty>(Expression<Func<T, TProperty>> argument)
         {
             var name = argument.NameOf();
-            return Arg<IEnumerable<object>>(name);
+            return Arg<IEnumerable<object?>>(name);
         }
     }
 
-    public class AstPrintConfig<T> : AstPrintConfig
+    internal class AstPrintConfig<T> : AstPrintConfig
         where T : INode
     {
-        public void Field<TProperty>(Expression<Func<T, TProperty>> resolve)
+        public AstPrintConfig(Func<INode, bool> matches) : base(matches)
+        {
+        }
+
+        public void Field<TProperty>(Expression<Func<T, TProperty?>> resolve)
         {
             var name = resolve.NameOf();
             var def = new AstPrintFieldDefinition
@@ -100,22 +116,22 @@ namespace GraphQL.Utilities
         }
     }
 
-    public class AstPrintFieldDefinition
+    internal class AstPrintFieldDefinition
     {
-        public string Name { get; set; }
-        public IValueResolver Resolver { get; set; }
+        public string Name { get; set; } = null!;
+        public IValueResolver Resolver { get; set; } = null!;
     }
 
-    public readonly struct ResolveValueContext
+    internal readonly struct ResolveValueContext
     {
-        public ResolveValueContext(object source)
+        public ResolveValueContext(object? source)
         {
             Source = source;
         }
 
-        public object Source { get; }
+        public object? Source { get; }
 
-        public TType SourceAs<TType>()
+        public TType? SourceAs<TType>()
         {
             if (Source != null)
             {
@@ -126,37 +142,37 @@ namespace GraphQL.Utilities
         }
     }
 
-    public interface IValueResolver
+    internal interface IValueResolver
     {
-        object Resolve(in ResolveValueContext context);
+        object? Resolve(in ResolveValueContext context);
     }
 
-    public interface IValueResolver<T> : IValueResolver
+    internal interface IValueResolver<T> : IValueResolver
     {
-        new T Resolve(in ResolveValueContext context);
+        new T? Resolve(in ResolveValueContext context);
     }
 
-    public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
+    internal class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
     {
-        private readonly Func<TObject, TProperty> _property;
+        private readonly Func<TObject, TProperty?> _property;
 
-        public ExpressionValueResolver(Expression<Func<TObject, TProperty>> property)
+        public ExpressionValueResolver(Expression<Func<TObject, TProperty?>> property)
         {
             _property = property.Compile();
         }
 
-        public TProperty Resolve(in ResolveValueContext context)
+        public TProperty? Resolve(in ResolveValueContext context)
         {
-            return _property(context.SourceAs<TObject>());
+            return _property(context.SourceAs<TObject>()!);
         }
 
-        object IValueResolver.Resolve(in ResolveValueContext context)
+        object? IValueResolver.Resolve(in ResolveValueContext context)
         {
             return Resolve(context);
         }
     }
 
-    public class AstPrintVisitor
+    internal class AstPrintVisitor
     {
         private readonly List<AstPrintConfig> _configs = new List<AstPrintConfig>();
 
@@ -185,11 +201,11 @@ namespace GraphQL.Utilities
                 c.Field(x => x.SelectionSet);
                 c.Print(p =>
                 {
-                    var op = p.Arg(x => x.OperationType).ToString().ToLower(CultureInfo.InvariantCulture);
+                    var op = p.Arg(x => x.OperationType)!.ToString().ToLower(CultureInfo.InvariantCulture);
                     var name = p.Arg(x => x.Name)?.ToString();
                     var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
                     var directives = Join(p.ArgArray(x => x.Directives), " ");
-                    var selectionSet = p.Arg(x => x.SelectionSet);
+                    var selectionSet = p.Arg(x => x.SelectionSet)!;
 
                     return string.IsNullOrWhiteSpace(name)
                            && string.IsNullOrWhiteSpace(directives)
@@ -228,7 +244,7 @@ namespace GraphQL.Utilities
             Config<SelectionSet>(c =>
             {
                 c.Field(x => x.SelectionsList);
-                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)));
+                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)!));
             });
 
             Config<Arguments>(c =>
@@ -236,7 +252,7 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Children);
                 c.Print(p =>
                 {
-                    var result = p.Arg(x => x.Children);
+                    var result = p.Arg(x => x.Children)!;
                     return result;
                 });
             });
@@ -284,7 +300,7 @@ namespace GraphQL.Utilities
             Config<IntValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((int)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<NullValue>(c => c.Print(f => "null"));
@@ -292,13 +308,13 @@ namespace GraphQL.Utilities
             Config<LongValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((long)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<BigIntValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => ((BigInteger)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
             });
 
             Config<FloatValue>(c =>
@@ -306,8 +322,14 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
-                    var val = (double)f.Arg(x => x.Value);
-                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                    var val = (double)f.Arg(x => x.Value)!;
+                    if (double.IsInfinity(val))
+                        throw new InvalidOperationException($"Cannot print value: {val}");
+                    // print most compact form of value with up to 15 digits of precision (C# default)
+                    // note: G17 format (17 digits of precision) is necessary to prevent losing any
+                    // information during roundtrip to string. However, "3.33" prints something like
+                    // "3.330000000000001" which probably is not desirable.
+                    return val.ToString("G15", CultureInfo.InvariantCulture);
                 });
             });
 
@@ -316,8 +338,8 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
-                    var val = (decimal)f.Arg(x => x.Value);
-                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                    var val = (decimal)f.Arg(x => x.Value)!;
+                    return val.ToString("G29", CultureInfo.InvariantCulture); //prints most compact form of value without losing any precision
                 });
             });
 
@@ -326,25 +348,51 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
-                    var val = f.Arg(x => x.Value);
-                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
+                    // http://spec.graphql.org/June2018/#sec-String-Value
+                    // TODO: can be changed to stackalloc / string.Create()
+                    var val = (string)f.Arg(x => x.Value)!;
+                    var sb = new System.Text.StringBuilder(val.Length + 2);
+                    sb.Append('"');
+                    foreach (char ch in val)
                     {
-                        val = $"\"{val}\"";
+                        if (ch < ' ')
+                        {
+                            if (ch == '\b')
+                                sb.Append("\\b");
+                            else if (ch == '\f')
+                                sb.Append("\\f");
+                            else if (ch == '\n')
+                                sb.Append("\\n");
+                            else if (ch == '\r')
+                                sb.Append("\\r");
+                            else if (ch == '\t')
+                                sb.Append("\\t");
+                            else
+                                sb.Append("\\u" + ((int)ch).ToString("X4"));
+                        }
+                        else if (ch == '\\')
+                            sb.Append("\\\\");
+                        else if (ch == '"')
+                            sb.Append("\\\"");
+                        else
+                            sb.Append(ch);
                     }
-                    return val;
+                    sb.Append('"');
+                    return sb;
                 });
+
             });
 
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
+                c.Print(f => (bool)f.Arg(x => x.Value)! ? "true" : "false");
             });
 
             Config<EnumValue>(c =>
             {
                 c.Field(x => x.Name);
-                c.Print(p => p.Arg(x => x.Name));
+                c.Print(p => p.Arg(x => x.Name)!);
             });
 
             Config<ListValue>(c =>
@@ -366,11 +414,7 @@ namespace GraphQL.Utilities
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<UriValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
-            });
+            Config<AnyValue>(c => c.Print(x => throw new InvalidOperationException("Cannot print AnyValue representation.")));
 
             // Directive
             Config<Directive>(c =>
@@ -389,7 +433,7 @@ namespace GraphQL.Utilities
             Config<NamedType>(c =>
             {
                 c.Field(x => x.Name);
-                c.Print(p => p.Arg(x => x.Name));
+                c.Print(p => p.Arg(x => x.Name)!);
             });
 
             Config<ListType>(c =>
@@ -410,22 +454,18 @@ namespace GraphQL.Utilities
         public void Config<T>(Action<AstPrintConfig<T>> configure)
             where T : INode
         {
-            var config = new AstPrintConfig<T>
-            {
-                Matches = n => n is T
-            };
+            var config = new AstPrintConfig<T>(n => n is T);
             configure(config);
             _configs.Add(config);
         }
 
-        private string Join(IEnumerable<object> nodes, string separator)
+        private string Join(IEnumerable<object?>? nodes, string separator)
         {
             return nodes != null
                 ? string.Join(
                     separator,
-                    nodes.Where(n => n != null)
-                        .Where(n => !string.IsNullOrWhiteSpace(n.ToString()))
-                        .Select(n => n.ToString()))
+                    nodes.Select(n => n?.ToString())
+                        .Where(s => !string.IsNullOrWhiteSpace(s)))
                 : "";
         }
 
@@ -437,7 +477,7 @@ namespace GraphQL.Utilities
                 : "";
         }
 
-        private string Wrap(string start, object middle, string end)
+        private string Wrap(string start, object? middle, string end)
         {
             var m = middle?.ToString() ?? "";
             return !string.IsNullOrWhiteSpace(m)
@@ -447,23 +487,23 @@ namespace GraphQL.Utilities
 
         private string Indent(string str)
         {
-            return Regex.Replace(str, "\n", "\n  ");
+            return str.Replace("\n", "\n  ");
         }
 
-        public object Visit(INode node)
+        public object? Visit(INode node)
         {
             return ApplyConfig(node);
         }
 
-        public object ApplyConfig(INode node)
+        public object? ApplyConfig(INode node)
         {
             var config = FindFor(node);
 
             if (config != null)
             {
-                var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                var vals = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 
-                config.FieldsList.Apply(f =>
+                foreach (var f in config.FieldsList)
                 {
                     var ctx = new ResolveValueContext(node);
 
@@ -478,20 +518,22 @@ namespace GraphQL.Utilities
                     }
 
                     vals[f.Name] = result;
-                });
+                }
 
-                return config.PrintAst(vals);
+                return config.PrintAst!(vals);
             }
 
             return null;
         }
 
-        private AstPrintConfig FindFor(INode node)
+        private AstPrintConfig? FindFor(INode node)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var c in _configs)
+            {
                 if (c.Matches(node))
                     return c;
+            }
 
             return null;
         }

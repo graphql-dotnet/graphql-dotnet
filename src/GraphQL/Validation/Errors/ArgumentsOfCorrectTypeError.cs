@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Errors
@@ -13,16 +12,16 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ArgumentsOfCorrectTypeError(ValidationContext context, Argument node, IEnumerable<string> verboseErrors)
-            : base(context.OriginalQuery, NUMBER, BadValueMessage(node.Name, context.Print(node.Value), verboseErrors), node)
+        public ArgumentsOfCorrectTypeError(ValidationContext context, Argument node, string verboseErrors)
+            : base(context.Document.OriginalQuery!, NUMBER, BadValueMessage(node.Name, verboseErrors), node)
         {
         }
 
-        internal static string BadValueMessage(string argName, string value, IEnumerable<string> verboseErrors)
+        internal static string BadValueMessage(string argName, string verboseErrors)
         {
-            var message = verboseErrors != null ? $"\n{string.Join("\n", verboseErrors)}" : "";
-
-            return $"Argument \"{argName}\" has invalid value {value}.{message}";
+            return string.IsNullOrEmpty(verboseErrors)
+                ? $"Argument '{argName}' has invalid value."
+                : $"Argument '{argName}' has invalid value. {verboseErrors}";
         }
     }
 }

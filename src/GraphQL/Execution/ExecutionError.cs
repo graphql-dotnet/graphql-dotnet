@@ -13,8 +13,6 @@ namespace GraphQL
     [Serializable]
     public class ExecutionError : Exception
     {
-        private List<ErrorLocation> _errorLocations;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message.
         /// </summary>
@@ -37,7 +35,7 @@ namespace GraphQL
         /// <see cref="Code"/> property based on the inner exception. Loads any exception data
         /// from the inner exception into this instance.
         /// </summary>
-        public ExecutionError(string message, Exception exception)
+        public ExecutionError(string message, Exception? exception)
             : base(message, exception)
         {
             SetCode(exception);
@@ -47,38 +45,33 @@ namespace GraphQL
         /// <summary>
         /// Returns a list of locations within the document that this error applies to.
         /// </summary>
-        public IEnumerable<ErrorLocation> Locations => _errorLocations;
+        public List<ErrorLocation>? Locations { get; private set; }
 
         /// <summary>
         /// Gets or sets a code for this error.
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// Gets or sets the path within the GraphQL document where this error applies to.
         /// </summary>
-        public IEnumerable<object> Path { get; set; }
+        public IEnumerable<object>? Path { get; set; }
 
         /// <summary>
         /// Adds a location to the list of locations that this error applies to.
         /// </summary>
         public void AddLocation(int line, int column)
         {
-            if (_errorLocations == null)
-            {
-                _errorLocations = new List<ErrorLocation>();
-            }
-
-            _errorLocations.Add(new ErrorLocation { Line = line, Column = column });
+            (Locations ??= new List<ErrorLocation>()).Add(new ErrorLocation(line, column));
         }
 
-        private void SetCode(Exception exception)
+        private void SetCode(Exception? exception)
         {
             if (exception != null)
                 Code = ErrorInfoProvider.GetErrorCode(exception);
         }
 
-        private void SetData(Exception exception)
+        private void SetData(Exception? exception)
         {
             if (exception?.Data != null)
                 SetData(exception.Data);
@@ -99,23 +92,32 @@ namespace GraphQL
     /// <summary>
     /// Represents a location within a document where a parsing or execution error occurred.
     /// </summary>
-    public struct ErrorLocation : IEquatable<ErrorLocation>
+    public readonly struct ErrorLocation : IEquatable<ErrorLocation>
     {
+        /// <summary>
+        /// Initializes a new instance with the specified line and column.
+        /// </summary>
+        public ErrorLocation(int line, int column)
+        {
+            Line = line;
+            Column = column;
+        }
+
         /// <summary>
         /// The line number of the document where the error occurred, where 1 is the first line.
         /// </summary>
-        public int Line { get; set; }
+        public int Line { get; }
 
         /// <summary>
         /// The column number of the document where the error occurred, where 1 is the first column.
         /// </summary>
-        public int Column { get; set; }
+        public int Column { get; }
 
         /// <inheritdoc/>
         public bool Equals(ErrorLocation other) => Line == other.Line && Column == other.Column;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is Location loc && Equals(loc);
+        public override bool Equals(object? obj) => obj is Location loc && Equals(loc);
 
         /// <inheritdoc/>
         public override int GetHashCode() => (Line, Column).GetHashCode();
@@ -139,20 +141,15 @@ namespace GraphQL
         /// <summary>
         /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
         /// </summary>
-        public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
+        public static TError AddLocation<TError>(this TError error, AbstractNode? abstractNode, Document? document)
+            where TError : ExecutionError
         {
-            if (abstractNode == null)
-                return;
+            if (abstractNode == null || document == null || document.OriginalQuery == null)
+                return error;
 
-            if (document != null)
-            {
-                var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
-                error.AddLocation(location.Line, location.Column);
-            }
-            else if (abstractNode.SourceLocation.Line > 0 && abstractNode.SourceLocation.Column > 0)
-            {
-                error.AddLocation(abstractNode.SourceLocation.Line, abstractNode.SourceLocation.Column);
-            }
+            var location = new Location(document.OriginalQuery, abstractNode.SourceLocation.Start);
+            error.AddLocation(location.Line, location.Column);
+            return error;
         }
     }
 }

@@ -165,84 +165,42 @@ options.UnhandledExecutionDelegate = ctx =>
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
 typically you will pass this object to an implementation of `IDocumentWriter` to convert the
-object tree into json. The GraphQL spec allows for four properties to be returned within each
-error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations
-provided for the [`Newtonsoft.Json`](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) and
-[`System.Text.Json`](https://www.nuget.org/packages/GraphQL.SystemTextJson) packages allow you to control the
-serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider`
-to the constructor of the document writer. The `ErrorInfoProvider` class (default implementation of
-`IErrorInfoProvider`) contains 5 properties to control serialization behavior:
-
-* `ExposeExceptionStackTrace` when enabled sets the `message` property for errors to equal the
-exception's `.ToString()` method, which includes a stack trace. This property defaults to `false`.
-* `ExposeCode` when enabled sets the `extensions`'s `code` property to equal the error's `Code`
-property. This property defaults to `true`.
-* `ExposeCodes` when enabled sets the `extensions`'s `codes` property to equal a list containing both
-the error's `Code` property, if any, and the type name of inner exceptions (after being converted to
-UPPER_CASE and removing the "Extension" suffix). So an `ExecutionError` with a code of `INVALID_FORMAT`
-that has an inner exception of type `ArgumentNullException` would contain a `codes` property
-of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to `true`.
-* `ExposeData` when enabled sets the `extension`'s `data` property to equal the data within the error's
-`Data` property. This property defaults to `true`.
-* `ExposeExtensions` when disabled hides the entire `extensions` property, including `code`, `codes`,
-and `data` (if enabled). This property defaults to `true`.
-
-For example, to show the stack traces for unhandled errors during development, you might write code like this:
-
-```csharp
-#if DEBUG
-    var documentWriter = new DocumentWriter(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
-#else
-    var documentWriter = new DocumentWriter();
-#endif
-```
-
-You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
-the numerical codes provided by GraphQL.NET for validation errors, reveal stack traces
-only to logged-in administrators, or simply add information to the returned error object. Below is a sample
-of a custom `IErrorInfoProvider` that adds a date stamp to returned error objects:
-
-```csharp
-public class MyErrorInfoProvider : GraphQL.Execution.ErrorInfoProvider
-{
-    public override ErrorInfo GetInfo(ExecutionError executionError)
-    {
-        var info = base.GetInfo(executionError);
-        info.Extensions["timestamp"] = DateTime.Now.ToString("u");
-        return info;
-    }
-}
-```
+object tree into json. The `IDocumentWriter` implementations provided by the `GraphQL.SystemTextJson`
+and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
+`IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
+the `IErrorInfoProvider` instance and it will be consumed by the `IDocumentWriter` implementation
+automatically. Please review the [serialization](../guides/serialization) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list
 
 Here is a full list of validation errors produced by GraphQL.NET:
 
-Rule                         | Code                               | Number
------------------------------|------------------------------------|-----------
-UniqueOperationNames         | `UNIQUE_OPERATION_NAMES`           | 5.2.1.1
-LoneAnonymousOperation       | `LONE_ANONYMOUS_OPERATION`         | 5.2.2.1
-SingleRootFieldSubscriptions | `SINGLE_ROOT_FIELD_SUBSCRIPTIONS`  | 5.2.3.1
-FieldsOnCorrectType          | `FIELDS_ON_CORRECT_TYPE`           | 5.3.1
-OverlappingFieldsCanBeMerged | `OVERLAPPING_FIELDS_CAN_BE_MERGED` | 5.3.2
-ScalarLeafs                  | `SCALAR_LEAFS`                     | 5.3.3
-KnownArgumentNames           | `KNOWN_ARGUMENT_NAMES`             | 5.4.1
-UniqueArgumentNames          | `UNIQUE_ARGUMENT_NAMES`            | 5.4.2
-ProvidedNonNullArguments     | `PROVIDED_NON_NULL_ARGUMENTS`      | 5.4.2.1
-UniqueFragmentNames          | `UNIQUE_FRAGMENT_NAMES`            | 5.5.1.1
-KnownTypeNames               | `KNOWN_TYPE_NAMES`                 | 5.5.1.2
-FragmentsOnCompositeTypes    | `FRAGMENTS_ON_COMPOSITE_TYPES`     | 5.5.1.3
-NoUnusedFragments            | `NO_UNUSED_FRAGMENTS`              | 5.5.1.4
-KnownFragmentNames           | `KNOWN_FRAGMENT_NAMES`             | 5.5.2.1
-NoFragmentCycles             | `NO_FRAGMENT_CYCLES`               | 5.5.2.2
-PossibleFragmentSpreads      | `POSSIBLE_FRAGMENT_SPREADS`        | 5.5.2.3
-ArgumentsOfCorrectType       | `ARGUMENTS_OF_CORRECT_TYPE`        | 5.6.1
-DefaultValuesOfCorrectType   | `DEFAULT_VALUES_OF_CORRECT_TYPE`   | 5.6.1
-UniqueInputFieldNames        | `UNIQUE_INPUT_FIELD_NAMES`         | 5.6.3
-KnownDirectives              | `KNOWN_DIRECTIVES`                 | 5.7.1
-UniqueDirectivesPerLocation  | `UNIQUE_DIRECTIVES_PER_LOCATION`   | 5.7.3
-UniqueVariableNames          | `UNIQUE_VARIABLE_NAMES`            | 5.8.1
-VariablesAreInputTypes       | `VARIABLES_ARE_INPUT_TYPES`        | 5.8.2
-NoUndefinedVariables         | `NO_UNDEFINED_VARIABLES`           | 5.8.3
-NoUnusedVariables            | `NO_UNUSED_VARIABLES`              | 5.8.4
-VariablesInAllowedPosition   | `VARIABLES_IN_ALLOWED_POSITION`    | 5.8.5
+Rule                              | Code                               | Number
+----------------------------------|------------------------------------|-----------
+UniqueOperationNames              | `UNIQUE_OPERATION_NAMES`           | 5.2.1.1
+LoneAnonymousOperation            | `LONE_ANONYMOUS_OPERATION`         | 5.2.2.1
+SingleRootFieldSubscriptions      | `SINGLE_ROOT_FIELD_SUBSCRIPTIONS`  | 5.2.3.1
+FieldsOnCorrectType               | `FIELDS_ON_CORRECT_TYPE`           | 5.3.1
+OverlappingFieldsCanBeMerged      | `OVERLAPPING_FIELDS_CAN_BE_MERGED` | 5.3.2
+ScalarLeafs                       | `SCALAR_LEAFS`                     | 5.3.3
+KnownArgumentNames                | `KNOWN_ARGUMENT_NAMES`             | 5.4.1
+UniqueArgumentNames               | `UNIQUE_ARGUMENT_NAMES`            | 5.4.2
+ProvidedNonNullArguments          | `PROVIDED_NON_NULL_ARGUMENTS`      | 5.4.2.1
+UniqueFragmentNames               | `UNIQUE_FRAGMENT_NAMES`            | 5.5.1.1
+KnownTypeNames                    | `KNOWN_TYPE_NAMES`                 | 5.5.1.2
+FragmentsOnCompositeTypes         | `FRAGMENTS_ON_COMPOSITE_TYPES`     | 5.5.1.3
+NoUnusedFragments                 | `NO_UNUSED_FRAGMENTS`              | 5.5.1.4
+KnownFragmentNames                | `KNOWN_FRAGMENT_NAMES`             | 5.5.2.1
+NoFragmentCycles                  | `NO_FRAGMENT_CYCLES`               | 5.5.2.2
+PossibleFragmentSpreads           | `POSSIBLE_FRAGMENT_SPREADS`        | 5.5.2.3
+ArgumentsOfCorrectType            | `ARGUMENTS_OF_CORRECT_TYPE`        | 5.6.1
+DefaultValuesOfCorrectType        | `DEFAULT_VALUES_OF_CORRECT_TYPE`   | 5.6.1
+UniqueInputFieldNames             | `UNIQUE_INPUT_FIELD_NAMES`         | 5.6.3
+KnownDirectivesInAllowedLocations | `KNOWN_DIRECTIVES`                 | 5.7.1
+KnownDirectivesInAllowedLocations | `DIRECTIVES_IN_ALLOWED_LOCATIONS`  | 5.7.2
+UniqueDirectivesPerLocation       | `UNIQUE_DIRECTIVES_PER_LOCATION`   | 5.7.3
+UniqueVariableNames               | `UNIQUE_VARIABLE_NAMES`            | 5.8.1
+VariablesAreInputTypes            | `VARIABLES_ARE_INPUT_TYPES`        | 5.8.2
+NoUndefinedVariables              | `NO_UNDEFINED_VARIABLES`           | 5.8.3
+NoUnusedVariables                 | `NO_UNUSED_VARIABLES`              | 5.8.4
+VariablesInAllowedPosition        | `VARIABLES_IN_ALLOWED_POSITION`    | 5.8.5

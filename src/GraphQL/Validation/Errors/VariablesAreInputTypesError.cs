@@ -14,11 +14,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public VariablesAreInputTypesError(ValidationContext context, VariableDefinition node, IGraphType type)
-            : base(context.OriginalQuery, NUMBER, UndefinedVarMessage(node.Name, type != null ? context.Print(type) : node.Type.Name()), node)
+            : base(context.Document.OriginalQuery!, NUMBER, UndefinedVarMessage(node.Name, type?.ToString() ?? node.Type.Name()), node)
         {
         }
 
         internal static string UndefinedVarMessage(string variableName, string typeName)
-            => $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
+            => $"Variable '{variableName}' cannot be non-input type '{typeName}'.";
     }
 }
