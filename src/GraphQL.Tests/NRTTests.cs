@@ -12,7 +12,7 @@ namespace GraphQL.Tests
         [Fact]
         public void TestNRTField2()
         {
-            var type = typeof(NullableClass18);
+            var type = typeof(NullableTestClass);
             var field = type.GetMethod("Field2").ShouldNotBeNull();
             var returnParameter = field.ReturnParameter;
             var context = new NullabilityInfoContext();
@@ -41,9 +41,8 @@ namespace GraphQL.Tests
             info.GenericTypeArguments[1].ReadState.ShouldBe(NullabilityState.NotNull); //incorrectly reports nullable
         }
 
-        public class NullableClass18
+        public class NullableTestClass
         {
-            //check ordering of nested types
             public static Tuple<Tuple<string?, string?>, string> Field2() => null!;
             /*             1      2      3        4         5
              *
