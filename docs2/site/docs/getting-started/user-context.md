@@ -28,3 +28,20 @@ public class Query : ObjectGraphType
   }
 }
 ```
+
+If you need to access the User from the request HttpContext and populate this globally, you will need to add a User property to your custom `UserContext` class and modify your Startup configuration as follows:
+```csharp
+
+  public class MyGraphQLUserContext : Dictionary<string, object?>
+  {
+      public ClaimsPrincipal User { get; set; }
+
+      public MyGraphQLUserContext(ClaimsPrincipal user)
+      {
+          User = user;
+      }
+  }
+
+  services.AddGraphQL()
+          .AddUserContextBuilder(httpContext => new MyGraphQLUserContext(httpContext.User));
+```
