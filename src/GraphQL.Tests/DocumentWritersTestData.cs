@@ -12,7 +12,11 @@ namespace GraphQL.Tests
                 WriteIndented = true,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
             }),
-            new NewtonsoftJson.DocumentWriter(indent: true)
+            new NewtonsoftJson.DocumentWriter(settings =>
+            {
+                settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                settings.Converters.Add(new NewtonsoftJson.FixPrecisionConverter(true, true, true));
+            })
         };
 
         public IEnumerator<object[]> GetEnumerator()
