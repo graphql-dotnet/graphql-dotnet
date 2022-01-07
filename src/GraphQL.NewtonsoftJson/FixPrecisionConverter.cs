@@ -8,6 +8,17 @@ namespace GraphQL.NewtonsoftJson
     // https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
     public class FixPrecisionConverter : JsonConverter
     {
+        private readonly bool _decimal;
+        private readonly bool _double;
+        private readonly bool _float;
+
+        public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat)
+        {
+            _decimal = forDecimal;
+            _double = forDouble;
+            _float = forFloat;
+        }
+
         public override bool CanRead => false;
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -15,7 +26,10 @@ namespace GraphQL.NewtonsoftJson
             throw new NotSupportedException();
         }
 
-        public override bool CanConvert(Type objType) => objType == typeof(decimal) || objType == typeof(float) || objType == typeof(double);
+        public override bool CanConvert(Type objType) =>
+            objType == typeof(decimal) && _decimal ||
+            objType == typeof(float) && _float ||
+            objType == typeof(double) && _double;
 
         public override void WriteJson(JsonWriter jWriter, object value, JsonSerializer jSerializer)
         {

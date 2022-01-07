@@ -29,7 +29,7 @@ namespace GraphQL.NewtonsoftJson
     }
     public class FixPrecisionConverter : Newtonsoft.Json.JsonConverter
     {
-        public FixPrecisionConverter() { }
+        public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat) { }
         public override bool CanRead { get; }
         public override bool CanConvert(System.Type objType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
