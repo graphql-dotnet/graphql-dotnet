@@ -212,6 +212,7 @@ namespace GraphQL
             var result = await executor.ExecuteAsync(options =>
             {
                 options.Schema = schema;
+                options.CancellationToken = cancellationToken;
                 configure(options);
             }).ConfigureAwait(false);
 
