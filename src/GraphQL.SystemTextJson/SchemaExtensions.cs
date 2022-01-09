@@ -21,7 +21,6 @@ namespace GraphQL.SystemTextJson
         /// Useful for quickly executing something and "getting started".
         /// Part of the public API and should not be removed even if it has no references.
         /// </remarks>
-        [Obsolete]
         public static Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
             => schema.ExecuteAsync(new GraphQLSerializer(indent: true), configure);
     }

@@ -324,11 +324,6 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
     }
-    public static class GraphQLSerializerExtensions
-    {
-        [System.Obsolete]
-        public static System.Threading.Tasks.ValueTask<string> WriteToStringAsync<T>(this GraphQL.IGraphQLSerializer serializer, T value, System.Threading.CancellationToken cancellationToken = default) { }
-    }
     public interface IDocumentExecuter
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
@@ -500,8 +495,7 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
-        [System.Obsolete]
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)

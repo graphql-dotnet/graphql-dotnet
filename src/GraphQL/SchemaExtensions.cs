@@ -195,14 +195,13 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IGraphQLSerializer"/>, and returns the result
+        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IGraphQLTextSerializer"/>, and returns the result
         /// </summary>
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
-        /// <param name="serializer">An instance of <see cref="IGraphQLSerializer"/> to use to serialize the result</param>
+        /// <param name="serializer">An instance of <see cref="IGraphQLTextSerializer"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
         /// <param name="cancellationToken">A cancellation token to cancel the execution</param>
-        [Obsolete] //only here for tests...
-        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLSerializer serializer, Action<ExecutionOptions> configure, CancellationToken cancellationToken = default)
+        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLTextSerializer serializer, Action<ExecutionOptions> configure, CancellationToken cancellationToken = default)
         {
             if (configure == null)
             {
@@ -216,9 +215,7 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return serializer is IGraphQLTextSerializer textSerializer
-                ? textSerializer.Serialize(result)
-                : await serializer.WriteToStringAsync(result, cancellationToken).ConfigureAwait(false);
+            return serializer.Serialize(result);
         }
 
         /// <summary>

@@ -57,7 +57,6 @@ namespace GraphQL.SystemTextJson
     }
     public static class SchemaExtensions
     {
-        [System.Obsolete]
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
     public class WebSocketMessageJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transports.Json.WebSocketMessage>
