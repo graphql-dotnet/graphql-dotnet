@@ -135,4 +135,9 @@ The `WriteAsync` method's functionality has not changed.
 
 ### 15. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
 
-Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation.
+Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
+`Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation.
+
+### 16. `WriteToStringAsync` has extension method has been removed.
+
+Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
