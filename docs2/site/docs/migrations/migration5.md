@@ -38,6 +38,32 @@ This makes it so that you can write JSON-based transport code independent of the
 JSON serialization engine used by your application, simplifying the most common use
 case, while still being configurable through your DI framework.
 
+You can also use `IGraphQLTextSerializer.ReadNode` to deserialize a framework-dependent
+JSON element node, stored within an `object`, into a specific type. The specific
+serialization engine you are using may have additional `Read` members as would be expected
+for that library.
+
+Be aware that System.Text.Json defaults to case-sensitive deserialization, while
+Newtonsoft.Json defaults to case-insensitive deserialization. However, the supported
+data models (such as `GraphQLRequest` and `WebSocketMessage`) will always deserialize
+with case-sensitive camelCase deserialization. You can write your own data classes
+which will behave in the default manner of the serializer's configuration. You can
+configure the serializer to use camelCase for all properties by default. You can also
+tag properties with serializer-specific attributes to change deserialization behavior,
+such as adding a `JsonPropertyName` attribute to a data member to override its
+serialized property name.
+
+Specific support is provided for serializing and deserializing to the following data models:
+
+| Class                   | Notes |
+|-------------------------|-------|
+| `ExecutionResult`       | Only serialization is supported |
+| `GraphQLRequest`        | |
+| `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
+| `WebSocketMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
+| `ApolloTrace`           | |
+| `Inputs`                | |
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -141,3 +167,14 @@ Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation
 ### 16. `WriteToStringAsync` has extension method has been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
+The asynchronous text serialization methods have been removed as the underlying serialization
+providers execute synchronously when serializing to a string.
+
+The `WriteAsync()` method can be used to asynchronously serialize to a stream. However,
+the Newtonsoft.Json serializer does not support asynchronous serialization, so synchronous
+calls are made to the underlying stream. Only System.Text.Json supports asynchronous writing.
+
+### 17. Other changes to the serialization infrastructure
+
+- `InputsConverter` renamed to `InputsJsonConverter`
+- `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
