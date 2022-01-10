@@ -60,7 +60,7 @@ namespace GraphQL.SystemTextJson
                         request.Id = reader.GetString();
                         break;
                     case WebSocketMessage.PAYLOAD_KEY:
-                        request.Payload = JsonSerializer.Deserialize<object>(ref reader, options);
+                        request.Payload = JsonSerializer.Deserialize<JsonElement?>(ref reader, options);
                         break;
                     default:
                         //unrecognized key
