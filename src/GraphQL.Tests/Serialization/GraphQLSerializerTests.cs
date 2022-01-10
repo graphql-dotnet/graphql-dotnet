@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Transports.Json;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests
+namespace GraphQL.Tests.Serialization
 {
     /// <summary>
     /// Tests for <see cref="IGraphQLTextSerializer"/> implementations and the custom converters
@@ -232,6 +233,23 @@ namespace GraphQL.Tests
             var actual = writer.Serialize(new GraphQLRequest[] { request });
 
             actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task Synchronous_and_Async_Works_Same(IGraphQLTextSerializer writer)
+        {
+            var schema = new GraphQL.StarWars.StarWarsSchema(new GraphQL.StarWars.IoC.SimpleContainer());
+            var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
+            {
+                Schema = schema,
+                Query = "IntrospectionQuery".ReadGraphQLRequest()
+            });
+            var syncResult = writer.Serialize(result);
+            var stream = new System.IO.MemoryStream();
+            await writer.WriteAsync(stream, result);
+            var asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+            syncResult.ShouldBe(asyncResult);
         }
 
         [Theory]

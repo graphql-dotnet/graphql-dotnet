@@ -74,7 +74,7 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class SchemaExtensions
     {
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class WebSocketMessageJsonConverter : Newtonsoft.Json.JsonConverter
     {
