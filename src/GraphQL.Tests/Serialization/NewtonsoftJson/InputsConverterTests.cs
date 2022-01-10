@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Shouldly;
@@ -296,6 +298,26 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
   },
   ""Value2"": 123
 }".Trim());
+        }
+
+        [Fact]
+        public void Deserializes_Dates()
+        {
+            var d = new DateTimeOffset(2022, 1, 3, 15, 47, 22, System.TimeSpan.Zero);
+            var json = $"{{ \"date\": \"{d:o}\"}}";
+
+            var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+                Converters =
+                {
+                    new InputsConverter()
+                },
+            });
+
+            var dic = jsonSerializer.Deserialize<Inputs>(new JsonTextReader(new StringReader(json)));
+            dic.ShouldContainKeyAndValue("date", d);
         }
 
         private class Nested

@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 
 namespace GraphQL.SystemTextJson
 {
@@ -124,6 +125,11 @@ namespace GraphQL.SystemTextJson
                 _options.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
             }
 
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))
+            {
+                _options.Converters.Add(new ApolloTraceJsonConverter());
+            }
+
             if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
             {
                 _options.Converters.Add(new JsonConverterBigInteger());
@@ -131,7 +137,7 @@ namespace GraphQL.SystemTextJson
         }
 
         private static JsonSerializerOptions GetDefaultSerializerOptions(bool indent)
-            => new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            => new JsonSerializerOptions { WriteIndented = indent };
 
         /// <inheritdoc/>
         public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)

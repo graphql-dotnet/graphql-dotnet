@@ -19,7 +19,7 @@ namespace GraphQL.NewtonsoftJson
         protected override JsonConverter ResolveContractConverter(Type objectType)
         {
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
-                return new ExecutionResultJsonConverter(_errorInfoProvider);
+                return new ExecutionResultJsonConverter(_errorInfoProvider, NamingStrategy);
 
             return base.ResolveContractConverter(objectType);
         }

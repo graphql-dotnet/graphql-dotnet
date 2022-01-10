@@ -69,7 +69,10 @@ namespace GraphQL.SystemTextJson
                     writer.WriteStartObject();
                     foreach (var childNode in objectExecutionNode.SubFields)
                     {
-                        writer.WritePropertyName(childNode.Name);
+                        var propertyName = childNode.Name;
+                        if (options.PropertyNamingPolicy != null)
+                            propertyName = options.PropertyNamingPolicy.ConvertName(propertyName);
+                        writer.WritePropertyName(propertyName);
                         WriteExecutionNode(writer, childNode, options);
                     }
                     writer.WriteEndObject();
@@ -104,6 +107,8 @@ namespace GraphQL.SystemTextJson
 
         private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
         {
+            if (options.PropertyNamingPolicy != null)
+                propertyName = options.PropertyNamingPolicy.ConvertName(propertyName);
             writer.WritePropertyName(propertyName);
             WriteValue(writer, propertyValue, options);
         }
