@@ -20,6 +20,13 @@ and passed through to field resolvers via `IResolveFieldContext.InputExtensions`
 dictionaries (such as `Dictionary<TKey, TValue>`) are thread-safe for read-only operations. Also you can
 access these extensions from validation rules via `ValidationContext.Extensions`.
 
+### 3. Improved GraphQL-Parser
+
+GraphQL.NET v5 uses GraphQL-Parser v8. This release brought numerous changes in the parser object model,
+which began to better fit the [latest version](http://spec.graphql.org/October2021/) of the published
+official GraphQL specification. GraphQL-Parser v8 has a lot of backward incompatible changes, but you are
+unlikely to come across them if you do not use advanced features.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -88,7 +95,11 @@ Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `Val
 Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
 If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
 
-### 13. Classes and members marked as obsolete have been removed
+### 13. Changes caused by GraphQL-Parser v8
+
+- `OperationType` and `DirectiveLocation` enums were removed, use enums from `GraphQLParser.AST` namespace
+
+### 14. Classes and members marked as obsolete have been removed
 
 The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
 
