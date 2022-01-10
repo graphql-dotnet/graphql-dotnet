@@ -68,7 +68,7 @@ query {
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async Task serialization_should_have_correct_case(IGraphQLTextSerializer writer)
+        public void serialization_should_have_correct_case(IGraphQLTextSerializer writer)
         {
             var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
             var expected = @"{

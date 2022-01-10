@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
@@ -12,7 +11,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug2839NewtonsoftJson
     {
         [Fact]
-        public async Task Bug2839Test()
+        public void Bug2839Test()
         {
             var schema = new Schema { Query = new TestQuery() };
             schema.ReplaceScalar(new MyDateTimeGraphType());
