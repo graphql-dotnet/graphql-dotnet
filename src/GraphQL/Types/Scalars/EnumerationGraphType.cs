@@ -126,7 +126,7 @@ namespace GraphQL.Types
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
     public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
-        private static readonly EnumCaseAttribute _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
+        private static readonly EnumCaseAttribute? _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnumerationGraphType"/> class.

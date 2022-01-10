@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQLParser.AST;
-using OperationType = GraphQL.Language.AST.OperationType;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
@@ -60,8 +59,8 @@ namespace GraphQL.Language
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
                 OperationType = ToOperationType(source.Operation),
-                Variables = VariableDefinitions(source.VariableDefinitions),
-                Directives = Directives(source.Directives)
+                Variables = VariableDefinitions(source.Variables?.Items),
+                Directives = Directives(source.Directives?.Items)
             };
         }
 
@@ -70,11 +69,11 @@ namespace GraphQL.Language
         /// </summary>
         private static FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
-            return new FragmentDefinition(Name(source.Name), NamedType(source.TypeCondition!), SelectionSet(source.SelectionSet))
+            return new FragmentDefinition(Name(source.Name), NamedType(source.TypeCondition.Type), SelectionSet(source.SelectionSet))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Directives = Directives(source.Directives)
+                Directives = Directives(source.Directives?.Items)
             };
         }
 
@@ -87,7 +86,7 @@ namespace GraphQL.Language
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Directives = Directives(source.Directives)
+                Directives = Directives(source.Directives?.Items)
             };
         }
 
@@ -100,8 +99,8 @@ namespace GraphQL.Language
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null,
-                Directives = Directives(source.Directives),
+                Type = source.TypeCondition != null ? NamedType(source.TypeCondition.Type) : null,
+                Directives = Directives(source.Directives?.Items),
             };
         }
 
@@ -170,7 +169,7 @@ namespace GraphQL.Language
         /// </summary>
         private static ISelection Selection(ASTNode source) => source.Kind switch
         {
-            ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
+            ASTNodeKind.Field => Field((GraphQLField)source),
             ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
             ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
             _ => throw new InvalidOperationException($"Unmapped selection {source.Kind}")
@@ -179,14 +178,14 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a field node and its children.
         /// </summary>
-        private static Field Field(GraphQLFieldSelection source)
+        private static Field Field(GraphQLField source)
         {
-            return new Field(Name(source.Alias), Name(source.Name))
+            return new Field(Name(source.Alias?.Name), Name(source.Name))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
-                Arguments = Arguments(source.Arguments),
-                Directives = Directives(source.Directives),
+                Arguments = Arguments(source.Arguments?.Items),
+                Directives = Directives(source.Directives?.Items),
                 SelectionSet = SelectionSet(source.SelectionSet)
             };
         }
@@ -216,7 +215,7 @@ namespace GraphQL.Language
             return new Directive(Name(d.Name))
             {
                 SourceLocation = Convert(d.Location),
-                Arguments = Arguments(d.Arguments)
+                Arguments = Arguments(d.Arguments?.Items)
             };
         }
 
@@ -254,12 +253,12 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.StringValue:
                 {
-                    var str = (GraphQLScalarValue)source;
+                    var str = (GraphQLStringValue)source;
                     return new StringValue((string)str.Value) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.IntValue:
                 {
-                    var str = (GraphQLScalarValue)source;
+                    var str = (GraphQLIntValue)source;
 
                     if (Int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
                     {
@@ -289,7 +288,7 @@ namespace GraphQL.Language
                 }
                 case ASTNodeKind.FloatValue:
                 {
-                    var str = (GraphQLScalarValue)source;
+                    var str = (GraphQLFloatValue)source;
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
@@ -321,13 +320,13 @@ namespace GraphQL.Language
                 }
                 case ASTNodeKind.BooleanValue:
                 {
-                    var str = (GraphQLScalarValue)source;
+                    var str = (GraphQLBooleanValue)source;
                     return new BooleanValue(str.Value.Length == 4 /*true.Length=4*/) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.EnumValue:
                 {
-                    var str = (GraphQLScalarValue)source;
-                    return new EnumValue((string)str.Value) { SourceLocation = Convert(str.Location) };
+                    var str = (GraphQLEnumValue)source;
+                    return new EnumValue((string)str.Name.Value) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.Variable:
                 {
@@ -348,7 +347,7 @@ namespace GraphQL.Language
                 }
                 case ASTNodeKind.NullValue:
                 {
-                    var str = (GraphQLScalarValue)source;
+                    var str = (GraphQLNullValue)source;
                     return new NullValue { SourceLocation = Convert(str.Location) };
                 }
             }

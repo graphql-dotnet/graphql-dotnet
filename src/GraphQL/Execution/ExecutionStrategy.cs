@@ -6,6 +6,7 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
