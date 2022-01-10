@@ -13,7 +13,11 @@ namespace GraphQL.Tests
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
             }),
-            new NewtonsoftJson.GraphQLSerializer(indent: true)
+            new NewtonsoftJson.GraphQLSerializer(settings =>
+            {
+                settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                settings.Converters.Add(new NewtonsoftJson.FixPrecisionConverter(true, true, true));
+            })
         };
 
         public IEnumerator<object[]> GetEnumerator()
