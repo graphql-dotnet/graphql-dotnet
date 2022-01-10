@@ -98,41 +98,6 @@ namespace GraphQL.Tests.Serialization
             Verify(variables);
         }
 
-        /*
-        [Theory]
-        [ClassData(typeof(GraphQLSerializersTestData))]
-        public void ElementToInputs_ReturnsEmptyForNull(IGraphQLTextSerializer serializer)
-        {
-            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-            var actual = serializer.Deserialize<TestClass2>(test);
-            actual.Query.ShouldBe("hello");
-            actual.Variables.ShouldBeNull();
-            var variables = serializer.ReadNode<Inputs>(actual.Variables);
-            variables.ShouldNotBeNull();
-            variables.Count.ShouldBe(0);
-        }
-
-        [Theory]
-        [ClassData(typeof(GraphQLSerializersTestData))]
-        public void ElementToInputs_ReturnsEmptyForMissing(IGraphQLTextSerializer serializer)
-        {
-            var test = $"{{\"query\":\"hello\"}}";
-            var actual = serializer.Deserialize<TestClass2>(test);
-            actual.Query.ShouldBe("hello");
-            actual.Variables.ShouldBeNull();
-            var variables = serializer.ReadNode<Inputs>(actual.Variables);
-            variables.ShouldNotBeNull();
-            variables.Count.ShouldBe(0);
-        }
-
-        [Theory]
-        [ClassData(typeof(GraphQLSerializersTestData))]
-        public void ToInputsReturnsEmptyForNull(IGraphQLTextSerializer serializer)
-        {
-            serializer.Deserialize<Inputs>(null).ShouldNotBeNull().Count.ShouldBe(0);
-        }
-        */
-
         private class TestClass1
         {
             public string Query { get; set; }
