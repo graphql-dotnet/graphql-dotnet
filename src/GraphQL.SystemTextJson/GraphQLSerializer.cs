@@ -198,7 +198,12 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.Deserialize<T>(jsonElement.GetRawText(), _options);
 #endif
 
-        T IGraphQLSerializer.ReadNode<T>(object value)
+        /// <summary>
+        /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
+        /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JsonElement"/>.
+        /// </summary>
+        public T ReadNode<T>(object value)
             => value == null ? default : ReadNode<T>((JsonElement)value);
     }
 }

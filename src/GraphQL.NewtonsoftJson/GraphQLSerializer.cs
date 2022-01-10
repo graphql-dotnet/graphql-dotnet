@@ -185,7 +185,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         public T Read<T>(TextReader json)
         {
-            var jsonReader = new JsonTextReader(json)
+            using var jsonReader = new JsonTextReader(json)
             {
                 CloseInput = false
             };
@@ -203,7 +203,12 @@ namespace GraphQL.NewtonsoftJson
         public T ReadNode<T>(JObject jObject)
             => jObject == null ? default : jObject.ToObject<T>(_serializer);
 
-        T IGraphQLSerializer.ReadNode<T>(object value)
+        /// <summary>
+        /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
+        /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JObject"/>.
+        /// </summary>
+        public T ReadNode<T>(object value)
             => ReadNode<T>((JObject)value);
     }
 }

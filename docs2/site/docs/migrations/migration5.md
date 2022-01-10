@@ -20,7 +20,7 @@ and passed through to field resolvers via `IResolveFieldContext.InputExtensions`
 dictionaries (such as `Dictionary<TKey, TValue>`) are thread-safe for read-only operations. Also you can
 access these extensions from validation rules via `ValidationContext.Extensions`.
 
-### 3. `IGraphQLSerializer` interface to support JSON deserialization
+### 3. `IGraphQLSerializer` interface with JSON deserialization support
 
 `IGraphQLSerializer.ReadAsync` is implemented by the `GraphQL.SystemTextJson` and
 `GraphQL.NewtonsoftJson` libraries. It supports deserialization of any type, with
@@ -30,7 +30,7 @@ a single request (with or without the JSON array wrapper) into a list.
 
 When calling the `AddSystemTextJson` or `AddNewtonsoftJson` extension method to
 the `IGraphQLBuilder` interface, the method will register the `IGraphQLSerializer`
-and `IGraphQLTextSerializer` interfaces with the appropriate
+and `IGraphQLSerializer` interfaces with the appropriate
 serialization engine. These interfaces handle both serialization and deserialization
 of objects.
 
@@ -68,6 +68,12 @@ Note that when deserializing a `IList<GraphQLRequest>`, and when the JSON data i
 single request rather than a list of requests, the request will be deserialized into
 a list or array of a single item. For example, `{"query":"{hero}"}` deserializes into
 `new[] { new GraphQLRequest { Query = "hero" }}`.
+
+### 4. `IGraphQLTextSerializer` interface to support serialization to/from strings.
+
+`IGraphQLTextSerializer.Serialize` and `IGraphQLTextSerializer.Deserialize` support
+serializing objects to and from `string` values. For the `GraphQL.SystemTextJson`
+and `GraphQL.NewtonsoftJson` libraries, these serialize and deserialize to JSON strings.
 
 ## Breaking Changes
 
