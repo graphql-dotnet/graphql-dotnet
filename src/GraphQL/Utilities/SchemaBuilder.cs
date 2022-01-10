@@ -9,7 +9,6 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationType = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Utilities
 {
