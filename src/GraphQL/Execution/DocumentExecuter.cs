@@ -70,7 +70,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(options));
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
-            if (options.Query == null)
+            if (options.Query == null && options.Document == null)
                 throw new InvalidOperationException("Cannot execute request if no query is specified");
 
             if (_configurations != null)
