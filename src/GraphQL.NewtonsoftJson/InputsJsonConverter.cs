@@ -55,6 +55,9 @@ namespace GraphQL.NewtonsoftJson
                 JsonToken.Float => reader.Value,
                 JsonToken.Boolean => reader.Value,
                 JsonToken.String => reader.Value,
+                JsonToken.Bytes => reader.Value,
+                JsonToken.Date => reader.Value,
+                JsonToken.Raw => reader.Value,
                 JsonToken.Null => null,
                 _ => throw new InvalidOperationException($"Unexpected token type: {reader.TokenType}")
             };

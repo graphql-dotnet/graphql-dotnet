@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.Serialization.NewtonsoftJson
+namespace GraphQL.Tests.Serialization
 {
     public class DeserializationTests
     {
@@ -69,10 +73,10 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             actual.Variables.ShouldBeNull();
         }
 
-        [Fact]
-        public void FromJson_IsCaseInsensitive_Element_Newtonsoft()
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void FromJson_IsCaseInsensitive_Element(IGraphQLTextSerializer serializer)
         {
-            var serializer = new GraphQL.NewtonsoftJson.GraphQLSerializer();
             var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
             var actual = serializer.Deserialize<TestClass2>(test);
             actual.Query.ShouldBe("hello");
@@ -80,26 +84,12 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             Verify(variables);
         }
 
-        /*
-#if NET6_0_OR_GREATER
-        [Fact]
-        public void FromJson_IsCaseInsensitive_Element_SystemTextJson()
-        {
-            var serializer = new GraphQL.SystemTextJson.GraphQLSerializer();
-            var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
-            var actual = serializer.Read<TestClass2SystemTextJson>(test);
-            actual.query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.variables);
-            Verify(variables);
-        }
-#endif
-
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
         public void FromJson_IsCaseInsensitive_Inputs(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"Query\":\"hello\",\"Variables\":{_exampleJson}}}";
-            var actual = serializer.Read<TestClass1>(test);
+            var actual = serializer.Deserialize<TestClass1>(test);
             actual.Query.ShouldBe("hello");
             var variables = actual.Variables;
             Verify(variables);
@@ -107,11 +97,11 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void FromJsonStream(IGraphQLTextSerializer serializer)
+        public async Task FromJsonStream(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
             var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
-            var actual = serializer.Read<TestClass1>(test);
+            var actual = await serializer.ReadAsync<TestClass1>(testData);
             actual.Query.ShouldBe("hello");
             Verify(actual.Variables);
             // verify that the stream has not been disposed
@@ -119,92 +109,50 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             testData.Dispose();
             Should.Throw<ObjectDisposedException>(() => testData.ReadByte());
         }
-        */
 
-        [Fact]
-        public void ElementToInputs_NewtonsoftJson()
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void ElementToInputs(IGraphQLTextSerializer serializer)
         {
-            var serializer = new GraphQL.NewtonsoftJson.GraphQLSerializer();
             var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
+            var actual = serializer.Deserialize<TestClass2>(test);
             actual.Query.ShouldBe("hello");
             var variables = serializer.ReadNode<Inputs>(actual.Variables);
             Verify(variables);
         }
 
-#if NET6_0_OR_GREATER
-        [Fact]
-        public void ElementToInputs_SystemTextJson()
-        {
-            var serializer = new GraphQL.SystemTextJson.GraphQLSerializer();
-            var test = $"{{\"query\":\"hello\",\"variables\":{_exampleJson}}}";
-            var actual = System.Text.Json.JsonSerializer.Deserialize<TestClass2SystemTextJson>(test);
-            actual.query.ShouldBe("hello");
-            var variables = serializer.ReadNode<Inputs>(actual.variables);
-            Verify(variables);
-        }
-#endif
-
         /*
-        [Fact]
-        public void ElementToInputs_ReturnsEmptyForNull_NewtonsoftJson()
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void ElementToInputs_ReturnsEmptyForNull(IGraphQLTextSerializer serializer)
         {
-            var serializer = new GraphQL.NewtonsoftJson.GraphQLSerializer();
             var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-            var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
+            var actual = serializer.Deserialize<TestClass2>(test);
             actual.Query.ShouldBe("hello");
             actual.Variables.ShouldBeNull();
-            var variables = serializer.Read<Inputs>(actual.Variables);
+            var variables = serializer.ReadNode<Inputs>(actual.Variables);
             variables.ShouldNotBeNull();
             variables.Count.ShouldBe(0);
         }
 
-#if NET6_0_OR_GREATER
-        [Fact]
-        public void ElementToInputs_ReturnsEmptyForNull_SystemTextJson()
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void ElementToInputs_ReturnsEmptyForMissing(IGraphQLTextSerializer serializer)
         {
-            var serializer = new GraphQL.SystemTextJson.GraphQLSerializer();
-            var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-            var actual = System.Text.Json.JsonSerializer.Deserialize<TestClass2SystemTextJson>(test);
-            actual.Query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.Variables);
-            variables.ShouldNotBeNull();
-            variables.Count.ShouldBe(0);
-        }
-#endif
-
-        [Fact]
-        public void ElementToInputs_ReturnsEmptyForMissing_NewtonsoftJson()
-        {
-            var serializer = new GraphQL.NewtonsoftJson.GraphQLSerializer();
             var test = $"{{\"query\":\"hello\"}}";
-            var actual = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClass2>(test);
+            var actual = serializer.Deserialize<TestClass2>(test);
             actual.Query.ShouldBe("hello");
             actual.Variables.ShouldBeNull();
-            var variables = serializer.Read<Inputs>(actual.Variables);
+            var variables = serializer.ReadNode<Inputs>(actual.Variables);
             variables.ShouldNotBeNull();
             variables.Count.ShouldBe(0);
         }
-
-#if NET6_0_OR_GREATER
-        [Fact]
-        public void ElementToInputs_ReturnsEmptyForMissing_SystemTextJson()
-        {
-            var serializer = new GraphQL.SystemTextJson.GraphQLSerializer();
-            var test = $"{{\"query\":\"hello\"}}";
-            var actual = System.Text.Json.JsonSerializer.Deserialize<TestClass2SystemTextJson>(test);
-            actual.Query.ShouldBe("hello");
-            var variables = serializer.Read<Inputs>(actual.Variables);
-            variables.ShouldNotBeNull();
-            variables.Count.ShouldBe(0);
-        }
-#endif
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
         public void ToInputsReturnsEmptyForNull(IGraphQLTextSerializer serializer)
         {
-            serializer.Read<Inputs>(null).ShouldNotBeNull().Count.ShouldBe(0);
+            serializer.Deserialize<Inputs>(null).ShouldNotBeNull().Count.ShouldBe(0);
         }
         */
 
@@ -217,13 +165,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
         private class TestClass2
         {
             public string Query { get; set; }
-            public Newtonsoft.Json.Linq.JObject Variables { get; set; }
-        }
-
-        private class TestClass2SystemTextJson
-        {
-            public string query { get; set; }
-            public System.Text.Json.JsonElement variables { get; set; }
+            public object Variables { get; set; }
         }
 
         public class TestData

@@ -5,12 +5,12 @@ namespace GraphQL.Tests
 {
     public class GraphQLSerializersTestData : IEnumerable<object[]>
     {
-        public static readonly List<IGraphQLSerializer> AllWriters = new List<IGraphQLSerializer>
+        public static readonly List<IGraphQLTextSerializer> AllWriters = new List<IGraphQLTextSerializer>
         {
             new SystemTextJson.GraphQLSerializer(new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true,
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
             }),
             new NewtonsoftJson.GraphQLSerializer(settings =>

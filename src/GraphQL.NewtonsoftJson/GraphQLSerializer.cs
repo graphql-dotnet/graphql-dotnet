@@ -157,7 +157,10 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc cref="IGraphQLTextSerializer.Serialize{T}(T)"/>
         public void Write<T>(TextWriter textWriter, T value)
         {
-            using var stringWriter = new JsonTextWriter(textWriter);
+            using var stringWriter = new JsonTextWriter(textWriter)
+            {
+                CloseOutput = false
+            };
             _serializer.Serialize(stringWriter, value);
         }
 
@@ -172,8 +175,7 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc/>
         public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            //note: do not dispose of stringReader or else the underlying stream will be disposed
-            var stringReader = new StreamReader(stream, Encoding.UTF8);
+            using var stringReader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
             using var jsonReader = new JsonTextReader(stringReader);
             return new ValueTask<T>(_serializer.Deserialize<T>(jsonReader));
         }
@@ -183,7 +185,10 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         public T Read<T>(TextReader json)
         {
-            using var jsonReader = new JsonTextReader(json);
+            var jsonReader = new JsonTextReader(json)
+            {
+                CloseInput = false
+            };
             return _serializer.Deserialize<T>(jsonReader);
         }
 
