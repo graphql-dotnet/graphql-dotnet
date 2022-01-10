@@ -1,0 +1,78 @@
+using System.Collections.Generic;
+using GraphQL.Transports.Json;
+using Shouldly;
+using Xunit;
+
+namespace GraphQL.Tests.Serialization
+{
+    public class WebSocketMessageTests : DeserializationTestBase
+    {
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_WebSocketMessage_Populated(IGraphQLTextSerializer serializer)
+        {
+            var test = $"{{\"id\":\"hello\",\"type\":\"hello2\",\"payload\":{{\"query\":\"hello3\",\"variables\":{ExampleJson}}}}}";
+            var actual = serializer.Deserialize<WebSocketMessage>(test);
+            actual.Id.ShouldBe("hello");
+            actual.Type.ShouldBe("hello2");
+            actual.Payload.ShouldNotBeNull();
+            var request = serializer.ReadNode<GraphQLRequest>(actual.Payload);
+            request.Query.ShouldBe("hello3");
+            Verify(request.Variables);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_WebSocketMessage_Nulls(IGraphQLTextSerializer serializer)
+        {
+            var test = $"{{\"id\":null,\"type\":null,\"payload\":null}}";
+            var actual = serializer.Deserialize<WebSocketMessage>(test);
+            actual.Id.ShouldBeNull();
+            actual.Type.ShouldBeNull();
+            actual.Payload.ShouldBeNull();
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_WebSocketMessage_Empty(IGraphQLTextSerializer serializer)
+        {
+            var test = $"{{}}";
+            var actual = serializer.Deserialize<WebSocketMessage>(test);
+            actual.Id.ShouldBeNull();
+            actual.Type.ShouldBeNull();
+            actual.Payload.ShouldBeNull();
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_WebSocketMessage_Populated(IGraphQLTextSerializer serializer)
+        {
+            var message = new WebSocketMessage
+            {
+                Id = "hello",
+                Type = "hello2",
+                Payload = new GraphQLRequest
+                {
+                    Query = "hello3",
+                    Variables = new Inputs(new Dictionary<string, object?> {
+                        { "arg", ExampleData },
+                    }),
+                }
+            };
+            var actual = serializer.Serialize(message);
+            var expected = $"{{\"type\":\"hello2\",\"id\":\"hello\",\"payload\":{{\"query\":\"hello3\",\"variables\":{{\"arg\":{ExampleJson}}}}}}}";
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_WebSocketMessage_Nulls(IGraphQLTextSerializer serializer)
+        {
+            var message = new WebSocketMessage();
+            var actual = serializer.Serialize(message);
+            var expected = @"{""type"":null}";
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+    }
+}
