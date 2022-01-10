@@ -173,7 +173,22 @@ The `WriteAsync` method's functionality has not changed.
 ### 15. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
 
 Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
-`Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation.
+`Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation. Note that
+these methods will return `null` if a null string or the string "null" is passed to them.
+Equivalent code to the previous functionality is as follows:
+
+```cs
+using GraphQL;
+using GraphQL.SystemTextJson;
+
+public class StringExtensions
+{
+    private static readonly IGraphQLTextSerializer _serializer = new SystemTextJson.GraphQLSerializer();
+
+    public static Inputs ToInputs(string json)
+        => json == null ? Inputs.Empty : _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
+}
+```
 
 ### 16. `WriteToStringAsync` has extension method has been removed.
 
