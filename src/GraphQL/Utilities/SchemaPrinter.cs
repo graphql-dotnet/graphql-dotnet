@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Utilities
 {

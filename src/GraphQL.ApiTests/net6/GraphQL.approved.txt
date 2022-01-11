@@ -918,6 +918,8 @@ namespace GraphQL.Execution
     {
         public GraphQLDocumentBuilder() { }
         public bool IgnoreComments { get; set; }
+        public bool IgnoreLocations { get; set; }
+        public int? MaxDepth { get; set; }
         public GraphQL.Language.AST.Document Build(string body) { }
     }
     public interface IDocumentBuilder
@@ -1249,7 +1251,7 @@ namespace GraphQL.Introspection
     {
         public @__DirectiveArgument() { }
     }
-    public class @__DirectiveLocation : GraphQL.Types.EnumerationGraphType<GraphQL.Types.DirectiveLocation>
+    public class @__DirectiveLocation : GraphQL.Types.EnumerationGraphType<GraphQLParser.AST.DirectiveLocation>
     {
         public @__DirectiveLocation() { }
     }
@@ -1548,17 +1550,11 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.Directives? Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        public GraphQL.Language.AST.OperationType OperationType { get; set; }
+        public GraphQLParser.AST.OperationType OperationType { get; set; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; }
         public GraphQL.Language.AST.VariableDefinitions? Variables { get; set; }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
-    }
-    public enum OperationType
-    {
-        Query = 0,
-        Mutation = 1,
-        Subscription = 2,
     }
     public class Operations : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Operation>, System.Collections.IEnumerable
     {
@@ -1959,55 +1955,16 @@ namespace GraphQL.Types
     }
     public class DirectiveGraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
     {
-        public DirectiveGraphType(string name, params GraphQL.Types.DirectiveLocation[] locations) { }
-        public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
+        public DirectiveGraphType(string name, params GraphQLParser.AST.DirectiveLocation[] locations) { }
+        public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQLParser.AST.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments? Arguments { get; set; }
         public string? Description { get; set; }
         public virtual bool? Introspectable { get; }
-        public System.Collections.Generic.List<GraphQL.Types.DirectiveLocation> Locations { get; }
+        public System.Collections.Generic.List<GraphQLParser.AST.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
         public bool Repeatable { get; set; }
         public override string ToString() { }
         public virtual void Validate(GraphQL.Types.AppliedDirective applied) { }
-    }
-    public enum DirectiveLocation
-    {
-        [System.ComponentModel.Description("Location adjacent to a query operation.")]
-        Query = 0,
-        [System.ComponentModel.Description("Location adjacent to a mutation operation.")]
-        Mutation = 1,
-        [System.ComponentModel.Description("Location adjacent to a subscription operation.")]
-        Subscription = 2,
-        [System.ComponentModel.Description("Location adjacent to a field.")]
-        Field = 3,
-        [System.ComponentModel.Description("Location adjacent to a fragment definition.")]
-        FragmentDefinition = 4,
-        [System.ComponentModel.Description("Location adjacent to a fragment spread.")]
-        FragmentSpread = 5,
-        [System.ComponentModel.Description("Location adjacent to an inline fragment.")]
-        InlineFragment = 6,
-        [System.ComponentModel.Description("Location adjacent to a schema definition.")]
-        Schema = 7,
-        [System.ComponentModel.Description("Location adjacent to a scalar definition.")]
-        Scalar = 8,
-        [System.ComponentModel.Description("Location adjacent to an object type definition.")]
-        Object = 9,
-        [System.ComponentModel.Description("Location adjacent to a field definition.")]
-        FieldDefinition = 10,
-        [System.ComponentModel.Description("Location adjacent to an argument definition.")]
-        ArgumentDefinition = 11,
-        [System.ComponentModel.Description("Location adjacent to an interface definition.")]
-        Interface = 12,
-        [System.ComponentModel.Description("Location adjacent to a union definition.")]
-        Union = 13,
-        [System.ComponentModel.Description("Location adjacent to an enum definition")]
-        Enum = 14,
-        [System.ComponentModel.Description("Location adjacent to an enum value definition")]
-        EnumValue = 15,
-        [System.ComponentModel.Description("Location adjacent to an input object type definition.")]
-        InputObject = 16,
-        [System.ComponentModel.Description("Location adjacent to an input object field definition.")]
-        InputFieldDefinition = 17,
     }
     [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.All, AllowMultiple=false)]
     public abstract class EnumCaseAttribute : System.Attribute
@@ -3092,7 +3049,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class DirectivesInAllowedLocationsError : GraphQL.Validation.ValidationError
     {
-        public DirectivesInAllowedLocationsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Types.DirectiveLocation candidateLocation) { }
+        public DirectivesInAllowedLocationsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQLParser.AST.DirectiveLocation candidateLocation) { }
     }
     [System.Serializable]
     public class FieldsOnCorrectTypeError : GraphQL.Validation.ValidationError

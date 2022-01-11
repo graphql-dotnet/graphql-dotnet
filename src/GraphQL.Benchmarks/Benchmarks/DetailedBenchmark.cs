@@ -220,7 +220,7 @@ namespace GraphQL.Benchmarks
 
             public GraphQLDocument Parse()
             {
-                return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.IgnoreComments });
+                return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.Comments });
             }
 
             public Document Convert()

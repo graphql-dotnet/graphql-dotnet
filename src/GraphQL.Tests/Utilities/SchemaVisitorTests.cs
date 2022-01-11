@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Tests.Utilities.Visitors;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 

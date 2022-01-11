@@ -9,6 +9,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {

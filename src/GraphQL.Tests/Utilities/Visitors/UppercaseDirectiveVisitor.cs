@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Utilities.Visitors
 {
