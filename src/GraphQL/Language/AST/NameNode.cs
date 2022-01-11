@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
-        public NameNode(string name, SourceLocation location)
+        public NameNode(string name, GraphQLLocation location)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             SourceLocation = location;
@@ -32,7 +33,7 @@ namespace GraphQL.Language.AST
         public string Name { get; }
 
         /// <inheritdoc/>
-        public SourceLocation SourceLocation { get; }
+        public GraphQLLocation SourceLocation { get; }
 
         IEnumerable<INode>? INode.Children => null;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the node's location within the source document.
         /// </summary>
-        SourceLocation SourceLocation { get; }
+        GraphQLLocation SourceLocation { get; }
 
         /// <summary>
         /// Returns a list of children nodes. If the node doesn't have children, returns <see langword="null"/>.

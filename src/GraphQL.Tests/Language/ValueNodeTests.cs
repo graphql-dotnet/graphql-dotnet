@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -28,8 +29,8 @@ namespace GraphQL.Tests.Language
         [Fact]
         public void namenode_can_contain_empty_location()
         {
-            new NameNode("a").SourceLocation.ShouldBe(default(SourceLocation));
-            new NameNode("a", default(SourceLocation)).SourceLocation.ShouldBe(default(SourceLocation));
+            new NameNode("a").SourceLocation.ShouldBe(default(GraphQLLocation));
+            new NameNode("a", default(GraphQLLocation)).SourceLocation.ShouldBe(default(GraphQLLocation));
         }
 
         [Fact]

@@ -98,6 +98,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
 ### 13. Changes caused by GraphQL-Parser v8
 
 - `OperationType` and `DirectiveLocation` enums were removed, use enums from `GraphQLParser.AST` namespace
+- `SourceLocation` struct was removed, use `GraphQLLocation` from `GraphQLParser.AST` namespace
 
 ### 14. Classes and members marked as obsolete have been removed
 

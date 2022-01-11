@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
@@ -19,7 +20,7 @@ namespace GraphQL.Language.AST
         public CommentNode? CommentNode { get; set; }
 
         /// <inheritdoc/>
-        public SourceLocation SourceLocation { get; set; }
+        public GraphQLLocation SourceLocation { get; set; }
 
         /// <inheritdoc/>
         public virtual IEnumerable<INode>? Children => null;

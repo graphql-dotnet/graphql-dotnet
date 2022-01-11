@@ -1285,7 +1285,7 @@ namespace GraphQL.Language.AST
         public virtual System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode>? Children { get; }
         public string? Comment { get; }
         public GraphQL.Language.AST.CommentNode? CommentNode { get; set; }
-        public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
+        public GraphQLParser.AST.GraphQLLocation SourceLocation { get; set; }
         public virtual void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Argument : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.IHaveValue, GraphQL.Language.AST.INode
@@ -1440,7 +1440,7 @@ namespace GraphQL.Language.AST
     public interface INode
     {
         System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode>? Children { get; }
-        GraphQL.Language.AST.SourceLocation SourceLocation { get; }
+        GraphQLParser.AST.GraphQLLocation SourceLocation { get; }
         void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state);
     }
     public interface ISelection : GraphQL.Language.AST.IHaveDirectives, GraphQL.Language.AST.INode { }
@@ -1492,9 +1492,9 @@ namespace GraphQL.Language.AST
     public readonly struct NameNode : GraphQL.Language.AST.INode
     {
         public NameNode(string name) { }
-        public NameNode(string name, GraphQL.Language.AST.SourceLocation location) { }
+        public NameNode(string name, GraphQLParser.AST.GraphQLLocation location) { }
         public string Name { get; }
-        public GraphQL.Language.AST.SourceLocation SourceLocation { get; }
+        public GraphQLParser.AST.GraphQLLocation SourceLocation { get; }
         public void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class NamedType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveName, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
@@ -1571,16 +1571,6 @@ namespace GraphQL.Language.AST
         public void Prepend(GraphQL.Language.AST.ISelection selection) { }
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
-    }
-    public readonly struct SourceLocation : System.IEquatable<GraphQL.Language.AST.SourceLocation>
-    {
-        public SourceLocation(int start, int end) { }
-        public int End { get; }
-        public int Start { get; }
-        public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
-        public override bool Equals(object? obj) { }
-        public override int GetHashCode() { }
-        public override string ToString() { }
     }
     public class StringValue : GraphQL.Language.AST.ValueNode<string>
     {
