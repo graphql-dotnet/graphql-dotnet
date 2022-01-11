@@ -66,8 +66,8 @@ Specific support is provided for serializing and deserializing to the following 
 
 Note that when deserializing a `IList<GraphQLRequest>`, and when the JSON data is a
 single request rather than a list of requests, the request will be deserialized into
-a list or array of a single item. For example, `{"query":"{hero}"}` deserializes into
-`new[] { new GraphQLRequest { Query = "hero" }}`.
+a list or array of a single item. For example, `{"query":"{ hero }"}` deserializes into
+`new[] { new GraphQLRequest { Query = "{ hero }" }}`.
 
 ### 4. `IGraphQLTextSerializer` interface to support serialization to/from strings.
 
