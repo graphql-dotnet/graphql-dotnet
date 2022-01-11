@@ -150,9 +150,9 @@ The following classes and members that were marked with `[Obsolete]` in v4 have 
 | Class or member | Notes |
 |-----------------|-------|
 | `GraphQL.NewtonsoftJson.StringExtensions.GetValue`     |                             |
-| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `Read` and `Deserialize` instead |
-| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsJsonConverter` instead    |
-| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `Read` and `Deserialize` instead |
+| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `Read` or `Deserialize` instead |
+| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsJsonConverter` instead   |
+| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `Read` or `Deserialize` instead |
 | `GraphQL.TypeExtensions.GetEnumerableElementType`      |                             |
 | `GraphQL.TypeExtensions.IsNullable`                    |                             |
 | `GraphQL.Builders.ConnectionBuilder.Unidirectional`    | `Unidirectional` is default and does not need to be called |
