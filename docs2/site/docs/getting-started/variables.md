@@ -48,10 +48,10 @@ a JSON-formatted variables string to an `Inputs` class suitable for passing to t
 var variablesJson = /* get from request */;
 var inputs = new GraphQLSerializer().Deserialize<Inputs>(variablesJson);
 
-await schema.ExecuteAsync(_ =>
+await schema.ExecuteAsync(options =>
 {
-  _.Query = "...";
-  _.Variables = inputs;
+  options.Query = "...";
+  options.Variables = inputs;
 });
 ```
 
