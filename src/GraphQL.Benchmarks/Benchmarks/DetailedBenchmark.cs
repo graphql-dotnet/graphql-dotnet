@@ -230,7 +230,7 @@ namespace GraphQL.Benchmarks
 
             public Inputs DeserializeInputs()
             {
-                return _serializer.Deserialize<Inputs>(InputsString) ?? Inputs.Empty;
+                return _serializer.Deserialize<Inputs>(InputsString);
             }
 
             public Language.AST.Variables ParseVariables()
@@ -238,7 +238,7 @@ namespace GraphQL.Benchmarks
                 return Inputs == null ? null : new ValidationContext
                 {
                     Schema = Schema,
-                    Variables = Inputs,
+                    Variables = Inputs ?? Inputs.Empty,
                     Operation = Operation,
                 }.GetVariableValues();
             }
@@ -250,7 +250,7 @@ namespace GraphQL.Benchmarks
                 {
                     Schema = Schema,
                     Document = Document,
-                    Variables = Inputs
+                    Variables = Inputs ?? Inputs.Empty,
                 }).Result.validationResult;
             }
 
