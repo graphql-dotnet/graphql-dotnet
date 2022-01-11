@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Introspection
 {

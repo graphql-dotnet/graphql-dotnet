@@ -4,13 +4,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Introspection;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationType = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Utilities
 {
@@ -59,14 +57,14 @@ namespace GraphQL.Utilities
         /// <returns>Created schema.</returns>
         public virtual Schema Build(string typeDefinitions)
         {
-            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
+            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.Comments : IgnoreOptions.None });
             Validate(document);
             return BuildSchemaFrom(document);
         }
 
         protected virtual void Validate(GraphQLDocument document)
         {
-            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name!.Value);
+            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().ToLookup(def => def.Name!.Value);
             var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
             if (duplicates.Length > 0)
             {
@@ -104,9 +102,21 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         break;
                     }
 
-                    case ASTNodeKind.TypeExtensionDefinition:
+                    case ASTNodeKind.ObjectTypeExtension:
                     {
-                        var type = ToObjectGraphType(def.As<GraphQLTypeExtensionDefinition>().Definition!, true);
+                        var ext = def.As<GraphQLObjectTypeExtension>();
+                        //TODO: rewrite
+                        var typeDef = new GraphQLObjectTypeDefinition
+                        {
+                            Comment = ext.Comment,
+                            Description = null,
+                            Directives = ext.Directives,
+                            Fields = ext.Fields,
+                            Interfaces = ext.Interfaces,
+                            Location = ext.Location,
+                            Name = ext.Name,
+                        };
+                        var type = ToObjectGraphType(typeDef, true);
                         _types[type.Name] = type;
                         break;
                     }
@@ -339,7 +349,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
             field.SetAstType(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
@@ -370,7 +380,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
             field.SetAstType(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
@@ -515,17 +525,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Text.ToString(),
                 Repeatable = directiveDef.Repeatable,
-                Arguments = ToQueryArguments(directiveDef.Arguments)
+                Arguments = ToQueryArguments(directiveDef.Arguments?.Items)
             };
 
-            if (directiveDef.Locations?.Count > 0) // just in case
+            if (directiveDef.Locations.Items.Count > 0) // just in case
             {
-                foreach (var location in directiveDef.Locations)
+                foreach (var location in directiveDef.Locations.Items)
                 {
-                    if (__DirectiveLocation.Instance.Values.FindByName(location.Value)?.Value is DirectiveLocation l)
-                        result.Locations.Add(l);
-                    else
-                        throw new InvalidOperationException($"Directive '{result.Name}' has an unknown directive location '{location.Value}'.");
+                    result.Locations.Add(location);
                 }
             }
 
@@ -622,13 +629,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 }
                 case ASTNodeKind.StringValue:
                 {
-                    var str = source as GraphQLScalarValue;
+                    var str = source as GraphQLStringValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
                     return (string)str!.Value;
                 }
                 case ASTNodeKind.IntValue:
                 {
-                    var str = source as GraphQLScalarValue;
+                    var str = source as GraphQLIntValue;
 
                     Debug.Assert(str != null, nameof(str) + " != null");
                     if (Int.TryParse(str!.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
@@ -658,7 +665,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 }
                 case ASTNodeKind.FloatValue:
                 {
-                    var str = source as GraphQLScalarValue;
+                    var str = source as GraphQLFloatValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
 
                     // the idea is to see if there is a loss of accuracy of value
@@ -691,15 +698,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 }
                 case ASTNodeKind.BooleanValue:
                 {
-                    var str = source as GraphQLScalarValue;
+                    var str = source as GraphQLBooleanValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
                     return (str!.Value.Length == 4).Boxed(); /*true.Length=4*/
                 }
                 case ASTNodeKind.EnumValue:
                 {
-                    var str = source as GraphQLScalarValue;
+                    var str = source as GraphQLEnumValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return (string)str!.Value;
+                    return (string)str!.Name.Value;
                 }
                 case ASTNodeKind.ObjectValue:
                 {

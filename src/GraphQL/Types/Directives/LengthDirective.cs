@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Validation.Rules;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {

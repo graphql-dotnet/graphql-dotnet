@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Language;
 using GraphQL.Types;
@@ -64,10 +65,23 @@ namespace GraphQL.Tests.Bugs
         [InlineData(ASTNodeKind.BooleanValue, "false")]
         public void Values_Parse_Successfully(ASTNodeKind kind, string valueString)
         {
+            ASTNode BuildNode()
+            {
+                return kind switch
+                {
+                    ASTNodeKind.IntValue => new GraphQLIntValue(),
+                    ASTNodeKind.FloatValue => new GraphQLFloatValue(),
+                    ASTNodeKind.BooleanValue => new GraphQLBooleanValue(),
+                    _ => throw new NotSupportedException(),
+                };
+            }
+
             //note: thousand separators and/or culture-specific characters are invalid graphql literals, and will not be returned by graphql-parser
             //uppercase TRUE and FALSE are also invalid graphql input data, and will not be returned by graphql-parser
             //whitespace will not be returned by graphql-parser
-            _ = CoreToVanillaConverter.Value(new GraphQLScalarValue(kind) { Value = valueString });
+            dynamic node = BuildNode();
+            node.Value = valueString;
+            _ = CoreToVanillaConverter.Value(node);
         }
     }
 

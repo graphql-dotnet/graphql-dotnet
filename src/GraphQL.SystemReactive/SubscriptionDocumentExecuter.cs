@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {

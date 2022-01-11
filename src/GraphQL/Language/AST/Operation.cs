@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
