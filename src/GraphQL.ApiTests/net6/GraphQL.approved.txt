@@ -495,7 +495,7 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure, System.Threading.CancellationToken cancellationToken = default) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
@@ -1775,7 +1775,7 @@ namespace GraphQL.Subscription
         public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>>? Streams { get; set; }
     }
 }
-namespace GraphQL.Transports.Json
+namespace GraphQL.Transport
 {
     public class GraphQLRequest
     {
@@ -1789,12 +1789,12 @@ namespace GraphQL.Transports.Json
         public string Query { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
     }
-    public class WebSocketMessage
+    public class OperationMessage
     {
         public const string ID_KEY = "id";
         public const string PAYLOAD_KEY = "payload";
         public const string TYPE_KEY = "type";
-        public WebSocketMessage() { }
+        public OperationMessage() { }
         public string? Id { get; set; }
         public object? Payload { get; set; }
         public string? Type { get; set; }
