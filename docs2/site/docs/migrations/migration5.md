@@ -43,8 +43,8 @@ JSON element node, stored within an `object`, into a specific type. The specific
 serialization engine you are using may have additional `Read` members as would be expected
 for that library.
 
-Be aware that System.Text.Json defaults to case-sensitive deserialization, while
-Newtonsoft.Json defaults to case-insensitive deserialization. However, the supported
+Be aware that `System.Text.Json` defaults to case-sensitive deserialization, while
+`Newtonsoft.Json` defaults to case-insensitive deserialization. However, the supported
 data models (such as `GraphQLRequest` and `WebSocketMessage`) will always deserialize
 with case-sensitive camelCase deserialization. You can write your own data classes
 which will behave in the default manner of the serializer's configuration. You can
@@ -203,15 +203,15 @@ public static class StringExtensions
 }
 ```
 
-### 16. `WriteToStringAsync` has extension method has been removed.
+### 16. The `WriteToStringAsync` extension methods have been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
 The asynchronous text serialization methods have been removed as the underlying serialization
 providers execute synchronously when serializing to a string.
 
 The `WriteAsync()` method can be used to asynchronously serialize to a stream. However,
-the Newtonsoft.Json serializer does not support asynchronous serialization, so synchronous
-calls are made to the underlying stream. Only System.Text.Json supports asynchronous writing.
+the `Newtonsoft.Json` serializer does not support asynchronous serialization, so synchronous
+calls are made to the underlying stream. Only `System.Text.Json` supports asynchronous writing.
 
 ### 17. Other changes to the serialization infrastructure
 
