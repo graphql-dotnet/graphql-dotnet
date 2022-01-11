@@ -29,7 +29,7 @@ Here is what this query would look like as a JSON request:
 Call `.Deserialize<GraphQLRequest>()` to parse a JSON request to provide it to the `DocumentExecuter`:
 
 ```csharp
-var requestJson = // request as shown above
+var requestJson = /* request as shown above */;
 var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(requestJson);
 
 var result = await schema.ExecuteAsync(options =>
@@ -45,7 +45,7 @@ If you need to parse the variables separately from the query, you can call `.Des
 a JSON-formatted variables string to an `Inputs` class suitable for passing to the `DocumentExecuter`:
 
 ```csharp
-var variablesJson = // get from request
+var variablesJson = /* get from request */;
 var inputs = new GraphQLSerializer().Deserialize<Inputs>(variablesJson);
 
 await schema.ExecuteAsync(_ =>
