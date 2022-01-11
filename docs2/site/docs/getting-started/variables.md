@@ -63,7 +63,7 @@ When using dependency injection, you will typically register the serializer via 
 `ISchema` and `IDocumentExecuter`, resulting with code more similar to the following:
 
 ```csharp
-Task<string> ExecuteAsync(string request, CancellationToken cancellationToken)
+Task<string> ExecuteAsync(string request, CancellationToken cancellationToken = default)
 {
   var request = _serializer.Deserialize<GraphQLRequest>(request);
   var result = await _documentExecuter.ExecuteAsync(options =>
