@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Execution;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -38,8 +38,8 @@ namespace GraphQL.NewtonsoftJson
                 objectType == typeof(GraphQLRequest[]))
                 return new GraphQLRequestListJsonConverter();
 
-            if (objectType == typeof(WebSocketMessage))
-                return new WebSocketMessageJsonConverter();
+            if (objectType == typeof(OperationMessage))
+                return new OperationMessageJsonConverter();
 
             return base.ResolveContractConverter(objectType);
         }

@@ -1,4 +1,4 @@
-namespace GraphQL.Transports.Json
+namespace GraphQL.Transport
 {
     /// <summary>
     /// Represents data sent by client to GraphQL server.

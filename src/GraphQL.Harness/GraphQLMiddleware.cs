@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

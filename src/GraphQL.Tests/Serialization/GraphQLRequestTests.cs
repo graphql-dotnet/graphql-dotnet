@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using Shouldly;
 using Xunit;
 

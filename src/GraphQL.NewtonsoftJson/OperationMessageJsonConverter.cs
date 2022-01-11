@@ -1,16 +1,16 @@
 using System;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
-    /// A custom JsonConverter for reading or writing a <see cref="WebSocketMessage"/> object.
+    /// A custom JsonConverter for reading or writing a <see cref="OperationMessage"/> object.
     /// </summary>
-    public class WebSocketMessageJsonConverter : JsonConverter
+    public class OperationMessageJsonConverter : JsonConverter
     {
         /// <inheritdoc/>
-        public override bool CanConvert(Type objectType) => objectType == typeof(WebSocketMessage);
+        public override bool CanConvert(Type objectType) => objectType == typeof(OperationMessage);
 
         /// <inheritdoc/>
         public override bool CanRead => true;
@@ -21,18 +21,18 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var request = (WebSocketMessage)value;
+            var request = (OperationMessage)value;
             writer.WriteStartObject();
-            writer.WritePropertyName(WebSocketMessage.TYPE_KEY);
+            writer.WritePropertyName(OperationMessage.TYPE_KEY);
             writer.WriteValue(request.Type);
             if (request.Id != null)
             {
-                writer.WritePropertyName(WebSocketMessage.ID_KEY);
+                writer.WritePropertyName(OperationMessage.ID_KEY);
                 writer.WriteValue(request.Id);
             }
             if (request.Payload != null)
             {
-                writer.WritePropertyName(WebSocketMessage.PAYLOAD_KEY);
+                writer.WritePropertyName(OperationMessage.PAYLOAD_KEY);
                 serializer.Serialize(writer, request.Payload);
             }
             writer.WriteEndObject();
@@ -44,7 +44,7 @@ namespace GraphQL.NewtonsoftJson
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException();
 
-            var request = new WebSocketMessage();
+            var request = new OperationMessage();
 
             while (reader.Read())
             {
@@ -58,13 +58,13 @@ namespace GraphQL.NewtonsoftJson
 
                 switch (key)
                 {
-                    case WebSocketMessage.TYPE_KEY:
+                    case OperationMessage.TYPE_KEY:
                         request.Type = reader.ReadAsString();
                         break;
-                    case WebSocketMessage.ID_KEY:
+                    case OperationMessage.ID_KEY:
                         request.Id = reader.ReadAsString();
                         break;
-                    case WebSocketMessage.PAYLOAD_KEY:
+                    case OperationMessage.PAYLOAD_KEY:
                         if (!reader.Read())
                             throw new JsonException();
                         request.Payload = serializer.Deserialize<object>(reader);

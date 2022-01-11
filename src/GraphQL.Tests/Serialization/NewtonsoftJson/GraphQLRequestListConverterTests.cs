@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.NewtonsoftJson;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using Shouldly;
 using Xunit;
 

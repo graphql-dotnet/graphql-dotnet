@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -200,8 +199,7 @@ namespace GraphQL
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
         /// <param name="serializer">An instance of <see cref="IGraphQLTextSerializer"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
-        /// <param name="cancellationToken">A cancellation token to cancel the execution</param>
-        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLTextSerializer serializer, Action<ExecutionOptions> configure, CancellationToken cancellationToken = default)
+        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLTextSerializer serializer, Action<ExecutionOptions> configure)
         {
             if (configure == null)
             {
@@ -212,7 +210,6 @@ namespace GraphQL
             var result = await executor.ExecuteAsync(options =>
             {
                 options.Schema = schema;
-                options.CancellationToken = cancellationToken;
                 configure(options);
             }).ConfigureAwait(false);
 

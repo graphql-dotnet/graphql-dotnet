@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 
 namespace GraphQL.SystemTextJson
 {
@@ -152,9 +152,9 @@ namespace GraphQL.SystemTextJson
                 _options.Converters.Add(new GraphQLRequestListJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(WebSocketMessage))))
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(OperationMessage))))
             {
-                _options.Converters.Add(new WebSocketMessageJsonConverter());
+                _options.Converters.Add(new OperationMessageJsonConverter());
             }
         }
 

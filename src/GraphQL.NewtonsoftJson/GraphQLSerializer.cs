@@ -154,7 +154,9 @@ namespace GraphQL.NewtonsoftJson
             await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        /// <inheritdoc cref="IGraphQLTextSerializer.Serialize{T}(T)"/>
+        /// <summary>
+        /// Serializes <paramref name="value"/> to the specified <see cref="TextWriter"/>.
+        /// </summary>
         public void Write<T>(TextWriter textWriter, T value)
         {
             using var stringWriter = new JsonTextWriter(textWriter)
@@ -181,7 +183,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Deserializes the specified string to the specified object type.
+        /// Deserializes from the specified <see cref="TextReader"/> to the specified object type.
         /// </summary>
         public T Read<T>(TextReader json)
         {

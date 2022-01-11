@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson

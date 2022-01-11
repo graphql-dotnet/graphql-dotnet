@@ -1,6 +1,9 @@
-namespace GraphQL.Transports.Json
+namespace GraphQL.Transport
 {
-    public class WebSocketMessage
+    /// <summary>
+    /// Represents a message typically used by the graphql-ws or graphql-transport-ws WebSockets-based protocols.
+    /// </summary>
+    public class OperationMessage
     {
         public const string ID_KEY = "id";
         public const string TYPE_KEY = "type";
@@ -12,7 +15,7 @@ namespace GraphQL.Transports.Json
         public string? Id { get; set; }
 
         /// <summary>
-        /// Type of packet
+        /// Type of operation
         /// </summary>
         public string? Type { get; set; }
 

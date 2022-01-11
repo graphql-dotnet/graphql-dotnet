@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Transports.Json;
+using GraphQL.Transport;
 
 namespace GraphQL
 {
@@ -9,7 +9,7 @@ namespace GraphQL
     /// Serializes and deserializes object hierarchies to/from a stream.
     /// Should include special support for <see cref="ExecutionResult"/>, <see cref="Inputs"/>
     /// and transport-specific classes as necessary.
-    /// Typical JSON-specific classes are providied within <see cref="Transports.Json">GraphQL.Transports.Json</see>.
+    /// Typical classes needed by HTTP-based servers are provided within <see cref="Transport">GraphQL.Transport</see>.
     /// </summary>
     public interface IGraphQLSerializer
     {
