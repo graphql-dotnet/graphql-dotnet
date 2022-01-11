@@ -251,9 +251,9 @@ might look like this:
 ```csharp
 var result = await _executer.ExecuteAsync(options =>
 {
-    options.Schema = schema;
+    options.Schema = _schema;
     options.Query = request.Query;
-    options.Variables = request.Variables.ToInputs();
+    options.Variables = _serializer.Deserialize<Inputs>(request.Variables);
     options.RequestServices = context.RequestServices;
 });
 ```

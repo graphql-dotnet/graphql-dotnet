@@ -150,9 +150,9 @@ The following classes and members that were marked with `[Obsolete]` in v4 have 
 | Class or member | Notes |
 |-----------------|-------|
 | `GraphQL.NewtonsoftJson.StringExtensions.GetValue`     |                             |
-| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
-| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsConverter` instead |
-| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `ToInputs` instead        |
+| `GraphQL.NewtonsoftJson.StringExtensions.ToDictionary` | Use `Read` and `Deserialize` instead |
+| `GraphQL.SystemTextJson.ObjectDictionaryConverter`     | Use `InputsJsonConverter` instead    |
+| `GraphQL.SystemTextJson.StringExtensions.ToDictionary` | Use `Read` and `Deserialize` instead |
 | `GraphQL.TypeExtensions.GetEnumerableElementType`      |                             |
 | `GraphQL.TypeExtensions.IsNullable`                    |                             |
 | `GraphQL.Builders.ConnectionBuilder.Unidirectional`    | `Unidirectional` is default and does not need to be called |
@@ -177,6 +177,8 @@ The `WriteAsync` method's functionality has not changed.
 Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
 `Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation. Note that
 these methods will return `null` if a null string or the string "null" is passed to them.
+The `ExecutionOptions.Variables` property does not require `Inputs.Empty`, but if you have
+tests based on the `.ToInputs()` extension method, you may want a direct replacement.
 Equivalent code to the previous functionality is as follows:
 
 ```cs
@@ -185,7 +187,7 @@ using GraphQL.SystemTextJson;
 
 public static class StringExtensions
 {
-    private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer();
+    private static readonly GraphQLSerializer _serializer = new();
 
     public static Inputs ToInputs(string json)
         => json == null ? Inputs.Empty : _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
