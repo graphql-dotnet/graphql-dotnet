@@ -10,20 +10,24 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class OperationMessageJsonConverter : JsonConverter<OperationMessage>
     {
+        private const string TYPE_KEY = "type";
+        private const string ID_KEY = "id";
+        private const string PAYLOAD_KEY = "payload";
+
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, OperationMessage value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName(OperationMessage.TYPE_KEY);
+            writer.WritePropertyName(TYPE_KEY);
             writer.WriteStringValue(value.Type);
             if (value.Id != null)
             {
-                writer.WritePropertyName(OperationMessage.ID_KEY);
+                writer.WritePropertyName(ID_KEY);
                 writer.WriteStringValue(value.Id);
             }
             if (value.Payload != null)
             {
-                writer.WritePropertyName(OperationMessage.PAYLOAD_KEY);
+                writer.WritePropertyName(PAYLOAD_KEY);
                 JsonSerializer.Serialize(writer, value.Payload, options);
             }
             writer.WriteEndObject();
@@ -53,13 +57,13 @@ namespace GraphQL.SystemTextJson
 
                 switch (key)
                 {
-                    case OperationMessage.TYPE_KEY:
+                    case TYPE_KEY:
                         request.Type = reader.GetString();
                         break;
-                    case OperationMessage.ID_KEY:
+                    case ID_KEY:
                         request.Id = reader.GetString();
                         break;
-                    case OperationMessage.PAYLOAD_KEY:
+                    case PAYLOAD_KEY:
                         request.Payload = JsonSerializer.Deserialize<JsonElement?>(ref reader, options);
                         break;
                     default:

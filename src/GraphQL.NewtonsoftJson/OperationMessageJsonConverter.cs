@@ -9,6 +9,10 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class OperationMessageJsonConverter : JsonConverter
     {
+        private const string TYPE_KEY = "type";
+        private const string ID_KEY = "id";
+        private const string PAYLOAD_KEY = "payload";
+
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType) => objectType == typeof(OperationMessage);
 
@@ -23,16 +27,16 @@ namespace GraphQL.NewtonsoftJson
         {
             var request = (OperationMessage)value;
             writer.WriteStartObject();
-            writer.WritePropertyName(OperationMessage.TYPE_KEY);
+            writer.WritePropertyName(TYPE_KEY);
             writer.WriteValue(request.Type);
             if (request.Id != null)
             {
-                writer.WritePropertyName(OperationMessage.ID_KEY);
+                writer.WritePropertyName(ID_KEY);
                 writer.WriteValue(request.Id);
             }
             if (request.Payload != null)
             {
-                writer.WritePropertyName(OperationMessage.PAYLOAD_KEY);
+                writer.WritePropertyName(PAYLOAD_KEY);
                 serializer.Serialize(writer, request.Payload);
             }
             writer.WriteEndObject();
@@ -58,13 +62,13 @@ namespace GraphQL.NewtonsoftJson
 
                 switch (key)
                 {
-                    case OperationMessage.TYPE_KEY:
+                    case TYPE_KEY:
                         request.Type = reader.ReadAsString();
                         break;
-                    case OperationMessage.ID_KEY:
+                    case ID_KEY:
                         request.Id = reader.ReadAsString();
                         break;
-                    case OperationMessage.PAYLOAD_KEY:
+                    case PAYLOAD_KEY:
                         if (!reader.Read())
                             throw new JsonException();
                         request.Payload = serializer.Deserialize<object>(reader);

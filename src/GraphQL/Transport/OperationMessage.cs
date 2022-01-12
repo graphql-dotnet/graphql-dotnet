@@ -5,10 +5,6 @@ namespace GraphQL.Transport
     /// </summary>
     public class OperationMessage
     {
-        public const string ID_KEY = "id";
-        public const string TYPE_KEY = "type";
-        public const string PAYLOAD_KEY = "payload";
-
         /// <summary>
         /// Nullable Id
         /// </summary>

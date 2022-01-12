@@ -1779,10 +1779,6 @@ namespace GraphQL.Transport
 {
     public class GraphQLRequest
     {
-        public const string EXTENSIONS_KEY = "extensions";
-        public const string OPERATION_NAME_KEY = "operationName";
-        public const string QUERY_KEY = "query";
-        public const string VARIABLES_KEY = "variables";
         public GraphQLRequest() { }
         public GraphQL.Inputs? Extensions { get; set; }
         public string? OperationName { get; set; }
@@ -1791,9 +1787,6 @@ namespace GraphQL.Transport
     }
     public class OperationMessage
     {
-        public const string ID_KEY = "id";
-        public const string PAYLOAD_KEY = "payload";
-        public const string TYPE_KEY = "type";
         public OperationMessage() { }
         public string? Id { get; set; }
         public object? Payload { get; set; }

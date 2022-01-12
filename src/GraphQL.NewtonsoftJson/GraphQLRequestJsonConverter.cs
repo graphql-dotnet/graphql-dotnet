@@ -9,6 +9,30 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class GraphQLRequestJsonConverter : JsonConverter
     {
+        /// <summary>
+        /// Name for the operation name parameter.
+        /// See https://github.com/graphql/graphql-over-http/blob/master/spec/GraphQLOverHTTP.md#request-parameters
+        /// </summary>
+        private const string OPERATION_NAME_KEY = "operationName";
+
+        /// <summary>
+        /// Name for the query parameter.
+        /// See https://github.com/graphql/graphql-over-http/blob/master/spec/GraphQLOverHTTP.md#request-parameters
+        /// </summary>
+        private const string QUERY_KEY = "query";
+
+        /// <summary>
+        /// Name for the variables parameter.
+        /// See https://github.com/graphql/graphql-over-http/blob/master/spec/GraphQLOverHTTP.md#request-parameters
+        /// </summary>
+        private const string VARIABLES_KEY = "variables";
+
+        /// <summary>
+        /// Name for the extensions parameter.
+        /// See https://github.com/graphql/graphql-over-http/blob/master/spec/GraphQLOverHTTP.md#request-parameters
+        /// </summary>
+        private const string EXTENSIONS_KEY = "extensions";
+
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType) => objectType == typeof(GraphQLRequest);
 
@@ -23,21 +47,21 @@ namespace GraphQL.NewtonsoftJson
         {
             var request = (GraphQLRequest)value;
             writer.WriteStartObject();
-            writer.WritePropertyName(GraphQLRequest.QUERY_KEY);
+            writer.WritePropertyName(QUERY_KEY);
             writer.WriteValue(request.Query);
             if (request.OperationName != null)
             {
-                writer.WritePropertyName(GraphQLRequest.OPERATION_NAME_KEY);
+                writer.WritePropertyName(OPERATION_NAME_KEY);
                 writer.WriteValue(request.OperationName);
             }
             if (request.Variables != null)
             {
-                writer.WritePropertyName(GraphQLRequest.VARIABLES_KEY);
+                writer.WritePropertyName(VARIABLES_KEY);
                 serializer.Serialize(writer, request.Variables);
             }
             if (request.Extensions != null)
             {
-                writer.WritePropertyName(GraphQLRequest.EXTENSIONS_KEY);
+                writer.WritePropertyName(EXTENSIONS_KEY);
                 serializer.Serialize(writer, request.Extensions);
             }
             writer.WriteEndObject();
@@ -63,18 +87,18 @@ namespace GraphQL.NewtonsoftJson
 
                 switch (key)
                 {
-                    case GraphQLRequest.QUERY_KEY:
+                    case QUERY_KEY:
                         request.Query = reader.ReadAsString();
                         break;
-                    case GraphQLRequest.OPERATION_NAME_KEY:
+                    case OPERATION_NAME_KEY:
                         request.OperationName = reader.ReadAsString();
                         break;
-                    case GraphQLRequest.VARIABLES_KEY:
+                    case VARIABLES_KEY:
                         if (!reader.Read())
                             throw new JsonException();
                         request.Variables = serializer.Deserialize<Inputs>(reader);
                         break;
-                    case GraphQLRequest.EXTENSIONS_KEY:
+                    case EXTENSIONS_KEY:
                         if (!reader.Read())
                             throw new JsonException();
                         request.Extensions = serializer.Deserialize<Inputs>(reader);
