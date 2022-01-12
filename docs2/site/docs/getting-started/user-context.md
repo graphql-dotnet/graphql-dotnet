@@ -29,7 +29,7 @@ public class Query : ObjectGraphType
 }
 ```
 
-If you need to access the User from the http request and populate this globally, you will need to add a User property to your custom `UserContext` class and modify your Startup configuration as follows:
+If you need to access the User from the http request and populate this in validation rules you may need to add a User property to your custom `UserContext` class and modify your Startup configuration as follows:
 ```csharp
 
   public class MyGraphQLUserContext : Dictionary<string, object?>
@@ -45,3 +45,4 @@ If you need to access the User from the http request and populate this globally,
   services.AddGraphQL()
           .AddUserContextBuilder(httpContext => new MyGraphQLUserContext(httpContext.User));
 ```
+Please note that the `AddUserContextBuilder` method above comes from the [`GraphQL.Server`](https://github.com/graphql-dotnet/server) project.
