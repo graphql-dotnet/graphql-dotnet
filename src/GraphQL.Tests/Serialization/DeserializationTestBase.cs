@@ -53,18 +53,18 @@ namespace GraphQL.Tests.Serialization
         {
             var array = actual["array"].ShouldBeOfType<List<object>>();
             array[0].ShouldBeNull();
-            array[1].ShouldBeOfType<string>().ShouldBe("test");
-            array[2].ShouldBeOfType<int>().ShouldBe(123);
-            array[3].ShouldBeOfType<double>().ShouldBe(1.2);
+            array[1].ShouldBeOfType<string>().ShouldBe((string)ExampleData.array[1]);
+            array[2].ShouldBeOfType<int>().ShouldBe((int)ExampleData.array[2]);
+            array[3].ShouldBeOfType<double>().ShouldBe((double)ExampleData.array[3]);
             var obj = actual["obj"].ShouldBeOfType<Dictionary<string, object>>();
             obj["itemNull"].ShouldBeNull();
-            obj["itemString"].ShouldBeOfType<string>().ShouldBe("test");
-            obj["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
+            obj["itemString"].ShouldBeOfType<string>().ShouldBe(ExampleData.obj.itemString);
+            obj["itemNum"].ShouldBeOfType<int>().ShouldBe(ExampleData.obj.itemNum);
+            obj["itemFloat"].ShouldBeOfType<double>().ShouldBe(ExampleData.obj.itemFloat);
             actual["itemNull"].ShouldBeNull();
-            actual["itemString"].ShouldBeOfType<string>().ShouldBe("test");
-            actual["itemNum"].ShouldBeOfType<int>().ShouldBe(123);
-            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(12.4);
+            actual["itemString"].ShouldBeOfType<string>().ShouldBe(ExampleData.itemString);
+            actual["itemNum"].ShouldBeOfType<int>().ShouldBe(ExampleData.itemNum);
+            actual["itemFloat"].ShouldBeOfType<double>().ShouldBe(ExampleData.itemFloat);
             actual["itemBigInt"].ShouldBeOfType<BigInteger>().ShouldBe(ExampleData.itemBigInt);
         }
     }
