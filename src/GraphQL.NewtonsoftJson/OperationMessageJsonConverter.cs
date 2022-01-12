@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Transport;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.NewtonsoftJson
 {
@@ -71,7 +72,7 @@ namespace GraphQL.NewtonsoftJson
                     case PAYLOAD_KEY:
                         if (!reader.Read())
                             throw new JsonException();
-                        request.Payload = serializer.Deserialize<object>(reader);
+                        request.Payload = serializer.Deserialize<JObject>(reader);
                         break;
                     default:
                         //unrecognized key

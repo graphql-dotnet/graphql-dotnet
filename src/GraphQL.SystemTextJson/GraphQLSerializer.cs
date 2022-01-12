@@ -15,7 +15,7 @@ namespace GraphQL.SystemTextJson
     /// Serializes an <see cref="ExecutionResult"/> (or any other object) to a stream using
     /// the <see cref="System.Text.Json"/> library.
     /// </summary>
-    public class GraphQLSerializer : IGraphQLSerializer, IGraphQLTextSerializer
+    public class GraphQLSerializer : IGraphQLTextSerializer
     {
         private readonly JsonSerializerOptions _options;
 

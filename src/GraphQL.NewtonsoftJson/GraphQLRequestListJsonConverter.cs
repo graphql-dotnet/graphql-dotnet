@@ -6,7 +6,8 @@ using Newtonsoft.Json;
 namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
-    /// A custom JsonConverter for reading or writing a <see cref="GraphQLRequest"/> object.
+    /// A custom JsonConverter for reading a list of <see cref="GraphQLRequest"/> objects.
+    /// Will deserialize a single request into a list containing one request. Doesn't support writing.
     /// </summary>
     public class GraphQLRequestListJsonConverter : JsonConverter
     {

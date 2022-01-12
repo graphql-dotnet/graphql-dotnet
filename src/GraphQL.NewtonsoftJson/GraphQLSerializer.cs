@@ -14,7 +14,7 @@ namespace GraphQL.NewtonsoftJson
     /// Serializes an <see cref="ExecutionResult"/> (or any other object) to a stream using
     /// the <see cref="Newtonsoft.Json"/> library.
     /// </summary>
-    public class GraphQLSerializer : IGraphQLSerializer, IGraphQLTextSerializer
+    public class GraphQLSerializer : IGraphQLTextSerializer
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
