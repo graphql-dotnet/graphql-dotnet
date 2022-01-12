@@ -23,19 +23,13 @@ namespace GraphQL.NewtonsoftJson
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider, NamingStrategy);
 
-            if (typeof(Inputs) == objectType)
+            if (objectType == typeof(Inputs))
                 return new InputsJsonConverter();
 
-            if (typeof(GraphQLRequest) == objectType)
+            if (objectType == typeof(GraphQLRequest))
                 return new GraphQLRequestJsonConverter();
 
-            if (objectType == typeof(IEnumerable<GraphQLRequest>) ||
-                objectType == typeof(ICollection<GraphQLRequest>) ||
-                objectType == typeof(IReadOnlyCollection<GraphQLRequest>) ||
-                objectType == typeof(IReadOnlyList<GraphQLRequest>) ||
-                objectType == typeof(IList<GraphQLRequest>) ||
-                objectType == typeof(List<GraphQLRequest>) ||
-                objectType == typeof(GraphQLRequest[]))
+            if (GraphQLRequestListJsonConverter.CanConvertType(objectType))
                 return new GraphQLRequestListJsonConverter();
 
             if (objectType == typeof(OperationMessage))

@@ -9,12 +9,12 @@ namespace GraphQL.Tests.Serialization
         protected readonly TestData ExampleData = new TestData
         {
             array = new object[]
-                {
-                    null,
-                    "test",
-                    123,
-                    1.2
-                },
+            {
+                null,
+                "test",
+                123,
+                1.2
+            },
             obj = new TestChildData
             {
                 itemNull = null,

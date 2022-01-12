@@ -16,13 +16,13 @@ namespace GraphQL.SystemTextJson
         public override bool CanConvert(Type typeToConvert)
         {
             return (
+                typeToConvert == typeof(IList<GraphQLRequest>) ||
+                typeToConvert == typeof(GraphQLRequest[]) ||
+                typeToConvert == typeof(List<GraphQLRequest>) ||
                 typeToConvert == typeof(IEnumerable<GraphQLRequest>) ||
                 typeToConvert == typeof(ICollection<GraphQLRequest>) ||
                 typeToConvert == typeof(IReadOnlyCollection<GraphQLRequest>) ||
-                typeToConvert == typeof(IReadOnlyList<GraphQLRequest>) ||
-                typeToConvert == typeof(IList<GraphQLRequest>) ||
-                typeToConvert == typeof(List<GraphQLRequest>) ||
-                typeToConvert == typeof(GraphQLRequest[]));
+                typeToConvert == typeof(IReadOnlyList<GraphQLRequest>));
         }
 
         /// <inheritdoc/>

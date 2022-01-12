@@ -73,6 +73,5 @@ namespace GraphQL.Tests.Serialization
             var expected = @"{""type"":null}";
             actual.ShouldBeCrossPlatJson(expected);
         }
-
     }
 }

@@ -3,7 +3,7 @@ using GraphQL.Transport;
 namespace GraphQL
 {
     /// <summary>
-    /// Serializes and deserializes object hierarchies to/from a string.
+    /// Serializes and deserializes object hierarchies to/from a string as well as to/from a stream.
     /// Should include special support for <see cref="ExecutionResult"/>, <see cref="Inputs"/>
     /// and transport-specific classes as necessary.
     /// Typical classes needed by HTTP-based servers are provided within <see cref="Transport">GraphQL.Transport</see>.

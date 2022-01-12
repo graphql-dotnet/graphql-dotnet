@@ -26,7 +26,8 @@ namespace GraphQL
         ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Deserializes the specified JSON element to the specified object type.
+        /// Deserializes the specified JSON element (element type depends on the serializer
+        /// implementation) to the specified object type.
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         T ReadNode<T>(object? value);

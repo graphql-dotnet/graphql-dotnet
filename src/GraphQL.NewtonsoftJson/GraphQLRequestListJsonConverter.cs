@@ -12,34 +12,29 @@ namespace GraphQL.NewtonsoftJson
     {
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
+            => CanConvertType(objectType);
+
+        internal static bool CanConvertType(Type objectType)
         {
             return (
+                objectType == typeof(IList<GraphQLRequest>) ||
+                objectType == typeof(GraphQLRequest[]) ||
                 objectType == typeof(IEnumerable<GraphQLRequest>) ||
+                objectType == typeof(List<GraphQLRequest>) ||
                 objectType == typeof(ICollection<GraphQLRequest>) ||
                 objectType == typeof(IReadOnlyCollection<GraphQLRequest>) ||
-                objectType == typeof(IReadOnlyList<GraphQLRequest>) ||
-                objectType == typeof(IList<GraphQLRequest>) ||
-                objectType == typeof(List<GraphQLRequest>) ||
-                objectType == typeof(GraphQLRequest[]));
+                objectType == typeof(IReadOnlyList<GraphQLRequest>));
         }
 
         /// <inheritdoc/>
         public override bool CanRead => true;
 
         /// <inheritdoc/>
-        public override bool CanWrite => true;
+        public override bool CanWrite => false;
 
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var requests = (IEnumerable<GraphQLRequest>)value;
-            writer.WriteStartArray();
-            foreach (var request in requests)
-            {
-                serializer.Serialize(writer, request);
-            }
-            writer.WriteEndArray();
-        }
+            => throw new NotSupportedException();
 
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

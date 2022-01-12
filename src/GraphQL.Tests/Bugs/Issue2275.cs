@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = @"query($data:Input!) {
                                 request(data: $data)
                 }";
-                _.Variables = serializer.Deserialize<Inputs>(@" {
+                _.Variables = serializer.Deserialize<Inputs>(@"{
                     ""data"": {
                         ""clientId"": 2,
                         ""filters"": [{
