@@ -241,6 +241,5 @@ namespace GraphQL.Tests.Serialization
             actual.OperationName.ShouldBe("hello2");
             Verify(actual.Extensions);
         }
-
     }
 }
