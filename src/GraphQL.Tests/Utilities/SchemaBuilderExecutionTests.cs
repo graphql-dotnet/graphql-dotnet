@@ -446,7 +446,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -467,7 +467,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""source"": true }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -484,7 +484,7 @@ namespace GraphQL.Tests.Utilities
             var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -501,7 +501,7 @@ namespace GraphQL.Tests.Utilities
             var result = await ExecuteAsync(schema, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -522,7 +522,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -543,7 +543,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -586,7 +586,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -608,7 +608,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""three"": true }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -630,7 +630,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""four"": true }");
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -728,7 +728,7 @@ namespace GraphQL.Tests.Utilities
 
             var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
             var expectedResult = CreateQueryResult(expected);
-            var serializedExpectedResult = Writer.Serialize(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -742,7 +742,7 @@ namespace GraphQL.Tests.Utilities
                 configure(options);
             }).ConfigureAwait(false);
 
-            return Writer.Serialize(result);
+            return Serializer.Serialize(result);
         }
     }
 

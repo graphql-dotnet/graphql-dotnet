@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IGraphQLTextSerializer Writer = new GraphQLSerializer(indent: true);
+        protected readonly IGraphQLTextSerializer Serializer = new GraphQLSerializer(indent: true);
         protected SchemaBuilder Builder { get; set; }
 
         public ExecutionResult AssertQuery(Action<ExecuteConfig> configure)
@@ -48,8 +48,8 @@ namespace GraphQL.Tests.Utilities
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.Serialize(runResult);
-            var expectedResult = Writer.Serialize(expectedExecutionResult);
+            var writtenResult = Serializer.Serialize(runResult);
+            var expectedResult = Serializer.Serialize(expectedExecutionResult);
 
             string additionalInfo = null;
 
