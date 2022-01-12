@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Serialization
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_GraphQLRequest_Correctly_Simple(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Correctly_Simple(IGraphQLTextSerializer serializer)
         {
             var request = new GraphQLRequest
             {
@@ -24,14 +24,14 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"{ ""query"": ""hello"" }";
 
-            var actual = writer.Serialize(request);
+            var actual = serializer.Serialize(request);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_GraphQLRequest_Correctly_Complex(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Correctly_Complex(IGraphQLTextSerializer serializer)
         {
             var request = new GraphQLRequest
             {
@@ -51,14 +51,14 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"{ ""query"": ""hello"", ""operationName"": ""opname"", ""variables"": { ""arg1"": 1, ""arg2"": ""test"" }, ""extensions"": { ""arg1"": 2, ""arg2"": ""test2"" } }";
 
-            var actual = writer.Serialize(request);
+            var actual = serializer.Serialize(request);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_GraphQLRequest_Correctly_SampleData(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Correctly_SampleData(IGraphQLTextSerializer serializer)
         {
             var request = new GraphQLRequest
             {
@@ -71,14 +71,14 @@ namespace GraphQL.Tests.Serialization
 
             var expected = $"{{ \"query\": \"hello\", \"variables\": {{ \"arg\": {ExampleJson} }} }}";
 
-            var actual = writer.Serialize(request);
+            var actual = serializer.Serialize(request);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_GraphQLRequest_List_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_List_Correctly(IGraphQLTextSerializer serializer)
         {
             var request = new GraphQLRequest
             {
@@ -87,14 +87,14 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"[{ ""query"": ""hello"" }]";
 
-            var actual = writer.Serialize(new List<GraphQLRequest> { request });
+            var actual = serializer.Serialize(new List<GraphQLRequest> { request });
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_GraphQLRequest_Array_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_GraphQLRequest_Array_Correctly(IGraphQLTextSerializer serializer)
         {
             var request = new GraphQLRequest
             {
@@ -103,7 +103,7 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"[{ ""query"": ""hello"" }]";
 
-            var actual = writer.Serialize(new GraphQLRequest[] { request });
+            var actual = serializer.Serialize(new GraphQLRequest[] { request });
 
             actual.ShouldBeCrossPlatJson(expected);
         }

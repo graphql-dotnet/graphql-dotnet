@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Serialization
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Can_Write_Execution_Result(IGraphQLTextSerializer writer)
+        public void Can_Write_Execution_Result(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -52,14 +52,14 @@ namespace GraphQL.Tests.Serialization
               }
             }";
 
-            var actual = writer.Serialize(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult { Executed = true };
 
@@ -67,14 +67,14 @@ namespace GraphQL.Tests.Serialization
               ""data"": null
             }";
 
-            var actual = writer.Serialize(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IGraphQLTextSerializer serializer)
         {
             // "If an error was encountered before execution begins, the data entry should not be present in the result."
             // Source: https://github.com/graphql/graphql-spec/blob/master/spec/Section%207%20--%20Response.md#data
@@ -92,14 +92,14 @@ namespace GraphQL.Tests.Serialization
               ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
             }";
 
-            var actual = writer.Serialize(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer writer)
+        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -111,7 +111,7 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"{ ""data"": {} }";
 
-            var actual = writer.Serialize(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
@@ -137,7 +137,7 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_Path_Property_Correctly(IGraphQLTextSerializer writer)
+        public void Writes_Path_Property_Correctly(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -153,14 +153,14 @@ namespace GraphQL.Tests.Serialization
 
             var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
 
-            var actual = writer.Serialize(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public async Task Synchronous_and_Async_Works_Same(IGraphQLTextSerializer writer)
+        public async Task Synchronous_and_Async_Works_Same(IGraphQLTextSerializer serializer)
         {
             var schema = new GraphQL.StarWars.StarWarsSchema(new GraphQL.StarWars.IoC.SimpleContainer());
             var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
@@ -168,9 +168,9 @@ namespace GraphQL.Tests.Serialization
                 Schema = schema,
                 Query = "IntrospectionQuery".ReadGraphQLRequest()
             });
-            var syncResult = writer.Serialize(result);
+            var syncResult = serializer.Serialize(result);
             var stream = new System.IO.MemoryStream();
-            await writer.WriteAsync(stream, result);
+            await serializer.WriteAsync(stream, result);
             var asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
             syncResult.ShouldBe(asyncResult);
         }

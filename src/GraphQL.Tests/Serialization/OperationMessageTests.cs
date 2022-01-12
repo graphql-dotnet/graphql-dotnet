@@ -5,11 +5,11 @@ using Xunit;
 
 namespace GraphQL.Tests.Serialization
 {
-    public class WebSocketMessageTests : DeserializationTestBase
+    public class OperationMessageTests : DeserializationTestBase
     {
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Reads_WebSocketMessage_Populated(IGraphQLTextSerializer serializer)
+        public void Reads_OperationMessage_Populated(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"id\":\"hello\",\"type\":\"hello2\",\"payload\":{{\"query\":\"hello3\",\"variables\":{ExampleJson}}}}}";
             var actual = serializer.Deserialize<OperationMessage>(test);
@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Reads_WebSocketMessage_Nulls(IGraphQLTextSerializer serializer)
+        public void Reads_OperationMessage_Nulls(IGraphQLTextSerializer serializer)
         {
             var test = $"{{\"id\":null,\"type\":null,\"payload\":null}}";
             var actual = serializer.Deserialize<OperationMessage>(test);
@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Reads_WebSocketMessage_Empty(IGraphQLTextSerializer serializer)
+        public void Reads_OperationMessage_Empty(IGraphQLTextSerializer serializer)
         {
             var test = $"{{}}";
             var actual = serializer.Deserialize<OperationMessage>(test);
@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_WebSocketMessage_Populated(IGraphQLTextSerializer serializer)
+        public void Writes_OperationMessage_Populated(IGraphQLTextSerializer serializer)
         {
             var message = new OperationMessage
             {
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_WebSocketMessage_Nulls(IGraphQLTextSerializer serializer)
+        public void Writes_OperationMessage_Nulls(IGraphQLTextSerializer serializer)
         {
             var message = new OperationMessage();
             var actual = serializer.Serialize(message);
