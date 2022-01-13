@@ -164,11 +164,11 @@ options.UnhandledExecutionDelegate = ctx =>
 ## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
-typically you will pass this object to an implementation of `IDocumentWriter` to convert the
-object tree into json. The `IDocumentWriter` implementations provided by the `GraphQL.SystemTextJson`
+typically you will pass this object to an implementation of `IGraphQLSerializer` to convert the
+object tree into json. The `IGraphQLSerializer` implementations provided by the `GraphQL.SystemTextJson`
 and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
 `IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
-the `IErrorInfoProvider` instance and it will be consumed by the `IDocumentWriter` implementation
+the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
 automatically. Please review the [serialization](../guides/serialization) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list

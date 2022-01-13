@@ -1,17 +1,19 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests
+namespace GraphQL.Tests.Serialization
 {
     /// <summary>
-    /// Tests for <see cref="IDocumentWriter"/> implementations and the custom converters
+    /// Tests for <see cref="IGraphQLTextSerializer"/> implementations and the custom converters
     /// that are used in the process of serializing an <see cref="ExecutionResult"/> to JSON.
     /// </summary>
-    public class DocumentWriterTests
+    public class ExecutionResultTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Can_Write_Execution_Result(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Can_Write_Execution_Result(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -50,14 +52,14 @@ namespace GraphQL.Tests
               }
             }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult { Executed = true };
 
@@ -65,14 +67,14 @@ namespace GraphQL.Tests
               ""data"": null
             }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IGraphQLTextSerializer serializer)
         {
             // "If an error was encountered before execution begins, the data entry should not be present in the result."
             // Source: https://github.com/graphql/graphql-spec/blob/master/spec/Section%207%20--%20Response.md#data
@@ -90,14 +92,14 @@ namespace GraphQL.Tests
               ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
             }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -109,14 +111,14 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""data"": {} }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
             {
@@ -128,14 +130,14 @@ namespace GraphQL.Tests
 
             var expected = @"{ }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = writer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async void Writes_Path_Property_Correctly(IDocumentWriter writer)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Path_Property_Correctly(IGraphQLTextSerializer serializer)
         {
             var executionResult = new ExecutionResult
             {
@@ -151,9 +153,26 @@ namespace GraphQL.Tests
 
             var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
 
-            var actual = await writer.WriteToStringAsync(executionResult);
+            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task Synchronous_and_Async_Works_Same(IGraphQLTextSerializer serializer)
+        {
+            var schema = new GraphQL.StarWars.StarWarsSchema(new GraphQL.StarWars.IoC.SimpleContainer());
+            var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
+            {
+                Schema = schema,
+                Query = "IntrospectionQuery".ReadGraphQLRequest()
+            });
+            var syncResult = serializer.Serialize(result);
+            var stream = new System.IO.MemoryStream();
+            await serializer.WriteAsync(stream, result);
+            var asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+            syncResult.ShouldBe(asyncResult);
         }
     }
 }

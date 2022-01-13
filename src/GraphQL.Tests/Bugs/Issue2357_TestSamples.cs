@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Xunit;
 

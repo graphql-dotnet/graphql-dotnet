@@ -1,7 +1,10 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.SystemTextJson;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -33,6 +36,19 @@ namespace GraphQL
                 return null;
 
             return new Dictionary<string, object?>(ret);
+        }
+
+        private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer(indent: true);
+        private static readonly IDocumentExecuter _executer = new DocumentExecuter();
+
+        public static Inputs? ToInputs(this string? json)
+            => _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
+
+        public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
+        {
+            var options = new ExecutionOptions { Schema = schema };
+            configure(options);
+            return _serializer.Serialize(await _executer.ExecuteAsync(options));
         }
     }
 }

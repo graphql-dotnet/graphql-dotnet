@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Xunit;
@@ -12,7 +11,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug2839SystemTextJson
     {
         [Fact]
-        public async Task Bug2839Test()
+        public void Bug2839Test()
         {
             var schema = new Schema { Query = new TestQuery() };
             schema.ReplaceScalar(new MyDateTimeGraphType());
@@ -26,13 +25,13 @@ namespace GraphQL.Tests.Bugs
             }
             ).Result;
 
-            var writer = new DocumentWriter(options =>
+            var writer = new GraphQLSerializer(options =>
             {
                 options.PropertyNamingPolicy = new MyNamingPolicy();
                 options.Converters.Add(new MyDateTimeConverter());
             });
 
-            var str = await writer.WriteToStringAsync(result);
+            var str = writer.Serialize(result);
             str.ShouldBeCrossPlatJson("{\"data\":{\"TEST\":{\"THISISASTRING\":\"String Value\",\"THISISADATETIME\":\"2022-Jan-04\"}}}");
         }
 

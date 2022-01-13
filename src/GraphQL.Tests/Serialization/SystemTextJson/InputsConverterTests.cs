@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
             WriteIndented = true,
             Converters =
             {
-                new InputsConverter(),
+                new InputsJsonConverter(),
                 new JsonConverterBigInteger(),
             }
         };

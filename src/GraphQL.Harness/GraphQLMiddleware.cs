@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.SystemTextJson;
+using GraphQL.Transport;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -15,18 +15,18 @@ namespace Example
         private readonly RequestDelegate _next;
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
-        private readonly IDocumentWriter _writer;
+        private readonly IGraphQLSerializer _serializer;
 
         public GraphQLMiddleware(
             RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IDocumentWriter writer)
+            IGraphQLSerializer serializer)
         {
             _next = next;
             _settings = options.Value;
             _executer = executer;
-            _writer = writer;
+            _serializer = serializer;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
@@ -51,7 +51,7 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = await context.Request.Body.FromJsonAsync<GraphQLRequest>(context.RequestAborted);
+            var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted);
 
             var result = await _executer.ExecuteAsync(options =>
             {
@@ -78,7 +78,7 @@ namespace Example
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200; // OK
 
-            await _writer.WriteAsync(context.Response.Body, result, cancellationToken);
+            await _serializer.WriteAsync(context.Response.Body, result, cancellationToken);
         }
     }
 }

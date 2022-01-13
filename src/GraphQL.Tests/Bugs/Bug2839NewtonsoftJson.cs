@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
@@ -12,7 +11,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug2839NewtonsoftJson
     {
         [Fact]
-        public async Task Bug2839Test()
+        public void Bug2839Test()
         {
             var schema = new Schema { Query = new TestQuery() };
             schema.ReplaceScalar(new MyDateTimeGraphType());
@@ -26,7 +25,7 @@ namespace GraphQL.Tests.Bugs
             }
             ).Result;
 
-            var writer = new DocumentWriter(options =>
+            var writer = new GraphQLSerializer(options =>
             {
                 options.Converters.Add(new IsoDateTimeConverter()
                 {
@@ -34,13 +33,13 @@ namespace GraphQL.Tests.Bugs
                     Culture = System.Globalization.CultureInfo.InvariantCulture,
                 });
 
-                options.ContractResolver = new ExecutionResultContractResolver(new ErrorInfoProvider())
+                options.ContractResolver = new GraphQLContractResolver(new ErrorInfoProvider())
                 {
                     NamingStrategy = new KebabCaseNamingStrategy(true, false, false)
                 };
             });
 
-            var str = await writer.WriteToStringAsync(result);
+            var str = writer.Serialize(result);
             str.ShouldBeCrossPlatJson("{\"data\":{\"test\":{\"this-is-a-string\":\"String Value\",\"this-is-a-date-time\":\"2022-Jan-04\"}}}");
         }
 

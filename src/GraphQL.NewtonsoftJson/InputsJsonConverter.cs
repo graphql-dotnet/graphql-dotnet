@@ -10,7 +10,7 @@ namespace GraphQL.NewtonsoftJson
     /// <see cref="IReadOnlyDictionary{TKey, TValue}">IReadOnlyDictionary&lt;string, object&gt;</see>,
     /// serialization of <see cref="Inputs"/> is supported directly by Newtonsoft.Json.
     /// </summary>
-    public class InputsConverter : JsonConverter
+    public class InputsJsonConverter : JsonConverter
     {
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

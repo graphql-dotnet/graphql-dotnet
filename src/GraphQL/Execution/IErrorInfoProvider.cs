@@ -1,7 +1,7 @@
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Prepares <see cref="ExecutionError"/>s for serialization by the <see cref="IDocumentWriter"/>
+    /// Prepares <see cref="ExecutionError"/>s for serialization by the <see cref="IGraphQLSerializer"/>
     /// </summary>
     public interface IErrorInfoProvider
     {

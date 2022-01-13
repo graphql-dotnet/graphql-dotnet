@@ -74,10 +74,6 @@ namespace GraphQL
     {
         public static System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(this GraphQL.IDocumentExecuter executer, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
-    public static class DocumentWriterExtensions
-    {
-        public static System.Threading.Tasks.Task<string> WriteToStringAsync<T>(this GraphQL.IDocumentWriter writer, T value) { }
-    }
     public readonly struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
         public ErrorLocation(int line, int column) { }
@@ -226,12 +222,6 @@ namespace GraphQL
             where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentListener<TDocumentListener>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentListener> documentListenerFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TDocumentListener :  class, GraphQL.Execution.IDocumentExecutionListener { }
-        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder)
-            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
-        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentWriter> documentWriterFactory)
-            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
-        public static GraphQL.DI.IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentWriter documentWriter)
-            where TDocumentWriter :  class, GraphQL.IDocumentWriter { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.ErrorInfoProviderOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
@@ -259,6 +249,12 @@ namespace GraphQL
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchema> schemaFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TSerializer :  class, GraphQL.IGraphQLSerializer { }
+        public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSerializer> serializerFactory)
+            where TSerializer :  class, GraphQL.IGraphQLSerializer { }
+        public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, TSerializer serializer)
+            where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
@@ -332,9 +328,16 @@ namespace GraphQL
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
     }
-    public interface IDocumentWriter
+    public interface IGraphQLSerializer
     {
-        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default);
+        System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);
+        T ReadNode<T>(object? value);
+        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T? value, System.Threading.CancellationToken cancellationToken = default);
+    }
+    public interface IGraphQLTextSerializer : GraphQL.IGraphQLSerializer
+    {
+        T Deserialize<T>(string? value);
+        string Serialize<T>(T? value);
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
@@ -492,7 +495,7 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, TGraphType>(this GraphQL.Types.ISchema schema)
@@ -1770,6 +1773,24 @@ namespace GraphQL.Subscription
         public SubscriptionExecutionResult() { }
         public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
         public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>>? Streams { get; set; }
+    }
+}
+namespace GraphQL.Transport
+{
+    public class GraphQLRequest
+    {
+        public GraphQLRequest() { }
+        public GraphQL.Inputs? Extensions { get; set; }
+        public string? OperationName { get; set; }
+        public string Query { get; set; }
+        public GraphQL.Inputs? Variables { get; set; }
+    }
+    public class OperationMessage
+    {
+        public OperationMessage() { }
+        public string? Id { get; set; }
+        public object? Payload { get; set; }
+        public string? Type { get; set; }
     }
 }
 namespace GraphQL.Types

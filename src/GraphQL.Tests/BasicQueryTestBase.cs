@@ -13,7 +13,7 @@ namespace GraphQL.Tests
     public class BasicQueryTestBase
     {
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
+        protected readonly IGraphQLTextSerializer Writer = new GraphQLSerializer(indent: true);
 
         public ExecutionResult AssertQuerySuccess(
             ISchema schema,
@@ -39,8 +39,8 @@ namespace GraphQL.Tests
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
+            var writtenResult = Writer.Serialize(runResult);
+            var expectedResult = Writer.Serialize(expectedExecutionResult);
 
             //#if DEBUG
             //            Console.WriteLine(writtenResult);
@@ -81,8 +81,8 @@ namespace GraphQL.Tests
                 _.ValidationRules = rules;
             }).GetAwaiter().GetResult();
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var writtenResult = Writer.Serialize(runResult);
+            var expectedResult = Writer.Serialize(expectedExecutionResult);
 
             //#if DEBUG
             //            Console.WriteLine(writtenResult);

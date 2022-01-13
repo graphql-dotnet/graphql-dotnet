@@ -42,7 +42,7 @@ namespace GraphQL.Benchmarks
             _queryDefaultVariableDocument = new Execution.GraphQLDocumentBuilder().Build(Queries.VariablesDefaultVariable);
 
             _queryVariableDocument = new Execution.GraphQLDocumentBuilder().Build(Queries.VariablesVariable);
-            _variableInputs = Variables.VariablesVariable.ToInputs();
+            _variableInputs = new GraphQLSerializer().Deserialize<Inputs>(Variables.VariablesVariable);
 
             //confirm no errors during execution
             var val = EnableValidation;
