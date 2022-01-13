@@ -19,6 +19,7 @@ namespace GraphQL.NewtonsoftJson
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
+        private const int DEFAULT_BUFFER_SIZE = 16 * 1024;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
@@ -142,7 +143,7 @@ namespace GraphQL.NewtonsoftJson
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var writer = new HttpResponseStreamWriter(stream, _utf8Encoding);
+            using var writer = new StreamWriter(stream, _utf8Encoding, DEFAULT_BUFFER_SIZE, true);
             using var jsonWriter = new JsonTextWriter(writer)
             {
                 ArrayPool = _jsonArrayPool,
