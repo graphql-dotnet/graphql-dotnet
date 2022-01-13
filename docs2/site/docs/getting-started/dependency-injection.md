@@ -253,7 +253,7 @@ var result = await _executer.ExecuteAsync(options =>
 {
     options.Schema = _schema;
     options.Query = request.Query;
-    options.Variables = _serializer.Deserialize<Inputs>(request.Variables);
+    options.Variables = _serializer.Deserialize<Inputs>(request.Variables); // IGraphQLTextSerializer from DI
     options.RequestServices = context.RequestServices;
 });
 ```

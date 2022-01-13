@@ -37,7 +37,7 @@ a single request (with or without the JSON array wrapper) into a list.
 
 When calling the `AddSystemTextJson` or `AddNewtonsoftJson` extension method to
 the `IGraphQLBuilder` interface, the method will register the `IGraphQLSerializer`
-and `IGraphQLSerializer` interfaces with the appropriate
+and `IGraphQLTextSerializer` interfaces with the appropriate
 serialization engine. These interfaces handle both serialization and deserialization
 of objects.
 
