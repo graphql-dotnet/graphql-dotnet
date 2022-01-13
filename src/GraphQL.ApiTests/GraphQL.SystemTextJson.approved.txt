@@ -43,9 +43,7 @@ namespace GraphQL.SystemTextJson
         public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public T Deserialize<T>(string json) { }
         public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
-        public T ReadDocument<T>(System.Text.Json.JsonDocument jsonDocument) { }
         public T ReadNode<T>(object value) { }
-        public T ReadNode<T>(System.Text.Json.JsonElement jsonElement) { }
         public string Serialize<T>(T value) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }

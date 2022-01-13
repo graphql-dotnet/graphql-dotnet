@@ -177,6 +177,7 @@ namespace GraphQL.SystemTextJson
         public T Deserialize<T>(string json)
             => json == null ? default : JsonSerializer.Deserialize<T>(json, _options);
 
+        /*******
         /// <summary>
         /// Converts the <see cref="JsonDocument"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// A <paramref name="jsonDocument"/> of <see langword="null"/> returns <see langword="default"/>.
@@ -187,11 +188,12 @@ namespace GraphQL.SystemTextJson
 #else
             => jsonDocument == null ? default : JsonSerializer.Deserialize<T>(jsonDocument.RootElement.GetRawText(), _options);
 #endif
+        ********/
 
         /// <summary>
         /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// </summary>
-        public T ReadNode<T>(JsonElement jsonElement)
+        private T ReadNode<T>(JsonElement jsonElement)
 #if NET6_0_OR_GREATER
             => JsonSerializer.Deserialize<T>(jsonElement, _options);
 #else
