@@ -52,7 +52,7 @@ for that library.
 
 Be aware that `System.Text.Json` defaults to case-sensitive deserialization, while
 `Newtonsoft.Json` defaults to case-insensitive deserialization. However, the supported
-data models (such as `GraphQLRequest` and `WebSocketMessage`) will always deserialize
+data models (such as `GraphQLRequest` and `OperationMessage`) will always deserialize
 with case-sensitive camelCase deserialization. You can write your own data classes
 which will behave in the default manner of the serializer's configuration. You can
 configure the serializer to use camelCase for all properties by default. You can also
@@ -67,7 +67,7 @@ Specific support is provided for serializing and deserializing to the following 
 | `ExecutionResult`       | Only serialization is supported |
 | `GraphQLRequest`        | |
 | `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
-| `WebSocketMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
+| `OperationMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
 | `ApolloTrace`           | |
 | `Inputs`                | |
 
