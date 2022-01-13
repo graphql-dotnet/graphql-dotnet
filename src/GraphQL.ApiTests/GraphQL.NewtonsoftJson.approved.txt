@@ -50,12 +50,14 @@ namespace GraphQL.NewtonsoftJson
     {
         public GraphQLSerializer() { }
         public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        protected GraphQLSerializer(Newtonsoft.Json.JsonSerializer jsonSerializer) { }
         public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
         public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
         public GraphQLSerializer(bool indent) { }
         public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        protected Newtonsoft.Json.JsonSerializer Serializer { get; }
         public T Deserialize<T>(string json) { }
         public T Read<T>(System.IO.TextReader json) { }
         public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
