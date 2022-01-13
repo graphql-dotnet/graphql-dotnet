@@ -177,7 +177,7 @@ read-only instead of read-write, such as `Field.Alias`.
 Various classes' constructors in the `GraphQL.Language.AST` namespace have been
 removed in favor of other constructors.
 
-### 14. `IDocumentWriter` has been renamed `IGraphQLSerializer` and related changes.
+### 14. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
 
 As such, the `DocumentWriter` classes have been renamed to `GraphQLSerializer`, and the
 `AddDocumentWriter` extension method for `IGraphQLBuilder` has been renamed to `AddSerializer`.
