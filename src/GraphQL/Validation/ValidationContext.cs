@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GraphQL.Execution;
+using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -15,11 +19,11 @@ namespace GraphQL.Validation
     {
         private List<ValidationError>? _errors;
 
-        private readonly Dictionary<Operation, List<FragmentDefinition>> _fragments
-            = new Dictionary<Operation, List<FragmentDefinition>>();
+        private readonly Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>> _fragments
+            = new Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>();
 
-        private readonly Dictionary<Operation, List<VariableUsage>> _variables =
-            new Dictionary<Operation, List<VariableUsage>>();
+        private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>> _variables =
+            new Dictionary<GraphQLOperationDefinition, List<VariableUsage>>();
 
         internal void Reset()
         {
@@ -38,13 +42,15 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns the operation requested to be executed.
         /// </summary>
-        public Operation Operation { get; set; } = null!;
+        public GraphQLOperationDefinition Operation { get; set; } = null!;
 
         /// <inheritdoc cref="ExecutionContext.Schema"/>
         public ISchema Schema { get; set; } = null!;
 
         /// <inheritdoc cref="ExecutionContext.Document"/>
-        public Document Document { get; set; } = null!;
+        public GraphQLDocument Document { get; set; } = null!;
+
+        public string? OriginalQuery { get; set; }
 
         /// <inheritdoc cref="Validation.TypeInfo"/>
         public TypeInfo TypeInfo { get; set; } = null!;
@@ -81,14 +87,14 @@ namespace GraphQL.Validation
         /// <summary>
         /// For a node with a selection set, returns a list of variable references along with what input type each were referenced for.
         /// </summary>
-        public List<VariableUsage> GetVariables(IHaveSelectionSet node)
+        public List<VariableUsage> GetVariables(IHasSelectionSetNode node)
         {
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
             var listener = new MatchingNodeVisitor<VariableReference, (List<VariableUsage> usages, TypeInfo info)>((usages, info), (varRef, __, state) => state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!)));
 
-            new BasicVisitor(info, listener).Visit(node, this);
+            new BasicVisitor(info, listener).Visit((ASTNode)node, new BasicVisitor.State(this)).GetAwaiter().GetResult(); // actually is sync
 
             return usages;
         }
@@ -97,7 +103,7 @@ namespace GraphQL.Validation
         /// For a specified operation with a document, returns a list of variable references
         /// along with what input type each was referenced for.
         /// </summary>
-        public List<VariableUsage> GetRecursiveVariables(Operation operation)
+        public List<VariableUsage> GetRecursiveVariables(GraphQLOperationDefinition operation)
         {
             if (_variables.TryGetValue(operation, out var results))
             {
@@ -119,29 +125,29 @@ namespace GraphQL.Validation
         /// <summary>
         /// Searches the document for a fragment definition by name and returns it.
         /// </summary>
-        public FragmentDefinition? GetFragment(string name) => Document.Fragments.FindDefinition(name);
+        public GraphQLFragmentDefinition? GetFragment(ROM name) => Document.FindFragmentDefinition(name);
 
         /// <summary>
         /// Returns a list of fragment spreads within the specified node.
         /// </summary>
-        public List<FragmentSpread> GetFragmentSpreads(SelectionSet node)
+        public List<GraphQLFragmentSpread> GetFragmentSpreads(GraphQLSelectionSet node)
         {
-            var spreads = new List<FragmentSpread>();
+            var spreads = new List<GraphQLFragmentSpread>();
 
-            var setsToVisit = new Stack<SelectionSet>();
+            var setsToVisit = new Stack<GraphQLSelectionSet>();
             setsToVisit.Push(node);
 
             while (setsToVisit.Count > 0)
             {
                 var set = setsToVisit.Pop();
 
-                foreach (var selection in set.SelectionsList)
+                foreach (var selection in set.Selections)
                 {
-                    if (selection is FragmentSpread spread)
+                    if (selection is GraphQLFragmentSpread spread)
                     {
                         spreads.Add(spread);
                     }
-                    else if (selection is IHaveSelectionSet hasSet && hasSet.SelectionSet != null)
+                    else if (selection is IHasSelectionSetNode hasSet && hasSet.SelectionSet != null)
                     {
                         setsToVisit.Push(hasSet.SelectionSet);
                     }
@@ -154,15 +160,15 @@ namespace GraphQL.Validation
         /// <summary>
         /// For a specified operation within a document, returns a list of all fragment definitions in use.
         /// </summary>
-        public List<FragmentDefinition> GetRecursivelyReferencedFragments(Operation operation)
+        public List<GraphQLFragmentDefinition> GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation)
         {
             if (_fragments.TryGetValue(operation, out var results))
             {
                 return results;
             }
 
-            var fragments = new List<FragmentDefinition>();
-            var nodesToVisit = new Stack<SelectionSet>();
+            var fragments = new List<GraphQLFragmentDefinition>();
+            var nodesToVisit = new Stack<GraphQLSelectionSet>();
             nodesToVisit.Push(operation.SelectionSet);
             var collectedNames = new Dictionary<string, bool>();
 
@@ -172,7 +178,7 @@ namespace GraphQL.Validation
 
                 foreach (var spread in GetFragmentSpreads(node))
                 {
-                    string fragName = spread.Name;
+                    string fragName = (string)spread.Name; //TODO:!!!!!alloc
                     if (!collectedNames.ContainsKey(fragName))
                     {
                         collectedNames[fragName] = true;
@@ -199,31 +205,32 @@ namespace GraphQL.Validation
         {
             var variableDefinitions = Operation?.Variables;
 
-            if ((variableDefinitions?.List?.Count ?? 0) == 0)
+            if ((variableDefinitions?.Count ?? 0) == 0)
             {
-                return Language.AST.Variables.None;
+                return Language.Variables.None;
             }
 
-            var variablesObj = new Variables(variableDefinitions!.List!.Count);
+            var variablesObj = new Variables(variableDefinitions!.Count);
 
             if (variableDefinitions != null)
             {
-                foreach (var variableDef in variableDefinitions.List)
+                foreach (var variableDef in variableDefinitions)
                 {
+                    var variableDefName = (string)variableDef.Variable.Name; //TODO:!!!!alloc
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(Schema);
 
                     if (graphType == null)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variableDef.Name, $"Variable has unknown type '{variableDef.Type.Name()}'"));
+                        ReportError(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
                         continue;
                     }
 
                     // create a new variable object
-                    var variable = new Variable(variableDef.Name);
+                    var variable = new Variable(variableDefName);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (Variables.TryGetValue(variableDef.Name, out var variableValue))
+                    if (Variables.TryGetValue(variableDefName, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
@@ -243,11 +250,11 @@ namespace GraphQL.Validation
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
+                            variable.Value = ExecutionHelper.CoerceValue(graphType, (IValue)variableDef.DefaultValue, variablesObj, null).Value;
                         }
                         catch (Exception ex)
                         {
-                            ReportError(new InvalidVariableError(this, variableDef, variableDef.Name, "Error coercing default value.", ex));
+                            ReportError(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
                             continue;
                         }
                         variable.IsDefault = true;
@@ -278,12 +285,12 @@ namespace GraphQL.Validation
         /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        private object? GetVariableValue(IGraphType graphType, VariableDefinition variableDef, object? input, IVariableVisitor? visitor)
+        private object? GetVariableValue(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
         {
-            return ParseValue(graphType, variableDef, variableDef.Name, input, visitor);
+            return ParseValue(graphType, variableDef, (string)variableDef.Variable.Name, input, visitor); //TODO:!!!!alloc
 
             // Coerces a value depending on the graph type.
-            object? ParseValue(IGraphType type, VariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            object? ParseValue(IGraphType type, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
@@ -317,7 +324,7 @@ namespace GraphQL.Validation
             }
 
             // Coerces a scalar value
-            object? ParseValueScalar(ScalarGraphType scalarGraphType, VariableDefinition variableDef, VariableName variableName, object? value)
+            object? ParseValueScalar(ScalarGraphType scalarGraphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value)
             {
                 try
                 {
@@ -329,7 +336,7 @@ namespace GraphQL.Validation
                 }
             }
 
-            IList<object?>? ParseValueList(ListGraphType listGraphType, VariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            IList<object?>? ParseValueList(ListGraphType listGraphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (value == null)
                     return null;
@@ -372,7 +379,7 @@ namespace GraphQL.Validation
                 }
             }
 
-            object? ParseValueObject(IInputObjectGraphType graphType, VariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            object? ParseValueObject(IInputObjectGraphType graphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (value == null)
                     return null;
@@ -463,6 +470,8 @@ namespace GraphQL.Validation
         /// </summary>
         public string? IsValidLiteralValue(IGraphType type, IValue valueAst)
         {
+            Debug.Assert(valueAst is null || valueAst is VariableReference || valueAst is GraphQLValue, "All AST values should inherit from GraphQLValue");
+
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType!;
@@ -527,14 +536,14 @@ namespace GraphQL.Validation
                 }
 
                 var fields = inputType.Fields.ToList();
-                var fieldAsts = objValue.ObjectFields.ToList();
+                var fieldAsts = objValue.Fields.ToList();
 
                 List<string>? errors = null;
 
                 // ensure every provided field is defined
                 foreach (var providedFieldAst in fieldAsts)
                 {
-                    var found = fields.Find(x => x.Name == providedFieldAst.Name);
+                    var found = fields.Find(x => x.Name == providedFieldAst.Name.Value);
                     if (found == null)
                     {
                         (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
@@ -544,11 +553,11 @@ namespace GraphQL.Validation
                 // ensure every defined field is valid
                 foreach (var field in fields)
                 {
-                    var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
+                    var fieldAst = fieldAsts.Find(x => x.Name.Value == field.Name);
 
                     if (fieldAst != null)
                     {
-                        string? error = IsValidLiteralValue(field.ResolvedType!, fieldAst.Value);
+                        string? error = IsValidLiteralValue(field.ResolvedType!, (IValue)fieldAst.Value);
                         if (error != null)
                             (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
                     }
@@ -565,9 +574,9 @@ namespace GraphQL.Validation
 
             if (type is ScalarGraphType scalar)
             {
-                return scalar.CanParseLiteral(valueAst)
+                return scalar.CanParseLiteral((GraphQLValue)valueAst)
                     ? null
-                    : $"Expected type '{type.Name}', found {valueAst.StringFrom(Document)}.";
+                    : $"Expected type '{type.Name}', found {((GraphQLValue)valueAst).StringFrom(OriginalQuery)}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name ?? "<NULL>"} is not a valid input graph type.");

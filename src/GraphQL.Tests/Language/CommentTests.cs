@@ -1,7 +1,6 @@
 using System.Linq;
-using GraphQL.Language;
-using GraphQL.Language.AST;
-using GraphQLParser;
+using GraphQL.Execution;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -9,6 +8,8 @@ namespace GraphQL.Tests.Language
 {
     public class CommentTests
     {
+        private static readonly GraphQLDocumentBuilder _builder = new GraphQLDocumentBuilder() { IgnoreComments = false };
+
         [Fact]
         public void operation_comment_should_be_null()
         {
@@ -19,8 +20,8 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
-            document.Operations.First().Comment.ShouldBeNull();
+            var document = _builder.Build(query);
+            document.Operation().Comment.ShouldBeNull();
         }
 
         [Fact]
@@ -33,8 +34,8 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Operation().Comment.Text.ShouldBe("comment");
         }
 
         [Fact]
@@ -47,12 +48,12 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
+            var document = _builder.Build(query);
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.ShouldBeNull();
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First()
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.ShouldBeNull();
         }
 
         [Fact]
@@ -67,12 +68,12 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment1");
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment2");
+            var document = _builder.Build(query);
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.Text.ShouldBe("comment1");
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First()
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.Text.ShouldBe("comment2");
         }
 
         [Fact]
@@ -90,8 +91,8 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Fragments.First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comment.Text.ShouldBe("comment");
         }
 
         [Fact]
@@ -109,10 +110,10 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<FragmentSpread>().First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First()
+                .SelectionSet.Selections.OfType<GraphQLFragmentSpread>().First().Comment.Text.ShouldBe("comment");
         }
 
         [Fact]
@@ -128,10 +129,10 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<InlineFragment>().First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First()
+                .SelectionSet.Selections.OfType<GraphQLInlineFragment>().First().Comment.Text.ShouldBe("comment");
         }
 
         [Fact]
@@ -146,10 +147,10 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .Arguments.First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Operation()
+                .SelectionSet.Selections.OfType<GraphQLField>().First()
+                .Arguments.First().Comment.Text.ShouldBe("comment");
         }
 
         [Fact]
@@ -164,9 +165,9 @@ query _(
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .Variables.First().Comment.ShouldBe("comment");
+            var document = _builder.Build(query);
+            document.Operation()
+                .Variables.First().Comment.Text.ShouldBe("comment");
         }
     }
 }

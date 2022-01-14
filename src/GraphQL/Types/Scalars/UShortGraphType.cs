@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +11,24 @@ namespace GraphQL.Types
     public class UShortGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((ushort)intValue.Value),
-            LongValue longValue => checked((ushort)longValue.Value),
-            BigIntValue bigIntValue => checked((ushort)bigIntValue.Value),
+            IntValue intValue => checked((ushort)intValue.ClrValue),
+            LongValue longValue => checked((ushort)longValue.ClrValue),
+            BigIntValue bigIntValue => checked((ushort)bigIntValue.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => ushort.MinValue <= intValue.Value && intValue.Value <= ushort.MaxValue,
-            LongValue longValue => ushort.MinValue <= longValue.Value && longValue.Value <= ushort.MaxValue,
-            BigIntValue bigIntValue => ushort.MinValue <= bigIntValue.Value && bigIntValue.Value <= ushort.MaxValue,
+            IntValue intValue => ushort.MinValue <= intValue.ClrValue && intValue.ClrValue <= ushort.MaxValue,
+            LongValue longValue => ushort.MinValue <= longValue.ClrValue && longValue.ClrValue <= ushort.MaxValue,
+            BigIntValue bigIntValue => ushort.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= ushort.MaxValue,
             NullValue _ => true,
+            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => false
         };
 

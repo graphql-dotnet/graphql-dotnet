@@ -2042,7 +2042,7 @@ type Zebra {
 
             public override object ParseValue(object value) => null;
 
-            public override object ParseLiteral(IValue value) => null;
+            public override object ParseLiteral(GraphQLValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

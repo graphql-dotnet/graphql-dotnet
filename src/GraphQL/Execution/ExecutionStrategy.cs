@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution
@@ -35,7 +37,7 @@ namespace GraphQL.Execution
             {
                 Executed = true,
                 Data = data,
-                Query = context.Document.OriginalQuery,
+                Query = context.OriginalQuery,
                 Document = context.Document,
                 Operation = context.Operation,
                 Extensions = context.OutputExtensions
@@ -55,7 +57,7 @@ namespace GraphQL.Execution
         {
             IObjectGraphType? type;
 
-            switch (context.Operation.OperationType)
+            switch (context.Operation.Operation)
             {
                 case OperationType.Query:
                     type = context.Schema.Query;
@@ -64,13 +66,13 @@ namespace GraphQL.Execution
                 case OperationType.Mutation:
                     type = context.Schema.Mutation;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document);
+                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document, context.OriginalQuery);
                     break;
 
                 case OperationType.Subscription:
                     type = context.Schema.Subscription;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document);
+                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document, context.OriginalQuery);
                     break;
 
                 default:
@@ -98,7 +100,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType!;
@@ -121,7 +123,7 @@ namespace GraphQL.Execution
         /// is <see langword="false"/> and the @include condition is <see langword="true"/>. Stated conversely, the field or
         /// fragment must not be queried if either the @skip condition is <see langword="true"/> or the @include condition is <see langword="false"/>.
         /// </summary>
-        protected virtual bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives node)
+        protected virtual bool ShouldIncludeNode(ExecutionContext context, IHasDirectivesNode node)
         {
             var directives = node.Directives;
 
@@ -133,7 +135,7 @@ namespace GraphQL.Execution
                     var arg = context.Schema.Directives.Skip.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
-                    if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
+                    if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, (IValue?)directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
 #pragma warning restore CS8605 // Unboxing a possibly null value.
                         return false;
                 }
@@ -144,7 +146,7 @@ namespace GraphQL.Execution
                     var arg = context.Schema.Directives.Include.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
-                    return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
+                    return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, (IValue?)directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
 #pragma warning restore CS8605 // Unboxing a possibly null value.
                 }
             }
@@ -191,17 +193,17 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, GraphQLField field)
         {
-            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
+            if (field.Name.Value == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
                 return schema.SchemaMetaFieldType;
             }
-            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
+            if (field.Name.Value == schema.TypeMetaFieldType.Name && schema.Query == parentType)
             {
                 return schema.TypeMetaFieldType;
             }
-            if (field.Name == schema.TypeNameMetaFieldType.Name)
+            if (field.Name.Value == schema.TypeNameMetaFieldType.Name)
             {
                 return schema.TypeNameMetaFieldType;
             }
@@ -211,11 +213,11 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
             }
 
-            return parentType.GetField(field.Name);
+            return parentType.GetField(field.Name.Value);
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<string, Field>? GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, GraphQLField>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
@@ -235,59 +237,70 @@ namespace GraphQL.Execution
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Dictionary<string, Field> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field>? fields)
+        protected virtual Dictionary<string, GraphQLField> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, GraphQLField>? fields)
         {
-            fields ??= new Dictionary<string, Field>();
-            List<string>? visitedFragmentNames = null;
+            fields ??= new Dictionary<string, GraphQLField>();
+            List<ROM>? visitedFragmentNames = null;
             CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields, ref List<string>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, GraphQLField> fields, ref List<ROM>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
             {
                 if (selectionSet != null)
                 {
-                    foreach (var selection in selectionSet.SelectionsList)
+                    foreach (var selection in selectionSet.Selections)
                     {
-                        if (selection is Field field)
+                        if (selection is GraphQLField field)
                         {
                             if (ShouldIncludeNode(context, field))
                                 Add(fields, field);
                         }
-                        else if (selection is FragmentSpread spread)
+                        else if (selection is GraphQLFragmentSpread spread)
                         {
-                            if (visitedFragmentNames?.Contains(spread.Name) != true && ShouldIncludeNode(context, spread))
+                            if (visitedFragmentNames?.Contains((string)spread.Name) != true && ShouldIncludeNode(context, spread)) //TODO:!!!! alloc
                             {
-                                (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
+                                (visitedFragmentNames ??= new List<ROM>()).Add(spread.Name);
 
-                                var fragment = context.Document.Fragments.FindDefinition(spread.Name);
-                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
+                                var fragment = context.Document.FindFragmentDefinition(spread.Name);
+                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, (string)fragment.TypeCondition.Type.Name, specificType)) //TODO:!!!!alloc
                                     CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
                             }
                         }
-                        else if (selection is InlineFragment inline)
+                        else if (selection is GraphQLInlineFragment inline)
                         {
                             // inline.Type may be null
                             // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
-                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.Type?.Name ?? specificType.Name, specificType))
+                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, (string)inline.TypeCondition?.Type.Name ?? specificType.Name, specificType)) //TODO:!!!!! alloc
                                 CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
                         }
                     }
                 }
             }
 
-            static void Add(Dictionary<string, Field> fields, Field field)
+            static void Add(Dictionary<string, GraphQLField> fields, GraphQLField field)
             {
-                string name = field.Alias ?? field.Name;
+                string name = (string)(field.Alias?.Name ?? field.Name); //TODO:!!!! alloc
 
                 fields[name] = fields.TryGetValue(name, out var original)
-                    ? new Field(original.AliasNode, original.NameNode) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    ? new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
+                        Alias = original.Alias,
+                        Name = original.Name,
                         Arguments = original.Arguments,
-                        SelectionSet = original.SelectionSet!.Merge(field.SelectionSet!),
+                        SelectionSet = Merge(original.SelectionSet!, field.SelectionSet!),
                         Directives = original.Directives,
-                        SourceLocation = original.SourceLocation,
+                        Location = original.Location,
                     }
                     : field;
+            }
+
+            /// <summary>
+            /// Returns a new selection set node with the contents merged with another selection set node's contents.
+            /// </summary>
+            static GraphQLSelectionSet Merge(GraphQLSelectionSet SelectionsList, GraphQLSelectionSet otherSelection)
+            {
+                var newSelection = SelectionsList.Selections.Union(otherSelection.Selections).ToList();
+                return new GraphQLSelectionSet { Selections = newSelection };
             }
         }
 
@@ -510,7 +523,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetNodeError(ExecutionContext context, ExecutionNode node, ExecutionError error)
         {
-            error.AddLocation(node.Field, context.Document);
+            error.AddLocation(node.Field, context.Document, context.OriginalQuery);
             error.Path = node.ResponsePath;
             context.Errors.Add(error);
 

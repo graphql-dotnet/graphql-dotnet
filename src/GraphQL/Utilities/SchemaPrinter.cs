@@ -507,7 +507,7 @@ namespace GraphQL.Utilities
             {
                 return string.Empty;
             }
-            return $" @deprecated(reason: {AstPrinter.Print(new StringValue(reason!))})";
+            return $" @deprecated(reason: {AstPrinter.Print((ASTNode)new StringValue(reason!))})";
         }
 
         public string[] BreakLine(string line, int len)

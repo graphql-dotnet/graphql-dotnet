@@ -1,5 +1,6 @@
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
@@ -17,13 +18,13 @@ namespace GraphQL.Utilities.Federation
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value.Value;
+        public override object? ParseLiteral(GraphQLValue value) => value is IValue v ? v.ClrValue : throw new System.Exception("!!!"); //TODO:!!!!!
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value;
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => true;
+        public override bool CanParseLiteral(GraphQLValue value) => true;
 
         /// <inheritdoc/>
         public override bool CanParseValue(object? value) => true;
@@ -32,6 +33,6 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) => true;
 
         /// <inheritdoc/>
-        public override IValue? ToAST(object? value) => new AnyValue(value);
+        public override GraphQLValue? ToAST(object? value) => new AnyValue(value);
     }
 }

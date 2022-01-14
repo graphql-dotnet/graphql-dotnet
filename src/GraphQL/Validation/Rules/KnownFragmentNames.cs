@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -21,13 +21,12 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownFragmentNamesError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<FragmentSpread>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
         {
-            var fragmentName = node.Name;
-            var fragment = context.GetFragment(fragmentName);
+            var fragment = context.GetFragment(node.Name);
             if (fragment == null)
             {
-                context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
+                context.ReportError(new KnownFragmentNamesError(context, node, node.Name));
             }
         });
     }

@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -139,15 +139,15 @@ namespace GraphQL
     public static class ExecutionErrorExtensions
     {
         /// <summary>
-        /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
+        /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="ASTNode"/> within a <see cref="GraphQLDocument"/>.
         /// </summary>
-        public static TError AddLocation<TError>(this TError error, AbstractNode? abstractNode, Document? document)
+        public static TError AddLocation<TError>(this TError error, ASTNode? abstractNode, GraphQLDocument? document, string? originalQuery)
             where TError : ExecutionError
         {
-            if (abstractNode == null || document == null || document.OriginalQuery == null)
+            if (abstractNode == null || document == null || originalQuery == null)
                 return error;
 
-            var location = new Location(document.OriginalQuery, abstractNode.SourceLocation.Start);
+            var location = new Location(originalQuery, abstractNode.Location.Start);
             error.AddLocation(location.Line, location.Column);
             return error;
         }

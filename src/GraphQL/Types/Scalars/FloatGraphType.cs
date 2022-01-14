@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,30 +11,32 @@ namespace GraphQL.Types
     public class FloatGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            FloatValue floatVal => floatVal.Value,
-            IntValue intVal => (double)intVal.Value,
-            LongValue longVal => (double)longVal.Value,
-            DecimalValue decVal => checked((double)decVal.Value),
-            BigIntValue bigIntVal => checked((double)bigIntVal.Value),
+            FloatValue floatVal => floatVal.ClrValue,
+            IntValue intVal => (double)intVal.ClrValue,
+            LongValue longVal => (double)longVal.ClrValue,
+            DecimalValue decVal => checked((double)decVal.ClrValue),
+            BigIntValue bigIntVal => checked((double)bigIntVal.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value)
+        public override bool CanParseLiteral(GraphQLValue value)
         {
             try
             {
                 return value switch
                 {
+                    LongValue _ => true,
+                    DecimalValue decVal => Ret(checked((double)decVal.ClrValue)),
+                    BigIntValue bigIntVal => Ret(checked((double)bigIntVal.ClrValue)),
                     FloatValue _ => true,
                     IntValue _ => true,
-                    LongValue _ => true,
-                    DecimalValue decVal => Ret(checked((double)decVal.Value)),
-                    BigIntValue bigIntVal => Ret(checked((double)bigIntVal.Value)),
                     NullValue _ => true,
+                    GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
                     _ => false
                 };
             }

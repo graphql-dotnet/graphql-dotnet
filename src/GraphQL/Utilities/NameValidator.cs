@@ -1,4 +1,5 @@
 using System;
+using GraphQLParser;
 
 namespace GraphQL.Utilities
 {
@@ -12,7 +13,7 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
-        public static void ValidateName(string name, NamedElement type) => GlobalSwitches.NameValidation(name, type);
+        public static void ValidateName(ROM name, NamedElement type) => GlobalSwitches.NameValidation(name, type);
 
         /// <summary>
         /// Validates a specified name during schema initialization.
@@ -26,23 +27,25 @@ namespace GraphQL.Utilities
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum or directive.</param>
-        public static void ValidateDefault(string name, NamedElement type)
+        public static void ValidateDefault(ROM name, NamedElement type)
         {
             ValidateNameNotNull(name, type);
 
-            if (name.Length > 1 && name[0] == '_' && name[1] == '_')
+            var span = name.Span;
+
+            if (name.Length > 1 && span[0] == '_' && span[1] == '_')
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     $"A {type.ToString().ToLower()} name: '{name}' must not begin with __, which is reserved by GraphQL introspection.");
             }
 
-            var c = name[0];
+            var c = span[0];
             if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && c != '_')
                 ThrowMatchError();
 
             for (int i = 1; i < name.Length; ++i)
             {
-                c = name[i];
+                c = span[i];
                 if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '_')
                     ThrowMatchError();
             }
@@ -55,9 +58,9 @@ namespace GraphQL.Utilities
         }
 
         //TODO: maybe remove after
-        internal static void ValidateNameNotNull(string name, NamedElement type)
+        internal static void ValidateNameNotNull(ROM name, NamedElement type)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (ROM.IsEmptyOrWhiteSpace(name))
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     $"A {type.ToString().ToLower()} name can not be null or empty.");

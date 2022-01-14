@@ -5,6 +5,7 @@ using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser.AST;
 using Shouldly;
 
 namespace GraphQL.Tests.Validation
@@ -101,7 +102,7 @@ namespace GraphQL.Tests.Validation
                 Schema = schema,
                 Document = document,
                 Rules = rules,
-                Operation = document.Operations.FirstOrDefault(),
+                Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault(),
                 Variables = variables
             }).Result.validationResult;
         }

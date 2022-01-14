@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Instrumentation
             _builder = new FieldMiddlewareBuilder();
             _context = new ResolveFieldContext
             {
-                FieldAst = new Field(default, new NameNode("Name")),
+                FieldAst = new GraphQLField { Name = new GraphQLName("Name") },
                 Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
                 Schema = new Schema(),

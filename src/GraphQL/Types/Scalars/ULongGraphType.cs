@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +11,24 @@ namespace GraphQL.Types
     public class ULongGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((ulong)intValue.Value),
-            LongValue longValue => checked((ulong)longValue.Value),
-            BigIntValue bigIntValue => checked((ulong)bigIntValue.Value),
+            IntValue intValue => checked((ulong)intValue.ClrValue),
+            LongValue longValue => checked((ulong)longValue.ClrValue),
+            BigIntValue bigIntValue => checked((ulong)bigIntValue.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
             IntValue _ => true,
             LongValue _ => true,
-            BigIntValue bigIntValue => ulong.MinValue <= bigIntValue.Value && bigIntValue.Value <= ulong.MaxValue,
+            BigIntValue bigIntValue => ulong.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= ulong.MaxValue,
             NullValue _ => true,
+            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => false
         };
 

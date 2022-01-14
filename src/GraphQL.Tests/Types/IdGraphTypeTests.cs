@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -34,7 +35,7 @@ namespace GraphQL.Tests.Types
         [InlineData("hello")]
         public void parse_literal_value_to_identifier(object value)
         {
-            IValue ast = value switch
+            GraphQLValue ast = value switch
             {
                 int i => new IntValue(i),
                 long l => new LongValue(l),

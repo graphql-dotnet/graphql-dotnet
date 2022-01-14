@@ -1,4 +1,5 @@
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -9,15 +10,16 @@ namespace GraphQL.Types
     public class StringGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
             StringValue s => s.Value,
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value is StringValue || value is NullValue;
+        public override bool CanParseLiteral(GraphQLValue value) => value is GraphQLStringValue || value is GraphQLNullValue;
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch

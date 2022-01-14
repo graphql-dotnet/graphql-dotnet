@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(null), 4, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 4, 21);
             });
         }
 
@@ -61,7 +61,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(null), 4, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 4, 21);
             });
         }
 

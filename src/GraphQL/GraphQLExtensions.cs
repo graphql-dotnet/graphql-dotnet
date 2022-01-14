@@ -5,6 +5,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -417,7 +419,7 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue ToAST(this IGraphType type, object value)
+        public static ASTNode ToAST(this IGraphType type, object value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -426,7 +428,7 @@ namespace GraphQL
             {
                 var astValue = ToAST(nonnull.ResolvedType!, value);
 
-                if (astValue is NullValue)
+                if (astValue is GraphQLNullValue)
                     throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
 
                 return astValue;
@@ -448,14 +450,15 @@ namespace GraphQL
             {
                 var itemType = listType.ResolvedType!;
 
-                if (!(value is string) && value is IEnumerable list)
+                if (value is not string && value is IEnumerable list)
                 {
                     var values = list
                         .Cast<object>()
                         .Select(item => ToAST(itemType, item))
+                        .Cast<GraphQLValue>()
                         .ToList();
 
-                    return new ListValue(values);
+                    return new GraphQLListValue { Values = values };
                 }
 
                 return ToAST(itemType, value);
@@ -469,6 +472,49 @@ namespace GraphQL
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
+        }
+
+        /// <summary>
+        /// Searches the list for a AST node specified by name and returns first match.
+        /// </summary>
+        public static TNode? Find<TNode>(this ASTListNode<TNode> node, string name)
+            where TNode : class, INamedNode
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var item in node)
+            {
+                if (item.Name.Value == name)
+                    return item;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Searches GraphQL document for the first matching fragment definition,
+        /// or returns <see langword="null"/> if none is found.
+        /// </summary>
+        public static GraphQLFragmentDefinition? FindFragmentDefinition(this GraphQLDocument document, ROM name)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in document.Definitions)
+            {
+                if (def is GraphQLFragmentDefinition frag && frag.Name == name)
+                    return frag;
+            }
+
+            return null;
+        }
+
+        public static GraphQLValue? ValueFor(this GraphQLArguments node, string name)
+        {
+            foreach (var item in node)
+            {
+                if (item.Name.Value == name)
+                    return item.Value;
+            }
+
+            return null;
         }
     }
 }

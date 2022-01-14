@@ -41,12 +41,12 @@ namespace GraphQL.Utilities
             {
                 foreach (var directive in ast.Directives!)
                 {
-                    provider.ApplyDirective((string)directive!.Name!.Value, d =>
+                    provider.ApplyDirective((string)directive!.Name, d => //TODO:!!!alloc
                     {
                         if (directive.Arguments?.Count > 0)
                         {
                             foreach (var arg in directive.Arguments)
-                                d.AddArgument(new DirectiveArgument((string)arg.Name!.Value) { Value = arg.Value!.ToValue() });
+                                d.AddArgument(new DirectiveArgument((string)arg.Name) { Value = arg.Value!.ToValue() }); //TODO:!!!alloc
                         }
                     });
                 }

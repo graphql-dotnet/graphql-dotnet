@@ -2,11 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
+using System.Threading;
 using GraphQL.Language.AST;
 using GraphQL.Utilities.Federation;
+using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL.Utilities
 {
@@ -24,10 +28,31 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Returns a string representation of the specified node.
         /// </summary>
-        public static string Print(INode node)
+        //public static string Print(INode node)
+        //{
+        //    var result = _visitor.Visit(node);
+        //    return result?.ToString() ?? string.Empty;
+        //}
+
+        /// <summary>
+        /// Returns a string representation of the specified node.
+        /// </summary>
+        public static string Print(ASTNode node)
         {
-            var result = _visitor.Visit(node);
-            return result?.ToString() ?? string.Empty;
+            var context = new PrintContext();
+            _writer.Visit(node, context).GetAwaiter().GetResult(); // actually is sync
+            return context.Writer.ToString();
+        }
+
+        private static readonly SDLWriter<PrintContext> _writer = new();
+
+        private class PrintContext : IWriteContext
+        {
+            public TextWriter Writer { get; set; } = new StringWriter();
+
+            public Stack<ASTNode> Parents { get; set; } = new Stack<ASTNode>();
+
+            public CancellationToken CancellationToken { get; set; }
         }
     }
 
@@ -35,10 +60,10 @@ namespace GraphQL.Utilities
     {
         internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
         public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
-        public Func<INode, bool> Matches { get; }
+        public Func<ASTNode, bool> Matches { get; }
         public Func<IDictionary<string, object?>, object>? PrintAst { get; set; }
 
-        public AstPrintConfig(Func<INode, bool> matches)
+        public AstPrintConfig(Func<ASTNode, bool> matches)
         {
             Matches = matches;
         }
@@ -88,9 +113,9 @@ namespace GraphQL.Utilities
     }
 
     internal class AstPrintConfig<T> : AstPrintConfig
-        where T : INode
+        where T : ASTNode
     {
-        public AstPrintConfig(Func<INode, bool> matches) : base(matches)
+        public AstPrintConfig(Func<ASTNode, bool> matches) : base(matches)
         {
         }
 
@@ -178,30 +203,30 @@ namespace GraphQL.Utilities
 
         public AstPrintVisitor()
         {
-            Config<Document>(c =>
+            Config<GraphQLDocument>(c =>
             {
-                c.Field(x => x.Operations);
-                c.Field(x => x.Fragments);
-                c.Print(p =>
-                {
-                    var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
-                    var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
+               // c.Field(x => x.Operations);
+               // c.Field(x => x.Fragments);
+              //  c.Print(p =>
+              //  {
+               //     var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
+               //     var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
 
-                    var result = Join(new[] { ops, frags }, "\n\n") + "\n";
-                    return result;
-                });
+                //    var result = Join(new[] { ops, frags }, "\n\n") + "\n";
+                 //   return result;
+               // });
             });
 
-            Config<Operation>(c =>
+            Config<GraphQLOperationDefinition>(c =>
             {
-                c.Field(x => x.OperationType);
+                c.Field(x => x.Operation);
                 c.Field(x => x.Name);
                 c.Field(x => x.Variables);
                 c.Field(x => x.Directives);
                 c.Field(x => x.SelectionSet);
                 c.Print(p =>
                 {
-                    var op = p.Arg(x => x.OperationType)!.ToString().ToLower(CultureInfo.InvariantCulture);
+                    var op = p.Arg(x => x.Operation)!.ToString().ToLower(CultureInfo.InvariantCulture);
                     var name = p.Arg(x => x.Name)?.ToString();
                     var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
                     var directives = Join(p.ArgArray(x => x.Directives), " ");
@@ -215,16 +240,16 @@ namespace GraphQL.Utilities
                 });
             });
 
-            Config<InlineFragment>(c =>
+            Config<GraphQLInlineFragment>(c =>
             {
                 c.Field(x => x.Directives);
                 c.Field(x => x.SelectionSet);
-                c.Field(x => x.Type);
+                c.Field(x => x.TypeCondition.Type);
                 c.Print(p =>
                 {
                     var directives = Join(p.ArgArray(x => x.Directives), " ");
                     var selectionSet = p.Arg(x => x.SelectionSet);
-                    var typename = p.Arg(x => x.Type);
+                    var typename = p.Arg(x => x.TypeCondition.Type);
                     var body = string.IsNullOrWhiteSpace(directives)
                         ? selectionSet
                         : Join(new[] { directives, selectionSet }, " ");
@@ -233,38 +258,38 @@ namespace GraphQL.Utilities
                 });
             });
 
-            Config<VariableDefinition>(c =>
+            Config<GraphQLVariableDefinition>(c =>
             {
-                c.Field(x => x.Name);
+                c.Field(x => x.Variable.Name);
                 c.Field(x => x.Type);
                 c.Field(x => x.DefaultValue);
-                c.Print(p => $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}");
+                c.Print(p => $"${p.Arg(x => x.Variable.Name)}: {p.Arg(x => x.Type)}");
             });
 
-            Config<SelectionSet>(c =>
+            Config<GraphQLSelectionSet>(c =>
             {
-                c.Field(x => x.SelectionsList);
-                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)!));
+                c.Field(x => x.Selections);
+                c.Print(p => Block(p.ArgArray(x => x.Selections)!));
             });
 
-            Config<Arguments>(c =>
+            Config<GraphQLArguments>(c =>
             {
-                c.Field(x => x.Children);
+             //   c.Field(x => x.Children); //TODO:!!!!!!
                 c.Print(p =>
                 {
-                    var result = p.Arg(x => x.Children)!;
-                    return result;
+                   // var result = p.Arg(x => x.Children)!; //TODO:!!!!!
+                    return "result";
                 });
             });
 
-            Config<Argument>(c =>
+            Config<GraphQLArgument>(c =>
             {
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
 
-            Config<Field>(c =>
+            Config<GraphQLField>(c =>
             {
                 c.Field(x => x.Alias);
                 c.Field(x => x.Name);
@@ -401,13 +426,13 @@ namespace GraphQL.Utilities
                 c.Print(p => $"[{Join(p.ArgArray(x => x.Values), ", ")}]");
             });
 
-            Config<ObjectValue>(c =>
+            Config<GraphQLObjectValue>(c =>
             {
-                c.Field(x => x.ObjectFields);
-                c.Print(p => $"{{{Join(p.ArgArray(x => x.ObjectFields), ", ")}}}");
+                c.Field(x => x.Fields);
+                c.Print(p => $"{{{Join(p.ArgArray(x => x.Fields), ", ")}}}");
             });
 
-            Config<ObjectField>(c =>
+            Config<GraphQLObjectField>(c =>
             {
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
@@ -417,7 +442,7 @@ namespace GraphQL.Utilities
             Config<AnyValue>(c => c.Print(x => throw new InvalidOperationException("Cannot print AnyValue representation.")));
 
             // Directive
-            Config<Directive>(c =>
+            Config<GraphQLDirective>(c =>
             {
                 c.Field(x => x.Name);
                 c.Field(x => x.Arguments);
@@ -430,19 +455,19 @@ namespace GraphQL.Utilities
             });
 
             // Type
-            Config<NamedType>(c =>
+            Config<GraphQLNamedType>(c =>
             {
                 c.Field(x => x.Name);
                 c.Print(p => p.Arg(x => x.Name)!);
             });
 
-            Config<ListType>(c =>
+            Config<GraphQLListType>(c =>
             {
                 c.Field(x => x.Type);
                 c.Print(p => $"[{p.Arg(x => x.Type)}]");
             });
 
-            Config<NonNullType>(c =>
+            Config<GraphQLNonNullType>(c =>
             {
                 c.Field(x => x.Type);
                 c.Print(p => $"{p.Arg(x => x.Type)}!");
@@ -452,7 +477,7 @@ namespace GraphQL.Utilities
         }
 
         public void Config<T>(Action<AstPrintConfig<T>> configure)
-            where T : INode
+            where T : ASTNode
         {
             var config = new AstPrintConfig<T>(n => n is T);
             configure(config);
@@ -490,12 +515,12 @@ namespace GraphQL.Utilities
             return str.Replace("\n", "\n  ");
         }
 
-        public object? Visit(INode node)
+        public object? Visit(ASTNode node)
         {
             return ApplyConfig(node);
         }
 
-        public object? ApplyConfig(INode node)
+        public object? ApplyConfig(ASTNode node)
         {
             var config = FindFor(node);
 
@@ -508,7 +533,7 @@ namespace GraphQL.Utilities
                     var ctx = new ResolveValueContext(node);
 
                     var result = f.Resolver.Resolve(ctx);
-                    if (result is INode nodeResult)
+                    if (result is ASTNode nodeResult)
                     {
                         result = ApplyConfig(nodeResult);
                     }
@@ -526,7 +551,7 @@ namespace GraphQL.Utilities
             return null;
         }
 
-        private AstPrintConfig? FindFor(INode node)
+        private AstPrintConfig? FindFor(ASTNode node)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var c in _configs)
@@ -543,7 +568,7 @@ namespace GraphQL.Utilities
             var list = new List<object>();
             foreach (var item in enumerable)
             {
-                if (item is INode node)
+                if (item is ASTNode node)
                 {
                     var listResult = ApplyConfig(node);
                     if (listResult != null)

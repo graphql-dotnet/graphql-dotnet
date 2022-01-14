@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -12,10 +12,10 @@ namespace GraphQL.Validation
     [Serializable]
     public class ValidationError : DocumentError
     {
-        private readonly List<INode> _nodes = new List<INode>();
+        private readonly List<ASTNode> _nodes = new List<ASTNode>();
 
-        /// <inheritdoc cref="ValidationError(string, string, string, INode[])"/>
-        public ValidationError(string originalQuery, string number, string message, INode node)
+        /// <inheritdoc cref="ValidationError(string, string, string, ASTNode[])"/>
+        public ValidationError(string originalQuery, string number, string message, ASTNode node)
             : this(originalQuery, number, message, (Exception?)null, node)
         {
         }
@@ -24,18 +24,18 @@ namespace GraphQL.Validation
         /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
         /// Sets locations based on the original query and specified AST nodes that this error applies to.
         /// </summary>
-        public ValidationError(string originalQuery, string number, string message, params INode[] nodes)
+        public ValidationError(string originalQuery, string number, string message, params ASTNode[] nodes)
             : this(originalQuery, number, message, null, nodes)
         {
         }
 
-        /// <inheritdoc cref="ValidationError(string, string, string, Exception, INode[])"/>
+        /// <inheritdoc cref="ValidationError(string, string, string, Exception, ASTNode[])"/>
         public ValidationError(
             string originalQuery,
             string number,
             string message,
             Exception? innerException,
-            INode node)
+            ASTNode node)
             : base(message, innerException)
         {
             Code = GetValidationErrorCode(GetType());
@@ -44,7 +44,7 @@ namespace GraphQL.Validation
             if (node != null)
             {
                 _nodes.Add(node);
-                var location = new Location(originalQuery, node.SourceLocation.Start);
+                var location = new Location(originalQuery, node.Location.Start);
                 AddLocation(location.Line, location.Column);
             }
         }
@@ -59,7 +59,7 @@ namespace GraphQL.Validation
             string number,
             string message,
             Exception? innerException,
-            params INode[]? nodes)
+            params ASTNode[]? nodes)
             : base(message, innerException)
         {
             Code = GetValidationErrorCode(GetType());
@@ -70,7 +70,7 @@ namespace GraphQL.Validation
                 foreach (var n in nodes)
                 {
                     _nodes.Add(n);
-                    var location = new Location(originalQuery, n.SourceLocation.Start);
+                    var location = new Location(originalQuery, n.Location.Start);
                     AddLocation(location.Line, location.Column);
                 }
             }
@@ -87,7 +87,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns a list of AST nodes that this error applies to.
         /// </summary>
-        public IEnumerable<INode> Nodes => _nodes;
+        public IEnumerable<ASTNode> Nodes => _nodes;
 
         /// <summary>
         /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification.

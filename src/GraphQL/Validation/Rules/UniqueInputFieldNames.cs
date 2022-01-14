@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -33,18 +34,18 @@ namespace GraphQL.Validation.Rules
                     },
                     leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop()),
 
-                new MatchingNodeVisitor<ObjectField>(
+                new MatchingNodeVisitor<GraphQLObjectField>(
                     leave: (objField, context) =>
                     {
                         var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
 
-                        if (knownNames.TryGetValue(objField.Name, out var value))
+                        if (knownNames.TryGetValue((string)objField.Name, out var value)) //TODO:!!!!alloc
                         {
                             context.ReportError(new UniqueInputFieldNamesError(context, value, objField));
                         }
                         else
                         {
-                            knownNames[objField.Name] = objField.Value;
+                            knownNames[(string)objField.Name] = (IValue)objField.Value; //TODO:!!!!alloc
                         }
                     })
             );

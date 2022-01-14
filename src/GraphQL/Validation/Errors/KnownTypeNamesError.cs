@@ -1,6 +1,7 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,12 +14,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownTypeNamesError(ValidationContext context, NamedType node, string[] suggestedTypes)
-            : base(context.Document.OriginalQuery!, NUMBER, UnknownTypeMessage(node.Name, suggestedTypes), node)
+        public KnownTypeNamesError(ValidationContext context, GraphQLNamedType node, string[] suggestedTypes)
+            : base(context.OriginalQuery!, NUMBER, UnknownTypeMessage(node.Name, suggestedTypes), node)
         {
         }
 
-        internal static string UnknownTypeMessage(string type, string[] suggestedTypes)
+        internal static string UnknownTypeMessage(ROM type, string[] suggestedTypes)
         {
             var message = $"Unknown type {type}.";
             if (suggestedTypes != null && suggestedTypes.Length > 0)

@@ -19,7 +19,7 @@ namespace GraphQL.Instrumentation
                 { "path", context.Path },
             };
 
-            using (context.Metrics.Subject("field", context.FieldAst.Name, metadata))
+            using (context.Metrics.Subject("field", (string)context.FieldAst.Name, metadata)) //TODO:!!!alloc
                 return await next(context).ConfigureAwait(false);
         }
     }

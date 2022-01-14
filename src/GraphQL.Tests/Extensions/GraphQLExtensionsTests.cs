@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Dummy;
@@ -8,6 +9,7 @@ using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -73,15 +75,26 @@ namespace GraphQL.Tests.Extensions
 
             public class PersonInputType : InputObjectGraphType<Person>
             {
-                public override IValue ToAST(object value)
+                public override GraphQLObjectValue ToAST(object value)
                 {
                     var person = (Person)value;
 
-                    return new ObjectValue(new[]
+                    return new GraphQLObjectValue
                     {
-                        new ObjectField("Name", new StringValue(person.Name)),
-                        new ObjectField("Age", new IntValue(person.Age))
-                    });
+                        Fields = new List<GraphQLObjectField>
+                        {
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("Name"),
+                                Value = new GraphQLStringValue { Value = person.Name },
+                            },
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("Age"),
+                                Value = new GraphQLIntValue { Value = person.Age.ToString(CultureInfo.InvariantCulture) }
+                            }
+                        }
+                    };
                 }
             }
 
@@ -100,8 +113,8 @@ namespace GraphQL.Tests.Extensions
                 yield return new object[] { new InputObjectGraphType<Person>(), null, new NullValue() };
                 yield return new object[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new ObjectValue(new[]
                     {
-                        new ObjectField("Name", new StringValue("Tom")),
-                        new ObjectField("Age", new IntValue(42))
+                        new GraphQLObjectField { Name = new GraphQLName("Name"), Value = new StringValue("Tom") },
+                        new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new IntValue(42) }
                     }) };
 
                 yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new BooleanValue(true) };
@@ -121,7 +134,7 @@ namespace GraphQL.Tests.Extensions
 
             public class BadPersonInputType : InputObjectGraphType<Person>
             {
-                public override IValue ToAST(object value) => null;
+                public override GraphQLObjectValue ToAST(object value) => null;
             }
 
             public IEnumerator<object[]> GetEnumerator()
@@ -151,7 +164,7 @@ namespace GraphQL.Tests.Extensions
 
         [Theory]
         [ClassData(typeof(ToASTTestData))]
-        public void ToAST_Test(IGraphType type, object value, IValue expected)
+        public void ToAST_Test(IGraphType type, object value, GraphQLValue expected)
         {
             var actual = AstPrinter.Print(type.ToAST(value));
             var result = AstPrinter.Print(expected);

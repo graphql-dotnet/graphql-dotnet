@@ -5,6 +5,7 @@ using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
 
@@ -445,7 +446,7 @@ namespace GraphQL.Types
                         var baseType = field.ResolvedType!.GetNamedType();
                         if (baseType is IInputObjectGraphType inputFieldType)
                             ExamineType(inputFieldType, completed, inProcess);
-                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
+                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, (IValue)Language.CoreToVanillaConverter.Value(value)).Value;
                     }
                 }
                 inProcess.Pop();

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Subscription;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -158,7 +159,7 @@ namespace GraphQL.Execution
                                 {
                                     GenerateError(
                                         context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'.",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.OriginalQuery}'.",
                                         node.Field,
                                         node.ResponsePath,
                                         exception)
@@ -177,7 +178,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode, object source)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType!;
@@ -195,8 +196,8 @@ namespace GraphQL.Execution
         private ExecutionError GenerateError(
             ExecutionContext context,
             string message,
-            Field field,
+            GraphQLField field,
             IEnumerable<object> path,
-            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
+            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document, context.OriginalQuery);
     }
 }

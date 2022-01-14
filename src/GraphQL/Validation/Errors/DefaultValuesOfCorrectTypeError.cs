@@ -1,6 +1,7 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,12 +14,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, IGraphType inputType, string verboseErrors)
-            : base(context.Document.OriginalQuery!, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, inputType.ToString(), varDefAst.DefaultValue!.StringFrom(context.Document), verboseErrors), varDefAst.DefaultValue!)
+        public DefaultValuesOfCorrectTypeError(ValidationContext context, GraphQLVariableDefinition varDefAst, IGraphType inputType, string verboseErrors)
+            : base(context.OriginalQuery!, NUMBER, BadValueForDefaultArgMessage(varDefAst.Variable.Name, inputType.ToString(), varDefAst.DefaultValue!.StringFrom(context.OriginalQuery), verboseErrors), varDefAst.DefaultValue!)
         {
         }
 
-        internal static string BadValueForDefaultArgMessage(string varName, string type, string value, string verboseErrors)
+        internal static string BadValueForDefaultArgMessage(ROM varName, string type, string value, string verboseErrors)
         {
             return string.IsNullOrEmpty(verboseErrors)
                 ? $"Variable '{varName}' of type '{type}' has invalid default value '{value}'."

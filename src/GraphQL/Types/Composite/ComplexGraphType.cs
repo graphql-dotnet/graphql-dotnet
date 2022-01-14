@@ -6,6 +6,7 @@ using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -33,7 +34,7 @@ namespace GraphQL.Types
         /// Returns the <see cref="FieldType"/> for the field matching the specified name that
         /// is configured for this graph type, or <see langword="null"/> if none is found.
         /// </summary>
-        FieldType? GetField(string name);
+        FieldType? GetField(ROM name);
     }
 
     /// <summary>
@@ -70,16 +71,13 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public FieldType? GetField(string name)
+        public FieldType? GetField(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
-            if (!string.IsNullOrWhiteSpace(name))
+            foreach (var field in Fields.List)
             {
-                foreach (var field in Fields.List)
-                {
-                    if (string.Equals(field.Name, name, StringComparison.Ordinal))
-                        return field;
-                }
+                if (field.Name == name)
+                    return field;
             }
 
             return null;

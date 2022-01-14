@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,19 +11,20 @@ namespace GraphQL.Types
     public class DecimalGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intVal => (decimal)intVal.Value,
-            LongValue longVal => (decimal)longVal.Value,
-            FloatValue floatVal => checked((decimal)floatVal.Value),
+            IntValue intVal => (decimal)intVal.ClrValue,
+            LongValue longVal => (decimal)longVal.ClrValue,
+            FloatValue floatVal => checked((decimal)floatVal.ClrValue),
             DecimalValue decVal => decVal.Value,
-            BigIntValue bigIntVal => checked((decimal)bigIntVal.Value),
+            BigIntValue bigIntVal => checked((decimal)bigIntVal.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value)
+        public override bool CanParseLiteral(GraphQLValue value)
         {
             try
             {
@@ -30,10 +32,11 @@ namespace GraphQL.Types
                 {
                     IntValue _ => true,
                     LongValue _ => true,
-                    FloatValue f => Ret(checked((decimal)f.Value)),
+                    FloatValue f => Ret(checked((decimal)f.ClrValue)),
                     DecimalValue _ => true,
-                    BigIntValue b => Ret(checked((decimal)b.Value)),
+                    BigIntValue b => Ret(checked((decimal)b.ClrValue)),
                     NullValue _ => true,
+                    GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
                     _ => false
                 };
             }

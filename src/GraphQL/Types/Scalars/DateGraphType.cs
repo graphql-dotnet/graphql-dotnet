@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -19,10 +20,11 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
             NullValue _ => null,
-            StringValue stringValue => ParseDate(stringValue.Value),
+            StringValue stringValue => ParseDate(stringValue.ClrValue),
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 

@@ -6,6 +6,7 @@ using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -38,7 +39,7 @@ namespace GraphQL.Tests.Execution
             return null;
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(GraphQLValue value)
         {
             if (value is StringValue stringValue)
             {
@@ -64,7 +65,7 @@ namespace GraphQL.Tests.Execution
         public override object ParseValue(object value)
             => value is string stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue) : null;
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(GraphQLValue value)
             => value is StringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value) : null;
     }
 

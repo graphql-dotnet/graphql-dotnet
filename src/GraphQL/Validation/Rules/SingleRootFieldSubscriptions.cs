@@ -20,7 +20,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="SingleRootFieldSubscriptionsError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Operation>((operation, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((operation, context) =>
         {
             if (!IsSubscription(operation))
             {
@@ -32,22 +32,22 @@ namespace GraphQL.Validation.Rules
             if (rootFields != 1)
             {
                 context.ReportError(new SingleRootFieldSubscriptionsError(context, operation,
-                    operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
+                    operation.SelectionSet.Selections.Skip(1).ToArray()));
             }
 
-            var fragment = operation.SelectionSet.SelectionsList.FirstOrDefault(IsFragment);
+            var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
 
             if (fragment == null)
             {
                 return;
             }
 
-            if (fragment is FragmentSpread fragmentSpread)
+            if (fragment is GraphQLFragmentSpread fragmentSpread)
             {
                 var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
                 rootFields = fragmentDefinition?.SelectionSet.Selections.Count ?? 0;
             }
-            else if (fragment is InlineFragment fragmentSelectionSet)
+            else if (fragment is GraphQLInlineFragment fragmentSelectionSet)
             {
                 rootFields = fragmentSelectionSet.SelectionSet.Selections.Count;
             }
@@ -59,8 +59,8 @@ namespace GraphQL.Validation.Rules
 
         });
 
-        private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
+        private static bool IsSubscription(GraphQLOperationDefinition operation) => operation.Operation == OperationType.Subscription;
 
-        private static bool IsFragment(ISelection selection) => selection is FragmentSpread || selection is InlineFragment;
+        private static bool IsFragment(ASTNode selection) => selection is GraphQLFragmentSpread || selection is GraphQLInlineFragment;
     }
 }

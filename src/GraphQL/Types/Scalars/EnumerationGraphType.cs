@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -62,18 +63,18 @@ namespace GraphQL.Types
         public EnumValues Values { get; }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            EnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
-            NullValue _ => null,
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name.Value)?.Value ?? ThrowLiteralConversionError(value),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            EnumValue enumValue => Values.FindByName(enumValue.Name) != null,
-            NullValue _ => true,
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name.Value) != null,
+            GraphQLNullValue _ => true,
             _ => false
         };
 
@@ -106,7 +107,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue? ToAST(object? value)
+        public override GraphQLValue? ToAST(object? value)
         {
             if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
                 return new NullValue();
@@ -114,7 +115,7 @@ namespace GraphQL.Types
             var foundByValue = Values.FindByValue(value);
             return foundByValue == null
                 ? ThrowASTConversionError(value)
-                : new EnumValue(foundByValue.Name);
+                : new GraphQLEnumValue { Name = new GraphQLName(foundByValue.Name) };
         }
     }
 

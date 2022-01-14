@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Types;
-using Field = GraphQL.Language.AST.Field;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -15,7 +15,7 @@ namespace GraphQL
     public class ResolveFieldContext : IResolveFieldContext<object?>
     {
         /// <inheritdoc/>
-        public Field FieldAst { get; set; }
+        public GraphQLField FieldAst { get; set; }
 
         /// <inheritdoc/>
         public FieldType FieldDefinition { get; set; }
@@ -42,10 +42,10 @@ namespace GraphQL
         public ISchema Schema { get; set; }
 
         /// <inheritdoc/>
-        public Document Document { get; set; }
+        public GraphQLDocument Document { get; set; }
 
         /// <inheritdoc/>
-        public Operation Operation { get; set; }
+        public GraphQLOperationDefinition Operation { get; set; }
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
@@ -66,7 +66,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, Field>? SubFields { get; set; }
+        public Dictionary<string, GraphQLField>? SubFields { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider? RequestServices { get; set; }

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -14,7 +17,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, Arguments? astArguments, Variables? variables)
+        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
@@ -28,7 +31,7 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType!;
 
-                values[arg.Name] = CoerceValue(type, value, variables, arg.DefaultValue);
+                values[arg.Name] = CoerceValue(type, (IValue?)value, variables, arg.DefaultValue);
             }
 
             return values;
@@ -40,6 +43,8 @@ namespace GraphQL.Execution
         /// </summary>
         public static ArgumentValue CoerceValue(IGraphType type, IValue? input, Variables? variables = null, object? fieldDefault = null)
         {
+            Debug.Assert(input is null || input is VariableReference || input is GraphQLValue, "All literal values should inherit from GraphQLValue");
+
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
@@ -66,10 +71,10 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
+                return new ArgumentValue(scalarType.ParseLiteral((GraphQLValue)input), ArgumentSource.Literal);
             }
 
-            if (input is NullValue)
+            if (input is GraphQLNullValue)
             {
                 return ArgumentValue.NullLiteral;
             }
@@ -122,7 +127,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, (IValue)objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {

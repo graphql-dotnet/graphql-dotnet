@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.DataLoader;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -25,7 +25,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field of this node.
         /// </summary>
-        public Field? Field { get; }
+        public GraphQLField? Field { get; }
 
         /// <summary>
         /// Returns the graph's field type of this node.
@@ -55,7 +55,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
         /// </summary>
-        public string? Name => Field?.Alias ?? Field?.Name;
+        public string? Name => (string)(Field?.Alias?.Name ?? Field?.Name); //TODO:!!!!!alloc
 
         /// <summary>
         /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
@@ -76,7 +76,7 @@ namespace GraphQL.Execution
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
-        protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, GraphQLField? field, FieldType? fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;

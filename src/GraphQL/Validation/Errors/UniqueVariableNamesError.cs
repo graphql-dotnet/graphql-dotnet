@@ -1,5 +1,6 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,12 +13,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UniqueVariableNamesError(ValidationContext context, VariableDefinition node, VariableDefinition altNode)
-            : base(context.Document.OriginalQuery!, NUMBER, DuplicateVariableMessage(node.Name), node, altNode)
+        public UniqueVariableNamesError(ValidationContext context, GraphQLVariableDefinition node, GraphQLVariableDefinition altNode)
+            : base(context.OriginalQuery!, NUMBER, DuplicateVariableMessage(node.Variable.Name), node, altNode)
         {
         }
 
-        internal static string DuplicateVariableMessage(string variableName)
+        internal static string DuplicateVariableMessage(ROM variableName)
             => $"There can be only one variable named '{variableName}'";
     }
 }

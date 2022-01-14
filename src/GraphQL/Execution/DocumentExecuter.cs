@@ -6,7 +6,7 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser.AST;
@@ -126,13 +126,13 @@ namespace GraphQL
                     }
                 }
 
-                if (document.Operations.Count == 0)
+                if (!document.Definitions.OfType<GraphQLOperationDefinition>().Any())
                 {
                     throw new NoOperationError();
                 }
 
                 var operation = GetOperation(options.OperationName, document);
-                metrics.SetOperationName(operation?.Name);
+                metrics.SetOperationName((string)operation?.Name); //TODO:!!!!alloc
 
                 if (operation == null)
                 {
@@ -147,6 +147,7 @@ namespace GraphQL
                         new ValidationOptions
                         {
                             Document = document,
+                            OriginalQuery = options.Query,
                             Rules = validationRules,
                             Operation = operation,
                             UserContext = options.UserContext,
@@ -261,11 +262,12 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, Document document, Operation operation, Variables variables, Metrics metrics)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics)
         {
             var context = new ExecutionContext
             {
                 Document = document,
+                OriginalQuery = options.Query,
                 Schema = options.Schema!,
                 RootValue = options.Root,
                 UserContext = options.UserContext,
@@ -291,16 +293,31 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns the selected <see cref="Operation"/> given a specified <see cref="Document"/> and operation name.
+        /// Returns the selected <see cref="GraphQLOperationDefinition"/> given a specified <see cref="GraphQLDocument"/> and operation name.
         /// <br/><br/>
         /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual Operation? GetOperation(string? operationName, Document document)
+        protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
         {
-            return string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.FirstOrDefault()
-                : document.Operations.WithName(operationName!);
+            if (string.IsNullOrWhiteSpace(operationName))
+            {
+                foreach (var def in document.Definitions)
+                {
+                    if (def is GraphQLOperationDefinition op)
+                        return op;
+                }
+            }
+            else
+            {
+                foreach (var def in document.Definitions)
+                {
+                    if (def is GraphQLOperationDefinition op && op.Name?.Value == operationName)
+                        return op;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -315,12 +332,12 @@ namespace GraphQL
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
             // TODO: Should we use cached instances of the default execution strategies?
-            return context.Operation.OperationType switch
+            return context.Operation.Operation switch
             {
                 OperationType.Query => ParallelExecutionStrategy.Instance,
                 OperationType.Mutation => SerialExecutionStrategy.Instance,
                 OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
-                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
+                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.Operation}")
             };
         }
     }

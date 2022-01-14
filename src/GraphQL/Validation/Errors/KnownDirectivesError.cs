@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +12,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownDirectivesError(ValidationContext context, Directive node)
-            : base(context.Document.OriginalQuery!, NUMBER, $"Unknown directive '{node.Name}'.", node)
+        public KnownDirectivesError(ValidationContext context, GraphQLDirective node)
+            : base(context.OriginalQuery!, NUMBER, $"Unknown directive '{node.Name}'.", node)
         {
         }
     }

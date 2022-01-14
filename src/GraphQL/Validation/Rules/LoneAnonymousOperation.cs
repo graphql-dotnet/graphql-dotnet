@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -21,9 +21,9 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="LoneAnonymousOperationError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (string.IsNullOrWhiteSpace(op.Name) && context.Document.Operations.Count > 1)
+            if (op.Name?.Value.Length == 0 && context.Document.OperationsCount() > 1)
             {
                 context.ReportError(new LoneAnonymousOperationError(context, op));
             }

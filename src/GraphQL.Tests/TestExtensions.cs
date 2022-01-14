@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests
 {
@@ -37,7 +38,7 @@ namespace GraphQL.Tests
         {
             if (value is IEnumerable<KeyValuePair<string, object>> dict)
             {
-                return new ObjectExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
+                return new ObjectExecutionNode(null, null, new GraphQLField{ Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
                 {
                     SubFields = dict.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray(),
                 };
@@ -49,14 +50,14 @@ namespace GraphQL.Tests
                 {
                     newList.Add(CreateExecutionNode(null, item));
                 }
-                return new ArrayExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
+                return new ArrayExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
                 {
                     Items = newList,
                 };
             }
             else
             {
-                return new ValueExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
+                return new ValueExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
                 {
                     Result = value
                 };

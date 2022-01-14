@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -45,16 +46,17 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
-        public virtual object? ParseLiteral(IValue value) => value switch
+        public virtual object? ParseLiteral(GraphQLValue value) => value switch
         {
-            BooleanValue b => ParseValue(b.Value.Boxed()),
-            IntValue i => ParseValue(i.Value),
-            LongValue l => ParseValue(l.Value),
-            BigIntValue bi => ParseValue(bi.Value),
-            FloatValue f => ParseValue(f.Value),
-            DecimalValue d => ParseValue(d.Value),
-            StringValue s => ParseValue(s.Value),
-            NullValue _ => ParseValue(null),
+            BooleanValue b => ParseValue(b.ClrValue.Boxed()),
+            IntValue i => ParseValue(i.ClrValue),
+            LongValue l => ParseValue(l.ClrValue),
+            BigIntValue bi => ParseValue(bi.ClrValue),
+            FloatValue f => ParseValue(f.ClrValue),
+            DecimalValue d => ParseValue(d.ClrValue),
+            StringValue s => ParseValue(s.ClrValue),
+            GraphQLNullValue _ => ParseValue(null),
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -83,7 +85,7 @@ namespace GraphQL.Types
         /// This method must return <see langword="true"/> when passed a <see cref="NullValue"/> node.
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="NullValue"/>.</param>
-        public virtual bool CanParseLiteral(IValue value)
+        public virtual bool CanParseLiteral(GraphQLValue value)
         {
             try
             {
@@ -150,7 +152,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">The value to convert. May be <see langword="null"/>.</param>
         /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion. Returning <see cref="NullValue"/> is valid.</returns>
-        public virtual IValue? ToAST(object? value)
+        public virtual GraphQLValue? ToAST(object? value)
         {
             var serialized = Serialize(value);
             return serialized switch
@@ -178,16 +180,16 @@ namespace GraphQL.Types
         /// Throws an exception indicating that a value cannot be converted to its AST representation. Typically called by
         /// <see cref="ToAST(object)"/> if the provided object (an internal representation) is not valid for this scalar type.
         /// </summary>
-        protected internal IValue ThrowASTConversionError(object? value)
+        protected internal GraphQLValue ThrowASTConversionError(object? value)
         {
             throw new InvalidOperationException($"Unable to convert '{value ?? "(null)"}' to its AST representation for the scalar type '{Name}'.");
         }
 
         /// <summary>
         /// Throws an exception indicating that an AST scalar node cannot be converted to a value. Typically called by
-        /// <see cref="ParseLiteral(IValue)"/> if the node type is invalid or cannot be parsed.
+        /// <see cref="ParseLiteral(GraphQLValue)"/> if the node type is invalid or cannot be parsed.
         /// </summary>
-        protected object ThrowLiteralConversionError(IValue input)
+        protected object ThrowLiteralConversionError(GraphQLValue input)
         {
             throw new InvalidOperationException($"Unable to convert '{input}' literal from AST representation to the scalar type '{Name}'");
         }

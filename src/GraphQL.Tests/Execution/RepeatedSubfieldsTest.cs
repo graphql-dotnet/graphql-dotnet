@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -11,46 +11,46 @@ namespace GraphQL.Tests.Execution
     {
         public RepeatedSubfieldsTests()
         {
-            FirstInnerField = new Field(default, new NameNode("first"));
-            FirstFieldSelection = new SelectionSet();
-            FirstFieldSelection.Add(FirstInnerField);
-            SecondInnerField = new Field(default, new NameNode("second"));
-            SecondFieldSelection = new SelectionSet();
-            SecondFieldSelection.Add(SecondInnerField);
-            FirstTestField = new Field(default, new NameNode("test"));
-            SecondTestField = new Field(default, new NameNode("test"));
-            AliasedTestField = new Field(new NameNode("alias"), new NameNode("test"));
+            FirstInnerField = new GraphQLField { Name = new GraphQLName("first") };
+            FirstFieldSelection = new GraphQLSelectionSet();
+            FirstFieldSelection.Selections.Add(FirstInnerField);
+            SecondInnerField = new GraphQLField { Name = new GraphQLName("second") };
+            SecondFieldSelection = new GraphQLSelectionSet();
+            SecondFieldSelection.Selections.Add(SecondInnerField);
+            FirstTestField = new GraphQLField { Name = new GraphQLName("test") };
+            SecondTestField = new GraphQLField { Name = new GraphQLName("test") };
+            AliasedTestField = new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("test") };
 
             FirstTestField.SelectionSet = FirstFieldSelection;
             SecondTestField.SelectionSet = SecondFieldSelection;
             AliasedTestField.SelectionSet = SecondFieldSelection;
         }
 
-        private Field FirstInnerField { get; }
-        private SelectionSet FirstFieldSelection { get; }
-        private Field SecondInnerField { get; }
-        private SelectionSet SecondFieldSelection { get; }
-        private Field FirstTestField { get; }
-        private Field SecondTestField { get; }
-        private Field AliasedTestField { get; }
+        private GraphQLField FirstInnerField { get; }
+        private GraphQLSelectionSet FirstFieldSelection { get; }
+        private GraphQLField SecondInnerField { get; }
+        private GraphQLSelectionSet SecondFieldSelection { get; }
+        private GraphQLField FirstTestField { get; }
+        private GraphQLField SecondTestField { get; }
+        private GraphQLField AliasedTestField { get; }
 
-        private Dictionary<string, Field> CollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+        private Dictionary<string, GraphQLField> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
         {
             return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
         }
 
         private class MyExecutionStrategy : ParallelExecutionStrategy
         {
-            public Dictionary<string, Field> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, SelectionSet selectionSet)
+            public Dictionary<string, GraphQLField> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
                 => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
         }
 
         [Fact]
         public void BeMergedCorrectlyInCaseOfFields()
         {
-            var outerSelection = new SelectionSet();
-            outerSelection.Add(FirstTestField);
-            outerSelection.Add(SecondTestField);
+            var outerSelection = new GraphQLSelectionSet();
+            outerSelection.Selections.Add(FirstTestField);
+            outerSelection.Selections.Add(SecondTestField);
 
             var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
@@ -62,9 +62,9 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void NotMergeAliasedFields()
         {
-            var outerSelection = new SelectionSet();
-            outerSelection.Add(FirstTestField);
-            outerSelection.Add(AliasedTestField);
+            var outerSelection = new GraphQLSelectionSet();
+            outerSelection.Selections.Add(FirstTestField);
+            outerSelection.Selections.Add(AliasedTestField);
 
             var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
@@ -77,16 +77,23 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void MergeFieldAndFragment()
         {
-            var fragmentSelection = new SelectionSet();
-            fragmentSelection.Add(FirstTestField);
-            var fragment = new FragmentDefinition(
-                new NameNode("fragment"),
-                new GraphQL.Language.AST.NamedType(
-                    new NameNode("Person")),
-                fragmentSelection);
+            var fragmentSelection = new GraphQLSelectionSet();
+            fragmentSelection.Selections.Add(FirstTestField);
+            var fragment = new GraphQLFragmentDefinition
+            {
+                Name = new GraphQLName("fragment"),
+                TypeCondition = new GraphQLTypeCondition
+                {
+                    Type = new GraphQLNamedType
+                    {
+                        Name = new GraphQLName("Person")
+                    }
+                },
+                SelectionSet = fragmentSelection
+            };
 
-            var document = new Document();
-            document.Fragments.Add(fragment);
+            var document = new GraphQLDocument();
+            document.Definitions.Add(fragment);
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
@@ -97,10 +104,10 @@ namespace GraphQL.Tests.Execution
                 Schema = schema
             };
 
-            var fragSpread = new FragmentSpread(new NameNode("fragment"));
-            var outerSelection = new SelectionSet();
-            outerSelection.Add(fragSpread);
-            outerSelection.Add(SecondTestField);
+            var fragSpread = new GraphQLFragmentSpread { Name = new GraphQLName("fragment") };
+            var outerSelection = new GraphQLSelectionSet();
+            outerSelection.Selections.Add(fragSpread);
+            outerSelection.Selections.Add(SecondTestField);
 
             var fields = CollectFrom(context, new PersonType(), outerSelection);
 

@@ -48,7 +48,7 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective((string)x.Name!.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name)) //TODO:!!!alloc
                     .Select(PrintAstDirective)
             );
 
@@ -59,7 +59,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            return AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+            return AstPrinter.Print(directive);
         }
 
         public override string PrintObject(IObjectGraphType type)

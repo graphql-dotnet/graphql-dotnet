@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -24,7 +23,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownDirectivesError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLDirective>((node, context) =>
         {
             var directiveDef = context.Schema.Directives.Find(node.Name);
             if (directiveDef == null)
@@ -45,25 +44,25 @@ namespace GraphQL.Validation.Rules
         {
             var appliedTo = context.TypeInfo.GetAncestor(1);
 
-            if (appliedTo is Directives || appliedTo is Arguments)
+            if (appliedTo is GraphQLDirectives || appliedTo is GraphQLArguments)
             {
                 appliedTo = context.TypeInfo.GetAncestor(2);
             }
 
             return appliedTo switch
             {
-                Operation op => op.OperationType switch
+                GraphQLOperationDefinition op => op.Operation switch
                 {
                     OperationType.Query => DirectiveLocation.Query,
                     OperationType.Mutation => DirectiveLocation.Mutation,
                     OperationType.Subscription => DirectiveLocation.Subscription,
-                    _ => throw new InvalidOperationException($"Unknown operation type '{op.OperationType}.")
+                    _ => throw new InvalidOperationException($"Unknown operation type '{op.Operation}.")
                 },
-                Field _ => DirectiveLocation.Field,
-                FragmentSpread _ => DirectiveLocation.FragmentSpread,
-                InlineFragment _ => DirectiveLocation.InlineFragment,
-                FragmentDefinition _ => DirectiveLocation.FragmentDefinition,
-                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.StringFrom(context.Document)}'.")
+                GraphQLField _ => DirectiveLocation.Field,
+                GraphQLFragmentSpread _ => DirectiveLocation.FragmentSpread,
+                GraphQLInlineFragment _ => DirectiveLocation.InlineFragment,
+                GraphQLFragmentDefinition _ => DirectiveLocation.FragmentDefinition,
+                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.StringFrom(context.OriginalQuery)}'.")
             };
         }
     }

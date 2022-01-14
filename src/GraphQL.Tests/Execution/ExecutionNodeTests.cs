@@ -1,10 +1,9 @@
 using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
-
-using AST = GraphQL.Language.AST;
 
 namespace GraphQL.Tests.Execution
 {
@@ -44,7 +43,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
-                new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
+                new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -60,7 +59,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
-                new AST.Field(default, new AST.NameNode("name")),
+                new GraphQLField { Name = new GraphQLName("name") },
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -76,7 +75,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
-                new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
+                new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -92,7 +91,7 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
-                new AST.Field(default, new AST.NameNode("name")),
+                new GraphQLField { Name = new GraphQLName("name") },
                 objectGraphType.GetField("value"),
                 indexInParentNode: null);
 
@@ -107,7 +106,7 @@ namespace GraphQL.Tests.Execution
         {
             Field<StringGraphType>(
                 "value",
-                resolve: context => context.FieldAst.Alias ?? context.FieldAst.Name);
+                resolve: context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
         }
     }
 }

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -21,12 +21,12 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedFragmentsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Fragments.Count > 0 ? _nodeVisitor : null);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Operation>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node)),
-            new MatchingNodeVisitor<FragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>()).Add(node)),
-            new MatchingNodeVisitor<Document>(leave: (document, context) =>
+            new MatchingNodeVisitor<GraphQLOperationDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<GraphQLOperationDefinition>(1)).Add(node)),
+            new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<GraphQLFragmentDefinition>()).Add(node)),
+            new MatchingNodeVisitor<GraphQLDocument>(leave: (document, context) =>
             {
                 var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
                 if (fragmentDefs == null)

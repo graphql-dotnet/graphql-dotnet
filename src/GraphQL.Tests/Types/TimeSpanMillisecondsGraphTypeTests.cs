@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -71,7 +72,7 @@ namespace GraphQL.Tests.Types
             {
                 var expected = TimeSpan.FromMilliseconds(Convert.ToDouble(value));
 
-                IValue ast = value switch
+                GraphQLValue ast = value switch
                 {
                     int i => new IntValue(i),
                     long l => new LongValue(l),

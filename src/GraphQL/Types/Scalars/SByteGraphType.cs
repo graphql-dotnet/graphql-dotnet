@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +11,24 @@ namespace GraphQL.Types
     public class SByteGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((sbyte)intValue.Value),
-            LongValue longValue => checked((sbyte)longValue.Value),
-            BigIntValue bigIntValue => checked((sbyte)bigIntValue.Value),
+            IntValue intValue => checked((sbyte)intValue.ClrValue),
+            LongValue longValue => checked((sbyte)longValue.ClrValue),
+            BigIntValue bigIntValue => checked((sbyte)bigIntValue.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => sbyte.MinValue <= intValue.Value && intValue.Value <= sbyte.MaxValue,
-            LongValue longValue => sbyte.MinValue <= longValue.Value && longValue.Value <= sbyte.MaxValue,
-            BigIntValue bigIntValue => sbyte.MinValue <= bigIntValue.Value && bigIntValue.Value <= sbyte.MaxValue,
+            IntValue intValue => sbyte.MinValue <= intValue.ClrValue && intValue.ClrValue <= sbyte.MaxValue,
+            LongValue longValue => sbyte.MinValue <= longValue.ClrValue && longValue.ClrValue <= sbyte.MaxValue,
+            BigIntValue bigIntValue => sbyte.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= sbyte.MaxValue,
             NullValue _ => true,
+            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => false
         };
 

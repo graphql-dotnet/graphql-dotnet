@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -139,8 +140,8 @@ namespace GraphQL.Tests.Types
         {
             type.ToAST(Colors.Red)
                 .ShouldNotBeNull()
-                .ShouldBeOfType<EnumValue>()
-                .Name.ShouldBe("RED");
+                .ShouldBeOfType<GraphQLEnumValue>()
+                .Name.Value.ShouldBe("RED");
         }
 
         [Fact]

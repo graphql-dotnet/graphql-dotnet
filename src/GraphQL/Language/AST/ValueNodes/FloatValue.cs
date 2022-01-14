@@ -1,18 +1,24 @@
 using System;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
     /// <summary>
     /// Represents a <see cref="double"/> value within a document.
     /// </summary>
-    public class FloatValue : ValueNode<double>
+    public class FloatValue : GraphQLFloatValue, IValue<double>
     {
         /// <summary>
         /// Initializes a new instance with the specified value.
         /// </summary>
-        public FloatValue(double value) : base(ValidateValue(value))
+        public FloatValue(double value)
         {
+            ClrValue = ValidateValue(value);
         }
+
+        public double ClrValue { get; }
+
+        object? IValue.ClrValue => ClrValue;
 
         private static double ValidateValue(double value)
         {

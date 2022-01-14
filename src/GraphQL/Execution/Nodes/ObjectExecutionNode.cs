@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -19,7 +20,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
         /// </summary>
-        public ObjectExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        public ObjectExecutionNode(ExecutionNode? parent, IGraphType? graphType, GraphQLField? field, FieldType? fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
@@ -89,7 +90,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the selection set from <see cref="Field"/>.
         /// </summary>
-        public virtual SelectionSet? SelectionSet => Field?.SelectionSet;
+        public virtual GraphQLSelectionSet? SelectionSet => Field?.SelectionSet;
 
         /// <inheritdoc/>
         public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)

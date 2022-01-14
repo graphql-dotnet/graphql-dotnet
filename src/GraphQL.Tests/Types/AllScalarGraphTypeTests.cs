@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -67,10 +68,12 @@ namespace GraphQL.Tests.Types
             var g = Create(graphType);
             g.ParseValue(null).ShouldBeNull();
             g.CanParseValue(null).ShouldBeTrue();
+            g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
+            g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
             g.ParseLiteral(new NullValue()).ShouldBeNull();
             g.CanParseLiteral(new NullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
-            ((IValue)g.ToAST(null).ShouldBeOfType<NullValue>()).Value.ShouldBeNull();
+            ((IValue)g.ToAST(null).ShouldBeOfType<NullValue>()).ClrValue.ShouldBeNull();
         }
 
         [Theory]
@@ -124,8 +127,8 @@ namespace GraphQL.Tests.Types
         {
             // if string to coercion were possible, all would pass, as the string is "0"
             var g = Create(graphType);
-            g.CanParseLiteral(new StringValue("0")).ShouldBeFalse();
-            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new StringValue("0")));
+            g.CanParseLiteral(new GraphQLStringValue { Value = "0" }).ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new GraphQLStringValue { Value = "0" }));
             g.CanParseValue("0").ShouldBeFalse();
             Should.Throw<InvalidOperationException>(() => g.ParseValue("0"));
             Should.Throw<InvalidOperationException>(() => g.Serialize("0"));
@@ -320,7 +323,7 @@ namespace GraphQL.Tests.Types
                 value = new BigInteger(Convert.ToDecimal(value));
 
             var g = Create(graphType);
-            var valueCasts = new Func<object, IValue>[]
+            var valueCasts = new Func<object, GraphQLValue>[]
             {
                 n => new IntValue(Convert.ToInt32(n)),
                 n => new LongValue(Convert.ToInt64(n)),
@@ -329,7 +332,7 @@ namespace GraphQL.Tests.Types
 
             foreach (var getValue in valueCasts)
             {
-                IValue astValue;
+                GraphQLValue astValue;
                 try
                 {
                     astValue = getValue(value);
@@ -497,7 +500,7 @@ namespace GraphQL.Tests.Types
                     _ => null
                 };
                 astActual.ShouldBeOfType(astExpected.GetType());
-                astActual.Value.ShouldBe(astExpected.Value);
+                ((IValue)astActual).ClrValue.ShouldBe(astExpected.ClrValue);
             }
         }
 
@@ -526,7 +529,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(FloatGraphType), 3.5, 3.5)]
         public void parseLiteral_other_ok(Type graphType, object value, object parsed)
         {
-            IValue astValue = value switch
+            GraphQLValue astValue = value switch
             {
                 int i => new IntValue(i),
                 long l => new LongValue(l),
@@ -624,7 +627,7 @@ namespace GraphQL.Tests.Types
         [InlineData(typeof(BigIntGraphType), 1.5)]
         public void parseLiteral_other_fail(Type graphType, object value)
         {
-            IValue astValue = value switch
+            GraphQLValue astValue = value switch
             {
                 int i => new IntValue(i),
                 long l => new LongValue(l),
@@ -755,7 +758,7 @@ namespace GraphQL.Tests.Types
         public void parseLiteral_out_of_range(Type graphType, object value)
         {
             var g = Create(graphType);
-            var valueCasts = new Func<object, IValue>[]
+            var valueCasts = new Func<object, GraphQLValue>[]
             {
                 n => new IntValue(Convert.ToInt32(n)),
                 n => new LongValue(Convert.ToInt64(n)),
@@ -764,7 +767,7 @@ namespace GraphQL.Tests.Types
 
             foreach (var getValue in valueCasts)
             {
-                IValue astValue;
+                GraphQLValue astValue;
                 try
                 {
                     astValue = getValue(value);

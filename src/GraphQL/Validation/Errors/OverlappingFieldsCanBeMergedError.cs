@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GraphQLParser.AST;
 using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 
 namespace GraphQL.Validation.Errors
@@ -14,8 +15,8 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public OverlappingFieldsCanBeMergedError(ValidationContext context, Conflict conflict)
-            : base(context.Document.OriginalQuery!, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
-                  conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray())
+            : base(context.OriginalQuery!, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
+                  conflict.FieldsLeft.Concat(conflict.FieldsRight).Cast<ASTNode>().ToArray()) //TODO:!!!!!cast
         {
         }
 

@@ -1,5 +1,6 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,12 +13,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownFragmentNamesError(ValidationContext context, FragmentSpread node, string fragmentName)
-            : base(context.Document.OriginalQuery!, NUMBER, UnknownFragmentMessage(fragmentName), node)
+        public KnownFragmentNamesError(ValidationContext context, GraphQLFragmentSpread node, ROM fragmentName)
+            : base(context.OriginalQuery!, NUMBER, UnknownFragmentMessage(fragmentName), node)
         {
         }
 
-        internal static string UnknownFragmentMessage(string fragName)
+        internal static string UnknownFragmentMessage(ROM fragName)
             => $"Unknown fragment '{fragName}'.";
     }
 }

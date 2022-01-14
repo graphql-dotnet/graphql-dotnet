@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -36,12 +36,12 @@ namespace GraphQL
         /// <summary>
         /// Returns the parsed GraphQL request.
         /// </summary>
-        public Document? Document { get; set; }
+        public GraphQLDocument? Document { get; set; }
 
         /// <summary>
         /// Returns the GraphQL operation that is being executed.
         /// </summary>
-        public Operation? Operation { get; set; }
+        public GraphQLOperationDefinition? Operation { get; set; }
 
         /// <summary>
         /// Returns the performance metrics (Apollo Tracing) when enabled by <see cref="ExecutionOptions.EnableMetrics"/>.

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -63,6 +63,7 @@ namespace GraphQL.Validation
             context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
+            context.OriginalQuery = options.OriginalQuery;
             context.UserContext = options.UserContext;
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
@@ -94,7 +95,7 @@ namespace GraphQL.Validation
                             visitors.Add(visitor);
                     }
 
-                    new BasicVisitor(visitors).Visit(context.Document, context);
+                    await new BasicVisitor(visitors).Visit(context.Document, new BasicVisitor.State(context));
                 }
 
                 // can report errors even without rules enabled

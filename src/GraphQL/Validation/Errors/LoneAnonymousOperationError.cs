@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +12,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public LoneAnonymousOperationError(ValidationContext context, Operation node)
-            : base(context.Document.OriginalQuery!, NUMBER, AnonOperationNotAloneMessage(), node)
+        public LoneAnonymousOperationError(ValidationContext context, GraphQLOperationDefinition node)
+            : base(context.OriginalQuery!, NUMBER, AnonOperationNotAloneMessage(), node)
         {
         }
 

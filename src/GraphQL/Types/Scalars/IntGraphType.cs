@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +11,24 @@ namespace GraphQL.Types
     public class IntGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => intValue.Value,
-            LongValue longValue => checked((int)longValue.Value),
-            BigIntValue bigIntValue => checked((int)bigIntValue.Value),
+            IntValue intValue => intValue.ClrValue,
+            LongValue longValue => checked((int)longValue.ClrValue),
+            BigIntValue bigIntValue => checked((int)bigIntValue.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
             IntValue _ => true,
-            LongValue longValue => int.MinValue <= longValue.Value && longValue.Value <= int.MaxValue,
-            BigIntValue bigIntValue => int.MinValue <= bigIntValue.Value && bigIntValue.Value <= int.MaxValue,
+            LongValue longValue => int.MinValue <= longValue.ClrValue && longValue.ClrValue <= int.MaxValue,
+            BigIntValue bigIntValue => int.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= int.MaxValue,
             NullValue _ => true,
+            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => false
         };
 

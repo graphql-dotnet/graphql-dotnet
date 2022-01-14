@@ -4,8 +4,9 @@ using System.Threading;
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.MicrosoftDI
 {
@@ -21,7 +22,7 @@ namespace GraphQL.MicrosoftDI
 
         public TSource Source => _baseContext.Source;
 
-        public Field FieldAst => _baseContext.FieldAst;
+        public GraphQLField FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
 
@@ -35,9 +36,9 @@ namespace GraphQL.MicrosoftDI
 
         public ISchema Schema => _baseContext.Schema;
 
-        public Document Document => _baseContext.Document;
+        public GraphQLDocument Document => _baseContext.Document;
 
-        public Operation Operation => _baseContext.Operation;
+        public GraphQLOperationDefinition Operation => _baseContext.Operation;
 
         public Variables Variables => _baseContext.Variables;
 
@@ -51,7 +52,7 @@ namespace GraphQL.MicrosoftDI
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Dictionary<string, Field> SubFields => _baseContext.SubFields;
+        public Dictionary<string, GraphQLField> SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
 

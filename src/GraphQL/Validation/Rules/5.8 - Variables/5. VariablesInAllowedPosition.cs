@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,15 +22,15 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<VariableDefinition>(
+            new MatchingNodeVisitor<GraphQLVariableDefinition>(
                 (varDefAst, context) =>
                 {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
-                    varDefMap[varDefAst.Name] = varDefAst;
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, GraphQLVariableDefinition>();
+                    varDefMap[(string)varDefAst.Variable.Name] = varDefAst; //TODO:!!!!alloc
                 }
             ),
 
-            new MatchingNodeVisitor<Operation>(
+            new MatchingNodeVisitor<GraphQLOperationDefinition>(
                 enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap?.Clear(),
                 leave: (op, context) =>
                 {
@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
                     foreach (var usage in context.GetRecursiveVariables(op))
                     {
                         var varName = usage.Node.Name;
-                        if (!varDefMap.TryGetValue(varName, out var varDef))
+                        if (!varDefMap.TryGetValue((string)varName, out var varDef)) //TODO:!!!!alloc
                         {
                             return;
                         }
@@ -62,7 +62,7 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// if a variable definition has a default value, it is effectively non-null.
         /// </summary>
-        private static GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
+        private static GraphType effectiveType(IGraphType varType, GraphQLVariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)
             {

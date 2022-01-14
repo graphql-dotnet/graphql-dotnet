@@ -1,6 +1,7 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,23 +14,23 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ProvidedNonNullArgumentsError(ValidationContext context, Field node, QueryArgument arg)
-            : base(context.Document.OriginalQuery!, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+        public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLField node, QueryArgument arg)
+            : base(context.OriginalQuery!, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ProvidedNonNullArgumentsError(ValidationContext context, Directive node, QueryArgument arg)
-            : base(context.Document.OriginalQuery!, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+        public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLDirective node, QueryArgument arg)
+            : base(context.OriginalQuery!, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 
-        internal static string MissingFieldArgMessage(string fieldName, string argName, string type)
+        internal static string MissingFieldArgMessage(ROM fieldName, string argName, string type)
             => $"Argument '{argName}' of type '{type}' is required for field '{fieldName}' but not provided.";
 
-        internal static string MissingDirectiveArgMessage(string directiveName, string argName, string type)
+        internal static string MissingDirectiveArgMessage(ROM directiveName, string argName, string type)
             => $"Argument '{argName}' of type '{type}' is required for directive '{directiveName}' but not provided.";
     }
 }

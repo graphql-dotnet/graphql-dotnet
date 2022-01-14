@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -201,7 +202,7 @@ type Query {
                 Name = "Int";
             }
 
-            public override object ParseLiteral(IValue value)
+            public override object ParseLiteral(GraphQLValue value)
             {
                 var ret = base.ParseLiteral(value);
                 return ret is int i ? i - 1 : ret;
@@ -221,7 +222,7 @@ type Query {
                 Name = "String";
             }
 
-            public override object ParseLiteral(IValue value)
+            public override object ParseLiteral(GraphQLValue value)
                 => value is StringValue s ? "input-" + s.Value : base.ParseLiteral(value);
 
             public override object ParseValue(object value)

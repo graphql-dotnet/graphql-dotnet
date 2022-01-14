@@ -1,5 +1,6 @@
 using System.Numerics;
 using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +11,24 @@ namespace GraphQL.Types
     public class ByteGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((byte)intValue.Value),
-            LongValue longValue => checked((byte)longValue.Value),
-            BigIntValue bigIntValue => checked((byte)bigIntValue.Value),
+            IntValue intValue => checked((byte)intValue.ClrValue),
+            LongValue longValue => checked((byte)longValue.ClrValue),
+            BigIntValue bigIntValue => checked((byte)bigIntValue.ClrValue),
             NullValue _ => null,
+            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue,
-            LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue,
-            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue,
+            IntValue intValue => byte.MinValue <= intValue.ClrValue && intValue.ClrValue <= byte.MaxValue,
+            LongValue longValue => byte.MinValue <= longValue.ClrValue && longValue.ClrValue <= byte.MaxValue,
+            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= byte.MaxValue,
             NullValue _ => true,
+            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
             _ => false
         };
 

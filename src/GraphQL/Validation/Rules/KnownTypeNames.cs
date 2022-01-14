@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,13 +23,13 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownTypeNamesError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLNamedType>(leave: (node, context) =>
         {
-            var type = context.Schema.AllTypes[node.Name];
+            var type = context.Schema.AllTypes[(string)node.Name]; //TODO:!!!!alloc
             if (type == null)
             {
                 var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
-                var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
+                var suggestionList = StringUtils.SuggestionList((string)node.Name, typeNames); //TODO:!!!!alloc
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }
         });

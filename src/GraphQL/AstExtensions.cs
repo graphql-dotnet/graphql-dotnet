@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -11,16 +11,14 @@ namespace GraphQL
         /// <summary>
         /// Returns the original string that was parsed from the provided document into the specified node.
         /// </summary>
-        public static string StringFrom(this INode node, Document document)
+        public static string StringFrom(this ASTNode node, string? originalQuery)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
-            if (document.OriginalQuery == null)
-                throw new ArgumentNullException(nameof(document) + "." + nameof(Document.OriginalQuery));
+            if (originalQuery == null)
+                throw new ArgumentNullException(nameof(originalQuery));
 
-            return document.OriginalQuery.Substring(node.SourceLocation.Start, node.SourceLocation.End - node.SourceLocation.Start);
+            return originalQuery.Substring(node.Location.Start, node.Location.End - node.Location.Start);
         }
     }
 }

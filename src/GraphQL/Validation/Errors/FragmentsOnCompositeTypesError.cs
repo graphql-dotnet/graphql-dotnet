@@ -1,5 +1,6 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,23 +13,23 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public FragmentsOnCompositeTypesError(ValidationContext context, InlineFragment node)
-            : base(context.Document.OriginalQuery!, NUMBER, InlineFragmentOnNonCompositeErrorMessage(node.Type!.StringFrom(context.Document)), node.Type!)
+        public FragmentsOnCompositeTypesError(ValidationContext context, GraphQLInlineFragment node)
+            : base(context.OriginalQuery!, NUMBER, InlineFragmentOnNonCompositeErrorMessage(node.TypeCondition!.Type.StringFrom(context.OriginalQuery)), node.TypeCondition!.Type)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public FragmentsOnCompositeTypesError(ValidationContext context, FragmentDefinition node)
-            : base(context.Document.OriginalQuery!, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, node.Type.StringFrom(context.Document)), node.Type)
+        public FragmentsOnCompositeTypesError(ValidationContext context, GraphQLFragmentDefinition node)
+            : base(context.OriginalQuery!, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, node.TypeCondition.Type.StringFrom(context.OriginalQuery)), node.TypeCondition.Type)
         {
         }
 
-        internal static string InlineFragmentOnNonCompositeErrorMessage(string type)
+        internal static string InlineFragmentOnNonCompositeErrorMessage(ROM type)
             => $"Fragment cannot condition on non composite type '{type}'.";
 
-        internal static string FragmentOnNonCompositeErrorMessage(string fragName, string type)
+        internal static string FragmentOnNonCompositeErrorMessage(ROM fragName, string type)
             => $"Fragment '{fragName}' cannot condition on non composite type '{type}'.";
     }
 }

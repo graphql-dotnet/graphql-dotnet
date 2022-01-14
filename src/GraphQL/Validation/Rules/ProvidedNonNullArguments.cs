@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Field>(leave: (node, context) =>
+            new MatchingNodeVisitor<GraphQLField>(leave: (node, context) =>
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
 
@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
                 }
             }),
 
-            new MatchingNodeVisitor<Directive>(leave: (node, context) =>
+            new MatchingNodeVisitor<GraphQLDirective>(leave: (node, context) =>
             {
                 var directive = context.TypeInfo.GetDirective();
 

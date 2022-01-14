@@ -5,6 +5,7 @@ using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -119,14 +120,14 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void anynode_throws()
         {
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new AnyValue("")));
+            Should.Throw<InvalidOperationException>(() => AstPrinter.Print((ASTNode)new AnyValue("")));
         }
 
         [Fact]
         public void string_encodes_control_characters()
         {
             var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
-            var ret = AstPrinter.Print(new StringValue(sample));
+            var ret = AstPrinter.Print((ASTNode)new StringValue(sample));
 
             foreach (char c in ret)
                 c.ShouldBeGreaterThanOrEqualTo(' ');
@@ -141,7 +142,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [MemberData(nameof(NodeTests))]
-        public void prints_node(INode node, string expected)
+        public void prints_node(ASTNode node, string expected)
         {
             var printed = AstPrinter.Print(node);
 
@@ -157,7 +158,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [MemberData(nameof(NodeTests))]
-        public void prints_node_cultures(INode node, string expected)
+        public void prints_node_cultures(ASTNode node, string expected)
         {
             CultureTestHelper.UseCultures(() => prints_node(node, expected));
         }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -18,7 +19,9 @@ namespace GraphQL.Execution
         public IExecutionStrategy ExecutionStrategy { get; set; }
 
         /// <inheritdoc/>
-        public Document Document { get; set; }
+        public GraphQLDocument Document { get; set; }
+
+        public string? OriginalQuery { get; set; }
 
         /// <inheritdoc/>
         public ISchema Schema { get; set; }
@@ -30,7 +33,7 @@ namespace GraphQL.Execution
         public IDictionary<string, object?> UserContext { get; set; }
 
         /// <inheritdoc/>
-        public Operation Operation { get; set; }
+        public GraphQLOperationDefinition Operation { get; set; }
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
@@ -142,6 +145,6 @@ namespace GraphQL.Execution
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
         /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
-        internal Dictionary<string, Field>? ReusableFields;
+        internal Dictionary<string, GraphQLField>? ReusableFields;
     }
 }

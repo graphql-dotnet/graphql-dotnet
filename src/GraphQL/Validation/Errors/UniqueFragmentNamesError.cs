@@ -1,5 +1,6 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,12 +13,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UniqueFragmentNamesError(ValidationContext context, FragmentDefinition node, FragmentDefinition altNode)
-            : base(context.Document.OriginalQuery!, NUMBER, DuplicateFragmentNameMessage(node.Name), node, altNode)
+        public UniqueFragmentNamesError(ValidationContext context, GraphQLFragmentDefinition node, GraphQLFragmentDefinition altNode)
+            : base(context.OriginalQuery!, NUMBER, DuplicateFragmentNameMessage(node.Name), node, altNode)
         {
         }
 
-        internal static string DuplicateFragmentNameMessage(string fragName)
+        internal static string DuplicateFragmentNameMessage(ROM fragName)
             => $"There can only be one fragment named '{fragName}'";
     }
 }

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
+using GraphQL.Language;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Moq;
 using Shouldly;
 using Xunit;
@@ -55,14 +56,14 @@ namespace GraphQL.MicrosoftDI.Tests
                 Arguments = new Dictionary<string, ArgumentValue>() { { "6", default } },
                 ArrayPool = Mock.Of<IExecutionArrayPool>(),
                 CancellationToken = default,
-                Document = new Document(),
+                Document = new GraphQLDocument(),
                 Errors = new ExecutionErrors(),
                 InputExtensions = new Dictionary<string, object>() { { "7", new object() } },
                 OutputExtensions = new Dictionary<string, object>() { { "1", new object() } },
-                FieldAst = new Field(default, new NameNode("test")),
+                FieldAst = new GraphQLField { Name = new GraphQLName("test") },
                 FieldDefinition = new FieldType(),
                 Metrics = new Instrumentation.Metrics(),
-                Operation = new Operation(new NameNode(), null!),
+                Operation = new GraphQLOperationDefinition(),
                 ParentType = Mock.Of<IObjectGraphType>(),
                 Path = new object[] { "5" },
                 RequestServices = Mock.Of<IServiceProvider>(),
@@ -70,7 +71,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 RootValue = new object(),
                 Schema = Mock.Of<ISchema>(),
                 Source = "hello",
-                SubFields = new Dictionary<string, Field>(),
+                SubFields = new Dictionary<string, GraphQLField>(),
                 UserContext = new Dictionary<string, object>() { { "3", new object() } },
                 Variables = new Variables(),
             };

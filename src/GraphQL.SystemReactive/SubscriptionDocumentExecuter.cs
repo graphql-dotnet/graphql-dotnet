@@ -31,7 +31,7 @@ namespace GraphQL
 
         protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
-            return context.Operation.OperationType switch
+            return context.Operation.Operation switch
             {
                 OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
                 _ => base.SelectExecutionStrategy(context)

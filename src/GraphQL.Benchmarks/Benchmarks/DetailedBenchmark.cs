@@ -190,11 +190,13 @@ namespace GraphQL.Benchmarks
             public string Query;
             public string InputsString;
             public GraphQLDocument GraphQLDocument;
-            public Document Document;
-            public Operation Operation;
+            public GraphQLDocument Document;
+            public GraphQLOperationDefinition Operation;
             public Inputs Inputs;
-            public Language.AST.Variables Variables;
+            public Language.Variables Variables;
             public ExecutionResult ExecutionResult;
+
+            private static readonly CoreToVanillaConverter _converter = new();
 
             public BenchmarkInfo(string query, string inputs, Func<ISchema> schemaBuilder)
             {
@@ -204,7 +206,7 @@ namespace GraphQL.Benchmarks
                 Query = query;
                 GraphQLDocument = Parse();
                 Document = Convert();
-                Operation = Document.Operations.FirstOrDefault();
+                Operation = Document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault();
                 InputsString = inputs;
                 Inputs = DeserializeInputs();
                 Variables = ParseVariables();
@@ -222,9 +224,12 @@ namespace GraphQL.Benchmarks
                 return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.Comments });
             }
 
-            public Document Convert()
+            //TODO:!!!!! not new document, dirty state, remove?
+            public GraphQLDocument Convert()
             {
-                return CoreToVanillaConverter.Convert(GraphQLDocument);
+                var context = new CoreToVanillaConverterContext();
+                _converter.Visit(GraphQLDocument, context).GetAwaiter().GetResult(); //actually sync
+                return GraphQLDocument;
             }
 
             public Inputs DeserializeInputs()
@@ -232,7 +237,7 @@ namespace GraphQL.Benchmarks
                 return InputsString?.ToInputs();
             }
 
-            public Language.AST.Variables ParseVariables()
+            public Language.Variables ParseVariables()
             {
                 return Inputs == null ? null : new ValidationContext
                 {

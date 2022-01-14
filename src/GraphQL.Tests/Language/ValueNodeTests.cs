@@ -21,29 +21,17 @@ namespace GraphQL.Tests.Language
         }
 
         [Fact]
-        public void namenode_cannot_contain_null()
-        {
-            Should.Throw<ArgumentNullException>(() => new NameNode(null));
-        }
-
-        [Fact]
-        public void namenode_can_contain_empty_location()
-        {
-            new NameNode("a").SourceLocation.ShouldBe(default(GraphQLLocation));
-            new NameNode("a", default(GraphQLLocation)).SourceLocation.ShouldBe(default(GraphQLLocation));
-        }
-
-        [Fact]
         public void enumvalue_cannot_contain_null()
         {
-            Should.Throw<ArgumentNullException>(() => new EnumValue(null));
+            Should.Throw<ArgumentNullException>(() => new EnumValue((string)null));
+            Should.Throw<ArgumentNullException>(() => new EnumValue((GraphQLName)null));
         }
 
         [Fact]
         public void enumvalue_cannot_contain_invalid_characters()
         {
             Should.Throw<ArgumentOutOfRangeException>(() => new EnumValue("kebab-enum"));
-            Should.Throw<ArgumentOutOfRangeException>(() => new EnumValue(new NameNode("kebab-enum")));
+            Should.Throw<ArgumentOutOfRangeException>(() => new EnumValue(new GraphQLName("kebab-enum")));
         }
     }
 }

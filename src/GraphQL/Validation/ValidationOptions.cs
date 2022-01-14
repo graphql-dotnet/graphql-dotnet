@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -11,7 +12,9 @@ namespace GraphQL.Validation
     {
         public ISchema Schema { get; set; } = null!;
 
-        public Document Document { get; set; } = null!;
+        public GraphQLDocument Document { get; set; } = null!;
+
+        public string? OriginalQuery { get; set; }
 
         public IEnumerable<IValidationRule>? Rules { get; set; }
 
@@ -24,6 +27,6 @@ namespace GraphQL.Validation
         /// <summary>
         /// Executed operation.
         /// </summary>
-        public Operation Operation { get; set; } = null!;
+        public GraphQLOperationDefinition Operation { get; set; } = null!;
     }
 }
