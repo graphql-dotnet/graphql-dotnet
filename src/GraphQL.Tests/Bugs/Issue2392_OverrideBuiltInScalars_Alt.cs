@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;

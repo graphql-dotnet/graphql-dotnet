@@ -1,6 +1,5 @@
 using System.Linq;
 using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;

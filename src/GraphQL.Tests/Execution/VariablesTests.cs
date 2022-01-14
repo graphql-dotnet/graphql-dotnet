@@ -2,7 +2,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;

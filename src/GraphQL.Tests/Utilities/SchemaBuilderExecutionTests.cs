@@ -439,14 +439,14 @@ namespace GraphQL.Tests.Utilities
             ");
 
             var root = new { Hello = "Hello World!" };
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = "{ hello }";
                 _.Root = root;
             });
 
             var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -460,14 +460,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = "{ source }";
                 _.Root = new { Hello = "World" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""source"": true }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -481,10 +481,10 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ => _.Query = "{ resolve }");
+            var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -498,10 +498,10 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
+            var result = await ExecuteAsync(schema, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -515,14 +515,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -536,14 +536,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new ChildMyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -579,14 +579,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = @"{ userContextWithParam(id: ""abcd"") }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -600,7 +600,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = @"{ three }";
                 _.Root = new { Hello = "World" };
@@ -608,7 +608,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""three"": true }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -622,7 +622,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
+            var result = await ExecuteAsync(schema, _ =>
             {
                 _.Query = @"{ four(id: 123) }";
                 _.Root = new { Hello = "World" };
@@ -630,7 +630,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult(@"{ ""four"": true }");
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -724,13 +724,25 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<PetQueryType>();
             });
 
-            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ pet { ... on Dog { name } } }");
+            var result = await ExecuteAsync(schema, _ => _.Query = @"{ pet { ... on Dog { name } } }");
 
             var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
             var expectedResult = CreateQueryResult(expected);
-            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
+        }
+
+        private async Task<string> ExecuteAsync(ISchema schema, Action<ExecutionOptions> configure)
+        {
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                configure(options);
+            }).ConfigureAwait(false);
+
+            return Serializer.Serialize(result);
         }
     }
 

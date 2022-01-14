@@ -114,10 +114,10 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-            foreach (var writer in DocumentWritersTestData.AllWriters)
+            foreach (var writer in GraphQLSerializersTestData.AllWriters)
             {
-                var writtenResult = writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
-                var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+                var writtenResult = writer.Serialize(renderResult);
+                var expectedResult = writer.Serialize(expectedExecutionResult);
 
                 writtenResult.ShouldBeCrossPlat(expectedResult);
 
@@ -154,10 +154,10 @@ namespace GraphQL.Tests
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
             }).GetAwaiter().GetResult();
 
-            foreach (var writer in DocumentWritersTestData.AllWriters)
+            foreach (var writer in GraphQLSerializersTestData.AllWriters)
             {
-                var writtenResult = writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-                var expectedResult = expectedExecutionResultOrJson is string s ? s : writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
+                var writtenResult = writer.Serialize(runResult);
+                var expectedResult = expectedExecutionResultOrJson is string s ? s : writer.Serialize((ExecutionResult)expectedExecutionResultOrJson);
 
                 string additionalInfo = $"{writer.GetType().FullName} failed: ";
 

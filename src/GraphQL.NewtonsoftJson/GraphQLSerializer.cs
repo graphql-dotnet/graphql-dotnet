@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.NewtonsoftJson
 {
@@ -13,77 +14,77 @@ namespace GraphQL.NewtonsoftJson
     /// Serializes an <see cref="ExecutionResult"/> (or any other object) to a stream using
     /// the <see cref="Newtonsoft.Json"/> library.
     /// </summary>
-    public class DocumentWriter : IDocumentWriter
+    public class GraphQLSerializer : IGraphQLTextSerializer
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings:
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
         /// no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
-        public DocumentWriter()
+        public GraphQLSerializer()
             : this(indent: false)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings
         /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="indent">Indicates if child objects should be indented</param>
-        public DocumentWriter(bool indent)
+        public GraphQLSerializer(bool indent)
             : this(BuildSerializer(indent, null, null))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings.
         /// </summary>
         /// <param name="indent">Indicates if child objects should be indented</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-        public DocumentWriter(bool indent, IErrorInfoProvider errorInfoProvider)
+        public GraphQLSerializer(bool indent, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(indent, null, errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with no indenting and the
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with no indenting and the
         /// specified <see cref="IErrorInfoProvider"/>.
         /// </summary>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-        public DocumentWriter(IErrorInfoProvider errorInfoProvider)
+        public GraphQLSerializer(IErrorInfoProvider errorInfoProvider)
             : this(false, errorInfoProvider)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class configured with the specified callback.
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class configured with the specified callback.
         /// Configuration defaults to no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="configureSerializerSettings">Specifies a callback used to configure the JSON serializer</param>
-        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
+        public GraphQLSerializer(Action<JsonSerializerSettings> configureSerializerSettings)
             : this(BuildSerializer(false, configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)), null))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings
         /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
-        public DocumentWriter(JsonSerializerSettings serializerSettings)
+        public GraphQLSerializer(JsonSerializerSettings serializerSettings)
             : this(BuildSerializer(serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)), null))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings.
         /// </summary>
         /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-        public DocumentWriter(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
+        public GraphQLSerializer(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(
                 serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)),
                 errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
@@ -91,19 +92,19 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings.
         /// Configuration defaults to no indenting and the specified instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="configureSerializerSettings">Specifies a callback used to configure the JSON serializer</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
+        public GraphQLSerializer(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(false,
                 configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)),
                 errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
         {
         }
 
-        private DocumentWriter(JsonSerializer jsonSerializer)
+        private GraphQLSerializer(JsonSerializer jsonSerializer)
         {
             _serializer = jsonSerializer;
         }
@@ -113,7 +114,7 @@ namespace GraphQL.NewtonsoftJson
             return new JsonSerializerSettings
             {
                 Formatting = indent ? Formatting.Indented : Formatting.None,
-                ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
+                ContractResolver = new GraphQLContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
             };
         }
 
@@ -129,9 +130,9 @@ namespace GraphQL.NewtonsoftJson
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
             if (serializerSettings.ContractResolver == null)
-                serializer.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
-            else if (!(serializerSettings.ContractResolver is ExecutionResultContractResolver))
-                throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(ExecutionResultContractResolver)}");
+                serializer.ContractResolver = new GraphQLContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
+            else if (!(serializerSettings.ContractResolver is GraphQLContractResolver))
+                throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(GraphQLContractResolver)}");
 
             return serializer;
         }
@@ -152,5 +153,64 @@ namespace GraphQL.NewtonsoftJson
             _serializer.Serialize(jsonWriter, value);
             await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Serializes <paramref name="value"/> to the specified <see cref="TextWriter"/>.
+        /// </summary>
+        public void Write<T>(TextWriter textWriter, T value)
+        {
+            using var stringWriter = new JsonTextWriter(textWriter)
+            {
+                CloseOutput = false
+            };
+            _serializer.Serialize(stringWriter, value);
+        }
+
+        /// <inheritdoc/>
+        public string Serialize<T>(T value)
+        {
+            using var stringWriter = new StringWriter();
+            Write(stringWriter, value);
+            return stringWriter.ToString();
+        }
+
+        /// <inheritdoc/>
+        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        {
+            using var stringReader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
+            using var jsonReader = new JsonTextReader(stringReader);
+            return new ValueTask<T>(_serializer.Deserialize<T>(jsonReader));
+        }
+
+        /// <summary>
+        /// Deserializes from the specified <see cref="TextReader"/> to the specified object type.
+        /// </summary>
+        public T Read<T>(TextReader json)
+        {
+            using var jsonReader = new JsonTextReader(json)
+            {
+                CloseInput = false
+            };
+            return _serializer.Deserialize<T>(jsonReader);
+        }
+
+        /// <inheritdoc/>
+        public T Deserialize<T>(string json)
+            => json == null ? default : Read<T>(new StringReader(json));
+
+        /// <summary>
+        /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="jObject"/> of <see langword="null"/> returns <see langword="default"/>.
+        /// </summary>
+        private T ReadNode<T>(JObject jObject)
+            => jObject == null ? default : jObject.ToObject<T>(_serializer);
+
+        /// <summary>
+        /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
+        /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
+        /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JObject"/>.
+        /// </summary>
+        public T ReadNode<T>(object value)
+            => ReadNode<T>((JObject)value);
     }
 }

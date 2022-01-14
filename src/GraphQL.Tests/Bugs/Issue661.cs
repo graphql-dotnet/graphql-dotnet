@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Bugs
             services.AddSingleton<ISchema, Issue661Schema>();
             services.AddSingleton<Issue661Query>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddSingleton<IGraphQLSerializer, GraphQLSerializer>();
 
             using var provider = services.BuildServiceProvider();
             var cache = provider.GetRequiredService<IDistributedCache>();

@@ -1,17 +1,18 @@
 using System;
 using System.Reflection;
 using GraphQL.Execution;
+using GraphQL.Transport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
-    public class ExecutionResultContractResolver : DefaultContractResolver
+    public class GraphQLContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
         private readonly IErrorInfoProvider _errorInfoProvider;
 
-        public ExecutionResultContractResolver(IErrorInfoProvider errorInfoProvider)
+        public GraphQLContractResolver(IErrorInfoProvider errorInfoProvider)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
@@ -20,6 +21,18 @@ namespace GraphQL.NewtonsoftJson
         {
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider, NamingStrategy);
+
+            if (objectType == typeof(Inputs))
+                return new InputsJsonConverter();
+
+            if (objectType == typeof(GraphQLRequest))
+                return new GraphQLRequestJsonConverter();
+
+            if (GraphQLRequestListJsonConverter.CanConvertType(objectType))
+                return new GraphQLRequestListJsonConverter();
+
+            if (objectType == typeof(OperationMessage))
+                return new OperationMessageJsonConverter();
 
             return base.ResolveContractConverter(objectType);
         }

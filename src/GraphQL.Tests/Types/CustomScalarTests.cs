@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -69,24 +69,33 @@ namespace GraphQL.Tests.Types
         [InlineData("inputOutput", null, null, Response.Success)]                     // custom scalar coerces null to "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "internalNull", null, Response.Success)]           // custom scalar receives "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "externalNull", "externalNull", Response.Success)] // custom scalar coerces "externalNull" to null and then custom scalar coerces null to "externalNull"
-        [InlineData("nonNullOutput", "internalNull", null, Response.ErrorNoField)]    // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
+        [InlineData("nonNullOutput", "internalNull", null, Response.ErrorDataNull)]   // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
         [InlineData("nonNullOutput", null, "externalNull", Response.Success)]         // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
         [InlineData("nonNullInput", "externalNull", null, Response.Success)]          // custom scalar coerces "externalNull" to null and string scalar returns null
         [InlineData("nonNullInput", null, "internalNull", Response.ErrorNoData)]      // custom scalar fails validation on null for non-null argument before execution begins
         public void InOut_Literal(string field, string argumentValue, string expectedResponse, Response responseType)
         {
-            var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
-            var quotedResponse = expectedResponse == null ? "null" : $"\"{expectedResponse}\"";
-            var result = CreateQueryResult(responseType == Response.Success || responseType == Response.Error ? $"{{ \"{field}\":{quotedResponse} }}" : "null");
-            if (responseType == Response.ErrorNoData)
+            var expectedResult = new ExecutionResult();
+            if (responseType == Response.Success || responseType == Response.Error)
             {
-                result = new ExecutionResult();
+                expectedResult.Data = new Dictionary<string, object>
+                {
+                    { field, expectedResponse },
+                };
+                expectedResult.Executed = true;
             }
-            var executionResult = AssertQueryIgnoreErrors($"{{ {field}(arg: {quotedArg}) }}", result,
-                expectedErrorCount: responseType == Response.Success ? 0 : 1);
-            if (responseType == Response.ErrorNoField || responseType == Response.Error)
+            else if (responseType == Response.ErrorDataNull)
             {
-                executionResult.Errors[0].Path.ShouldBe(new object[] { field });
+                expectedResult.Data = null;
+                expectedResult.Executed = true;
+            }
+
+            var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+            var actualResult = AssertQueryIgnoreErrors($"{{ {field}(arg: {quotedArg}) }}", expectedResult,
+                expectedErrorCount: responseType == Response.Success ? 0 : 1);
+            if (responseType == Response.ErrorDataNull || responseType == Response.Error)
+            {
+                actualResult.Errors[0].Path.ShouldBe(new object[] { field });
             }
         }
 
@@ -103,24 +112,33 @@ namespace GraphQL.Tests.Types
         [InlineData("inputOutput", null, null, "CustomScalar", Response.Success)]                     // custom scalar coerces null to "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "internalNull", null, "CustomScalar", Response.Success)]           // custom scalar receives "internalNull" and then custom scalar coerces "internalNull" to null
         [InlineData("inputOutput", "externalNull", "externalNull", "CustomScalar", Response.Success)] // custom scalar coerces "externalNull" to null and then custom scalar coerces null to "externalNull"
-        [InlineData("nonNullOutput", "internalNull", null, "String", Response.ErrorNoField)]          // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
+        [InlineData("nonNullOutput", "internalNull", null, "String", Response.ErrorDataNull)]         // string scalar receives "internalNull" and non-null custom scalar attempts to return null (and fails)
         [InlineData("nonNullOutput", null, "externalNull", "String", Response.Success)]               // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
         [InlineData("nonNullInput", "externalNull", null, "CustomScalar!", Response.Success)]         // custom scalar coerces "externalNull" to null and string scalar returns null
         [InlineData("nonNullInput", null, "internalNull", "CustomScalar!", Response.ErrorNoData)]     // custom scalar fails validation on null for non-null argument before execution begins
         public void InOut_Variable(string field, string argumentValue, string expectedResponse, string argumentType, Response responseType)
         {
-            var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
-            var quotedResponse = expectedResponse == null ? "null" : $"\"{expectedResponse}\"";
-            var result = CreateQueryResult(responseType == Response.Success || responseType == Response.Error ? $"{{ \"{field}\":{quotedResponse} }}" : "null");
-            if (responseType == Response.ErrorNoData)
+            var expectedResult = new ExecutionResult();
+            if (responseType == Response.Success || responseType == Response.Error)
             {
-                result = new ExecutionResult();
+                expectedResult.Data = new Dictionary<string, object>
+                {
+                    { field, expectedResponse },
+                };
+                expectedResult.Executed = true;
             }
-            var executionResult = AssertQueryIgnoreErrors($"query ($arg: {argumentType}) {{ {field}(arg: $arg) }}", result, $"{{ \"arg\": {quotedArg} }}".ToInputs(),
-                expectedErrorCount: responseType == Response.Success ? 0 : 1);
-            if (responseType == Response.ErrorNoField || responseType == Response.Error)
+            else if (responseType == Response.ErrorDataNull)
             {
-                executionResult.Errors[0].Path.ShouldBe(new object[] { field });
+                expectedResult.Data = null;
+                expectedResult.Executed = true;
+            }
+
+            var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+            var actualResult = AssertQueryIgnoreErrors($"query ($arg: {argumentType}) {{ {field}(arg: $arg) }}", expectedResult, $"{{ \"arg\": {quotedArg} }}".ToInputs(),
+                expectedErrorCount: responseType == Response.Success ? 0 : 1);
+            if (responseType == Response.ErrorDataNull || responseType == Response.Error)
+            {
+                actualResult.Errors[0].Path.ShouldBe(new object[] { field });
             }
         }
 
@@ -156,9 +174,21 @@ namespace GraphQL.Tests.Types
 
     public enum Response
     {
+        /// <summary>
+        /// Field is set properly
+        /// </summary>
         Success,
+        /// <summary>
+        /// Field is set to null due to execution error within the field on a nullable field
+        /// </summary>
         Error,
-        ErrorNoField,
+        /// <summary>
+        /// Data is null due to execution error within the field on a non-null field
+        /// </summary>
+        ErrorDataNull,
+        /// <summary>
+        /// Data does not exist in the response map due to a validation error before execution begins
+        /// </summary>
         ErrorNoData
     }
 

@@ -49,6 +49,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bVariable;
         private BenchmarkInfo _bLiteral;
         private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
+        private static readonly GraphQLSerializer _serializer = new GraphQLSerializer();
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -131,7 +132,7 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Variables = benchmarkInfo.InputsString?.ToInputs();
+                        o.Variables = _serializer.Deserialize<Inputs>(benchmarkInfo.InputsString);
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
@@ -234,7 +235,7 @@ namespace GraphQL.Benchmarks
 
             public Inputs DeserializeInputs()
             {
-                return InputsString?.ToInputs();
+                return _serializer.Deserialize<Inputs>(InputsString);
             }
 
             public Language.Variables ParseVariables()
@@ -242,7 +243,7 @@ namespace GraphQL.Benchmarks
                 return Inputs == null ? null : new ValidationContext
                 {
                     Schema = Schema,
-                    Variables = Inputs,
+                    Variables = Inputs ?? Inputs.Empty,
                     Operation = Operation,
                 }.GetVariableValues();
             }
@@ -254,7 +255,7 @@ namespace GraphQL.Benchmarks
                 {
                     Schema = Schema,
                     Document = Document,
-                    Variables = Inputs
+                    Variables = Inputs ?? Inputs.Empty,
                 }).Result.validationResult;
             }
 
@@ -285,11 +286,10 @@ namespace GraphQL.Benchmarks
                 return _parallelExecutionStrategy.ExecuteAsync(context).Result;
             }
 
-            private static readonly DocumentWriter _documentWriter = new DocumentWriter();
             public System.IO.MemoryStream Serialize()
             {
                 var mem = new System.IO.MemoryStream();
-                _documentWriter.WriteAsync(mem, ExecutionResult).GetAwaiter().GetResult();
+                _serializer.WriteAsync(mem, ExecutionResult, default).GetAwaiter().GetResult();
                 mem.Position = 0;
                 return mem;
             }

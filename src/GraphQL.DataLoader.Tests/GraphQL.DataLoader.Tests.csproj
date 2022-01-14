@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\GraphQL.Tests\DocumentWritersTestData.cs" Link="DocumentWritersTestData.cs" />
+    <Compile Include="..\GraphQL.Tests\GraphQLSerializersTestData.cs" Link="GraphQLSerializersTestData.cs" />
   </ItemGroup>
 
   <ItemGroup>
