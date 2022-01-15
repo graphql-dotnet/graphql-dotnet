@@ -10,29 +10,48 @@ namespace GraphQL.Types
     public class FloatGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(GraphQLValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value)
         {
-            FloatValue floatVal => floatVal.ClrValue,
-            IntValue intVal => (double)intVal.ClrValue,
-            LongValue longVal => (double)longVal.ClrValue,
-            DecimalValue decVal => checked((double)decVal.ClrValue),
-            BigIntValue bigIntVal => checked((double)bigIntVal.ClrValue),
-            GraphQLNullValue _ => null,
-            _ => ThrowLiteralConversionError(value)
-        };
+            object? Parse(object? v) =>
+                v switch
+                {
+                    double x => x,
+                    int x => (double)x,
+                    long x => (double)x,
+                    decimal x => checked((double)x),
+                    BigInteger x => checked((double)x),
+                    _ => ThrowLiteralConversionError(value)
+                };
+
+            return value switch
+            {
+                GraphQLIntValue x => Parse(x.ClrValue),
+                GraphQLFloatValue x => Parse(x.ClrValue),
+                GraphQLNullValue _ => null,
+                _ => ThrowLiteralConversionError(value)
+            };
+        }
 
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value)
         {
+            bool CanParse(object? v) =>
+                v switch
+                {
+                    long _ => true,
+                    decimal x => Ret(checked((double)x)),
+                    BigInteger x => Ret(checked((double)x)),
+                    double _ => true,
+                    int _ => true,
+                    _ => false
+                };
+
             try
             {
                 return value switch
                 {
-                    LongValue _ => true,
-                    DecimalValue decVal => Ret(checked((double)decVal.ClrValue)),
-                    BigIntValue bigIntVal => Ret(checked((double)bigIntVal.ClrValue)),
-                    FloatValue _ => true,
-                    IntValue _ => true,
+                    GraphQLIntValue x => CanParse(x),
+                    GraphQLFloatValue x => CanParse(x),
                     GraphQLNullValue _ => true,
                     _ => false
                 };

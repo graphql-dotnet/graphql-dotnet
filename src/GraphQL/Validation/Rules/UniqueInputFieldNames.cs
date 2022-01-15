@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -24,10 +24,10 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-                new MatchingNodeVisitor<ObjectValue>(
+                new MatchingNodeVisitor<GraphQLObjectValue>(
                     enter: (objVal, context) =>
                     {
-                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<ROM, GraphQLValue>>();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
@@ -37,15 +37,15 @@ namespace GraphQL.Validation.Rules
                 new MatchingNodeVisitor<GraphQLObjectField>(
                     leave: (objField, context) =>
                     {
-                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<ROM, GraphQLValue>();
 
-                        if (knownNames.TryGetValue((string)objField.Name, out var value)) //TODO:!!!!alloc
+                        if (knownNames.TryGetValue(objField.Name, out var value))
                         {
                             context.ReportError(new UniqueInputFieldNamesError(context, value, objField));
                         }
                         else
                         {
-                            knownNames[(string)objField.Name] = (IValue)objField.Value; //TODO:!!!!alloc
+                            knownNames[objField.Name] = objField.Value;
                         }
                     })
             );

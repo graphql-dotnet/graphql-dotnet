@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
@@ -135,7 +134,7 @@ namespace GraphQL.Execution
                     var arg = context.Schema.Directives.Skip.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
-                    if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, (IValue?)directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
+                    if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
 #pragma warning restore CS8605 // Unboxing a possibly null value.
                         return false;
                 }
@@ -146,7 +145,7 @@ namespace GraphQL.Execution
                     var arg = context.Schema.Directives.Include.Arguments!.Find("if")!;
 
 #pragma warning disable CS8605 // Unboxing a possibly null value.
-                    return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, (IValue?)directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
+                    return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
 #pragma warning restore CS8605 // Unboxing a possibly null value.
                 }
             }

@@ -269,7 +269,7 @@ namespace GraphQL.Validation
         /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
         /// are not redundantly reported.
         /// </summary>
-        internal HashSet<string>? NoFragmentCycles_VisitedFrags;
+        internal HashSet<ROM>? NoFragmentCycles_VisitedFrags;
         /// <summary>
         /// Array of AST nodes used to produce meaningful errors
         /// </summary>
@@ -277,7 +277,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Position in the spread path
         /// </summary>
-        internal Dictionary<string, int>? NoFragmentCycles_SpreadPathIndexByName;
+        internal Dictionary<ROM, int>? NoFragmentCycles_SpreadPathIndexByName;
 
         internal HashSet<ROM>? NoUndefinedVariables_VariableNameDefined;
 
@@ -290,13 +290,13 @@ namespace GraphQL.Validation
 
         internal Dictionary<ROM, GraphQLFragmentDefinition>? UniqueFragmentNames_KnownFragments;
 
-        internal Stack<Dictionary<string, GraphQLValue>>? UniqueInputFieldNames_KnownNameStack;
-        internal Dictionary<string, GraphQLValue>? UniqueInputFieldNames_KnownNames;
+        internal Stack<Dictionary<ROM, GraphQLValue>>? UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<ROM, GraphQLValue>? UniqueInputFieldNames_KnownNames;
 
         internal HashSet<ROM>? UniqueOperationNames_Frequency;
 
         internal Dictionary<ROM, GraphQLVariableDefinition>? UniqueVariableNames_KnownVariables;
 
-        internal Dictionary<string, GraphQLVariableDefinition>? VariablesInAllowedPosition_VarDefMap;
+        internal Dictionary<ROM, GraphQLVariableDefinition>? VariablesInAllowedPosition_VarDefMap;
     }
 }

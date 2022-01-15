@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -29,7 +28,7 @@ namespace GraphQL.Validation.Rules
                 return;
 
             var type = argDef.ResolvedType!;
-            var errors = context.IsValidLiteralValue(type, (IValue)argAst.Value);
+            var errors = context.IsValidLiteralValue(type, argAst.Value);
             if (errors != null)
             {
                 context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));

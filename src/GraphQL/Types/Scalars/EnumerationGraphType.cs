@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
 
@@ -110,7 +109,7 @@ namespace GraphQL.Types
         public override GraphQLValue? ToAST(object? value)
         {
             if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
-                return new NullValue();
+                return new GraphQLNullValue();
 
             var foundByValue = Values.FindByValue(value);
             return foundByValue == null

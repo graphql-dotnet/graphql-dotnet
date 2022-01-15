@@ -25,11 +25,11 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLNamedType>(leave: (node, context) =>
         {
-            var type = context.Schema.AllTypes[(string)node.Name]; //TODO:!!!!alloc
+            var type = context.Schema.AllTypes[node.Name.StringValue]; //TODO:!!!!alloc
             if (type == null)
             {
                 var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
-                var suggestionList = StringUtils.SuggestionList((string)node.Name, typeNames); //TODO:!!!!alloc
+                var suggestionList = StringUtils.SuggestionList(node.Name.StringValue, typeNames); //TODO:!!!!alloc
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }
         });

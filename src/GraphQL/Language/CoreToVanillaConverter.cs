@@ -18,6 +18,7 @@ namespace GraphQL.Language
         //TODO: throw on schema definitions
         public override async ValueTask Visit(ASTNode? node, CoreToVanillaConverterContext context)
         {
+            // TODO: remove??? GraphQLEnumValue can not have name with hyphens
             if (node is GraphQLEnumValue enumValue)
                 NameValidator.ValidateDefault(enumValue.Name, NamedElement.EnumValue);
 

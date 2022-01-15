@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -60,19 +59,20 @@ namespace GraphQL.Types
         {
             GraphQLNonNullType nonnull => Name(nonnull.Type),
             GraphQLListType list => Name(list.Type),
-            GraphQLNamedType named => (string)named.Name, //TODO:!!!!! alloc
+            GraphQLNamedType named => named.Name.StringValue, //TODO:!!!!! alloc
             _ => throw new NotSupportedException($"Unknown type {type}")
         };
 
         /// <summary>
-        /// Returns the formatted GraphQL type name of the AST type, using brackets and exclamation points as necessary to
+        /// Returns the formatted GraphQL type name of the AST type,
+        /// using brackets and exclamation points as necessary to
         /// indicate lists or non-null types, respectively.
         /// </summary>
         public static string FullName(this GraphQLType type) => type switch
         {
             GraphQLNonNullType nonnull => $"{FullName(nonnull.Type)}!",
             GraphQLListType list => $"[{FullName(list.Type)}]",
-            GraphQLNamedType named => (string)named.Name, //TODO:!!!!!!alloc
+            GraphQLNamedType named => named.Name.StringValue, //TODO:!!!!!!alloc
             _ => throw new NotSupportedException($"Unknown type {type}")
         };
     }

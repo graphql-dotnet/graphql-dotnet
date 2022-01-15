@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
-    public class FederatedSchemaPrinter : SchemaPrinter
+    public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
     {
         private readonly List<string> _federatedDirectives = new List<string>
         {

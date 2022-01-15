@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -192,7 +191,7 @@ namespace GraphQL.Utilities
             // validate default value
             if (field.DefaultValue is GraphQLValue value)
             {
-                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, (IValue)Language.CoreToVanillaConverter.Value(value)).Value;
+                field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
             }
             else if (field.DefaultValue != null && !field.ResolvedType!.IsValidDefault(field.DefaultValue))
             {
@@ -272,7 +271,7 @@ namespace GraphQL.Utilities
             // validate default
             if (argument.DefaultValue is GraphQLValue value)
             {
-                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, (IValue)Language.CoreToVanillaConverter.Value(value)).Value;
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value).Value;
             }
             else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
             {
@@ -284,7 +283,7 @@ namespace GraphQL.Utilities
         {
             if (argument.DefaultValue is GraphQLValue value)
             {
-                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, (IValue)Language.CoreToVanillaConverter.Value(value)).Value;
+                argument.DefaultValue = Execution.ExecutionHelper.CoerceValue(argument.ResolvedType!, value).Value;
             }
             else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
             {

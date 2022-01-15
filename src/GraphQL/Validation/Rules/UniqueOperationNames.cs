@@ -21,11 +21,11 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Definitions.OfType<GraphQLOperationDefinition>().Count() < 2 ? null : _nodeVisitor); //TODO:!!!!alloc
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (op.Name.Value.Length == 0)
+            if (op.Name == null || op.Name.Value == "")
             {
                 return;
             }

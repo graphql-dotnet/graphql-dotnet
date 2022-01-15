@@ -169,7 +169,7 @@ namespace GraphQL.Validation
             var fragments = new List<GraphQLFragmentDefinition>();
             var nodesToVisit = new Stack<GraphQLSelectionSet>();
             nodesToVisit.Push(operation.SelectionSet);
-            var collectedNames = new Dictionary<string, bool>();
+            var collectedNames = new Dictionary<ROM, bool>();
 
             while (nodesToVisit.Count > 0)
             {
@@ -177,7 +177,7 @@ namespace GraphQL.Validation
 
                 foreach (var spread in GetFragmentSpreads(node))
                 {
-                    string fragName = (string)spread.Name; //TODO:!!!!!alloc
+                    var fragName = spread.Name;
                     if (!collectedNames.ContainsKey(fragName))
                     {
                         collectedNames[fragName] = true;

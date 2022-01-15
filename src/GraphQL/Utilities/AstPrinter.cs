@@ -15,7 +15,7 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Prints a string representation of the specified AST document or node.
     /// </summary>
-    public static class AstPrinter
+    public static class AstPrinter // TODO: remove completely whole file
     {
         // new-ing AstPrintVisitor every time we called AstPrinter
         // was killing the performance of introspection queries (20-30% of the call time)

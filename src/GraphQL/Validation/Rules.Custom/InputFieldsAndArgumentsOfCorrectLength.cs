@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
@@ -82,7 +81,7 @@ namespace GraphQL.Validation.Rules
             {
                 CheckStringLength(strLiteral.Value.Length);
             }
-            else if (value is VariableReference vRef && context.Variables != null && context.Variables.TryGetValue((string)vRef.Name, out object? val)) //TODO:!!!!!alloc
+            else if (value is GraphQLVariable vRef && context.Variables != null && context.Variables.TryGetValue((string)vRef.Name, out object? val)) //TODO:!!!!!alloc
             {
                 if (val is string strVariable)
                     CheckStringLength(strVariable.Length);

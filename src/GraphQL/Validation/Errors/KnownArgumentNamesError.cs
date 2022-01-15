@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
                     node.Name,
                     fieldDef.Name,
                     parentType.ToString(),
-                    StringUtils.SuggestionList((string)node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))), //TODO:!!!!alloc
+                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //TODO:!!!!alloc
                 node)
         {
         }

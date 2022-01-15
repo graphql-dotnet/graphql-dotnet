@@ -3,7 +3,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -362,7 +361,7 @@ namespace GraphQL
             return false;
         }
 
-        private static readonly NullValue _null = new NullValue();
+        private static readonly GraphQLNullValue _null = new GraphQLNullValue();
 
         /// <summary>
         /// Returns a value indicating whether the provided value is a valid default value

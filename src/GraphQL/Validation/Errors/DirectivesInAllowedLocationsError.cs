@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors

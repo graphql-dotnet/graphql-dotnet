@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using GraphQL.Introspection;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
+
+//TODO:should be completely rewritten
 
 namespace GraphQL.Utilities
 {
@@ -507,7 +508,7 @@ namespace GraphQL.Utilities
             {
                 return string.Empty;
             }
-            return $" @deprecated(reason: {AstPrinter.Print((ASTNode)new StringValue(reason!))})";
+            return $" @deprecated(reason: {AstPrinter.Print(new GraphQLStringValue(reason!))})";
         }
 
         public string[] BreakLine(string line, int len)

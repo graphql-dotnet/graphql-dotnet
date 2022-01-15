@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -25,8 +26,8 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<GraphQLVariableDefinition>(
                 (varDefAst, context) =>
                 {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, GraphQLVariableDefinition>();
-                    varDefMap[(string)varDefAst.Variable.Name] = varDefAst; //TODO:!!!!alloc
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<ROM, GraphQLVariableDefinition>();
+                    varDefMap[varDefAst.Variable.Name] = varDefAst;
                 }
             ),
 
@@ -41,7 +42,7 @@ namespace GraphQL.Validation.Rules
                     foreach (var usage in context.GetRecursiveVariables(op))
                     {
                         var varName = usage.Node.Name;
-                        if (!varDefMap.TryGetValue((string)varName, out var varDef)) //TODO:!!!!alloc
+                        if (!varDefMap.TryGetValue(varName, out var varDef))
                         {
                             return;
                         }

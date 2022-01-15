@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -29,7 +28,7 @@ namespace GraphQL.Validation.Rules
 
             if (inputType != null && defaultValue != null)
             {
-                var errors = context.IsValidLiteralValue(inputType, (IValue)defaultValue);
+                var errors = context.IsValidLiteralValue(inputType, defaultValue);
                 if (errors != null)
                 {
                     context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
