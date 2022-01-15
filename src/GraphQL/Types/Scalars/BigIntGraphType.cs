@@ -1,5 +1,4 @@
 using System.Numerics;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -15,9 +14,8 @@ namespace GraphQL.Types
         {
             IntValue intValue => new BigInteger(intValue.ClrValue),
             LongValue longValue => new BigInteger(longValue.ClrValue),
-            BigIntValue bigIntValue => bigIntValue.Value,
-            NullValue _ => null,
-            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+            BigIntValue bigIntValue => bigIntValue.ClrValue,
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 

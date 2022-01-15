@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Language;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -92,7 +91,7 @@ namespace GraphQL.Validation
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
-            var listener = new MatchingNodeVisitor<VariableReference, (List<VariableUsage> usages, TypeInfo info)>((usages, info), (varRef, __, state) => state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!)));
+            var listener = new MatchingNodeVisitor<GraphQLVariable, (List<VariableUsage> usages, TypeInfo info)>((usages, info), (varRef, __, state) => state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!)));
 
             new BasicVisitor(info, listener).Visit((ASTNode)node, new BasicVisitor.State(this)).GetAwaiter().GetResult(); // actually is sync
 
@@ -250,7 +249,7 @@ namespace GraphQL.Validation
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, (IValue)variableDef.DefaultValue, variablesObj, null).Value;
+                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
                         }
                         catch (Exception ex)
                         {
@@ -468,15 +467,15 @@ namespace GraphQL.Validation
         /// Graph types that are lists or non-null types are handled appropriately by this method.
         /// Returns a string representing the errors encountered while validating the value.
         /// </summary>
-        public string? IsValidLiteralValue(IGraphType type, IValue valueAst)
+        public string? IsValidLiteralValue(IGraphType type, GraphQLValue valueAst)
         {
-            Debug.Assert(valueAst is null || valueAst is VariableReference || valueAst is GraphQLValue, "All AST values should inherit from GraphQLValue");
+            Debug.Assert(valueAst is null || valueAst is GraphQLValue, "All AST values should inherit from GraphQLValue");
 
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType!;
 
-                if (valueAst == null || valueAst is NullValue)
+                if (valueAst == null || valueAst is GraphQLNullValue)
                 {
                     if (ofType != null)
                     {
@@ -488,7 +487,7 @@ namespace GraphQL.Validation
 
                 return IsValidLiteralValue(ofType, valueAst);
             }
-            else if (valueAst is NullValue)
+            else if (valueAst is GraphQLNullValue)
             {
                 return null;
             }
@@ -500,7 +499,7 @@ namespace GraphQL.Validation
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
-            if (valueAst is VariableReference)
+            if (valueAst is GraphQLVariable)
             {
                 return null;
             }
@@ -509,13 +508,13 @@ namespace GraphQL.Validation
             {
                 var ofType = list.ResolvedType!;
 
-                if (valueAst is ListValue listValue)
+                if (valueAst is GraphQLListValue listValue)
                 {
                     List<string>? errors = null;
 
-                    for (int index = 0; index < listValue.ValuesList.Count; ++index)
+                    for (int index = 0; index < listValue.Values.Count; ++index)
                     {
-                        string? error = IsValidLiteralValue(ofType, listValue.ValuesList[index]);
+                        string? error = IsValidLiteralValue(ofType, listValue.Values[index]);
                         if (error != null)
                             (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
                     }
@@ -530,7 +529,7 @@ namespace GraphQL.Validation
 
             if (type is IInputObjectGraphType inputType)
             {
-                if (valueAst is not ObjectValue objValue)
+                if (valueAst is not GraphQLObjectValue objValue)
                 {
                     return $"Expected '{inputType.Name}', found not an object.";
                 }
@@ -557,7 +556,7 @@ namespace GraphQL.Validation
 
                     if (fieldAst != null)
                     {
-                        string? error = IsValidLiteralValue(field.ResolvedType!, (IValue)fieldAst.Value);
+                        string? error = IsValidLiteralValue(field.ResolvedType!, fieldAst.Value);
                         if (error != null)
                             (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
                     }

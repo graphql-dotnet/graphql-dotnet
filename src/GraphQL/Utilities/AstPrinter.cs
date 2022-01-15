@@ -5,9 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
 using System.Threading;
-using GraphQL.Language.AST;
 using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
@@ -316,33 +314,33 @@ namespace GraphQL.Utilities
 
             // Value
 
-            Config<VariableReference>(c =>
+            Config<GraphQLVariable>(c =>
             {
                 c.Field(x => x.Name);
                 c.Print(p => $"${p.Arg(x => x.Name)}");
             });
 
-            Config<IntValue>(c =>
+            Config<GraphQLIntValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f => ((int)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
             });
 
-            Config<NullValue>(c => c.Print(f => "null"));
+            Config<GraphQLNullValue>(c => c.Print(f => "null"));
 
-            Config<LongValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(f => ((long)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
-            });
+            //Config<LongValue>(c =>
+            //{
+            //    c.Field(x => x.Value);
+            //    c.Print(f => ((long)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
+            //});
 
-            Config<BigIntValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(f => ((BigInteger)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
-            });
+            //Config<BigIntValue>(c =>
+            //{
+            //    c.Field(x => x.Value);
+            //    c.Print(f => ((BigInteger)f.Arg(x => x.Value)!).ToString(CultureInfo.InvariantCulture));
+            //});
 
-            Config<FloatValue>(c =>
+            Config<GraphQLFloatValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f =>
@@ -358,17 +356,17 @@ namespace GraphQL.Utilities
                 });
             });
 
-            Config<DecimalValue>(c =>
-            {
-                c.Field(x => x.Value);
-                c.Print(f =>
-                {
-                    var val = (decimal)f.Arg(x => x.Value)!;
-                    return val.ToString("G29", CultureInfo.InvariantCulture); //prints most compact form of value without losing any precision
-                });
-            });
+            //Config<GraphQLDecimalValue>(c =>
+            //{
+            //    c.Field(x => x.Value);
+            //    c.Print(f =>
+            //    {
+            //        var val = (decimal)f.Arg(x => x.Value)!;
+            //        return val.ToString("G29", CultureInfo.InvariantCulture); //prints most compact form of value without losing any precision
+            //    });
+            //});
 
-            Config<StringValue>(c =>
+            Config<GraphQLStringValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f =>
@@ -408,19 +406,19 @@ namespace GraphQL.Utilities
 
             });
 
-            Config<BooleanValue>(c =>
+            Config<GraphQLBooleanValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f => (bool)f.Arg(x => x.Value)! ? "true" : "false");
             });
 
-            Config<EnumValue>(c =>
-            {
-                c.Field(x => x.Name);
-                c.Print(p => p.Arg(x => x.Name)!);
-            });
+            //Config<EnumValue>(c =>
+            //{
+            //    c.Field(x => x.Name);
+            //    c.Print(p => p.Arg(x => x.Name)!);
+            //});
 
-            Config<ListValue>(c =>
+            Config<GraphQLListValue>(c =>
             {
                 c.Field(x => x.Values);
                 c.Print(p => $"[{Join(p.ArgArray(x => x.Values), ", ")}]");

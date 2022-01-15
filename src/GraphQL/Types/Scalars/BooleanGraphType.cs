@@ -1,4 +1,3 @@
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -12,9 +11,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            BooleanValue b => b.ClrValue.Boxed(),
-            NullValue _ => null,
-            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+            GraphQLBooleanValue b => b.ClrValue,
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -35,8 +33,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override GraphQLValue? ToAST(object? value) => value switch
         {
-            bool b => new BooleanValue(b),
-            null => new NullValue(),
+            bool b => new GraphQLBooleanValue(b),
+            null => new GraphQLNullValue(),
             _ => ThrowASTConversionError(value)
         };
     }

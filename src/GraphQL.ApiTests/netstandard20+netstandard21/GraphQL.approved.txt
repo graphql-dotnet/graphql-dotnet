@@ -1386,7 +1386,6 @@ namespace GraphQL.Language
         public static GraphQL.Language.Variables None { get; }
         public virtual void Add(GraphQL.Language.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.Variable> GetEnumerator() { }
-        public override string ToString() { }
         public bool ValueFor(GraphQLParser.ROM name, out GraphQL.Execution.ArgumentValue value) { }
         public object? ValueFor(string name, object? defaultValue = null) { }
     }

@@ -1,5 +1,4 @@
 using System.Numerics;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -16,8 +15,7 @@ namespace GraphQL.Types
             IntValue intValue => checked((byte)intValue.ClrValue),
             LongValue longValue => checked((byte)longValue.ClrValue),
             BigIntValue bigIntValue => checked((byte)bigIntValue.ClrValue),
-            NullValue _ => null,
-            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -27,8 +25,7 @@ namespace GraphQL.Types
             IntValue intValue => byte.MinValue <= intValue.ClrValue && intValue.ClrValue <= byte.MaxValue,
             LongValue longValue => byte.MinValue <= longValue.ClrValue && longValue.ClrValue <= byte.MaxValue,
             BigIntValue bigIntValue => byte.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= byte.MaxValue,
-            NullValue _ => true,
-            GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+            GraphQLNullValue _ => true,
             _ => false
         };
 

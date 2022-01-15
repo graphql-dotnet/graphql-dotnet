@@ -57,6 +57,18 @@ namespace GraphQL.Execution
         /// </summary>
         public string? Name => (string)(Field?.Alias?.Name ?? Field?.Name); //TODO:!!!!!alloc
 
+        private object GetNameOrAlias(bool preferAlias)
+        {
+            if (preferAlias)
+            {
+                return (Field?.Alias?.Name ?? Field?.Name)!.Value;
+            }
+            else
+            {
+                return Field!.Name.Value;
+            }
+        }
+
         /// <summary>
         /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
         /// result that has not yet finished executing.
@@ -178,7 +190,7 @@ namespace GraphQL.Execution
             {
                 pathList[--index] = node.IndexInParentNode.HasValue
                     ? GetObjectIndex(node.IndexInParentNode.Value)
-                    : preferAlias ? node.Name! : node.Field!.Name!;
+                    : GetNameOrAlias(preferAlias);
                 node = node.Parent!;
             }
 

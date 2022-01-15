@@ -616,126 +616,100 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         public static object? ToValue(this GraphQLValue source)
         {
-            if (source == null)
+            object FromInt(GraphQLIntValue str)
             {
-                return null;
+                if (Int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
+                {
+                    return intResult;
+                }
+
+                // If the value doesn't fit in an integer, revert to using long...
+                if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
+                {
+                    return longResult;
+                }
+
+                // If the value doesn't fit in an long, revert to using decimal...
+                if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
+                {
+                    return decimalResult;
+                }
+
+                // If the value doesn't fit in an decimal, revert to using BigInteger...
+                if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
+                {
+                    return bigIntegerResult;
+                }
+
+                throw new InvalidOperationException($"Invalid number {str.Value}");
+            };
+
+            object FromFloat(GraphQLFloatValue str)
+            {
+                // the idea is to see if there is a loss of accuracy of value
+                // for example, 12.1 or 12.11 is double but 12.10 is decimal
+                if (!Double.TryParse(
+                    str!.Value,
+                    NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                    CultureInfo.InvariantCulture,
+                    out double dbl))
+                {
+                    dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
+                }
+
+                //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                if (Decimal.TryParse(
+                    str.Value,
+                    NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                    CultureInfo.InvariantCulture,
+                    out decimal dec))
+                {
+                    // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
+                    var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
+                    decimal temp = new decimal(dbl);
+                    var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
+                    if (!decBits.Equals(dblAsDecBits))
+                        return dec;
+                }
+
+                return dbl;
+            };
+
+            object FromObject(GraphQLObjectValue obj)
+            {
+                var values = new Dictionary<string, object?>();
+
+                if (obj!.Fields != null)
+                {
+                    foreach (var f in obj.Fields)
+                        values[(string)f.Name] = ToValue(f.Value!); //TODO:!!!alloc
+                }
+
+                return values;
+            };
+
+            object FromList(GraphQLListValue list)
+            {
+                if (list!.Values == null)
+                    return Array.Empty<object>();
+
+                object?[] values = list.Values.Select(ToValue).ToArray();
+                return values;
             }
 
-            switch (source.Kind)
+            return source switch
             {
-                case ASTNodeKind.NullValue:
-                {
-                    return null;
-                }
-                case ASTNodeKind.StringValue:
-                {
-                    var str = source as GraphQLStringValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (string)str!.Value;
-                }
-                case ASTNodeKind.IntValue:
-                {
-                    var str = source as GraphQLIntValue;
-
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    if (Int.TryParse(str!.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
-                    {
-                        return intResult;
-                    }
-
-                    // If the value doesn't fit in an integer, revert to using long...
-                    if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
-                    {
-                        return longResult;
-                    }
-
-                    // If the value doesn't fit in an long, revert to using decimal...
-                    if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
-                    {
-                        return decimalResult;
-                    }
-
-                    // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
-                    {
-                        return bigIntegerResult;
-                    }
-
-                    throw new InvalidOperationException($"Invalid number {str.Value}");
-                }
-                case ASTNodeKind.FloatValue:
-                {
-                    var str = source as GraphQLFloatValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-
-                    // the idea is to see if there is a loss of accuracy of value
-                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    if (!Double.TryParse(
-                        str!.Value,
-                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                        CultureInfo.InvariantCulture,
-                        out double dbl))
-                    {
-                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
-                    }
-
-                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
-                    if (Decimal.TryParse(
-                        str.Value,
-                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                        CultureInfo.InvariantCulture,
-                        out decimal dec))
-                    {
-                        // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
-                        var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
-                        decimal temp = new decimal(dbl);
-                        var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
-                        if (!decBits.Equals(dblAsDecBits))
-                            return dec;
-                    }
-
-                    return dbl;
-                }
-                case ASTNodeKind.BooleanValue:
-                {
-                    var str = source as GraphQLBooleanValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (str!.Value.Length == 4).Boxed(); /*true.Length=4*/
-                }
-                case ASTNodeKind.EnumValue:
-                {
-                    var str = source as GraphQLEnumValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (string)str!.Name; //TODO:!!!alloc
-                }
-                case ASTNodeKind.ObjectValue:
-                {
-                    var obj = source as GraphQLObjectValue;
-                    var values = new Dictionary<string, object?>();
-
-                    Debug.Assert(obj != null, nameof(obj) + " != null");
-                    if (obj!.Fields != null)
-                    {
-                        foreach (var f in obj.Fields)
-                            values[(string)f.Name] = ToValue(f.Value!); //TODO:!!!alloc
-                    }
-
-                    return values;
-                }
-                case ASTNodeKind.ListValue:
-                {
-                    var list = source as GraphQLListValue;
-                    Debug.Assert(list != null, nameof(list) + " != null");
-
-                    if (list!.Values == null)
-                        return Array.Empty<object>();
-
-                    object?[] values = list.Values.Select(ToValue).ToArray();
-                    return values;
-                }
-                default:
-                    throw new InvalidOperationException($"Unsupported value type {source.Kind}");
-            }
+                null => null,
+                GraphQLNullValue _ => null,
+                GraphQLStringValue str => (string)str.Value, //TODO:!!!alloc
+                GraphQLIntValue str => FromInt(str),
+                GraphQLFloatValue str => FromFloat(str),
+                GraphQLBooleanValue str => (str.Value.Length == 4).Boxed(), /*true.Length=4*/
+                GraphQLEnumValue str => (string)str.Name, //TODO:!!!alloc
+                GraphQLObjectValue obj => FromObject(obj),
+                GraphQLListValue list => FromList(list),
+                _ => throw new InvalidOperationException($"Unsupported value type {source.Kind}"),
+            };
         }
     }
 }

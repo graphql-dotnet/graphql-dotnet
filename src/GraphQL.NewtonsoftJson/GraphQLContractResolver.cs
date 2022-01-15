@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using GraphQL.Execution;
 using GraphQL.Transport;
+using GraphQLParser;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -33,6 +34,9 @@ namespace GraphQL.NewtonsoftJson
 
             if (objectType == typeof(OperationMessage))
                 return new OperationMessageJsonConverter();
+
+            if (objectType == typeof(ROM))
+                return new ROMJsonConverter();
 
             return base.ResolveContractConverter(objectType);
         }

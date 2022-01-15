@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace GraphQL.Resolvers
@@ -31,6 +32,8 @@ namespace GraphQL.Resolvers
         {
             if (source == null || name == null)
                 return null;
+
+            Debug.Assert(name != "", "Property/method name is empty");
 
             // We use reflection to create a delegate to access the property/method
             // Then cache the delegate

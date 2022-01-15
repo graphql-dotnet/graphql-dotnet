@@ -66,6 +66,12 @@ namespace GraphQL.SystemTextJson
         public override GraphQL.Transport.OperationMessage Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Transport.OperationMessage value, System.Text.Json.JsonSerializerOptions options) { }
     }
+    public class ROMJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQLParser.ROM>
+    {
+        public ROMJsonConverter() { }
+        public override GraphQLParser.ROM Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQLParser.ROM value, System.Text.Json.JsonSerializerOptions options) { }
+    }
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }

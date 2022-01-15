@@ -100,6 +100,7 @@ namespace GraphQL.Tests.Validation
             {
                 Schema = schema,
                 Document = document,
+                OriginalQuery = query,
                 Rules = rules,
                 Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault(),
                 Variables = variables

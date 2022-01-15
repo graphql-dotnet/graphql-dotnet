@@ -1,5 +1,4 @@
 using System.Numerics;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -16,10 +15,9 @@ namespace GraphQL.Types
             IntValue intVal => (decimal)intVal.ClrValue,
             LongValue longVal => (decimal)longVal.ClrValue,
             FloatValue floatVal => checked((decimal)floatVal.ClrValue),
-            DecimalValue decVal => decVal.Value,
+            DecimalValue decVal => decVal.ClrValue,
             BigIntValue bigIntVal => checked((decimal)bigIntVal.ClrValue),
-            NullValue _ => null,
-            GraphQLValue v and not IValue => ParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -30,13 +28,11 @@ namespace GraphQL.Types
             {
                 return value switch
                 {
-                    IntValue _ => true,
-                    LongValue _ => true,
-                    FloatValue f => Ret(checked((decimal)f.ClrValue)),
-                    DecimalValue _ => true,
-                    BigIntValue b => Ret(checked((decimal)b.ClrValue)),
-                    NullValue _ => true,
-                    GraphQLValue v and not IValue => CanParseLiteral((GraphQLValue)Language.CoreToVanillaConverter.Value(v)),
+                    GraphQLFloatValue v when v.ClrValue is double d => Ret(checked((decimal)d)),
+                    GraphQLIntValue v when v.ClrValue is BigInteger b => Ret(checked((decimal)b)),
+                    GraphQLIntValue _ => true,
+                    GraphQLFloatValue _ => true,
+                    GraphQLNullValue _ => true,
                     _ => false
                 };
             }

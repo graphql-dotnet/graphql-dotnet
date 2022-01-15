@@ -22,8 +22,15 @@ namespace GraphQL.SystemTextJson
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
+        public ApolloTraceJsonConverter()
+        {
+            var converter = new ROMJsonConverter();
+            _optionsNoIndent.Converters.Add(converter);
+            _optionsIndent.Converters.Add(converter);
+        }
+
         /// <inheritdoc/>
-        public override void Write(Utf8JsonWriter writer, ApolloTrace value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ApolloTrace value, JsonSerializerOptions options) //TODO: options ignored
             => JsonSerializer.Serialize(writer, value, options.WriteIndented ? _optionsIndent : _optionsNoIndent);
 
         /// <inheritdoc/>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -291,8 +290,8 @@ namespace GraphQL.Validation
 
         internal Dictionary<ROM, GraphQLFragmentDefinition>? UniqueFragmentNames_KnownFragments;
 
-        internal Stack<Dictionary<string, IValue>>? UniqueInputFieldNames_KnownNameStack;
-        internal Dictionary<string, IValue>? UniqueInputFieldNames_KnownNames;
+        internal Stack<Dictionary<string, GraphQLValue>>? UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<string, GraphQLValue>? UniqueInputFieldNames_KnownNames;
 
         internal HashSet<ROM>? UniqueOperationNames_Frequency;
 

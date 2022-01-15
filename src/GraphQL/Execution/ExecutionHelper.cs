@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using GraphQL.Language;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -31,7 +30,7 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType!;
 
-                values[arg.Name] = CoerceValue(type, (IValue?)value, variables, arg.DefaultValue);
+                values[arg.Name] = CoerceValue(type, value, variables, arg.DefaultValue);
             }
 
             return values;
@@ -41,9 +40,9 @@ namespace GraphQL.Execution
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static ArgumentValue CoerceValue(IGraphType type, IValue? input, Variables? variables = null, object? fieldDefault = null)
+        public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
         {
-            Debug.Assert(input is null || input is VariableReference || input is GraphQLValue, "All literal values should inherit from GraphQLValue");
+            Debug.Assert(input is null || input is GraphQLValue, "All literal values should inherit from GraphQLValue");
 
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -60,7 +59,7 @@ namespace GraphQL.Execution
                 return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
-            if (input is VariableReference variable)
+            if (input is GraphQLVariable variable)
             {
                 if (variables == null)
                     return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
@@ -83,15 +82,15 @@ namespace GraphQL.Execution
             {
                 var listItemType = listType.ResolvedType!;
 
-                if (input is ListValue list)
+                if (input is GraphQLListValue list)
                 {
-                    var count = list.ValuesList.Count;
+                    var count = list.Values.Count;
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
                     var values = new object?[count];
                     for (int i = 0; i < count; ++i)
-                        values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
+                        values[i] = CoerceValue(listItemType, list.Values[i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
@@ -102,7 +101,7 @@ namespace GraphQL.Execution
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                if (!(input is ObjectValue objectValue))
+                if (!(input is GraphQLObjectValue objectValue))
                 {
                     throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
                 }
@@ -127,7 +126,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType!, (IValue)objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {

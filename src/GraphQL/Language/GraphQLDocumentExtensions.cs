@@ -34,5 +34,24 @@ namespace GraphQLParser.AST
 
             return count;
         }
+
+        /// <summary>
+        /// Returns the first matching field node contained within this object value
+        /// node that matches the specified name, or <see langword="null"/> otherwise.
+        /// </summary>
+        public static GraphQLObjectField? Field(this GraphQLObjectValue objectValue, ROM name)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            if (objectValue.Fields != null)
+            {
+                foreach (var field in objectValue.Fields)
+                {
+                    if (field.Name.Value == name)
+                        return field;
+                }
+            }
+
+            return null;
+        }
     }
 }
