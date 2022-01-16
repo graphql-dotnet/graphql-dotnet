@@ -311,13 +311,15 @@ public class MyGraphType : ObjectGraphType<Category>
     {
         Field("Name", context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products")
-            .ResolveScopedAsync((context, serviceProvider) => {
-                var db = serviceProvider.GetRequiredService<MyDbContext>();
+            .ResolveScopedAsync(context => {
+                var db = context.RequestServices.GetRequiredService<MyDbContext>();
                 return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
             });
     }
 }
 ```
+
+In this case `context.RequestServices` will be an `IServiceProvider` in a newly created scope.
 
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
