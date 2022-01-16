@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQLParser.AST;
 using Shouldly;

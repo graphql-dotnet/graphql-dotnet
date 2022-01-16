@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution
@@ -70,7 +71,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return new ArgumentValue(scalarType.ParseLiteral((GraphQLValue)input), ArgumentSource.Literal);
+                return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
             }
 
             if (input is GraphQLNullValue)
@@ -84,13 +85,13 @@ namespace GraphQL.Execution
 
                 if (input is GraphQLListValue list)
                 {
-                    var count = list.Values.Count;
+                    var count = list.Values?.Count ?? 0;
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
                     var values = new object?[count];
                     for (int i = 0; i < count; ++i)
-                        values[i] = CoerceValue(listItemType, list.Values[i], variables).Value;
+                        values[i] = CoerceValue(listItemType, list.Values![i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
@@ -103,7 +104,7 @@ namespace GraphQL.Execution
             {
                 if (!(input is GraphQLObjectValue objectValue))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
+                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{AstPrinter.Print(input)}'.");
                 }
 
                 var obj = new Dictionary<string, object?>();

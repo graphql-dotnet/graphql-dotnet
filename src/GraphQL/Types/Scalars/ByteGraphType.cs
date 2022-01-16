@@ -12,9 +12,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((byte)intValue.ClrValue),
-            LongValue longValue => checked((byte)longValue.ClrValue),
-            BigIntValue bigIntValue => checked((byte)bigIntValue.ClrValue),
+            GraphQLIntValue x => Byte.Parse(x.Value),
+            GraphQLFloatValue x => Byte.Parse(x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -22,9 +21,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => byte.MinValue <= intValue.ClrValue && intValue.ClrValue <= byte.MaxValue,
-            LongValue longValue => byte.MinValue <= longValue.ClrValue && longValue.ClrValue <= byte.MaxValue,
-            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.ClrValue && bigIntValue.ClrValue <= byte.MaxValue,
+            GraphQLIntValue x => Byte.TryParse(x.Value, out var _),
+            GraphQLFloatValue x => Byte.TryParse(x.Value, out var _),
             GraphQLNullValue _ => true,
             _ => false
         };

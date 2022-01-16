@@ -30,7 +30,7 @@ namespace GraphQL.SystemTextJson
         }
 
         /// <inheritdoc/>
-        public override void Write(Utf8JsonWriter writer, ApolloTrace value, JsonSerializerOptions options) //TODO: options ignored
+        public override void Write(Utf8JsonWriter writer, ApolloTrace value, JsonSerializerOptions options) // options ignored, this is by design to enforce camelCase
             => JsonSerializer.Serialize(writer, value, options.WriteIndented ? _optionsIndent : _optionsNoIndent);
 
         /// <inheritdoc/>

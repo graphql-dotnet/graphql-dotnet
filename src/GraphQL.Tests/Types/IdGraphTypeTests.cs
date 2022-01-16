@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -14,7 +13,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void parse_literal_null_returns_null()
         {
-            _type.ParseLiteral(new NullValue()).ShouldBeNull();
+            _type.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
         }
 
         [Fact]
@@ -37,9 +36,9 @@ namespace GraphQL.Tests.Types
         {
             GraphQLValue ast = value switch
             {
-                int i => new IntValue(i),
-                long l => new LongValue(l),
-                string s => new StringValue(s),
+                int i => new GraphQLIntValue(i),
+                long l => new GraphQLIntValue(l),
+                string s => new GraphQLStringValue(s),
                 _ => null
             };
             var ret = _type.ParseLiteral(ast);
@@ -84,7 +83,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void boolean_literal_throws()
         {
-            Should.Throw<InvalidOperationException>(() => _type.ParseLiteral(new BooleanValue(true)));
+            Should.Throw<InvalidOperationException>(() => _type.ParseLiteral(new GraphQLBooleanValue(true)));
         }
 
         [Fact]

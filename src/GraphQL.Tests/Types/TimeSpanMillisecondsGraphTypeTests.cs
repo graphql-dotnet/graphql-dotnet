@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -74,8 +73,8 @@ namespace GraphQL.Tests.Types
 
                 GraphQLValue ast = value switch
                 {
-                    int i => new IntValue(i),
-                    long l => new LongValue(l),
+                    int i => new GraphQLIntValue(i),
+                    long l => new GraphQLIntValue(l),
                     _ => null
                 };
                 var actual = _type.ParseLiteral(ast);

@@ -9,6 +9,11 @@ namespace GraphQL.Tests
 {
     internal static class TestExtensions
     {
+        public static GraphQLOperationDefinition Operation(this GraphQLDocument document)
+        {
+            return document.Definitions.OfType<GraphQLOperationDefinition>().First();
+        }
+
         public static IReadOnlyDictionary<string, object> ToDict(this object data)
         {
             if (data == null)

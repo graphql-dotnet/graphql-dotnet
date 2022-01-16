@@ -12,11 +12,21 @@ namespace GraphQL.Tests.Execution
         public RepeatedSubfieldsTests()
         {
             FirstInnerField = new GraphQLField { Name = new GraphQLName("first") };
-            FirstFieldSelection = new GraphQLSelectionSet();
-            FirstFieldSelection.Selections.Add(FirstInnerField);
+            FirstFieldSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    FirstInnerField
+                }
+            };
             SecondInnerField = new GraphQLField { Name = new GraphQLName("second") };
-            SecondFieldSelection = new GraphQLSelectionSet();
-            SecondFieldSelection.Selections.Add(SecondInnerField);
+            SecondFieldSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    SecondInnerField
+                }
+            };
             FirstTestField = new GraphQLField { Name = new GraphQLName("test") };
             SecondTestField = new GraphQLField { Name = new GraphQLName("test") };
             AliasedTestField = new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("test") };
@@ -48,9 +58,14 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void BeMergedCorrectlyInCaseOfFields()
         {
-            var outerSelection = new GraphQLSelectionSet();
-            outerSelection.Selections.Add(FirstTestField);
-            outerSelection.Selections.Add(SecondTestField);
+            var outerSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    FirstTestField,
+                    SecondTestField
+                }
+            };
 
             var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
@@ -62,9 +77,14 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void NotMergeAliasedFields()
         {
-            var outerSelection = new GraphQLSelectionSet();
-            outerSelection.Selections.Add(FirstTestField);
-            outerSelection.Selections.Add(AliasedTestField);
+            var outerSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    FirstTestField,
+                    AliasedTestField
+                }
+            };
 
             var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
 
@@ -77,8 +97,13 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void MergeFieldAndFragment()
         {
-            var fragmentSelection = new GraphQLSelectionSet();
-            fragmentSelection.Selections.Add(FirstTestField);
+            var fragmentSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    FirstTestField
+                }
+            };
             var fragment = new GraphQLFragmentDefinition
             {
                 Name = new GraphQLName("fragment"),
@@ -92,8 +117,13 @@ namespace GraphQL.Tests.Execution
                 SelectionSet = fragmentSelection
             };
 
-            var document = new GraphQLDocument();
-            document.Definitions.Add(fragment);
+            var document = new GraphQLDocument
+            {
+                Definitions = new List<ASTNode>
+                {
+                    fragment
+                }
+            };
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
@@ -105,9 +135,14 @@ namespace GraphQL.Tests.Execution
             };
 
             var fragSpread = new GraphQLFragmentSpread { Name = new GraphQLName("fragment") };
-            var outerSelection = new GraphQLSelectionSet();
-            outerSelection.Selections.Add(fragSpread);
-            outerSelection.Selections.Add(SecondTestField);
+            var outerSelection = new GraphQLSelectionSet
+            {
+                Selections = new List<ASTNode>
+                {
+                    fragSpread,
+                    SecondTestField
+                }
+            };
 
             var fields = CollectFrom(context, new PersonType(), outerSelection);
 

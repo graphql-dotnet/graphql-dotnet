@@ -1,5 +1,4 @@
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -127,7 +126,7 @@ namespace GraphQL.Tests.Bugs
     public class Issue1874Base64GraphType : ScalarGraphType
     {
         public override object ParseLiteral(GraphQLValue value)
-            => System.Convert.FromBase64String(((IValue)value).ClrValue.ToString());
+            => System.Convert.FromBase64String(value.ClrValue.ToString());
 
         public override object ParseValue(object value)
             => System.Convert.FromBase64String(value.ToString());

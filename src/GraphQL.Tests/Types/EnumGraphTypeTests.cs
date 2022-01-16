@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -114,7 +113,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void parse_literal_from_name()
         {
-            type.ParseLiteral(new EnumValue("RED")).ShouldBe(Colors.Red);
+            type.ParseLiteral(new GraphQLEnumValue { Name = new GraphQLName("RED") }).ShouldBe(Colors.Red);
         }
 
         [Fact]

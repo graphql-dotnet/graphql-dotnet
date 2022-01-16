@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Numerics;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -70,10 +69,10 @@ namespace GraphQL.Tests.Types
             g.CanParseValue(null).ShouldBeTrue();
             g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
             g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
-            g.ParseLiteral(new NullValue()).ShouldBeNull();
-            g.CanParseLiteral(new NullValue()).ShouldBeTrue();
+            g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
+            g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
-            ((IValue)g.ToAST(null).ShouldBeOfType<NullValue>()).ClrValue.ShouldBeNull();
+            g.ToAST(null).ShouldBeOfType<GraphQLNullValue>().ClrValue.ShouldBeNull();
         }
 
         [Theory]
@@ -325,9 +324,9 @@ namespace GraphQL.Tests.Types
             var g = Create(graphType);
             var valueCasts = new Func<object, GraphQLValue>[]
             {
-                n => new IntValue(Convert.ToInt32(n)),
-                n => new LongValue(Convert.ToInt64(n)),
-                n => n is ulong ul ? new BigIntValue(ul) : new BigIntValue(Convert.ToInt64(n))
+                n => new GraphQLIntValue(Convert.ToInt32(n)),
+                n => new GraphQLIntValue(Convert.ToInt64(n)),
+                n => n is ulong ul ? new GraphQLIntValue(ul) : new GraphQLIntValue(Convert.ToInt64(n))
             };
 
             foreach (var getValue in valueCasts)
@@ -484,23 +483,23 @@ namespace GraphQL.Tests.Types
                     continue;
                 }
                 var astActual = g.ToAST(converted);
-                IValue astExpected = value switch
+                GraphQLValue astExpected = value switch
                 {
-                    sbyte sb => new IntValue(sb),
-                    byte b => new IntValue(b),
-                    short s => new IntValue(s),
-                    ushort us => new IntValue(us),
-                    int i => new IntValue(i),
-                    uint ui => new LongValue(ui),
-                    long l => new LongValue(l),
-                    ulong ul => new BigIntValue(ul),
-                    BigInteger bi => new BigIntValue(bi),
-                    float f => new FloatValue(f),
-                    double d => new FloatValue(d),
+                    sbyte sb => new GraphQLIntValue(sb),
+                    byte b => new GraphQLIntValue(b),
+                    short s => new GraphQLIntValue(s),
+                    ushort us => new GraphQLIntValue(us),
+                    int i => new GraphQLIntValue(i),
+                    uint ui => new GraphQLIntValue(ui),
+                    long l => new GraphQLIntValue(l),
+                    ulong ul => new GraphQLIntValue(ul),
+                    BigInteger bi => new GraphQLIntValue(bi),
+                    float f => new GraphQLFloatValue(f),
+                    double d => new GraphQLFloatValue(d),
                     _ => null
                 };
                 astActual.ShouldBeOfType(astExpected.GetType());
-                ((IValue)astActual).ClrValue.ShouldBe(astExpected.ClrValue);
+                astActual.ClrValue.ShouldBe(astExpected.ClrValue);
             }
         }
 
@@ -531,11 +530,11 @@ namespace GraphQL.Tests.Types
         {
             GraphQLValue astValue = value switch
             {
-                int i => new IntValue(i),
-                long l => new LongValue(l),
-                bool b => new BooleanValue(b),
-                double f => new FloatValue(f),
-                string s => new StringValue(s),
+                int i => new GraphQLIntValue(i),
+                long l => new GraphQLIntValue(l),
+                bool b => new GraphQLBooleanValue(b),
+                double f => new GraphQLFloatValue(f),
+                string s => new GraphQLStringValue(s),
                 _ => null
             };
 
@@ -629,11 +628,11 @@ namespace GraphQL.Tests.Types
         {
             GraphQLValue astValue = value switch
             {
-                int i => new IntValue(i),
-                long l => new LongValue(l),
-                bool b => new BooleanValue(b),
-                double d => new FloatValue(d),
-                string s => new StringValue(s),
+                int i => new GraphQLIntValue(i),
+                long l => new GraphQLIntValue(l),
+                bool b => new GraphQLBooleanValue(b),
+                double d => new GraphQLFloatValue(d),
+                string s => new GraphQLStringValue(s),
                 _ => null
             };
 
@@ -760,9 +759,9 @@ namespace GraphQL.Tests.Types
             var g = Create(graphType);
             var valueCasts = new Func<object, GraphQLValue>[]
             {
-                n => new IntValue(Convert.ToInt32(n)),
-                n => new LongValue(Convert.ToInt64(n)),
-                n => n is ulong ul ? new BigIntValue(ul) : new BigIntValue(Convert.ToInt64(n))
+                n => new GraphQLIntValue(Convert.ToInt32(n)),
+                n => new GraphQLIntValue(Convert.ToInt64(n)),
+                n => n is ulong ul ? new GraphQLIntValue(ul) : new GraphQLIntValue(Convert.ToInt64(n))
             };
 
             foreach (var getValue in valueCasts)

@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (op.Name?.Value.Length == 0 && context.Document.OperationsCount() > 1)
+            if (op.Name == null && context.Document.OperationsCount() > 1)
             {
                 context.ReportError(new LoneAnonymousOperationError(context, op));
             }

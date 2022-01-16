@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Xunit;
@@ -76,8 +75,8 @@ namespace GraphQL.Tests.Bugs
 
             public override object ParseLiteral(GraphQLValue value) => value switch
             {
-                StringValue s => int.TryParse(s.ClrValue, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
-                NullValue _ => 0,
+                GraphQLStringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
+                GraphQLNullValue _ => 0,
                 _ => ThrowLiteralConversionError(value)
             };
 

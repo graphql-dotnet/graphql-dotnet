@@ -190,7 +190,7 @@ namespace GraphQL.Execution
             {
                 pathList[--index] = node.IndexInParentNode.HasValue
                     ? GetObjectIndex(node.IndexInParentNode.Value)
-                    : GetNameOrAlias(preferAlias);
+                    : node.GetNameOrAlias(preferAlias);
                 node = node.Parent!;
             }
 

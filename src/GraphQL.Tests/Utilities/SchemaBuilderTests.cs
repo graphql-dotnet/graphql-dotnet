@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQLParser.AST;

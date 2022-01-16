@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;

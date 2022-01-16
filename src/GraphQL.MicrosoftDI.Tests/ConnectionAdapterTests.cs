@@ -4,7 +4,6 @@ using System.Threading;
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Language;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Moq;

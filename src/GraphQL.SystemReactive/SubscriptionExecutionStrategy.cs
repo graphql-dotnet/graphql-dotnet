@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQLParser.AST;

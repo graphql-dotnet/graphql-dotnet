@@ -12,37 +12,20 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intVal => (decimal)intVal.ClrValue,
-            LongValue longVal => (decimal)longVal.ClrValue,
-            FloatValue floatVal => checked((decimal)floatVal.ClrValue),
-            DecimalValue decVal => decVal.ClrValue,
-            BigIntValue bigIntVal => checked((decimal)bigIntVal.ClrValue),
+            GraphQLIntValue x => Decimal.Parse(x.Value),
+            GraphQLFloatValue x => Decimal.Parse(x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(GraphQLValue value)
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            try
-            {
-                return value switch
-                {
-                    GraphQLFloatValue v when v.ClrValue is double d => Ret(checked((decimal)d)),
-                    GraphQLIntValue v when v.ClrValue is BigInteger b => Ret(checked((decimal)b)),
-                    GraphQLIntValue _ => true,
-                    GraphQLFloatValue _ => true,
-                    GraphQLNullValue _ => true,
-                    _ => false
-                };
-            }
-            catch
-            {
-                return false;
-            }
-
-            static bool Ret(decimal _) => true;
-        }
+            GraphQLIntValue x => Decimal.TryParse(x.Value, out var _),
+            GraphQLFloatValue x => Decimal.TryParse(x.Value, out var _),
+            GraphQLNullValue _ => true,
+            _ => false
+        };
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch

@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Bugs
         [InlineData(ASTNodeKind.BooleanValue, "false")]
         public void Values_Parse_Successfully(ASTNodeKind kind, string valueString)
         {
-            ASTNode BuildNode()
+            GraphQLValue BuildNode()
             {
                 return kind switch
                 {
@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Bugs
             //whitespace will not be returned by graphql-parser
             dynamic node = BuildNode();
             node.Value = valueString;
-            _ = CoreToVanillaConverter.Value(node);
+            var _ = node.ClrValue;
         }
     }
 

@@ -91,7 +91,14 @@ namespace GraphQL.Validation
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
-            var listener = new MatchingNodeVisitor<GraphQLVariable, (List<VariableUsage> usages, TypeInfo info)>((usages, info), (varRef, __, state) => state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!)));
+            var listener = new MatchingNodeVisitor<GraphQLVariable, (List<VariableUsage> usages, TypeInfo info)>(
+                (usages, info),
+                (varRef, context, state) =>
+                {
+                    // GraphQLVariable AST node represents both variable definition and variable usage so check parent node
+                    if (info.GetAncestor(1) is not GraphQLVariableDefinition)
+                        state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!));
+                });
 
             new BasicVisitor(info, listener).Visit((ASTNode)node, new BasicVisitor.State(this)).GetAwaiter().GetResult(); // actually is sync
 
@@ -512,11 +519,14 @@ namespace GraphQL.Validation
                 {
                     List<string>? errors = null;
 
-                    for (int index = 0; index < listValue.Values.Count; ++index)
+                    if (listValue.Values != null)
                     {
-                        string? error = IsValidLiteralValue(ofType, listValue.Values[index]);
-                        if (error != null)
-                            (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                        for (int index = 0; index < listValue.Values.Count; ++index)
+                        {
+                            string? error = IsValidLiteralValue(ofType, listValue.Values[index]);
+                            if (error != null)
+                                (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                        }
                     }
 
                     return errors == null
@@ -534,8 +544,10 @@ namespace GraphQL.Validation
                     return $"Expected '{inputType.Name}', found not an object.";
                 }
 
-                var fields = inputType.Fields.ToList();
-                var fieldAsts = objValue.Fields.ToList();
+                var fields = inputType.Fields.List;
+                var fieldAsts = objValue.Fields;
+                if (fieldAsts == null)
+                    return null;
 
                 List<string>? errors = null;
 
@@ -573,9 +585,9 @@ namespace GraphQL.Validation
 
             if (type is ScalarGraphType scalar)
             {
-                return scalar.CanParseLiteral((GraphQLValue)valueAst)
+                return scalar.CanParseLiteral(valueAst)
                     ? null
-                    : $"Expected type '{type.Name}', found {((GraphQLValue)valueAst).StringFrom(OriginalQuery)}.";
+                    : $"Expected type '{type.Name}', found {valueAst.StringFrom(OriginalQuery)}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name ?? "<NULL>"} is not a valid input graph type.");

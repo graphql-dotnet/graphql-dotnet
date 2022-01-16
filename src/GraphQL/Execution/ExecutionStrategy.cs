@@ -286,7 +286,7 @@ namespace GraphQL.Execution
                         Alias = original.Alias,
                         Name = original.Name,
                         Arguments = original.Arguments,
-                        SelectionSet = Merge(original.SelectionSet!, field.SelectionSet!),
+                        SelectionSet = Merge(original.SelectionSet, field.SelectionSet),
                         Directives = original.Directives,
                         Location = original.Location,
                     }
@@ -296,10 +296,18 @@ namespace GraphQL.Execution
             /// <summary>
             /// Returns a new selection set node with the contents merged with another selection set node's contents.
             /// </summary>
-            static GraphQLSelectionSet Merge(GraphQLSelectionSet SelectionsList, GraphQLSelectionSet otherSelection)
+            static GraphQLSelectionSet? Merge(GraphQLSelectionSet? selection, GraphQLSelectionSet? otherSelection)
             {
-                var newSelection = SelectionsList.Selections.Union(otherSelection.Selections).ToList();
-                return new GraphQLSelectionSet { Selections = newSelection };
+                if (selection == null)
+                    return otherSelection;
+
+                if (otherSelection == null)
+                    return selection;
+
+                return new GraphQLSelectionSet
+                {
+                    Selections = selection.Selections.Union(otherSelection.Selections).ToList()
+                };
             }
         }
 

@@ -10,59 +10,22 @@ namespace GraphQL.Types
     public class FloatGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            object? Parse(object? v) =>
-                v switch
-                {
-                    double x => x,
-                    int x => (double)x,
-                    long x => (double)x,
-                    decimal x => checked((double)x),
-                    BigInteger x => checked((double)x),
-                    _ => ThrowLiteralConversionError(value)
-                };
-
-            return value switch
-            {
-                GraphQLIntValue x => Parse(x.ClrValue),
-                GraphQLFloatValue x => Parse(x.ClrValue),
-                GraphQLNullValue _ => null,
-                _ => ThrowLiteralConversionError(value)
-            };
-        }
+            GraphQLIntValue x => Double.Parse(x.Value),
+            GraphQLFloatValue x => Double.Parse(x.Value),
+            GraphQLNullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(GraphQLValue value)
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            bool CanParse(object? v) =>
-                v switch
-                {
-                    long _ => true,
-                    decimal x => Ret(checked((double)x)),
-                    BigInteger x => Ret(checked((double)x)),
-                    double _ => true,
-                    int _ => true,
-                    _ => false
-                };
-
-            try
-            {
-                return value switch
-                {
-                    GraphQLIntValue x => CanParse(x),
-                    GraphQLFloatValue x => CanParse(x),
-                    GraphQLNullValue _ => true,
-                    _ => false
-                };
-            }
-            catch
-            {
-                return false;
-            }
-
-            static bool Ret(double _) => true;
-        }
+            GraphQLIntValue x => Double.TryParse(x.Value, out var _),
+            GraphQLFloatValue x => Double.TryParse(x.Value, out var _),
+            GraphQLNullValue _ => true,
+            _ => false
+        };
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch

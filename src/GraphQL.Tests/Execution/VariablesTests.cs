@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
@@ -40,7 +39,7 @@ namespace GraphQL.Tests.Execution
 
         public override object ParseLiteral(GraphQLValue value)
         {
-            if (value is StringValue stringValue)
+            if (value is GraphQLStringValue stringValue)
             {
                 if (stringValue.Value.Equals("SerializedValue"))
                 {
@@ -65,7 +64,7 @@ namespace GraphQL.Tests.Execution
             => value is string stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue) : null;
 
         public override object ParseLiteral(GraphQLValue value)
-            => value is StringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value) : null;
+            => value is GraphQLStringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value) : null;
     }
 
     public class TestJsonScalarObject
@@ -210,7 +209,7 @@ namespace GraphQL.Tests.Execution
 
             var result = AssertQueryWithErrors(query, expected, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: true);
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'fieldWithObjectInput'.");
-            result.Errors[0].InnerException.Message.ShouldStartWith("Expected object value for 'TestInputObject', found not an object 'ListValue{values=StringValue{value=foo}, StringValue{value=bar}, StringValue{value=baz}}'.");
+            result.Errors[0].InnerException.Message.ShouldStartWith("Expected object value for 'TestInputObject', found not an object '[\"foo\", \"bar\", \"baz\"]'.");
         }
     }
 

@@ -162,7 +162,7 @@ namespace GraphQL.Types
                 long l => new GraphQLIntValue(l),
                 ulong ul => new GraphQLIntValue(ul),
                 BigInteger bi => new GraphQLIntValue(bi),
-                decimal d => Math.Truncate(d) == d ? new GraphQLIntValue(d) : new GraphQLFloatValue(d),
+                decimal d => Math.Truncate(d) == d ? new GraphQLIntValue(d) : new GraphQLFloatValue(d), //TODO:!!!try change
                 float f => new GraphQLFloatValue(f),
                 double d => new GraphQLFloatValue(d),
                 string s => new GraphQLStringValue(s),

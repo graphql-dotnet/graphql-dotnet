@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Xunit;
@@ -222,7 +221,7 @@ type Query {
             }
 
             public override object ParseLiteral(GraphQLValue value)
-                => value is StringValue s ? "input-" + s.Value : base.ParseLiteral(value);
+                => value is GraphQLStringValue s ? "input-" + s.Value : base.ParseLiteral(value);
 
             public override object ParseValue(object value)
                 => value is string s ? "input-" + s : base.ParseValue(value);

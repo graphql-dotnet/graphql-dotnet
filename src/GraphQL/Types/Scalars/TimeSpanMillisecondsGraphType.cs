@@ -22,9 +22,9 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue v when v.ClrValue is int intValue => TimeSpan.FromSeconds(intValue),
-            GraphQLIntValue v when v.ClrValue is long longValue => TimeSpan.FromSeconds(longValue),
-            GraphQLIntValue v when v.ClrValue is BigInteger bigIntValue => TimeSpan.FromSeconds(checked((double)bigIntValue)),
+            GraphQLIntValue v when v.ClrValue is int intValue => TimeSpan.FromMilliseconds(intValue),
+            GraphQLIntValue v when v.ClrValue is long longValue => TimeSpan.FromMilliseconds(longValue),
+            GraphQLIntValue v when v.ClrValue is BigInteger bigIntValue => TimeSpan.FromMilliseconds(checked((double)bigIntValue)),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

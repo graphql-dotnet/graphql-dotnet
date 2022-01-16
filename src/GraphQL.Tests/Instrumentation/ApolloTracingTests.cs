@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -42,7 +43,7 @@ query {
             trace.Validation.StartOffset.ShouldNotBeSameAs(trace.Parsing.StartOffset);
             trace.Validation.Duration.ShouldNotBeSameAs(trace.Parsing.Duration);
 
-            var expectedPaths = new HashSet<List<object>>
+            var expectedPaths = new List<List<object>>
             {
                 new List<object> { "hero" },
                 new List<object> { "hero", "name" },
@@ -58,11 +59,12 @@ query {
                 resolver.Duration.ShouldNotBe(0);
                 resolver.ParentType.ShouldNotBeNull();
                 resolver.ReturnType.ShouldNotBeNull();
-                resolver.FieldName.ShouldBe((string)resolver.Path.Last());
+                resolver.FieldName.ShouldBe((string)(ROM)resolver.Path.Last());
                 paths.Add(resolver.Path);
             }
             paths.Count.ShouldBe(expectedPaths.Count);
-            new HashSet<List<object>>(paths).ShouldBe(expectedPaths);
+            for (int i = 0; i < paths.Count; ++i)
+                paths[i].ShouldBe(expectedPaths[i], new ROMToStringComparer());
         }
 
         [Theory]

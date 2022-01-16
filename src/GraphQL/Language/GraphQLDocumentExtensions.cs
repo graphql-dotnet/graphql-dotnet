@@ -1,14 +1,13 @@
-using System.Linq;
-
 namespace GraphQLParser.AST
 {
+    /// <summary>
+    /// Extension methods for <see cref="GraphQLDocument"/>.
+    /// </summary>
     public static class GraphQLDocumentExtensions
     {
-        public static GraphQLOperationDefinition Operation(this GraphQLDocument document)
-        {
-            return document.Definitions.OfType<GraphQLOperationDefinition>().First();
-        }
-
+        /// <summary>
+        /// Gets count of operations in the specified document.
+        /// </summary>
         public static int OperationsCount(this GraphQLDocument document)
         {
             int count = 0;
@@ -22,6 +21,9 @@ namespace GraphQLParser.AST
             return count;
         }
 
+        /// <summary>
+        /// Gets count of fragments in the specified document.
+        /// </summary>
         public static int FragmentsCount(this GraphQLDocument document)
         {
             int count = 0;

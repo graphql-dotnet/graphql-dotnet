@@ -877,7 +877,7 @@ namespace GraphQL.Execution
     }
     public static class ExecutionHelper
     {
-        public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue? input, GraphQL.Language.Variables? variables = null, object? fieldDefault = null) { }
+        public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue? input, GraphQL.Language.Variables? variables = null, object? fieldDefault = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue>? GetArgumentValues(GraphQL.Types.QueryArguments? definitionArguments, GraphQLParser.AST.GraphQLArguments? astArguments, GraphQL.Language.Variables? variables) { }
     }
     public abstract class ExecutionNode
@@ -1285,80 +1285,6 @@ namespace GraphQL.Introspection
         public @__TypeKind() { }
     }
 }
-namespace GraphQL.Language.AST
-{
-    public class BigIntValue : GraphQLParser.AST.GraphQLIntValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<System.Numerics.BigInteger>
-    {
-        public BigIntValue(System.Numerics.BigInteger value) { }
-        public System.Numerics.BigInteger ClrValue { get; }
-    }
-    public class BooleanValue : GraphQLParser.AST.GraphQLBooleanValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<bool>
-    {
-        public BooleanValue(bool value) { }
-        public bool ClrValue { get; }
-    }
-    public class DecimalValue : GraphQLParser.AST.GraphQLFloatValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<decimal>
-    {
-        public DecimalValue(decimal value) { }
-        public decimal ClrValue { get; }
-    }
-    public class EnumValue : GraphQLParser.AST.GraphQLEnumValue, GraphQL.Language.AST.IValue
-    {
-        public EnumValue(GraphQLParser.AST.GraphQLName name) { }
-        public EnumValue(string name) { }
-        public string ClrValue { get; }
-    }
-    public class FloatValue : GraphQLParser.AST.GraphQLFloatValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<double>
-    {
-        public FloatValue(double value) { }
-        public double ClrValue { get; }
-    }
-    public interface IValue
-    {
-        object? ClrValue { get; }
-    }
-    public interface IValue<T> : GraphQL.Language.AST.IValue
-    {
-        T ClrValue { get; }
-    }
-    public class IntValue : GraphQLParser.AST.GraphQLIntValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<int>
-    {
-        public IntValue(int value) { }
-        public int ClrValue { get; }
-    }
-    public class ListValue : GraphQLParser.AST.GraphQLListValue, GraphQL.Language.AST.IValue
-    {
-        public ListValue(System.Collections.Generic.IEnumerable<GraphQL.Language.AST.IValue> values) { }
-        public ListValue(System.Collections.Generic.List<GraphQL.Language.AST.IValue> values) { }
-        public object ClrValue { get; }
-    }
-    public class LongValue : GraphQLParser.AST.GraphQLIntValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<long>
-    {
-        public LongValue(long value) { }
-        public long ClrValue { get; }
-    }
-    public class NullValue : GraphQLParser.AST.GraphQLNullValue, GraphQL.Language.AST.IValue
-    {
-        public NullValue() { }
-    }
-    public class ObjectValue : GraphQLParser.AST.GraphQLObjectValue, GraphQL.Language.AST.IValue
-    {
-        public ObjectValue(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLObjectField> fields) { }
-        public ObjectValue(System.Collections.Generic.List<GraphQLParser.AST.GraphQLObjectField> fields) { }
-        public object ClrValue { get; }
-        public System.Collections.Generic.IEnumerable<string> FieldNames { get; }
-        public GraphQLParser.AST.GraphQLObjectField? Field(string name) { }
-    }
-    public class StringValue : GraphQLParser.AST.GraphQLStringValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<string>
-    {
-        public StringValue(string value) { }
-        public string ClrValue { get; }
-    }
-    public class VariableReference : GraphQLParser.AST.GraphQLVariable, GraphQL.Language.AST.IValue
-    {
-        public VariableReference() { }
-    }
-}
 namespace GraphQL.Language
 {
     public class CoreToVanillaConverter : GraphQLParser.Visitors.DefaultNodeVisitor<GraphQL.Language.CoreToVanillaConverterContext>
@@ -1370,7 +1296,6 @@ namespace GraphQL.Language
     {
         public CoreToVanillaConverterContext() { }
         public System.Threading.CancellationToken CancellationToken { get; }
-        public System.Collections.Generic.Stack<GraphQLParser.AST.ASTNode> Parents { get; }
     }
     public class Variable
     {
@@ -2522,10 +2447,10 @@ namespace GraphQL.Utilities.Federation
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
     }
-    public class AnyValue : GraphQLParser.AST.GraphQLValue, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<object>
+    public class AnyValue : GraphQLParser.AST.GraphQLValue
     {
         public AnyValue(object? value) { }
-        public object ClrValue { get; }
+        public override object? ClrValue { get; }
         public override GraphQLParser.AST.ASTNodeKind Kind { get; }
     }
     public class FederatedResolveContext
@@ -2700,7 +2625,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition> GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public GraphQL.Language.Variables GetVariableValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQLParser.AST.IHasSelectionSetNode node) { }
-        public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst) { }
+        public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
     [System.Serializable]
@@ -2734,8 +2659,8 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
-        public VariableUsage(GraphQL.Language.AST.VariableReference node, GraphQL.Types.IGraphType type) { }
-        public GraphQL.Language.AST.VariableReference Node { get; }
+        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type) { }
+        public GraphQLParser.AST.GraphQLVariable Node { get; }
         public GraphQL.Types.IGraphType Type { get; }
     }
 }
@@ -2830,12 +2755,12 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class NoFragmentCyclesError : GraphQL.Validation.ValidationError
     {
-        public NoFragmentCyclesError(GraphQL.Validation.ValidationContext context, string fragName, string[] spreadNames, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public NoFragmentCyclesError(GraphQL.Validation.ValidationContext context, GraphQLParser.ROM fragName, string[] spreadNames, params GraphQLParser.AST.ASTNode[] nodes) { }
     }
     [System.Serializable]
     public class NoUndefinedVariablesError : GraphQL.Validation.ValidationError
     {
-        public NoUndefinedVariablesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLOperationDefinition node, GraphQL.Language.AST.VariableReference variableReference) { }
+        public NoUndefinedVariablesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLOperationDefinition node, GraphQLParser.AST.GraphQLVariable variableReference) { }
     }
     [System.Serializable]
     public class NoUnusedFragmentsError : GraphQL.Validation.ValidationError
@@ -2893,7 +2818,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class UniqueInputFieldNamesError : GraphQL.Validation.ValidationError
     {
-        public UniqueInputFieldNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.IValue node, GraphQLParser.AST.GraphQLObjectField altNode) { }
+        public UniqueInputFieldNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLValue node, GraphQLParser.AST.GraphQLObjectField altNode) { }
     }
     [System.Serializable]
     public class UniqueOperationNamesError : GraphQL.Validation.ValidationError
@@ -3019,7 +2944,7 @@ namespace GraphQL.Validation.Rules
         {
             public ConflictReason() { }
             public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Message Message { get; set; }
-            public string Name { get; set; }
+            public GraphQLParser.ROM Name { get; set; }
         }
         public class Message
         {
@@ -3105,8 +3030,8 @@ namespace GraphQLParser.AST
 {
     public static class GraphQLDocumentExtensions
     {
+        public static GraphQLParser.AST.GraphQLObjectField? Field(this GraphQLParser.AST.GraphQLObjectValue objectValue, GraphQLParser.ROM name) { }
         public static int FragmentsCount(this GraphQLParser.AST.GraphQLDocument document) { }
-        public static GraphQLParser.AST.GraphQLOperationDefinition Operation(this GraphQLParser.AST.GraphQLDocument document) { }
         public static int OperationsCount(this GraphQLParser.AST.GraphQLDocument document) { }
     }
 }

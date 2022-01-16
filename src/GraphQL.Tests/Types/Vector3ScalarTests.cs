@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Types
                 {
                     try
                     {
-                        var vector3Parts = vector3InputString.Split(',');
+                        var vector3Parts = vector3InputString.Split(','); // strings allocations
                         var x = float.Parse(vector3Parts[0]);
                         var y = float.Parse(vector3Parts[1]);
                         var z = float.Parse(vector3Parts[2]);
@@ -150,6 +150,32 @@ namespace GraphQL.Tests.Types
                     catch
                     {
                         throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputString}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
+                    }
+                }
+
+                if (value is ROM vector3InputROM)
+                {
+                    try
+                    {
+                        // no strings allocations
+                        var span = vector3InputROM.Span;
+
+                        var i = span.IndexOf(',');
+                        var x = float.Parse(vector3InputROM.Slice(0, i));
+
+                        span = span.Slice(i + 1);
+
+                        i = span.IndexOf(',');
+                        var y = float.Parse(span.Slice(0, i));
+
+                        span = span.Slice(i + 1);
+
+                        var z = float.Parse(span.Slice(0, i));
+                        return new Vector3(x, y, z);
+                    }
+                    catch
+                    {
+                        throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputROM}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
                     }
                 }
 

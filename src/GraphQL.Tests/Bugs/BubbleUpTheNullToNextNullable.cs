@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Bugs
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                     "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
                 {
-                    Path = new[] {"nullableDataGraph", "nonNullable"}
+                    Path = new[] { "nullableDataGraph", "nonNullable" }
                 }
             };
 
@@ -248,7 +248,7 @@ namespace GraphQL.Tests.Bugs
                     ExecutionError expectedError = errors[i];
 
                     actualError.Message.ShouldBe(expectedError.Message);
-                    actualError.Path.ShouldBe(expectedError.Path);
+                    actualError.Path.ShouldBe(expectedError.Path, new ROMToStringComparer());
                     if (expectedError.InnerException == null)
                     {
                         actualError.InnerException.ShouldBeNull();
