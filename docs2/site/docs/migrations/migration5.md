@@ -228,4 +228,3 @@ calls are made to the underlying stream. Only `System.Text.Json` supports asynch
 
 - `InputsConverter` renamed to `InputsJsonConverter`
 - `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
-- `HttpResponseStreamWriter` removed
