@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -23,7 +24,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLStringValue stringValue => ParseDate(stringValue.TypedValue),
+            GraphQLStringValue stringValue => ParseDate(stringValue.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -37,12 +38,16 @@ namespace GraphQL.Types
             _ => ThrowValueConversionError(value)
         };
 
-        private static DateTime ParseDate(string stringValue)
+        private static DateTime ParseDate(ROM stringValue)
         {
             // ISO-8601 format
             // Note that the "O" format is similar but always prints the fractional parts
             // of the second, which is not required by ISO-8601.
-            if (DateTime.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
+            if (DateTime.TryParseExact(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
             {
                 return date;
             }

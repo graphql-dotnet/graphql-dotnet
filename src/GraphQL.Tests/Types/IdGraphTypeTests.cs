@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Types
 
         [Theory]
         [InlineData(1)]
-        [InlineData(2L)]
+        [InlineData(5000000000L)]
         [InlineData("hello")]
         public void parse_literal_value_to_identifier(object value)
         {

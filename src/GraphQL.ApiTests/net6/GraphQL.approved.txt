@@ -2464,8 +2464,8 @@ namespace GraphQL.Utilities.Federation
     public class AnyValue : GraphQLParser.AST.GraphQLValue
     {
         public AnyValue(object? value) { }
-        public override object? ClrValue { get; }
         public override GraphQLParser.AST.ASTNodeKind Kind { get; }
+        public object? Value { get; }
     }
     public class FederatedResolveContext
     {

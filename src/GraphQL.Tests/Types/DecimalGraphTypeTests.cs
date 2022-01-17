@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void converts_DecimalValue_to_decimal()
         {
-            _type.ParseLiteral(new GraphQLIntValue(12345.6579m)).ShouldBe(12345.6579m);
+            _type.ParseLiteral(new GraphQLFloatValue(12345.6579m)).ShouldBe(12345.6579m);
             _type.ParseLiteral(new GraphQLIntValue(39614081257132168796771975168m)).ShouldBe(39614081257132168796771975168m);
         }
 

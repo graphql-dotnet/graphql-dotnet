@@ -53,7 +53,10 @@ namespace GraphQL.Tests.Types
             // try converting internal value to AST
             var ast = c.ToAST(internalValue);
             ast.ShouldNotBeNull();
-            ast.ClrValue.ShouldBe(externalValue);
+            if (ast is GraphQLNullValue) // GraphQLNullValue.Value is 'null' ROM
+                externalValue.ShouldBeNull();
+            else
+                ast.ShouldBeAssignableTo<IHasValueNode>().Value.ShouldBe(externalValue);
         }
 
         [Theory]
@@ -272,7 +275,7 @@ namespace GraphQL.Tests.Types
                 return "internalNull";
             }
 
-            return value.ClrValue.ToString();
+            throw new NotSupportedException();
         }
 
         public override object Serialize(object value)

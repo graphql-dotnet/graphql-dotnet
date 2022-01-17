@@ -6,11 +6,11 @@ namespace GraphQL.Utilities.Federation
     {
         public AnyValue(object? value)
         {
-            ClrValue = value!;
+            Value = value!;
         }
 
         public override ASTNodeKind Kind => (ASTNodeKind)(-1); //TODO:!!!!!
 
-        public override object? ClrValue { get; }
+        public object? Value { get; }
     }
 }

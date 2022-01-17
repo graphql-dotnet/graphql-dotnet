@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Bugs
             valid.Errors.ShouldBeNull();
         }
 
-        [Theory]
+        [Theory(Skip = "Should be moved into parser")]
         [InlineData(ASTNodeKind.IntValue, "1")]
         [InlineData(ASTNodeKind.IntValue, "-1")]
         [InlineData(ASTNodeKind.IntValue, "9223372036854775807")]

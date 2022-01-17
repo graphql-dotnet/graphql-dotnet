@@ -12,7 +12,11 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLStringValue s => Guid.Parse(s.TypedValue),
+            GraphQLStringValue s => Guid.Parse(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                s.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -20,8 +24,11 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            //TODO: TryParse can work with Span on netstandard2.1
-            GraphQLStringValue s => Guid.TryParse(s.TypedValue, out _),
+            GraphQLStringValue s => Guid.TryParse(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                s.Value, out _),
             GraphQLNullValue _ => true,
             _ => false
         };

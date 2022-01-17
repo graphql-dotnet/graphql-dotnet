@@ -12,7 +12,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLStringValue s => new Uri(s.TypedValue),
+            GraphQLStringValue s => new Uri((string)s.Value), //ISSUE:allocation
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

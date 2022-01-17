@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -126,7 +127,13 @@ namespace GraphQL.Tests.Bugs
     public class Issue1874Base64GraphType : ScalarGraphType
     {
         public override object ParseLiteral(GraphQLValue value)
-            => System.Convert.FromBase64String(value.ClrValue.ToString());
+        {
+            return value switch
+            {
+                GraphQLStringValue s => Convert.FromBase64String((string)s.Value),
+                _ => throw new NotSupportedException()
+            };
+        }
 
         public override object ParseValue(object value)
             => System.Convert.FromBase64String(value.ToString());

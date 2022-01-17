@@ -11,7 +11,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLStringValue s => s.ClrValue,
+            GraphQLStringValue s => (string)s.Value, //ISSUE:allocation
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

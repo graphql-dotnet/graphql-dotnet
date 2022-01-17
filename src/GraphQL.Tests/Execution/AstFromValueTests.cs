@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = new BooleanGraphType().ToAST(true);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLBooleanValue>().ClrValue.ShouldBe(true);
+            result.ShouldBeOfType<GraphQLBooleanValue>().Value.ShouldBe("true");
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Execution
             long val = 12345678910111213;
             var result = new LongGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLIntValue>().ClrValue.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12345678910111213");
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Execution
             decimal val = 1234.56789m;
             var result = new DecimalGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLFloatValue>().ClrValue.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("1234.56789");
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace GraphQL.Tests.Execution
             int val = 123;
             var result = new IntGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLIntValue>().ClrValue.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("123");
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Execution
             double val = 0.42;
             var result = new FloatGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLFloatValue>().ClrValue.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("0.42");
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Execution
             byte value = 12;
             var result = new ByteGraphType().ToAST(value);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLIntValue>().ClrValue.ShouldBe(value);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12");
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution
             sbyte val = -12;
             var result = new SByteGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLIntValue>().ClrValue.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("-12");
         }
 
         [Fact]

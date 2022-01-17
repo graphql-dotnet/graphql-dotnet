@@ -42,17 +42,19 @@ namespace GraphQL.Types
         /// String but rather complex ones when appropriate.
         /// <br/><br/>
         /// This method must handle a value of <see cref="GraphQLNullValue"/>.
+        /// <br/><br/>
+        /// This method SHOULD be overridded by descendants.
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="GraphQLNullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>
         public virtual object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLBooleanValue b => ParseValue(b.ClrValue),
-            GraphQLIntValue i => ParseValue(i.ClrValue),
-            GraphQLFloatValue f => ParseValue(f.ClrValue),
-            GraphQLStringValue s => ParseValue(s.ClrValue),
+            GraphQLBooleanValue b => ParseValue((b.Value == "true").Boxed()),
+            GraphQLIntValue i => ParseValue((string)i.Value), //ISSUE:allocation
+            GraphQLFloatValue f => ParseValue((string)f.Value), //ISSUE:allocation
+            GraphQLStringValue s => ParseValue((string)s.Value), //ISSUE:allocation
             GraphQLNullValue _ => ParseValue(null),
-            _ => ThrowLiteralConversionError(value)
+            _ => ThrowLiteralConversionError(value) // GraphQLVariable, GraphQLEnumValue
         };
 
         /// <summary>

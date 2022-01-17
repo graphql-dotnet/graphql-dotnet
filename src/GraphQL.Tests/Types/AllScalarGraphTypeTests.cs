@@ -72,7 +72,7 @@ namespace GraphQL.Tests.Types
             g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
             g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
-            g.ToAST(null).ShouldBeOfType<GraphQLNullValue>().ClrValue.ShouldBeNull();
+            g.ToAST(null).ShouldBeOfType<GraphQLNullValue>().Value.ShouldBe("null");
         }
 
         [Theory]
@@ -499,7 +499,10 @@ namespace GraphQL.Tests.Types
                     _ => null
                 };
                 astActual.ShouldBeOfType(astExpected.GetType());
-                astActual.ClrValue.ShouldBe(astExpected.ClrValue);
+                astActual
+                    .ShouldBeAssignableTo<IHasValueNode>()
+                    .Value
+                    .ShouldBe(astExpected.ShouldBeAssignableTo<IHasValueNode>().Value);
             }
         }
 

@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -25,7 +26,7 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLNullValue _ => null,
-            GraphQLStringValue stringValue => ParseDate(stringValue.TypedValue),
+            GraphQLStringValue stringValue => ParseDate(stringValue.Value),
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -46,7 +47,7 @@ namespace GraphQL.Types
             _ => ThrowSerializationError(value)
         };
 
-        private static DateOnly ParseDate(string stringValue)
+        private static DateOnly ParseDate(ROM stringValue)
         {
             if (DateOnly.TryParseExact(stringValue, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
             {

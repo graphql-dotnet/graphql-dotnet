@@ -27,8 +27,10 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLStringValue str => str.ClrValue,
-            GraphQLIntValue num => num.ClrValue,
+            GraphQLStringValue str => (string)str.Value, //ISSUE:allocation
+            GraphQLIntValue num when Int.TryParse(num.Value, out int i) => i,
+            GraphQLIntValue num when Long.TryParse(num.Value, out long l) => l,
+            GraphQLIntValue num when BigInt.TryParse(num.Value, out var b) => b,
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value),
         };
@@ -48,7 +50,7 @@ namespace GraphQL.Types
             string _ => value,
             int _ => value,
             long _ => value,
-            Guid _ => value,
+            Guid _ => value, //TODO: wtf???
             null => null,
             byte _ => value,
             sbyte _ => value,
