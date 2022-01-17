@@ -472,48 +472,5 @@ namespace GraphQL
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
         }
-
-        /// <summary>
-        /// Searches the list for a AST node specified by name and returns first match.
-        /// </summary>
-        public static TNode? Find<TNode>(this ASTListNode<TNode> node, string name)
-            where TNode : class, INamedNode
-        {
-            // DO NOT USE LINQ ON HOT PATH
-            foreach (var item in node)
-            {
-                if (item.Name == name)
-                    return item;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Searches GraphQL document for the first matching fragment definition,
-        /// or returns <see langword="null"/> if none is found.
-        /// </summary>
-        public static GraphQLFragmentDefinition? FindFragmentDefinition(this GraphQLDocument document, ROM name)
-        {
-            // DO NOT USE LINQ ON HOT PATH
-            foreach (var def in document.Definitions)
-            {
-                if (def is GraphQLFragmentDefinition frag && frag.Name == name)
-                    return frag;
-            }
-
-            return null;
-        }
-
-        public static GraphQLValue? ValueFor(this GraphQLArguments node, string name)
-        {
-            foreach (var item in node)
-            {
-                if (item.Name == name)
-                    return item.Value;
-            }
-
-            return null;
-        }
     }
 }

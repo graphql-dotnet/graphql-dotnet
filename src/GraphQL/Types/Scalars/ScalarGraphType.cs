@@ -43,7 +43,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// This method must handle a value of <see cref="GraphQLNullValue"/>.
         /// <br/><br/>
-        /// This method SHOULD be overridded by descendants.
+        /// This method SHOULD be overridden by descendants.
         /// </summary>
         /// <param name="value">AST value node. Must not be <see langword="null"/>, but may be <see cref="GraphQLNullValue"/>.</param>
         /// <returns>Internal scalar representation. Returning <see langword="null"/> is valid.</returns>

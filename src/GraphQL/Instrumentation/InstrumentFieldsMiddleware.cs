@@ -14,12 +14,12 @@ namespace GraphQL.Instrumentation
             var metadata = new Dictionary<string, object?>
             {
                 { "typeName", context.ParentType.Name },
-                { "fieldName", context.FieldAst.Name.StringValue },
+                { "fieldName", context.FieldAst.Name.StringValue }, //TODO:!!!alloc
                 { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
                 { "path", context.Path },
             };
 
-            using (context.Metrics.Subject("field", context.FieldAst.Name.StringValue, metadata))
+            using (context.Metrics.Subject("field", context.FieldAst.Name.StringValue, metadata)) //TODO:!!!alloc
                 return await next(context).ConfigureAwait(false);
         }
     }

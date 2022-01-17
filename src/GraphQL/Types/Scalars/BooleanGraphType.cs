@@ -11,7 +11,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLBooleanValue b => BoolBox.Boxed(b.Value == "true"),
+            GraphQLBooleanValue b => BoolBox.Boxed(b.BoolValue),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

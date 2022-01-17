@@ -220,7 +220,7 @@ namespace GraphQL.Validation
 
             if (variableDefinitions != null)
             {
-                foreach (var variableDef in variableDefinitions)
+                foreach (var variableDef in variableDefinitions.Items)
                 {
                     var variableDefName = (string)variableDef.Variable.Name; //TODO:!!!!alloc
                     // find the IGraphType instance for the variable type

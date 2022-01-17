@@ -43,8 +43,6 @@ namespace GraphQL.Execution
         /// </summary>
         public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
         {
-            Debug.Assert(input is null || input is GraphQLValue, "All literal values should inherit from GraphQLValue");
-
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 

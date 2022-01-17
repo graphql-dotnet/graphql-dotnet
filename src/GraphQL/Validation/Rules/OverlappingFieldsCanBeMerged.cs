@@ -633,8 +633,8 @@ namespace GraphQL.Validation.Rules
         private static bool SameValue(GraphQLArgument arg1, GraphQLArgument arg2)
         {
             // normalize values prior to comparison by using AstPrinter.Print rather than INode.ToString(document)
-            return arg1.Value == null && arg2.Value == null ||
-                arg1.Value != null && arg2.Value != null && AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
+            return arg1.Value is null && arg2.Value is null ||
+                arg1.Value is not null && arg2.Value is not null && AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
         }
 
         private static CachedField GetFieldsAndFragmentNames(
@@ -703,7 +703,7 @@ namespace GraphQL.Validation.Rules
                         fieldDef = (parentType as IComplexGraphType)!.GetField(fieldName);
                     }
 
-                    var responseName = field.Alias == null ? fieldName : field.Alias.Name;
+                    var responseName = field.Alias is null ? fieldName : field.Alias.Name;
 
                     if (!nodeAndDefs.ContainsKey(responseName))
                     {

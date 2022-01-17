@@ -26,7 +26,7 @@ namespace GraphQL.Tests
                 Name = "Anyone"
             };
 
-            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldAst = new GraphQLField { Name = name == null ? null : new GraphQLName(name) } });
+            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) } });
 
             if (throws)
                 Should.Throw<InvalidOperationException>(() => result());

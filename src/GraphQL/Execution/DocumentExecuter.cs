@@ -9,6 +9,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -126,7 +127,7 @@ namespace GraphQL
                     }
                 }
 
-                if (!document.Definitions.OfType<GraphQLOperationDefinition>().Any())
+                if (document.OperationsCount() == 0)
                 {
                     throw new NoOperationError();
                 }

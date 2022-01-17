@@ -69,8 +69,6 @@ namespace GraphQL.Tests.Types
             g.CanParseValue(null).ShouldBeTrue();
             g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
             g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
-            g.ParseLiteral(new GraphQLNullValue()).ShouldBeNull();
-            g.CanParseLiteral(new GraphQLNullValue()).ShouldBeTrue();
             g.Serialize(null).ShouldBeNull();
             g.ToAST(null).ShouldBeOfType<GraphQLNullValue>().Value.ShouldBe("null");
         }
