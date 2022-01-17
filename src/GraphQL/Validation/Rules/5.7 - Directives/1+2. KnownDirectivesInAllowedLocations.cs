@@ -40,6 +40,12 @@ namespace GraphQL.Validation.Rules
             }
         });
 
+        // From http://spec.graphql.org/October2021/#sec-Document:
+        // Documents are only executable by a GraphQL service if they are ExecutableDocument and contain at least
+        // one OperationDefinition. A Document which contains TypeSystemDefinitionOrExtension must not be executed;
+        // GraphQL execution services which receive a Document containing these should return a descriptive error.
+        //
+        // Nevertheless, this method calculates all possible locations.
         private static DirectiveLocation DirectiveLocationForAstPath(ValidationContext context)
         {
             var appliedTo = context.TypeInfo.GetAncestor(1);
@@ -51,6 +57,7 @@ namespace GraphQL.Validation.Rules
 
             return appliedTo switch
             {
+                // http://spec.graphql.org/October2021/#ExecutableDirectiveLocation
                 GraphQLOperationDefinition op => op.Operation switch
                 {
                     OperationType.Query => DirectiveLocation.Query,
@@ -59,9 +66,24 @@ namespace GraphQL.Validation.Rules
                     _ => throw new InvalidOperationException($"Unknown operation type '{op.Operation}.")
                 },
                 GraphQLField _ => DirectiveLocation.Field,
+                GraphQLFragmentDefinition _ => DirectiveLocation.FragmentDefinition,
                 GraphQLFragmentSpread _ => DirectiveLocation.FragmentSpread,
                 GraphQLInlineFragment _ => DirectiveLocation.InlineFragment,
-                GraphQLFragmentDefinition _ => DirectiveLocation.FragmentDefinition,
+                GraphQLVariableDefinition _ => DirectiveLocation.VariableDefinition,
+
+                // http://spec.graphql.org/October2021/#TypeSystemDirectiveLocation
+                GraphQLSchemaDefinition _ => DirectiveLocation.Schema,
+                GraphQLScalarTypeDefinition _ => DirectiveLocation.Scalar,
+                GraphQLObjectTypeDefinition _ => DirectiveLocation.Object,
+                GraphQLFieldDefinition _ => DirectiveLocation.FieldDefinition,
+                //GraphQLArgument?s?Definition => DirectiveLocation.ArgumentDefinition, //TODO: ???
+                GraphQLInterfaceTypeDefinition _ => DirectiveLocation.Interface,
+                GraphQLUnionTypeDefinition _ => DirectiveLocation.Union,
+                GraphQLEnumTypeDefinition _ => DirectiveLocation.Enum,
+                GraphQLEnumValueDefinition _ => DirectiveLocation.EnumValue, //TODO: https://github.com/graphql/graphql-spec/issues/924
+                GraphQLEnumValue _ => DirectiveLocation.EnumValue,
+                GraphQLInputObjectTypeDefinition _ => DirectiveLocation.InputObject,
+                GraphQLInputFieldsDefinition _ => DirectiveLocation.InputFieldDefinition,
                 _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.StringFrom(context.OriginalQuery)}'.")
             };
         }

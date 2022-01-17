@@ -23,10 +23,11 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
         {
-            var fragment = context.GetFragment(node.Name);
+            var fragmentName = node.Name;
+            var fragment = context.GetFragment(fragmentName);
             if (fragment == null)
             {
-                context.ReportError(new KnownFragmentNamesError(context, node, node.Name));
+                context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
             }
         });
     }

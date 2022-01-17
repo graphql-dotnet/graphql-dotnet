@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (op.Name is null || op.Name == "")
+            if (op.Name is null)
             {
                 return;
             }
