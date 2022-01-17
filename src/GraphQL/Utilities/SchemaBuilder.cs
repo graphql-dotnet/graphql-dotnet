@@ -217,7 +217,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
             return operationDefinition == null
                 ? type.Name == "Subscription"
-                : type.Name == operationDefinition.Type!.Name!.Value;
+                : type.Name == operationDefinition.Type!.Name;
         }
 
         private void AssertKnownType(TypeConfig typeConfig)

@@ -189,20 +189,20 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
+        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="GraphQLField"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
         protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, GraphQLField field)
         {
-            if (field.Name.Value == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
+            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
                 return schema.SchemaMetaFieldType;
             }
-            if (field.Name.Value == schema.TypeMetaFieldType.Name && schema.Query == parentType)
+            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
             {
                 return schema.TypeMetaFieldType;
             }
-            if (field.Name.Value == schema.TypeNameMetaFieldType.Name)
+            if (field.Name == schema.TypeNameMetaFieldType.Name)
             {
                 return schema.TypeNameMetaFieldType;
             }
@@ -212,7 +212,7 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
             }
 
-            return parentType.GetField(field.Name.Value);
+            return parentType.GetField(field.Name);
         }
 
         /// <inheritdoc/>
@@ -293,9 +293,7 @@ namespace GraphQL.Execution
                     : field;
             }
 
-            /// <summary>
-            /// Returns a new selection set node with the contents merged with another selection set node's contents.
-            /// </summary>
+            // Returns a new selection set node with the contents merged with another selection set node's contents.
             static GraphQLSelectionSet? Merge(GraphQLSelectionSet? selection, GraphQLSelectionSet? otherSelection)
             {
                 if (selection == null)

@@ -3026,12 +3026,3 @@ namespace GraphQL.Validation.Rules
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
 }
-namespace GraphQLParser.AST
-{
-    public static class GraphQLDocumentExtensions
-    {
-        public static GraphQLParser.AST.GraphQLObjectField? Field(this GraphQLParser.AST.GraphQLObjectValue objectValue, GraphQLParser.ROM name) { }
-        public static int FragmentsCount(this GraphQLParser.AST.GraphQLDocument document) { }
-        public static int OperationsCount(this GraphQLParser.AST.GraphQLDocument document) { }
-    }
-}

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Utilities;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -64,7 +65,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name.Value)?.Value ?? ThrowLiteralConversionError(value),
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -72,7 +73,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name.Value) != null,
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name) != null,
             GraphQLNullValue _ => true,
             _ => false
         };
@@ -204,12 +205,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns an enumeration definition for the specified name.
         /// </summary>
-        internal EnumValueDefinition? FindByName(ReadOnlySpan<char> name)
+        internal EnumValueDefinition? FindByName(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
             {
-                if (name.SequenceEqual(def.Name.AsSpan()))
+                if (def.Name == name)
                     return def;
             }
 

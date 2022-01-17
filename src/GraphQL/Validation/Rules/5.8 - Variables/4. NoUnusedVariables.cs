@@ -40,7 +40,7 @@ namespace GraphQL.Validation.Rules
                         return;
 
                     var usages = context.GetRecursiveVariables(op)
-                        .Select(usage => usage.Node.Name.Value) //TODO: add == operator for GraphQLName
+                        .Select(usage => usage.Node.Name)
                         .ToList(); //TODO: ToList may be removed
 
                     foreach (var variableDef in variableDefs)

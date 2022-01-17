@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -23,7 +24,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (op.Name == null && context.Document.OperationsCount() > 1)
+            if (op.Name is null && context.Document.OperationsCount() > 1)
             {
                 context.ReportError(new LoneAnonymousOperationError(context, op));
             }

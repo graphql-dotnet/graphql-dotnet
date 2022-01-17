@@ -55,7 +55,7 @@ namespace GraphQL.Validation.Rules
 
             foreach (var directive in directives)
             {
-                if (directive.Name.Value == name)
+                if (directive.Name == name)
                     ++count;
             }
 

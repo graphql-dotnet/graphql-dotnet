@@ -482,7 +482,7 @@ namespace GraphQL
             // DO NOT USE LINQ ON HOT PATH
             foreach (var item in node)
             {
-                if (item.Name.Value == name)
+                if (item.Name == name)
                     return item;
             }
 
@@ -509,7 +509,7 @@ namespace GraphQL
         {
             foreach (var item in node)
             {
-                if (item.Name.Value == name)
+                if (item.Name == name)
                     return item.Value;
             }
 

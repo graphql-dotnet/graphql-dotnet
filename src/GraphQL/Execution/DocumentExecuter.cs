@@ -111,7 +111,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && (document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false)) != null)
+                    if (document == null && (document = await _documentCache.GetAsync(options.Query!).ConfigureAwait(false)) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -121,7 +121,7 @@ namespace GraphQL
                     }
                     if (document == null)
                     {
-                        document = _documentBuilder.Build(options.Query);
+                        document = _documentBuilder.Build(options.Query!);
                         saveInCache = true;
                     }
                 }
@@ -165,7 +165,7 @@ namespace GraphQL
 
                 if (saveInCache && validationResult.IsValid)
                 {
-                    await _documentCache.SetAsync(options.Query, document).ConfigureAwait(false);
+                    await _documentCache.SetAsync(options.Query!, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);
@@ -312,7 +312,7 @@ namespace GraphQL
             {
                 foreach (var def in document.Definitions)
                 {
-                    if (def is GraphQLOperationDefinition op && op.Name?.Value == operationName)
+                    if (def is GraphQLOperationDefinition op && op.Name == operationName)
                         return op;
                 }
             }

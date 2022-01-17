@@ -554,7 +554,7 @@ namespace GraphQL.Validation
                 // ensure every provided field is defined
                 foreach (var providedFieldAst in fieldAsts)
                 {
-                    var found = fields.Find(x => x.Name == providedFieldAst.Name.Value);
+                    var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
                         (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
@@ -564,7 +564,7 @@ namespace GraphQL.Validation
                 // ensure every defined field is valid
                 foreach (var field in fields)
                 {
-                    var fieldAst = fieldAsts.Find(x => x.Name.Value == field.Name);
+                    var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
 
                     if (fieldAst != null)
                     {

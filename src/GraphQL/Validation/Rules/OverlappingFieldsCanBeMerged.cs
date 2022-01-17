@@ -620,7 +620,7 @@ namespace GraphQL.Validation.Rules
 
             return arguments1.All(arg1 =>
             {
-                var arg2 = arguments2.FirstOrDefault(x => x.Name.Value == arg1.Name.Value);
+                var arg2 = arguments2.FirstOrDefault(x => x.Name == arg1.Name);
 
                 if (arg2 == null)
                 {

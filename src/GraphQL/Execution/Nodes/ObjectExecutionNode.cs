@@ -87,7 +87,7 @@ namespace GraphQL.Execution
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields ?? Enumerable.Empty<ExecutionNode>();
 
         /// <summary>
-        /// Returns the selection set from <see cref="Field"/>.
+        /// Returns the selection set from <see cref="ExecutionNode.Field"/>.
         /// </summary>
         public virtual GraphQLSelectionSet? SelectionSet => Field?.SelectionSet;
 

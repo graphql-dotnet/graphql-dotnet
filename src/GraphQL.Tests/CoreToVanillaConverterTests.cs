@@ -42,46 +42,6 @@ namespace GraphQL.Tests.Bugs
             valid.Data.ShouldNotBeNull();
             valid.Errors.ShouldBeNull();
         }
-
-        [Theory(Skip = "Should be moved into parser")]
-        [InlineData(ASTNodeKind.IntValue, "1")]
-        [InlineData(ASTNodeKind.IntValue, "-1")]
-        [InlineData(ASTNodeKind.IntValue, "9223372036854775807")]
-        [InlineData(ASTNodeKind.IntValue, "-9223372036854775808")]
-        [InlineData(ASTNodeKind.IntValue, "79228162514264337593543950335")]
-        [InlineData(ASTNodeKind.IntValue, "-79228162514264337593543950335")]
-        [InlineData(ASTNodeKind.IntValue, "100000000000000000000000000000000")]
-        [InlineData(ASTNodeKind.IntValue, "-100000000000000000000000000000000")]
-        [InlineData(ASTNodeKind.FloatValue, "1.7976931348623157E+308")]
-        [InlineData(ASTNodeKind.FloatValue, "-1.7976931348623157E+308")]
-        [InlineData(ASTNodeKind.FloatValue, "1e+5")]
-        [InlineData(ASTNodeKind.FloatValue, "1e-5")]
-        [InlineData(ASTNodeKind.FloatValue, "1e5")]
-        [InlineData(ASTNodeKind.FloatValue, "1.0")]
-        [InlineData(ASTNodeKind.FloatValue, "1.")]
-        [InlineData(ASTNodeKind.FloatValue, "1.7976931348623157E+900")]
-        [InlineData(ASTNodeKind.FloatValue, "-1.7976931348623157E+900")]
-        [InlineData(ASTNodeKind.BooleanValue, "true")]
-        [InlineData(ASTNodeKind.BooleanValue, "false")]
-        public void Values_Parse_Successfully(ASTNodeKind kind, string valueString)
-        {
-            IHasValueNode BuildNode(string valueString)
-            {
-                return kind switch
-                {
-                    ASTNodeKind.IntValue => new GraphQLIntValue(valueString),
-                    ASTNodeKind.FloatValue => new GraphQLFloatValue(valueString),
-                    ASTNodeKind.BooleanValue => new GraphQLBooleanValue(bool.Parse(valueString)),
-                    _ => throw new NotSupportedException(),
-                };
-            }
-
-            //note: thousand separators and/or culture-specific characters are invalid graphql literals, and will not be returned by graphql-parser
-            //uppercase TRUE and FALSE are also invalid graphql input data, and will not be returned by graphql-parser
-            //whitespace will not be returned by graphql-parser
-            var node = BuildNode(valueString);
-            node.Value.ShouldBe(valueString);
-        }
     }
 
     public class PR1781Schema : Schema

@@ -119,7 +119,7 @@ namespace GraphQL.Utilities.Federation
         {
             foreach (var selection in selectionSet.Selections)
             {
-                if (selection is GraphQLField childField && childField.Name.Value == "__typename")
+                if (selection is GraphQLField childField && childField.Name == "__typename")
                 {
                     setToAlter = null;
                     return false;
@@ -189,7 +189,7 @@ namespace GraphQL.Utilities.Federation
 
         private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
         {
-            return directives?.FirstOrDefault(x => x.Name!.Value == name);
+            return directives?.FirstOrDefault(x => x.Name == name);
         }
     }
 }

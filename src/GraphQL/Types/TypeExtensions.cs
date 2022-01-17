@@ -10,7 +10,7 @@ namespace GraphQL.Types
     {
         /// <summary>
         /// Searches a schema for a graph type specified by an AST type after unwrapping any
-        /// <see cref="NonNullType"/> or <see cref="ListType"/> layers. If the type cannot be
+        /// <see cref="GraphQLNonNullType"/> or <see cref="GraphQLListType"/> layers. If the type cannot be
         /// found, returns <see langword="null"/>.
         /// </summary>
         /// <param name="type">The AST type to search for.</param>

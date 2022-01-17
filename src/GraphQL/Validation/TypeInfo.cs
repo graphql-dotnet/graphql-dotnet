@@ -238,7 +238,7 @@ namespace GraphQL.Validation
 
         private FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
         {
-            var name = field.Name.Value;
+            var name = field.Name;
 
             if (name == schema.SchemaMetaFieldType.Name && Equals(schema.Query, parentType))
             {
