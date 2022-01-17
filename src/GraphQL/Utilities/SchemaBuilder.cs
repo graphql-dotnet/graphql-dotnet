@@ -160,7 +160,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.Comment?.Text.ToString();
+                schema.Description = _schemaDef.Comment?.Value.ToString();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {
@@ -251,7 +251,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (!isExtensionType)
             {
-                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.Comment?.Text.ToString();
+                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.Comment?.Value.ToString();
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
@@ -342,7 +342,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Value.ToString(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver
             };
@@ -371,7 +371,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new EventStreamFieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Value.ToString(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -402,7 +402,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString(),
                 ResolvedType = ToGraphType(inputDef.Type!),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
@@ -422,7 +422,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InterfaceGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.Comment?.Value.ToString(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(interfaceDef);
 
@@ -449,7 +449,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new UnionGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.Comment?.Value.ToString(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(unionDef);
 
@@ -479,7 +479,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InputObjectGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString(),
             }.SetAstType(inputDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -505,7 +505,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new EnumerationGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.Comment?.Value.ToString(),
             }.SetAstType(enumDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -523,7 +523,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
             var result = new DirectiveGraphType((string)directiveDef.Name) //TODO:!!!alloc
             {
-                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Text.ToString(),
+                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Value.ToString(),
                 Repeatable = directiveDef.Repeatable,
                 Arguments = ToQueryArguments(directiveDef.Arguments?.Items)
             };
@@ -546,7 +546,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Value = enumType == null ? name : Enum.Parse(enumType, name, true),
                 Name = name,
-                Description = valDef.Description?.Value.ToString() ?? valDef.Comment?.Text.ToString()
+                Description = valDef.Description?.Value.ToString() ?? valDef.Comment?.Value.ToString()
                 // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
                 //DeprecationReason = ???
             }.SetAstType(valDef);
@@ -558,7 +558,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = argumentConfig.Name,
                 DefaultValue = argumentConfig.DefaultValue ?? inputDef.DefaultValue,
-                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString()
+                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString()
             }.SetAstType(inputDef);
 
             argumentConfig.CopyMetadataTo(argument);

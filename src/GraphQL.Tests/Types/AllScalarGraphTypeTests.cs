@@ -126,8 +126,8 @@ namespace GraphQL.Tests.Types
         {
             // if string to coercion were possible, all would pass, as the string is "0"
             var g = Create(graphType);
-            g.CanParseLiteral(new GraphQLStringValue { Value = "0" }).ShouldBeFalse();
-            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new GraphQLStringValue { Value = "0" }));
+            g.CanParseLiteral(new GraphQLStringValue("0")).ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(() => g.ParseLiteral(new GraphQLStringValue("0")));
             g.CanParseValue("0").ShouldBeFalse();
             Should.Throw<InvalidOperationException>(() => g.ParseValue("0"));
             Should.Throw<InvalidOperationException>(() => g.Serialize("0"));

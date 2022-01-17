@@ -85,12 +85,12 @@ namespace GraphQL.Tests.Extensions
                             new GraphQLObjectField
                             {
                                 Name = new GraphQLName("Name"),
-                                Value = new GraphQLStringValue { Value = person.Name },
+                                Value = new GraphQLStringValue(person.Name),
                             },
                             new GraphQLObjectField
                             {
                                 Name = new GraphQLName("Age"),
-                                Value = new GraphQLIntValue { Value = person.Age.ToString(CultureInfo.InvariantCulture) }
+                                Value = new GraphQLIntValue(person.Age.ToString(CultureInfo.InvariantCulture))
                             }
                         }
                     };

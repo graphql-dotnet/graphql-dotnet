@@ -55,7 +55,6 @@ namespace GraphQL.Tests.Types
         public void coerces_decimal_to_value()
         {
             type.ParseValue(9223372036854775808m).ShouldBeOfType<double>().ShouldBe(9223372036854775808d);
-            type.ParseLiteral(new GraphQLIntValue(9223372036854775808m)).ShouldBeOfType<double>().ShouldBe(9223372036854775808d);
         }
 
         [Fact]

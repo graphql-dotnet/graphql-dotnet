@@ -65,13 +65,13 @@ namespace GraphQL.Tests.Bugs
         [InlineData(ASTNodeKind.BooleanValue, "false")]
         public void Values_Parse_Successfully(ASTNodeKind kind, string valueString)
         {
-            GraphQLValue BuildNode()
+            IHasValueNode BuildNode(string valueString)
             {
                 return kind switch
                 {
-                    ASTNodeKind.IntValue => new GraphQLIntValue(),
-                    ASTNodeKind.FloatValue => new GraphQLFloatValue(),
-                    ASTNodeKind.BooleanValue => new GraphQLBooleanValue(),
+                    ASTNodeKind.IntValue => new GraphQLIntValue(valueString),
+                    ASTNodeKind.FloatValue => new GraphQLFloatValue(valueString),
+                    ASTNodeKind.BooleanValue => new GraphQLBooleanValue(bool.Parse(valueString)),
                     _ => throw new NotSupportedException(),
                 };
             }
@@ -79,9 +79,8 @@ namespace GraphQL.Tests.Bugs
             //note: thousand separators and/or culture-specific characters are invalid graphql literals, and will not be returned by graphql-parser
             //uppercase TRUE and FALSE are also invalid graphql input data, and will not be returned by graphql-parser
             //whitespace will not be returned by graphql-parser
-            dynamic node = BuildNode();
-            node.Value = valueString;
-            var _ = node.ClrValue;
+            var node = BuildNode(valueString);
+            node.Value.ShouldBe(valueString);
         }
     }
 

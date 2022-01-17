@@ -253,17 +253,17 @@ namespace GraphQL.Tests.Types
                             new GraphQLObjectField
                             {
                                 Name = new GraphQLName("x"),
-                                Value = new GraphQLFloatValue { Value = vector3.X.ToString() }
+                                Value = new GraphQLFloatValue(vector3.X.ToString())
                             },
                             new GraphQLObjectField
                             {
                                 Name = new GraphQLName("y"),
-                                Value = new GraphQLFloatValue { Value = vector3.Y.ToString() }
+                                Value = new GraphQLFloatValue(vector3.Y.ToString())
                             },
                             new GraphQLObjectField
                             {
                                 Name = new GraphQLName("z"),
-                                Value = new GraphQLFloatValue { Value = vector3.Z.ToString() }
+                                Value = new GraphQLFloatValue(vector3.Z.ToString())
                             }
                         }
                     };

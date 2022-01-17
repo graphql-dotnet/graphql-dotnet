@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Types
         {
             var c = new CustomScalar();
             // try parsing literal AST
-            c.ParseLiteral(externalValue == null ? new GraphQLNullValue() : new GraphQLStringValue { Value = externalValue }).ShouldBe(internalValue);
+            c.ParseLiteral(externalValue == null ? new GraphQLNullValue() : new GraphQLStringValue(externalValue)).ShouldBe(internalValue);
         }
 
         [Theory]
