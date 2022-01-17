@@ -13,7 +13,6 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLIntValue x => UShort.Parse(x.Value),
-            GraphQLFloatValue x => UShort.Parse(x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -22,7 +21,6 @@ namespace GraphQL.Types
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLIntValue x => UShort.TryParse(x.Value, out var _),
-            GraphQLFloatValue x => UShort.TryParse(x.Value, out var _),
             GraphQLNullValue _ => true,
             _ => false
         };
