@@ -17,6 +17,9 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class GraphQLSerializer : IGraphQLTextSerializer
     {
+        /// <summary>
+        /// Returns the set of options used by the underlying serializer.
+        /// </summary>
         protected JsonSerializerOptions SerializerOptions { get; }
 
         /// <summary>
