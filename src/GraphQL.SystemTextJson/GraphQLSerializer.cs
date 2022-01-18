@@ -18,7 +18,10 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class GraphQLSerializer : IGraphQLTextSerializer
     {
-        private readonly JsonSerializerOptions _options;
+        /// <summary>
+        /// Returns the set of options used by the underlying serializer.
+        /// </summary>
+        protected JsonSerializerOptions SerializerOptions { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
@@ -69,8 +72,8 @@ namespace GraphQL.SystemTextJson
             if (configureSerializerOptions == null)
                 throw new ArgumentNullException(nameof(configureSerializerOptions));
 
-            _options = GetDefaultSerializerOptions(indent: false);
-            configureSerializerOptions.Invoke(_options);
+            SerializerOptions = GetDefaultSerializerOptions(indent: false);
+            configureSerializerOptions.Invoke(SerializerOptions);
 
             ConfigureOptions(null);
         }
@@ -82,7 +85,7 @@ namespace GraphQL.SystemTextJson
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions)
         {
-            _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
             // TODO: fix this: it modifies serializerOptions
             ConfigureOptions(null);
@@ -95,7 +98,7 @@ namespace GraphQL.SystemTextJson
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
-            _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
             // TODO: fix this: it modifies serializerOptions
             ConfigureOptions(errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)));
@@ -115,47 +118,47 @@ namespace GraphQL.SystemTextJson
             if (errorInfoProvider == null)
                 throw new ArgumentNullException(nameof(errorInfoProvider));
 
-            _options = GetDefaultSerializerOptions(indent: false);
-            configureSerializerOptions.Invoke(_options);
+            SerializerOptions = GetDefaultSerializerOptions(indent: false);
+            configureSerializerOptions.Invoke(SerializerOptions);
 
             ConfigureOptions(errorInfoProvider);
         }
 
         private void ConfigureOptions(IErrorInfoProvider errorInfoProvider)
         {
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
-                _options.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
+                SerializerOptions.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))
             {
-                _options.Converters.Add(new ApolloTraceJsonConverter());
+                SerializerOptions.Converters.Add(new ApolloTraceJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
             {
-                _options.Converters.Add(new JsonConverterBigInteger());
+                SerializerOptions.Converters.Add(new JsonConverterBigInteger());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(Inputs))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(Inputs))))
             {
-                _options.Converters.Add(new InputsJsonConverter());
+                SerializerOptions.Converters.Add(new InputsJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(GraphQLRequest))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(GraphQLRequest))))
             {
-                _options.Converters.Add(new GraphQLRequestJsonConverter());
+                SerializerOptions.Converters.Add(new GraphQLRequestJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(List<GraphQLRequest>))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(List<GraphQLRequest>))))
             {
-                _options.Converters.Add(new GraphQLRequestListJsonConverter());
+                SerializerOptions.Converters.Add(new GraphQLRequestListJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(OperationMessage))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(OperationMessage))))
             {
-                _options.Converters.Add(new OperationMessageJsonConverter());
+                SerializerOptions.Converters.Add(new OperationMessageJsonConverter());
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(ROM))))
@@ -169,19 +172,19 @@ namespace GraphQL.SystemTextJson
 
         /// <inheritdoc/>
         public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
-            => JsonSerializer.SerializeAsync(stream, value, _options, cancellationToken);
+            => JsonSerializer.SerializeAsync(stream, value, SerializerOptions, cancellationToken);
 
         /// <inheritdoc/>
         public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
-            => JsonSerializer.DeserializeAsync<T>(stream, _options, cancellationToken);
+            => JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
 
         /// <inheritdoc/>
         public string Serialize<T>(T value)
-            => JsonSerializer.Serialize(value, _options);
+            => JsonSerializer.Serialize(value, SerializerOptions);
 
         /// <inheritdoc/>
         public T Deserialize<T>(string json)
-            => json == null ? default : JsonSerializer.Deserialize<T>(json, _options);
+            => json == null ? default : JsonSerializer.Deserialize<T>(json, SerializerOptions);
 
         /*******
         /// <summary>
@@ -201,9 +204,9 @@ namespace GraphQL.SystemTextJson
         /// </summary>
         private T ReadNode<T>(JsonElement jsonElement)
 #if NET6_0_OR_GREATER
-            => JsonSerializer.Deserialize<T>(jsonElement, _options);
+            => JsonSerializer.Deserialize<T>(jsonElement, SerializerOptions);
 #else
-            => JsonSerializer.Deserialize<T>(jsonElement.GetRawText(), _options);
+            => JsonSerializer.Deserialize<T>(jsonElement.GetRawText(), SerializerOptions);
 #endif
 
         /// <summary>
