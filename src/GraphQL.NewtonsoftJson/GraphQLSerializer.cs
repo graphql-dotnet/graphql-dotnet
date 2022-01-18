@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
+using GraphQL.Transport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -17,8 +19,12 @@ namespace GraphQL.NewtonsoftJson
     public class GraphQLSerializer : IGraphQLTextSerializer
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
-        private readonly JsonSerializer _serializer;
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
+
+        /// <summary>
+        /// Returns the underlying serializer.
+        /// </summary>
+        protected JsonSerializer Serializer { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
@@ -104,9 +110,14 @@ namespace GraphQL.NewtonsoftJson
         {
         }
 
-        private GraphQLSerializer(JsonSerializer jsonSerializer)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified <see cref="JsonSerializer"/>.
+        /// The specified <see cref="JsonSerializer"/> should support serializing and/or deserializing <see cref="ExecutionResult"/>,
+        /// <see cref="GraphQLRequest"/>, <see cref="Inputs"/>, <see cref="OperationMessage"/> and <see cref="ApolloTrace"/>.
+        /// </summary>
+        protected GraphQLSerializer(JsonSerializer jsonSerializer)
         {
-            _serializer = jsonSerializer;
+            Serializer = jsonSerializer;
         }
 
         private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider errorInfoProvider)
@@ -150,7 +161,7 @@ namespace GraphQL.NewtonsoftJson
                 AutoCompleteOnClose = false
             };
 
-            _serializer.Serialize(jsonWriter, value);
+            Serializer.Serialize(jsonWriter, value);
             await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -163,7 +174,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 CloseOutput = false
             };
-            _serializer.Serialize(stringWriter, value);
+            Serializer.Serialize(stringWriter, value);
         }
 
         /// <inheritdoc/>
@@ -179,7 +190,7 @@ namespace GraphQL.NewtonsoftJson
         {
             using var stringReader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
             using var jsonReader = new JsonTextReader(stringReader);
-            return new ValueTask<T>(_serializer.Deserialize<T>(jsonReader));
+            return new ValueTask<T>(Serializer.Deserialize<T>(jsonReader));
         }
 
         /// <summary>
@@ -191,7 +202,7 @@ namespace GraphQL.NewtonsoftJson
             {
                 CloseInput = false
             };
-            return _serializer.Deserialize<T>(jsonReader);
+            return Serializer.Deserialize<T>(jsonReader);
         }
 
         /// <inheritdoc/>
@@ -203,7 +214,7 @@ namespace GraphQL.NewtonsoftJson
         /// A <paramref name="jObject"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         private T ReadNode<T>(JObject jObject)
-            => jObject == null ? default : jObject.ToObject<T>(_serializer);
+            => jObject == null ? default : jObject.ToObject<T>(Serializer);
 
         /// <summary>
         /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
