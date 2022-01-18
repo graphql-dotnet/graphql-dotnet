@@ -293,7 +293,7 @@ namespace GraphQL.Validation
         /// </summary>
         private object? GetVariableValue(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
         {
-            return ParseValue(graphType, variableDef, (string)variableDef.Variable.Name, input, visitor); //TODO:!!!!alloc
+            return ParseValue(graphType, variableDef, variableDef.Variable.Name.StringValue, input, visitor); //ISSUE:allocation
 
             // Coerces a value depending on the graph type.
             object? ParseValue(IGraphType type, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)

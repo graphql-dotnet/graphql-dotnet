@@ -59,7 +59,7 @@ namespace GraphQL.Types
         {
             GraphQLNonNullType nonnull => Name(nonnull.Type),
             GraphQLListType list => Name(list.Type),
-            GraphQLNamedType named => named.Name.StringValue, //TODO:!!!!! alloc
+            GraphQLNamedType named => named.Name.StringValue, //ISSUE:allocation but used only on error paths
             _ => throw new NotSupportedException($"Unknown type {type}")
         };
 
@@ -72,7 +72,7 @@ namespace GraphQL.Types
         {
             GraphQLNonNullType nonnull => $"{FullName(nonnull.Type)}!",
             GraphQLListType list => $"[{FullName(list.Type)}]",
-            GraphQLNamedType named => named.Name.StringValue, //TODO:!!!!!!alloc
+            GraphQLNamedType named => named.Name.StringValue, //ISSUE:allocation
             _ => throw new NotSupportedException($"Unknown type {type}")
         };
     }

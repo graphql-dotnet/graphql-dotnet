@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
             if (type == null)
             {
                 var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
-                var suggestionList = StringUtils.SuggestionList(node.Name.StringValue, typeNames); //TODO:!!!!alloc
+                var suggestionList = StringUtils.SuggestionList(node.Name.StringValue, typeNames); //ISSUE:allocation
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }
         });

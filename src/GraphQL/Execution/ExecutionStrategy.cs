@@ -256,7 +256,7 @@ namespace GraphQL.Execution
                         }
                         else if (selection is GraphQLFragmentSpread spread)
                         {
-                            if (visitedFragmentNames?.Contains((string)spread.FragmentName.Name) != true && ShouldIncludeNode(context, spread)) //TODO:!!!! alloc
+                            if (visitedFragmentNames?.Contains(spread.FragmentName.Name) != true && ShouldIncludeNode(context, spread))
                             {
                                 (visitedFragmentNames ??= new List<ROM>()).Add(spread.FragmentName.Name);
 

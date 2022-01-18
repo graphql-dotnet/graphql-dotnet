@@ -9,7 +9,7 @@ namespace GraphQL.Utilities.Federation
             Value = value!;
         }
 
-        public override ASTNodeKind Kind => (ASTNodeKind)(-1); //TODO:!!!!!
+        public override ASTNodeKind Kind => (ASTNodeKind)(-1); //TODO: how to deal with node kind?
 
         public object? Value { get; }
     }

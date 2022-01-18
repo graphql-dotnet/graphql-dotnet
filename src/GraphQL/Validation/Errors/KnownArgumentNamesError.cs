@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
                     node.Name,
                     fieldDef.Name,
                     parentType.ToString(),
-                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //TODO:!!!!alloc
+                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }
@@ -35,7 +35,7 @@ namespace GraphQL.Validation.Errors
                 UnknownDirectiveArgMessage(
                     node.Name,
                     directive.Name,
-                    StringUtils.SuggestionList((string)node.Name, directive.Arguments?.Select(q => q.Name))), //TODO:!!!alloc
+                    StringUtils.SuggestionList(node.Name.StringValue, directive.Arguments?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }

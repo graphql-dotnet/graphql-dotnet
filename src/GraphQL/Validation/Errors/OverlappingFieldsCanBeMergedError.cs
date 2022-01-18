@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Errors
         /// </summary>
         public OverlappingFieldsCanBeMergedError(ValidationContext context, Conflict conflict)
             : base(context.OriginalQuery!, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
-                  conflict.FieldsLeft.Concat(conflict.FieldsRight).Cast<ASTNode>().ToArray()) //TODO:!!!!!cast
+                  conflict.FieldsLeft.Concat(conflict.FieldsRight).Cast<ASTNode>().ToArray())
         {
         }
 

@@ -117,7 +117,7 @@ namespace GraphQL.Validation
 
             if (node is GraphQLDirective directive)
             {
-                _directive = _schema.Directives.Find((string)directive.Name); //TODO:!!!! alloc
+                _directive = _schema.Directives.Find(directive.Name);
             }
 
             if (node is GraphQLOperationDefinition op)
@@ -169,7 +169,7 @@ namespace GraphQL.Validation
 
                 if (args != null)
                 {
-                    argDef = args.Find((string)argAst.Name); //TODO:!!!!
+                    argDef = args.Find(argAst.Name);
                     argType = argDef?.ResolvedType;
                 }
 
@@ -190,7 +190,7 @@ namespace GraphQL.Validation
 
                 if (objectType is IInputObjectGraphType complexType)
                 {
-                    var inputField = complexType.GetField((string)objectField.Name); //TODO:!!!!! alloc
+                    var inputField = complexType.GetField(objectField.Name);
 
                     fieldType = inputField?.ResolvedType;
                 }
@@ -259,7 +259,7 @@ namespace GraphQL.Validation
             {
                 var complexType = (IComplexGraphType)parentType;
 
-                return complexType.GetField((string)field.Name); //TODO:!!!! alloc
+                return complexType.GetField(field.Name);
             }
 
             return null;
