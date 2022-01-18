@@ -476,8 +476,6 @@ namespace GraphQL.Validation
         /// </summary>
         public string? IsValidLiteralValue(IGraphType type, GraphQLValue valueAst)
         {
-            Debug.Assert(valueAst is null || valueAst is GraphQLValue, "All AST values should inherit from GraphQLValue");
-
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType!;

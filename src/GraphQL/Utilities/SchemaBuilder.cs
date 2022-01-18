@@ -614,7 +614,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return node as TNode ?? throw new InvalidOperationException($"Node should be of type '{typeof(TNode).Name}' but it is of type '{node?.GetType().Name}'.");
         }
 
-        public static object? ToValue(this GraphQLValue source)
+        public static object? ToValue(this GraphQLValue source) //TODO: merge with bits from AnyScalarGraphType 
         {
             object FromInt(GraphQLIntValue str)
             {

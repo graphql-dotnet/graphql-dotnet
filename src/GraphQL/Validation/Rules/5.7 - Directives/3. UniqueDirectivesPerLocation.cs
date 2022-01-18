@@ -31,7 +31,9 @@ namespace GraphQL.Validation.Rules
 
             new MatchingNodeVisitor<GraphQLFragmentSpread>((f, context) => CheckDuplicates(context, f.Directives)),
 
-            new MatchingNodeVisitor<GraphQLInlineFragment>((f, context) => CheckDuplicates(context, f.Directives))
+            new MatchingNodeVisitor<GraphQLInlineFragment>((f, context) => CheckDuplicates(context, f.Directives)),
+
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((f, context) => CheckDuplicates(context, f.Directives))
         );
 
         private static void CheckDuplicates(ValidationContext context, GraphQLDirectives? directives)

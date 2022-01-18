@@ -292,9 +292,6 @@ namespace GraphQL
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static bool DoTypesOverlap(GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
-        public static TNode? Find<TNode>(this GraphQLParser.AST.ASTListNode<TNode> node, string name)
-            where TNode :  class, GraphQLParser.AST.INamedNode { }
-        public static GraphQLParser.AST.GraphQLFragmentDefinition? FindFragmentDefinition(this GraphQLParser.AST.GraphQLDocument document, GraphQLParser.ROM name) { }
         public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
@@ -308,8 +305,7 @@ namespace GraphQL
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public static GraphQLParser.AST.ASTNode ToAST(this GraphQL.Types.IGraphType type, object value) { }
-        public static GraphQLParser.AST.GraphQLValue? ValueFor(this GraphQLParser.AST.GraphQLArguments node, string name) { }
+        public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }

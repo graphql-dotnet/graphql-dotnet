@@ -1,5 +1,6 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
+using GraphQLParser.AST;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -79,7 +80,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(subscriptionName), 4, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 4, 21);
             });
         }
 
@@ -97,7 +98,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(subscriptionName), 4, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 4, 21);
             });
         }
 
@@ -109,7 +110,7 @@ namespace GraphQL.Tests.Validation
                 subscription NamedSubscription {
                     ...newMessageFields
                 }
-                
+
                 fragment newMessageFields on Subscription {
                     newMessage {
                         body
@@ -122,7 +123,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(subscriptionName), 3, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 21);
             });
         }
 
@@ -145,7 +146,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(subscriptionName), 3, 21);
+                config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 21);
             });
         }
 

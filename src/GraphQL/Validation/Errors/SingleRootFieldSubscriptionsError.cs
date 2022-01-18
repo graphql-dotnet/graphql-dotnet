@@ -18,9 +18,9 @@ namespace GraphQL.Validation.Errors
         {
         }
 
-        internal static string InvalidNumberOfRootFieldMessage(ROM name)
+        internal static string InvalidNumberOfRootFieldMessage(GraphQLName? name)
         {
-            string prefix = name.IsEmpty ? "Anonymous Subscription" : $"Subscription '{name}'";
+            string prefix = name is not null ? $"Subscription '{name}'" : "Anonymous Subscription";
             return $"{prefix} must select only one top level field.";
         }
     }

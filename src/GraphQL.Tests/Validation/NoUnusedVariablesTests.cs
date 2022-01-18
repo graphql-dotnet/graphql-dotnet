@@ -1,5 +1,6 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
+using GraphQLParser.AST;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -243,7 +244,7 @@ namespace GraphQL.Tests.Validation
         {
             _.Error(err =>
             {
-                err.Message = NoUnusedVariablesError.UnusedVariableMessage(varName, opName);
+                err.Message = NoUnusedVariablesError.UnusedVariableMessage(varName, opName == null ? null : new GraphQLName(opName));
                 err.Loc(line, column);
             });
         }

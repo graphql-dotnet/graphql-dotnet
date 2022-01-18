@@ -18,11 +18,11 @@ namespace GraphQL.Validation.Errors
         {
         }
 
-        internal static string UnusedVariableMessage(ROM varName, ROM? opName)
+        internal static string UnusedVariableMessage(ROM varName, GraphQLName? opName)
         {
-            return opName.HasValue && opName.Value.Length > 0
-              ? $"Variable '${varName}' is never used in operation '${opName}'."
-              : $"Variable '${varName}' is never used.";
+            return opName is null
+                ? $"Variable '${varName}' is never used."
+                : $"Variable '${varName}' is never used in operation '${opName}'.";
         }
     }
 }
