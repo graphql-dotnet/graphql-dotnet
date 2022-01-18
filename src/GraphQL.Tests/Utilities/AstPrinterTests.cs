@@ -12,68 +12,6 @@ namespace GraphQL.Tests.Utilities
 {
     public class AstPrinterTests
     {
-        private readonly IDocumentBuilder _builder = new GraphQLDocumentBuilder();
-
-        [Fact(Skip = "Move into parser")]
-        public void prints_ast()
-        {
-            var query = @"{
-  complicatedArgs {
-    intArgField(intArg: 2)
-  }
-}
-";
-            var document = _builder.Build(query);
-
-            var result = AstPrinter.Print(document);
-            result.ShouldNotBeNull();
-            result.ShouldBe(MonetizeLineBreaks(query));
-        }
-
-        [Fact(Skip = "Move into parser")]
-        public void prints_variables()
-        {
-            var query = @"mutation createUser($userInput: UserInput!) {
-  createUser(userInput: $userInput) {
-    id
-    gender
-    profileImage
-  }
-}
-";
-
-            var document = _builder.Build(query);
-
-            var result = AstPrinter.Print(document);
-            result.ShouldNotBeNull();
-            result.ToString().ShouldBe(MonetizeLineBreaks(query));
-        }
-
-        [Fact(Skip = "Move into parser")]
-        public void prints_inline_fragments()
-        {
-            var query = @"query users {
-  users {
-    id
-    union {
-      ... on UserType {
-        username
-      }
-      ... on CustomerType {
-        customername
-      }
-    }
-  }
-}
-";
-
-            var document = _builder.Build(query);
-
-            var result = AstPrinter.Print(document);
-            result.ShouldNotBeNull();
-            result.ToString().ShouldBe(MonetizeLineBreaks(query));
-        }
-
         [Fact]
         public void prints_int_value()
         {
@@ -106,13 +44,6 @@ namespace GraphQL.Tests.Utilities
             var val = new GraphQLFloatValue(value);
             var result = AstPrinter.Print(val);
             result.ShouldBe(value.ToString("0.0##", NumberFormatInfo.InvariantInfo));
-        }
-
-        private static string MonetizeLineBreaks(string input)
-        {
-            return (input ?? string.Empty)
-                .Replace("\r\n", "\n")
-                .Replace("\r", "\n");
         }
 
         [Fact]

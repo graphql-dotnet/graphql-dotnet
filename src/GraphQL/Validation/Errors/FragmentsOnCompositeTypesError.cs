@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, GraphQLFragmentDefinition node)
-            : base(context.OriginalQuery!, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, node.TypeCondition.Type.StringFrom(context.OriginalQuery)), node.TypeCondition.Type)
+            : base(context.OriginalQuery!, NUMBER, FragmentOnNonCompositeErrorMessage(node.FragmentName.Name, node.TypeCondition.Type.StringFrom(context.OriginalQuery)), node.TypeCondition.Type)
         {
         }
 

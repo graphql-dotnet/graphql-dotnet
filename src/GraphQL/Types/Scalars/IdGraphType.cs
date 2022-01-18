@@ -50,7 +50,7 @@ namespace GraphQL.Types
             string _ => value,
             int _ => value,
             long _ => value,
-            Guid _ => value, //TODO: wtf???
+            Guid _ => value,
             null => null,
             byte _ => value,
             sbyte _ => value,

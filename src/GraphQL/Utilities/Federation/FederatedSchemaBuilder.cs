@@ -133,7 +133,7 @@ namespace GraphQL.Utilities.Federation
 
                 if (selection is GraphQLFragmentSpread spread)
                 {
-                    var def = document.FindFragmentDefinition(spread.Name)!;
+                    var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
                     return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }

@@ -38,7 +38,7 @@ namespace GraphQL.Validation.Rules
 
             new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
             {
-                var fragName = node.Name;
+                var fragName = node.FragmentName.Name;
                 var fragType = getFragmentType(context, fragName);
                 var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
 

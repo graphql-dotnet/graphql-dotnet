@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
             var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<ROM>();
             var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<GraphQLFragmentSpread>();
             var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<ROM, int>();
-            if (!visitedFrags.Contains(node.Name))
+            if (!visitedFrags.Contains(node.FragmentName.Name))
             {
                 detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
             }
@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
             Dictionary<ROM, int> spreadPathIndexByName,
             ValidationContext context)
         {
-            var fragmentName = fragment.Name;
+            var fragmentName = fragment.FragmentName.Name;
             visitedFrags.Add(fragmentName);
 
             var spreadNodes = context.GetFragmentSpreads(fragment.SelectionSet);
@@ -54,7 +54,7 @@ namespace GraphQL.Validation.Rules
 
             foreach (var spreadNode in spreadNodes)
             {
-                var spreadName = spreadNode.Name;
+                var spreadName = spreadNode.FragmentName.Name;
                 if (!spreadPathIndexByName.TryGetValue(spreadName, out var cycleIndex))
                 {
                     spreadPath.Push(spreadNode);
@@ -80,7 +80,7 @@ namespace GraphQL.Validation.Rules
                     var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
                     var nodes = cyclePath.OfType<ASTNode>().Concat(new[] { spreadNode }).ToArray();
 
-                    context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.Name.StringValue).ToArray(), nodes)); //TODO:!!!alloc
+                    context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //TODO:!!!alloc
                 }
             }
 

@@ -161,9 +161,9 @@ namespace GraphQL.SystemTextJson
                 SerializerOptions.Converters.Add(new OperationMessageJsonConverter());
             }
 
-            if (!_options.Converters.Any(c => c.CanConvert(typeof(ROM))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ROM))))
             {
-                _options.Converters.Add(new ROMJsonConverter());
+                SerializerOptions.Converters.Add(new ROMJsonConverter());
             }
         }
 

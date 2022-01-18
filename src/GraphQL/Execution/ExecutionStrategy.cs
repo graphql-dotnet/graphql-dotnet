@@ -256,11 +256,11 @@ namespace GraphQL.Execution
                         }
                         else if (selection is GraphQLFragmentSpread spread)
                         {
-                            if (visitedFragmentNames?.Contains((string)spread.Name) != true && ShouldIncludeNode(context, spread)) //TODO:!!!! alloc
+                            if (visitedFragmentNames?.Contains((string)spread.FragmentName.Name) != true && ShouldIncludeNode(context, spread)) //TODO:!!!! alloc
                             {
-                                (visitedFragmentNames ??= new List<ROM>()).Add(spread.Name);
+                                (visitedFragmentNames ??= new List<ROM>()).Add(spread.FragmentName.Name);
 
-                                var fragment = context.Document.FindFragmentDefinition(spread.Name);
+                                var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
                                 if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, (string)fragment.TypeCondition.Type.Name, specificType)) //TODO:!!!!alloc
                                     CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
                             }

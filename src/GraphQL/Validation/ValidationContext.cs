@@ -184,7 +184,7 @@ namespace GraphQL.Validation
 
                 foreach (var spread in GetFragmentSpreads(node))
                 {
-                    var fragName = spread.Name;
+                    var fragName = spread.FragmentName.Name;
                     if (!collectedNames.ContainsKey(fragName))
                     {
                         collectedNames[fragName] = true;

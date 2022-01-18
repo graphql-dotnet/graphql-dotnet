@@ -720,7 +720,7 @@ namespace GraphQL.Validation.Rules
                 }
                 else if (selection is GraphQLFragmentSpread fragmentSpread)
                 {
-                    fragments.Add(fragmentSpread.Name);
+                    fragments.Add(fragmentSpread.FragmentName.Name);
 
                 }
                 else if (selection is GraphQLInlineFragment inlineFragment)
@@ -910,7 +910,7 @@ namespace GraphQL.Validation.Rules
 
             if (selection is GraphQLFragmentSpread fragmentSpread)
             {
-                return fragmentSpread.Name;
+                return fragmentSpread.FragmentName.Name;
             }
 
             return default;

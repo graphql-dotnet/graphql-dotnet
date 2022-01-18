@@ -106,7 +106,7 @@ namespace GraphQL.Tests.Execution
             };
             var fragment = new GraphQLFragmentDefinition
             {
-                Name = new GraphQLName("fragment"),
+                FragmentName = new GraphQLFragmentName { Name = new GraphQLName("fragment") },
                 TypeCondition = new GraphQLTypeCondition
                 {
                     Type = new GraphQLNamedType
@@ -134,7 +134,7 @@ namespace GraphQL.Tests.Execution
                 Schema = schema
             };
 
-            var fragSpread = new GraphQLFragmentSpread { Name = new GraphQLName("fragment") };
+            var fragSpread = new GraphQLFragmentSpread { FragmentName = new GraphQLFragmentName { Name = new GraphQLName("fragment") } };
             var outerSelection = new GraphQLSelectionSet
             {
                 Selections = new List<ASTNode>

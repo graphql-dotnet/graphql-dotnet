@@ -300,26 +300,7 @@ namespace GraphQL
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
         protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
-        {
-            if (string.IsNullOrWhiteSpace(operationName))
-            {
-                foreach (var def in document.Definitions)
-                {
-                    if (def is GraphQLOperationDefinition op)
-                        return op;
-                }
-            }
-            else
-            {
-                foreach (var def in document.Definitions)
-                {
-                    if (def is GraphQLOperationDefinition op && op.Name == operationName)
-                        return op;
-                }
-            }
-
-            return null;
-        }
+            => document.OperationWithName(operationName ?? ROM.Empty);
 
         /// <summary>
         /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.

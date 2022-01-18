@@ -39,12 +39,12 @@ namespace GraphQL.Validation.Rules
 
                 var fragmentNamesUsed = operationDefs
                     .SelectMany(context.GetRecursivelyReferencedFragments)
-                    .Select(fragment => fragment.Name)
+                    .Select(fragment => fragment.FragmentName.Name)
                     .ToList();
 
                 foreach (var fragmentDef in fragmentDefs)
                 {
-                    var fragName = fragmentDef.Name;
+                    var fragName = fragmentDef.FragmentName.Name;
 
                     if (!fragmentNamesUsed.Contains(fragName))
                     {

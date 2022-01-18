@@ -46,6 +46,8 @@ namespace GraphQL.Utilities
             public Stack<ASTNode> Parents { get; set; } = new Stack<ASTNode>();
 
             public CancellationToken CancellationToken { get; set; }
+
+            public int IndentLevel { get; set; }
         }
     }
 }

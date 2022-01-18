@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueFragmentNamesError(ValidationContext context, GraphQLFragmentDefinition node, GraphQLFragmentDefinition altNode)
-            : base(context.OriginalQuery!, NUMBER, DuplicateFragmentNameMessage(node.Name), node, altNode)
+            : base(context.OriginalQuery!, NUMBER, DuplicateFragmentNameMessage(node.FragmentName.Name), node, altNode)
         {
         }
 

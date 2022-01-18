@@ -43,7 +43,7 @@ namespace GraphQL.Validation.Rules
 
             if (fragment is GraphQLFragmentSpread fragmentSpread)
             {
-                var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
+                var fragmentDefinition = context.GetFragment(fragmentSpread.FragmentName.Name);
                 rootFields = fragmentDefinition?.SelectionSet.Selections.Count ?? 0;
             }
             else if (fragment is GraphQLInlineFragment fragmentSelectionSet)
