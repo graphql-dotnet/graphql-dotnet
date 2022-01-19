@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using GraphQL.Dummy;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
@@ -169,8 +168,8 @@ namespace GraphQL.Tests.Extensions
         [ClassData(typeof(ToASTTestData))]
         public void ToAST_Test(IGraphType type, object value, GraphQLValue expected)
         {
-            var actual = AstPrinter.Print(type.ToAST(value));
-            var result = AstPrinter.Print(expected);
+            var actual = type.ToAST(value).Print();
+            var result = expected.Print();
             actual.ShouldBe(result);
         }
 

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
-using GraphQL.Language;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -212,7 +211,7 @@ namespace GraphQL.Validation
 
             if ((variableDefinitions?.Count ?? 0) == 0)
             {
-                return Language.Variables.None;
+                return Validation.Variables.None;
             }
 
             var variablesObj = new Variables(variableDefinitions!.Count);

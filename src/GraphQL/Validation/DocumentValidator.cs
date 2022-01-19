@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation

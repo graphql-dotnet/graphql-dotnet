@@ -9,7 +9,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using GraphQL.Execution;
-using GraphQL.Language;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
@@ -137,9 +136,6 @@ namespace GraphQL.Benchmarks
                 case StageEnum.Parse:
                     benchmarkInfo.Parse();
                     break;
-                case StageEnum.Convert:
-                    benchmarkInfo.Convert();
-                    break;
                 case StageEnum.Validate:
                     benchmarkInfo.Validate();
                     break;
@@ -161,7 +157,7 @@ namespace GraphQL.Benchmarks
         }
 
         //[Params(StageEnum.Build, StageEnum.TypicalExecution, StageEnum.Serialize)]
-        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
+        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
         public StageEnum Stage { get; set; }
 
         void IBenchmark.RunProfiler()
@@ -174,7 +170,6 @@ namespace GraphQL.Benchmarks
         {
             Build,
             Parse,
-            Convert,
             Validate,
             DeserializeVars,
             ParseVariables,
@@ -189,14 +184,11 @@ namespace GraphQL.Benchmarks
             public Func<ISchema> SchemaBuilder;
             public string Query;
             public string InputsString;
-            public GraphQLDocument GraphQLDocument;
             public GraphQLDocument Document;
             public GraphQLOperationDefinition Operation;
             public Inputs Inputs;
-            public Language.Variables Variables;
+            public Validation.Variables Variables;
             public ExecutionResult ExecutionResult;
-
-            private static readonly CoreToVanillaConverter _converter = new();
 
             public BenchmarkInfo(string query, string inputs, Func<ISchema> schemaBuilder)
             {
@@ -204,8 +196,7 @@ namespace GraphQL.Benchmarks
                 SchemaBuilder = schemaBuilder;
                 Schema = BuildSchema();
                 Query = query;
-                GraphQLDocument = Parse();
-                Document = Convert();
+                Document = Parse();
                 Operation = Document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault();
                 InputsString = inputs;
                 Inputs = DeserializeInputs();
@@ -224,20 +215,12 @@ namespace GraphQL.Benchmarks
                 return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.Comments });
             }
 
-            //TODO:!!!!! not new document, dirty state, remove?
-            public GraphQLDocument Convert()
-            {
-                var context = new CoreToVanillaConverterContext();
-                _converter.Visit(GraphQLDocument, context).GetAwaiter().GetResult(); //actually sync
-                return GraphQLDocument;
-            }
-
             public Inputs DeserializeInputs()
             {
                 return _serializer.Deserialize<Inputs>(InputsString);
             }
 
-            public Language.Variables ParseVariables()
+            public Validation.Variables ParseVariables()
             {
                 return Inputs == null ? null : new ValidationContext
                 {

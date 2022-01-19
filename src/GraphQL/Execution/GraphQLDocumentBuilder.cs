@@ -1,4 +1,3 @@
-using GraphQL.Language;
 using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Exceptions;
@@ -12,8 +11,6 @@ namespace GraphQL.Execution
     /// </summary>
     public class GraphQLDocumentBuilder : IDocumentBuilder
     {
-        private static readonly CoreToVanillaConverter _converter = new();
-
         /// <summary>
         /// Specifies whether to ignore comments when parsing GraphQL document.
         /// By default, all comments are ignored.
@@ -38,20 +35,14 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public GraphQLDocument Build(string body)
         {
-            GraphQLDocument result;
             try
             {
-                result = Parser.Parse(body, new ParserOptions { Ignore = CreateIgnoreOptions(), MaxDepth = MaxDepth });
+                return Parser.Parse(body, new ParserOptions { Ignore = CreateIgnoreOptions(), MaxDepth = MaxDepth });
             }
             catch (GraphQLSyntaxErrorException ex)
             {
                 throw new SyntaxError(ex);
             }
-
-            var context = new CoreToVanillaConverterContext();
-            _converter.Visit(result, context).GetAwaiter().GetResult(); //actually sync
-
-            return result;
         }
 
         private IgnoreOptions CreateIgnoreOptions()

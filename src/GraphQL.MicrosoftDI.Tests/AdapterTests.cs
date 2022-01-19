@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQLParser.AST;
 using Moq;
 using Shouldly;

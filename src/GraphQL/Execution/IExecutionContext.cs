@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution

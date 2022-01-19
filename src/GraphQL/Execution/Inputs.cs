@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using GraphQL.Language;
+using GraphQL.Validation;
 
 namespace GraphQL
 {

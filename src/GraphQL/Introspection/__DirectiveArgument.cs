@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
@@ -44,8 +43,7 @@ namespace GraphQL.Introspection
                     var argumentDefinition = directiveDefinition!.Arguments!.Find(argument.Name);
 
                     var ast = argumentDefinition!.ResolvedType!.ToAST(argument.Value);
-                    string result = AstPrinter.Print(ast);
-                    return string.IsNullOrWhiteSpace(result) ? null : result;
+                    return ast.Print();
                 });
         }
     }

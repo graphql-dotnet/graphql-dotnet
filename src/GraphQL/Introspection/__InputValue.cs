@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
@@ -37,8 +36,7 @@ namespace GraphQL.Introspection
                         return null;
 
                     var ast = hasDefault.ResolvedType!.ToAST(hasDefault.DefaultValue);
-                    string result = AstPrinter.Print(ast);
-                    return string.IsNullOrWhiteSpace(result) ? null : result;
+                    return ast.Print();
                 });
 
             if (allowAppliedDirectives)

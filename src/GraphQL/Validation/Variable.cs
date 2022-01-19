@@ -1,4 +1,4 @@
-namespace GraphQL.Language
+namespace GraphQL.Validation
 {
     /// <summary>
     /// Represents a variable name and value tuple that has been gathered from the document and attached <see cref="Inputs"/>.

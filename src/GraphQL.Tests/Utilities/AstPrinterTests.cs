@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
 using Shouldly;
@@ -16,7 +15,7 @@ namespace GraphQL.Tests.Utilities
         {
             int value = 3;
             var val = new GraphQLIntValue(value);
-            var result = AstPrinter.Print(val);
+            var result = val.Print();
             result.ShouldBe("3");
         }
 
@@ -25,7 +24,7 @@ namespace GraphQL.Tests.Utilities
         {
             long value = 3;
             var val = new GraphQLIntValue(value);
-            var result = AstPrinter.Print(val);
+            var result = val.Print();
             result.ShouldBe("3");
         }
 
@@ -41,21 +40,21 @@ namespace GraphQL.Tests.Utilities
             double value = 3.33;
 
             var val = new GraphQLFloatValue(value);
-            var result = AstPrinter.Print(val);
+            var result = val.Print();
             result.ShouldBe(value.ToString("0.0##", NumberFormatInfo.InvariantInfo));
         }
 
         [Fact]
         public void anynode_throws()
         {
-            Should.Throw<InvalidOperationException>(() => AstPrinter.Print(new AnyValue("")));
+            Should.Throw<InvalidOperationException>(() => new AnyValue("").Print());
         }
 
         [Fact]
         public void string_encodes_control_characters()
         {
             var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
-            var ret = AstPrinter.Print(new GraphQLStringValue(sample));
+            var ret = new GraphQLStringValue(sample).Print();
 
             foreach (char c in ret)
                 c.ShouldBeGreaterThanOrEqualTo(' ');
@@ -72,7 +71,7 @@ namespace GraphQL.Tests.Utilities
         [MemberData(nameof(NodeTests))]
         public void prints_node(ASTNode node, string expected)
         {
-            var printed = AstPrinter.Print(node);
+            var printed = node.Print();
 
             printed.ShouldBe(expected);
 

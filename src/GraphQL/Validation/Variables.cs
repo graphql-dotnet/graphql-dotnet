@@ -5,7 +5,7 @@ using System.Linq;
 using GraphQL.Execution;
 using GraphQLParser;
 
-namespace GraphQL.Language
+namespace GraphQL.Validation
 {
     /// <summary>
     /// Contains a list of variables (name &amp; value tuples) that have been gathered from the document and attached <see cref="Inputs"/>.

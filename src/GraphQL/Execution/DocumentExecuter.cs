@@ -6,7 +6,6 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser;

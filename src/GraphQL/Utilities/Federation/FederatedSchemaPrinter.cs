@@ -58,7 +58,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            return AstPrinter.Print(directive);
+            return directive.Print();
         }
 
         public override string PrintObject(IObjectGraphType type)

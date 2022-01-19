@@ -4,9 +4,9 @@ using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQLParser.AST;
 
 namespace GraphQL

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Language;
 using GraphQL.Types;
-using GraphQL.Utilities;
+using GraphQL.Validation;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution
@@ -101,7 +100,7 @@ namespace GraphQL.Execution
             {
                 if (!(input is GraphQLObjectValue objectValue))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{AstPrinter.Print(input)}'.");
+                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                 }
 
                 var obj = new Dictionary<string, object?>();

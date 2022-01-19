@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -634,7 +633,7 @@ namespace GraphQL.Validation.Rules
         {
             // normalize values prior to comparison by using AstPrinter.Print rather than INode.ToString(document)
             return arg1.Value is null && arg2.Value is null ||
-                arg1.Value is not null && arg2.Value is not null && AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
+                arg1.Value is not null && arg2.Value is not null && arg1.Value.Print() == arg2.Value.Print(); //TODO: change
         }
 
         private static CachedField GetFieldsAndFragmentNames(
