@@ -1126,7 +1126,7 @@ namespace GraphQL.Instrumentation
         public bool Enabled { get; }
         public static GraphQL.Instrumentation.Metrics None { get; }
         public GraphQL.Instrumentation.PerfRecord[]? Finish() { }
-        public GraphQL.Instrumentation.Metrics SetOperationName(string? name) { }
+        public GraphQL.Instrumentation.Metrics SetOperationName(GraphQLParser.ROM name) { }
         public GraphQL.Instrumentation.Metrics Start(string? operationName) { }
         public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
         public readonly struct Marker : System.IDisposable
@@ -2054,8 +2054,8 @@ namespace GraphQL.Types
         protected SchemaTypes() { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public int Count { get; }
-        protected virtual System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> Dictionary { get; }
-        public GraphQL.Types.IGraphType? this[string typeName] { get; }
+        protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
+        public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
         protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }

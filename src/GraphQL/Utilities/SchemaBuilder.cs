@@ -164,7 +164,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {
-                    var typeName = (string)operationTypeDef.Type!.Name; //TODO:!!!alloc
+                    var typeName = (string)operationTypeDef.Type!.Name; //TODO:alloc
                     var type = GetType(typeName) as IObjectGraphType;
 
                     switch (operationTypeDef.Operation)
@@ -240,7 +240,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
-            var name = (string)astType.Name; //TODO:!!!!alloc
+            var name = (string)astType.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -270,7 +270,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (astType.Interfaces != null)
             {
                 foreach (var i in astType.Interfaces)
-                    type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name)); //TODO:!!!alloc
+                    type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name)); //TODO:alloc
             }
 
             if (isExtensionType)
@@ -334,7 +334,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:!!!!alloc
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:alloc
             InitializeField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -363,7 +363,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:!!!alloc
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:alloc
             InitializeSubscriptionField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -394,7 +394,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)inputDef.Name); //TODO:!!!alloc
+            var fieldConfig = typeConfig.FieldFor((string)inputDef.Name); //TODO:alloc
             InitializeField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -414,7 +414,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
-            var name = (string)interfaceDef.Name; //TODO:!!!alloc
+            var name = (string)interfaceDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -441,7 +441,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
-            var name = (string)unionDef.Name; //TODO:!!!alloc
+            var name = (string)unionDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -461,7 +461,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 foreach (var x in unionDef.Types)
                 {
-                    string n = (string)x.Name; //TODO:!!!alloc
+                    string n = (string)x.Name; //TODO:alloc
                     type.AddPossibleType(((GetType(n) ?? new GraphQLTypeReference(n)) as IObjectGraphType)!);
                 }
             }
@@ -471,7 +471,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
-            var name = (string)inputDef.Name; //TODO:!!!alloc
+            var name = (string)inputDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -497,7 +497,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
-            var name = (string)enumDef.Name; //TODO:!!!alloc
+            var name = (string)enumDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -521,7 +521,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var result = new DirectiveGraphType((string)directiveDef.Name) //TODO:!!!alloc
+            var result = new DirectiveGraphType((string)directiveDef.Name) //TODO:alloc
             {
                 Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Value.ToString(),
                 Repeatable = directiveDef.Repeatable,
@@ -541,7 +541,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type enumType)
         {
-            var name = (string)valDef.Name; //TODO:!!!alloc
+            var name = (string)valDef.Name; //TODO:alloc
             return new EnumValueDefinition
             {
                 Value = enumType == null ? name : Enum.Parse(enumType, name, true),
@@ -585,7 +585,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 case ASTNodeKind.NamedType:
                 {
                     var namedType = (GraphQLNamedType)astType;
-                    var name = (string)namedType.Name; //TODO:!!!alloc
+                    var name = (string)namedType.Name; //TODO:alloc
                     var type = GetType(name);
                     return type ?? new GraphQLTypeReference(name);
                 }
@@ -598,12 +598,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         //TODO: add support for directive arguments
         private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition>? arguments)
         {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name), a))); //TODO:!!!alloc
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name), a))); //TODO:alloc
         }
 
         private QueryArguments ToQueryArguments(FieldConfig fieldConfig, List<GraphQLInputValueDefinition>? arguments)
         {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:!!!alloc
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:alloc
         }
     }
 
@@ -682,7 +682,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 if (obj!.Fields != null)
                 {
                     foreach (var f in obj.Fields)
-                        values[(string)f.Name] = ToValue(f.Value!); //TODO:!!!alloc
+                        values[(string)f.Name] = ToValue(f.Value!); //TODO:alloc
                 }
 
                 return values;
@@ -701,11 +701,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 null => null,
                 GraphQLNullValue _ => null,
-                GraphQLStringValue str => (string)str.Value, //TODO:!!!alloc
+                GraphQLStringValue str => (string)str.Value, //TODO:alloc
                 GraphQLIntValue str => FromInt(str),
                 GraphQLFloatValue str => FromFloat(str),
                 GraphQLBooleanValue str => (str.Value.Length == 4).Boxed(), /*true.Length=4*/
-                GraphQLEnumValue str => (string)str.Name, //TODO:!!!alloc
+                GraphQLEnumValue str => (string)str.Name, //TODO:alloc
                 GraphQLObjectValue obj => FromObject(obj),
                 GraphQLListValue list => FromList(list),
                 _ => throw new InvalidOperationException($"Unsupported value type {source.Kind}"),
