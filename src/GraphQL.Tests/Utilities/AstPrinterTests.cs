@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using GraphQL.Execution;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
