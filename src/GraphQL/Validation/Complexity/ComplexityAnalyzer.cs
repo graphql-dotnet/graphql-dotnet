@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GraphQLParser.AST;
@@ -11,28 +10,6 @@ namespace GraphQL.Validation.Complexity
     /// </summary>
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
-        private sealed class FragmentComplexity
-        {
-            public int Depth { get; set; }
-            public double Complexity { get; set; }
-        }
-
-        private sealed class AnalysisContext
-        {
-            public ComplexityResult Result { get; } = new ComplexityResult();
-            public int LoopCounter { get; set; }
-            public int MaxRecursionCount { get; set; }
-            public Dictionary<string, FragmentComplexity> FragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
-
-            public void AssertRecursion()
-            {
-                if (LoopCounter++ > MaxRecursionCount)
-                {
-                    throw new InvalidOperationException("Query is too complex to validate.");
-                }
-            }
-        }
-
         /// <inheritdoc/>
         public void Validate(GraphQLDocument document, ComplexityConfiguration complexityParameters)
         {
@@ -73,108 +50,23 @@ namespace GraphQL.Validation.Complexity
             if (avgImpact <= 1)
                 throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
-            var context = new AnalysisContext { MaxRecursionCount = maxRecursionCount };
+            var context = new AnalysisContext
+            {
+                MaxRecursionCount = maxRecursionCount,
+                AvgImpact = avgImpact,
+                CurrentSubSelectionImpact = avgImpact,
+                CurrentEndNodeImpact = 1d
+            };
+            var fragmentComplexityBuilder = new ComplexityVisitor();
 
-            //TODO:!!!!!
-            //foreach (var node in doc.Children.OfType<FragmentDefinition>())
-            //{
-            //    var fragResult = new FragmentComplexity();
-            //    FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);
-            //    context.FragmentMap[node.Name] = fragResult;
-            //}
+            foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>())
+                fragmentComplexityBuilder.Visit(frag, context).GetAwaiter().GetResult();
 
-            TreeIterator(context, doc, avgImpact, avgImpact, 1d);
+            context.FragmentMapAlreadyBuilt = true;
+
+            fragmentComplexityBuilder.Visit(doc, context).GetAwaiter().GetResult();
 
             return context.Result;
-        }
-
-        private void FragmentIterator(AnalysisContext context, ASTNode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
-        {
-            context.AssertRecursion();
-
-            //TODO:!!!!
-            //if (node.Children != null &&
-            //    node.Children.Any(
-            //        n => n is Field || (n is SelectionSet set && set.Children.Any()) || n is Operation))
-            //{
-            //    if (node is Field)
-            //    {
-            //        qDepthComplexity.Depth++;
-            //        var impactFromArgs = GetImpactFromArgs(node);
-            //        qDepthComplexity.Complexity += currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact;
-            //        foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-            //            FragmentIterator(context, nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
-            //    }
-            //    else
-            //        foreach (var nodeChild in node.Children)
-            //            FragmentIterator(context, nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
-            //}
-            //else if (node is Field)
-            //    qDepthComplexity.Complexity += currentEndNodeImpact;
-        }
-
-        private void TreeIterator(AnalysisContext context, ASTNode node, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
-        {
-            context.AssertRecursion();
-
-            if (node is GraphQLFragmentDefinition)
-                return;
-
-            //TODO:!!!!!!
-            //if (node.Children != null &&
-            //    node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet set && set.Children.Any()) || n is Operation))
-            //{
-            //    if (node is Field)
-            //    {
-            //        context.Result.TotalQueryDepth++;
-            //        var impactFromArgs = GetImpactFromArgs(node);
-            //        RecordFieldComplexity(context, node, currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact);
-            //        foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-            //            TreeIterator(context, nodeChild, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
-            //    }
-            //    else
-            //        foreach (var nodeChild in node.Children)
-            //            TreeIterator(context, nodeChild, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
-            //}
-            //else if (node is Field)
-            //    RecordFieldComplexity(context, node, currentEndNodeImpact);
-            //else if (node is FragmentSpread spread)
-            //{
-            //    var fragmentComplexity = context.FragmentMap[spread.Name];
-            //    RecordFieldComplexity(context, spread, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
-            //    context.Result.TotalQueryDepth += fragmentComplexity.Depth;
-            //}
-        }
-
-        private static double? GetImpactFromArgs(ASTNode node)
-        {
-            double? newImpact = null;
-            //TODO:!!!!!!
-            //if (!(node.Children.FirstOrDefault(n => n is Arguments) is Arguments args))
-            //    return null;
-
-            //if (args.ValueFor("id") != null)
-            //    newImpact = 1;
-            //else
-            //{
-            //    if (args.ValueFor("first") is IntValue firstValue)
-            //        newImpact = firstValue.ClrValue;
-            //    else
-            //    {
-            //        if (args.ValueFor("last") is IntValue lastValue)
-            //            newImpact = lastValue.ClrValue;
-            //    }
-            //}
-            return newImpact;
-        }
-
-        private static void RecordFieldComplexity(AnalysisContext context, ASTNode node, double impact)
-        {
-            context.Result.Complexity += impact;
-            if (context.Result.ComplexityMap.ContainsKey(node))
-                context.Result.ComplexityMap[node] += impact;
-            else
-                context.Result.ComplexityMap.Add(node, impact);
         }
     }
 }
