@@ -43,7 +43,7 @@ namespace GraphQL.Tests
         {
             if (value is IEnumerable<KeyValuePair<string, object>> dict)
             {
-                return new ObjectExecutionNode(null, null, new GraphQLField{ Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
+                return new ObjectExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
                 {
                     SubFields = dict.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray(),
                 };
