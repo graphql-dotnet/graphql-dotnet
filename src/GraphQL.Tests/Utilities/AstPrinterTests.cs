@@ -116,12 +116,16 @@ namespace GraphQL.Tests.Utilities
             new object[] { new GraphQLFloatValue(0.00000001256), "1.256E-08" },
             new object[] { new GraphQLFloatValue(12.56), "12.56" },
             new object[] { new GraphQLFloatValue(3.33), "3.33" },
-            new object[] { new GraphQLFloatValue(1.0), "1" },
-            new object[] { new GraphQLFloatValue((double)34), "34" }, //TODO: ????
-            new object[] { new GraphQLFloatValue(1.0000m), "1.0000" }, //TODO: ???
+            new object[] { new GraphQLFloatValue(1.0), "1" }, // double
+            new object[] { new GraphQLFloatValue((float)1.0), "1" },
+            new object[] { new GraphQLFloatValue((float)34), "34" },
+            new object[] { new GraphQLFloatValue(1.0000m), "1.0000" },
+            new object[] { new GraphQLFloatValue(1.0m), "1.0" },
+            new object[] { new GraphQLFloatValue(1m), "1" },
             new object[] { new GraphQLFloatValue(decimal.MinValue), "-79228162514264337593543950335"},
             new object[] { new GraphQLFloatValue(decimal.MaxValue), "79228162514264337593543950335"},
-            new object[] { new GraphQLFloatValue(0.00000000000000001m), "0.00000000000000001"}, //TODO: ????
+            new object[] { new GraphQLFloatValue(0.00000000000000001), "1E-17"}, // double: G15 format
+            new object[] { new GraphQLFloatValue(0.00000000000000001m), "0.00000000000000001"}, // decimal
             new object[] { new GraphQLBooleanValue(false), "false"},
             new object[] { new GraphQLBooleanValue(true), "true"},
             new object[] { new GraphQLEnumValue { Name = new GraphQLName("TEST") }, "TEST"},
