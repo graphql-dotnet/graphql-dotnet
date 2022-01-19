@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Validation.Complexity
+namespace GraphQL.Validation.Complexity
 {
     internal sealed class FragmentComplexity
     {
