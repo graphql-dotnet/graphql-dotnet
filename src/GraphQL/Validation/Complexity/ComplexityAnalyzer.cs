@@ -57,14 +57,14 @@ namespace GraphQL.Validation.Complexity
                 CurrentSubSelectionImpact = avgImpact,
                 CurrentEndNodeImpact = 1d
             };
-            var fragmentComplexityBuilder = new ComplexityVisitor();
+            var visitor = new ComplexityVisitor();
 
             foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>())
-                fragmentComplexityBuilder.Visit(frag, context).GetAwaiter().GetResult();
+                visitor.Visit(frag, context).GetAwaiter().GetResult();
 
             context.FragmentMapAlreadyBuilt = true;
 
-            fragmentComplexityBuilder.Visit(doc, context).GetAwaiter().GetResult();
+            visitor.Visit(doc, context).GetAwaiter().GetResult();
 
             return context.Result;
         }

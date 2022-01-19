@@ -19,7 +19,7 @@ namespace GraphQL.Types
         {
             GraphQLNonNullType nonnull => NamedGraphTypeFromType(nonnull.Type, schema),
             GraphQLListType list => NamedGraphTypeFromType(list.Type, schema),
-            GraphQLNamedType named => schema.AllTypes[(string)named.Name], //TODO:!!!! alloc
+            GraphQLNamedType named => schema.AllTypes[named.Name],
             _ => null
         };
 
@@ -48,7 +48,7 @@ namespace GraphQL.Types
             }
 
             return type is GraphQLNamedType named
-                ? schema.AllTypes[(string)named.Name] //TODO:!!!! alloc
+                ? schema.AllTypes[named.Name]
                 : null;
         }
 

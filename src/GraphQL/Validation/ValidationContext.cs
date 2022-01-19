@@ -221,7 +221,7 @@ namespace GraphQL.Validation
             {
                 foreach (var variableDef in variableDefinitions.Items)
                 {
-                    var variableDefName = (string)variableDef.Variable.Name; //TODO:!!!!alloc
+                    var variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(Schema);
 

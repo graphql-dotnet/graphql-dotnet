@@ -133,7 +133,7 @@ namespace GraphQL
                 }
 
                 var operation = GetOperation(options.OperationName, document);
-                metrics.SetOperationName((string)operation?.Name); //TODO:!!!!alloc
+                metrics.SetOperationName(operation?.Name);
 
                 if (operation == null)
                 {

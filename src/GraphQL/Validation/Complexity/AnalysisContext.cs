@@ -36,7 +36,7 @@ namespace GraphQL.Validation.Complexity
             }
         }
 
-        public static double? GetImpactFromArgs(GraphQLField node)
+        public static double? GetImpactFromArgs(GraphQLField node) //TODO: variables support
         {
             double? newImpact = null;
 
@@ -63,6 +63,17 @@ namespace GraphQL.Validation.Complexity
             return newImpact;
         }
 
+        /// <summary>
+        /// Takes into account the complexity of the specified node.
+        /// <br/>
+        /// Available nodes:
+        /// <list type="number">
+        /// <item><see cref="GraphQLField"/></item>
+        /// <item><see cref="GraphQLFragmentSpread"/></item>
+        /// </list>
+        /// </summary>
+        /// <param name="node">The node for which the complexity is added.</param>
+        /// <param name="impact">Added complexity.</param>
         public void RecordFieldComplexity(ASTNode node, double impact)
         {
             Result.Complexity += impact;

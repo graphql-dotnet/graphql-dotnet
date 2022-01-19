@@ -4,6 +4,11 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity
 {
+    /// <summary>
+    /// Two-phase complexity visitor. See <see cref="ComplexityAnalyzer.Analyze(GraphQLDocument, double, int)"/>.
+    /// Phase 1. Calculate complexity of all fragments defined in GraphQL document; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is false.
+    /// Phase 2. Calculate complexity of executed operation; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is true.
+    /// </summary>
     internal class ComplexityVisitor : DefaultNodeVisitor<AnalysisContext>
     {
         public override async ValueTask VisitFragmentDefinition(GraphQLFragmentDefinition fragmentDefinition, AnalysisContext context)

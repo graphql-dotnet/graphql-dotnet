@@ -141,14 +141,14 @@ namespace GraphQL.Validation
 
             if (node is GraphQLFragmentDefinition def1)
             {
-                var type = _schema.AllTypes[(string)def1.TypeCondition.Type.Name]; //TODO:!!!!! allocation
+                var type = _schema.AllTypes[def1.TypeCondition.Type.Name];
                 _typeStack.Push(type);
                 return;
             }
 
             if (node is GraphQLInlineFragment def)
             {
-                var type = def.TypeCondition != null ? _schema.AllTypes[(string)def.TypeCondition.Type.Name] : GetLastType(); //TODO:!!!alloc
+                var type = def.TypeCondition != null ? _schema.AllTypes[def.TypeCondition.Type.Name] : GetLastType();
                 _typeStack.Push(type);
                 return;
             }
