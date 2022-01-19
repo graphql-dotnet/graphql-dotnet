@@ -18,6 +18,10 @@ namespace GraphQL.Tests
             _ => x
         };
 
-        public int GetHashCode([DisallowNull] object obj) => throw new NotImplementedException();
+        public int GetHashCode(
+#if NET6_0_OR_GREATER
+            [DisallowNull]
+#endif
+        object obj) => throw new NotImplementedException();
     }
 }
