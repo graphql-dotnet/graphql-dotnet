@@ -1,8 +1,5 @@
-using System;
 using System.Threading.Tasks;
-using GraphQL.Language;
 using GraphQL.Types;
-using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 

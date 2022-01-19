@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Utilities;
