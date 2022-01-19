@@ -21,7 +21,6 @@ namespace GraphQL.Utilities
         {
             var context = new PrintContext();
             _writer.Visit(node, context).GetAwaiter().GetResult(); // actually is sync
-            //TODO: https://github.com/graphql-dotnet/parser/issues/155
             return context.Writer.ToString()!;
         }
 

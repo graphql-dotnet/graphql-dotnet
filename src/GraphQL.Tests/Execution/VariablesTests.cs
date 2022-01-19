@@ -64,7 +64,7 @@ namespace GraphQL.Tests.Execution
             => value is string stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue) : null;
 
         public override object ParseLiteral(GraphQLValue value)
-            => value is GraphQLStringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>((string)stringValue.Value) : null;
+            => value is GraphQLStringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>((string)stringValue.Value) : null; // string conversion for NET48
     }
 
     public class TestJsonScalarObject

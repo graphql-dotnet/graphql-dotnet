@@ -161,16 +161,16 @@ namespace GraphQL.Tests.Types
                         var span = vector3InputROM.Span;
 
                         var i = span.IndexOf(',');
-                        var x = float.Parse(vector3InputROM.Slice(0, i));
+                        var x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                         span = span.Slice(i + 1);
 
                         i = span.IndexOf(',');
-                        var y = float.Parse(span.Slice(0, i));
+                        var y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                         span = span.Slice(i + 1);
 
-                        var z = float.Parse(span.Slice(0, i));
+                        var z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
                         return new Vector3(x, y, z);
                     }
                     catch

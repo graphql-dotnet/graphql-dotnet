@@ -130,7 +130,7 @@ namespace GraphQL.Tests.Bugs
         {
             return value switch
             {
-                GraphQLStringValue s => Convert.FromBase64String((string)s.Value),
+                GraphQLStringValue s => Convert.FromBase64String((string)s.Value), // string conversion for NET48
                 _ => throw new NotSupportedException()
             };
         }

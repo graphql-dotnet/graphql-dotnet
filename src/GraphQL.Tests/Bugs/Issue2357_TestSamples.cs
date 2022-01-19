@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Bugs
 
             public override object ParseLiteral(GraphQLValue value) => value switch
             {
-                GraphQLStringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
+                GraphQLStringValue s => int.TryParse((string)s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."), // string conversion for NET48
                 GraphQLNullValue _ => 0,
                 _ => ThrowLiteralConversionError(value)
             };
