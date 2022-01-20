@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -12,8 +13,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => Double.Parse(x.Value),
-            GraphQLFloatValue x => Double.Parse(x.Value),
+            GraphQLIntValue x => AssertValid(Double.Parse(x.Value)),
+            GraphQLFloatValue x => AssertValid(Double.Parse(x.Value)),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -21,11 +22,19 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => Double.TryParse(x.Value, out var _),
-            GraphQLFloatValue x => Double.TryParse(x.Value, out var _),
+            GraphQLIntValue x => Double.TryParse(x.Value, out double v) && IsValid(v),
+            GraphQLFloatValue x => Double.TryParse(x.Value, out double v) && IsValid(v),
             GraphQLNullValue _ => true,
             _ => false
         };
+
+        private static double AssertValid(double d)
+            => IsValid(d)
+                ? d
+                : throw new OverflowException("Value was either too large or too small for a Double.");
+
+        private static bool IsValid(double d)
+            => !double.IsNegativeInfinity(d) && !double.IsPositiveInfinity(d) && !double.IsNaN(d);
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch
