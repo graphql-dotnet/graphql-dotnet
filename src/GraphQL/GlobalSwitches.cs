@@ -48,7 +48,7 @@ namespace GraphQL
         /// parser cannot parse incoming queries with invalid characters in the names, so the resulting
         /// member would become unusable.
         /// </summary>
-        public static Action<ROM, NamedElement> NameValidation = NameValidator.ValidateDefault;
+        public static Action<string, NamedElement> NameValidation = NameValidator.ValidateDefault;
 
         /// <summary>
         /// Specifies whether to use the names of parent (declaring) types in case of nested graph types

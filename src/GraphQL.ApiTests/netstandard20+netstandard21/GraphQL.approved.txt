@@ -165,7 +165,7 @@ namespace GraphQL
     }
     public static class GlobalSwitches
     {
-        public static System.Action<GraphQLParser.ROM, GraphQL.Utilities.NamedElement> NameValidation;
+        public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -2271,8 +2271,8 @@ namespace GraphQL.Utilities
     }
     public static class NameValidator
     {
-        public static void ValidateDefault(GraphQLParser.ROM name, GraphQL.Utilities.NamedElement type) { }
-        public static void ValidateName(GraphQLParser.ROM name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateDefault(string name, GraphQL.Utilities.NamedElement type) { }
+        public static void ValidateName(string name, GraphQL.Utilities.NamedElement type) { }
     }
     public enum NamedElement
     {
