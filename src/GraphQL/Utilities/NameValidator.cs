@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 
 namespace GraphQL.Utilities
 {
