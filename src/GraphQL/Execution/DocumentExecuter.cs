@@ -299,7 +299,7 @@ namespace GraphQL
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
         protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
-            => document.OperationWithName(operationName ?? ROM.Empty);
+            => document.OperationWithName(operationName);
 
         /// <summary>
         /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
