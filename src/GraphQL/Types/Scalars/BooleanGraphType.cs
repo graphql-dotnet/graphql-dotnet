@@ -33,8 +33,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override GraphQLValue? ToAST(object? value) => value switch
         {
-            bool b => new GraphQLBooleanValue(b),
-            null => new GraphQLNullValue(),
+            bool b => new GraphQLBooleanValue(b), //TODO: cache?
+            null => new GraphQLNullValue(), //TODO: cache? see GraphQLExtensions._null
             _ => ThrowASTConversionError(value)
         };
     }

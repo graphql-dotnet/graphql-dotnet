@@ -154,7 +154,7 @@ namespace GraphQL.Types
             var serialized = Serialize(value);
             return serialized switch
             {
-                bool b => new GraphQLBooleanValue(b),
+                bool b => new GraphQLBooleanValue(b), //TODO: cache?
                 byte b => new GraphQLIntValue(b),
                 sbyte sb => new GraphQLIntValue(sb),
                 short s => new GraphQLIntValue(s),
@@ -168,7 +168,7 @@ namespace GraphQL.Types
                 float f => new GraphQLFloatValue(f),
                 double d => new GraphQLFloatValue(d),
                 string s => new GraphQLStringValue(s),
-                null => new GraphQLNullValue(),
+                null => new GraphQLNullValue(), //TODO: cache? see GraphQLExtensions._null
                 _ => throw new NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
             };
         }
