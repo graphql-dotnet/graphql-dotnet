@@ -82,6 +82,13 @@ a list or array of a single item. For example, `{"query":"{ hero }"}` deserializ
 serializing objects to and from `string` values. For the `GraphQL.SystemTextJson`
 and `GraphQL.NewtonsoftJson` libraries, these serialize and deserialize to JSON strings.
 
+### 6. More strict behavior of FloatGraphType for special values
+
+This is a spec-compliance issue (bug fix), the spec says that:
+
+> Non-finite floating-point internal values (NaN and Infinity) cannot be
+> coerced to Float and must raise a field error.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate

@@ -13,8 +13,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => AssertValid(Double.Parse(x.Value)),
-            GraphQLFloatValue x => AssertValid(Double.Parse(x.Value)),
+            GraphQLIntValue x => Parse(value, x.Value),
+            GraphQLFloatValue x => Parse(value, x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -22,19 +22,24 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => Double.TryParse(x.Value, out double v) && IsValid(v),
-            GraphQLFloatValue x => Double.TryParse(x.Value, out double v) && IsValid(v),
+            GraphQLIntValue x => TryParse(x.Value),
+            GraphQLFloatValue x => TryParse(x.Value),
             GraphQLNullValue _ => true,
             _ => false
         };
 
-        private static double AssertValid(double d)
-            => IsValid(d)
-                ? d
-                : throw new OverflowException("Value was either too large or too small for a Double.");
+        // IsNaN checks not really necessary because text from parser cannot represent NaN
 
-        private static bool IsValid(double d)
-            => !double.IsNegativeInfinity(d) && !double.IsPositiveInfinity(d) && !double.IsNaN(d);
+        private double Parse(GraphQLValue value, ReadOnlySpan<char> chars)
+        {
+            var number = Double.Parse(chars);
+            if (/* double.IsNaN(number) || */ double.IsInfinity(number))
+                ThrowLiteralConversionError(value);
+            return number;
+        }
+
+        private bool TryParse(ReadOnlySpan<char> chars)
+            => Double.TryParse(chars, out var number) /* && !double.IsNaN(number) */ && !double.IsInfinity(number);
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch

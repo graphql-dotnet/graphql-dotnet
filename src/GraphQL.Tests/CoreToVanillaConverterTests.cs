@@ -24,8 +24,8 @@ namespace GraphQL.Tests.Bugs
             type.CanParseLiteral(value1).ShouldBeFalse();
             type.CanParseLiteral(value2).ShouldBeFalse();
 
-            Should.Throw<OverflowException>(() => type.ParseLiteral(value1));
-            Should.Throw<OverflowException>(() => type.ParseLiteral(value2));
+            Should.Throw<InvalidOperationException>(() => type.ParseLiteral(value1)).Message.ShouldBe("Unable to convert '1797693134862320000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.0' literal from AST representation to the scalar type 'Float'");
+            Should.Throw<InvalidOperationException>(() => type.ParseLiteral(value2)).Message.ShouldBe("Unable to convert '-1797693134862320000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.0' literal from AST representation to the scalar type 'Float'");
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Bugs
             valid.Data.ShouldBeNull();
             valid.Errors.ShouldNotBeNull();
             valid.Errors.Count.ShouldBe(1);
-            valid.Errors[0].Message.ShouldStartWith("Argument 'arg' has invalid value. Expected type 'Float', found");
+            valid.Errors[0].Message.ShouldBe($"Argument 'arg' has invalid value. Expected type 'Float', found {double.MaxValue:0}0.0.");
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace GraphQL.Tests.Bugs
             valid.Data.ShouldBeNull();
             valid.Errors.ShouldNotBeNull();
             valid.Errors.Count.ShouldBe(1);
-            valid.Errors[0].Message.ShouldStartWith("Argument 'arg' has invalid value. Expected type 'Float', found");
+            valid.Errors[0].Message.ShouldBe($"Argument 'arg' has invalid value. Expected type 'Float', found {double.MinValue:0}0.0.");
         }
     }
 

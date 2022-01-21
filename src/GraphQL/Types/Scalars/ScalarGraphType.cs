@@ -188,7 +188,8 @@ namespace GraphQL.Types
         /// </summary>
         protected object ThrowLiteralConversionError(GraphQLValue input)
         {
-            throw new InvalidOperationException($"Unable to convert '{input}' literal from AST representation to the scalar type '{Name}'");
+            var value = input is IHasValueNode node ? node.Value.ToString() : input?.ToString();
+            throw new InvalidOperationException($"Unable to convert '{value}' literal from AST representation to the scalar type '{Name}'");
         }
 
         /// <summary>
