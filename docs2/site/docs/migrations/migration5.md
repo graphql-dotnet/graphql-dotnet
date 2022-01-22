@@ -84,7 +84,7 @@ and `GraphQL.NewtonsoftJson` libraries, these serialize and deserialize to JSON 
 
 ### 6. `AutoRegisteringObjectGraphType` and `AutoRegisteringInputObjectGraphType` enhancements
 
-#### Overridiable base functionality
+#### Overridable base functionality
 
 The classes can be overridden, providing the ability to customize behavior of automatically
 generated graph types. For instance, to exclude properties marked with a custom attribute
@@ -112,7 +112,7 @@ If you utilize dependency injection within your schema, you can register your cu
 type over top of the usual one as follows:
 
 ```cs
-services.Register(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
+services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
 ```
 
 Then any graph types defined as `AutoRegisteringObjectGraphType<...>` will use your custom
