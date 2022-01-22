@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -33,6 +34,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
         /// </summary>
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
+            => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite);
     }
 }
