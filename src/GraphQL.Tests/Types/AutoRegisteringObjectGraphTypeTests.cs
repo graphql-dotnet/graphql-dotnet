@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Types
             public int Field1 { get; set; }
             public int Field2 { get; }
             public int Field3 { set { } }
-            public int Field5() => 0;
+            public int Field4() => 0;
         }
     }
 }
