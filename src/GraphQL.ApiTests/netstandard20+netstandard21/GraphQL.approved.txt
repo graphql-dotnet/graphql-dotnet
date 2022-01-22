@@ -1822,12 +1822,16 @@ namespace GraphQL.Types
     {
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        protected virtual GraphQL.Types.FieldType? CreateFieldType(System.Reflection.PropertyInfo propertyInfo) { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> CreateFieldTypeList() { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
         public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        protected virtual GraphQL.Types.FieldType? CreateFieldType(System.Reflection.PropertyInfo propertyInfo) { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> CreateFieldTypeList() { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
