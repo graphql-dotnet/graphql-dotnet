@@ -201,7 +201,7 @@ namespace GraphQL.Validation.Rules
                     {
                         Reason = new ConflictReason
                         {
-                            Name = responseName,
+                            Name = (string)responseName, //ISSUE:allocation
                             Message = new Message
                             {
                                 Msg = $"{name1} and {name2} are different fields"
@@ -219,7 +219,7 @@ namespace GraphQL.Validation.Rules
                     {
                         Reason = new ConflictReason
                         {
-                            Name = responseName,
+                            Name = (string)responseName, //ISSUE:allocation
                             Message = new Message
                             {
                                 Msg = "they have differing arguments"
@@ -237,7 +237,7 @@ namespace GraphQL.Validation.Rules
                 {
                     Reason = new ConflictReason
                     {
-                        Name = responseName,
+                        Name = (string)responseName, //ISSUE:allocation
                         Message = new Message
                         {
                             Msg = $"they return conflicting types {type1} and {type2}"
@@ -771,7 +771,7 @@ namespace GraphQL.Validation.Rules
                 {
                     Reason = new ConflictReason
                     {
-                        Name = responseName,
+                        Name = (string)responseName, //ISSUE:allocation
                         Message = new Message
                         {
                             Msgs = conflicts.Select(c => c.Reason).ToList()
@@ -822,7 +822,7 @@ namespace GraphQL.Validation.Rules
             /// <summary>
             /// The name of the field in conflict.
             /// </summary>
-            public ROM Name { get; set; }
+            public string Name { get; set; }
 
             /// <summary>
             /// Returns a message descriptor describing the conflict.

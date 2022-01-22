@@ -98,15 +98,15 @@ namespace GraphQL.Tests.Extensions
 
             public IEnumerator<object[]> GetEnumerator()
             {
-                yield return new object[] { new BooleanGraphType(), true, new GraphQLBooleanValue(true) };
-                yield return new object[] { new BooleanGraphType(), false, new GraphQLBooleanValue(false) };
+                yield return new object[] { new BooleanGraphType(), true, new GraphQLTrueBooleanValue() };
+                yield return new object[] { new BooleanGraphType(), false, new GraphQLFalseBooleanValue() };
                 yield return new object[] { new BooleanGraphType(), null, new GraphQLNullValue() };
 
-                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), false, new GraphQLBooleanValue(false) };
+                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), false, new GraphQLFalseBooleanValue() };
 
                 yield return new object[] { new ListGraphType(new BooleanGraphType()), null, new GraphQLNullValue() };
-                yield return new object[] { new ListGraphType(new BooleanGraphType()), new object[] { true, false, null }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLBooleanValue(true), new GraphQLBooleanValue(false), new GraphQLNullValue() } } };
-                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, true }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLBooleanValue(true), new GraphQLBooleanValue(false), new GraphQLBooleanValue(true) } } };
+                yield return new object[] { new ListGraphType(new BooleanGraphType()), new object[] { true, false, null }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue() } } };
+                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, true }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue() } } };
 
                 yield return new object[] { new InputObjectGraphType<Person>(), null, new GraphQLNullValue() };
                 yield return new object[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new GraphQLObjectValue
@@ -119,7 +119,7 @@ namespace GraphQL.Tests.Extensions
                 }
                 };
 
-                yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLBooleanValue(true) };
+                yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue() };
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

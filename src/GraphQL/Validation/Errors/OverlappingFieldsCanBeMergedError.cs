@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Errors
         {
         }
 
-        internal static string FieldsConflictMessage(ROM responseName, ConflictReason reason) =>
+        internal static string FieldsConflictMessage(string responseName, ConflictReason reason) =>
             $"Fields {responseName} conflicts because {ReasonMessage(reason.Message)}. " +
             "Use different aliases on the fields to fetch both if this was intentional.";
 

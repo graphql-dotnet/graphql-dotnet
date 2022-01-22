@@ -154,7 +154,7 @@ namespace GraphQL.Types
             var serialized = Serialize(value);
             return serialized switch
             {
-                bool b => new GraphQLBooleanValue(b), //TODO: cache?
+                bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(), //TODO: cache?
                 byte b => new GraphQLIntValue(b),
                 sbyte sb => new GraphQLIntValue(sb),
                 short s => new GraphQLIntValue(s),

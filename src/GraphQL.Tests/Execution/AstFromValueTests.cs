@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = new BooleanGraphType().ToAST(true);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<GraphQLBooleanValue>().Value.ShouldBe("true");
+            result.ShouldBeAssignableTo<GraphQLBooleanValue>().Value.ShouldBe("true");
         }
 
         [Fact]

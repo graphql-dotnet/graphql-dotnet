@@ -2938,7 +2938,7 @@ namespace GraphQL.Validation.Rules
         {
             public ConflictReason() { }
             public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Message Message { get; set; }
-            public GraphQLParser.ROM Name { get; set; }
+            public string Name { get; set; }
         }
         public class Message
         {

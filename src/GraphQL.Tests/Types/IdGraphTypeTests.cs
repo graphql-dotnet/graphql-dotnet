@@ -83,7 +83,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void boolean_literal_throws()
         {
-            Should.Throw<InvalidOperationException>(() => _type.ParseLiteral(new GraphQLBooleanValue(true)));
+            Should.Throw<InvalidOperationException>(() => _type.ParseLiteral(new GraphQLTrueBooleanValue()));
         }
 
         [Fact]

@@ -126,8 +126,8 @@ namespace GraphQL.Tests.Utilities
             new object[] { new GraphQLFloatValue(decimal.MaxValue), "79228162514264337593543950335"},
             new object[] { new GraphQLFloatValue(0.00000000000000001), "1E-17"}, // double: G15 format
             new object[] { new GraphQLFloatValue(0.00000000000000001m), "0.00000000000000001"}, // decimal
-            new object[] { new GraphQLBooleanValue(false), "false"},
-            new object[] { new GraphQLBooleanValue(true), "true"},
+            new object[] { new GraphQLFalseBooleanValue(), "false"},
+            new object[] { new GraphQLTrueBooleanValue(), "true"},
             new object[] { new GraphQLEnumValue { Name = new GraphQLName("TEST") }, "TEST"},
         };
     }

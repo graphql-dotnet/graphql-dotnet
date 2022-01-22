@@ -533,7 +533,7 @@ namespace GraphQL.Tests.Types
             {
                 int i => new GraphQLIntValue(i),
                 long l => new GraphQLIntValue(l),
-                bool b => new GraphQLBooleanValue(b),
+                bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
                 double f => new GraphQLFloatValue(f),
                 string s => new GraphQLStringValue(s),
                 _ => null
@@ -631,7 +631,7 @@ namespace GraphQL.Tests.Types
             {
                 int i => new GraphQLIntValue(i),
                 long l => new GraphQLIntValue(l),
-                bool b => new GraphQLBooleanValue(b),
+                bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
                 double d => new GraphQLFloatValue(d),
                 string s => new GraphQLStringValue(s),
                 _ => null
