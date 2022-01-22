@@ -32,7 +32,16 @@ namespace GraphQL.Types
 
         private double Parse(GraphQLValue value, ReadOnlySpan<char> chars)
         {
-            var number = Double.Parse(chars);
+            double number = 0;
+            try
+            {
+                number = Double.Parse(chars);
+            }
+            catch (OverflowException ex) // .NET Framework throws instead of returning  +/- Infinity
+            {
+                ThrowLiteralConversionError(value, ex.Message);
+            }
+
             if (/* double.IsNaN(number) || */ double.IsInfinity(number))
                 ThrowLiteralConversionError(value);
             return number;

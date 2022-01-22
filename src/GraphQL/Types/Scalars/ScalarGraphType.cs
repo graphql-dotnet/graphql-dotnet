@@ -186,10 +186,12 @@ namespace GraphQL.Types
         /// Throws an exception indicating that an AST scalar node cannot be converted to a value. Typically called by
         /// <see cref="ParseLiteral(GraphQLValue)"/> if the node type is invalid or cannot be parsed.
         /// </summary>
-        protected object ThrowLiteralConversionError(GraphQLValue input)
+        protected object ThrowLiteralConversionError(GraphQLValue input, string? description = null)
         {
             var value = input is IHasValueNode node ? node.Value.ToString() : input?.ToString();
-            throw new InvalidOperationException($"Unable to convert '{value}' literal from AST representation to the scalar type '{Name}'");
+            if (description != null)
+                description = "; " + description;
+            throw new InvalidOperationException($"Unable to convert '{value}' literal from AST representation to the scalar type '{Name}'{description}");
         }
 
         /// <summary>
