@@ -17,6 +17,8 @@ namespace GraphQL.Types
     /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
     {
+        private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
+
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
         /// </summary>
@@ -28,13 +30,16 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         {
-            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
+            _excludedProperties = excludedProperties;
+            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties());
         }
 
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
         /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
-            => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite);
+            => AutoRegisteringHelper.ExcludeProperties(
+                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
+                _excludedProperties);
     }
 }

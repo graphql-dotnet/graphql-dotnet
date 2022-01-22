@@ -10,15 +10,17 @@ namespace GraphQL.Types
 {
     internal static class AutoRegisteringHelper
     {
-        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+        internal static IEnumerable<PropertyInfo> ExcludeProperties<TSourceType>(IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+            => excludedProperties == null || excludedProperties.Length == 0
+                ? properties
+                : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
+
+        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties)
         {
             type.Name = typeof(TSourceType).GraphQLName();
 
             foreach (var propertyInfo in properties)
             {
-                if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
-                    continue;
-
                 type.Field(
                     type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), type is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
                     name: propertyInfo.Name,
