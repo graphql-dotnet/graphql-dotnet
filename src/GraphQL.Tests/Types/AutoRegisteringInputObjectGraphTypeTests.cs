@@ -16,6 +16,16 @@ namespace GraphQL.Tests.Types
             inputType.Fields.Find("Field4").ShouldBeNull();
         }
 
+        [Fact]
+        public void SkipsSpecifiedProperties()
+        {
+            var inputType = new AutoRegisteringInputObjectGraphType<TestClass>(x => x.Field1);
+            inputType.Fields.Find("Field1").ShouldBeNull();
+            inputType.Fields.Find("Field2").ShouldBeNull();
+            inputType.Fields.Find("Field3").ShouldNotBeNull();
+            inputType.Fields.Find("Field4").ShouldBeNull();
+        }
+
         private class TestClass
         {
             public int Field1 { get; set; }
