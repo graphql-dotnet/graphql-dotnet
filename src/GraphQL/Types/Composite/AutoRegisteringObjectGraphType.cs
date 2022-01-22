@@ -33,7 +33,6 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
         /// </summary>
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
-            => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite);
+        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance);
     }
 }
