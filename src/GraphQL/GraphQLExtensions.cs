@@ -478,7 +478,7 @@ namespace GraphQL
         /// <summary>
         /// Returns a string representation of the specified node.
         /// </summary>
-        public static string Print(this ASTNode node)
+        internal static string Print(this ASTNode node)
         {
             var context = new PrintContext();
             _sdlWriter.Visit(node, context).GetAwaiter().GetResult(); // actually is sync
