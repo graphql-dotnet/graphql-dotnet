@@ -22,7 +22,6 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue v when Int.TryParse(v.Value, out int i) => TimeSpan.FromMilliseconds(i),
             GraphQLIntValue v when Long.TryParse(v.Value, out long l) => TimeSpan.FromMilliseconds(l),
             GraphQLIntValue v when BigInt.TryParse(v.Value, out var b) => TimeSpan.FromMilliseconds(checked((double)b)),
             GraphQLNullValue _ => null,
