@@ -631,7 +631,7 @@ namespace GraphQL.Validation.Rules
 
         private static bool SameValue(GraphQLArgument arg1, GraphQLArgument arg2)
         {
-            // normalize values prior to comparison by using AstPrinter.Print rather than INode.ToString(document)
+            // normalize values prior to comparison by using ASTNode.Print
             return arg1.Value is null && arg2.Value is null ||
                 arg1.Value is not null && arg2.Value is not null && arg1.Value.Print() == arg2.Value.Print(); //TODO: change
         }

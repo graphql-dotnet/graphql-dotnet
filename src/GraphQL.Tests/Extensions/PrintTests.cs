@@ -6,9 +6,9 @@ using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.Utilities
+namespace GraphQL.Tests.Extensions
 {
-    public class AstPrinterTests
+    public class PrintTests
     {
         [Fact]
         public void prints_int_value()
