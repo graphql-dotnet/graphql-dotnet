@@ -15,7 +15,7 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
-        internal static FieldType CreateFieldType(PropertyInfo propertyInfo, bool isInputType)
+        internal static FieldType CreateField(PropertyInfo propertyInfo, bool isInputType)
             => new()
             {
                 Name = propertyInfo.Name,

@@ -93,19 +93,19 @@ called `[InternalUse]` you could write this:
 ```csharp
 private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
 {
-    protected override IEnumerable<FieldType> CreateFieldTypeList()
+    protected override IEnumerable<FieldType> ProvideFields()
     {
         var props = GetRegisteredProperties();
         foreach (var prop in props)
         {
             if (prop.IsDefined(typeof(InternalUseAttribute)))
-                yield return CreateFieldType(prop);
+                yield return CreateField(prop);
         }
     }
 }
 ```
 
-Similarly, by overriding `CreateFieldType` you can change the default name, description,
+Similarly, by overriding `CreateField` you can change the default name, description,
 graph type, or other information applied to each generated field.
 
 If you utilize dependency injection within your schema, you can register your custom graph
@@ -115,7 +115,7 @@ type over top of the usual one as follows:
 services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
 ```
 
-Then any graph types defined as `AutoRegisteringObjectGraphType<...>` will use your custom
+Then any graph type defined as `AutoRegisteringObjectGraphType<...>` will use your custom
 type instead.
 
 ## Breaking Changes

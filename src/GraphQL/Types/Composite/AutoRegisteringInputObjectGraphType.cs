@@ -32,7 +32,7 @@ namespace GraphQL.Types
         {
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
-            foreach (var fieldType in CreateFieldTypeList())
+            foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
             }
@@ -42,11 +42,11 @@ namespace GraphQL.Types
         /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
         /// added to the graph type.
         /// </summary>
-        protected virtual IEnumerable<FieldType> CreateFieldTypeList()
+        protected virtual IEnumerable<FieldType> ProvideFields()
         {
             foreach (var propertyInfo in GetRegisteredProperties())
             {
-                var fieldType = CreateFieldType(propertyInfo);
+                var fieldType = CreateField(propertyInfo);
                 if (fieldType != null)
                     yield return fieldType;
             }
@@ -56,8 +56,8 @@ namespace GraphQL.Types
         /// Processes the specified property and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
-        protected virtual FieldType? CreateFieldType(PropertyInfo propertyInfo)
-            => AutoRegisteringHelper.CreateFieldType(propertyInfo, true);
+        protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
+            => AutoRegisteringHelper.CreateField(propertyInfo, true);
 
         /// <summary>
         /// Returns a list of properties that should have fields created for them.

@@ -46,17 +46,17 @@ namespace GraphQL.Tests.Types
 
         private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
         {
-            protected override IEnumerable<FieldType> CreateFieldTypeList()
+            protected override IEnumerable<FieldType> ProvideFields()
             {
-                yield return CreateFieldType(GetRegisteredProperties().First(x => x.Name == "Field1"));
+                yield return CreateField(GetRegisteredProperties().First(x => x.Name == "Field1"));
             }
         }
 
         private class TestChangingName<T> : AutoRegisteringInputObjectGraphType<T>
         {
-            protected override FieldType CreateFieldType(PropertyInfo propertyInfo)
+            protected override FieldType CreateField(PropertyInfo propertyInfo)
             {
-                var field = base.CreateFieldType(propertyInfo);
+                var field = base.CreateField(propertyInfo);
                 field.Name += "Prop";
                 return field;
             }
