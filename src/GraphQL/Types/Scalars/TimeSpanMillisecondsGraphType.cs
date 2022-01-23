@@ -22,8 +22,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
+            // TimeSpan stores the time as a long in ticks - 1/10000 of a millisecond. So the millisecond value must be representable in a long.
             GraphQLIntValue v when Long.TryParse(v.Value, out long l) => TimeSpan.FromMilliseconds(l),
-            GraphQLIntValue v when BigInt.TryParse(v.Value, out var b) => TimeSpan.FromMilliseconds(checked((double)b)),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
