@@ -1958,6 +1958,8 @@ namespace GraphQL.Types
         public virtual bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public virtual bool CanParseValue(object? value) { }
         public virtual bool IsValidDefault(object value) { }
+        protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
+            where TValueNode : GraphQLParser.AST.GraphQLValue, GraphQLParser.AST.IHasValueNode { }
         public virtual object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public abstract object? ParseValue(object? value);
         public virtual object? Serialize(object? value) { }

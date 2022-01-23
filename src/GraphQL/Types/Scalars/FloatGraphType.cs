@@ -13,8 +13,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => Parse(value, x.Value),
-            GraphQLFloatValue x => Parse(value, x.Value),
+            GraphQLIntValue x => ParseDoubleAccordingSpec(x),
+            GraphQLFloatValue x => ParseDoubleAccordingSpec(x),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
@@ -29,24 +29,6 @@ namespace GraphQL.Types
         };
 
         // IsNaN checks not really necessary because text from parser cannot represent NaN
-
-        private double Parse(GraphQLValue value, ReadOnlySpan<char> chars)
-        {
-            double number = 0;
-            try
-            {
-                number = Double.Parse(chars);
-            }
-            catch (OverflowException ex) // .NET Framework throws instead of returning  +/- Infinity
-            {
-                ThrowLiteralConversionError(value, ex.Message);
-            }
-
-            if (/* double.IsNaN(number) || */ double.IsInfinity(number))
-                ThrowLiteralConversionError(value);
-            return number;
-        }
-
         private bool TryParse(ReadOnlySpan<char> chars)
             => Double.TryParse(chars, out var number) /* && !double.IsNaN(number) */ && !double.IsInfinity(number);
 

@@ -51,11 +51,30 @@ namespace GraphQL.Types
         {
             GraphQLBooleanValue b => ParseValue(b.BoolValue.Boxed()),
             GraphQLIntValue i => GraphQLValuesCache.GetInt(i.Value),
-            GraphQLFloatValue f => Double.Parse(f.Value),
+            GraphQLFloatValue f => ParseDoubleAccordingSpec(f),
             GraphQLStringValue s => ParseValue((string)s.Value),
             GraphQLNullValue _ => ParseValue(null),
             _ => ThrowLiteralConversionError(value)
         };
+
+        protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
+            where TValueNode : GraphQLValue, IHasValueNode
+        {
+            double number = 0;
+            try
+            {
+                number = Double.Parse(node.Value);
+            }
+            catch (OverflowException ex) // .NET Framework throws instead of returning  +/- Infinity
+            {
+                ThrowLiteralConversionError(node, ex.Message);
+            }
+
+            // IsNaN checks not really necessary because text from parser cannot represent NaN
+            if (/* double.IsNaN(number) || */ double.IsInfinity(number))
+                ThrowLiteralConversionError(node);
+            return number;
+        }
 
         /// <summary>
         /// Value input coercion. Argument values can not only provided via GraphQL syntax inside a
