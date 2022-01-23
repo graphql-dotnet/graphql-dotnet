@@ -273,3 +273,21 @@ calls are made to the underlying stream. Only `System.Text.Json` supports asynch
 
 - `InputsConverter` renamed to `InputsJsonConverter`
 - `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
+
+### 18. `GraphQLMetadataAttribute` cannot be applied to graph type classes
+
+The `[GraphQLMetadata]` attribute is designed to be used for schema-first configurations
+and has not changed in this regard. For code-first graph definitions, please set the
+GraphQL type name within the constructor.
+
+```csharp
+//[GraphQLMetadata("Person")] //previously supported
+public class HumanType : ObjectGraphType<Human>
+{
+    public HumanType()
+    {
+        Name = "Person"; //correct implementation
+        ...
+    }
+}
+```

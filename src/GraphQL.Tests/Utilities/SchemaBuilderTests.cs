@@ -706,6 +706,40 @@ namespace GraphQL.Tests.Utilities
             type.Fields.Count.ShouldBe(2);
         }
 
+        [Fact]
+        public void builds_with_customized_clr_type()
+        {
+            var definitions = @"
+                type Query {
+                    test: MyTestType
+                }
+
+                type MyTestType {
+                    myTestField: ID
+                }
+            ";
+
+            var schema = Schema.For(definitions, b => b.Types.Include<TestType>());
+            schema.Initialize();
+
+            var graphType = schema.AllTypes["MyTestType"].ShouldNotBeNull().ShouldBeAssignableTo<ObjectGraphType>();
+            graphType.Description.ShouldBe("Test1");
+            graphType.DeprecationReason.ShouldBe("Test2");
+            var fieldType = graphType.Fields.Find("myTestField").ShouldNotBeNull();
+            fieldType.Description.ShouldBe("Test3");
+            fieldType.DeprecationReason.ShouldBe("Test4");
+            fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
+            var context = new ResolveFieldContext() { Source = new TestType() };
+            fieldType.Resolver.Resolve(context).ShouldBeOfType<string>().ShouldBe("value");
+        }
+
+        [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]
+        internal class TestType
+        {
+            [GraphQLMetadata("myTestField", Description = "Test3", DeprecationReason = "Test4")]
+            public string Example() => "value";
+        }
+
         internal class Movie
         {
             [GraphQLMetadata("movies", DeprecationReason = "my reason")]
