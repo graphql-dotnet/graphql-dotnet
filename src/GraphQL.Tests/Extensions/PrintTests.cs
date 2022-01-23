@@ -45,12 +45,6 @@ namespace GraphQL.Tests.Extensions
         }
 
         [Fact]
-        public void anynode_throws()
-        {
-            Should.Throw<InvalidOperationException>(() => new AnyValue("").Print());
-        }
-
-        [Fact]
         public void string_encodes_control_characters()
         {
             var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());

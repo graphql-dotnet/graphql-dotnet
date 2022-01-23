@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQLParser;
 using GraphQLParser.AST;
 
@@ -6,61 +5,32 @@ namespace GraphQL
 {
     internal class GraphQLValuesCache
     {
-        private static readonly Dictionary<ROM, object> _ints = new Dictionary<ROM, object>
+        private static readonly object[] _positiveInts = new object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        private static readonly object[] _negativeInts = new object[] { 0, -1, -2, -3, -4, -5, -6, -7, -8, -9 };
+        private static readonly object[] _positiveLongs = new object[] { 0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
+        private static readonly object[] _negativeLongs = new object[] { 0L, -1L, -2L, -3L, -4L, -5L, -6L, -7L, -8L, 9L };
+
+        public static object GetInt(ROM value)
         {
-            ["-10"] = -10,
-            ["-9"] = -9,
-            ["-8"] = -8,
-            ["-7"] = -7,
-            ["-6"] = -6,
-            ["-5"] = -5,
-            ["-4"] = -4,
-            ["-3"] = -3,
-            ["-2"] = -2,
-            ["-1"] = -1,
-            ["0"] = 0,
-            ["1"] = 1,
-            ["2"] = 2,
-            ["3"] = 3,
-            ["4"] = 4,
-            ["5"] = 5,
-            ["6"] = 6,
-            ["7"] = 7,
-            ["8"] = 8,
-            ["9"] = 9,
-            ["10"] = 10,
-        };
+            return value.Length switch
+            {
+                1 when '0' <= value.Span[0] && value.Span[0] <= '9' => _positiveInts[value.Span[0] - '0'],
+                2 when value.Span[0] == '-' && '0' <= value.Span[0] && value.Span[0] <= '9' => _negativeInts[value.Span[1] - '0'],
+                _ => Int.Parse(value)
+            };
+        }
 
-        private static readonly Dictionary<ROM, object> _longs = new Dictionary<ROM, object>
+        public static object GetLong(ROM value)
         {
-            ["-10"] = -10L,
-            ["-9"] = -9L,
-            ["-8"] = -8L,
-            ["-7"] = -7L,
-            ["-6"] = -6L,
-            ["-5"] = -5L,
-            ["-4"] = -4L,
-            ["-3"] = -3L,
-            ["-2"] = -2L,
-            ["-1"] = -1L,
-            ["0"] = 0L,
-            ["1"] = 1L,
-            ["2"] = 2L,
-            ["3"] = 3L,
-            ["4"] = 4L,
-            ["5"] = 5L,
-            ["6"] = 6L,
-            ["7"] = 7L,
-            ["8"] = 8L,
-            ["9"] = 9L,
-            ["10"] = 10L,
-        };
+            return value.Length switch
+            {
+                1 when '0' <= value.Span[0] && value.Span[0] <= '9' => _positiveLongs[value.Span[0] - '0'],
+                2 when value.Span[0] == '-' && '0' <= value.Span[0] && value.Span[0] <= '9' => _negativeLongs[value.Span[1] - '0'],
+                _ => Long.Parse(value)
+            };
+        }
 
-        public static object GetInt(ROM value) => _ints.TryGetValue(value, out object i) ? i : Int.Parse(value);
-
-        public static object GetLong(ROM value) => _longs.TryGetValue(value, out object i) ? i : Long.Parse(value);
-
-        public static readonly GraphQLNullValue Null = new GraphQLNullValue();
+        public static readonly GraphQLNullValue Null = new();
 
         public static readonly GraphQLBooleanValue True = new GraphQLTrueBooleanValue();
 

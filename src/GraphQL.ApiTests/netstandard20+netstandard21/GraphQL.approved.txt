@@ -2415,12 +2415,6 @@ namespace GraphQL.Utilities.Federation
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
     }
-    public class AnyValue : GraphQLParser.AST.GraphQLValue
-    {
-        public AnyValue(object? value) { }
-        public override GraphQLParser.AST.ASTNodeKind Kind { get; }
-        public object? Value { get; }
-    }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
