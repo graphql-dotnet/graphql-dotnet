@@ -98,7 +98,7 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
         var props = GetRegisteredProperties();
         foreach (var prop in props)
         {
-            if (prop.GetCustomAttribute<InternalUseAttribute>() != null)
+            if (prop.IsDefined(typeof(InternalUseAttribute)))
                 yield return CreateFieldType(prop);
         }
     }
