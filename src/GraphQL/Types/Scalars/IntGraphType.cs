@@ -12,7 +12,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => Int.Parse(x.Value),
+            GraphQLIntValue x => GraphQLValuesCache.GetInt(x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

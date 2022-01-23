@@ -366,8 +366,6 @@ namespace GraphQL
             return false;
         }
 
-        private static readonly GraphQLNullValue _null = new GraphQLNullValue();
-
         /// <summary>
         /// Returns a value indicating whether the provided value is a valid default value
         /// for the specified input graph type.
@@ -445,7 +443,7 @@ namespace GraphQL
 
             if (value == null)
             {
-                return _null;
+                return GraphQLValuesCache.Null;
             }
 
             // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but

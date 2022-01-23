@@ -110,7 +110,7 @@ namespace GraphQL.Types
         public override GraphQLValue? ToAST(object? value)
         {
             if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
-                return new GraphQLNullValue(); //TODO: cache? see GraphQLExtensions._null
+                return GraphQLValuesCache.Null;
 
             var foundByValue = Values.FindByValue(value);
             return foundByValue == null

@@ -50,7 +50,7 @@ namespace GraphQL.Types
         public virtual object? ParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLBooleanValue b => ParseValue(b.BoolValue.Boxed()),
-            GraphQLIntValue i => Int.Parse(i.Value),
+            GraphQLIntValue i => GraphQLValuesCache.GetInt(i.Value),
             GraphQLFloatValue f => Double.Parse(f.Value),
             GraphQLStringValue s => ParseValue((string)s.Value),
             GraphQLNullValue _ => ParseValue(null),
@@ -154,7 +154,7 @@ namespace GraphQL.Types
             var serialized = Serialize(value);
             return serialized switch
             {
-                bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(), //TODO: cache?
+                bool b => b ? GraphQLValuesCache.True : GraphQLValuesCache.False,
                 byte b => new GraphQLIntValue(b),
                 sbyte sb => new GraphQLIntValue(sb),
                 short s => new GraphQLIntValue(s),
@@ -168,7 +168,7 @@ namespace GraphQL.Types
                 float f => new GraphQLFloatValue(f),
                 double d => new GraphQLFloatValue(d),
                 string s => new GraphQLStringValue(s),
-                null => new GraphQLNullValue(), //TODO: cache? see GraphQLExtensions._null
+                null => GraphQLValuesCache.Null,
                 _ => throw new NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' scalar to support this operation.")
             };
         }

@@ -17,7 +17,8 @@ namespace GraphQL.Types
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(GraphQLValue value) => value is GraphQLBooleanValue || value is GraphQLNullValue;
+        public override bool CanParseLiteral(GraphQLValue value)
+            => value is GraphQLBooleanValue || value is GraphQLNullValue;
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch
@@ -33,8 +34,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override GraphQLValue? ToAST(object? value) => value switch
         {
-            bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(), //TODO: cache?
-            null => new GraphQLNullValue(), //TODO: cache? see GraphQLExtensions._null
+            bool b => b ? GraphQLValuesCache.True : GraphQLValuesCache.False,
+            null => GraphQLValuesCache.Null,
             _ => ThrowASTConversionError(value)
         };
     }
