@@ -109,7 +109,7 @@ Similarly, by overriding `CreateField` you can change the default name, descript
 graph type, or other information applied to each generated field.
 
 If you utilize dependency injection within your schema, you can register your custom graph
-type over top of the usual one as follows:
+type to be used instead of the built-in type as follows:
 
 ```cs
 services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
