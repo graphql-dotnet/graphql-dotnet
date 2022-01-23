@@ -8,7 +8,7 @@ using Xunit;
 namespace GraphQL.Tests.Bugs
 {
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1781
-    public class CoreToVanillaConverterTests : QueryTestBase<PR1781Schema>
+    public class FloatGraphTypeBadValueTests : QueryTestBase<PR1781Schema>
     {
         [Fact]
         public void BadFloatValues()
