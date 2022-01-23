@@ -485,19 +485,7 @@ namespace GraphQL
             return context.Writer.ToString()!;
         }
 
-        private static readonly SDLWriterEx _sdlWriter = new();
-
-        private class SDLWriterEx : SDLWriter<PrintContext>
-        {
-            public override ValueTask Visit(ASTNode? node, PrintContext context)
-            {
-                return node switch //TODO: deal with AnyValue
-                {
-                    AnyValue _ => throw new InvalidOperationException("TODO: may be implemented? see anynode_throws test"),
-                    _ => base.Visit(node, context)
-                };
-            }
-        }
+        private static readonly SDLWriter<PrintContext> _sdlWriter = new();
 
         private sealed class PrintContext : IWriteContext
         {

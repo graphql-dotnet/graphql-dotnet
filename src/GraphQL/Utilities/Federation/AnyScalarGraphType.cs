@@ -28,9 +28,9 @@ namespace GraphQL.Utilities.Federation
             GraphQLFloatValue v => ParseFloat(v),
             GraphQLStringValue v => ParseString(v),
             GraphQLBooleanValue v => (v.Value == "true").Boxed(),
-            GraphQLEnumValue e => e.Name.StringValue, //TODO:???
+            GraphQLEnumValue e => e.Name.StringValue, //TODO:think about it later if/when refactoring federation
             GraphQLNullValue _ => null,
-            _ => throw new NotSupportedException() // GraphQLVariable
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
@@ -46,7 +46,7 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) => true;
 
         /// <inheritdoc/>
-        public override GraphQLValue? ToAST(object? value) => new AnyValue(value);
+        public override GraphQLValue? ToAST(object? value) => ThrowASTConversionError(value);
 
         private static readonly ReadOnlyDictionary<string, object?> _empty = new(new Dictionary<string, object?>());
 
