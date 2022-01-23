@@ -822,7 +822,7 @@ namespace GraphQL.Validation.Rules
             /// <summary>
             /// The name of the field in conflict.
             /// </summary>
-            public string Name { get; set; }
+            public string Name { get; set; } = null!;
 
             /// <summary>
             /// Returns a message descriptor describing the conflict.
