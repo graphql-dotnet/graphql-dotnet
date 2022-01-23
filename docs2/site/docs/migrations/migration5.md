@@ -82,9 +82,46 @@ a list or array of a single item. For example, `{"query":"{ hero }"}` deserializ
 serializing objects to and from `string` values. For the `GraphQL.SystemTextJson`
 and `GraphQL.NewtonsoftJson` libraries, these serialize and deserialize to JSON strings.
 
-### 6. More strict behavior of FloatGraphType for special values
+### 6. `AutoRegisteringObjectGraphType` and `AutoRegisteringInputObjectGraphType` enhancements
 
-This is a spec-compliance issue (bug fix), the spec says that:
+#### Overridable base functionality
+
+The classes can be overridden, providing the ability to customize behavior of automatically
+generated graph types. For instance, to exclude properties marked with a custom attribute
+called `[InternalUse]` you could write this:
+
+```csharp
+private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
+{
+    protected override IEnumerable<FieldType> ProvideFields()
+    {
+        var props = GetRegisteredProperties();
+        foreach (var prop in props)
+        {
+            if (prop.IsDefined(typeof(InternalUseAttribute)))
+                yield return CreateField(prop);
+        }
+    }
+}
+```
+
+Similarly, by overriding `CreateField` you can change the default name, description,
+graph type, or other information applied to each generated field.
+
+If you utilize dependency injection within your schema, you can register your custom graph
+type to be used instead of the built-in type as follows:
+
+```cs
+services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
+```
+
+Then any graph type defined as `AutoRegisteringObjectGraphType<...>` will use your custom
+type instead.
+
+### 7. More strict behavior of FloatGraphType for special values
+
+This is a spec-compliance issue (bug fix), that fixes parsing of Nan and -/+ Infinity values.
+The spec says that:
 
 > Non-finite floating-point internal values (NaN and Infinity) cannot be
 > coerced to Float and must raise a field error.

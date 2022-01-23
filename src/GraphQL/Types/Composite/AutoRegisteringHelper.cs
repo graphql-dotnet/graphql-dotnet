@@ -15,20 +15,15 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
-        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties)
-        {
-            type.Name = typeof(TSourceType).GraphQLName();
-
-            foreach (var propertyInfo in properties)
+        internal static FieldType CreateField(PropertyInfo propertyInfo, bool isInputType)
+            => new()
             {
-                type.Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), type is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
-                    name: propertyInfo.Name,
-                    description: propertyInfo.Description(),
-                    deprecationReason: propertyInfo.ObsoleteMessage()
-                ).DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value;
-            }
-        }
+                Name = propertyInfo.Name,
+                Description = propertyInfo.Description(),
+                DeprecationReason = propertyInfo.ObsoleteMessage(),
+                Type = propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), isInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
+                DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value,
+            };
 
         private static bool IsNullableProperty(PropertyInfo propertyInfo)
         {

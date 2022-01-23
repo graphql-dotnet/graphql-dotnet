@@ -30,8 +30,33 @@ namespace GraphQL.Types
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         {
             _excludedProperties = excludedProperties;
-            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties());
+            Name = typeof(TSourceType).GraphQLName();
+            foreach (var fieldType in ProvideFields())
+            {
+                _ = AddField(fieldType);
+            }
         }
+
+        /// <summary>
+        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
+        /// </summary>
+        protected virtual IEnumerable<FieldType> ProvideFields()
+        {
+            foreach (var propertyInfo in GetRegisteredProperties())
+            {
+                var fieldType = CreateField(propertyInfo);
+                if (fieldType != null)
+                    yield return fieldType;
+            }
+        }
+
+        /// <summary>
+        /// Processes the specified property and returns a <see cref="FieldType"/>.
+        /// May return <see langword="null"/> to skip a property.
+        /// </summary>
+        protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
+            => AutoRegisteringHelper.CreateField(propertyInfo, false);
 
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
