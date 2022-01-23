@@ -50,11 +50,11 @@ namespace GraphQL.Types
         public virtual object? ParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLBooleanValue b => ParseValue(b.BoolValue.Boxed()),
-            GraphQLIntValue i => ParseValue((string)i.Value), //ISSUE:allocation
-            GraphQLFloatValue f => ParseValue((string)f.Value), //ISSUE:allocation
-            GraphQLStringValue s => ParseValue((string)s.Value), //ISSUE:allocation
+            GraphQLIntValue i => Int.Parse(i.Value),
+            GraphQLFloatValue f => Double.Parse(f.Value),
+            GraphQLStringValue s => ParseValue((string)s.Value),
             GraphQLNullValue _ => ParseValue(null),
-            _ => ThrowLiteralConversionError(value) // GraphQLVariable, GraphQLEnumValue
+            _ => ThrowLiteralConversionError(value)
         };
 
         /// <summary>

@@ -1956,7 +1956,7 @@ namespace GraphQL.Types
         public abstract object? ParseValue(object? value);
         public virtual object? Serialize(object? value) { }
         protected GraphQLParser.AST.GraphQLValue ThrowASTConversionError(object? value) { }
-        protected object ThrowLiteralConversionError(GraphQLParser.AST.GraphQLValue input) { }
+        protected object ThrowLiteralConversionError(GraphQLParser.AST.GraphQLValue input, string? description = null) { }
         protected object ThrowSerializationError(object? value) { }
         protected object ThrowValueConversionError(object? value) { }
         public virtual GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
