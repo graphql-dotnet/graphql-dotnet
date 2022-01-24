@@ -312,7 +312,7 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All)]
-    public class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
+    public sealed class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
     {
         public GraphQLMetadataAttribute() { }
         public GraphQLMetadataAttribute(string name) { }
