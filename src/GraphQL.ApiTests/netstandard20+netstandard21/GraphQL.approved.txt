@@ -185,8 +185,10 @@ namespace GraphQL
     {
         public GraphQLAuthorizeAttribute(string policy) { }
         public string Policy { get; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     public static class GraphQLBuilderExtensions
     {
@@ -373,6 +375,13 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
+    public class InputNameAttribute : GraphQL.GraphQLAttribute
+    {
+        public InputNameAttribute(string name) { }
+        public string Name { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
@@ -425,6 +434,8 @@ namespace GraphQL
         public string Key { get; set; }
         public object Value { get; set; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
@@ -442,6 +453,13 @@ namespace GraphQL
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
+    public class OutputNameAttribute : GraphQL.GraphQLAttribute
+    {
+        public OutputNameAttribute(string name) { }
+        public string Name { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
@@ -1859,6 +1877,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
@@ -1867,6 +1886,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
