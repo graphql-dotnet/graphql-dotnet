@@ -340,12 +340,13 @@ var schema = Schema.For(definitions, c =>
 ## Type Mapping
 
 When specifying a field using the shortcut syntax `Field(x => x.Parent)`, which does not specify
-a specific graph type, GraphQL.NET will first look at the data model to see if it has a `GraphQLMetadata`
-attribute specified on it indicating the graph type to use for the data model. For instance, you can
-specify the graph type for a `Widget` class in the following manner:
+a specific graph type, GraphQL.NET will first look at the data model to see if it has an `[InputType]`
+or `[OutputType]` attribute specified on it indicating the graph type to use for the data model. For
+instance, you can specify the graph type for a `Widget` class in the following manner:
 
 ```csharp
-[GraphQLMetadata(InputType = typeof(WidgetInputGraphType), OutputType = typeof(WidgetGraphType)]
+[InputType(typeof(WidgetInputGraphType))]
+[OutputType(typeof(WidgetGraphType))]
 public class Widget
 {
     ...
