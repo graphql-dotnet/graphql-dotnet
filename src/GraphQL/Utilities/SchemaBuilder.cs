@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Reflection;
@@ -73,7 +72,7 @@ namespace GraphQL.Utilities
         /// <returns>Created schema.</returns>
         public virtual Schema Build(string typeDefinitions)
         {
-            using var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = CreateIgnoreOptions() });
+            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = CreateIgnoreOptions() });
             Validate(document);
             return BuildSchemaFrom(document);
         }
@@ -117,7 +116,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     //TODO: rewrite and add support for other extensions
                     var typeDef = new GraphQLObjectTypeDefinition
                     {
-                        Comment = ext.Comment,
+                        Comments = ext.Comments,
                         Description = null,
                         Directives = ext.Directives,
                         Fields = ext.Fields,
@@ -157,7 +156,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.Comment?.Value.ToString();
+                schema.Description = _schemaDef.MergeComments();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {
@@ -248,7 +247,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (!isExtensionType)
             {
-                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.Comment?.Value.ToString();
+                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.MergeComments();
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
@@ -339,7 +338,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Value.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver
             };
@@ -368,7 +367,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new EventStreamFieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Value.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -399,7 +398,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString(),
+                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
                 ResolvedType = ToGraphType(inputDef.Type!),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
@@ -419,7 +418,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InterfaceGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.Comment?.Value.ToString(),
+                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(interfaceDef);
 
@@ -446,7 +445,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new UnionGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.Comment?.Value.ToString(),
+                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(unionDef);
 
@@ -476,7 +475,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InputObjectGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString(),
+                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
             }.SetAstType(inputDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -502,7 +501,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new EnumerationGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.Comment?.Value.ToString(),
+                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.MergeComments(),
             }.SetAstType(enumDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -518,9 +517,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var result = new DirectiveGraphType((string)directiveDef.Name) //TODO:alloc
+            var result = new DirectiveGraphType(directiveDef.Name.StringValue) //ISSUE:allocation
             {
-                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Value.ToString(),
+                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.MergeComments(),
                 Repeatable = directiveDef.Repeatable,
                 Arguments = ToQueryArguments(directiveDef.Arguments?.Items)
             };
@@ -543,7 +542,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Value = enumType == null ? name : Enum.Parse(enumType, name, true),
                 Name = name,
-                Description = valDef.Description?.Value.ToString() ?? valDef.Comment?.Value.ToString()
+                Description = valDef.Description?.Value.ToString() ?? valDef.MergeComments()
                 // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
                 //DeprecationReason = ???
             }.SetAstType(valDef);
@@ -555,7 +554,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = argumentConfig.Name,
                 DefaultValue = argumentConfig.DefaultValue ?? inputDef.DefaultValue,
-                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Value.ToString()
+                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments()
             }.SetAstType(inputDef);
 
             argumentConfig.CopyMetadataTo(argument);
@@ -601,107 +600,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         private QueryArguments ToQueryArguments(FieldConfig fieldConfig, List<GraphQLInputValueDefinition>? arguments)
         {
             return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:alloc
-        }
-    }
-
-    internal static class Extensions
-    {
-        public static object? ToValue(this GraphQLValue source) //TODO: merge with bits from AnyScalarGraphType
-        {
-            object FromInt(GraphQLIntValue str)
-            {
-                if (Int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
-                {
-                    return intResult;
-                }
-
-                // If the value doesn't fit in an integer, revert to using long...
-                if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
-                {
-                    return longResult;
-                }
-
-                // If the value doesn't fit in an long, revert to using decimal...
-                if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
-                {
-                    return decimalResult;
-                }
-
-                // If the value doesn't fit in an decimal, revert to using BigInteger...
-                if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
-                {
-                    return bigIntegerResult;
-                }
-
-                throw new InvalidOperationException($"Invalid number {str.Value}");
-            };
-
-            object FromFloat(GraphQLFloatValue str)
-            {
-                // the idea is to see if there is a loss of accuracy of value
-                // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                if (!Double.TryParse(
-                    str!.Value,
-                    NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                    CultureInfo.InvariantCulture,
-                    out double dbl))
-                {
-                    dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
-                }
-
-                //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
-                if (Decimal.TryParse(
-                    str.Value,
-                    NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                    CultureInfo.InvariantCulture,
-                    out decimal dec))
-                {
-                    // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
-                    var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
-                    decimal temp = new decimal(dbl);
-                    var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
-                    if (!decBits.Equals(dblAsDecBits))
-                        return dec;
-                }
-
-                return dbl;
-            };
-
-            object FromObject(GraphQLObjectValue obj)
-            {
-                var values = new Dictionary<string, object?>();
-
-                if (obj!.Fields != null)
-                {
-                    foreach (var f in obj.Fields)
-                        values[(string)f.Name] = ToValue(f.Value!); //TODO:alloc
-                }
-
-                return values;
-            };
-
-            object FromList(GraphQLListValue list)
-            {
-                if (list!.Values == null)
-                    return Array.Empty<object>();
-
-                object?[] values = list.Values.Select(ToValue).ToArray();
-                return values;
-            }
-
-            return source switch
-            {
-                null => null,
-                GraphQLNullValue _ => null,
-                GraphQLStringValue str => (string)str.Value, //TODO:alloc
-                GraphQLIntValue str => FromInt(str),
-                GraphQLFloatValue str => FromFloat(str),
-                GraphQLBooleanValue str => (str.Value.Length == 4).Boxed(), /*true.Length=4*/
-                GraphQLEnumValue str => (string)str.Name, //TODO:alloc
-                GraphQLObjectValue obj => FromObject(obj),
-                GraphQLListValue list => FromList(list),
-                _ => throw new InvalidOperationException($"Unsupported value type {source.Kind}"),
-            };
         }
     }
 }

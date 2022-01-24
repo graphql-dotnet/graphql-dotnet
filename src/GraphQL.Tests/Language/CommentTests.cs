@@ -21,7 +21,7 @@ query _ {
 }";
 
             var document = _builder.Build(query);
-            document.Operation().Comment.ShouldBeNull();
+            document.Operation().Comments.ShouldBeNull();
         }
 
         [Fact]
@@ -35,7 +35,7 @@ query _ {
 }";
 
             var document = _builder.Build(query);
-            document.Operation().Comment.Value.ShouldBe("comment");
+            document.Operation().Comments[0].Value.ShouldBe("comment");
         }
 
         [Fact]
@@ -50,10 +50,10 @@ query _ {
 
             var document = _builder.Build(query);
             document.Operation()
-                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.ShouldBeNull();
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
             document.Operation()
                 .SelectionSet.Selections.OfType<GraphQLField>().First()
-                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.ShouldBeNull();
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
         }
 
         [Fact]
@@ -70,10 +70,10 @@ query _ {
 
             var document = _builder.Build(query);
             document.Operation()
-                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.Value.ShouldBe("comment1");
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment1");
             document.Operation()
                 .SelectionSet.Selections.OfType<GraphQLField>().First()
-                .SelectionSet.Selections.OfType<GraphQLField>().First().Comment.Value.ShouldBe("comment2");
+                .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment2");
         }
 
         [Fact]
@@ -92,7 +92,7 @@ fragment human on person {
 }";
 
             var document = _builder.Build(query);
-            document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comment.Value.ShouldBe("comment");
+            document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comments[0].Value.ShouldBe("comment");
         }
 
         [Fact]
@@ -113,7 +113,7 @@ fragment human on person {
             var document = _builder.Build(query);
             document.Operation()
                 .SelectionSet.Selections.OfType<GraphQLField>().First()
-                .SelectionSet.Selections.OfType<GraphQLFragmentSpread>().First().Comment.Value.ShouldBe("comment");
+                .SelectionSet.Selections.OfType<GraphQLFragmentSpread>().First().Comments[0].Value.ShouldBe("comment");
         }
 
         [Fact]
@@ -132,7 +132,7 @@ query _ {
             var document = _builder.Build(query);
             document.Operation()
                 .SelectionSet.Selections.OfType<GraphQLField>().First()
-                .SelectionSet.Selections.OfType<GraphQLInlineFragment>().First().Comment.Value.ShouldBe("comment");
+                .SelectionSet.Selections.OfType<GraphQLInlineFragment>().First().Comments[0].Value.ShouldBe("comment");
         }
 
         [Fact]
@@ -150,7 +150,7 @@ query _ {
             var document = _builder.Build(query);
             document.Operation()
                 .SelectionSet.Selections.OfType<GraphQLField>().First()
-                .Arguments.First().Comment.Value.ShouldBe("comment");
+                .Arguments.First().Comments[0].Value.ShouldBe("comment");
         }
 
         [Fact]
@@ -167,7 +167,7 @@ query _(
 
             var document = _builder.Build(query);
             document.Operation()
-                .Variables.First().Comment.Value.ShouldBe("comment");
+                .Variables.First().Comments[0].Value.ShouldBe("comment");
         }
     }
 }
