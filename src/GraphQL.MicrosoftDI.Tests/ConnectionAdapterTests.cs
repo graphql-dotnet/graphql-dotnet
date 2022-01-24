@@ -49,7 +49,7 @@ namespace GraphQL.MicrosoftDI.Tests
             rccMock.SetupGet(x => x.RootValue).Returns(new object());
             rccMock.SetupGet(x => x.Schema).Returns(Mock.Of<ISchema>());
             rccMock.SetupGet(x => x.Source).Returns("hello");
-            rccMock.SetupGet(x => x.SubFields).Returns(new Dictionary<string, GraphQLField>());
+            rccMock.SetupGet(x => x.SubFields).Returns(new Dictionary<string, (GraphQLField, FieldType)>());
             rccMock.SetupGet(x => x.UserContext).Returns(new Dictionary<string, object>() { { "3", new object() } });
             rccMock.SetupGet(x => x.Variables).Returns(new Variables());
             rccMock.SetupGet(x => x.First).Returns(10);

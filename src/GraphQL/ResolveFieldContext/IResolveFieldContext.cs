@@ -76,7 +76,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        Dictionary<string, GraphQLField>? SubFields { get; }
+        Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; }
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.

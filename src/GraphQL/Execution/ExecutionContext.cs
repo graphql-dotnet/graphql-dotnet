@@ -145,6 +145,6 @@ namespace GraphQL.Execution
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
         /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
-        internal Dictionary<string, GraphQLField>? ReusableFields;
+        internal Dictionary<string, (GraphQLField field, FieldType fieldType)>? ReusableFields;
     }
 }

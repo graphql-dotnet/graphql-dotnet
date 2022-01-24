@@ -44,14 +44,14 @@ namespace GraphQL.Tests.Execution
         private GraphQLField SecondTestField { get; }
         private GraphQLField AliasedTestField { get; }
 
-        private Dictionary<string, GraphQLField> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+        private Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
         {
             return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
         }
 
         private class MyExecutionStrategy : ParallelExecutionStrategy
         {
-            public Dictionary<string, GraphQLField> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+            public Dictionary<string, (GraphQLField Field, FieldType FieldType)> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
                 => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
         }
 
@@ -67,11 +67,22 @@ namespace GraphQL.Tests.Execution
                 }
             };
 
-            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
+            var query = new ObjectGraphType { Name = "Query" };
+            query.Fields.Add(new FieldType
+            {
+                Name = "test",
+                ResolvedType = new StringGraphType()
+            });
+
+            var context = new ExecutionContext
+            {
+                Schema = new Schema { Query = query }
+            };
+            var fields = CollectFrom(context, query, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+            fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -86,12 +97,24 @@ namespace GraphQL.Tests.Execution
                 }
             };
 
-            var fields = CollectFrom(new ExecutionContext(), null, outerSelection);
+            var query = new ObjectGraphType { Name = "Query" };
+            query.Fields.Add(new FieldType
+            {
+                Name = "test",
+                ResolvedType = new StringGraphType()
+            });
 
-            fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-            fields["alias"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["alias"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+            var context = new ExecutionContext
+            {
+                Schema = new Schema { Query = query }
+            };
+
+            var fields = CollectFrom(context, query, outerSelection);
+
+            fields["test"].Field.SelectionSet.Selections.ShouldHaveSingleItem();
+            fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["alias"].Field.SelectionSet.Selections.ShouldHaveSingleItem();
+            fields["alias"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -111,7 +134,7 @@ namespace GraphQL.Tests.Execution
                 {
                     Type = new GraphQLNamedType
                     {
-                        Name = new GraphQLName("Person")
+                        Name = new GraphQLName("Query")
                     }
                 },
                 SelectionSet = fragmentSelection
@@ -125,8 +148,13 @@ namespace GraphQL.Tests.Execution
                 }
             };
 
-            var schema = new Schema();
-            schema.RegisterType(new PersonType());
+            var query = new ObjectGraphType { Name = "Query" };
+            query.Fields.Add(new FieldType
+            {
+                Name = "test",
+                ResolvedType = new StringGraphType()
+            });
+            var schema = new Schema { Query = query };
 
             var context = new ExecutionContext
             {
@@ -144,11 +172,11 @@ namespace GraphQL.Tests.Execution
                 }
             };
 
-            var fields = CollectFrom(context, new PersonType(), outerSelection);
+            var fields = CollectFrom(context, query, outerSelection);
 
             fields.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+            fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
     }
 }

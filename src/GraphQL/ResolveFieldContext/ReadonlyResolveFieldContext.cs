@@ -17,7 +17,7 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue>? _arguments;
-        private Dictionary<string, GraphQLField>? _subFields;
+        private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, GraphQLField>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext => _executionContext.UserContext;

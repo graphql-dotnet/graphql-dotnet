@@ -160,25 +160,16 @@ namespace GraphQL.Execution
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
             var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
-
-            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema)!, parent.SelectionSet!, fields);
-
             var parentType = parent.GetObjectGraphType(context.Schema)!;
+            fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];
 
             int i = 0;
             foreach (var kvp in fields)
             {
-                var field = kvp.Value;
-
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
-
-                if (fieldDefinition == null)
-                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{parentType.Name}'.");
-
+                (var field, var fieldDefinition) = kvp.Value;
                 var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
-
                 subFields[i++] = node;
             }
 
@@ -192,7 +183,7 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="GraphQLField"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, GraphQLField field)
+        protected FieldType? GetFieldDefinition(ISchema schema, IComplexGraphType parentType, GraphQLField field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -216,7 +207,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<string, GraphQLField>? GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
@@ -232,18 +223,18 @@ namespace GraphQL.Execution
         /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
         /// </summary>
         /// <param name="context">The execution context.</param>
-        /// <param name="specificType">The graph type to compare the selection set against.</param>
+        /// <param name="specificType">The graph type to compare the selection set against. May be <see langword="null"/> for root execution node.</param>
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Dictionary<string, GraphQLField> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, GraphQLField>? fields)
+        protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
-            fields ??= new Dictionary<string, GraphQLField>();
+            fields ??= new Dictionary<string, (GraphQLField field, FieldType fieldType)>();
             List<ROM>? visitedFragmentNames = null;
             CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, GraphQLField> fields, ref List<ROM>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)> fields, ref List<ROM>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
             {
                 if (selectionSet != null)
                 {
@@ -252,7 +243,13 @@ namespace GraphQL.Execution
                         if (selection is GraphQLField field)
                         {
                             if (ShouldIncludeNode(context, field))
-                                Add(fields, field);
+                            {
+                                var fieldDefinition = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
+                                if (fieldDefinition == null)
+                                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
+
+                                Add(fields, field, fieldDefinition);
+                            }
                         }
                         else if (selection is GraphQLFragmentSpread spread)
                         {
@@ -276,21 +273,21 @@ namespace GraphQL.Execution
                 }
             }
 
-            static void Add(Dictionary<string, GraphQLField> fields, GraphQLField field)
+            static void Add(Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
             {
-                string name = (string)(field.Alias?.Name ?? field.Name); //TODO:alloc
+                string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 
                 fields[name] = fields.TryGetValue(name, out var original)
-                    ? new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    ? (new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
-                        Alias = original.Alias,
-                        Name = original.Name,
-                        Arguments = original.Arguments,
-                        SelectionSet = Merge(original.SelectionSet, field.SelectionSet),
-                        Directives = original.Directives,
-                        Location = original.Location,
-                    }
-                    : field;
+                        Alias = original.Field.Alias,
+                        Name = original.Field.Name,
+                        Arguments = original.Field.Arguments,
+                        SelectionSet = Merge(original.Field.SelectionSet, field.SelectionSet),
+                        Directives = original.Field.Directives,
+                        Location = original.Field.Location,
+                    }, original.FieldType)
+                    : (field, fieldType);
             }
 
             // Returns a new selection set node with the contents merged with another selection set node's contents.
