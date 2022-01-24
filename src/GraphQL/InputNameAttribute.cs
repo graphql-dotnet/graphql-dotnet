@@ -5,7 +5,7 @@ using GraphQL.Types;
 namespace GraphQL
 {
     /// <summary>
-    /// Specifies a GraphQL type name for a CLR class when used as an intput type.
+    /// Specifies a GraphQL type name for a CLR class when used as an input type.
     /// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
