@@ -144,7 +144,7 @@ namespace GraphQL
         public static TError AddLocation<TError>(this TError error, ASTNode? abstractNode, GraphQLDocument? document, string? originalQuery)
             where TError : ExecutionError
         {
-            if (abstractNode == null || document == null || originalQuery == null)
+            if (abstractNode == null || document == null || originalQuery == null || abstractNode.Location == default)
                 return error;
 
             var location = new Location(originalQuery, abstractNode.Location.Start);
