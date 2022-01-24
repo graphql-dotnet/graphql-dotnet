@@ -176,8 +176,10 @@ namespace GraphQL
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
+        public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
     {
@@ -321,8 +323,10 @@ namespace GraphQL
         public string? Name { get; set; }
         public System.Type? OutputType { get; set; }
         public GraphQL.ResolverType ResolverType { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     public interface IDocumentExecuter
     {
@@ -404,6 +408,21 @@ namespace GraphQL
     public static class MemoryExtensions
     {
         public static System.Collections.Generic.IList<T> Constrained<T>(this T[] array, int count) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=true, Inherited=false)]
+    public class MetadataAttribute : GraphQL.GraphQLAttribute
+    {
+        public MetadataAttribute(string key, object value) { }
+        public string Key { get; set; }
+        public object Value { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
+    public class NameAttribute : GraphQL.GraphQLAttribute
+    {
+        public NameAttribute(string name) { }
+        public string Name { get; }
     }
     public static class ObjectExtensions
     {

@@ -10,6 +10,27 @@ namespace GraphQL.Types
 {
     internal static class AutoRegisteringHelper
     {
+        internal static void ConfigureGraphType<TSourceType>(IGraphType graphType)
+        {
+            var classType = typeof(TSourceType);
+
+            //allow default name / description / obsolete tags to remain if not overridden
+            var nameAttribute = classType.GetCustomAttribute<NameAttribute>();
+            if (nameAttribute != null)
+                graphType.Name = nameAttribute.Name;
+
+            var descriptionAttribute = classType.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttribute != null)
+                graphType.Description = descriptionAttribute.Description;
+            var obsoleteAttribute = classType.GetCustomAttribute<ObsoleteAttribute>();
+            if (obsoleteAttribute != null)
+                graphType.DeprecationReason = obsoleteAttribute.Message;
+
+            //pull metadata
+            foreach (var metadataAttribute in classType.GetCustomAttributes<MetadataAttribute>())
+                graphType.Metadata.Add(metadataAttribute.Key, metadataAttribute.Value);
+        }
+
         internal static IEnumerable<PropertyInfo> ExcludeProperties<TSourceType>(IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
             => excludedProperties == null || excludedProperties.Length == 0
                 ? properties
