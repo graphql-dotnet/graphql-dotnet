@@ -29,13 +29,13 @@ namespace GraphQL
         /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
         {
-
+            graphType.WithMetadata(Key, Value);
         }
 
         /// <inheritdoc/>
         public override void Modify(FieldType fieldType, bool isInputType)
         {
-
+            fieldType.WithMetadata(Key, Value);
         }
     }
 }

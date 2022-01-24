@@ -32,6 +32,7 @@ namespace GraphQL.Types
         {
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
+            AutoRegisteringHelper.ConfigureGraphType<TSourceType>(this);
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);

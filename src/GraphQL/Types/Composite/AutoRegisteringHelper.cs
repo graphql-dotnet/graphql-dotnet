@@ -14,21 +14,22 @@ namespace GraphQL.Types
         {
             var classType = typeof(TSourceType);
 
-            //allow default name / description / obsolete tags to remain if not overridden
-            var nameAttribute = classType.GetCustomAttribute<NameAttribute>();
-            if (nameAttribute != null)
-                graphType.Name = nameAttribute.Name;
-
+            // Apply [Description] attribute
             var descriptionAttribute = classType.GetCustomAttribute<DescriptionAttribute>();
             if (descriptionAttribute != null)
                 graphType.Description = descriptionAttribute.Description;
+
+            // Apply [Obsolete] attribute
             var obsoleteAttribute = classType.GetCustomAttribute<ObsoleteAttribute>();
             if (obsoleteAttribute != null)
                 graphType.DeprecationReason = obsoleteAttribute.Message;
 
-            //pull metadata
-            foreach (var metadataAttribute in classType.GetCustomAttributes<MetadataAttribute>())
-                graphType.Metadata.Add(metadataAttribute.Key, metadataAttribute.Value);
+            // Apply derivatives of GraphQLAttribute
+            var attributes = classType.GetCustomAttributes<GraphQLAttribute>();
+            foreach (var attr in attributes)
+            {
+                attr.Modify(graphType);
+            }
         }
 
         internal static IEnumerable<PropertyInfo> ExcludeProperties<TSourceType>(IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
@@ -37,7 +38,8 @@ namespace GraphQL.Types
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
         internal static FieldType CreateField(PropertyInfo propertyInfo, bool isInputType)
-            => new()
+        {
+            var fieldType = new FieldType()
             {
                 Name = propertyInfo.Name,
                 Description = propertyInfo.Description(),
@@ -45,6 +47,16 @@ namespace GraphQL.Types
                 Type = propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), isInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
                 DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value,
             };
+
+            // Apply derivatives of GraphQLAttribute
+            var attributes = propertyInfo.GetCustomAttributes<GraphQLAttribute>();
+            foreach (var attr in attributes)
+            {
+                attr.Modify(fieldType, isInputType);
+            }
+
+            return fieldType;
+        }
 
         private static bool IsNullableProperty(PropertyInfo propertyInfo)
         {

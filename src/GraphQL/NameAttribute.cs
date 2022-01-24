@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Conversion;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -10,16 +11,39 @@ namespace GraphQL
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class NameAttribute : GraphQLAttribute
     {
+        private string _name;
+
         /// <inheritdoc cref="NameAttribute"/>
         public NameAttribute(string name)
         {
-            Name = name;
+            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         /// <summary>
         /// Returns the GraphQL name of the class (graph type) or property (field).
         /// </summary>
-        public string Name { get; }
-        
+        public string Name
+        {
+            get => _name;
+            set => _name = value ?? throw new ArgumentNullException(nameof(value));
+        }
+    
+        /// <inheritdoc/>
+        public override void Modify(IGraphType graphType)
+        {
+            if (Name != null)
+            {
+                graphType.Name = Name;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(FieldType fieldType, bool isInputType)
+        {
+            if (Name != null)
+            {
+                fieldType.Name = Name;
+            }
+        }
     }
 }

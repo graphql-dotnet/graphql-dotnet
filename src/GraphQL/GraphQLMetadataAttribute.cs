@@ -45,7 +45,7 @@ namespace GraphQL
     /// Attribute for specifying additional information when matching a CLR type to a corresponding GraphType.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class GraphQLMetadataAttribute : GraphQLAttribute
+    public class GraphQLMetadataAttribute : GraphQLAttribute
     {
         private Type? _mappedToInput;
         private Type? _mappedToOutput;
@@ -135,7 +135,9 @@ namespace GraphQL
         public override void Modify(IGraphType graphType)
         {
             if (Name != null)
+            {
                 graphType.Name = Name;
+            }
 
             if (Description != null)
                 graphType.Description = Description == "" ? null : Description;
