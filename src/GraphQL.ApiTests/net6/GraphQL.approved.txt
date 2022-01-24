@@ -320,9 +320,11 @@ namespace GraphQL
         public GraphQLMetadataAttribute(string name) { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        [System.Obsolete("Please use the [InputType] attribute instead of this property.")]
         public System.Type? InputType { get; set; }
         public System.Type? IsTypeOf { get; set; }
         public string? Name { get; set; }
+        [System.Obsolete("Please use the [OutputType] attribute instead of this property.")]
         public System.Type? OutputType { get; set; }
         public GraphQL.ResolverType ResolverType { get; set; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
@@ -362,6 +364,12 @@ namespace GraphQL
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
         TSource Source { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public class InputTypeAttribute : System.Attribute
+    {
+        public InputTypeAttribute(System.Type graphType) { }
+        public System.Type InputType { get; set; }
     }
     public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
@@ -408,6 +416,12 @@ namespace GraphQL
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public class OutputTypeAttribute : System.Attribute
+    {
+        public OutputTypeAttribute(System.Type graphType) { }
+        public System.Type OutputType { get; set; }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
