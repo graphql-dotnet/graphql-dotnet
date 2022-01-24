@@ -25,7 +25,7 @@ namespace GraphQL.Resolvers
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
         /// <inheritdoc/>
-        public object? Resolve(IResolveFieldContext context) => Resolve(context?.Source, (string)context?.FieldAst?.Name); //TODO:alloc
+        public object? Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldDefinition?.Name);
 
         private static object? Resolve(object? source, string? name)
         {

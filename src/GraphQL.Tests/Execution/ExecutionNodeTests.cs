@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Execution
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
-                objectGraphType.GetField("value"),
+                objectGraphType.GetField("name"),
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
@@ -61,7 +61,7 @@ namespace GraphQL.Tests.Execution
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new GraphQLField { Name = new GraphQLName("name") },
-                objectGraphType.GetField("value"),
+                objectGraphType.GetField("name"),
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Execution
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
-                objectGraphType.GetField("value"),
+                objectGraphType.GetField("name"),
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
@@ -93,7 +93,7 @@ namespace GraphQL.Tests.Execution
                 new RootExecutionNode(objectGraphType, null),
                 new StringGraphType(),
                 new GraphQLField { Name = new GraphQLName("name") },
-                objectGraphType.GetField("value"),
+                objectGraphType.GetField("name"),
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
@@ -106,7 +106,7 @@ namespace GraphQL.Tests.Execution
         public AliasedFieldTestObject()
         {
             Field<StringGraphType>(
-                "value",
+                "name",
                 resolve: context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -90,6 +91,8 @@ namespace GraphQL.Execution
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
         protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, GraphQLField? field, FieldType? fieldDefinition, int? indexInParentNode)
         {
+            Debug.Assert(field?.Name == fieldDefinition?.Name);
+
             Parent = parent;
             GraphType = graphType;
             Field = field;
