@@ -27,7 +27,7 @@ namespace GraphQL
             get => _name;
             set => _name = value ?? throw new ArgumentNullException(nameof(value));
         }
-    
+
         /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
         {
