@@ -878,13 +878,13 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQLParser.AST.GraphQLField? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
-        public GraphQLParser.AST.GraphQLField? Field { get; }
-        public GraphQL.Types.FieldType? FieldDefinition { get; }
-        public GraphQL.Types.IGraphType? GraphType { get; }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public GraphQLParser.AST.GraphQLField Field { get; }
+        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public GraphQL.Types.IGraphType GraphType { get; }
         public int? IndexInParentNode { get; }
         public string? Name { get; }
-        public GraphQL.Execution.ExecutionNode? Parent { get; }
+        public GraphQL.Execution.ExecutionNode Parent { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
         public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public object? Result { get; set; }
@@ -991,7 +991,7 @@ namespace GraphQL.Execution
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode? parent, GraphQL.Types.IGraphType? graphType, GraphQLParser.AST.GraphQLField? field, GraphQL.Types.FieldType? fieldDefinition, int? indexInParentNode) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public virtual GraphQLParser.AST.GraphQLSelectionSet? SelectionSet { get; }
         public GraphQL.Execution.ExecutionNode[]? SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
@@ -1008,7 +1008,7 @@ namespace GraphQL.Execution
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
-        public RootExecutionNode(GraphQL.Types.IObjectGraphType? graphType, GraphQLParser.AST.GraphQLSelectionSet? selectionSet) { }
+        public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType, GraphQLParser.AST.GraphQLSelectionSet? selectionSet) { }
         public override GraphQLParser.AST.GraphQLSelectionSet? SelectionSet { get; }
     }
     public class SerialExecutionStrategy : GraphQL.Execution.ExecutionStrategy

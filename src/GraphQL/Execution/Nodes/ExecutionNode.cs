@@ -15,23 +15,23 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the parent node, or <see langword="null"/> if this is the root node.
         /// </summary>
-        public ExecutionNode? Parent { get; }
+        public ExecutionNode Parent { get; }
 
         /// <summary>
         /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
         /// Array nodes will be a <see cref="ListGraphType"/> instance.
         /// </summary>
-        public IGraphType? GraphType { get; }
+        public IGraphType GraphType { get; }
 
         /// <summary>
         /// Returns the AST field of this node.
         /// </summary>
-        public GraphQLField? Field { get; }
+        public GraphQLField Field { get; }
 
         /// <summary>
         /// Returns the graph's field type of this node.
         /// </summary>
-        public FieldType? FieldDefinition { get; }
+        public FieldType FieldDefinition { get; }
 
         /// <summary>
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, <see langword="null"/>.
@@ -56,7 +56,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
         /// </summary>
-        public string? Name => (string)(Field?.Alias?.Name ?? Field?.Name); //TODO:alloc
+        public string? Name => Field?.Alias != null ? Field.Alias.Name.StringValue : FieldDefinition?.Name; //ISSUE:allocation in case of alias
 
         private object GetNameOrAlias(bool preferAlias)
         {
@@ -89,14 +89,14 @@ namespace GraphQL.Execution
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
-        protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, GraphQLField? field, FieldType? fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
         {
-            Debug.Assert(field?.Name == fieldDefinition?.Name);
+            Debug.Assert(field?.Name == fieldDefinition?.Name); // ? for RootExecutionNode
 
             Parent = parent;
             GraphType = graphType;
-            Field = field;
-            FieldDefinition = fieldDefinition;
+            Field = field!;
+            FieldDefinition = fieldDefinition!;
             IndexInParentNode = indexInParentNode;
         }
 

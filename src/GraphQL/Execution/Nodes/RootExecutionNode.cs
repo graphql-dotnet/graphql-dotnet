@@ -11,8 +11,8 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes a new instance for the specified root graph type.
         /// </summary>
-        public RootExecutionNode(IObjectGraphType? graphType, GraphQLSelectionSet? selectionSet)
-            : base(null, graphType, null, null, null)
+        public RootExecutionNode(IObjectGraphType graphType, GraphQLSelectionSet? selectionSet)
+            : base(null!, graphType, null!, null!, null)
         {
             SelectionSet = selectionSet;
         }
