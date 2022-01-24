@@ -22,13 +22,6 @@ namespace GraphQL.SystemTextJson
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
 
-        public ApolloTraceJsonConverter()
-        {
-            var converter = new ROMJsonConverter();
-            _optionsNoIndent.Converters.Add(converter);
-            _optionsIndent.Converters.Add(converter);
-        }
-
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, ApolloTrace value, JsonSerializerOptions options) // options ignored, this is by design to enforce camelCase
             => JsonSerializer.Serialize(writer, value, options.WriteIndented ? _optionsIndent : _optionsNoIndent);

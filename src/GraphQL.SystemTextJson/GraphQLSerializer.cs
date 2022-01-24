@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Transport;
-using GraphQLParser;
 
 namespace GraphQL.SystemTextJson
 {
@@ -159,11 +158,6 @@ namespace GraphQL.SystemTextJson
             if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(OperationMessage))))
             {
                 SerializerOptions.Converters.Add(new OperationMessageJsonConverter());
-            }
-
-            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ROM))))
-            {
-                SerializerOptions.Converters.Add(new ROMJsonConverter());
             }
         }
 
