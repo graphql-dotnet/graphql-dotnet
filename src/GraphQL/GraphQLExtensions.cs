@@ -1,14 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
@@ -480,22 +476,11 @@ namespace GraphQL
         /// </summary>
         internal static string Print(this ASTNode node)
         {
-            var context = new PrintContext();
-            _sdlWriter.Visit(node, context).GetAwaiter().GetResult(); // actually is sync
-            return context.Writer.ToString()!;
+            var writer = new StringWriter();
+            _sdlPrinter.PrintAsync(node, writer).GetAwaiter().GetResult(); // actually is sync
+            return writer.ToString()!;
         }
 
-        private static readonly SDLWriter<PrintContext> _sdlWriter = new();
-
-        private sealed class PrintContext : IWriteContext
-        {
-            public TextWriter Writer { get; set; } = new StringWriter();
-
-            public Stack<ASTNode> Parents { get; set; } = new Stack<ASTNode>();
-
-            public CancellationToken CancellationToken => default;
-
-            public int IndentLevel { get; set; }
-        }
+        private static readonly SDLPrinter _sdlPrinter = new();
     }
 }

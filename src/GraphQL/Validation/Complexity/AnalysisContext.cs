@@ -6,7 +6,7 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity
 {
-    internal sealed class AnalysisContext : INodeVisitorContext
+    internal sealed class AnalysisContext : IASTVisitorContext
     {
         public double AvgImpact { get; set; }
 

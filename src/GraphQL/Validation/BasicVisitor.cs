@@ -10,7 +10,7 @@ namespace GraphQL.Validation
     /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/>
     /// and <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
     /// </summary>
-    public class BasicVisitor : DefaultNodeVisitor<BasicVisitor.State>
+    public class BasicVisitor : ASTVisitor<BasicVisitor.State>
     {
         private readonly IList<INodeVisitor> _visitors;
 
@@ -32,21 +32,21 @@ namespace GraphQL.Validation
         /// Walks the specified <see cref="ASTNode"/>, executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/> and
         /// <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
         /// </summary>
-        public override async ValueTask Visit(ASTNode? node, State context)
+        public override async ValueTask VisitAsync(ASTNode? node, State context)
         {
             if (node != null)
             {
                 for (int i = 0; i < _visitors.Count; ++i)
                     _visitors[i].Enter(node, context.Context);
 
-                await base.Visit(node, context);
+                await base.VisitAsync(node, context);
 
                 for (int i = _visitors.Count - 1; i >= 0; --i)
                     _visitors[i].Leave(node, context.Context);
             }
         }
 
-        public readonly struct State : INodeVisitorContext
+        public readonly struct State : IASTVisitorContext
         {
             public State(ValidationContext context)
             {

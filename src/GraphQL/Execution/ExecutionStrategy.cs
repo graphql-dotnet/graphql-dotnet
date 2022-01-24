@@ -261,7 +261,7 @@ namespace GraphQL.Execution
                                 (visitedFragmentNames ??= new List<ROM>()).Add(spread.FragmentName.Name);
 
                                 var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
-                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, (string)fragment.TypeCondition.Type.Name, specificType)) //TODO:alloc
+                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.TypeCondition.Type.Name, specificType))
                                     CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
                             }
                         }
@@ -269,7 +269,7 @@ namespace GraphQL.Execution
                         {
                             // inline.Type may be null
                             // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
-                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, (string)inline.TypeCondition?.Type.Name ?? specificType.Name, specificType)) //TODO:alloc
+                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.TypeCondition != null ? inline.TypeCondition.Type.Name : specificType.Name, specificType))
                                 CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
                         }
                     }
@@ -315,10 +315,10 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
         /// </summary>
-        protected bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
+        protected bool DoesFragmentConditionMatch(ExecutionContext context, ROM fragmentName, IGraphType type /* should be named type*/)
         {
-            if (fragmentName == null)
-                throw new ArgumentNullException(nameof(fragmentName));
+            if (fragmentName.IsEmpty)
+                throw new ArgumentException("Fragment name can not be empty", nameof(fragmentName));
 
             var conditionalType = context.Schema.AllTypes[fragmentName];
 

@@ -98,7 +98,7 @@ namespace GraphQL.Validation
                         state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!));
                 });
 
-            new BasicVisitor(info, listener).Visit((ASTNode)node, new BasicVisitor.State(this)).GetAwaiter().GetResult(); // actually is sync
+            new BasicVisitor(info, listener).VisitAsync((ASTNode)node, new BasicVisitor.State(this)).GetAwaiter().GetResult(); // actually is sync
 
             return usages;
         }

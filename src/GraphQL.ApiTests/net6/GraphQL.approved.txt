@@ -901,7 +901,7 @@ namespace GraphQL.Execution
         protected virtual System.Collections.Generic.Dictionary<string, GraphQLParser.AST.GraphQLField> CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQLParser.AST.GraphQLSelectionSet selectionSet, System.Collections.Generic.Dictionary<string, GraphQLParser.AST.GraphQLField>? fields) { }
         protected virtual System.Threading.Tasks.Task CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual System.Threading.Tasks.Task CompleteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
+        protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, GraphQLParser.ROM fragmentName, GraphQL.Types.IGraphType type) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
@@ -2308,6 +2308,7 @@ namespace GraphQL.Utilities
         public bool AllowUnknownFields { get; set; }
         public bool AllowUnknownTypes { get; set; }
         public bool IgnoreComments { get; set; }
+        public bool IgnoreLocations { get; set; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
@@ -2490,12 +2491,12 @@ namespace GraphQL.Validation
         public virtual void VisitObject(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLVariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.IInputObjectGraphType type, object? variableValue, object? parsedValue) { }
         public virtual void VisitScalar(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLVariableDefinition variable, GraphQL.VariableName variableName, GraphQL.Types.ScalarGraphType type, object? variableValue, object? parsedValue) { }
     }
-    public class BasicVisitor : GraphQLParser.Visitors.DefaultNodeVisitor<GraphQL.Validation.BasicVisitor.State>
+    public class BasicVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Validation.BasicVisitor.State>
     {
         public BasicVisitor(params GraphQL.Validation.INodeVisitor[] visitors) { }
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
-        public override System.Threading.Tasks.ValueTask Visit(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
-        public readonly struct State : GraphQLParser.Visitors.INodeVisitorContext
+        public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
+        public readonly struct State : GraphQLParser.Visitors.IASTVisitorContext
         {
             public State(GraphQL.Validation.ValidationContext context) { }
             public System.Threading.CancellationToken CancellationToken { get; }

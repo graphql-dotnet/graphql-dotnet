@@ -60,11 +60,11 @@ namespace GraphQL.Validation.Complexity
             var visitor = new ComplexityVisitor();
 
             foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>())
-                visitor.Visit(frag, context).GetAwaiter().GetResult();
+                visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
 
             context.FragmentMapAlreadyBuilt = true;
 
-            visitor.Visit(doc, context).GetAwaiter().GetResult();
+            visitor.VisitAsync(doc, context).GetAwaiter().GetResult();
 
             return context.Result;
         }
