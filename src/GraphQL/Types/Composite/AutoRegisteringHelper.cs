@@ -10,28 +10,25 @@ namespace GraphQL.Types
 {
     internal static class AutoRegisteringHelper
     {
-        internal static void ConfigureGraphType<TSourceType>(IGraphType graphType)
+        /// <summary>
+        /// Scans a specific CLR type for <see cref="GraphQLAttribute"/> attributes and applies
+        /// them to to the specified <see cref="IGraphType"/>.
+        /// </summary>
+        internal static void ApplyGraphQLAttributes<TSourceType>(IGraphType graphType)
         {
-            var classType = typeof(TSourceType);
-
-            // Apply [Description] attribute
-            var descriptionAttribute = classType.GetCustomAttribute<DescriptionAttribute>();
-            if (descriptionAttribute != null)
-                graphType.Description = descriptionAttribute.Description;
-
-            // Apply [Obsolete] attribute
-            var obsoleteAttribute = classType.GetCustomAttribute<ObsoleteAttribute>();
-            if (obsoleteAttribute != null)
-                graphType.DeprecationReason = obsoleteAttribute.Message;
+            // Description and deprecation reason are already set in ComplexGraphType<TSourceType> constructor
 
             // Apply derivatives of GraphQLAttribute
-            var attributes = classType.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = typeof(TSourceType).GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
                 attr.Modify(graphType);
             }
         }
 
+        /// <summary>
+        /// Filters an enumeration of <see cref="PropertyInfo"/> values to exclude specified properties.
+        /// </summary>
         internal static IEnumerable<PropertyInfo> ExcludeProperties<TSourceType>(IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
             => excludedProperties == null || excludedProperties.Length == 0
                 ? properties
@@ -45,7 +42,7 @@ namespace GraphQL.Types
                 Description = propertyInfo.Description(),
                 DeprecationReason = propertyInfo.ObsoleteMessage(),
                 Type = propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), isInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
-                DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value,
+                DefaultValue = isInputType ? propertyInfo.DefaultValue() : null,
             };
 
             // Apply derivatives of GraphQLAttribute
