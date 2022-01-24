@@ -5,16 +5,16 @@ using GraphQL.Types;
 namespace GraphQL
 {
     /// <summary>
-    /// Specifies a GraphQL type name for a CLR class, or a field name for a property.
+    /// Specifies a GraphQL type name for a CLR class when used as an output type.
     /// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class NameAttribute : GraphQLAttribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class OutputNameAttribute : GraphQLAttribute
     {
         private string _name;
 
         /// <inheritdoc cref="NameAttribute"/>
-        public NameAttribute(string name)
+        public OutputNameAttribute(string name)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
         }
@@ -30,10 +30,11 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
-            => graphType.Name = Name;
-
-        /// <inheritdoc/>
-        public override void Modify(FieldType fieldType, bool isInputType)
-            => fieldType.Name = Name;
+        {
+            if (graphType is not IInputObjectGraphType)
+            {
+                graphType.Name = Name;
+            }
+        }
     }
 }

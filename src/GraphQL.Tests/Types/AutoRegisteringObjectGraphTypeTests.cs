@@ -21,6 +21,20 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void Class_IgnoresInputNameAttribute()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomInputName>();
+            graphType.Name.ShouldBe("TestClass_WithCustomInputName");
+        }
+
+        [Fact]
+        public void Class_RecognizesOutputNameAttribute()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomOutputName>();
+            graphType.Name.ShouldBe("TestWithCustomName");
+        }
+
+        [Fact]
         public void Class_RecognizesDescriptionAttribute()
         {
             var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomDescription>();
@@ -221,6 +235,12 @@ namespace GraphQL.Tests.Types
 
         [Name("TestWithCustomName")]
         private class TestClass_WithCustomName { }
+
+        [InputName("TestWithCustomName")]
+        private class TestClass_WithCustomInputName { }
+
+        [OutputName("TestWithCustomName")]
+        private class TestClass_WithCustomOutputName { }
 
         [Description("Test description")]
         private class TestClass_WithCustomDescription { }

@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -27,15 +28,15 @@ namespace GraphQL
         public object Value { get; set; }
 
         /// <inheritdoc/>
-        public override void Modify(IGraphType graphType)
-        {
-            graphType.WithMetadata(Key, Value);
-        }
+        public override void Modify(TypeConfig type) => type.WithMetadata(Key, Value);
 
         /// <inheritdoc/>
-        public override void Modify(FieldType fieldType, bool isInputType)
-        {
-            fieldType.WithMetadata(Key, Value);
-        }
+        public override void Modify(FieldConfig field) => field.WithMetadata(Key, Value);
+
+        /// <inheritdoc/>
+        public override void Modify(IGraphType graphType) => graphType.WithMetadata(Key, Value);
+
+        /// <inheritdoc/>
+        public override void Modify(FieldType fieldType, bool isInputType) =>fieldType.WithMetadata(Key, Value);
     }
 }
