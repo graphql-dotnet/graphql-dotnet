@@ -85,6 +85,7 @@ namespace GraphQL
         /// <summary>
         /// Indicates which GraphType input type this CLR type is mapped to (if used in input context).
         /// </summary>
+        [Obsolete("Please use the [InputType] attribute instead of this property.")]
         public Type? InputType
         {
             get => _mappedToInput;
@@ -100,6 +101,7 @@ namespace GraphQL
         /// <summary>
         /// Indicates which GraphType output type this CLR type is mapped to (if used in output context).
         /// </summary>
+        [Obsolete("Please use the [OutputType] attribute instead of this property.")]
         public Type? OutputType
         {
             get => _mappedToOutput;
