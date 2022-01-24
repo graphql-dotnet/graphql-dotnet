@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
-using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -59,12 +58,12 @@ query {
                 resolver.Duration.ShouldNotBe(0);
                 resolver.ParentType.ShouldNotBeNull();
                 resolver.ReturnType.ShouldNotBeNull();
-                resolver.FieldName.ShouldBe((string)(ROM)resolver.Path.Last());
+                resolver.FieldName.ShouldBe(resolver.Path.Last());
                 paths.Add(resolver.Path);
             }
             paths.Count.ShouldBe(expectedPaths.Count);
             for (int i = 0; i < paths.Count; ++i)
-                paths[i].ShouldBe(expectedPaths[i], new ROMToStringComparer());
+                paths[i].ShouldBe(expectedPaths[i]);
         }
 
         [Theory]

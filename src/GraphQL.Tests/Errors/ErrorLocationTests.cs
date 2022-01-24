@@ -61,7 +61,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Path.ShouldBe(new[] { "testSub", "two" }, new ROMToStringComparer());
+            error.Path.ShouldBe(new[] { "testSub", "two" });
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Path.ShouldBe(new object[] { "testSubList", 0, "two" }, new ROMToStringComparer());
+            error.Path.ShouldBe(new object[] { "testSubList", 0, "two" });
         }
 
         [Fact]

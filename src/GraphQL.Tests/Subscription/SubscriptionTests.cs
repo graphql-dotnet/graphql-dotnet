@@ -272,7 +272,7 @@ namespace GraphQL.Tests.Subscription
             message.Data.ShouldBeNull();
             var error = message.Errors.Single();
             error.InnerException.Message.ShouldBe("test");
-            error.Path.ShouldBe(new[] { "messageAdded" }, new ROMToStringComparer());
+            error.Path.ShouldBe(new[] { "messageAdded" });
         }
     }
 }

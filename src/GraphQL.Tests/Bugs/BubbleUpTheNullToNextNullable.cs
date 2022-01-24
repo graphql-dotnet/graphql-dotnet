@@ -248,7 +248,7 @@ namespace GraphQL.Tests.Bugs
                     ExecutionError expectedError = errors[i];
 
                     actualError.Message.ShouldBe(expectedError.Message);
-                    actualError.Path.ShouldBe(expectedError.Path, new ROMToStringComparer());
+                    actualError.Path.ShouldBe(expectedError.Path);
                     if (expectedError.InnerException == null)
                     {
                         actualError.InnerException.ShouldBeNull();

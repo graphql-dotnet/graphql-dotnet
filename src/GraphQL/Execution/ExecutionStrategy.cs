@@ -244,11 +244,11 @@ namespace GraphQL.Execution
                         {
                             if (ShouldIncludeNode(context, field))
                             {
-                                var fieldDefinition = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
-                                if (fieldDefinition == null)
+                                var fieldType = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
+                                if (fieldType == null)
                                     throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
-                                Add(fields, field, fieldDefinition);
+                                Add(fields, field, fieldType);
                             }
                         }
                         else if (selection is GraphQLFragmentSpread spread)

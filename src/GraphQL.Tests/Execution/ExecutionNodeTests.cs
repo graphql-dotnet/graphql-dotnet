@@ -1,7 +1,6 @@
 using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
@@ -49,7 +48,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            path.ShouldHaveSingleItem().ShouldBeOfType<ROM>().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBe("name");
         }
 
         [Fact]
@@ -65,7 +64,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            path.ShouldHaveSingleItem().ShouldBeOfType<ROM>().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBe("name");
         }
 
         [Fact]
@@ -81,7 +80,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            path.ShouldHaveSingleItem().ShouldBeOfType<ROM>().ShouldBe("alias");
+            path.ShouldHaveSingleItem().ShouldBe("alias");
         }
 
         [Fact]
@@ -97,7 +96,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            path.ShouldHaveSingleItem().ShouldBeOfType<ROM>().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBe("name");
         }
     }
 

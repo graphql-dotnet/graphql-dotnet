@@ -98,7 +98,7 @@ namespace GraphQL.Tests.Types
                 expectedErrorCount: responseType == Response.Success ? 0 : 1);
             if (responseType == Response.ErrorDataNull || responseType == Response.Error)
             {
-                actualResult.Errors[0].Path.ShouldBe(new object[] { (ROM)field });
+                actualResult.Errors[0].Path.ShouldBe(new object[] { field });
             }
         }
 
@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Types
                 expectedErrorCount: responseType == Response.Success ? 0 : 1);
             if (responseType == Response.ErrorDataNull || responseType == Response.Error)
             {
-                actualResult.Errors[0].Path.ShouldBe(new object[] { (ROM)field });
+                actualResult.Errors[0].Path.ShouldBe(new object[] { field });
             }
         }
 
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Types
             result.Errors.ShouldNotBeNull();
             result.Errors.Count.ShouldBe(1);
             result.Errors[0].Message.ShouldBe("Error trying to resolve field 'listNonNullInvalid'.");
-            result.Errors[0].Path.ShouldBe(new object[] { (ROM)"listNonNullInvalid", errorIndex });
+            result.Errors[0].Path.ShouldBe(new object[] { "listNonNullInvalid", errorIndex });
         }
     }
 

@@ -58,18 +58,6 @@ namespace GraphQL.Execution
         /// </summary>
         public string? Name => Field?.Alias != null ? Field.Alias.Name.StringValue : FieldDefinition?.Name; //ISSUE:allocation in case of alias
 
-        private object GetNameOrAlias(bool preferAlias)
-        {
-            if (preferAlias)
-            {
-                return (Field?.Alias?.Name ?? Field?.Name)!.Value;
-            }
-            else
-            {
-                return Field!.Name.Value;
-            }
-        }
-
         /// <summary>
         /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
         /// result that has not yet finished executing.
@@ -189,11 +177,11 @@ namespace GraphQL.Execution
             var pathList = new object[count];
             var index = count;
             node = this;
-            while (!(node is RootExecutionNode))
+            while (node is not RootExecutionNode)
             {
                 pathList[--index] = node.IndexInParentNode.HasValue
                     ? GetObjectIndex(node.IndexInParentNode.Value)
-                    : node.GetNameOrAlias(preferAlias);
+                    : preferAlias ? node.Name! : node.FieldDefinition.Name;
                 node = node.Parent!;
             }
 
