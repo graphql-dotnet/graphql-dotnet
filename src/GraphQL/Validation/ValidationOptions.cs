@@ -13,8 +13,6 @@ namespace GraphQL.Validation
 
         public GraphQLDocument Document { get; set; } = null!;
 
-        public string? OriginalQuery { get; set; }
-
         public IEnumerable<IValidationRule>? Rules { get; set; }
 
         public IDictionary<string, object?> UserContext { get; set; } = null!;

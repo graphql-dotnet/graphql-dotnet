@@ -147,7 +147,6 @@ namespace GraphQL
                         new ValidationOptions
                         {
                             Document = document,
-                            OriginalQuery = options.Query,
                             Rules = validationRules,
                             Operation = operation,
                             UserContext = options.UserContext,
