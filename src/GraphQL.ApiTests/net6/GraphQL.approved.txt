@@ -2502,7 +2502,7 @@ namespace GraphQL.Validation
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
         public readonly struct State : GraphQLParser.Visitors.IASTVisitorContext
         {
-            public State(GraphQL.Validation.ValidationContext context) { }
+            public State(GraphQL.Validation.ValidationContext context, System.Threading.CancellationToken cancellationToken) { }
             public System.Threading.CancellationToken CancellationToken { get; }
             public GraphQL.Validation.ValidationContext Context { get; }
         }
@@ -2621,6 +2621,7 @@ namespace GraphQL.Validation
     public class ValidationOptions
     {
         public ValidationOptions() { }
+        public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }

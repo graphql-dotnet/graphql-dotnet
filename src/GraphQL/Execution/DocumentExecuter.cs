@@ -150,6 +150,7 @@ namespace GraphQL
                             Rules = validationRules,
                             Operation = operation,
                             UserContext = options.UserContext,
+                            CancellationToken = options.CancellationToken,
                             Schema = options.Schema,
                             Variables = options.Variables ?? Inputs.Empty,
                             Extensions = options.Extensions ?? Inputs.Empty,

@@ -48,14 +48,15 @@ namespace GraphQL.Validation
 
         public readonly struct State : IASTVisitorContext
         {
-            public State(ValidationContext context)
+            public State(ValidationContext context, CancellationToken cancellationToken)
             {
                 Context = context;
+                CancellationToken = cancellationToken;
             }
 
             public ValidationContext Context { get; }
 
-            public CancellationToken CancellationToken => default;
+            public CancellationToken CancellationToken { get; }
         }
     }
 }

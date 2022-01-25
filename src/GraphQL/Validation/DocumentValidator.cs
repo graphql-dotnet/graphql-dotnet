@@ -93,7 +93,7 @@ namespace GraphQL.Validation
                             visitors.Add(visitor);
                     }
 
-                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context));
+                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context, options.CancellationToken));
                 }
 
                 // can report errors even without rules enabled

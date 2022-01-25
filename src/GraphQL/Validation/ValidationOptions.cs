@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -25,5 +26,11 @@ namespace GraphQL.Validation
         /// Executed operation.
         /// </summary>
         public GraphQLOperationDefinition Operation { get; set; } = null!;
+
+        /// <summary>
+        /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
+        /// defaults to <see cref="CancellationToken.None"/>
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
     }
 }
