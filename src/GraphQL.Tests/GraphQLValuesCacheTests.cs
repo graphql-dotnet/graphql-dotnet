@@ -10,7 +10,7 @@ namespace GraphQL.Tests
         [Fact]
         public void GetInt()
         {
-            for (int i=-15; i<=15; ++i)
+            for (int i = -15; i <= 15; ++i)
                 GraphQLValuesCache.GetInt(i.ToString(CultureInfo.InvariantCulture)).ShouldBe(i);
 
             GraphQLValuesCache.GetInt("-1000000").ShouldBe(-1000000);
