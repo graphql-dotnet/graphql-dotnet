@@ -159,8 +159,8 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
             var parentType = parent.GetObjectGraphType(context.Schema)!;
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];

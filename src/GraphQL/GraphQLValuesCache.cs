@@ -15,7 +15,7 @@ namespace GraphQL
             return value.Length switch
             {
                 1 when '0' <= value.Span[0] && value.Span[0] <= '9' => _positiveInts[value.Span[0] - '0'],
-                2 when value.Span[0] == '-' && '0' <= value.Span[0] && value.Span[0] <= '9' => _negativeInts[value.Span[1] - '0'],
+                2 when value.Span[0] == '-' && '0' <= value.Span[1] && value.Span[1] <= '9' => _negativeInts[value.Span[1] - '0'],
                 _ => Int.Parse(value)
             };
         }
@@ -25,7 +25,7 @@ namespace GraphQL
             return value.Length switch
             {
                 1 when '0' <= value.Span[0] && value.Span[0] <= '9' => _positiveLongs[value.Span[0] - '0'],
-                2 when value.Span[0] == '-' && '0' <= value.Span[0] && value.Span[0] <= '9' => _negativeLongs[value.Span[1] - '0'],
+                2 when value.Span[0] == '-' && '0' <= value.Span[1] && value.Span[1] <= '9' => _negativeLongs[value.Span[1] - '0'],
                 _ => Long.Parse(value)
             };
         }
