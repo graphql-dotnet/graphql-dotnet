@@ -15,13 +15,13 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public VariablesInAllowedPositionError(ValidationContext context, GraphQLVariableDefinition varDef, IGraphType varType, VariableUsage usage)
-            : base(context.OriginalQuery!, NUMBER, BadVarPosMessage(usage.Node.Name, varType, usage.Type))
+            : base(context.Document.Source, NUMBER, BadVarPosMessage(usage.Node.Name, varType, usage.Type))
         {
-            var varDefPos = new Location(context.OriginalQuery!, varDef.Location.Start);
-            var usagePos = new Location(context.OriginalQuery!, usage.Node.Location.Start);
+            var varDefLoc = Location.FromLinearPosition(context.Document.Source, varDef.Location.Start);
+            var usageLoc = Location.FromLinearPosition(context.Document.Source, usage.Node.Location.Start);
 
-            AddLocation(varDefPos.Line, varDefPos.Column);
-            AddLocation(usagePos.Line, usagePos.Column);
+            AddLocation(varDefLoc);
+            AddLocation(usageLoc);
         }
 
         internal static string BadVarPosMessage(ROM varName, object varType, object expectedType)

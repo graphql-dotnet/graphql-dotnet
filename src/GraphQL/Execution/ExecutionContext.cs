@@ -21,8 +21,6 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public GraphQLDocument Document { get; set; }
 
-        public string? OriginalQuery { get; set; }
-
         /// <inheritdoc/>
         public ISchema Schema { get; set; }
 

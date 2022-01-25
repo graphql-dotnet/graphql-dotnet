@@ -47,8 +47,6 @@ namespace GraphQL.Validation
         /// <inheritdoc cref="ExecutionContext.Document"/>
         public GraphQLDocument Document { get; set; } = null!;
 
-        public string? OriginalQuery { get; set; }
-
         /// <inheritdoc cref="Validation.TypeInfo"/>
         public TypeInfo TypeInfo { get; set; } = null!;
 
@@ -583,7 +581,7 @@ namespace GraphQL.Validation
             {
                 return scalar.CanParseLiteral(valueAst)
                     ? null
-                    : $"Expected type '{type.Name}', found {valueAst.StringFrom(OriginalQuery)}.";
+                    : $"Expected type '{type.Name}', found {valueAst.Print()}.";
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name ?? "<NULL>"} is not a valid input graph type.");

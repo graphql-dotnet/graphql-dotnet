@@ -12,10 +12,10 @@ namespace GraphQL.Validation
     [Serializable]
     public class ValidationError : DocumentError
     {
-        private readonly List<ASTNode> _nodes = new List<ASTNode>();
+        private readonly List<ASTNode> _nodes = new();
 
-        /// <inheritdoc cref="ValidationError(string, string, string, ASTNode[])"/>
-        public ValidationError(string originalQuery, string number, string message, ASTNode node)
+        /// <inheritdoc cref="ValidationError(ROM, string, string, ASTNode[])"/>
+        public ValidationError(ROM originalQuery, string number, string message, ASTNode node)
             : this(originalQuery, number, message, (Exception?)null, node)
         {
         }
@@ -24,14 +24,14 @@ namespace GraphQL.Validation
         /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
         /// Sets locations based on the original query and specified AST nodes that this error applies to.
         /// </summary>
-        public ValidationError(string originalQuery, string number, string message, params ASTNode[] nodes)
+        public ValidationError(ROM originalQuery, string number, string message, params ASTNode[] nodes)
             : this(originalQuery, number, message, null, nodes)
         {
         }
 
-        /// <inheritdoc cref="ValidationError(string, string, string, Exception, ASTNode[])"/>
+        /// <inheritdoc cref="ValidationError(ROM, string, string, Exception, ASTNode[])"/>
         public ValidationError(
-            string originalQuery,
+            ROM originalQuery,
             string number,
             string message,
             Exception? innerException,
@@ -44,8 +44,7 @@ namespace GraphQL.Validation
             if (node != null)
             {
                 _nodes.Add(node);
-                var location = new Location(originalQuery, node.Location.Start);
-                AddLocation(location.Line, location.Column);
+                AddLocation(Location.FromLinearPosition(originalQuery, node.Location.Start));
             }
         }
 
@@ -55,7 +54,7 @@ namespace GraphQL.Validation
         /// codes based on the inner exception(s). Loads any exception data from the inner exception into this instance.
         /// </summary>
         public ValidationError(
-            string originalQuery,
+            ROM originalQuery,
             string number,
             string message,
             Exception? innerException,
@@ -70,8 +69,7 @@ namespace GraphQL.Validation
                 foreach (var n in nodes)
                 {
                     _nodes.Add(n);
-                    var location = new Location(originalQuery, n.Location.Start);
-                    AddLocation(location.Line, location.Column);
+                    AddLocation(Location.FromLinearPosition(originalQuery, n.Location.Start));
                 }
             }
         }

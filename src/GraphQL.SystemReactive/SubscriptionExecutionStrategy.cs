@@ -158,7 +158,7 @@ namespace GraphQL.Execution
                                 {
                                     GenerateError(
                                         context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.OriginalQuery}'.",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.Source}'.",
                                         node.Field,
                                         node.ResponsePath,
                                         exception)
@@ -197,6 +197,6 @@ namespace GraphQL.Execution
             string message,
             GraphQLField field,
             IEnumerable<object> path,
-            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document, context.OriginalQuery);
+            Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }
 }

@@ -15,7 +15,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, GraphQLInlineFragment node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery!, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType, fragType), node)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType, fragType), node)
         {
         }
 
@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, GraphQLFragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery!, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name, parentType, fragType), node)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name, parentType, fragType), node)
         {
         }
 

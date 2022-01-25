@@ -36,7 +36,7 @@ namespace GraphQL.Execution
             {
                 Executed = true,
                 Data = data,
-                Query = context.OriginalQuery,
+                Query = context.Document.Source,
                 Document = context.Document,
                 Operation = context.Operation,
                 Extensions = context.OutputExtensions
@@ -65,13 +65,13 @@ namespace GraphQL.Execution
                 case OperationType.Mutation:
                     type = context.Schema.Mutation;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document, context.OriginalQuery);
+                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document);
                     break;
 
                 case OperationType.Subscription:
                     type = context.Schema.Subscription;
                     if (type == null)
-                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document, context.OriginalQuery);
+                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document);
                     break;
 
                 default:
@@ -525,7 +525,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetNodeError(ExecutionContext context, ExecutionNode node, ExecutionError error)
         {
-            error.AddLocation(node.Field, context.Document, context.OriginalQuery);
+            error.AddLocation(node.Field, context.Document);
             error.Path = node.ResponsePath;
             context.Errors.Add(error);
 

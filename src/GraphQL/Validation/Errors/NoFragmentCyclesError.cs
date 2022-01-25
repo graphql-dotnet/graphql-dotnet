@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoFragmentCyclesError(ValidationContext context, ROM fragName, string[] spreadNames, params ASTNode[] nodes)
-            : base(context.OriginalQuery!, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
+            : base(context.Document.Source, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
         {
         }
 

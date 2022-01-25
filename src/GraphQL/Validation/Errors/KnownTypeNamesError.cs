@@ -15,7 +15,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownTypeNamesError(ValidationContext context, GraphQLNamedType node, string[] suggestedTypes)
-            : base(context.OriginalQuery!, NUMBER, UnknownTypeMessage(node.Name, suggestedTypes), node)
+            : base(context.Document.Source, NUMBER, UnknownTypeMessage(node.Name, suggestedTypes), node)
         {
         }
 

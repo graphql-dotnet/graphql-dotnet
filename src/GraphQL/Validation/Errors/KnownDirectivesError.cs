@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownDirectivesError(ValidationContext context, GraphQLDirective node)
-            : base(context.OriginalQuery!, NUMBER, $"Unknown directive '{node.Name}'.", node)
+            : base(context.Document.Source, NUMBER, $"Unknown directive '{node.Name}'.", node)
         {
         }
     }

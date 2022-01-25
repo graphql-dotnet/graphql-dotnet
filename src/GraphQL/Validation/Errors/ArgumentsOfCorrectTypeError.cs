@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ArgumentsOfCorrectTypeError(ValidationContext context, GraphQLArgument node, string verboseErrors)
-            : base(context.OriginalQuery!, NUMBER, BadValueMessage(node.Name, verboseErrors), node)
+            : base(context.Document.Source, NUMBER, BadValueMessage(node.Name, verboseErrors), node)
         {
         }
 

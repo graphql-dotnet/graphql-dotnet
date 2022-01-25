@@ -15,7 +15,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public VariablesAreInputTypesError(ValidationContext context, GraphQLVariableDefinition node, IGraphType type)
-            : base(context.OriginalQuery!, NUMBER, UndefinedVarMessage(node.Variable.Name, type?.ToString() ?? node.Type.Name()), node)
+            : base(context.Document.Source, NUMBER, UndefinedVarMessage(node.Variable.Name, type?.ToString() ?? node.Type.Name()), node)
         {
         }
 

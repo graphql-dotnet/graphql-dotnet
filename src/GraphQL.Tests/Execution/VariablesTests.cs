@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
@@ -634,11 +635,11 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0027input\u0027 has invalid value. Expected type \u0027String\u0027, found WRONG_TYPE.")
+            var error = new ValidationError(default, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0027input\u0027 has invalid value. Expected type \u0027String\u0027, found WRONG_TYPE.")
             {
                 Code = "ARGUMENTS_OF_CORRECT_TYPE",
             };
-            error.AddLocation(3, 45);
+            error.AddLocation(new Location(3, 45));
 
             var expected = new ExecutionResult
             {

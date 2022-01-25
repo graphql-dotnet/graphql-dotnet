@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueArgumentNamesError(ValidationContext context, GraphQLArgument node, GraphQLArgument otherNode)
-            : base(context.OriginalQuery!, NUMBER, DuplicateArgMessage(node.Name), node, otherNode)
+            : base(context.Document.Source, NUMBER, DuplicateArgMessage(node.Name), node, otherNode)
         {
         }
 

@@ -4,6 +4,7 @@ using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace GraphQL.Tests.Bugs
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
             if (line != 0)
-                error.AddLocation(line, column);
+                error.AddLocation(new Location(line, column));
             error.Path = path;
             if (code != null)
                 error.Code = code;

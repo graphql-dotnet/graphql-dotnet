@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public LoneAnonymousOperationError(ValidationContext context, GraphQLOperationDefinition node)
-            : base(context.OriginalQuery!, NUMBER, AnonOperationNotAloneMessage(), node)
+            : base(context.Document.Source, NUMBER, AnonOperationNotAloneMessage(), node)
         {
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -31,7 +32,7 @@ namespace GraphQL
         /// <summary>
         /// Returns the original GraphQL query.
         /// </summary>
-        public string? Query { get; set; }
+        public ROM Query { get; set; }
 
         /// <summary>
         /// Returns the parsed GraphQL request.

@@ -267,7 +267,6 @@ namespace GraphQL
             var context = new ExecutionContext
             {
                 Document = document,
-                OriginalQuery = options.Query,
                 Schema = options.Schema!,
                 RootValue = options.Root,
                 UserContext = options.UserContext,

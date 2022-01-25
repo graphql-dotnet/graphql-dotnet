@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueDirectivesPerLocationError(ValidationContext context, GraphQLDirective node)
-            : base(context.OriginalQuery!, NUMBER, $"The directive '{node.Name}' can only be used once at this location.", node)
+            : base(context.Document.Source, NUMBER, $"The directive '{node.Name}' can only be used once at this location.", node)
         {
         }
     }

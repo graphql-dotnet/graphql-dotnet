@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public InputFieldsAndArgumentsOfCorrectLengthError(ValidationContext context, ASTNode node, int? length, int? min, int? max)
-            : base(context.OriginalQuery!, NUMBER, BadValueMessage(node, length, min, max), node)
+            : base(context.Document.Source, NUMBER, BadValueMessage(node, length, min, max), node)
         {
         }
 
@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public InputFieldsAndArgumentsOfCorrectLengthError(ValidationContext context, GraphQLVariableDefinition node, VariableName variableName, int? length, int? min, int? max)
-            : base(context.OriginalQuery!, NUMBER, BadValueMessage(variableName, length, min, max), node)
+            : base(context.Document.Source, NUMBER, BadValueMessage(variableName, length, min, max), node)
         {
         }
 

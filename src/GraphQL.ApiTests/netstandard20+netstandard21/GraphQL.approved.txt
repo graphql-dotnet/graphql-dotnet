@@ -1,9 +1,5 @@
 namespace GraphQL
 {
-    public static class AstExtensions
-    {
-        public static string StringFrom(this GraphQLParser.AST.ASTNode node, string? originalQuery) { }
-    }
     public static class AuthorizationExtensions
     {
         public const string POLICY_KEY = "Authorization__Policies";
@@ -74,17 +70,6 @@ namespace GraphQL
     {
         public static System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(this GraphQL.IDocumentExecuter executer, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
-    public readonly struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
-    {
-        public ErrorLocation(int line, int column) { }
-        public int Column { get; }
-        public int Line { get; }
-        public bool Equals(GraphQL.ErrorLocation other) { }
-        public override bool Equals(object? obj) { }
-        public override int GetHashCode() { }
-        public static bool operator !=(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
-        public static bool operator ==(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
-    }
     [System.Serializable]
     public class ExecutionError : System.Exception
     {
@@ -92,13 +77,13 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception? exception) { }
         public string? Code { get; set; }
-        public System.Collections.Generic.List<GraphQL.ErrorLocation>? Locations { get; }
+        public System.Collections.Generic.List<GraphQLParser.Location>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
-        public void AddLocation(int line, int column) { }
+        public void AddLocation(GraphQLParser.Location location) { }
     }
     public static class ExecutionErrorExtensions
     {
-        public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document, string? originalQuery)
+        public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document)
             where TError : GraphQL.ExecutionError { }
     }
     public class ExecutionErrors : System.Collections.Generic.IEnumerable<GraphQL.ExecutionError>, System.Collections.IEnumerable
@@ -143,7 +128,7 @@ namespace GraphQL
         public System.Collections.Generic.Dictionary<string, object?>? Extensions { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition? Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[]? Perf { get; set; }
-        public string? Query { get; set; }
+        public GraphQLParser.ROM Query { get; set; }
         public GraphQL.ExecutionResult AddError(GraphQL.ExecutionError error) { }
         public GraphQL.ExecutionResult AddErrors(GraphQL.ExecutionErrors errors) { }
     }
@@ -867,7 +852,6 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
-        public string? OriginalQuery { get; set; }
         public System.Collections.Generic.Dictionary<string, object?> OutputExtensions { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public object? RootValue { get; set; }
@@ -2597,7 +2581,6 @@ namespace GraphQL.Validation
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
-        public string? OriginalQuery { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
@@ -2614,10 +2597,10 @@ namespace GraphQL.Validation
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
     {
-        public ValidationError(string originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(string originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
-        public ValidationError(string originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(string originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
         public string Number { get; set; }
     }

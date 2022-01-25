@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoUndefinedVariablesError(ValidationContext context, GraphQLOperationDefinition node, GraphQLVariable variableReference)
-            : base(context.OriginalQuery!, NUMBER, UndefinedVarMessage(variableReference.Name, node.Name), variableReference, node)
+            : base(context.Document.Source, NUMBER, UndefinedVarMessage(variableReference.Name, node.Name), variableReference, node)
         {
         }
 

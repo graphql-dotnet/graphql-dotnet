@@ -18,7 +18,7 @@ namespace GraphQL.Execution
             : base("Error parsing query: " + ex.Description, ex)
         {
             // Code will contain SYNTAX_ERROR due to inner exception
-            AddLocation(ex.Line, ex.Column);
+            AddLocation(ex.Location);
         }
     }
 }

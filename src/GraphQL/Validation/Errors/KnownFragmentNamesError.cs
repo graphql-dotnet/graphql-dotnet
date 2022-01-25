@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public KnownFragmentNamesError(ValidationContext context, GraphQLFragmentSpread node, ROM fragmentName)
-            : base(context.OriginalQuery!, NUMBER, UnknownFragmentMessage(fragmentName), node)
+            : base(context.Document.Source, NUMBER, UnknownFragmentMessage(fragmentName), node)
         {
         }
 

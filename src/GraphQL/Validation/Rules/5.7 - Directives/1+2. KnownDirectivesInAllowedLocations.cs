@@ -84,7 +84,7 @@ namespace GraphQL.Validation.Rules
                 GraphQLEnumValue _ => DirectiveLocation.EnumValue,
                 GraphQLInputObjectTypeDefinition _ => DirectiveLocation.InputObject,
                 GraphQLInputFieldsDefinition _ => DirectiveLocation.InputFieldDefinition,
-                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.StringFrom(context.OriginalQuery)}'.")
+                _ => throw new InvalidOperationException($"Unable to determine directive location for '{appliedTo?.Print()}'.")
             };
         }
     }

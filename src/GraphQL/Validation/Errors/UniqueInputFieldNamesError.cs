@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueInputFieldNamesError(ValidationContext context, GraphQLValue node, GraphQLObjectField altNode)
-            : base(context.OriginalQuery!, NUMBER, DuplicateInputField(altNode.Name), node, altNode.Value)
+            : base(context.Document.Source, NUMBER, DuplicateInputField(altNode.Name), node, altNode.Value)
         {
         }
 

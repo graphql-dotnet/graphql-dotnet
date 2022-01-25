@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Tests.Utilities;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -43,7 +44,7 @@ namespace GraphQL.Tests.Errors
             Builder.Types.Include<Query>();
 
             var expectedError = new ExecutionError("Test error message");
-            expectedError.AddLocation(1, 3);
+            expectedError.AddLocation(new Location(1, 3));
             expectedError.Path = new[] { "hello2" };
 
             AssertQuery(options =>
@@ -74,7 +75,7 @@ namespace GraphQL.Tests.Errors
             Builder.Types.Include<Query>();
 
             var expectedError = new ExecutionError("Test error message", new ApplicationException());
-            expectedError.AddLocation(1, 3);
+            expectedError.AddLocation(new Location(1, 3));
             expectedError.Path = new[] { "hello2" };
 
             AssertQuery(options =>

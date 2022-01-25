@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Tests.Utilities;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -37,7 +38,7 @@ namespace GraphQL.Tests.Bugs
             schema.Initialize();
 
             var error = new ExecutionError(errorMessage);
-            error.AddLocation(1, 18);
+            error.AddLocation(new Location(1, 18));
             error.Path = new string[] { "hero", "friend" };
             error.Code = code;
 
