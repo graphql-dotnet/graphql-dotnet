@@ -1,7 +1,5 @@
-using System;
 using System.Globalization;
 using System.Linq;
-using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;

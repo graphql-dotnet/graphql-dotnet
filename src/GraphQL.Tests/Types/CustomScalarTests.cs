@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
