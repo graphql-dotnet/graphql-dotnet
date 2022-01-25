@@ -159,8 +159,8 @@ updated or added for convenience as follows:
 | Attribute            | Description        |
 |----------------------|--------------------|
 | `[Name]`             | Specifies a GraphQL name for a CLR class or property |
-| `[InputName]`        | Specifies a GraphQL name for an input CLR class |
-| `[OutputName]`       | Specifies a GraphQL name for an output CLR class |
+| `[InputName]`        | Specifies a GraphQL name for an input CLR class or property |
+| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or property |
 | `[InputType]`        | Specifies a graph type for a field on an input model |
 | `[OutputType]`       | Specifies a graph type for a field on an output model |
 | `[Metadata]`         | Specifies custom metadata to be added to the graph type or field |

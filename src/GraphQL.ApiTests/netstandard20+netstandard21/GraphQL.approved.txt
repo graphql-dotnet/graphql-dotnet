@@ -375,12 +375,13 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
     {
         public InputNameAttribute(string name) { }
         public string Name { get; set; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
@@ -454,12 +455,13 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {
         public OutputNameAttribute(string name) { }
         public string Name { get; set; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
