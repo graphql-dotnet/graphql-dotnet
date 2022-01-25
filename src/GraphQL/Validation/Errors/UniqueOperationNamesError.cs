@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -14,11 +13,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public UniqueOperationNamesError(ValidationContext context, GraphQLOperationDefinition node)
-            : base(context.Document.Source, NUMBER, DuplicateOperationNameMessage(node.Name), node)
+            : base(context.Document.Source, NUMBER, DuplicateOperationNameMessage(node.Name?.StringValue), node)
         {
         }
 
-        internal static string DuplicateOperationNameMessage(ROM opName)
+        internal static string DuplicateOperationNameMessage(string? opName)
             => $"There can only be one operation named {opName}.";
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -13,12 +12,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public NoFragmentCyclesError(ValidationContext context, ROM fragName, string[] spreadNames, params ASTNode[] nodes)
+        public NoFragmentCyclesError(ValidationContext context, string fragName, string[] spreadNames, params ASTNode[] nodes)
             : base(context.Document.Source, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
         {
         }
 
-        internal static string CycleErrorMessage(ROM fragName, string[] spreadNames)
+        internal static string CycleErrorMessage(string fragName, string[] spreadNames)
         {
             var via = spreadNames.Length > 0 ? " via " + string.Join(", ", spreadNames) : "";
             return $"Cannot spread fragment '{fragName}' within itself{via}.";

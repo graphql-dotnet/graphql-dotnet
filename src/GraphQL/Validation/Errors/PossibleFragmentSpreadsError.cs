@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -23,11 +22,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, GraphQLFragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name, parentType, fragType), node)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name.StringValue, parentType, fragType), node)
         {
         }
 
-        internal static string TypeIncompatibleSpreadMessage(ROM fragName, object parentType, object fragType)
+        internal static string TypeIncompatibleSpreadMessage(string fragName, object parentType, object fragType)
             => $"Fragment '{fragName}' cannot be spread here as objects of type '{parentType}' can never be of type '{fragType}'.";
 
         internal static string TypeIncompatibleAnonSpreadMessage(object parentType, object fragType)

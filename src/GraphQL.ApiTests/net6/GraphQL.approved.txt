@@ -2736,7 +2736,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class KnownFragmentNamesError : GraphQL.Validation.ValidationError
     {
-        public KnownFragmentNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLFragmentSpread node, GraphQLParser.ROM fragmentName) { }
+        public KnownFragmentNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLFragmentSpread node, string fragmentName) { }
     }
     [System.Serializable]
     public class KnownTypeNamesError : GraphQL.Validation.ValidationError
@@ -2751,7 +2751,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class NoFragmentCyclesError : GraphQL.Validation.ValidationError
     {
-        public NoFragmentCyclesError(GraphQL.Validation.ValidationContext context, GraphQLParser.ROM fragName, string[] spreadNames, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public NoFragmentCyclesError(GraphQL.Validation.ValidationContext context, string fragName, string[] spreadNames, params GraphQLParser.AST.ASTNode[] nodes) { }
     }
     [System.Serializable]
     public class NoUndefinedVariablesError : GraphQL.Validation.ValidationError

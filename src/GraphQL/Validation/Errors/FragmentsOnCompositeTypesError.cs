@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -22,14 +21,14 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public FragmentsOnCompositeTypesError(ValidationContext context, GraphQLFragmentDefinition node)
-            : base(context.Document.Source, NUMBER, FragmentOnNonCompositeErrorMessage(node.FragmentName.Name, node.TypeCondition.Type.Print()), node.TypeCondition.Type)
+            : base(context.Document.Source, NUMBER, FragmentOnNonCompositeErrorMessage(node.FragmentName.Name.StringValue, node.TypeCondition.Type.Print()), node.TypeCondition.Type)
         {
         }
 
-        internal static string InlineFragmentOnNonCompositeErrorMessage(ROM type)
+        internal static string InlineFragmentOnNonCompositeErrorMessage(string type)
             => $"Fragment cannot condition on non composite type '{type}'.";
 
-        internal static string FragmentOnNonCompositeErrorMessage(ROM fragName, string type)
+        internal static string FragmentOnNonCompositeErrorMessage(string fragName, string type)
             => $"Fragment '{fragName}' cannot condition on non composite type '{type}'.";
     }
 }

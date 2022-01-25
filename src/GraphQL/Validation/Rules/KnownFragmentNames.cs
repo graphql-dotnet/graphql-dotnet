@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Rules
             var fragment = context.GetFragment(fragmentName);
             if (fragment == null)
             {
-                context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
+                context.ReportError(new KnownFragmentNamesError(context, node, fragmentName.StringValue));
             }
         });
     }

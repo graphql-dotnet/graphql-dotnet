@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -14,11 +13,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoUnusedVariablesError(ValidationContext context, GraphQLVariableDefinition node, GraphQLOperationDefinition op)
-            : base(context.Document.Source, NUMBER, UnusedVariableMessage(node.Variable.Name, op.Name), node)
+            : base(context.Document.Source, NUMBER, UnusedVariableMessage(node.Variable.Name.StringValue, op.Name?.StringValue), node)
         {
         }
 
-        internal static string UnusedVariableMessage(ROM varName, GraphQLName? opName)
+        internal static string UnusedVariableMessage(string varName, string? opName)
         {
             return opName is null
                 ? $"Variable '${varName}' is never used."

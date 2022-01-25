@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -19,7 +18,7 @@ namespace GraphQL.Validation.Errors
         public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, FieldType fieldDef, IGraphType parentType)
             : base(context.Document.Source, NUMBER,
                 UnknownArgMessage(
-                    node.Name,
+                    node.Name.StringValue,
                     fieldDef.Name,
                     parentType.ToString(),
                     StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //ISSUE:allocation
@@ -33,14 +32,14 @@ namespace GraphQL.Validation.Errors
         public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, DirectiveGraphType directive)
             : base(context.Document.Source, NUMBER,
                 UnknownDirectiveArgMessage(
-                    node.Name,
+                    node.Name.StringValue,
                     directive.Name,
                     StringUtils.SuggestionList(node.Name.StringValue, directive.Arguments?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }
 
-        internal static string UnknownArgMessage(ROM argName, string fieldName, string type, string[] suggestedArgs)
+        internal static string UnknownArgMessage(string argName, string fieldName, string type, string[] suggestedArgs)
         {
             var message = $"Unknown argument '{argName}' on field '{fieldName}' of type '{type}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
@@ -50,7 +49,7 @@ namespace GraphQL.Validation.Errors
             return message;
         }
 
-        internal static string UnknownDirectiveArgMessage(ROM argName, string directiveName, string[] suggestedArgs)
+        internal static string UnknownDirectiveArgMessage(string argName, string directiveName, string[] suggestedArgs)
         {
             var message = $"Unknown argument '{argName}' on directive '{directiveName}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)

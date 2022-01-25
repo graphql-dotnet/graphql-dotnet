@@ -15,7 +15,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public VariablesInAllowedPositionError(ValidationContext context, GraphQLVariableDefinition varDef, IGraphType varType, VariableUsage usage)
-            : base(context.Document.Source, NUMBER, BadVarPosMessage(usage.Node.Name, varType, usage.Type))
+            : base(context.Document.Source, NUMBER, BadVarPosMessage(usage.Node.Name.StringValue, varType, usage.Type))
         {
             var varDefLoc = Location.FromLinearPosition(context.Document.Source, varDef.Location.Start);
             var usageLoc = Location.FromLinearPosition(context.Document.Source, usage.Node.Location.Start);
@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Errors
             AddLocation(usageLoc);
         }
 
-        internal static string BadVarPosMessage(ROM varName, object varType, object expectedType)
+        internal static string BadVarPosMessage(string varName, object varType, object expectedType)
             => $"Variable '${varName}' of type '{varType}' used in position expecting type '{expectedType}'.";
     }
 }

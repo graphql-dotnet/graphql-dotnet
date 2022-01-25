@@ -1,5 +1,4 @@
 using System;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -14,11 +13,11 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public NoUnusedFragmentsError(ValidationContext context, GraphQLFragmentDefinition node)
-            : base(context.Document.Source, NUMBER, UnusedFragMessage(node.FragmentName.Name), node)
+            : base(context.Document.Source, NUMBER, UnusedFragMessage(node.FragmentName.Name.StringValue), node)
         {
         }
 
-        internal static string UnusedFragMessage(ROM fragName)
+        internal static string UnusedFragMessage(string fragName)
             => $"Fragment '{fragName}' is never used.";
     }
 }

@@ -80,7 +80,7 @@ namespace GraphQL.Validation.Rules
                     var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
                     var nodes = cyclePath.OfType<ASTNode>().Concat(new[] { spreadNode }).ToArray();
 
-                    context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //ISSUE:allocation
+                    context.ReportError(new NoFragmentCyclesError(context, spreadName.StringValue, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //ISSUE:allocation
                 }
             }
 

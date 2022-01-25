@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -15,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLField node, QueryArgument arg)
-            : base(context.Document.Source, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+            : base(context.Document.Source, NUMBER, MissingFieldArgMessage(node.Name.StringValue, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 
@@ -23,14 +22,14 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLDirective node, QueryArgument arg)
-            : base(context.Document.Source, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+            : base(context.Document.Source, NUMBER, MissingDirectiveArgMessage(node.Name.StringValue, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 
-        internal static string MissingFieldArgMessage(ROM fieldName, string argName, string type)
+        internal static string MissingFieldArgMessage(string fieldName, string argName, string type)
             => $"Argument '{argName}' of type '{type}' is required for field '{fieldName}' but not provided.";
 
-        internal static string MissingDirectiveArgMessage(ROM directiveName, string argName, string type)
+        internal static string MissingDirectiveArgMessage(string directiveName, string argName, string type)
             => $"Argument '{argName}' of type '{type}' is required for directive '{directiveName}' but not provided.";
     }
 }
