@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, GraphQLInlineFragment node, IGraphType parentType, IGraphType fragType)
-            : base(context.Document.Source, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType, fragType), node)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType.ToString(), fragType.ToString()), node)
         {
         }
 
@@ -22,14 +22,14 @@ namespace GraphQL.Validation.Errors
         /// Initializes a new instance with the specified properties.
         /// </summary>
         public PossibleFragmentSpreadsError(ValidationContext context, GraphQLFragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name.StringValue, parentType, fragType), node)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name.StringValue, parentType.ToString(), fragType.ToString()), node)
         {
         }
 
-        internal static string TypeIncompatibleSpreadMessage(string fragName, object parentType, object fragType)
+        internal static string TypeIncompatibleSpreadMessage(string fragName, string parentType, string fragType)
             => $"Fragment '{fragName}' cannot be spread here as objects of type '{parentType}' can never be of type '{fragType}'.";
 
-        internal static string TypeIncompatibleAnonSpreadMessage(object parentType, object fragType)
+        internal static string TypeIncompatibleAnonSpreadMessage(string parentType, string fragType)
             => $"Fragment cannot be spread here as objects of type '{parentType}' can never be of type '{fragType}'.";
     }
 }
