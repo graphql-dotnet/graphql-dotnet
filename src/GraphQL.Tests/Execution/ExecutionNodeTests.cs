@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            path.ShouldHaveSingleItem().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            path.ShouldHaveSingleItem().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            path.ShouldHaveSingleItem().ShouldBe("alias");
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("alias");
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            path.ShouldHaveSingleItem().ShouldBe("name");
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
     }
 
