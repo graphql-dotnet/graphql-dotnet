@@ -11,7 +11,7 @@ namespace GraphQL.Types
     {
         /// <summary>
         /// Scans a specific CLR type for <see cref="GraphQLAttribute"/> attributes and applies
-        /// them to to the specified <see cref="IGraphType"/>.
+        /// them to the specified <see cref="IGraphType"/>.
         /// </summary>
         internal static void ApplyGraphQLAttributes<TSourceType>(IGraphType graphType)
         {
