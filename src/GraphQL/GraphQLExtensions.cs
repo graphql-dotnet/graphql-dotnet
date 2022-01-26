@@ -139,6 +139,28 @@ namespace GraphQL
             return namedType is GraphQLTypeReference;
         }
 
+        internal static bool IsNamedType(this Type? type)
+        {
+            if (type is null)
+                return true;
+            if (type is not IGraphType)
+                return false;
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(NonNullGraphType<>) ||
+                    genericType == typeof(ListGraphType<>))
+                {
+                    return false;
+                }
+            }
+            else if (type == typeof(NonNullGraphType) || type == typeof(ListGraphType))
+            {
+                return false;
+            }
+
+            return true;
+        }
         internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType? type)
         {
             return type switch
