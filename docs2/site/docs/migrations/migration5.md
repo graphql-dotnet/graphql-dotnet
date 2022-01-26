@@ -210,7 +210,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
   - `GraphQL.Language.AST.SelectionSet` -> `GraphQLParser.AST.GraphQLSelectionSet`
   - `GraphQL.Language.AST.IHaveDirectives` -> `GraphQLParser.AST.IHasDirectivesNode`
   - `GraphQL.Language.AST.IType` -> `GraphQLParser.AST.GraphQLType`
-- Some APIs become to work with `GraphQLParser.ROM` struct instead of `string`:
+- Some APIs utilize `GraphQLParser.ROM` struct instead of `string`:
   - `ExecutionResult.Query`
   - `Metrics.SetOperationName`
   - `IComplexGraphType.GetField`
@@ -222,6 +222,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
   - All `ValidationError`'s constructors take _originalQuery_ as `ROM`
 - `OperationType` and `DirectiveLocation` enums were removed, use enums from `GraphQLParser.AST` namespace
 - `SourceLocation` struct was removed, use `GraphQLLocation` from `GraphQLParser.AST` namespace
+- `CoreToVanillaConverter` class was removed
 - `ErrorLocation` struct was removed, use `Location` from `GraphQLParser` namespace
 - `IResolveFieldContext.SubFields` and `IExecutionStrategy.GetSubFields` returns dictionary with
    values of tuple of queried field and its field definition
@@ -323,18 +324,23 @@ public class HumanType : ObjectGraphType<Human>
 
 ### 20. `AstPrinter` class was removed
 
-`AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project:
+`AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project.
+
+Code before changes:
 
 ```csharp
-public static async Task Print(string text)
-{
-    using var document = Parser.Parse(text);
-    var writer = new StringWriter(); 
-    var printer = new SDLPrinter()
-    await printer.PrintAsync(document, writer);
-    var rendered = writer.ToString();
-    Console.WriteLine(rendered);
-}
+INode node = ...;
+string s = AstPrinter.Print(node);
+```
+
+Code after changes:
+
+```csharp
+ASTNode node = ...;
+var writer = new StringWriter();
+var printer = new SDLPrinter();
+sdlPrinter.PrintAsync(node, writer).GetAwaiter().GetResult(); // actually is sync
+string s = writer.ToString();
 ```
 
 `SDLPrinter` is a highly optimized visitor for asynchronous non-blocking SDL output
