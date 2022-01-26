@@ -84,6 +84,27 @@ and `GraphQL.NewtonsoftJson` libraries, these serialize and deserialize to JSON 
 
 ### 6. `AutoRegisteringObjectGraphType` and `AutoRegisteringInputObjectGraphType` enhancements
 
+These two classes now provide a range of customizable behavior for data models without the
+need for creating individual graph types for each data model. New for v5, fields' names
+and graph types can be customized by applying attributes to the respective property, such
+as is shown in the below example:
+
+```csharp
+// graph type: AutoRegisteringObjectGraphType<Person>
+
+class Person
+{
+    [Name("Id")]
+    [OutputType(typeof(IdGraphType))]
+    public int PersonId { get; set; }
+
+    public string Name { get; set; }
+
+    [GraphQLAuthorize("Administrators")]
+    public int Age { get; set; }
+}
+```
+
 #### Overridable base functionality
 
 The classes can be overridden, providing the ability to customize behavior of automatically
@@ -108,6 +129,17 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
 Similarly, by overriding `CreateField` you can change the default name, description,
 graph type, or other information applied to each generated field.
 
+These `protected` methods can be overridden to provide the following customizations to
+automatically-generated graph types:
+
+| Method           | Description                                                          | Typical use      |
+|------------------|----------------------------------------------------------------------|------------------|
+| (constructor)    | Configures graph properties and adds fields                          | Configuring graph after default initialization is complete |
+| ConfigureGraph   | Configures default graph properties prior to applying attributes     | Applying a different default naming convention, such as appending "Input" or "Model" |
+| GetRegisteredProperties | Returns the set of properties to be automatically configured  | Filtering internal properties; sorting the property list |
+| ProvideFields    | Returns a set of generated fields                                    | Adding additional fields to the generated set |
+| CreateField      | Creates a `FieldType` from a `PropertyInfo`                          | Applying custom behavior to field generation |
+
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
 
@@ -117,6 +149,25 @@ services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAut
 
 Then any graph type defined as `AutoRegisteringObjectGraphType<...>` will use your custom
 type instead.
+
+#### Graphs and fields recognize attributes to control initialization behavior
+
+Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, is can be set on a
+CLR class or one if its properties and is configured for the graph or field type. New attributes have been
+updated or added for convenience as follows:
+
+| Attribute            | Description        |
+|----------------------|--------------------|
+| `[Name]`             | Specifies a GraphQL name for a CLR class or property |
+| `[InputName]`        | Specifies a GraphQL name for an input CLR class or property |
+| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or property |
+| `[InputType]`        | Specifies a graph type for a field on an input model |
+| `[OutputType]`       | Specifies a graph type for a field on an output model |
+| `[Metadata]`         | Specifies custom metadata to be added to the graph type or field |
+| `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
+| `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
+
+Custom attributes can be easily added to control any other initialization of graphs or fields.
 
 ### 7. More strict behavior of FloatGraphType for special values
 

@@ -279,8 +279,8 @@ public class MySchema
 ```
 
 This is not necessary if you use the alternate `Field<T>` syntax which specifies the graph type
-to be used for the field, or if your scalar data type is marked with the `GraphQLMetadata`
-attribute setting the `InputType` and/or `OutputType` properties.
+to be used for the field, or if your scalar data type is marked with the
+`[InputType]` and/or `[OutputType]` attributes.
 
 In this example, you created a custom scalar. In summary:
 
