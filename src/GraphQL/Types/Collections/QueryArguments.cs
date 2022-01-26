@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -76,7 +77,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Finds an argument by its name from the list.
         /// </summary>
-        public QueryArgument? Find(string name)
+        public QueryArgument? Find(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)

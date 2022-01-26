@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity(@"
 query {
-  A
+  A #1
 }");
             res.TotalQueryDepth.ShouldBe(0);
             res.Complexity.ShouldBe(1);
@@ -30,8 +30,8 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  A {
-    B
+  A { #2
+    B #2
   }
 }");
             res.TotalQueryDepth.ShouldBe(1);
@@ -43,10 +43,10 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  A {
-    B
-    C
-    D
+  A { #2
+    B #2
+    C #2
+    D #2
   }
 }");
             res.TotalQueryDepth.ShouldBe(1);
@@ -58,9 +58,9 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  A {
-    B {
-      C
+  A {   #2
+    B { #4
+      C #4
     }
   }
 }");
@@ -73,12 +73,12 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  F
-  A {
-    B
-    D {
-      C
-      E
+  F     #1
+  A {   #2
+    B   #2
+    D { #4
+      C #4
+      E #4
     }
   }
 }");
@@ -91,10 +91,10 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  A {
-    B {
-      C {
-        D
+  A {     #2
+    B {   #4
+      C { #8
+        D #8
       }
     }
   }
@@ -108,14 +108,14 @@ query {
         {
             var res = AnalyzeComplexity(@"
 query {
-  A {
-    B
+  A { #2
+    B #2
   }
-  C {
-    D
+  C { #2
+    D #2
   }
-  E {
-    F
+  E { #2
+    F #2
   }
 }");
             res.TotalQueryDepth.ShouldBe(3);

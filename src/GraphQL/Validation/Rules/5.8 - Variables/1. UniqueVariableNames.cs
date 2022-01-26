@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,12 +23,12 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
-            new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
+            new MatchingNodeVisitor<GraphQLOperationDefinition>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((variableDefinition, context) =>
             {
-                var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<string, VariableDefinition>();
+                var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<ROM, GraphQLVariableDefinition>();
 
-                var variableName = variableDefinition.Name;
+                var variableName = variableDefinition.Variable.Name;
 
                 if (knownVariables.TryGetValue(variableName, out var variable))
                 {

@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
+using GraphQLParser;
 
-namespace GraphQL.Language.AST
+namespace GraphQL.Validation
 {
     /// <summary>
     /// Contains a list of variables (name &amp; value tuples) that have been gathered from the document and attached <see cref="Inputs"/>.
@@ -41,7 +42,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
         /// </summary>
-        public bool ValueFor(string name, out ArgumentValue value)
+        public bool ValueFor(ROM name, out ArgumentValue value)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)
@@ -64,9 +65,6 @@ namespace GraphQL.Language.AST
         public IEnumerator<Variable> GetEnumerator() => (_variables ?? Enumerable.Empty<Variable>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        /// <inheritdoc/>
-        public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
 
         /// <summary>
         /// Returns a static instance that holds no variables.

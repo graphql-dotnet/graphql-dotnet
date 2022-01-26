@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Utilities
     {
         [Fact]
         public void ValidateName_whenNameIsNull_throwsArgumentOutOfRange() =>
-           Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(null, NamedElement.Field));
+           Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(default, NamedElement.Field));
 
         [Fact]
         public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange()

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,18 +23,20 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Operation>((f, context) => CheckDuplicates(context, f.Directives)),
+            new MatchingNodeVisitor<GraphQLOperationDefinition>((f, context) => CheckDuplicates(context, f.Directives)),
 
-            new MatchingNodeVisitor<Field>((f, context) => CheckDuplicates(context, f.Directives)),
+            new MatchingNodeVisitor<GraphQLField>((f, context) => CheckDuplicates(context, f.Directives)),
 
-            new MatchingNodeVisitor<FragmentDefinition>((f, context) => CheckDuplicates(context, f.Directives)),
+            new MatchingNodeVisitor<GraphQLFragmentDefinition>((f, context) => CheckDuplicates(context, f.Directives)),
 
-            new MatchingNodeVisitor<FragmentSpread>((f, context) => CheckDuplicates(context, f.Directives)),
+            new MatchingNodeVisitor<GraphQLFragmentSpread>((f, context) => CheckDuplicates(context, f.Directives)),
 
-            new MatchingNodeVisitor<InlineFragment>((f, context) => CheckDuplicates(context, f.Directives))
+            new MatchingNodeVisitor<GraphQLInlineFragment>((f, context) => CheckDuplicates(context, f.Directives)),
+
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((f, context) => CheckDuplicates(context, f.Directives))
         );
 
-        private static void CheckDuplicates(ValidationContext context, Directives? directives)
+        private static void CheckDuplicates(ValidationContext context, GraphQLDirectives? directives)
         {
             if (directives?.Count > 0)
             {
@@ -48,7 +51,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private static int GetCount(Directives directives, string name)
+        private static int GetCount(GraphQLDirectives directives, ROM name)
         {
             int count = 0;
 

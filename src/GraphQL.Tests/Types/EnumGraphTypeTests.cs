@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -113,7 +113,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void parse_literal_from_name()
         {
-            type.ParseLiteral(new EnumValue("RED")).ShouldBe(Colors.Red);
+            type.ParseLiteral(new GraphQLEnumValue { Name = new GraphQLName("RED") }).ShouldBe(Colors.Red);
         }
 
         [Fact]
@@ -139,8 +139,8 @@ namespace GraphQL.Tests.Types
         {
             type.ToAST(Colors.Red)
                 .ShouldNotBeNull()
-                .ShouldBeOfType<EnumValue>()
-                .Name.ShouldBe("RED");
+                .ShouldBeOfType<GraphQLEnumValue>()
+                .Name.Value.ShouldBe("RED");
         }
 
         [Fact]

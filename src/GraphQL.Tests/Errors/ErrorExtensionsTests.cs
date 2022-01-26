@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Types;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.Errors
@@ -17,7 +18,7 @@ namespace GraphQL.Tests.Errors
             {
                 Code = code
             };
-            error.AddLocation(1, 3);
+            error.AddLocation(new Location(1, 3));
             error.Path = new[] { "firstSync" };
             errors.Add(error);
 

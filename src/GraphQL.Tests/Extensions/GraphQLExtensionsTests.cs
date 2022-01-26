@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Dummy;
-using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using GraphQL.Utilities;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -73,38 +73,53 @@ namespace GraphQL.Tests.Extensions
 
             public class PersonInputType : InputObjectGraphType<Person>
             {
-                public override IValue ToAST(object value)
+                public override GraphQLObjectValue ToAST(object value)
                 {
                     var person = (Person)value;
 
-                    return new ObjectValue(new[]
+                    return new GraphQLObjectValue
                     {
-                        new ObjectField("Name", new StringValue(person.Name)),
-                        new ObjectField("Age", new IntValue(person.Age))
-                    });
+                        Fields = new List<GraphQLObjectField>
+                        {
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("Name"),
+                                Value = new GraphQLStringValue(person.Name),
+                            },
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("Age"),
+                                Value = new GraphQLIntValue(person.Age.ToString(CultureInfo.InvariantCulture))
+                            }
+                        }
+                    };
                 }
             }
 
             public IEnumerator<object[]> GetEnumerator()
             {
-                yield return new object[] { new BooleanGraphType(), true, new BooleanValue(true) };
-                yield return new object[] { new BooleanGraphType(), false, new BooleanValue(false) };
-                yield return new object[] { new BooleanGraphType(), null, new NullValue() };
+                yield return new object[] { new BooleanGraphType(), true, new GraphQLTrueBooleanValue() };
+                yield return new object[] { new BooleanGraphType(), false, new GraphQLFalseBooleanValue() };
+                yield return new object[] { new BooleanGraphType(), null, new GraphQLNullValue() };
 
-                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), false, new BooleanValue(false) };
+                yield return new object[] { new NonNullGraphType(new BooleanGraphType()), false, new GraphQLFalseBooleanValue() };
 
-                yield return new object[] { new ListGraphType(new BooleanGraphType()), null, new NullValue() };
-                yield return new object[] { new ListGraphType(new BooleanGraphType()), new object[] { true, false, null }, new ListValue(new IValue[] { new BooleanValue(true), new BooleanValue(false), new NullValue() }) };
-                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, true }, new ListValue(new IValue[] { new BooleanValue(true), new BooleanValue(false), new BooleanValue(true) }) };
+                yield return new object[] { new ListGraphType(new BooleanGraphType()), null, new GraphQLNullValue() };
+                yield return new object[] { new ListGraphType(new BooleanGraphType()), new object[] { true, false, null }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue() } } };
+                yield return new object[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object[] { true, false, true }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue() } } };
 
-                yield return new object[] { new InputObjectGraphType<Person>(), null, new NullValue() };
-                yield return new object[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new ObjectValue(new[]
+                yield return new object[] { new InputObjectGraphType<Person>(), null, new GraphQLNullValue() };
+                yield return new object[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new GraphQLObjectValue
+                {
+                    Fields = new List<GraphQLObjectField>
                     {
-                        new ObjectField("Name", new StringValue("Tom")),
-                        new ObjectField("Age", new IntValue(42))
-                    }) };
+                        new GraphQLObjectField { Name = new GraphQLName("Name"), Value = new GraphQLStringValue("Tom") },
+                        new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(42) }
+                    }
+                }
+                };
 
-                yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new BooleanValue(true) };
+                yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue() };
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -121,7 +136,7 @@ namespace GraphQL.Tests.Extensions
 
             public class BadPersonInputType : InputObjectGraphType<Person>
             {
-                public override IValue ToAST(object value) => null;
+                public override GraphQLObjectValue ToAST(object value) => null;
             }
 
             public IEnumerator<object[]> GetEnumerator()
@@ -151,10 +166,10 @@ namespace GraphQL.Tests.Extensions
 
         [Theory]
         [ClassData(typeof(ToASTTestData))]
-        public void ToAST_Test(IGraphType type, object value, IValue expected)
+        public void ToAST_Test(IGraphType type, object value, GraphQLValue expected)
         {
-            var actual = AstPrinter.Print(type.ToAST(value));
-            var result = AstPrinter.Print(expected);
+            var actual = type.ToAST(value).Print();
+            var result = expected.Print();
             actual.ShouldBe(result);
         }
 

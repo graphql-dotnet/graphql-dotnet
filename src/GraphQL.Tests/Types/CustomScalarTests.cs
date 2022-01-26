@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Types
         {
             var c = new CustomScalar();
             // try parsing literal AST
-            c.ParseLiteral(externalValue == null ? (IValue)new NullValue() : new StringValue(externalValue)).ShouldBe(internalValue);
+            c.ParseLiteral(externalValue == null ? new GraphQLNullValue() : new GraphQLStringValue(externalValue)).ShouldBe(internalValue);
         }
 
         [Theory]
@@ -52,7 +52,10 @@ namespace GraphQL.Tests.Types
             // try converting internal value to AST
             var ast = c.ToAST(internalValue);
             ast.ShouldNotBeNull();
-            ast.Value.ShouldBe(externalValue);
+            if (ast is GraphQLNullValue) // GraphQLNullValue.Value is 'null' ROM
+                externalValue.ShouldBeNull();
+            else
+                ast.ShouldBeAssignableTo<IHasValueNode>().Value.ShouldBe(externalValue);
         }
 
         [Theory]
@@ -253,9 +256,9 @@ namespace GraphQL.Tests.Types
             return value.ToString();
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(GraphQLValue value)
         {
-            if (value is StringValue stringValue)
+            if (value is GraphQLStringValue stringValue)
             {
                 if (stringValue.Value == "externalNull")
                     return null;
@@ -263,15 +266,15 @@ namespace GraphQL.Tests.Types
                 if (stringValue.Value == "error")
                     throw new Exception("Cannot parse value");
 
-                return stringValue.Value;
+                return (string)stringValue.Value;
             }
 
-            if (value is NullValue)
+            if (value is GraphQLNullValue)
             {
                 return "internalNull";
             }
 
-            return value.Value.ToString();
+            throw new NotSupportedException();
         }
 
         public override object Serialize(object value)

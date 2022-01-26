@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -19,16 +20,16 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.Operations.Count < 2 ? null : _nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {
-            if (string.IsNullOrWhiteSpace(op.Name))
+            if (op.Name is null)
             {
                 return;
             }
 
-            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<string>();
+            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<ROM>();
 
             if (!frequency.Add(op.Name))
             {

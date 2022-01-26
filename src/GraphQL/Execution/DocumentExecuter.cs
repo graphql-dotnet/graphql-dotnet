@@ -6,9 +6,9 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -111,7 +111,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && (document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false)) != null)
+                    if (document == null && (document = await _documentCache.GetAsync(options.Query!).ConfigureAwait(false)) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -121,12 +121,12 @@ namespace GraphQL
                     }
                     if (document == null)
                     {
-                        document = _documentBuilder.Build(options.Query);
+                        document = _documentBuilder.Build(options.Query!);
                         saveInCache = true;
                     }
                 }
 
-                if (document.Operations.Count == 0)
+                if (document.OperationsCount() == 0)
                 {
                     throw new NoOperationError();
                 }
@@ -150,6 +150,7 @@ namespace GraphQL
                             Rules = validationRules,
                             Operation = operation,
                             UserContext = options.UserContext,
+                            CancellationToken = options.CancellationToken,
                             Schema = options.Schema,
                             Variables = options.Variables ?? Inputs.Empty,
                             Extensions = options.Extensions ?? Inputs.Empty,
@@ -164,7 +165,7 @@ namespace GraphQL
 
                 if (saveInCache && validationResult.IsValid)
                 {
-                    await _documentCache.SetAsync(options.Query, document).ConfigureAwait(false);
+                    await _documentCache.SetAsync(options.Query!, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);
@@ -261,7 +262,7 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, Document document, Operation operation, Variables variables, Metrics metrics)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics)
         {
             var context = new ExecutionContext
             {
@@ -291,17 +292,13 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns the selected <see cref="Operation"/> given a specified <see cref="Document"/> and operation name.
+        /// Returns the selected <see cref="GraphQLOperationDefinition"/> given a specified <see cref="GraphQLDocument"/> and operation name.
         /// <br/><br/>
         /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual Operation? GetOperation(string? operationName, Document document)
-        {
-            return string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.FirstOrDefault()
-                : document.Operations.WithName(operationName!);
-        }
+        protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
+            => document.OperationWithName(operationName);
 
         /// <summary>
         /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
@@ -315,12 +312,12 @@ namespace GraphQL
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
             // TODO: Should we use cached instances of the default execution strategies?
-            return context.Operation.OperationType switch
+            return context.Operation.Operation switch
             {
                 OperationType.Query => ParallelExecutionStrategy.Instance,
                 OperationType.Mutation => SerialExecutionStrategy.Instance,
                 OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
-                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
+                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.Operation}")
             };
         }
     }

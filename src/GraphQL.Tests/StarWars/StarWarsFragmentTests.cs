@@ -1,5 +1,6 @@
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.StarWars
@@ -96,7 +97,7 @@ namespace GraphQL.Tests.StarWars
             {
                 Code = "KNOWN_FRAGMENT_NAMES"
             };
-            error.AddLocation(4, 25);
+            error.AddLocation(new Location(4, 25));
             errors.Add(error);
 
             AssertQuery(query, CreateQueryResult(null, errors, executed: false), null, null);

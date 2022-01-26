@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
-    public class FederatedSchemaPrinter : SchemaPrinter
+    public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
     {
         private readonly List<string> _federatedDirectives = new List<string>
         {
@@ -48,7 +47,7 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective((string)x.Name!.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name)) //TODO:alloc
                     .Select(PrintAstDirective)
             );
 
@@ -59,7 +58,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            return AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+            return directive.Print();
         }
 
         public override string PrintObject(IObjectGraphType type)

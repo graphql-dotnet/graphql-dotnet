@@ -1,7 +1,7 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -14,14 +14,14 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public VariablesInAllowedPositionError(ValidationContext context, VariableDefinition varDef, IGraphType varType, VariableUsage usage)
-            : base(context.Document.OriginalQuery!, NUMBER, BadVarPosMessage(usage.Node.Name, varType.ToString(), usage.Type.ToString()))
+        public VariablesInAllowedPositionError(ValidationContext context, GraphQLVariableDefinition varDef, IGraphType varType, VariableUsage usage)
+            : base(context.Document.Source, NUMBER, BadVarPosMessage(usage.Node.Name.StringValue, varType.ToString(), usage.Type.ToString()))
         {
-            var varDefPos = new Location(context.Document.OriginalQuery!, varDef.SourceLocation.Start);
-            var usagePos = new Location(context.Document.OriginalQuery!, usage.Node.SourceLocation.Start);
+            var varDefLoc = Location.FromLinearPosition(context.Document.Source, varDef.Location.Start);
+            var usageLoc = Location.FromLinearPosition(context.Document.Source, usage.Node.Location.Start);
 
-            AddLocation(varDefPos.Line, varDefPos.Column);
-            AddLocation(usagePos.Line, usagePos.Column);
+            AddLocation(varDefLoc);
+            AddLocation(usageLoc);
         }
 
         internal static string BadVarPosMessage(string varName, string varType, string expectedType)

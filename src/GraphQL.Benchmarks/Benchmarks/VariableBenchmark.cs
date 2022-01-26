@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks
@@ -16,12 +17,12 @@ namespace GraphQL.Benchmarks
         private ISchema _schema;
         private DocumentExecuter _executer;
 
-        private Language.AST.Document _queryLiteralDocument;
+        private GraphQLDocument _queryLiteralDocument;
 
-        private Language.AST.Document _queryVariableDocument;
+        private GraphQLDocument _queryVariableDocument;
         private Inputs _variableInputs;
 
-        private Language.AST.Document _queryDefaultVariableDocument;
+        private GraphQLDocument _queryDefaultVariableDocument;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -76,7 +77,7 @@ namespace GraphQL.Benchmarks
             var result = ExecuteQuery(_schema, Queries.VariablesVariable, _queryVariableDocument, _variableInputs);
         }
 
-        private ExecutionResult ExecuteQuery(ISchema schema, string query, Language.AST.Document document, Inputs inputs)
+        private ExecutionResult ExecuteQuery(ISchema schema, string query, GraphQLDocument document, Inputs inputs)
         {
             return _executer.ExecuteAsync(_ =>
             {

@@ -1,11 +1,13 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution
@@ -35,7 +37,7 @@ namespace GraphQL.Execution
             {
                 Executed = true,
                 Data = data,
-                Query = context.Document.OriginalQuery,
+                Query = context.Document.Source,
                 Document = context.Document,
                 Operation = context.Operation,
                 Extensions = context.OutputExtensions
@@ -55,7 +57,7 @@ namespace GraphQL.Execution
         {
             IObjectGraphType? type;
 
-            switch (context.Operation.OperationType)
+            switch (context.Operation.Operation)
             {
                 case OperationType.Query:
                     type = context.Schema.Query;
@@ -98,7 +100,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType!;
@@ -121,7 +123,7 @@ namespace GraphQL.Execution
         /// is <see langword="false"/> and the @include condition is <see langword="true"/>. Stated conversely, the field or
         /// fragment must not be queried if either the @skip condition is <see langword="true"/> or the @include condition is <see langword="false"/>.
         /// </summary>
-        protected virtual bool ShouldIncludeNode(ExecutionContext context, IHaveDirectives node)
+        protected virtual bool ShouldIncludeNode(ExecutionContext context, IHasDirectivesNode node)
         {
             var directives = node.Directives;
 
@@ -158,26 +160,17 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
-
-            fields = CollectFieldsFrom(context, parent.GetObjectGraphType(context.Schema)!, parent.SelectionSet!, fields);
-
             var parentType = parent.GetObjectGraphType(context.Schema)!;
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
+            fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];
 
             int i = 0;
             foreach (var kvp in fields)
             {
-                var field = kvp.Value;
-
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
-
-                if (fieldDefinition == null)
-                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{parentType.Name}'.");
-
+                (var field, var fieldDefinition) = kvp.Value;
                 var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
-
                 subFields[i++] = node;
             }
 
@@ -188,10 +181,10 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
+        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="GraphQLField"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType? GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        protected FieldType? GetFieldDefinition(ISchema schema, IComplexGraphType parentType, GraphQLField field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -215,7 +208,7 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<string, Field>? GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
@@ -231,63 +224,120 @@ namespace GraphQL.Execution
         /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
         /// </summary>
         /// <param name="context">The execution context.</param>
-        /// <param name="specificType">The graph type to compare the selection set against.</param>
+        /// <param name="specificType">The graph type to compare the selection set against. May be <see langword="null"/> for root execution node.</param>
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Dictionary<string, Field> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field>? fields)
+        protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
-            fields ??= new Dictionary<string, Field>();
-            List<string>? visitedFragmentNames = null;
-            CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
+            fields ??= new Dictionary<string, (GraphQLField field, FieldType fieldType)>();
+
+            // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
+            int countOfSpreads = GetFragmentSpreads(selectionSet);
+            ROM[]? visitedFragmentNames = null;
+            if (countOfSpreads > 1)
+                visitedFragmentNames = ArrayPool<ROM>.Shared.Rent(countOfSpreads);
+
+            CollectFields(context, specificType.GetNamedType(), selectionSet, fields, visitedFragmentNames, 0);
+
+            if (visitedFragmentNames != null)
+                ArrayPool<ROM>.Shared.Return(visitedFragmentNames, true);
+
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, SelectionSet selectionSet, Dictionary<string, Field> fields, ref List<string>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)> fields, ROM[]? visitedFragmentNames, int foundFragments)
             {
+                static bool Contains(ROM[] array, ROM item, int count)
+                {
+                    for (int i = 0; i < count; ++i)
+                    {
+                        if (array[i] == item)
+                            return true;
+                    }
+                    return false;
+                }
+
                 if (selectionSet != null)
                 {
-                    foreach (var selection in selectionSet.SelectionsList)
+                    foreach (var selection in selectionSet.Selections)
                     {
-                        if (selection is Field field)
+                        if (selection is GraphQLField field)
                         {
                             if (ShouldIncludeNode(context, field))
-                                Add(fields, field);
-                        }
-                        else if (selection is FragmentSpread spread)
-                        {
-                            if (visitedFragmentNames?.Contains(spread.Name) != true && ShouldIncludeNode(context, spread))
                             {
-                                (visitedFragmentNames ??= new List<string>()).Add(spread.Name);
+                                var fieldType = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
+                                if (fieldType == null)
+                                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
-                                var fragment = context.Document.Fragments.FindDefinition(spread.Name);
-                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                                    CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
+                                Add(fields, field, fieldType);
                             }
                         }
-                        else if (selection is InlineFragment inline)
+                        else if (selection is GraphQLFragmentSpread spread)
+                        {
+                            if ((visitedFragmentNames == null || !Contains(visitedFragmentNames, spread.FragmentName.Name, foundFragments)) && ShouldIncludeNode(context, spread))
+                            {
+                                if (visitedFragmentNames != null)
+                                    visitedFragmentNames[foundFragments++] = spread.FragmentName.Name;
+
+                                var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
+                                if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.TypeCondition.Type.Name, specificType))
+                                    CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames, foundFragments);
+                            }
+                        }
+                        else if (selection is GraphQLInlineFragment inline)
                         {
                             // inline.Type may be null
                             // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
-                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.Type?.Name ?? specificType.Name, specificType))
-                                CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
+                            if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.TypeCondition != null ? inline.TypeCondition.Type.Name : specificType.Name, specificType))
+                                CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames, foundFragments);
                         }
                     }
                 }
             }
 
-            static void Add(Dictionary<string, Field> fields, Field field)
+            static void Add(Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
             {
-                string name = field.Alias ?? field.Name;
+                string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 
                 fields[name] = fields.TryGetValue(name, out var original)
-                    ? new Field(original.AliasNode, original.NameNode) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    ? (new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
-                        Arguments = original.Arguments,
-                        SelectionSet = original.SelectionSet!.Merge(field.SelectionSet!),
-                        Directives = original.Directives,
-                        SourceLocation = original.SourceLocation,
-                    }
-                    : field;
+                        Alias = original.Field.Alias,
+                        Name = original.Field.Name,
+                        Arguments = original.Field.Arguments,
+                        SelectionSet = Merge(original.Field.SelectionSet, field.SelectionSet),
+                        Directives = original.Field.Directives,
+                        Location = original.Field.Location,
+                    }, original.FieldType)
+                    : (field, fieldType);
+            }
+
+            // Returns a new selection set node with the contents merged with another selection set node's contents.
+            static GraphQLSelectionSet? Merge(GraphQLSelectionSet? selection, GraphQLSelectionSet? otherSelection)
+            {
+                if (selection == null)
+                    return otherSelection;
+
+                if (otherSelection == null)
+                    return selection;
+
+                return new GraphQLSelectionSet
+                {
+                    Selections = selection.Selections.Union(otherSelection.Selections).ToList()
+                };
+            }
+
+            static int GetFragmentSpreads(GraphQLSelectionSet selectionSet)
+            {
+                int count = 0;
+
+                foreach (var selection in selectionSet.Selections)
+                {
+                    if (selection is GraphQLFragmentSpread)
+                        ++count;
+                }
+
+                return count;
             }
         }
 
@@ -297,10 +347,10 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
         /// </summary>
-        protected bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type /* should be named type*/)
+        protected bool DoesFragmentConditionMatch(ExecutionContext context, ROM fragmentName, IGraphType type /* should be named type*/)
         {
-            if (fragmentName == null)
-                throw new ArgumentNullException(nameof(fragmentName));
+            if (fragmentName.IsEmpty)
+                throw new ArgumentException("Fragment name can not be empty", nameof(fragmentName));
 
             var conditionalType = context.Schema.AllTypes[fragmentName];
 

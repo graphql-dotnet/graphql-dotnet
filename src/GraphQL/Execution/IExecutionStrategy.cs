@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -19,6 +20,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the children fields for a specified node.
         /// </summary>
-        Dictionary<string, Field>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
+        Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
 }

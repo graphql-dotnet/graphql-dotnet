@@ -1,5 +1,3 @@
-using GraphQL.Language;
-using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Exceptions;
@@ -35,21 +33,16 @@ namespace GraphQL.Execution
         public int? MaxDepth { get; set; }
 
         /// <inheritdoc/>
-        public Document Build(string body)
+        public GraphQLDocument Build(string body)
         {
-            GraphQLDocument result;
             try
             {
-                result = Parser.Parse(body, new ParserOptions { Ignore = CreateIgnoreOptions(), MaxDepth = MaxDepth });
+                return Parser.Parse(body, new ParserOptions { Ignore = CreateIgnoreOptions(), MaxDepth = MaxDepth });
             }
             catch (GraphQLSyntaxErrorException ex)
             {
                 throw new SyntaxError(ex);
             }
-
-            var document = CoreToVanillaConverter.Convert(result);
-            document.OriginalQuery = body;
-            return document;
         }
 
         private IgnoreOptions CreateIgnoreOptions()

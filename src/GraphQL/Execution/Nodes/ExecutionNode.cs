@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using GraphQL.DataLoader;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -14,23 +15,23 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the parent node, or <see langword="null"/> if this is the root node.
         /// </summary>
-        public ExecutionNode? Parent { get; }
+        public ExecutionNode Parent { get; }
 
         /// <summary>
         /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
         /// Array nodes will be a <see cref="ListGraphType"/> instance.
         /// </summary>
-        public IGraphType? GraphType { get; }
+        public IGraphType GraphType { get; }
 
         /// <summary>
         /// Returns the AST field of this node.
         /// </summary>
-        public Field? Field { get; }
+        public GraphQLField Field { get; }
 
         /// <summary>
         /// Returns the graph's field type of this node.
         /// </summary>
-        public FieldType? FieldDefinition { get; }
+        public FieldType FieldDefinition { get; }
 
         /// <summary>
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, <see langword="null"/>.
@@ -55,7 +56,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
         /// </summary>
-        public string? Name => Field?.Alias ?? Field?.Name;
+        public string? Name => Field?.Alias != null ? Field.Alias.Name.StringValue : FieldDefinition?.Name; //ISSUE:allocation in case of alias
 
         /// <summary>
         /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
@@ -76,12 +77,14 @@ namespace GraphQL.Execution
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
-        protected ExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
         {
+            Debug.Assert(field?.Name == fieldDefinition?.Name); // ? for RootExecutionNode
+
             Parent = parent;
             GraphType = graphType;
-            Field = field;
-            FieldDefinition = fieldDefinition;
+            Field = field!;
+            FieldDefinition = fieldDefinition!;
             IndexInParentNode = indexInParentNode;
         }
 
@@ -174,11 +177,11 @@ namespace GraphQL.Execution
             var pathList = new object[count];
             var index = count;
             node = this;
-            while (!(node is RootExecutionNode))
+            while (node is not RootExecutionNode)
             {
                 pathList[--index] = node.IndexInParentNode.HasValue
                     ? GetObjectIndex(node.IndexInParentNode.Value)
-                    : preferAlias ? node.Name! : node.Field!.Name!;
+                    : preferAlias ? node.Name! : node.FieldDefinition.Name;
                 node = node.Parent!;
             }
 

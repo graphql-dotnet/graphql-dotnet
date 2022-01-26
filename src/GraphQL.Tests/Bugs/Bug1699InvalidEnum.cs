@@ -2,6 +2,7 @@ using System;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -16,11 +17,11 @@ namespace GraphQL.Tests.Bugs
         {
             ExecutionError error;
             if (number != null)
-                error = exception == null ? new ValidationError(null, number, message) : new ValidationError(null, number, message, exception);
+                error = exception == null ? new ValidationError(default, number, message) : new ValidationError(default, number, message, exception);
             else
                 error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
             if (line != 0)
-                error.AddLocation(line, column);
+                error.AddLocation(new Location(line, column));
             error.Path = path;
             if (code != null)
                 error.Code = code;

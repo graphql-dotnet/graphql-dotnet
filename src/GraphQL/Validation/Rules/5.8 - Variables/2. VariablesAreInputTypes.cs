@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="VariablesAreInputTypesError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
         {
             var type = varDef.Type.NamedGraphTypeFromType(context.Schema);
 

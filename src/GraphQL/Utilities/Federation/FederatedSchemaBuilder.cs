@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
@@ -108,32 +108,32 @@ namespace GraphQL.Utilities.Federation
                 });
         }
 
-        private void AddTypeNameToSelection(Field field, Document document)
+        private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
         {
             if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
             {
-                setToAlter!.Prepend(new Field(default, new NameNode("__typename")));
+                setToAlter!.Selections.Insert(0, new GraphQLField { Name = new GraphQLName("__typename") });
             }
         }
 
-        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet? setToAlter)
+        private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
         {
-            foreach (var selection in selectionSet.SelectionsList)
+            foreach (var selection in selectionSet.Selections)
             {
-                if (selection is Field childField && childField.Name == "__typename")
+                if (selection is GraphQLField childField && childField.Name == "__typename")
                 {
                     setToAlter = null;
                     return false;
                 }
 
-                if (selection is InlineFragment frag)
+                if (selection is GraphQLInlineFragment frag)
                 {
                     return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
                 }
 
-                if (selection is FragmentSpread spread)
+                if (selection is GraphQLFragmentSpread spread)
                 {
-                    var def = document.Fragments.FindDefinition(spread.Name)!;
+                    var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
                     return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }
@@ -190,7 +190,7 @@ namespace GraphQL.Utilities.Federation
 
         private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
         {
-            return directives?.FirstOrDefault(x => x.Name!.Value == name);
+            return directives?.FirstOrDefault(x => x.Name == name);
         }
     }
 }

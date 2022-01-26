@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
@@ -2042,7 +2041,7 @@ type Zebra {
 
             public override object ParseValue(object value) => null;
 
-            public override object ParseLiteral(IValue value) => null;
+            public override object ParseLiteral(GraphQLValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

@@ -1,6 +1,6 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,16 +13,16 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public PossibleFragmentSpreadsError(ValidationContext context, InlineFragment node, IGraphType parentType, IGraphType fragType)
-            : base(context.Document.OriginalQuery!, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType.ToString(), fragType.ToString()), node)
+        public PossibleFragmentSpreadsError(ValidationContext context, GraphQLInlineFragment node, IGraphType parentType, IGraphType fragType)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleAnonSpreadMessage(parentType.ToString(), fragType.ToString()), node)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public PossibleFragmentSpreadsError(ValidationContext context, FragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.Document.OriginalQuery!, NUMBER, TypeIncompatibleSpreadMessage(node.Name, parentType.ToString(), fragType.ToString()), node)
+        public PossibleFragmentSpreadsError(ValidationContext context, GraphQLFragmentSpread node, IGraphType parentType, IGraphType fragType)
+            : base(context.Document.Source, NUMBER, TypeIncompatibleSpreadMessage(node.FragmentName.Name.StringValue, parentType.ToString(), fragType.ToString()), node)
         {
         }
 

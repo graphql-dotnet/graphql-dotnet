@@ -11,9 +11,9 @@ namespace GraphQL.Caching
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         public virtual void Dispose() { }
-        public virtual System.Threading.Tasks.ValueTask<GraphQL.Language.AST.Document?> GetAsync(string query) { }
+        public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
-        public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQL.Language.AST.Document value) { }
+        public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {

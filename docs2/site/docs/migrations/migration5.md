@@ -170,6 +170,20 @@ updated or added for convenience as follows:
 
 Custom attributes can be easily added to control any other initialization of graphs or fields.
 
+### 7. More strict behavior of FloatGraphType for special values
+
+This is a spec-compliance issue (bug fix), that fixes parsing of Nan and -/+ Infinity values.
+The spec says that:
+
+> Non-finite floating-point internal values (NaN and Infinity) cannot be
+> coerced to Float and must raise a field error.
+
+### 8. Support for cancellation at validation stage
+
+With new visitors design from GraphQL-Parser v8 it is possible now to cancel GraphQL request
+at validation stage before actual execution. `DocumentExecuter` uses the same cancellation token
+specified into `ExecutionOptions` to pass into `IDocumentValidator.ValidateAsync`.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -240,7 +254,32 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
 
 ### 13. Changes caused by GraphQL-Parser v8
 
+- The `GraphQL.Language.AST` namespace and all classes from it have been removed in favor of ones
+  from `GraphQLParser.AST` namespace in GraphQL-Parser project. Examples of changed usages:
+  - `GraphQL.Language.AST.Document` -> `GraphQLParser.AST.GraphQLDocument`
+  - `GraphQL.Language.AST.IValue` -> `GraphQLParser.AST.GraphQLValue`
+  - `GraphQL.Language.AST.Field` -> `GraphQLParser.AST.GraphQLField`
+  - `GraphQL.Language.AST.SelectionSet` -> `GraphQLParser.AST.GraphQLSelectionSet`
+  - `GraphQL.Language.AST.IHaveDirectives` -> `GraphQLParser.AST.IHasDirectivesNode`
+  - `GraphQL.Language.AST.IType` -> `GraphQLParser.AST.GraphQLType`
+- Some APIs utilize `GraphQLParser.ROM` struct instead of `string`:
+  - `ExecutionResult.Query`
+  - `Metrics.SetOperationName`
+  - `IComplexGraphType.GetField`
+  - `QueryArguments.Find`
+  - `SchemaDirectives.Find`
+  - `SchemaDirectives.this[]`
+  - `SchemaDirectives.Dictionary`
+  - `ValidationContext.GetFragment`
+  - All `ValidationError`'s constructors take _originalQuery_ as `ROM`
 - `OperationType` and `DirectiveLocation` enums were removed, use enums from `GraphQLParser.AST` namespace
+- `SourceLocation` struct was removed, use `GraphQLLocation` from `GraphQLParser.AST` namespace
+- `CoreToVanillaConverter` class was removed
+- `ErrorLocation` struct was removed, use `Location` from `GraphQLParser` namespace
+- `IResolveFieldContext.SubFields` and `IExecutionStrategy.GetSubFields` returns dictionary with
+   values of tuple of queried field and its field definition
+- All scalars works with `GraphQLParser.AST.GraphQLValue` instead of `GraphQL.Language.AST.IValue`
+- `IInputObjectGraphType.ToAST` returns `GraphQLParser.AST.GraphQLObjectValue` instead of `GraphQL.Language.AST.IValue`
 
 ### 14. Classes and members marked as obsolete have been removed
 
@@ -265,13 +304,13 @@ read-only instead of read-write, such as `Field.Alias`.
 Various classes' constructors in the `GraphQL.Language.AST` namespace have been
 removed in favor of other constructors.
 
-### 14. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
+### 15. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
 
 As such, the `DocumentWriter` classes have been renamed to `GraphQLSerializer`, and the
 `AddDocumentWriter` extension method for `IGraphQLBuilder` has been renamed to `AddSerializer`.
 The `WriteAsync` method's functionality has not changed.
 
-### 15. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
+### 16. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
 
 Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
 `Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation. Note that
@@ -302,7 +341,7 @@ public static class StringExtensions
 }
 ```
 
-### 16. The `WriteToStringAsync` extension methods have been removed.
+### 17. The `WriteToStringAsync` extension methods have been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
 The asynchronous text serialization methods have been removed as the underlying serialization
@@ -312,12 +351,12 @@ The `WriteAsync()` method can be used to asynchronously serialize to a stream. H
 the `Newtonsoft.Json` serializer does not support asynchronous serialization, so synchronous
 calls are made to the underlying stream. Only `System.Text.Json` supports asynchronous writing.
 
-### 17. Other changes to the serialization infrastructure
+### 18. Other changes to the serialization infrastructure
 
 - `InputsConverter` renamed to `InputsJsonConverter`
 - `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
 
-### 18. `GraphQLMetadataAttribute` cannot be applied to graph type classes
+### 19. `GraphQLMetadataAttribute` cannot be applied to graph type classes
 
 The `[GraphQLMetadata]` attribute is designed to be used for schema-first configurations
 and has not changed in this regard. For code-first graph definitions, please set the
@@ -334,3 +373,28 @@ public class HumanType : ObjectGraphType<Human>
     }
 }
 ```
+
+### 20. `AstPrinter` class was removed
+
+`AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project.
+
+Code before changes:
+
+```csharp
+INode node = ...;
+string s = AstPrinter.Print(node);
+```
+
+Code after changes:
+
+```csharp
+ASTNode node = ...;
+var writer = new StringWriter();
+var printer = new SDLPrinter();
+sdlPrinter.PrintAsync(node, writer).GetAwaiter().GetResult(); // actually is sync
+string s = writer.ToString();
+```
+
+`SDLPrinter` is a highly optimized visitor for asynchronous non-blocking SDL output
+into provided `TextWriter`. In the majority of cases it does not allocate memory in
+the managed heap at all.

@@ -8,7 +8,7 @@ namespace GraphQL.Introspection
     /// </summary>
     public class __DirectiveLocation : EnumerationGraphType<DirectiveLocation>
     {
-        internal static readonly __DirectiveLocation Instance = new __DirectiveLocation();
+        internal static readonly __DirectiveLocation Instance = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="__DirectiveLocation"/> graph type.

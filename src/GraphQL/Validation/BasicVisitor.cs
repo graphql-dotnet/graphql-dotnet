@@ -1,18 +1,17 @@
-using System;
 using System.Collections.Generic;
-using GraphQL.Language.AST;
+using System.Threading;
+using System.Threading.Tasks;
+using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(INode, ValidationContext)"/>
-    /// and <see cref="INodeVisitor.Leave(INode, ValidationContext)"/> methods for each node.
+    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/>
+    /// and <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
     /// </summary>
-    public readonly struct BasicVisitor
+    public class BasicVisitor : ASTVisitor<BasicVisitor.State>
     {
-        // https://github.com/dotnet/roslyn/issues/39869
-        private static readonly Action<INode, State> _visitDelegate = VisitRecursive;
-
         private readonly IList<INodeVisitor> _visitors;
 
         /// <summary>
@@ -30,36 +29,34 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Walks the specified <see cref="INode"/>, executing <see cref="INodeVisitor.Enter(INode, ValidationContext)"/> and
-        /// <see cref="INodeVisitor.Leave(INode, ValidationContext)"/> methods for each node.
+        /// Walks the specified <see cref="ASTNode"/>, executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/> and
+        /// <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
         /// </summary>
-        public void Visit(INode node, ValidationContext context) => VisitRecursive(node, new State(context, _visitors));
-
-        private static void VisitRecursive(INode node, State state)
+        public override async ValueTask VisitAsync(ASTNode? node, State context)
         {
             if (node != null)
             {
-                for (int i = 0; i < state.Visitors.Count; ++i)
-                    state.Visitors[i].Enter(node, state.Context);
+                for (int i = 0; i < _visitors.Count; ++i)
+                    _visitors[i].Enter(node, context.Context);
 
-                node.Visit(_visitDelegate, state);
+                await base.VisitAsync(node, context);
 
-                for (int i = state.Visitors.Count - 1; i >= 0; --i)
-                    state.Visitors[i].Leave(node, state.Context);
+                for (int i = _visitors.Count - 1; i >= 0; --i)
+                    _visitors[i].Leave(node, context.Context);
             }
         }
 
-        private readonly struct State
+        public readonly struct State : IASTVisitorContext
         {
-            public State(ValidationContext context, IList<INodeVisitor> visitors)
+            public State(ValidationContext context, CancellationToken cancellationToken)
             {
                 Context = context;
-                Visitors = visitors;
+                CancellationToken = cancellationToken;
             }
 
             public ValidationContext Context { get; }
 
-            public IList<INodeVisitor> Visitors { get; }
+            public CancellationToken CancellationToken { get; }
         }
     }
 }

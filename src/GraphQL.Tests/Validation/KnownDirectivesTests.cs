@@ -128,31 +128,47 @@ namespace GraphQL.Tests.Validation
         [Fact]
         public void within_schema_language_well_placed_directives()
         {
-            ShouldPassRule(@"
-              type MyObj implements MyInterface @onObject {
-                myField(myArg: Int @onArgumentDefinition): String @onFieldDefinition
-              }
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"
+                  type MyObj implements MyInterface @onObject {
+                    myField(myArg: Int @onArgumentDefinition): String @onFieldDefinition
+                  }
 
-              scalar MyScalar @onScalar
+                  scalar MyScalar @onScalar
 
-              interface MyInterface @onInterface {
-                myField(myArg: Int @onArgumentDefinition): String @onFieldDefinition
-              }
+                  interface MyInterface @onInterface {
+                    myField(myArg: Int @onArgumentDefinition): String @onFieldDefinition
+                  }
 
-              union MyUnion @onUnion = MyObj | Other
+                  union MyUnion @onUnion = MyObj | Other
 
-              enum MyEnum @onEnum {
-                MY_VALUE @onEnumValue
-              }
+                  enum MyEnum @onEnum {
+                    MY_VALUE @onEnumValue
+                  }
 
-              input MyInput @onInputObject {
-                myField: Int @onInputFieldDefinition
-              }
+                  input MyInput @onInputObject {
+                    myField: Int @onInputFieldDefinition
+                  }
 
-              schema @onSchema {
-                query: MyQuery
-              }
-            ");
+                  schema @onSchema {
+                    query: MyQuery
+                  }
+                ";
+                unknownDirective(_, "onObject", 2, 53);
+                unknownDirective(_, "onArgumentDefinition", 3, 40);
+                unknownDirective(_, "onFieldDefinition", 3, 71);
+                unknownDirective(_, "onScalar", 6, 35);
+                unknownDirective(_, "onInterface", 8, 41);
+                unknownDirective(_, "onArgumentDefinition", 9, 40);
+                unknownDirective(_, "onFieldDefinition", 9, 71);
+                unknownDirective(_, "onUnion", 12, 33);
+                unknownDirective(_, "onEnum", 14, 31);
+                unknownDirective(_, "onEnumValue", 15, 30);
+                unknownDirective(_, "onInputObject", 18, 33);
+                unknownDirective(_, "onInputFieldDefinition", 19, 34);
+                unknownDirective(_, "onSchema", 22, 26);
+            });
         }
     }
 }

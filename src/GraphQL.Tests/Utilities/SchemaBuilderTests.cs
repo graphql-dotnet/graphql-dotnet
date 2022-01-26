@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -756,7 +755,7 @@ namespace GraphQL.Tests.Utilities
 
             public override object ParseValue(object value) => throw new System.NotImplementedException();
 
-            public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();
+            public override object ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
         }
     }
 }

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -27,7 +27,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return <see langword="null"/> for a failed conversion.
         /// </summary>
-        IValue? ToAST(object value);
+        GraphQLObjectValue? ToAST(object value);
     }
 
     /// <inheritdoc/>
@@ -71,7 +71,7 @@ namespace GraphQL.Types
         /// overridden to support introspection of fields of this type that have default values. This method
         /// is not otherwise needed to be implemented.
         /// </summary>
-        public virtual IValue? ToAST(object value)
+        public virtual GraphQLObjectValue? ToAST(object value)
         {
             throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
         }

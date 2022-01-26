@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using GraphQL.Language.AST;
+using System.Threading;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Validation
     {
         public ISchema Schema { get; set; } = null!;
 
-        public Document Document { get; set; } = null!;
+        public GraphQLDocument Document { get; set; } = null!;
 
         public IEnumerable<IValidationRule>? Rules { get; set; }
 
@@ -24,6 +25,12 @@ namespace GraphQL.Validation
         /// <summary>
         /// Executed operation.
         /// </summary>
-        public Operation Operation { get; set; } = null!;
+        public GraphQLOperationDefinition Operation { get; set; } = null!;
+
+        /// <summary>
+        /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
+        /// defaults to <see cref="CancellationToken.None"/>
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
     }
 }

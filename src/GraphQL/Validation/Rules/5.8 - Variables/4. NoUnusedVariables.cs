@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -25,13 +25,13 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<VariableDefinition>((def, context) =>
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((def, context) =>
             {
-                var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<VariableDefinition>();
+                var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<GraphQLVariableDefinition>();
                 varDefs.Add(def);
             }),
 
-            new MatchingNodeVisitor<Operation>(
+            new MatchingNodeVisitor<GraphQLOperationDefinition>(
                 enter: (op, context) => context.TypeInfo.NoUnusedVariables_VariableDefs?.Clear(),
                 leave: (op, context) =>
                 {
@@ -41,11 +41,11 @@ namespace GraphQL.Validation.Rules
 
                     var usages = context.GetRecursiveVariables(op)
                         .Select(usage => usage.Node.Name)
-                        .ToList();
+                        .ToList(); //TODO: ToList may be removed
 
                     foreach (var variableDef in variableDefs)
                     {
-                        var variableName = variableDef.Name;
+                        var variableName = variableDef.Variable.Name;
                         if (!usages.Contains(variableName))
                         {
                             context.ReportError(new NoUnusedVariablesError(context, variableDef, op));

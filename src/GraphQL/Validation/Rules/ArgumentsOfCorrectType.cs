@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="ArgumentsOfCorrectTypeError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Argument>((argAst, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((argAst, context) =>
         {
             var argDef = context.TypeInfo.GetArgument();
             if (argDef == null)

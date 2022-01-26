@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
@@ -11,8 +10,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public DirectivesInAllowedLocationsError(ValidationContext context, Directive node, DirectiveLocation candidateLocation)
-            : base(context.Document.OriginalQuery!, "5.7.2", $"Directive '{node.Name}' may not be used on {candidateLocation}.", node)
+        public DirectivesInAllowedLocationsError(ValidationContext context, GraphQLDirective node, DirectiveLocation candidateLocation)
+            : base(context.Document.Source, "5.7.2", $"Directive '{node.Name}' may not be used on {candidateLocation}.", node)
         {
         }
     }
