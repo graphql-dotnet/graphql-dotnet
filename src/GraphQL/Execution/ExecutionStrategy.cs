@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -230,12 +231,32 @@ namespace GraphQL.Execution
         protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
             fields ??= new Dictionary<string, (GraphQLField field, FieldType fieldType)>();
-            List<ROM>? visitedFragmentNames = null;
-            CollectFields(context, specificType.GetNamedType(), selectionSet, fields, ref visitedFragmentNames);
+
+            // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
+            int countOfSpreads = GetFragmentSpreads(selectionSet);
+            ROM[]? visitedFragmentNames = null;
+            if (countOfSpreads > 1)
+                visitedFragmentNames = ArrayPool<ROM>.Shared.Rent(countOfSpreads);
+
+            CollectFields(context, specificType.GetNamedType(), selectionSet, fields, visitedFragmentNames, 0);
+
+            if (visitedFragmentNames != null)
+                ArrayPool<ROM>.Shared.Return(visitedFragmentNames, true);
+
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)> fields, ref List<ROM>? visitedFragmentNames) //TODO: can be completely eliminated? see Fields.Add
+            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)> fields, ROM[]? visitedFragmentNames, int foundFragments)
             {
+                static bool Contains(ROM[] array, ROM item, int count)
+                {
+                    for (int i=0; i<count; ++i)
+                    {
+                        if (array[i] == item)
+                            return true;
+                    }
+                    return false;
+                }
+
                 if (selectionSet != null)
                 {
                     foreach (var selection in selectionSet.Selections)
@@ -253,13 +274,14 @@ namespace GraphQL.Execution
                         }
                         else if (selection is GraphQLFragmentSpread spread)
                         {
-                            if (visitedFragmentNames?.Contains(spread.FragmentName.Name) != true && ShouldIncludeNode(context, spread))
+                            if ((visitedFragmentNames == null || !Contains(visitedFragmentNames, spread.FragmentName.Name, foundFragments)) && ShouldIncludeNode(context, spread))
                             {
-                                (visitedFragmentNames ??= new List<ROM>()).Add(spread.FragmentName.Name);
+                                if (visitedFragmentNames != null)
+                                    visitedFragmentNames[foundFragments++] = spread.FragmentName.Name;
 
                                 var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
                                 if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.TypeCondition.Type.Name, specificType))
-                                    CollectFields(context, specificType, fragment.SelectionSet, fields, ref visitedFragmentNames);
+                                    CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames, foundFragments);
                             }
                         }
                         else if (selection is GraphQLInlineFragment inline)
@@ -267,7 +289,7 @@ namespace GraphQL.Execution
                             // inline.Type may be null
                             // See [2.8.2] Inline Fragments: If the TypeCondition is omitted, an inline fragment is considered to be of the same type as the enclosing context.
                             if (ShouldIncludeNode(context, inline) && DoesFragmentConditionMatch(context, inline.TypeCondition != null ? inline.TypeCondition.Type.Name : specificType.Name, specificType))
-                                CollectFields(context, specificType, inline.SelectionSet, fields, ref visitedFragmentNames);
+                                CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames, foundFragments);
                         }
                     }
                 }
@@ -303,6 +325,19 @@ namespace GraphQL.Execution
                 {
                     Selections = selection.Selections.Union(otherSelection.Selections).ToList()
                 };
+            }
+
+            static int GetFragmentSpreads(GraphQLSelectionSet selectionSet)
+            {
+                int count = 0;
+
+                foreach (var selection in selectionSet.Selections)
+                {
+                    if (selection is GraphQLFragmentSpread)
+                        ++count;
+                }
+
+                return count;
             }
         }
 
