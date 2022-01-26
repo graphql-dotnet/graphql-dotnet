@@ -31,12 +31,9 @@ namespace GraphQL.Introspection
                 "A GraphQL-formatted string representing the default value for this input value.",
                 resolve: context =>
                 {
-                    var hasDefault = context.Source as IHaveDefaultValue;
-                    if (hasDefault?.DefaultValue == null)
-                        return null;
-
-                    var ast = hasDefault.ResolvedType!.ToAST(hasDefault.DefaultValue);
-                    return ast.Print();
+                    return context.Source is IHaveDefaultValue hasDefault && hasDefault.DefaultValue != null
+                        ? hasDefault.ResolvedType!.Print(hasDefault.DefaultValue)
+                        : null;
                 });
 
             if (allowAppliedDirectives)

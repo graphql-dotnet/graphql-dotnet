@@ -489,6 +489,20 @@ namespace GraphQL
             return merged;
         }
 
+        // optimized version of Print(this ASTNode node) for primitive values
+        internal static string Print(this IGraphType type, object value)
+        {
+            return (type, value) switch
+            {
+                (StringGraphType, string s) when s.IndexOfAny(_escapes) == -1 => "\"" + s + "\"",
+                (BooleanGraphType, false) => "false",
+                (BooleanGraphType, true) => "true",
+                _ => type.ToAST(value).Print(),
+            };
+        }
+
+        private static readonly char[] _escapes = new char[] { '\b', '\f', '\n', '\r', '\t', '\\', '"' };
+
         /// <summary>
         /// Returns a string representation of the specified node.
         /// </summary>

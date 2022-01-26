@@ -42,8 +42,7 @@ namespace GraphQL.Introspection
                     var directiveDefinition = context.Schema.Directives.Find(appliedDirective.Name);
                     var argumentDefinition = directiveDefinition!.Arguments!.Find(argument.Name);
 
-                    var ast = argumentDefinition!.ResolvedType!.ToAST(argument.Value);
-                    return ast.Print();
+                    return argumentDefinition!.ResolvedType!.Print(argument.Value);
                 });
         }
     }
