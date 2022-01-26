@@ -249,7 +249,7 @@ namespace GraphQL.Execution
             {
                 static bool Contains(ROM[] array, ROM item, int count)
                 {
-                    for (int i=0; i<count; ++i)
+                    for (int i = 0; i < count; ++i)
                     {
                         if (array[i] == item)
                             return true;
