@@ -61,7 +61,7 @@ namespace GraphQL.Validation.Rules
 
                     if (!visitedFrags.Contains(spreadName))
                     {
-                        var spreadFragment = context.GetFragment(spreadName);
+                        var spreadFragment = context.Document.FindFragmentDefinition(spreadName);
                         if (spreadFragment != null)
                         {
                             detectCycleRecursive(

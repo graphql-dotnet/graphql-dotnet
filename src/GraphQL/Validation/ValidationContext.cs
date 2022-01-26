@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation
 {
@@ -16,11 +18,9 @@ namespace GraphQL.Validation
     {
         private List<ValidationError>? _errors;
 
-        private readonly Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>> _fragments
-            = new Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>();
+        private readonly Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?> _fragments = new();
 
-        private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>> _variables =
-            new Dictionary<GraphQLOperationDefinition, List<VariableUsage>>();
+        private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>> _variables = new();
 
         internal void Reset()
         {
@@ -114,20 +114,20 @@ namespace GraphQL.Validation
 
             var usages = GetVariables(operation);
 
-            foreach (var fragment in GetRecursivelyReferencedFragments(operation))
+            var frags = GetRecursivelyReferencedFragments(operation);
+
+            if (frags != null)
             {
-                usages.AddRange(GetVariables(fragment));
+                foreach (var fragment in frags)
+                {
+                    usages.AddRange(GetVariables(fragment));
+                }
             }
 
             _variables[operation] = usages;
 
             return usages;
         }
-
-        /// <summary>
-        /// Searches the document for a fragment definition by name and returns it.
-        /// </summary>
-        public GraphQLFragmentDefinition? GetFragment(ROM name) => Document.FindFragmentDefinition(name);
 
         /// <summary>
         /// Returns a list of fragment spreads within the specified node.
@@ -159,45 +159,98 @@ namespace GraphQL.Validation
             return spreads;
         }
 
-        /// <summary>
-        /// For a specified operation within a document, returns a list of all fragment definitions in use.
-        /// </summary>
-        public List<GraphQLFragmentDefinition> GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation)
+        private sealed class GetRecursivelyReferencedFragmentsVisitorContext : IASTVisitorContext
         {
-            if (_fragments.TryGetValue(operation, out var results))
+            public GraphQLDocument Document { get; set; } = null!;
+
+            public List<GraphQLFragmentDefinition>? Fragments { get; set; }
+
+            public System.Threading.CancellationToken CancellationToken => default;
+        }
+
+        private static readonly GetRecursivelyReferencedFragmentsVisitor _visitor = new();
+
+        private sealed class GetRecursivelyReferencedFragmentsVisitor : ASTVisitor<GetRecursivelyReferencedFragmentsVisitorContext>
+        {
+            protected override ValueTask VisitSelectionSetAsync(GraphQLSelectionSet selectionSet, GetRecursivelyReferencedFragmentsVisitorContext context)
             {
-                return results;
+                return VisitAsync(selectionSet.Selections, context);
             }
 
-            var fragments = new List<GraphQLFragmentDefinition>();
-            var nodesToVisit = new Stack<GraphQLSelectionSet>();
-            nodesToVisit.Push(operation.SelectionSet);
-            var collectedNames = new Dictionary<ROM, bool>();
-
-            while (nodesToVisit.Count > 0)
+            protected override ValueTask VisitFieldAsync(GraphQLField field, GetRecursivelyReferencedFragmentsVisitorContext context)
             {
-                var node = nodesToVisit.Pop();
+                return VisitAsync(field.SelectionSet, context);
+            }
 
-                foreach (var spread in GetFragmentSpreads(node))
+            protected override ValueTask VisitInlineFragmentAsync(GraphQLInlineFragment inlineFragment, GetRecursivelyReferencedFragmentsVisitorContext context)
+            {
+                return VisitAsync(inlineFragment.SelectionSet, context);
+            }
+
+            protected override async ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, GetRecursivelyReferencedFragmentsVisitorContext context)
+            {
+                if (!Contains(fragmentSpread, context))
                 {
-                    var fragName = spread.FragmentName.Name;
-                    if (!collectedNames.ContainsKey(fragName))
+                    var fragmentDefinition = context.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
+                    if (fragmentDefinition != null)
                     {
-                        collectedNames[fragName] = true;
-
-                        var fragment = GetFragment(fragName);
-                        if (fragment != null)
-                        {
-                            fragments.Add(fragment);
-                            nodesToVisit.Push(fragment.SelectionSet);
-                        }
+                        (context.Fragments ??= new List<GraphQLFragmentDefinition>()).Add(fragmentDefinition);
+                        await VisitSelectionSetAsync(fragmentDefinition.SelectionSet, context).ConfigureAwait(false);
                     }
                 }
             }
 
-            _fragments[operation] = fragments;
+            private bool Contains(GraphQLFragmentSpread fragmentSpread, GetRecursivelyReferencedFragmentsVisitorContext context)
+            {
+                if (context.Fragments == null)
+                    return false;
 
-            return fragments;
+                foreach (var frag in context.Fragments)
+                {
+                    if (frag.FragmentName.Name == fragmentSpread.FragmentName.Name)
+                        return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// For a specified operation within a document, returns a list of all fragment definitions in use.
+        /// </summary>
+        public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation)
+        {
+            if (_fragments.TryGetValue(operation, out var results)) //TODO: possible remove from cache
+            {
+                return results;
+            }
+
+            var context = new GetRecursivelyReferencedFragmentsVisitorContext { Document = Document };
+            _visitor.VisitAsync(operation.SelectionSet, context).GetAwaiter().GetResult();
+            _fragments[operation] = context.Fragments;
+            return context.Fragments;
+        }
+
+        /// <summary>
+        /// For a specified operations within a document, returns a list of all fragment definitions in use.
+        /// </summary>
+        public List<GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(List<GraphQLOperationDefinition> operations)
+        {
+            if (operations.Count == 1)
+            {
+                return GetRecursivelyReferencedFragments(operations[0]);
+            }
+            else
+            {
+                List<GraphQLFragmentDefinition>? fragments = null;
+                foreach (var operation in operations)
+                {
+                    var items = GetRecursivelyReferencedFragments(operation);
+                    if (items != null)
+                        (fragments ??= new List<GraphQLFragmentDefinition>()).AddRange(items);
+                }
+                return fragments;
+            }
         }
 
         /// <summary>
