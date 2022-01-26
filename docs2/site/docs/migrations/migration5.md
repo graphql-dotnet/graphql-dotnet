@@ -227,19 +227,6 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
    values of tuple of queried field and its field definition
 - All scalars works with `GraphQLParser.AST.GraphQLValue` instead of `GraphQL.Language.AST.IValue`
 - `IInputObjectGraphType.ToAST` returns `GraphQLParser.AST.GraphQLObjectValue` instead of `GraphQL.Language.AST.IValue`
-- `AstPrinter` class was removed in favor or `SDLPrinter` from GraphQL-Parser project:
-
-```csharp
-public static async Task Print(string text)
-{
-    using var document = Parser.Parse(text);
-    var writer = new StringWriter(); 
-    var printer = new SDLPrinter()
-    await printer.PrintAsync(document, writer);
-    var rendered = writer.ToString();
-    Console.WriteLine(rendered);
-}
-```
 
 ### 14. Classes and members marked as obsolete have been removed
 
@@ -333,3 +320,23 @@ public class HumanType : ObjectGraphType<Human>
     }
 }
 ```
+
+### 20. `AstPrinter` class was removed
+
+`AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project:
+
+```csharp
+public static async Task Print(string text)
+{
+    using var document = Parser.Parse(text);
+    var writer = new StringWriter(); 
+    var printer = new SDLPrinter()
+    await printer.PrintAsync(document, writer);
+    var rendered = writer.ToString();
+    Console.WriteLine(rendered);
+}
+```
+
+`SDLPrinter` is a highly optimized visitor for asynchronous non-blocking SDL output
+into provided `TextWriter`. In the majority of cases it does not allocate memory in
+the managed heap at all.
