@@ -1,14 +1,15 @@
 using System;
+using GraphQL.Types;
 
 namespace GraphQL
 {
     /// <summary>
-    /// Specifies an output graph type mapping for the CLR class marked with this attribute
+    /// Specifies an output graph type mapping for the CLR class or property marked with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class OutputTypeAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    public class OutputTypeAttribute : GraphQLAttribute
     {
-        private Type _mappedToOutput = null!;
+        private Type _outputType = null!;
 
         /// <inheritdoc cref="OutputTypeAttribute"/>
         public OutputTypeAttribute(Type graphType)
@@ -19,7 +20,7 @@ namespace GraphQL
         /// <inheritdoc cref="OutputTypeAttribute"/>
         public Type OutputType
         {
-            get => _mappedToOutput;
+            get => _outputType;
             set
             {
                 if (value == null)
@@ -28,7 +29,16 @@ namespace GraphQL
                 if (!value.IsOutputType())
                     throw new ArgumentException(nameof(OutputType), $"'{value}' should be an output type");
 
-                _mappedToOutput = value;
+                _outputType = value;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(FieldType fieldType, bool isInputType)
+        {
+            if (!isInputType)
+            {
+                fieldType.Type = _outputType;
             }
         }
     }

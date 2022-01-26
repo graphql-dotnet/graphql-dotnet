@@ -1,14 +1,15 @@
 using System;
+using GraphQL.Types;
 
 namespace GraphQL
 {
     /// <summary>
-    /// Specifies an input graph type mapping for the CLR class marked with this attribute
+    /// Specifies an input graph type mapping for the CLR class or property marked with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class InputTypeAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    public class InputTypeAttribute : GraphQLAttribute
     {
-        private Type _mappedToInput = null!;
+        private Type _inputType = null!;
 
         /// <inheritdoc cref="InputTypeAttribute"/>
         public InputTypeAttribute(Type graphType)
@@ -19,7 +20,7 @@ namespace GraphQL
         /// <inheritdoc cref="InputTypeAttribute"/>
         public Type InputType
         {
-            get => _mappedToInput;
+            get => _inputType;
             set
             {
                 if (value == null)
@@ -28,7 +29,16 @@ namespace GraphQL
                 if (!value.IsInputType())
                     throw new ArgumentException(nameof(InputType), $"'{value}' should be an input type");
 
-                _mappedToInput = value;
+                _inputType = value;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(FieldType fieldType, bool isInputType)
+        {
+            if (isInputType)
+            {
+                fieldType.Type = _inputType;
             }
         }
     }
