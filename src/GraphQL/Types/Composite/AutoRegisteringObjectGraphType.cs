@@ -53,6 +53,8 @@ namespace GraphQL.Types
         {
             foreach (var propertyInfo in GetRegisteredProperties())
             {
+                if (propertyInfo.IsDefined(typeof(IgnoreAttribute)))
+                    continue;
                 var fieldType = CreateField(propertyInfo);
                 if (fieldType != null)
                     yield return fieldType;
