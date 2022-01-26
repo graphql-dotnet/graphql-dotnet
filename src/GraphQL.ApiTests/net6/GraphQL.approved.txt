@@ -363,6 +363,11 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false)]
+    public class IgnoreAttribute : System.Attribute
+    {
+        public IgnoreAttribute() { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
     {

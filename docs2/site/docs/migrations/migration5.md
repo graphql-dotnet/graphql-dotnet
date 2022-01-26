@@ -152,7 +152,7 @@ type instead.
 
 #### Graphs and fields recognize attributes to control initialization behavior
 
-Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, is can be set on a
+Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
 CLR class or one if its properties and is configured for the graph or field type. New attributes have been
 updated or added for convenience as follows:
 
@@ -163,6 +163,7 @@ updated or added for convenience as follows:
 | `[OutputName]`       | Specifies a GraphQL name for an output CLR class or property |
 | `[InputType]`        | Specifies a graph type for a field on an input model |
 | `[OutputType]`       | Specifies a graph type for a field on an output model |
+| `[Ignore]`           | Indicates that a CLR property should not be mapped to a field |
 | `[Metadata]`         | Specifies custom metadata to be added to the graph type or field |
 | `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |

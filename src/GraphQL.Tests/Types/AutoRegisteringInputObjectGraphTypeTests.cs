@@ -158,6 +158,13 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void Field_RecognizesIgnoreAttribute()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+            graphType.Fields.Find("Field11").ShouldBeNull();
+        }
+
+        [Fact]
         public void DefaultServiceProvider_Should_Create_AutoRegisteringGraphTypes()
         {
             var provider = new DefaultServiceProvider();
@@ -223,6 +230,8 @@ namespace GraphQL.Tests.Types
             public string? Field9 { get; set; }
             [OutputName("OutputField10")]
             public string? Field10 { get; set; }
+            [Ignore]
+            public string? Field11 { get; set; }
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
