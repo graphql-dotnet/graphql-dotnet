@@ -605,7 +605,7 @@ namespace GraphQL
         public System.Reflection.MemberInfo MemberInfo { get; }
         public System.Type Type { get; set; }
         public virtual void ApplyAttributes() { }
-        public virtual System.Type GetConstructedGraphType() { }
+        public virtual System.Type ConstructGraphType() { }
     }
     public enum TypeMappingMode
     {

@@ -69,7 +69,7 @@ namespace GraphQL.Types
         protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
         {
             var typeInformation = GetTypeInformation(propertyInfo);
-            var graphType = typeInformation.GetConstructedGraphType();
+            var graphType = typeInformation.ConstructGraphType();
             return AutoRegisteringHelper.CreateField(propertyInfo, graphType, true);
         }
 

@@ -207,7 +207,7 @@ namespace GraphQL
         /// The graph type is then wrapped with <see cref="NonNullGraphType{T}"/> and/or
         /// <see cref="ListGraphType{T}"/> as appropriate.
         /// </summary>
-        public virtual Type GetConstructedGraphType()
+        public virtual Type ConstructGraphType()
         {
             var t = GraphType;
             if (t != null)
