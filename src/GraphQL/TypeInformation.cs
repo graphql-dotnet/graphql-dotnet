@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Types;
@@ -8,7 +9,7 @@ namespace GraphQL
     /// <summary>
     /// Contains type and nullability information for a method return type or argument type.
     /// </summary>
-    public sealed class TypeInformation
+    public class TypeInformation
     {
         private Type? _graphType;
 
@@ -96,50 +97,108 @@ namespace GraphQL
             GraphType = graphType;
         }
 
+        private static readonly Type[] _listTypes = new Type[] {
+            typeof(IEnumerable<>),
+            typeof(IList<>),
+            typeof(List<>),
+            typeof(ICollection<>),
+            typeof(IReadOnlyCollection<>),
+            typeof(IReadOnlyList<>),
+            typeof(HashSet<>),
+            typeof(ISet<>),
+        };
 
         /// <summary>
-        /// Analyzes a property and returns a <see cref="TypeInformation"/>
-        /// struct containing type information necessary to select a graph type.
+        /// Initializes an instance containing type information necessary to select a graph type.
+        /// The instance is populated based on inspecting the type and NRT annotations on the specified property.
         /// </summary>
-        public static TypeInformation GetTypeInformation(PropertyInfo propertyInfo, bool isInputProperty)
+        public TypeInformation(PropertyInfo propertyInfo, bool isInputProperty)
         {
-            var isList = false;
-            var isNullableList = false;
+            MemberInfo = propertyInfo;
+            IsInputType = isInputProperty;
+
+            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInputProperty);
+
             foreach (var type in typeTree)
             {
-                if (type.Type.IsArray)
+                //detect list types, but not lists of lists
+                if (!IsList)
                 {
-                    //unwrap type and mark as list
-                    isList = true;
-                    isNullableList = type.Nullable != Nullability.NonNullable;
-                    continue;
-                }
-                if (type.Type.IsGenericType)
-                {
-                    var g = type.Type.GetGenericTypeDefinition();
-                    if (_listTypes.Contains(g))
+                    if (type.Type.IsArray)
                     {
                         //unwrap type and mark as list
-                        isList = true;
-                        isNullableList = type.Nullable != Nullability.NonNullable;
+                        IsList = true;
+                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
                         continue;
                     }
-                }
-                if (type.Type == typeof(IEnumerable) || type.Type == typeof(ICollection))
-                {
-                    //assume list of nullable object
-                    isList = true;
-                    isNullableList = type.Nullable != Nullability.NonNullable;
-                    break;
+                    if (type.Type.IsGenericType)
+                    {
+                        var g = type.Type.GetGenericTypeDefinition();
+                        if (Array.IndexOf(_listTypes, g) >= 0)
+                        {
+                            //unwrap type and mark as list
+                            IsList = true;
+                            ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                            continue;
+                        }
+                    }
+                    if (type.Type == typeof(IEnumerable) || type.Type == typeof(ICollection))
+                    {
+                        //assume list of nullable object
+                        IsList = true;
+                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                        break;
+                    }
                 }
                 //found match
-                var nullable = type.Nullable != Nullability.NonNullable;
-                return new TypeInformation(propertyInfo, isInputProperty, type.Type, nullable, isList, isNullableList, null);
+                IsNullable = type.Nullable != NullabilityState.NotNull;
+                Type = type.Type;
+                return;
             }
             //unknown type
-            return new TypeInformation(propertyInfo, isInputProperty, typeof(object), true, isList, isNullableList, null);
+            IsNullable = true;
+            Type = typeof(object);
         }
 
+        /// <summary>
+        /// Flattens a complex <see cref="NullabilityInfo"/> structure into a list types and nullability flags.
+        /// <see cref="Nullable{T}"/> structs return their underlying type rather than <see cref="Nullable{T}"/>.
+        /// </summary>
+        private static IEnumerable<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInputProperty)
+        {
+            var list = new List<(Type, NullabilityState)>(info.GenericTypeArguments.Length + 1);
+            RecursiveLoop(info);
+            return list;
+
+            void RecursiveLoop(NullabilityInfo info)
+            {
+                if (info.Type.IsGenericType)
+                {
+                    var nullableType = Nullable.GetUnderlyingType(info.Type);
+                    if (nullableType != null)
+                    {
+                        list.Add((nullableType, NullabilityState.Nullable));
+                    }
+                    else
+                    {
+                        list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    }
+                    foreach (var t in info.GenericTypeArguments)
+                    {
+                        RecursiveLoop(t);
+                    }
+                }
+                else if (info.ElementType != null)
+                {
+                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    RecursiveLoop(info.ElementType);
+                }
+                else
+                {
+                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a graph type constructed based on the properties set within this instance.
@@ -148,7 +207,7 @@ namespace GraphQL
         /// The graph type is then wrapped with <see cref="NonNullGraphType{T}"/> and/or
         /// <see cref="ListGraphType{T}"/> as appropriate.
         /// </summary>
-        public Type GetConstructedGraphType()
+        public virtual Type GetConstructedGraphType()
         {
             var t = GraphType;
             if (t != null)
@@ -170,21 +229,27 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns a new instance with <see cref="RequiredAttribute"/>, <see cref="OptionalAttribute"/>, <see cref="RequiredListAttribute"/>,
-        /// <see cref="OptionalListAttribute"/>, <see cref="IdAttribute"/> and <see cref="DIGraphAttribute"/>
-        /// applied as necessary.
+        /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
         /// </summary>
-        internal TypeInformation ApplyAttributes(ICustomAttributeProvider member)
+        public virtual void ApplyAttributes()
         {
-            var typeInformation = this; //copy struct
-            //var member = examineParent ? (ICustomAttributeProvider)typeInformation.ParameterInfo.Member : typeInformation.ParameterInfo;
-            if (typeInformation.IsNullable)
+            if (MemberInfo.IsDefined(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false))
             {
-                if (member.IsDefined(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false))
-                    typeInformation.IsNullable = false;
+                if (IsList)
+                {
+                    ListIsNullable = false;
+                }
+                else
+                {
+                    IsNullable = false;
+                } 
             }
-            return typeInformation;
-        }
 
+            var attributes = MemberInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            foreach (var attr in attributes)
+            {
+                ((GraphQLAttribute)attr).Modify(this);
+            }
+        }
     }
 }

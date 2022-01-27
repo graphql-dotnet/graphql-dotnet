@@ -39,5 +39,12 @@ namespace GraphQL
         public virtual void Modify(FieldType fieldType, bool isInputType)
         {
         }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="TypeInformation"/> as necessary.
+        /// </summary>
+        public virtual void Modify(TypeInformation typeInformation)
+        {
+        }
     }
 }

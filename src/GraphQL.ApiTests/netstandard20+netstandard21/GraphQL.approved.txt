@@ -161,6 +161,7 @@ namespace GraphQL
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
+        public virtual void Modify(GraphQL.TypeInformation typeInformation) { }
         public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
@@ -362,6 +363,12 @@ namespace GraphQL
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
         TSource Source { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public class IdAttribute : GraphQL.GraphQLAttribute
+    {
+        public IdAttribute() { }
+        public override void Modify(GraphQL.TypeInformation typeInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false)]
     public class IgnoreAttribute : System.Attribute
@@ -585,6 +592,20 @@ namespace GraphQL
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
+    }
+    public class TypeInformation
+    {
+        public TypeInformation(System.Reflection.PropertyInfo propertyInfo, bool isInputProperty) { }
+        public TypeInformation(System.Reflection.MemberInfo memberInfo, bool isInputType, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
+        public System.Type? GraphType { get; set; }
+        public bool IsInputType { get; }
+        public bool IsList { get; set; }
+        public bool IsNullable { get; set; }
+        public bool ListIsNullable { get; set; }
+        public System.Reflection.MemberInfo MemberInfo { get; }
+        public System.Type Type { get; set; }
+        public virtual void ApplyAttributes() { }
+        public virtual System.Type GetConstructedGraphType() { }
     }
     public enum TypeMappingMode
     {
@@ -1526,6 +1547,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+        protected virtual GraphQL.TypeInformation GetTypeInformation(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
@@ -1535,6 +1557,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+        protected virtual GraphQL.TypeInformation GetTypeInformation(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType

@@ -67,7 +67,11 @@ namespace GraphQL.Types
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
         protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
-            => AutoRegisteringHelper.CreateField(propertyInfo, true);
+        {
+            var typeInformation = GetTypeInformation(propertyInfo);
+            var graphType = typeInformation.GetConstructedGraphType();
+            return AutoRegisteringHelper.CreateField(propertyInfo, graphType, true);
+        }
 
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
@@ -78,26 +82,18 @@ namespace GraphQL.Types
                 _excludedProperties);
 
         /// <summary>
-        /// Analyzes a property and returns a <see cref="TypeInformation"/>
-        /// struct containing type information necessary to select a graph type.
-        /// </summary>
-        protected virtual TypeInformation GetTypeInformation(PropertyInfo propertyInfo)
-            => GraphTypeHelper.GetTypeInformation(propertyInfo, true, GetNullabilityInformation(propertyInfo));
-
-        /// <summary>
-        /// Apply <see cref="RequiredAttribute"/>, <see cref="OptionalAttribute"/>, <see cref="RequiredListAttribute"/>,
-        /// <see cref="OptionalListAttribute"/>, <see cref="IdAttribute"/> and <see cref="DIGraphAttribute"/> over
-        /// the supplied <see cref="TypeInformation"/>.
+        /// Analyzes a property and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Any <see cref="GraphQLAttribute"/>
+        /// attributes marked on the property are applied.
+        /// <br/><br/>
         /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
         /// attributes to change graph type selection behavior.
         /// </summary>
-        protected virtual TypeInformation ApplyAttributes(TypeInformation typeInformation)
-            => typeInformation.ApplyAttributes(typeInformation.MemberInfo);
-
-        /// <summary>
-        /// Returns a GraphQL input type for a specified CLR type
-        /// </summary>
-        protected virtual Type InferGraphType(TypeInformation typeInformation)
-            => typeInformation.InferGraphType();
+        protected virtual TypeInformation GetTypeInformation(PropertyInfo propertyInfo)
+        {
+            var typeInformation = new TypeInformation(propertyInfo, true);
+            typeInformation.ApplyAttributes();
+            return typeInformation;
+        }
     }
 }

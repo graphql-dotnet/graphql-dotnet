@@ -33,14 +33,14 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
-        internal static FieldType CreateField(PropertyInfo propertyInfo, bool isInputType)
+        internal static FieldType CreateField(PropertyInfo propertyInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
             {
                 Name = propertyInfo.Name,
                 Description = propertyInfo.Description(),
                 DeprecationReason = propertyInfo.ObsoleteMessage(),
-                Type = propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), isInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
+                Type = graphType,
                 DefaultValue = isInputType ? propertyInfo.DefaultValue() : null,
             };
 
@@ -52,17 +52,6 @@ namespace GraphQL.Types
             }
 
             return fieldType;
-        }
-
-        private static bool IsNullableProperty(PropertyInfo propertyInfo)
-        {
-            if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute)))
-                return false;
-
-            if (!propertyInfo.PropertyType.IsValueType)
-                return true;
-
-            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
         private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
