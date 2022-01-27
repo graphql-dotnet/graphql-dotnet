@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Types;
 
-namespace GraphQL
+namespace GraphQL.Types
 {
     /// <summary>
     /// Contains type and nullability information for a method return type or argument type.
