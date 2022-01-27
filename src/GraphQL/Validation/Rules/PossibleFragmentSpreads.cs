@@ -51,7 +51,7 @@ namespace GraphQL.Validation.Rules
 
         private static IGraphType? getFragmentType(ValidationContext context, ROM name)
         {
-            var frag = context.GetFragment(name);
+            var frag = context.Document.FindFragmentDefinition(name);
             return frag?.TypeCondition.Type.GraphTypeFromType(context.Schema);
         }
     }

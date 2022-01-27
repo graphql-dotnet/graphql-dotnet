@@ -17,11 +17,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly KnownDirectivesInAllowedLocations Instance = new KnownDirectivesInAllowedLocations();
+        public static readonly KnownDirectivesInAllowedLocations Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="KnownDirectivesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLDirective>((node, context) =>
         {

@@ -236,7 +236,7 @@ namespace GraphQL.Validation
             }
         }
 
-        private FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
+        private static FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
         {
             var name = field.Name;
 

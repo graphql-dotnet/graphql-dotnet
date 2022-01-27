@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
@@ -11,18 +10,18 @@ namespace GraphQL.Validation.Rules
     /// No unused fragments:
     ///
     /// A GraphQL document is only valid if all fragment definitions are spread
-    /// within operations, or spread within other fragments spread within operations.
+    /// within operations, or spread within other fragment spreads within operations.
     /// </summary>
     public class NoUnusedFragments : IValidationRule
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
+        public static readonly NoUnusedFragments Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedFragmentsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLOperationDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<GraphQLOperationDefinition>(1)).Add(node)),
@@ -37,16 +36,11 @@ namespace GraphQL.Validation.Rules
                 if (operationDefs == null)
                     return;
 
-                var fragmentNamesUsed = operationDefs
-                    .SelectMany(context.GetRecursivelyReferencedFragments)
-                    .Select(fragment => fragment.FragmentName.Name)
-                    .ToList();
+                var fragmentsUsed = context.GetRecursivelyReferencedFragments(operationDefs);
 
                 foreach (var fragmentDef in fragmentDefs)
                 {
-                    var fragName = fragmentDef.FragmentName.Name;
-
-                    if (!fragmentNamesUsed.Contains(fragName))
+                    if (fragmentsUsed == null || !fragmentsUsed.Contains(fragmentDef))
                     {
                         context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
                     }

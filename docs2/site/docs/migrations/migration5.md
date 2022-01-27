@@ -245,7 +245,7 @@ Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `Val
 
 ### 10. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
 
-### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` class
+### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
 
 ### 12. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
 
@@ -276,6 +276,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
 - `SourceLocation` struct was removed, use `GraphQLLocation` from `GraphQLParser.AST` namespace
 - `CoreToVanillaConverter` class was removed
 - `ErrorLocation` struct was removed, use `Location` from `GraphQLParser` namespace
+- `ValidationContext.GetFragment` method was removed, use `ValidationContext.Document.FindFragmentDefinition`
 - `IResolveFieldContext.SubFields` and `IExecutionStrategy.GetSubFields` returns dictionary with
    values of tuple of queried field and its field definition
 - All scalars works with `GraphQLParser.AST.GraphQLValue` instead of `GraphQL.Language.AST.IValue`

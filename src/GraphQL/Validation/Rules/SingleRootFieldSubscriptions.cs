@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -43,7 +44,7 @@ namespace GraphQL.Validation.Rules
 
             if (fragment is GraphQLFragmentSpread fragmentSpread)
             {
-                var fragmentDefinition = context.GetFragment(fragmentSpread.FragmentName.Name);
+                var fragmentDefinition = context.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
                 rootFields = fragmentDefinition?.SelectionSet.Selections.Count ?? 0;
             }
             else if (fragment is GraphQLInlineFragment fragmentSelectionSet)
