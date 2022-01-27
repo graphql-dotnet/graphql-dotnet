@@ -2650,11 +2650,12 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Inputs Variables { get; set; }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentSpread> GetFragmentSpreads(GraphQLParser.AST.GraphQLSelectionSet node) { }
-        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(System.Collections.Generic.List<GraphQLParser.AST.GraphQLOperationDefinition> operations) { }
         public GraphQL.Validation.Variables GetVariableValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
-        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQLParser.AST.IHasSelectionSetNode node) { }
+        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
+            where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
@@ -2668,7 +2669,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
         public string Number { get; set; }
     }
-    public class ValidationOptions
+    public readonly struct ValidationOptions
     {
         public ValidationOptions() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }

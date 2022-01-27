@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly OverlappingFieldsCanBeMerged Instance = new OverlappingFieldsCanBeMerged();
+        public static readonly OverlappingFieldsCanBeMerged Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
@@ -31,7 +31,7 @@ namespace GraphQL.Validation.Rules
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<GraphQLSelectionSet, CachedField>();
 
-            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>((selectionSet, context) =>
+            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>((selectionSet, context) => //TODO:allocation of Action<GraphQLSelectionSet,ValidationContext>
             {
                 var conflicts = FindConflictsWithinSelectionSet(
                         context,

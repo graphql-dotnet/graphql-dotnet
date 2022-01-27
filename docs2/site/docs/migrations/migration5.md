@@ -245,7 +245,7 @@ Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `Val
 
 ### 10. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
 
-### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` class
+### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
 
 ### 12. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
 
