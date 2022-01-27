@@ -143,7 +143,7 @@ namespace GraphQL
         {
             if (type is null)
                 return true;
-            if (type is not IGraphType)
+            if (!typeof(IGraphType).IsAssignableFrom(type))
                 return false;
             if (type.IsGenericType)
             {
