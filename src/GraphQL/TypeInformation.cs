@@ -242,7 +242,7 @@ namespace GraphQL
                 else
                 {
                     IsNullable = false;
-                } 
+                }
             }
 
             var attributes = MemberInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
