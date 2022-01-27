@@ -128,7 +128,7 @@ it will override the interpreted graph type such as in the following examples:
 
 | CLR type marked with `[Id]` | Graph type  |
 |-------------------|-----------------------|
-| `string?`         | `IdGraphType`     |
+| `string?`         | `IdGraphType`         |
 | `string`          | `NonNullGraphType<IdGraphType>` |
 | `List<int>`       | `NonNullGraphType<ListGraphType<NonNullGraphType<IdGraphType>>>` |
 
