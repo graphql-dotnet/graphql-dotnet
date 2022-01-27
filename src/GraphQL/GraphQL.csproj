@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="GraphQL-Parser" Version="8.0.0-preview-113" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="NullabilityInfo" Version="1.0.4">
+    <PackageReference Include="NullabilityInfo" Version="1.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
