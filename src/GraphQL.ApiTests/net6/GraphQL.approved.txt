@@ -2566,7 +2566,7 @@ namespace GraphQL.Validation
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
         public readonly struct State : GraphQLParser.Visitors.IASTVisitorContext
         {
-            public State(GraphQL.Validation.ValidationContext context, System.Threading.CancellationToken cancellationToken) { }
+            public State(GraphQL.Validation.ValidationContext context) { }
             public System.Threading.CancellationToken CancellationToken { get; }
             public GraphQL.Validation.ValidationContext Context { get; }
         }
@@ -2578,14 +2578,14 @@ namespace GraphQL.Validation
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(GraphQL.Validation.ValidationOptions options) { }
+        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
     }
     public interface IDocumentValidator
     {
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(GraphQL.Validation.ValidationOptions options);
+        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
     }
     public interface INodeVisitor
     {
@@ -2654,6 +2654,7 @@ namespace GraphQL.Validation
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {
         public ValidationContext() { }
+        public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }

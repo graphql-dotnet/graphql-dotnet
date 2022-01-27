@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -68,6 +69,12 @@ namespace GraphQL.Validation
 
         /// <inheritdoc cref="ExecutionOptions.Extensions"/>
         public Inputs Extensions { get; set; } = null!;
+
+        /// <summary>
+        /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
+        /// defaults to <see cref="CancellationToken.None"/>
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
 
         /// <summary>
         /// Adds a validation error to the list of validation errors.

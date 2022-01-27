@@ -11,7 +11,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options);
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
@@ -54,7 +54,7 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options)
+        public Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options)
         {
             options.Schema.Initialize();
 
@@ -66,8 +66,13 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.CancellationToken = options.CancellationToken;
 
-            var rules = options.Rules ?? CoreRules;
+            return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
+        }
+
+        private async Task<(IValidationResult validationResult, Variables variables)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        {
             try
             {
                 Variables? variables = null;
@@ -110,7 +115,7 @@ namespace GraphQL.Validation
                                 visitors.Add(visitor);
                         }
                     }
-                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context, options.CancellationToken));
+                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context));
                 }
 
                 // can report errors even without rules enabled
