@@ -95,17 +95,6 @@ namespace GraphQL.Types
             GraphType = graphType;
         }
 
-        private static readonly Type[] _listTypes = new Type[] {
-            typeof(IEnumerable<>),
-            typeof(IList<>),
-            typeof(List<>),
-            typeof(ICollection<>),
-            typeof(IReadOnlyCollection<>),
-            typeof(IReadOnlyList<>),
-            typeof(HashSet<>),
-            typeof(ISet<>),
-        };
-
         /// <summary>
         /// Initializes an instance containing type information necessary to select a graph type.
         /// The instance is populated based on inspecting the type and NRT annotations on the specified property.
@@ -129,8 +118,7 @@ namespace GraphQL.Types
                     }
                     if (type.Type.IsGenericType)
                     {
-                        var g = type.Type.GetGenericTypeDefinition();
-                        if (Array.IndexOf(_listTypes, g) >= 0)
+                        if (IsRecognizedListType(type.Type))
                         {
                             //unwrap type and mark as list
                             IsList = true;
@@ -229,23 +217,42 @@ namespace GraphQL.Types
         /// </summary>
         public virtual Type ConstructGraphType()
         {
-            var t = GraphType;
-            if (t != null)
+            var type = GraphType;
+            if (type != null)
             {
                 if (!IsNullable)
-                    t = typeof(NonNullGraphType<>).MakeGenericType(t);
+                    type = typeof(NonNullGraphType<>).MakeGenericType(type);
             }
             else
             {
-                t = Type.GetGraphTypeFromType(IsNullable, IsInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                type = Type.GetGraphTypeFromType(IsNullable, IsInputType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
             }
             if (IsList)
             {
-                t = typeof(ListGraphType<>).MakeGenericType(t);
+                type = typeof(ListGraphType<>).MakeGenericType(type);
                 if (!ListIsNullable)
-                    t = typeof(NonNullGraphType<>).MakeGenericType(t);
+                    type = typeof(NonNullGraphType<>).MakeGenericType(type);
             }
-            return t;
+            return type;
         }
+
+        private static readonly Type[] _listTypes = new Type[] {
+            typeof(IEnumerable<>),
+            typeof(IList<>),
+            typeof(List<>),
+            typeof(ICollection<>),
+            typeof(IReadOnlyCollection<>),
+            typeof(IReadOnlyList<>),
+            typeof(HashSet<>),
+            typeof(ISet<>),
+        };
+
+        /// <summary>
+        /// Determines if the specified type is one of a certain set of recognized generic list types.
+        /// Does not match for <see cref="string"/> or <see cref="IDictionary{TKey, TValue}"/> or other
+        /// types which may also be able to be cast to <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        private bool IsRecognizedListType(Type type)
+            => Array.IndexOf(_listTypes, type.GetGenericTypeDefinition()) >= 0;
     }
 }
