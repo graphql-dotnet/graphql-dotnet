@@ -32,8 +32,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Determines whether the indicated type implements <see cref="IGraphType"/>.
+        /// Determines whether the indicated type implements IGraphType.
         /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>
+        ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsGraphType(this Type type)
             => typeof(IGraphType).IsAssignableFrom(type);
 
