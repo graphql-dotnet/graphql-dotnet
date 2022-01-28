@@ -47,14 +47,6 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
-      - name: Check formatting
-        if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
-        run: |
-          dotnet tool install -g dotnet-format --version 6.0.243104 --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
-          dotnet format --no-restore --verify-no-changes --severity warn whitespace || (echo "Run 'dotnet format' to fix whitespace issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn analyzers || (echo "Run 'dotnet format' to fix analyzers issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn style || (echo "Run 'dotnet format' to fix style issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
