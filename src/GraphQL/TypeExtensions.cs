@@ -235,7 +235,7 @@ namespace GraphQL
             return friendlyName;
         }
 
-        private static bool IsAnIEnumerable(this Type type) =>
+        private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
         /// <summary>
