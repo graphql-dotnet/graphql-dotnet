@@ -86,7 +86,12 @@ namespace GraphQL.Types
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead),
                 _excludedProperties);
             var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .Where(x => !x.ContainsGenericParameters && !x.IsSpecialName && x.ReturnType != typeof(void) && x.ReturnType != typeof(Task));
+                .Where(x =>
+                    !x.ContainsGenericParameters && //exclude methods with open generics
+                    !x.IsSpecialName &&             //exclude methods generated for properties
+                    x.ReturnType != typeof(void) && //exclude methods which do not return a value
+                    x.ReturnType != typeof(Task) && //exclude methods which do not return a value
+                    x.GetParameters().Length == 0); //exclude methods which contain arguments
             return props.Concat<MemberInfo>(methods);
         }
 

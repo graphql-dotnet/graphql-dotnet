@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -41,6 +42,7 @@ namespace GraphQL.Types
                 DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
                 DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
+                Resolver = MemberResolver.Create(memberInfo),
             };
 
             // Apply derivatives of GraphQLAttribute
@@ -52,6 +54,7 @@ namespace GraphQL.Types
 
             return fieldType;
         }
+
 
         private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
         {

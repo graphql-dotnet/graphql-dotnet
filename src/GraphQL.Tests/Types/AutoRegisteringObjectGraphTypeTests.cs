@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -242,8 +243,30 @@ namespace GraphQL.Tests.Types
         public void CanAddFieldInfos()
         {
             var graph = new TestFieldSupport<TestClass>();
-            graph.Fields.Count.ShouldBe(1);
             graph.Fields.Find("Field5").ShouldNotBeNull();
+        }
+
+        [Theory]
+        [InlineData("Field1", 1)]
+        [InlineData("Field2", 2)]
+        [InlineData("Field4", 4)]
+        [InlineData("Field5", 5)]
+        [InlineData("Field6AltName", 6)]
+        public void FieldResolversWork(string fieldName, object expected)
+        {
+            var graph = new TestFieldSupport<TestClass>();
+            var resolver = graph.Fields.Find(fieldName)!.Resolver ?? NameFieldResolver.Instance;
+            var obj = new TestClass();
+            var actual = resolver.Resolve(new ResolveFieldContext
+            {
+                Source = obj,
+                FieldDefinition = new FieldType { Name = fieldName },
+            });
+            if (actual is Task task)
+            {
+                actual = ((dynamic)task).Result;
+            }
+            actual.ShouldBe(expected);
         }
 
         private class FieldTests
@@ -305,7 +328,7 @@ namespace GraphQL.Tests.Types
         private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
         {
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-                => typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public);
+                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public));
         }
 
         private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
@@ -320,11 +343,14 @@ namespace GraphQL.Tests.Types
 
         private class TestClass
         {
-            public int Field1 { get; set; }
-            public int Field2 { get; }
+            public int Field1 { get; set; } = 1;
+            public int Field2 => 2;
             public int Field3 { set { } }
-            public int Field4() => 0;
-            public int Field5;
+            public int Field4() => 4;
+            public int Field5 = 5;
+            [Name("Field6AltName")]
+            public int Field6 => 6;
+            public Task<int> Field7 => Task.FromResult(7);
         }
 
         [Name("TestWithCustomName")]
