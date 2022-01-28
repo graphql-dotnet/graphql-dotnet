@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -178,6 +179,8 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>))]
         [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>))]
         [InlineData(nameof(FieldTests.IdField), typeof(NonNullGraphType<IdGraphType>))]
+        [InlineData(nameof(FieldTests.EnumerableField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<object>>>))]
+        [InlineData(nameof(FieldTests.CollectionField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<object>>>))]
         public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
         {
             var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
@@ -271,6 +274,8 @@ namespace GraphQL.Tests.Types
             public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
             [Id]
             public int IdField { get; set; }
+            public IEnumerable EnumerableField { get; set; } = null!;
+            public ICollection CollectionField { get; set; } = null!;
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
