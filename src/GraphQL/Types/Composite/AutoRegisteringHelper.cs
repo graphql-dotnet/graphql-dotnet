@@ -33,6 +33,9 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
+        /// <summary>
+        /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
+        /// </summary>
         internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
@@ -42,8 +45,12 @@ namespace GraphQL.Types
                 DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
                 DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
-                Resolver = MemberResolver.Create(memberInfo),
+                Resolver = isInputType ? null : MemberResolver.Create(memberInfo),
             };
+            if (isInputType)
+            {
+                fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+            }
 
             // Apply derivatives of GraphQLAttribute
             var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
@@ -54,7 +61,6 @@ namespace GraphQL.Types
 
             return fieldType;
         }
-
 
         private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
         {

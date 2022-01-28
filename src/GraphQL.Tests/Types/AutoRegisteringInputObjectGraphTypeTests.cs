@@ -236,8 +236,25 @@ namespace GraphQL.Tests.Types
         public void CanAddFieldInfos()
         {
             var graph = new TestFieldSupport<TestClass>();
-            graph.Fields.Count.ShouldBe(1);
             graph.Fields.Find("Field5").ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void DoesParse()
+        {
+            var dic = new Dictionary<string, object?>()
+            {
+                { "Field1", 11 },
+                { "Field3", 13 },
+                { "Field5", 15 },
+                { "Field6AltName", 16 },
+            };
+            var graph = new TestFieldSupport<TestClass>();
+            var actual = graph.ParseDictionary(dic).ShouldBeOfType<TestClass>();
+            actual.Field1.ShouldBe(11);
+            actual.Field3Value.ShouldBe(13);
+            actual.Field5.ShouldBe(15);
+            actual.Field6.ShouldBe(16);
         }
 
         private class FieldTests
@@ -299,7 +316,7 @@ namespace GraphQL.Tests.Types
         private class TestFieldSupport<T> : AutoRegisteringInputObjectGraphType<T>
         {
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-                => typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public);
+                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public));
         }
 
         private class TestChangingName<T> : AutoRegisteringInputObjectGraphType<T>
@@ -314,11 +331,14 @@ namespace GraphQL.Tests.Types
 
         private class TestClass
         {
-            public int Field1 { get; set; }
-            public int Field2 { get; }
-            public int Field3 { set { } }
-            public int Field4() => 0;
-            public int Field5;
+            internal int Field3Value = 0;
+            public int Field1 { get; set; } = 1;
+            public int Field2 { get; } = 2;
+            public int Field3 { set => Field3Value = value; }
+            public int Field4() => 4;
+            public int Field5 = 5;
+            [Name("Field6AltName")]
+            public int Field6 { get; set; } = 6;
         }
 
         [Name("TestWithCustomName")]

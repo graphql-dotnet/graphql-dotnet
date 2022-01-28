@@ -255,7 +255,8 @@ namespace GraphQL.Tests.Types
         public void FieldResolversWork(string fieldName, object expected)
         {
             var graph = new TestFieldSupport<TestClass>();
-            var resolver = graph.Fields.Find(fieldName)!.Resolver ?? NameFieldResolver.Instance;
+            var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
+            var resolver = field.Resolver.ShouldNotBeNull();
             var obj = new TestClass();
             var actual = resolver.Resolve(new ResolveFieldContext
             {
