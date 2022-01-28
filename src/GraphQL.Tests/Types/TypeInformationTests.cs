@@ -8,8 +8,7 @@ namespace GraphQL.Tests.Types
 {
     public class TypeInformationTests
     {
-        private bool _property { get; set; }
-        private readonly PropertyInfo _member = typeof(TypeInformationTests).GetProperty(nameof(_property))!;
+        private static readonly PropertyInfo _member = typeof(Type).GetProperty(nameof(Type.FullName))!;
 
         [Fact]
         public void GraphType_Output_VerifyErrors()
