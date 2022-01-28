@@ -160,10 +160,10 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Flattens a complex <see cref="NullabilityInfo"/> structure into a list types and nullability flags.
+        /// Flattens a complex <see cref="NullabilityInfo"/> structure into a list of types and nullability flags.
         /// <see cref="Nullable{T}"/> structs return their underlying type rather than <see cref="Nullable{T}"/>.
         /// </summary>
-        private static IEnumerable<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInputProperty)
+        private static List<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInputProperty)
         {
             var list = new List<(Type, NullabilityState)>(info.GenericTypeArguments.Length + 1);
             RecursiveLoop(info);
@@ -202,7 +202,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type constructed based on the properties set within this instance.
         /// If <see cref="GraphType"/> is <see langword="null"/>, the graph type is generated via
-        /// <see cref="TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>.
+        /// <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>.
         /// The graph type is then wrapped with <see cref="NonNullGraphType{T}"/> and/or
         /// <see cref="ListGraphType{T}"/> as appropriate.
         /// </summary>
