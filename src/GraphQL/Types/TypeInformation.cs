@@ -67,7 +67,7 @@ namespace GraphQL.Types
                 {
                     throw new ArgumentOutOfRangeException(nameof(value), "Value can only be an output graph type.");
                 }
-                if (!value.IsNamedType())
+                if (!value.IsNamedGraphType())
                 {
                     throw new ArgumentOutOfRangeException(nameof(value), "Value must be a named type.");
                 }
