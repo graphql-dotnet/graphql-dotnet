@@ -7,7 +7,7 @@ namespace GraphQL
     /// <summary>
     /// Attribute for specifying additional information when matching a CLR type to a corresponding GraphType.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, Inherited = false)]
     public sealed class GraphQLMetadataAttribute : GraphQLAttribute
     {
         private Type? _mappedToInput;
@@ -107,6 +107,9 @@ namespace GraphQL
 
             if (DeprecationReason != null)
                 graphType.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
+
+            if (graphType is IObjectGraphType objectGraphType && IsTypeOf != null)
+                objectGraphType.IsTypeOf = obj => IsTypeOf.IsAssignableFrom(obj.GetType());
         }
 
         /// <inheritdoc/>

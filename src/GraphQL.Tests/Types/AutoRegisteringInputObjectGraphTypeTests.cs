@@ -203,6 +203,7 @@ namespace GraphQL.Tests.Types
             inputType.Fields.Find("Field2").ShouldBeNull();
             inputType.Fields.Find("Field3").ShouldNotBeNull();
             inputType.Fields.Find("Field4").ShouldBeNull();
+            inputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
@@ -213,6 +214,7 @@ namespace GraphQL.Tests.Types
             inputType.Fields.Find("Field2").ShouldBeNull();
             inputType.Fields.Find("Field3").ShouldNotBeNull();
             inputType.Fields.Find("Field4").ShouldBeNull();
+            inputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
@@ -282,15 +284,15 @@ namespace GraphQL.Tests.Types
         {
             protected override IEnumerable<FieldType> ProvideFields()
             {
-                yield return CreateField(GetRegisteredProperties().First(x => x.Name == "Field1"))!;
+                yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
             }
         }
 
         private class TestChangingName<T> : AutoRegisteringInputObjectGraphType<T>
         {
-            protected override FieldType CreateField(PropertyInfo propertyInfo)
+            protected override FieldType CreateField(MemberInfo memberInfo)
             {
-                var field = base.CreateField(propertyInfo)!;
+                var field = base.CreateField(memberInfo)!;
                 field.Name += "Prop";
                 return field;
             }
@@ -302,6 +304,7 @@ namespace GraphQL.Tests.Types
             public int Field2 { get; }
             public int Field3 { set { } }
             public int Field4() => 0;
+            public int Field5;
         }
 
         [Name("TestWithCustomName")]

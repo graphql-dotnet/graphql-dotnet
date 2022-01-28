@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 
 namespace GraphQL.Types
 {
@@ -11,7 +13,7 @@ namespace GraphQL.Types
     public class TypeInformation
     {
         /// <summary>
-        /// The member being inspected.
+        /// The member being inspected. This is a <see cref="MethodInfo"/> or <see cref="PropertyInfo"/> instance.
         /// </summary>
         public MemberInfo MemberInfo { get; }
 
@@ -104,6 +106,39 @@ namespace GraphQL.Types
         {
             var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInputProperty);
 
+            ProcessTypeTree(typeTree, isInputProperty);
+        }
+
+        /// <summary>
+        /// Initializes an instance containing type information necessary to select a graph type.
+        /// The instance is populated based on inspecting the type and NRT annotations on the specified field.
+        /// </summary>
+        public TypeInformation(FieldInfo fieldInfo, bool isInput)
+            : this(fieldInfo, isInput, fieldInfo.FieldType, false, false, false, null)
+        {
+            var typeTree = Interpret(new NullabilityInfoContext().Create(fieldInfo), isInput);
+
+            ProcessTypeTree(typeTree, isInput);
+        }
+
+        /// <summary>
+        /// Initializes an instance containing type information necessary to select a graph type.
+        /// The instance is populated based on inspecting the type and NRT annotations on the specified method.
+        /// </summary>
+        public TypeInformation(MethodInfo methodInfo)
+            : this(methodInfo, false, methodInfo.ReturnType, false, false, false, null)
+        {
+            var typeTree = Interpret(new NullabilityInfoContext().Create(methodInfo.ReturnParameter), false);
+
+            ProcessTypeTree(typeTree, false);
+        }
+
+        /// <summary>
+        /// Populates the <see cref="Type"/>, <see cref="IsNullable"/>, <see cref="IsList"/> and <see cref="ListIsNullable"/>
+        /// properties of this instance from a provided <paramref name="typeTree"/>.
+        /// </summary>
+        private void ProcessTypeTree(List<(Type Type, NullabilityState Nullable)> typeTree, bool isInput)
+        {
             foreach (var type in typeTree)
             {
                 //detect list types, but not lists of lists
@@ -113,7 +148,7 @@ namespace GraphQL.Types
                     {
                         //unwrap type and mark as list
                         IsList = true;
-                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                        ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
                         continue;
                     }
                     if (type.Type.IsGenericType)
@@ -122,7 +157,8 @@ namespace GraphQL.Types
                         {
                             //unwrap type and mark as list
                             IsList = true;
-                            ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                            ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
+                            IsNullable = false;
                             continue;
                         }
                     }
@@ -130,12 +166,31 @@ namespace GraphQL.Types
                     {
                         //assume list of nullable object
                         IsList = true;
-                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                        ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
+                        IsNullable = false;
+                        break;
+                    }
+                }
+                if (!isInput)
+                {
+                    if (type.Type.IsGenericType)
+                    {
+                        var genericType = type.Type.GetGenericTypeDefinition();
+                        if (genericType == typeof(Task<>) || genericType == typeof(IDataLoaderResult<>))
+                        {
+                            //unwrap type
+                            IsNullable |= type.Nullable != NullabilityState.NotNull;
+                            continue;
+                        }
+                    }
+                    if (type.Type == typeof(IDataLoaderResult))
+                    {
+                        //assume nullable object
                         break;
                     }
                 }
                 //found match
-                IsNullable = type.Nullable != NullabilityState.NotNull;
+                IsNullable |= type.Nullable != NullabilityState.NotNull;
                 Type = type.Type;
                 return;
             }

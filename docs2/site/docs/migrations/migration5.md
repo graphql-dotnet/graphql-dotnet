@@ -137,6 +137,25 @@ Custom attributes can also be added to perform the following behavior changes:
 - Override detected nullability or list nullability state
 - Override chosen underlying graph type
 
+#### Method support for `AutoRegisteringObjectGraphType<T>` instances
+
+Methods will be detected and added to fields on the graph. Asynchronous methods
+and data loader methods are supported such as shown in the below example:
+
+| CLR type                     | Graph type                          |
+|------------------------------|-------------------------------------|
+| `Task<string>`               | `NonNullGraphType<StringGraphType>` |
+| `IDataLoaderResult<Person?>` | `PersonGraphType`                   |
+
+The above example assumes that the `Person` CLR type was mapped to `PersonGraphType`
+in the schema CLR type mappings.
+
+#### CLR field support
+
+CLR fields are not automatically added to graph types, but can be added by overriding
+the `GetRegisteredMembers` method of a `AutoRegisteringObjectGraphType<T>` or
+`AutoRegisteringInputObjectGraphType<T>` instance.
+
 #### Overridable base functionality
 
 The classes can be overridden, providing the ability to customize behavior of automatically
@@ -168,9 +187,9 @@ automatically-generated graph types:
 |------------------|----------------------------------------------------------------------|------------------|
 | (constructor)    | Configures graph properties and adds fields                          | Configuring graph after default initialization is complete |
 | ConfigureGraph   | Configures default graph properties prior to applying attributes     | Applying a different default naming convention, such as appending "Input" or "Model" |
-| GetRegisteredProperties | Returns the set of properties to be automatically configured  | Filtering internal properties; sorting the property list |
+| GetRegisteredMembers | Returns the set of properties, methods and fields to be automatically configured | Filtering internal properties; sorting the property list; including fields; excluding methods |
 | ProvideFields    | Returns a set of generated fields                                    | Adding additional fields to the generated set |
-| CreateField      | Creates a `FieldType` from a `PropertyInfo`                          | Applying custom behavior to field generation |
+| CreateField      | Creates a `FieldType` from a `MemberInfo`                            | Applying custom behavior to field generation |
 
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
@@ -430,3 +449,33 @@ string s = writer.ToString();
 `SDLPrinter` is a highly optimized visitor for asynchronous non-blocking SDL output
 into provided `TextWriter`. In the majority of cases it does not allocate memory in
 the managed heap at all.
+
+### 21. `AutoRegisteringObjectGraphType` changes
+
+The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
+and now supports properties, methods and fields, although fields are not included
+with the default implementation. Override the method in a derived class to include fields.
+
+New for v5, methods are included by default.  To revert to v4 behavior, which does not
+include methods, create a derived class as follows:
+
+```csharp
+public class AutoRegisteringObjectGraphTypeWithoutMethods<T> : AutoRegisteringObjectGraphType<T>
+{
+    public AutoRegisteringObjectGraphTypeWithoutMethods() : base() { }
+    public AutoRegisteringObjectGraphTypeWithoutMethods(params Expression<Func<T, object?>>[]? excludedProperties) : base(excludedProperties) { }
+    protected override IEnumerable<MemberInfo> GetRegisteredMembers() => base.GetRegisteredMembers().Where(x => x is PropertyInfo);
+}
+```
+
+Register this class within your DI engine like this:
+
+```cs
+services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
+```
+
+### 22. `AutoRegisteringInputObjectGraphType` changes
+
+The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
+and now supports returning both properties and fields, although fields are not included
+with the default implementation. Override the method in a derived class to include fields.

@@ -32,19 +32,19 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
-        internal static FieldType CreateField(PropertyInfo propertyInfo, Type graphType, bool isInputType)
+        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
             {
-                Name = propertyInfo.Name,
-                Description = propertyInfo.Description(),
-                DeprecationReason = propertyInfo.ObsoleteMessage(),
+                Name = memberInfo.Name,
+                Description = memberInfo.Description(),
+                DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
-                DefaultValue = isInputType ? propertyInfo.DefaultValue() : null,
+                DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
             };
 
             // Apply derivatives of GraphQLAttribute
-            var attributes = propertyInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);
