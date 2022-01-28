@@ -10,8 +10,6 @@ namespace GraphQL.Types
     /// </summary>
     public class TypeInformation
     {
-        private Type? _graphType;
-
         /// <summary>
         /// The member being inspected.
         /// </summary>
@@ -43,6 +41,7 @@ namespace GraphQL.Types
         /// </summary>
         public bool ListIsNullable { get; set; }
 
+        private Type? _graphType;
         /// <summary>
         /// The graph type of the underlying CLR type or <see langword="null"/> to detect the graph type automatically.
         /// </summary>
@@ -69,7 +68,7 @@ namespace GraphQL.Types
                 }
                 if (!value.IsNamedGraphType())
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value), "Value must be a named type.");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Value must be a named graph type.");
                 }
                 _graphType = value;
             }
@@ -112,10 +111,8 @@ namespace GraphQL.Types
         /// The instance is populated based on inspecting the type and NRT annotations on the specified property.
         /// </summary>
         public TypeInformation(PropertyInfo propertyInfo, bool isInputProperty)
+            : this(propertyInfo, isInputProperty, propertyInfo.PropertyType, false, false, false, null)
         {
-            MemberInfo = propertyInfo;
-            IsInputType = isInputProperty;
-
             var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInputProperty);
 
             foreach (var type in typeTree)
@@ -200,6 +197,30 @@ namespace GraphQL.Types
         }
 
         /// <summary>
+        /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
+        /// </summary>
+        public virtual void ApplyAttributes()
+        {
+            if (MemberInfo.IsDefined(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false))
+            {
+                if (IsList)
+                {
+                    ListIsNullable = false;
+                }
+                else
+                {
+                    IsNullable = false;
+                }
+            }
+
+            var attributes = MemberInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            foreach (var attr in attributes)
+            {
+                ((GraphQLAttribute)attr).Modify(this);
+            }
+        }
+
+        /// <summary>
         /// Returns a graph type constructed based on the properties set within this instance.
         /// If <see cref="GraphType"/> is <see langword="null"/>, the graph type is generated via
         /// <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>.
@@ -225,30 +246,6 @@ namespace GraphQL.Types
                     t = typeof(NonNullGraphType<>).MakeGenericType(t);
             }
             return t;
-        }
-
-        /// <summary>
-        /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
-        /// </summary>
-        public virtual void ApplyAttributes()
-        {
-            if (MemberInfo.IsDefined(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false))
-            {
-                if (IsList)
-                {
-                    ListIsNullable = false;
-                }
-                else
-                {
-                    IsNullable = false;
-                }
-            }
-
-            var attributes = MemberInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
-            foreach (var attr in attributes)
-            {
-                ((GraphQLAttribute)attr).Modify(this);
-            }
         }
     }
 }
