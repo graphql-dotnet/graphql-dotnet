@@ -238,6 +238,14 @@ namespace GraphQL.Tests.Types
             graph.Fields.Find("Field1").ShouldNotBeNull();
         }
 
+        [Fact]
+        public void CanAddFieldInfos()
+        {
+            var graph = new TestFieldSupport<TestClass>();
+            graph.Fields.Count.ShouldBe(1);
+            graph.Fields.Find("Field5").ShouldNotBeNull();
+        }
+
         private class FieldTests
         {
             [Name("Test1")]
@@ -292,6 +300,12 @@ namespace GraphQL.Tests.Types
             {
                 yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
             }
+        }
+
+        private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
+        {
+            protected override IEnumerable<MemberInfo> GetRegisteredMembers()
+                => typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public);
         }
 
         private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
