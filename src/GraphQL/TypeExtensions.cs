@@ -32,14 +32,34 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Determines whether the indicated type implements IGraphType.
+        /// Determines whether the indicated type implements <see cref="IGraphType"/>.
         /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>
-        ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
-        /// </returns>
         public static bool IsGraphType(this Type type)
             => typeof(IGraphType).IsAssignableFrom(type);
+
+        /// <summary>
+        /// Determines if the specified type represents a named graph type (not a wrapper type such as <see cref="ListGraphType"/>).
+        /// </summary>
+        internal static bool IsNamedType(this Type type)
+        {
+            if (!IsGraphType(type))
+                return false;
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(NonNullGraphType<>) ||
+                    genericType == typeof(ListGraphType<>))
+                {
+                    return false;
+                }
+            }
+            else if (type == typeof(NonNullGraphType) || type == typeof(ListGraphType))
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
@@ -211,7 +231,7 @@ namespace GraphQL
             return friendlyName;
         }
 
-        private static bool IsAnIEnumerable(Type type) =>
+        private static bool IsAnIEnumerable(this Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
         /// <summary>
