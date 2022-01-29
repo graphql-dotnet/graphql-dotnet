@@ -17,8 +17,10 @@ namespace GraphQL.Tests.Types
             typeInfo.GraphType.ShouldBeNull();
             typeInfo.GraphType = typeof(ObjectGraphType);
             typeInfo.GraphType = typeof(IdGraphType);
-            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(InputObjectGraphType));
-            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ListGraphType<ObjectGraphType>));
+            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(InputObjectGraphType))
+                .Message.ShouldStartWith("Value can only be an output graph type.");
+            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ListGraphType<ObjectGraphType>))
+                .Message.ShouldStartWith("Value must be a named graph type.");
             typeInfo.GraphType = null;
         }
 
@@ -29,8 +31,10 @@ namespace GraphQL.Tests.Types
             typeInfo.GraphType.ShouldBeNull();
             typeInfo.GraphType = typeof(InputObjectGraphType);
             typeInfo.GraphType = typeof(IdGraphType);
-            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ObjectGraphType));
-            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ListGraphType<InputObjectGraphType>));
+            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ObjectGraphType))
+                .Message.ShouldStartWith("Value can only be an input graph type.");
+            Should.Throw<ArgumentException>(() => typeInfo.GraphType = typeof(ListGraphType<InputObjectGraphType>))
+                .Message.ShouldStartWith("Value must be a named graph type.");
             typeInfo.GraphType = null;
         }
     }

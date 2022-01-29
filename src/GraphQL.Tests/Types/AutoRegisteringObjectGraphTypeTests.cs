@@ -166,6 +166,10 @@ namespace GraphQL.Tests.Types
         }
 
         [Theory]
+        [InlineData(nameof(FieldTests.NotNullIntField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(nameof(FieldTests.NullableIntField), typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(nameof(FieldTests.NotNullStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(nameof(FieldTests.NullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
         [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
         [InlineData(nameof(FieldTests.NotNullListNotNullStringField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<string>>>>))]
         [InlineData(nameof(FieldTests.NullableListNullableStringField), typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
@@ -179,8 +183,12 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>))]
         [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>>))]
         [InlineData(nameof(FieldTests.IdField), typeof(NonNullGraphType<IdGraphType>))]
+        [InlineData(nameof(FieldTests.NullableIdField), typeof(IdGraphType))]
         [InlineData(nameof(FieldTests.EnumerableField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<object>>>))]
         [InlineData(nameof(FieldTests.CollectionField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<object>>>))]
+        [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
+        [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
+
         public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
         {
             var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
@@ -256,6 +264,10 @@ namespace GraphQL.Tests.Types
             public string? Field10 { get; set; }
             [Ignore]
             public string? Field11 { get; set; }
+            public int NotNullIntField { get; set; }
+            public int? NullableIntField { get; set; }
+            public string NotNullStringField { get; set; } = null!;
+            public string? NullableStringField { get; set; }
             public List<string?> NotNullListNullableStringField { get; set; } = null!;
             public List<string> NotNullListNotNullStringField { get; set; } = null!;
             public List<string?>? NullableListNullableStringField { get; set; }
@@ -270,8 +282,12 @@ namespace GraphQL.Tests.Types
             public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
             [Id]
             public int IdField { get; set; }
+            [Id]
+            public int? NullableIdField { get; set; }
             public IEnumerable EnumerableField { get; set; } = null!;
             public ICollection CollectionField { get; set; } = null!;
+            public IEnumerable? NullableEnumerableField { get; set; }
+            public ICollection? NullableCollectionField { get; set; }
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
