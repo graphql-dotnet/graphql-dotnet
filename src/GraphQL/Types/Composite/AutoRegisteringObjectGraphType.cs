@@ -96,9 +96,10 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Analyzes a property or method and returns an instance of <see cref="TypeInformation"/>
-        /// containing information necessary to select a graph type. Any <see cref="GraphQLAttribute"/>
-        /// attributes marked on the property are applied.
+        /// Analyzes a property, method or field and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
         /// <br/><br/>
         /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
         /// attributes to change graph type selection behavior.
