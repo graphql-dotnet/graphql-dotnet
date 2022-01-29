@@ -17,7 +17,7 @@ namespace GraphQL.Types
         public MemberInfo MemberInfo { get; }
 
         /// <summary>
-        /// Indicates that this is an input type (an argument); false for output types.
+        /// Indicates that this is an input type (an argument or input field); false for output types.
         /// </summary>
         public bool IsInputType { get; }
 
