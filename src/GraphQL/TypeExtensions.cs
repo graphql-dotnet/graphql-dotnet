@@ -44,7 +44,7 @@ namespace GraphQL
         /// <summary>
         /// Determines if the specified type represents a named graph type (not a wrapper type such as <see cref="ListGraphType"/>).
         /// </summary>
-        internal static bool IsNamedGraphType(this Type type)
+        internal static bool IsNamedType(this Type type)
         {
             if (!IsGraphType(type))
                 return false;

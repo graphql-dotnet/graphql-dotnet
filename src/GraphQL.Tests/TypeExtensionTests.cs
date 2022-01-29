@@ -18,7 +18,7 @@ namespace GraphQL.Tests
         [InlineData(null, false)]
         public void IsNamedGraphType(Type type, bool expected)
         {
-            type.IsNamedGraphType().ShouldBe(expected);
+            type.IsNamedType().ShouldBe(expected);
         }
     }
 }
