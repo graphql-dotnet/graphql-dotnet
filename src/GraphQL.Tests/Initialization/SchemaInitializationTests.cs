@@ -276,7 +276,7 @@ namespace GraphQL.Tests.Initialization
             public SomeInputType()
             {
                 Name = "SomeInput";
-                Field(x => x.Names);
+                Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("names");
             }
         }
 
@@ -294,26 +294,12 @@ namespace GraphQL.Tests.Initialization
             root.Field<NonNullGraphType<StringGraphType>>(
                "field",
                arguments: new QueryArguments(
-                   new QueryArgument<NonNullGraphType<SomeInputType>>
+                   new QueryArgument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>
                    {
                        Name = "argOne",
-                       DefaultValue = new SomeInput { Names = new List<string> { "a", null, "b" } }
+                       DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } }
                    }));
             Query = root;
-        }
-
-        public class SomeInputType : InputObjectGraphType<SomeInput>
-        {
-            public SomeInputType()
-            {
-                Name = "SomeInput";
-                Field<ListGraphType<NonNullGraphType<StringGraphType>>>("names");
-            }
-        }
-
-        public class SomeInput
-        {
-            public IList<string> Names { get; set; }
         }
     }
 }
