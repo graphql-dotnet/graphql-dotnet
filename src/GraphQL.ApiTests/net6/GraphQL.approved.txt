@@ -1884,7 +1884,7 @@ namespace GraphQL.Types
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
-        public virtual GraphQLParser.AST.GraphQLValue ToAST(object value) { }
+        public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
