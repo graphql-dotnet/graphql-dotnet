@@ -77,14 +77,18 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Converts a value to an AST representation. This is necessary for introspection queries
-        /// to return the default value for fields of this input object type. This method may throw an exception
-        /// or return <see langword="null"/> for a failed conversion.
+        /// to return the default value for fields of this input object type. Also AST representation
+        /// is used while printing schema as SDL.
+        /// <br/>
+        /// This method may throw an exception or return <see langword="null"/> for a failed conversion.
         /// <br/><br/>
-        /// The default implementation always throws an exception. It is recommended that this method be
-        /// overridden to support introspection of fields of this type that have default values. This method
-        /// is not otherwise needed to be implemented.
+        /// The default implementation returns <see cref="GraphQLNullValue"/> if <paramref name="value"/>
+        /// is <see langword="null"/> and <see cref="GraphQLObjectValue"/> filled with the values
+        /// for all input fields except ones returning <see cref="GraphQLNullValue"/>.
+        /// <br/><br/>
+        /// Note that you may need to override this method if you have already overrided <see cref="ParseDictionary"/>.
         /// </summary>
-        public virtual GraphQLValue ToAST(object value)
+        public virtual GraphQLValue ToAST(object? value)
         {
             if (value == null)
                 return GraphQLValuesCache.Null;
@@ -108,11 +112,9 @@ namespace GraphQL.Types
             }
 
             return objectValue;
-
-            //throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
         }
 
-        private object? GetFieldValue(FieldType field, object? value)
+        private static object? GetFieldValue(FieldType field, object? value)
         {
             if (value == null)
                 return null;

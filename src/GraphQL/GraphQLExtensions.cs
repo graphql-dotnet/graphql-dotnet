@@ -389,7 +389,7 @@ namespace GraphQL
             {
                 var itemType = listType.ResolvedType!;
 
-                if (!(value is string) && value is IEnumerable list)
+                if (value is not string && value is IEnumerable list)
                 {
                     foreach (var item in list)
                     {
