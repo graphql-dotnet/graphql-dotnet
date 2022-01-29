@@ -417,7 +417,7 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue ToAST(this IGraphType type, object value)
+        public static IValue ToAST(this IGraphType type, object? value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));

@@ -73,15 +73,11 @@ namespace GraphQL.Tests.Extensions
 
             public class PersonInputType : InputObjectGraphType<Person>
             {
-                public override IValue ToAST(object value)
+                public PersonInputType()
                 {
-                    var person = (Person)value;
-
-                    return new ObjectValue(new[]
-                    {
-                        new ObjectField("Name", new StringValue(person.Name)),
-                        new ObjectField("Age", new IntValue(person.Age))
-                    });
+                    // ResolvedType should be set (it usually happens during schema initialization)
+                    Field(p => p.Name).FieldType.ResolvedType = new StringGraphType();
+                    Field(p => p.Age).FieldType.ResolvedType = new NonNullGraphType(new IntGraphType());
                 }
             }
 
@@ -99,11 +95,14 @@ namespace GraphQL.Tests.Extensions
 
                 yield return new object[] { new InputObjectGraphType<Person>(), null, new NullValue() };
                 yield return new object[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new ObjectValue(new[]
-                    {
-                        new ObjectField("Name", new StringValue("Tom")),
-                        new ObjectField("Age", new IntValue(42))
-                    }) };
-
+                {
+                    new ObjectField("Name", new StringValue("Tom")),
+                    new ObjectField("Age", new IntValue(42))
+                }) };
+                yield return new object[] { new PersonInputType(), new Person { }, new ObjectValue(new[]
+                {
+                    new ObjectField("Age", new IntValue(0))
+                }) };
                 yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new BooleanValue(true) };
             }
 
@@ -127,7 +126,6 @@ namespace GraphQL.Tests.Extensions
             public IEnumerator<object[]> GetEnumerator()
             {
                 yield return new object[] { new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'") };
-                yield return new object[] { new InputObjectGraphType<Person>(), new Person(), new NotImplementedException("Please override the 'ToAST' method of the 'InputObjectGraphType`1' Input Object to support this operation.") };
                 yield return new object[] { new BadPersonInputType(), new Person(), new InvalidOperationException("Unable to get an AST representation of the input object type 'BadPersonInputType' for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests+ToASTExceptionTestData+Person'.") };
                 yield return new object[] { new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
                 yield return new object[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of null value for type '[Boolean]!'.") };

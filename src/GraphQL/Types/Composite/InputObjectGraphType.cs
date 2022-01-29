@@ -73,28 +73,6 @@ namespace GraphQL.Types
             }
 
             return true;
-
-            object? GetFieldValue(FieldType field, object? value)
-            {
-                if (value == null)
-                    return null;
-
-                // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
-                string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
-                PropertyInfo? propertyInfo = null;
-                try
-                {
-                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                }
-                catch (AmbiguousMatchException)
-                {
-                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                }
-
-                return propertyInfo?.CanRead == true
-                    ? propertyInfo.GetValue(value)
-                    : null;
-            }
         }
 
         /// <summary>
@@ -108,7 +86,43 @@ namespace GraphQL.Types
         /// </summary>
         public virtual IValue? ToAST(object value)
         {
-            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
+            if (value == null)
+                return new NullValue();
+
+            List<ObjectField> fields = new();
+
+            foreach (var field in Fields)
+            {
+                var val = field.ResolvedType!.ToAST(GetFieldValue(field, value));
+                if (val is not NullValue)
+                    fields.Add(new ObjectField(field.Name, val));
+            }
+
+            return new ObjectValue(fields);
+
+            //throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
+        }
+
+        private object? GetFieldValue(FieldType field, object? value)
+        {
+            if (value == null)
+                return null;
+
+            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+            string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+            PropertyInfo? propertyInfo;
+            try
+            {
+                propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            }
+            catch (AmbiguousMatchException)
+            {
+                propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            }
+
+            return propertyInfo?.CanRead == true
+                ? propertyInfo.GetValue(value)
+                : null;
         }
     }
 }
