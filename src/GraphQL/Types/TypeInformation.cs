@@ -6,7 +6,8 @@ using System.Reflection;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Contains type and nullability information for a method return type or argument type.
+    /// Parses a <see cref="System.Type"/> along with nullability information into its constituent parts
+    /// in preparation for creating a graph type that represents such a type.
     /// </summary>
     public class TypeInformation
     {
