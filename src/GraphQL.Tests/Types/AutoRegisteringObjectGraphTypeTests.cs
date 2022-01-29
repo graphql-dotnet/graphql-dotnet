@@ -288,7 +288,7 @@ namespace GraphQL.Tests.Types
             public ICollection CollectionField { get; set; } = null!;
             public IEnumerable? NullableEnumerableField { get; set; }
             public ICollection? NullableCollectionField { get; set; }
-            public int[]?[]? ListOfListOfIntsField { get; set; }
+            public int?[]?[]? ListOfListOfIntsField { get; set; }
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
