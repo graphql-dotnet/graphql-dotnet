@@ -456,7 +456,7 @@ The protected method `GetRegisteredProperties` has been renamed to `GetRegistere
 and now supports properties, methods and fields, although fields are not included
 with the default implementation. Override the method in a derived class to include fields.
 
-New for v5, methods are included by default.  To revert to v4 behavior, which does not
+New for v5, methods are included by default. To revert to v4 behavior, which does not
 include methods, create a derived class as follows:
 
 ```csharp
