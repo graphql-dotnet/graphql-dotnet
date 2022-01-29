@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Dummy;
@@ -101,8 +100,14 @@ namespace GraphQL.Tests.Extensions
                         new GraphQLObjectField { Name = new GraphQLName("Name"), Value = new GraphQLStringValue("Tom") },
                         new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(42) }
                     }
-                }
-                };
+                } };
+                yield return new object[] { new PersonInputType(), new Person { }, new GraphQLObjectValue
+                {
+                    Fields = new List<GraphQLObjectField>
+                    {
+                        new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(0) }
+                    }
+                } };
 
                 yield return new object[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue() };
             }
