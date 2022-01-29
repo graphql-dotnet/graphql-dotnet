@@ -126,7 +126,7 @@ namespace GraphQL.Tests.Extensions
 
             public class BadPersonInputType : InputObjectGraphType<Person>
             {
-                public override GraphQLObjectValue ToAST(object value) => null;
+                public override GraphQLValue ToAST(object value) => null;
             }
 
             public IEnumerator<object[]> GetEnumerator()
