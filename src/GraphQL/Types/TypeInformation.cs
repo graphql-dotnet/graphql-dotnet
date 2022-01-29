@@ -79,7 +79,7 @@ namespace GraphQL.Types
         /// Initializes an instance with the specified properties.
         /// </summary>
         /// <param name="memberInfo">The member being inspected.</param>
-        /// <param name="isInputType">Indicates that this is an input type (an argument); false for output types.</param>
+        /// <param name="isInputType">Indicates that this is an input type (an argument or input field); false for output types.</param>
         /// <param name="type">The underlying type.</param>
         /// <param name="isNullable">Indicates that the underlying type is nullable.</param>
         /// <param name="isList">Indicates that this member represents a list of elements.</param>
