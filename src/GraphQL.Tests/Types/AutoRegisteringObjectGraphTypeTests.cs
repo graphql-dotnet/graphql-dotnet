@@ -188,7 +188,7 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.CollectionField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<object>>>))]
         [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
-
+        [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
         public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
         {
             var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
@@ -288,6 +288,7 @@ namespace GraphQL.Tests.Types
             public ICollection CollectionField { get; set; } = null!;
             public IEnumerable? NullableEnumerableField { get; set; }
             public ICollection? NullableCollectionField { get; set; }
+            public int[]?[]? ListOfListOfIntsField { get; set; }
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
