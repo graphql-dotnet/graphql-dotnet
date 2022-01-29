@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Xunit;
@@ -115,8 +117,7 @@ type NestedObjType {
 
 type root {
   listOfObjField: [NestedObjType]
-}
-");
+}");
         }
 
         [Fact]
@@ -132,8 +133,7 @@ type NestedObjType {
 
 type root {
   listOfObjField: NestedObjType!
-}
-");
+}");
         }
 
         [Fact]
@@ -149,8 +149,7 @@ type NestedObjType {
 
 type root {
   listOfObjField: NestedObjType
-}
-");
+}");
         }
 
         private string build_schema(string propType)
@@ -199,8 +198,13 @@ type root {
             {
                 Query = rootType
             };
-            var schema = new SchemaPrinter(s).Print();
-            return schema;
+            var printer = new SchemaPrinter2(new SchemaPrinterOptions2
+            {
+                Comparer = new AlphabeticalSchemaComparer()
+            });
+            var writer = new StringWriter();
+            printer.PrintAsync(s, writer).GetAwaiter().GetResult();
+            return writer.ToString();
         }
 
         public class SomeObject

@@ -1228,6 +1228,7 @@ namespace GraphQL.Introspection
         public AlphabeticalSchemaComparer() { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.DirectiveGraphType directive) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
@@ -1237,6 +1238,7 @@ namespace GraphQL.Introspection
         public DefaultSchemaComparer() { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.DirectiveGraphType directive) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent) { }
@@ -1262,6 +1264,7 @@ namespace GraphQL.Introspection
     {
         System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
         System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.DirectiveGraphType directive);
         System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field);
         System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
         System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent);
@@ -2270,6 +2273,41 @@ namespace GraphQL.Types.Relay.DataObjects
 }
 namespace GraphQL.Utilities
 {
+    public class ASTConverter
+    {
+        public ASTConverter(GraphQL.Utilities.ASTConverterOptions? options = null) { }
+        public GraphQL.Utilities.ASTConverterOptions Options { get; }
+        public virtual GraphQLParser.AST.GraphQLDocument Convert(GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLArgumentsDefinition? ConvertArgumentsDefinition(GraphQL.Types.QueryArguments? arguments, System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? comparer, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLDescription? ConvertDescription(GraphQL.Types.IProvideDescription provider) { }
+        protected virtual GraphQLParser.AST.GraphQLArguments? ConvertDirectiveArguments(GraphQL.Types.AppliedDirective directive, GraphQL.Types.DirectiveGraphType type) { }
+        protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ConvertDirectiveDefinition(GraphQL.Types.DirectiveGraphType directive, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLDirectiveLocations ConvertDirectiveLocations(GraphQL.Types.DirectiveGraphType directive) { }
+        protected virtual GraphQLParser.AST.GraphQLDirectives? ConvertDirectives(GraphQL.Types.IProvideMetadata provider, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ConvertEnumTypeDefinition(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLEnumValuesDefinition? ConvertEnumValues(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLFieldsDefinition? ConvertFieldsDefinition(GraphQL.Types.IComplexGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLImplementsInterfaces? ConvertImplementsInterfaces(GraphQL.Types.IImplementInterfaces type) { }
+        protected virtual GraphQLParser.AST.GraphQLInputObjectTypeDefinition ConvertInputObjectTypeDefinition(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLInterfaceTypeDefinition ConvertInterfaceTypeDefinition(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLObjectTypeDefinition ConvertObjectTypeDefinition(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual System.Collections.Generic.List<GraphQLParser.AST.GraphQLRootOperationTypeDefinition> ConvertRootOperationTypeDefinitions(GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLScalarTypeDefinition ConvertScalarTypeDefinition(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual GraphQLParser.AST.GraphQLSchemaDefinition? ConvertSchemaDefinition(GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLType ConvertType(GraphQL.Types.IGraphType type) { }
+        public virtual GraphQLParser.AST.GraphQLTypeDefinition ConvertTypeDefinition(GraphQL.Types.IGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLUnionMemberTypes? ConvertUnionMemberTypes(GraphQL.Types.UnionGraphType type) { }
+        protected virtual GraphQLParser.AST.GraphQLUnionTypeDefinition ConvertUnionTypeDefinition(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
+        protected virtual GraphQLParser.AST.GraphQLValue? ConvertValue(object? value, GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQLParser.AST.GraphQLInputFieldsDefinition? CreateInputFieldsDefinition(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        protected static bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
+    }
+    public class ASTConverterOptions
+    {
+        public ASTConverterOptions() { }
+        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
+        public bool IncludeDescriptions { get; set; }
+    }
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.AppliedDirectivesValidationVisitor Instance;
@@ -2394,6 +2432,22 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.UnionGraphType ToUnionType(GraphQLParser.AST.GraphQLUnionTypeDefinition unionDef) { }
         protected virtual void Validate(GraphQLParser.AST.GraphQLDocument document) { }
     }
+    public class SchemaIntrospectionPrinter
+    {
+        public SchemaIntrospectionPrinter() { }
+        public SchemaIntrospectionPrinter(GraphQL.Utilities.SchemaIntrospectionPrinterOptions options) { }
+        public GraphQL.Utilities.SchemaIntrospectionPrinterOptions Options { get; }
+        public System.Threading.Tasks.ValueTask PrintAsync(GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+    public class SchemaIntrospectionPrinterOptions : GraphQLParser.Visitors.SDLPrinterOptions
+    {
+        public SchemaIntrospectionPrinterOptions() { }
+        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
+        public bool IncludeBuiltinDirectives { get; set; }
+        public bool IncludeBuiltinScalars { get; set; }
+        public bool IncludeDeprecationReasons { get; set; }
+        public bool IncludeDescriptions { get; set; }
+    }
     public class SchemaPrinter
     {
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
@@ -2428,6 +2482,15 @@ namespace GraphQL.Utilities
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
     }
+    public class SchemaPrinter2
+    {
+        public SchemaPrinter2() { }
+        public SchemaPrinter2(GraphQL.Utilities.SchemaPrinterOptions2 options) { }
+        public GraphQL.Utilities.SchemaPrinterOptions2 Options { get; }
+        public System.Threading.Tasks.ValueTask PrintAsync(GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask PrintSchemaDefinitionAsync(GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask PrintTypeAsync(GraphQL.Types.IGraphType type, GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
+    }
     public class SchemaPrinterOptions
     {
         public SchemaPrinterOptions() { }
@@ -2436,6 +2499,15 @@ namespace GraphQL.Utilities
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }
         public bool PrintDescriptionsAsComments { get; set; }
+    }
+    public class SchemaPrinterOptions2 : GraphQLParser.Visitors.SDLPrinterOptions
+    {
+        public SchemaPrinterOptions2() { }
+        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
+        public bool IncludeBuiltinDirectives { get; set; }
+        public bool IncludeBuiltinScalars { get; set; }
+        public bool IncludeDeprecationReasons { get; set; }
+        public bool IncludeDescriptions { get; set; }
     }
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {

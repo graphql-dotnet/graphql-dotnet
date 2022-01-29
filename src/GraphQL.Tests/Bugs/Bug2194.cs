@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -13,9 +15,15 @@ namespace GraphQL.Tests.Bugs
         {
             CultureTestHelper.UseCultures(() =>
             {
-                var printer = new SchemaPrinter(new Bug2194Schema(), new SchemaPrinterOptions { IncludeDeprecationReasons = false, IncludeDescriptions = false });
-                var printed = printer.Print();
-                printed.ShouldBe("Bug2194".ReadSDL());
+                var printer = new SchemaPrinter2(new SchemaPrinterOptions2
+                {
+                    IncludeDeprecationReasons = false,
+                    IncludeDescriptions = false,
+                    Comparer = new AlphabeticalSchemaComparer()
+                });
+                var writer = new StringWriter();
+                printer.PrintAsync(new Bug2194Schema(), writer).GetAwaiter().GetResult();
+                writer.ToString().ShouldBe("Bug2194".ReadSDL());
             });
         }
 

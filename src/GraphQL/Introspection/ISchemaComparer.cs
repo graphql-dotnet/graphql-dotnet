@@ -29,6 +29,13 @@ namespace GraphQL.Introspection
         IComparer<QueryArgument>? ArgumentComparer(IFieldType field);
 
         /// <summary>
+        /// Returns a comparer for directive arguments.
+        /// If this returns <see langword="null"/> then the original argument ordering is preserved.
+        /// </summary>
+        /// <param name="directive"> The directive to which the arguments belong. </param>
+        IComparer<QueryArgument>? ArgumentComparer(DirectiveGraphType directive);
+
+        /// <summary>
         /// Returns a comparer for enum values.
         /// If this returns <see langword="null"/> then the original enum value ordering is preserved.
         /// </summary>
@@ -57,6 +64,9 @@ namespace GraphQL.Introspection
         public virtual IComparer<QueryArgument>? ArgumentComparer(IFieldType field) => null;
 
         /// <inheritdoc/>
+        public virtual IComparer<QueryArgument>? ArgumentComparer(DirectiveGraphType directive) => null;
+
+        /// <inheritdoc/>
         public virtual IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent) => null;
 
         /// <inheritdoc/>
@@ -68,11 +78,11 @@ namespace GraphQL.Introspection
     /// </summary>
     public class AlphabeticalSchemaComparer : ISchemaComparer
     {
-        private static readonly TypeByNameComparer _instance1 = new TypeByNameComparer();
-        private static readonly DirectiveByNameComparer _instance2 = new DirectiveByNameComparer();
-        private static readonly ArgumentByNameComparer _instance3 = new ArgumentByNameComparer();
-        private static readonly EnumValueByNameComparer _instance4 = new EnumValueByNameComparer();
-        private static readonly FieldByNameComparer _instance5 = new FieldByNameComparer();
+        private static readonly TypeByNameComparer _instance1 = new();
+        private static readonly DirectiveByNameComparer _instance2 = new();
+        private static readonly ArgumentByNameComparer _instance3 = new();
+        private static readonly EnumValueByNameComparer _instance4 = new();
+        private static readonly FieldByNameComparer _instance5 = new();
 
         private sealed class TypeByNameComparer : IComparer<IGraphType>
         {
@@ -107,6 +117,9 @@ namespace GraphQL.Introspection
 
         /// <inheritdoc/>
         public virtual IComparer<QueryArgument> ArgumentComparer(IFieldType field) => _instance3;
+
+        /// <inheritdoc/>
+        public virtual IComparer<QueryArgument>? ArgumentComparer(DirectiveGraphType directive) => _instance3;
 
         /// <inheritdoc/>
         public virtual IComparer<EnumValueDefinition> EnumValueComparer(EnumerationGraphType parent) => _instance4;

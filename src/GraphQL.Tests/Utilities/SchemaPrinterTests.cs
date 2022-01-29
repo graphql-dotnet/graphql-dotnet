@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
@@ -37,13 +39,15 @@ namespace GraphQL.Tests.Utilities
 
         private static string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true, PrintDescriptionsAsComments = true });
+            return print(schema, new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeDeprecationReasons = true, Comparer = new AlphabeticalSchemaComparer() });
         }
 
-        private static string print(ISchema schema, SchemaPrinterOptions options)
+        private static string print(ISchema schema, SchemaPrinterOptions2 options)
         {
-            var printer = new SchemaPrinter(schema, options);
-            return Environment.NewLine + printer.Print();
+            var printer = new SchemaPrinter2(options);
+            var writer = new StringWriter();
+            printer.PrintAsync(schema, writer).GetAwaiter().GetResult();
+            return Environment.NewLine + writer.ToString();
         }
 
         private void AssertEqual(string result, string expectedName, string expected, bool excludeScalars = false)
@@ -68,7 +72,7 @@ namespace GraphQL.Tests.Utilities
                 var orderedScalars = expected
                     .OrderBy(x => x.Key, StringComparer.Ordinal)
                     .Select(x => x.Value);
-                exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
+                exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars);
             }
 
             result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
@@ -211,12 +215,12 @@ directive @skip(
             {
                 {
                     "Foo",
-@"# This is a Foo object type
+@"""This is a Foo object type""
 type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int @deprecated(reason: ""This field is now deprecated"")
+  ""This is of type String""
+  str: String
 }"
                 },
                 {
@@ -237,22 +241,22 @@ type Foo {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
-@"# This is a Foo object type
+@"""This is a Foo object type""
 type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }"
                 },
                 {
@@ -273,28 +277,22 @@ type Foo {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
-@"""""""
-This is a Foo object type
-""""""
+@"""This is a Foo object type""
 type Foo {
-  """"""
-  This is of type String
-  """"""
-  str: String
-  """"""
-  This is of type Integer
-  """"""
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }"
                 },
                 {
@@ -315,23 +313,23 @@ type Foo {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
                 IncludeDeprecationReasons = true,
-                PrintDescriptionsAsComments = true,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
-@"# This is a Foo object type
+@"""This is a Foo object type""
 type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
                 },
                 {
@@ -353,29 +351,23 @@ type Foo {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
                 IncludeDeprecationReasons = true,
-                PrintDescriptionsAsComments = false,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
-@"""""""
-This is a Foo object type
-""""""
+@"""This is a Foo object type""
 type Foo {
-  """"""
-  This is of type String
-  """"""
-  str: String
-  """"""
-  This is of type Integer
-  """"""
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
                 },
                 {
@@ -467,7 +459,7 @@ type Foo {
 
             const string expected =
 @"type Query {
-  singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
+  singleField(argOne: Int = 1, argThree: Boolean, argTwo: String): String
 }";
             AssertEqual(result, "Query", expected);
         }
@@ -485,7 +477,7 @@ type Foo {
 
             const string expected =
 @"type Query {
-  singleField(argOne: Int, argTwo: String = ""foo"", argThree: Boolean): String
+  singleField(argOne: Int, argThree: Boolean, argTwo: String = ""foo""): String
 }";
             AssertEqual(result, "Query", expected);
         }
@@ -503,7 +495,7 @@ type Foo {
 
             const string expected =
 @"type Query {
-  singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
+  singleField(argOne: Int, argThree: Boolean = false, argTwo: String): String
 }";
             AssertEqual(result, "Query", expected);
         }
@@ -522,20 +514,19 @@ schema {
 }
 
 type Bar implements IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
-# This is a Foo interface type
+""This is a Foo interface type""
 interface IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
 type Root {
   bar: Bar
-}
-", excludeScalars: true);
+}", excludeScalars: true);
         }
 
         [Fact]
@@ -550,117 +541,26 @@ type Root {
 
             AssertEqual(result, "", @"
 interface Baaz {
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
 }
 
 type Bar implements IFoo & Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }
 
-# This is a Foo interface type
+""This is a Foo interface type""
 interface IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
 type Query {
   bar: Bar
-}
-", excludeScalars: true);
-        }
-
-        [Fact]
-        public void prints_multiple_interfaces_with_old_implements_syntax()
-        {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
-
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
-            {
-                OldImplementsSyntax = true,
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
-            };
-
-            AssertEqual(print(schema, options), "", @"
-interface Baaz {
-  # This is of type Integer
-  int: Int
-}
-
-type Bar implements IFoo, Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}
-
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
-
-type Query {
-  bar: Bar
-}
-", excludeScalars: true);
-        }
-
-        [Fact]
-        public void prints_multiple_interfaces_with_old_implements_syntax_2()
-        {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
-
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
-            {
-                OldImplementsSyntax = true,
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
-            };
-
-            AssertEqual(print(schema, options), "", @"
-interface Baaz {
-  """"""
-  This is of type Integer
-  """"""
-  int: Int
-}
-
-type Bar implements IFoo, Baaz {
-  """"""
-  This is of type String
-  """"""
-  str: String
-  """"""
-  This is of type Integer
-  """"""
-  int: Int
-}
-
-""""""
-This is a Foo interface type
-""""""
-interface IFoo {
-  """"""
-  This is of type String
-  """"""
-  str: String
-}
-
-type Query {
-  bar: Bar
-}
-", excludeScalars: true);
+}", excludeScalars: true);
         }
 
         [Fact]
@@ -671,37 +571,36 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var result = print(schema, options);
 
             AssertEqual(result, "", @"
 interface Baaz {
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
 }
 
 type Bar implements IFoo & Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }
 
-# This is a Foo interface type
+""This is a Foo interface type""
 interface IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
 type Query {
   bar: Bar
-}
-", excludeScalars: true);
+}", excludeScalars: true);
         }
 
         [Fact]
@@ -712,47 +611,36 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions
+            var options = new SchemaPrinterOptions2
             {
                 IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
+                Comparer = new AlphabeticalSchemaComparer()
             };
 
             var result = print(schema, options);
 
             AssertEqual(result, "", @"
 interface Baaz {
-  """"""
-  This is of type Integer
-  """"""
+  ""This is of type Integer""
   int: Int
 }
 
 type Bar implements IFoo & Baaz {
-  """"""
-  This is of type String
-  """"""
-  str: String
-  """"""
-  This is of type Integer
-  """"""
+  ""This is of type Integer""
   int: Int
+  ""This is of type String""
+  str: String
 }
 
-""""""
-This is a Foo interface type
-""""""
+""This is a Foo interface type""
 interface IFoo {
-  """"""
-  This is of type String
-  """"""
+  ""This is of type String""
   str: String
 }
 
 type Query {
   bar: Bar
-}
-", excludeScalars: true);
+}", excludeScalars: true);
         }
 
         [Fact]
@@ -766,33 +654,32 @@ type Query {
 
             AssertEqual(print(schema), "", @"
 type Bar implements IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
-# This is a Foo object type
+""This is a Foo object type""
 type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
+  ""This is of type Integer""
   int: Int @deprecated(reason: ""This field is now deprecated"")
+  ""This is of type String""
+  str: String
 }
 
-# This is a Foo interface type
+""This is a Foo interface type""
 interface IFoo {
-  # This is of type String
+  ""This is of type String""
   str: String
 }
 
 union MultipleUnion = Foo | Bar
 
 type Query {
-  single: SingleUnion
   multiple: MultipleUnion
+  single: SingleUnion
 }
 
-union SingleUnion = Foo
-", excludeScalars: true);
+union SingleUnion = Foo", excludeScalars: true);
         }
 
         [Fact]
@@ -1007,18 +894,13 @@ type Query {
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+""The `Date` scalar type represents a year, month and day in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.""
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+""The `DateTime` scalar type represents a date and time. `DateTime` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.""
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+""The `DateTimeOffset` scalar type represents a date, time and offset from UTC. `DateTimeOffset` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.""
 scalar DateTimeOffset
 
 scalar Decimal
@@ -1027,8 +909,7 @@ scalar Guid
 
 scalar Long
 
-# The `Milliseconds` scalar type represents a period of time represented as the
-# total number of milliseconds in range [-922337203685477, 922337203685477].
+""The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds in range [-922337203685477, 922337203685477].""
 scalar Milliseconds
 
 type Query {
@@ -1046,14 +927,13 @@ type Query {
   short: Short
   uint: UInt
   ulong: ULong
-  ushort: UShort
   uri: Uri
+  ushort: UShort
 }
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total
-# number of seconds in range [-922337203685, 922337203685].
+""The `Seconds` scalar type represents a period of time represented as the total number of seconds in range [-922337203685, 922337203685].""
 scalar Seconds
 
 scalar Short
@@ -1062,9 +942,9 @@ scalar UInt
 
 scalar ULong
 
-scalar UShort
+scalar Uri
 
-scalar Uri"
+scalar UShort"
                 },
             };
             AssertEqual(print(schema), expected);
@@ -1089,12 +969,12 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
-  # Red!
-  RED @deprecated(reason: ""Use green!"")
-  # Green!
-  GREEN
-  # Blue!
+  ""Blue!""
   BLUE
+  ""Green!""
+  GREEN
+  ""Red!""
+  RED @deprecated(reason: ""Use green!"")
 }"
                 },
             };
@@ -1130,12 +1010,12 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
-  # Red!
-  RED @deprecated(reason: ""Use green!"")
-  # Green!
-  GREEN
-  # Blue!
+  ""Blue!""
   BLUE
+  ""Green!""
+  GREEN
+  ""Red!""
+  RED @deprecated(reason: ""Use green!"")
 }"
                 },
             };
