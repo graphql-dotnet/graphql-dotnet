@@ -9,8 +9,6 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using GraphQL.Execution;
-using GraphQL.Language;
-using GraphQL.Language.AST;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
@@ -49,6 +47,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bVariable;
         private BenchmarkInfo _bLiteral;
         private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
+        private static readonly GraphQLSerializer _serializer = new GraphQLSerializer();
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -131,14 +130,11 @@ namespace GraphQL.Benchmarks
                     {
                         o.Schema = benchmarkInfo.Schema;
                         o.Query = benchmarkInfo.Query;
-                        o.Variables = benchmarkInfo.InputsString?.ToInputs();
+                        o.Variables = _serializer.Deserialize<Inputs>(benchmarkInfo.InputsString);
                     }).GetAwaiter().GetResult();
                     break;
                 case StageEnum.Parse:
                     benchmarkInfo.Parse();
-                    break;
-                case StageEnum.Convert:
-                    benchmarkInfo.Convert();
                     break;
                 case StageEnum.Validate:
                     benchmarkInfo.Validate();
@@ -161,7 +157,7 @@ namespace GraphQL.Benchmarks
         }
 
         //[Params(StageEnum.Build, StageEnum.TypicalExecution, StageEnum.Serialize)]
-        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
+        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
         public StageEnum Stage { get; set; }
 
         void IBenchmark.RunProfiler()
@@ -174,7 +170,6 @@ namespace GraphQL.Benchmarks
         {
             Build,
             Parse,
-            Convert,
             Validate,
             DeserializeVars,
             ParseVariables,
@@ -189,11 +184,10 @@ namespace GraphQL.Benchmarks
             public Func<ISchema> SchemaBuilder;
             public string Query;
             public string InputsString;
-            public GraphQLDocument GraphQLDocument;
-            public Document Document;
-            public Operation Operation;
+            public GraphQLDocument Document;
+            public GraphQLOperationDefinition Operation;
             public Inputs Inputs;
-            public Language.AST.Variables Variables;
+            public Validation.Variables Variables;
             public ExecutionResult ExecutionResult;
 
             public BenchmarkInfo(string query, string inputs, Func<ISchema> schemaBuilder)
@@ -202,9 +196,8 @@ namespace GraphQL.Benchmarks
                 SchemaBuilder = schemaBuilder;
                 Schema = BuildSchema();
                 Query = query;
-                GraphQLDocument = Parse();
-                Document = Convert();
-                Operation = Document.Operations.FirstOrDefault();
+                Document = Parse();
+                Operation = Document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault();
                 InputsString = inputs;
                 Inputs = DeserializeInputs();
                 Variables = ParseVariables();
@@ -219,25 +212,20 @@ namespace GraphQL.Benchmarks
 
             public GraphQLDocument Parse()
             {
-                return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.IgnoreComments });
-            }
-
-            public Document Convert()
-            {
-                return CoreToVanillaConverter.Convert(GraphQLDocument);
+                return GraphQLParser.Parser.Parse(Query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.Comments });
             }
 
             public Inputs DeserializeInputs()
             {
-                return InputsString?.ToInputs();
+                return _serializer.Deserialize<Inputs>(InputsString);
             }
 
-            public Language.AST.Variables ParseVariables()
+            public Validation.Variables ParseVariables()
             {
                 return Inputs == null ? null : new ValidationContext
                 {
                     Schema = Schema,
-                    Variables = Inputs,
+                    Variables = Inputs ?? Inputs.Empty,
                     Operation = Operation,
                 }.GetVariableValues();
             }
@@ -249,7 +237,7 @@ namespace GraphQL.Benchmarks
                 {
                     Schema = Schema,
                     Document = Document,
-                    Variables = Inputs
+                    Variables = Inputs ?? Inputs.Empty,
                 }).Result.validationResult;
             }
 
@@ -280,11 +268,10 @@ namespace GraphQL.Benchmarks
                 return _parallelExecutionStrategy.ExecuteAsync(context).Result;
             }
 
-            private static readonly DocumentWriter _documentWriter = new DocumentWriter();
             public System.IO.MemoryStream Serialize()
             {
                 var mem = new System.IO.MemoryStream();
-                _documentWriter.WriteAsync(mem, ExecutionResult).GetAwaiter().GetResult();
+                _serializer.WriteAsync(mem, ExecutionResult, default).GetAwaiter().GetResult();
                 mem.Position = 0;
                 return mem;
             }

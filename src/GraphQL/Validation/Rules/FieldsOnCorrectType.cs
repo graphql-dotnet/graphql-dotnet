@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="FieldsOnCorrectTypeError"/>
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<Field>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLField>((node, context) =>
         {
             var type = context.TypeInfo.GetParentType()?.GetNamedType();
 
@@ -39,12 +39,12 @@ namespace GraphQL.Validation.Rules
                     var fieldName = node.Name;
 
                     // First determine if there are any suggested types to condition on.
-                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
+                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName.StringValue).ToList(); //ISSUE:allocation
 
                     // If there are no suggested types, then perhaps this was a typo?
                     var suggestedFieldNames = suggestedTypeNames.Count > 0
                         ? Array.Empty<string>()
-                        : GetSuggestedFieldNames(type, fieldName);
+                        : GetSuggestedFieldNames(type, fieldName.StringValue); //ISSUE:allocation
 
                     // Report an error, including helpful suggestions.
                     context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));

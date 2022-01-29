@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -23,24 +23,24 @@ namespace GraphQL.Tests.Bugs
         [InlineData("1")]
         public void TestVariableObject_InvalidType(string param)
         {
-            var error1 = new ValidationError(null, VariablesAreInputTypesError.NUMBER,
+            var error1 = new ValidationError(default, VariablesAreInputTypesError.NUMBER,
                 VariablesAreInputTypesError.UndefinedVarMessage("arg", "abcdefg"))
             {
                 Code = "VARIABLES_ARE_INPUT_TYPES"
             };
-            error1.AddLocation(1, 7);
-            var error2 = new ValidationError(null, KnownTypeNamesError.NUMBER,
+            error1.AddLocation(new Location(1, 7));
+            var error2 = new ValidationError(default, KnownTypeNamesError.NUMBER,
                 KnownTypeNamesError.UnknownTypeMessage("abcdefg", null))
             {
                 Code = "KNOWN_TYPE_NAMES"
             };
-            error2.AddLocation(1, 13);
-            var error3 = new ValidationError(null, "5.8",
+            error2.AddLocation(new Location(1, 13));
+            var error3 = new ValidationError(default, "5.8",
                "Variable \u0027$arg\u0027 is invalid. Variable has unknown type \u0027abcdefg\u0027")
             {
                 Code = "INVALID_VALUE"
             };
-            error3.AddLocation(1, 7);
+            error3.AddLocation(new Location(1, 7));
             var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2, error3 }, executed: false);
             AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, variables: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 3, renderErrors: true);
         }

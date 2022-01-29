@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity
 {
@@ -11,6 +11,6 @@ namespace GraphQL.Validation.Complexity
         /// <exception cref="InvalidOperationException">
         /// Thrown if complexity is not within the defined range in parameters.
         /// </exception>
-        void Validate(Document document, ComplexityConfiguration parameters);
+        void Validate(GraphQLDocument document, ComplexityConfiguration parameters);
     }
 }

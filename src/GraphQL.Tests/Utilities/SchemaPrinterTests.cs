@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -1209,6 +1209,8 @@ enum __DirectiveLocation {
   FRAGMENT_SPREAD
   # Location adjacent to an inline fragment.
   INLINE_FRAGMENT
+  # Location adjacent to a variable definition.
+  VARIABLE_DEFINITION
   # Location adjacent to a schema definition.
   SCHEMA
   # Location adjacent to a scalar definition.
@@ -1412,6 +1414,10 @@ enum __DirectiveLocation {
   Location adjacent to an inline fragment.
   """"""
   INLINE_FRAGMENT
+  """"""
+  Location adjacent to a variable definition.
+  """"""
+  VARIABLE_DEFINITION
   """"""
   Location adjacent to a schema definition.
   """"""
@@ -1666,6 +1672,8 @@ enum __DirectiveLocation {
   FRAGMENT_SPREAD
   # Location adjacent to an inline fragment.
   INLINE_FRAGMENT
+  # Location adjacent to a variable definition.
+  VARIABLE_DEFINITION
   # Location adjacent to a schema definition.
   SCHEMA
   # Location adjacent to a scalar definition.
@@ -2033,7 +2041,7 @@ type Zebra {
 
             public override object ParseValue(object value) => null;
 
-            public override object ParseLiteral(IValue value) => null;
+            public override object ParseLiteral(GraphQLValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

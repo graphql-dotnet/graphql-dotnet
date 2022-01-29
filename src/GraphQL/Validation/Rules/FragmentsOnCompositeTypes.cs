@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,16 +23,16 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<InlineFragment>((node, context) =>
+            new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
-                if (node.Type != null && type != null && !type.IsCompositeType())
+                if (node.TypeCondition?.Type != null && type != null && !type.IsCompositeType())
                 {
                     context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                 }
             }),
 
-            new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+            new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
                 if (type != null && !type.IsCompositeType())

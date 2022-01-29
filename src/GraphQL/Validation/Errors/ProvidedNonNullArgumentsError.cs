@@ -1,6 +1,6 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,16 +13,16 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ProvidedNonNullArgumentsError(ValidationContext context, Field node, QueryArgument arg)
-            : base(context.Document.OriginalQuery!, NUMBER, MissingFieldArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+        public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLField node, QueryArgument arg)
+            : base(context.Document.Source, NUMBER, MissingFieldArgMessage(node.Name.StringValue, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ProvidedNonNullArgumentsError(ValidationContext context, Directive node, QueryArgument arg)
-            : base(context.Document.OriginalQuery!, NUMBER, MissingDirectiveArgMessage(node.Name, arg.Name, arg.ResolvedType!.ToString()), node)
+        public ProvidedNonNullArgumentsError(ValidationContext context, GraphQLDirective node, QueryArgument arg)
+            : base(context.Document.Source, NUMBER, MissingDirectiveArgMessage(node.Name.StringValue, arg.Name, arg.ResolvedType!.ToString()), node)
         {
         }
 

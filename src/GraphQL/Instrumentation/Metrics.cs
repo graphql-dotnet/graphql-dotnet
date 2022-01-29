@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQLParser;
 
 namespace GraphQL.Instrumentation
 {
@@ -56,10 +57,10 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Sets the name of the GraphQL operation.
         /// </summary>
-        public Metrics SetOperationName(string? name)
+        public Metrics SetOperationName(ROM name)
         {
             if (Enabled && _main != null)
-                _main.Subject = name;
+                _main.Subject = name.IsEmpty ? null : (string)name;
 
             return this;
         }

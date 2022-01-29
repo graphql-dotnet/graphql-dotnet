@@ -1,8 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -238,7 +237,7 @@ type Query {
                 Name = "Int";
             }
 
-            public override object ParseLiteral(IValue value)
+            public override object ParseLiteral(GraphQLValue value)
             {
                 var ret = base.ParseLiteral(value);
                 return ret is int i ? i - 1 : ret;
@@ -258,8 +257,8 @@ type Query {
                 Name = "String";
             }
 
-            public override object ParseLiteral(IValue value)
-                => value is StringValue s ? "input-" + s.Value : base.ParseLiteral(value);
+            public override object ParseLiteral(GraphQLValue value)
+                => value is GraphQLStringValue s ? "input-" + s.Value : base.ParseLiteral(value);
 
             public override object ParseValue(object value)
                 => value is string s ? "input-" + s : base.ParseValue(value);
@@ -275,7 +274,7 @@ type Query {
                 Name = "MyQuery";
             }
 
-            public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();
+            public override object ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
 
             public override object ParseValue(object value) => throw new System.NotImplementedException();
         }

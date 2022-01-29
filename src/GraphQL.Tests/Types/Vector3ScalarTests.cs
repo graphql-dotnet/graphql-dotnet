@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQLParser;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Types
                 {
                     try
                     {
-                        var vector3Parts = vector3InputString.Split(',');
+                        var vector3Parts = vector3InputString.Split(','); // strings allocations
                         var x = float.Parse(vector3Parts[0]);
                         var y = float.Parse(vector3Parts[1]);
                         var z = float.Parse(vector3Parts[2]);
@@ -150,6 +150,32 @@ namespace GraphQL.Tests.Types
                     catch
                     {
                         throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputString}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
+                    }
+                }
+
+                if (value is ROM vector3InputROM)
+                {
+                    try
+                    {
+                        // no strings allocations
+                        var span = vector3InputROM.Span;
+
+                        var i = span.IndexOf(',');
+                        var x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+
+                        span = span.Slice(i + 1);
+
+                        i = span.IndexOf(',');
+                        var y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+
+                        span = span.Slice(i + 1);
+
+                        var z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                        return new Vector3(x, y, z);
+                    }
+                    catch
+                    {
+                        throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputROM}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
                     }
                 }
 
@@ -173,17 +199,17 @@ namespace GraphQL.Tests.Types
                 return ThrowValueConversionError(value);
             }
 
-            public override object ParseLiteral(IValue value)
+            public override object ParseLiteral(GraphQLValue value)
             {
-                if (value is NullValue)
+                if (value is GraphQLNullValue)
                     return null;
 
-                if (value is StringValue stringValue)
+                if (value is GraphQLStringValue stringValue)
                     return ParseValue(stringValue.Value);
 
-                if (value is ObjectValue objectValue)
+                if (value is GraphQLObjectValue objectValue)
                 {
-                    var entries = objectValue.ObjectFields.ToDictionary(x => x.Name, x => _floatScalar.ParseLiteral(x.Value));
+                    var entries = objectValue.Fields.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
                     if (entries.Count != 3)
                         return ThrowLiteralConversionError(value);
                     var x = (double)entries["x"];
@@ -213,19 +239,34 @@ namespace GraphQL.Tests.Types
                 return ThrowSerializationError(value);
             }
 
-            public override IValue ToAST(object value)
+            public override GraphQLValue ToAST(object value)
             {
                 if (value == null)
-                    return new NullValue();
+                    return new GraphQLNullValue();
 
                 if (value is Vector3 vector3)
                 {
-                    return new ObjectValue(new[]
+                    return new GraphQLObjectValue
                     {
-                        new ObjectField("x", new FloatValue(vector3.X)),
-                        new ObjectField("y", new FloatValue(vector3.Y)),
-                        new ObjectField("z", new FloatValue(vector3.Z)),
-                    });
+                        Fields = new List<GraphQLObjectField>
+                        {
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("x"),
+                                Value = new GraphQLFloatValue(vector3.X.ToString())
+                            },
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("y"),
+                                Value = new GraphQLFloatValue(vector3.Y.ToString())
+                            },
+                            new GraphQLObjectField
+                            {
+                                Name = new GraphQLName("z"),
+                                Value = new GraphQLFloatValue(vector3.Z.ToString())
+                            }
+                        }
+                    };
                 }
 
                 return ThrowASTConversionError(value);

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -55,7 +56,7 @@ namespace GraphQL
 
         public T Source { get; private set; }
 
-        public Field FieldAst => _baseContext.FieldAst;
+        public GraphQLField FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
 
@@ -69,9 +70,9 @@ namespace GraphQL
 
         public ISchema Schema => _baseContext.Schema;
 
-        public Document Document => _baseContext.Document;
+        public GraphQLDocument Document => _baseContext.Document;
 
-        public Operation Operation => _baseContext.Operation;
+        public GraphQLOperationDefinition Operation => _baseContext.Operation;
 
         public Variables Variables => _baseContext.Variables;
 
@@ -85,7 +86,7 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Dictionary<string, Field>? SubFields => _baseContext.SubFields;
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _baseContext.SubFields;
 
         public IDictionary<string, object?> UserContext => _baseContext.UserContext;
 

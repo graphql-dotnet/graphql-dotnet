@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using Xunit;
@@ -10,7 +9,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug2553
     {
         [Fact]
-        public async Task ShouldSerializeErrorExtensionsAccordingToOptions()
+        public void ShouldSerializeErrorExtensionsAccordingToOptions()
         {
             var options = new JsonSerializerOptions
             {
@@ -21,8 +20,8 @@ namespace GraphQL.Tests.Bugs
             var executionResult = new ExecutionResult();
             executionResult.AddError(new ExecutionError("An error occurred."));
 
-            var writer = new DocumentWriter(options);
-            string json = await writer.WriteToStringAsync(executionResult);
+            var writer = new GraphQLSerializer(options);
+            string json = writer.Serialize(executionResult);
 
             json.ShouldBeCrossPlatJson(@"{
                 ""errors"": [{

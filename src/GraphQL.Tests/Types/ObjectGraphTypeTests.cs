@@ -9,8 +9,16 @@ namespace GraphQL.Tests.Types
     {
         private class TestInterface : InterfaceGraphType { }
 
-        [GraphQLMetadata(Name = ":::")]
-        private class TypeWithInvalidName : ObjectGraphType { }
+        private class TypeWithInvalidName : ObjectGraphType
+        {
+            public TypeWithInvalidName()
+            {
+                Name = ":::";
+            }
+        }
+
+        [GraphQLMetadata(Name = "testing")]
+        private class TypeWithAttribute : ObjectGraphType { }
 
         [Fact]
         public void can_implement_interfaces()
@@ -44,6 +52,13 @@ namespace GraphQL.Tests.Types
                 System.Threading.Thread.Sleep(100); // wait a bit and retry
                 Should.Throw<ArgumentOutOfRangeException>(() => new TypeWithInvalidName()).Message.ShouldBe(ex.Message);
             }
+        }
+
+        [Fact]
+        public void should_ignore_graphqlmetadata_attribute()
+        {
+            var type = new TypeWithAttribute();
+            type.Name.ShouldBe("TypeWithAttribute");
         }
     }
 }

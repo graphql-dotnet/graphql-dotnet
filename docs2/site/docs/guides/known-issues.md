@@ -246,9 +246,26 @@ so it is safe to preserve these instances without calling `.Copy()`.
 
 ## Known Issues
 
+### IResolveFieldContext.HasArgument issue
+
 `IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.
 It cannot identify which arguments have been provided a `null` value compared to arguments which were not provided.
 This issue should supposedly be resolved in version 4.
+
+### Serialization of decimals does not respect precision
+
+This one is `Newtonsoft.Json` specific issue. For more information see:
+- https://github.com/JamesNK/Newtonsoft.Json/issues/1726
+- https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
+
+As a workaround you may add `FixPrecisionConverter`:
+
+```csharp
+new NewtonsoftJson.DocumentWriter(settings =>
+{
+    settings.Converters.Add(new NewtonsoftJson.FixPrecisionConverter(true, true, true));
+})
+```
 
 ## Common Errors
 

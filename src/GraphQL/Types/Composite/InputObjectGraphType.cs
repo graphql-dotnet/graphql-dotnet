@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -28,7 +28,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return <see langword="null"/> for a failed conversion.
         /// </summary>
-        IValue? ToAST(object value);
+        GraphQLValue ToAST(object value);
     }
 
     /// <inheritdoc/>
@@ -84,21 +84,30 @@ namespace GraphQL.Types
         /// overridden to support introspection of fields of this type that have default values. This method
         /// is not otherwise needed to be implemented.
         /// </summary>
-        public virtual IValue? ToAST(object value)
+        public virtual GraphQLValue ToAST(object value)
         {
             if (value == null)
-                return new NullValue();
+                return GraphQLValuesCache.Null;
 
-            List<ObjectField> fields = new();
+            var objectValue = new GraphQLObjectValue
+            {
+                Fields = new List<GraphQLObjectField>(Fields.Count)
+            };
 
             foreach (var field in Fields)
             {
-                var val = field.ResolvedType!.ToAST(GetFieldValue(field, value));
-                if (val is not NullValue)
-                    fields.Add(new ObjectField(field.Name, val));
+                var fieldValue = field.ResolvedType!.ToAST(GetFieldValue(field, value));
+                if (fieldValue is not GraphQLNullValue)
+                {
+                    objectValue.Fields.Add(new GraphQLObjectField
+                    {
+                        Name = new GraphQLName(field.Name),
+                        Value = fieldValue
+                    });
+                }
             }
 
-            return new ObjectValue(fields);
+            return objectValue;
 
             //throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
         }

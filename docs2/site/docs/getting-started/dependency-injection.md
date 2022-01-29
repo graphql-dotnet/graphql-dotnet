@@ -78,7 +78,6 @@ A list of the available extension methods is below:
 | `AddDocumentCache<>`    | Registers the specified document caching service | |
 | `AddDocumentExecuter<>` | Registers the specified document executer; useful when needed to change the execution strategy utilized | |
 | `AddDocumentListener<>` | Registers the specified document listener and configures execution to use it | |
-| `AddDocumentWriter<>`   | Registers the specified document writer | |
 | `AddErrorInfoProvider`  | Registers a custom error info provider or configures the default error info provider | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
@@ -87,6 +86,7 @@ A list of the available extension methods is below:
 | `AddNewtonsoftJson`     | Registers the document writer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
+| `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSubscriptionDocumentExecuter` | Registers the document executer that has subscription support | GraphQL.SystemReactive | |
 | `AddSystemTextJson`     | Registers the document writer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
@@ -115,7 +115,7 @@ To use the `AddGraphQL` method, you will need to install the proper nuget packag
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-    services.AddSingleton<IDocumentWriter, DocumentWriter>();
+    services.AddSingleton<IGraphQLSerializer, GraphQLSerializer>();
     services.AddSingleton<StarWarsData>();
     services.AddSingleton<StarWarsQuery>();
     services.AddSingleton<StarWarsMutation>();
@@ -251,9 +251,9 @@ might look like this:
 ```csharp
 var result = await _executer.ExecuteAsync(options =>
 {
-    options.Schema = schema;
+    options.Schema = _schema;
     options.Query = request.Query;
-    options.Variables = request.Variables.ToInputs();
+    options.Variables = _serializer.Deserialize<Inputs>(request.Variables); // IGraphQLTextSerializer from DI
     options.RequestServices = context.RequestServices;
 });
 ```
@@ -311,13 +311,15 @@ public class MyGraphType : ObjectGraphType<Category>
     {
         Field("Name", context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products")
-            .ResolveScopedAsync((context, serviceProvider) => {
-                var db = serviceProvider.GetRequiredService<MyDbContext>();
+            .ResolveScopedAsync(context => {
+                var db = context.RequestServices.GetRequiredService<MyDbContext>();
                 return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
             });
     }
 }
 ```
+
+In this case `context.RequestServices` will be an `IServiceProvider` in a newly created scope.
 
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).

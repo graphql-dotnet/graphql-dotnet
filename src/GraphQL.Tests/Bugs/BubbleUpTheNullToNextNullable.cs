@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Bugs
                 new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                     "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
                 {
-                    Path = new[] {"nullableDataGraph", "nonNullable"}
+                    Path = new[] { "nullableDataGraph", "nonNullable" }
                 }
             };
 

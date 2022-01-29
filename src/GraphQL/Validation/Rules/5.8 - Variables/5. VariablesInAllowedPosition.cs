@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,15 +23,15 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<VariableDefinition>(
+            new MatchingNodeVisitor<GraphQLVariableDefinition>(
                 (varDefAst, context) =>
                 {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
-                    varDefMap[varDefAst.Name] = varDefAst;
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<ROM, GraphQLVariableDefinition>();
+                    varDefMap[varDefAst.Variable.Name] = varDefAst;
                 }
             ),
 
-            new MatchingNodeVisitor<Operation>(
+            new MatchingNodeVisitor<GraphQLOperationDefinition>(
                 enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap?.Clear(),
                 leave: (op, context) =>
                 {
@@ -38,20 +39,24 @@ namespace GraphQL.Validation.Rules
                     if (varDefMap == null)
                         return;
 
-                    foreach (var usage in context.GetRecursiveVariables(op))
+                    var usages = context.GetRecursiveVariables(op);
+                    if (usages != null)
                     {
-                        var varName = usage.Node.Name;
-                        if (!varDefMap.TryGetValue(varName, out var varDef))
+                        foreach (var usage in usages)
                         {
-                            return;
-                        }
-
-                        if (varDef != null && usage.Type != null)
-                        {
-                            var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                            if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
+                            var varName = usage.Node.Name;
+                            if (!varDefMap.TryGetValue(varName, out var varDef))
                             {
-                                context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
+                                return;
+                            }
+
+                            if (varDef != null && usage.Type != null)
+                            {
+                                var varType = varDef.Type.GraphTypeFromType(context.Schema);
+                                if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
+                                {
+                                    context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
+                                }
                             }
                         }
                     }
@@ -62,7 +67,7 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// if a variable definition has a default value, it is effectively non-null.
         /// </summary>
-        private static GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
+        private static GraphType effectiveType(IGraphType varType, GraphQLVariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)
             {

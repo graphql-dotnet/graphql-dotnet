@@ -34,8 +34,8 @@ mutation {
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldBeNull();
-            caughtError?.Message.Contains("In field \"bar\": In field \"id\": Expected \"Int!\", found null.");
+            caughtError.InnerException.ShouldBeNull();
+            caughtError.Message.Contains("In field \"bar\": In field \"id\": Expected \"Int!\", found null.");
         }
 
         [Fact]
@@ -51,8 +51,8 @@ mutation {
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldBeNull();
-            caughtError?.Message.Contains("In field \"foo\": Expected \"String!\", found null.");
+            caughtError.InnerException.ShouldBeNull();
+            caughtError.Message.Contains("In field \"foo\": Expected \"String!\", found null.");
         }
 
         [Fact]
@@ -68,8 +68,8 @@ mutation {
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldBeNull();
-            caughtError?.Message.Contains("In field \"bar\": Expected \"NonNullSubChild!\", found null.");
+            caughtError.InnerException.ShouldBeNull();
+            caughtError.Message.Contains("In field \"bar\": Expected \"NonNullSubChild!\", found null.");
         }
     }
 

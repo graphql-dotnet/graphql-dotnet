@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -32,13 +31,6 @@ namespace GraphQL.Types
         private string GetDefaultName()
         {
             var type = GetType();
-
-            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-
-            if (!string.IsNullOrEmpty(attr?.Name))
-            {
-                return attr!.Name!;
-            }
 
             string name = type.Name;
             if (GlobalSwitches.UseDeclaringTypeNames)

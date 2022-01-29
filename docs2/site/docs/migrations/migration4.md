@@ -214,6 +214,7 @@ Here are some of the situations that you may run into with version 4:
 - `EnumGraphType` is stricter, requiring internal values for serialization, and external values for deserialization
 - `IdGraphType` (which allows any basic type) does not coerce variable values to trimmed strings during deserialization
 - `IdGraphType` does not trim serialized values (but does convert them to strings)
+- `DateTimeGraphType` serializes values to strings instead of letting the JSON serializer do so
 
 If you have a schema-first schema, you may run into an issue with enumeration types, since the `SchemaBuilder` uses the name of each
 enumeration value as its value also. In other words, you must return a string corresponding to the enumeration value (e.g, `"Cat"` or

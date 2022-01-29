@@ -16,6 +16,8 @@ namespace GraphQL.Types
     /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
     {
+        private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
+
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
         /// </summary>
@@ -27,84 +29,51 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         {
-            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
-        }
-
-        /// <summary>
-        /// Returns a list of properties that should have fields created for them.
-        /// </summary>
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-    }
-
-    /// <summary>
-    /// Allows you to automatically register the necessary fields for the specified input type.
-    /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
-    /// Also it can get descriptions for fields from the XML comments.
-    /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
-    /// </summary>
-    /// <typeparam name="TSourceType"></typeparam>
-    public class AutoRegisteringInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
-    {
-        /// <summary>
-        /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
-        /// </summary>
-        public AutoRegisteringInputObjectGraphType() : this(null) { }
-
-        /// <summary>
-        /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
-        /// </summary>
-        /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
-        public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
-        {
-            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
-        }
-
-        /// <summary>
-        /// Returns a list of properties that should have fields created for them.
-        /// </summary>
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties() => typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-    }
-
-    internal static class AutoRegisteringHelper
-    {
-        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object?>>[]? excludedProperties)
-        {
-            type.Name = typeof(TSourceType).GraphQLName();
-
-            foreach (var propertyInfo in properties)
+            _excludedProperties = excludedProperties;
+            Name = typeof(TSourceType).GraphQLName();
+            ConfigureGraph();
+            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
+            foreach (var fieldType in ProvideFields())
             {
-                if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
-                    continue;
-
-                type.Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo), type is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType),
-                    name: propertyInfo.Name,
-                    description: propertyInfo.Description(),
-                    deprecationReason: propertyInfo.ObsoleteMessage()
-                ).DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value;
+                _ = AddField(fieldType);
             }
         }
 
-        private static bool IsNullableProperty(PropertyInfo propertyInfo)
+        /// <summary>
+        /// Applies default configuration settings to this graph type prior to applying <see cref="GraphQLAttribute"/> attributes.
+        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to this class.
+        /// </summary>
+        protected virtual void ConfigureGraph() { }
+
+        /// <summary>
+        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
+        /// </summary>
+        protected virtual IEnumerable<FieldType> ProvideFields()
         {
-            if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute)))
-                return false;
-
-            if (!propertyInfo.PropertyType.IsValueType)
-                return true;
-
-            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            foreach (var propertyInfo in GetRegisteredProperties())
+            {
+                if (propertyInfo.IsDefined(typeof(IgnoreAttribute)))
+                    continue;
+                var fieldType = CreateField(propertyInfo);
+                if (fieldType != null)
+                    yield return fieldType;
+            }
         }
 
-        private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
-        {
-            if (expression.Body is MemberExpression m1)
-                return m1.Member.Name;
+        /// <summary>
+        /// Processes the specified property and returns a <see cref="FieldType"/>.
+        /// May return <see langword="null"/> to skip a property.
+        /// </summary>
+        protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
+            => AutoRegisteringHelper.CreateField(propertyInfo, false);
 
-            if (expression.Body is UnaryExpression u && u.Operand is MemberExpression m2)
-                return m2.Member.Name;
-
-            throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
-        }
+        /// <summary>
+        /// Returns a list of properties that should have fields created for them.
+        /// </summary>
+        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
+            => AutoRegisteringHelper.ExcludeProperties(
+                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead),
+                _excludedProperties);
     }
 }

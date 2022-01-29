@@ -1,5 +1,4 @@
 using System;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;

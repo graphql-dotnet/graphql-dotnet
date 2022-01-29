@@ -1,6 +1,6 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -26,7 +26,7 @@ namespace GraphQL.Tests
                 Name = "Anyone"
             };
 
-            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldAst = new Field(default, name == null ? default : new NameNode(name)) });
+            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldDefinition = new GraphQL.Types.FieldType { Name = name }, FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) } });
 
             if (throws)
                 Should.Throw<InvalidOperationException>(() => result());

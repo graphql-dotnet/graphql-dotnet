@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -12,7 +11,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options);
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
@@ -55,7 +54,7 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(ValidationOptions options)
+        public Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options)
         {
             options.Schema.Initialize();
 
@@ -67,8 +66,13 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.CancellationToken = options.CancellationToken;
 
-            var rules = options.Rules ?? CoreRules;
+            return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
+        }
+
+        private async Task<(IValidationResult validationResult, Variables variables)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        {
             try
             {
                 Variables? variables = null;
@@ -81,20 +85,37 @@ namespace GraphQL.Validation
                         context.TypeInfo
                     };
 
-                    foreach (var rule in rules)
+                    if (rules is List<IValidationRule> list) //TODO:allocation - optimization for List+Enumerator<IvalidationRule>
                     {
-                        if (rule is IVariableVisitorProvider provider)
+                        foreach (var rule in list)
                         {
-                            var variableVisitor = provider.GetVisitor(context);
-                            if (variableVisitor != null)
-                                (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                            if (rule is IVariableVisitorProvider provider)
+                            {
+                                var variableVisitor = provider.GetVisitor(context);
+                                if (variableVisitor != null)
+                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                            }
+                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
+                            if (visitor != null)
+                                visitors.Add(visitor);
                         }
-                        var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
-                        if (visitor != null)
-                            visitors.Add(visitor);
                     }
-
-                    new BasicVisitor(visitors).Visit(context.Document, context);
+                    else
+                    {
+                        foreach (var rule in rules)
+                        {
+                            if (rule is IVariableVisitorProvider provider)
+                            {
+                                var variableVisitor = provider.GetVisitor(context);
+                                if (variableVisitor != null)
+                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                            }
+                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
+                            if (visitor != null)
+                                visitors.Add(visitor);
+                        }
+                    }
+                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context));
                 }
 
                 // can report errors even without rules enabled

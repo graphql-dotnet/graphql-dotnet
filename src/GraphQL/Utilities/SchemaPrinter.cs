@@ -5,8 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using GraphQL.Introspection;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
+
+//TODO:should be completely rewritten
 
 namespace GraphQL.Utilities
 {
@@ -356,14 +358,9 @@ namespace GraphQL.Utilities
         {
             if (Options.IncludeDescriptions)
             {
-                if (Options.PrintDescriptionsAsComments)
-                {
-                    return PrintComment(description, indentation);
-                }
-                else
-                {
-                    return PrintDescription(description, indentation);
-                }
+                return Options.PrintDescriptionsAsComments
+                    ? PrintComment(description, indentation)
+                    : PrintDescription(description, indentation);
             }
             return "";
         }
@@ -380,8 +377,8 @@ namespace GraphQL.Utilities
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
                 ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
-                EnumerationGraphType enumeration => AstPrinter.Print(enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")),
-                ScalarGraphType scalar => AstPrinter.Print(scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")),
+                EnumerationGraphType enumeration => (enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")).Print(),
+                ScalarGraphType scalar => (scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")).Print(),
                 _ => throw new NotSupportedException($"Unsupported graph type '{graphType}'")
             };
         }
@@ -511,7 +508,7 @@ namespace GraphQL.Utilities
             {
                 return string.Empty;
             }
-            return $" @deprecated(reason: {AstPrinter.Print(new StringValue(reason!))})";
+            return $" @deprecated(reason: {new GraphQLStringValue(reason!).Print()})";
         }
 
         public string[] BreakLine(string line, int len)

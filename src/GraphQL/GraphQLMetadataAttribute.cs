@@ -1,20 +1,9 @@
 using System;
+using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public abstract class GraphQLAttribute : Attribute
-    {
-        public virtual void Modify(TypeConfig type)
-        {
-        }
-
-        public virtual void Modify(FieldConfig field)
-        {
-        }
-    }
-
     /// <summary>
     /// Attribute for specifying additional information when matching a CLR type to a corresponding GraphType.
     /// </summary>
@@ -59,6 +48,7 @@ namespace GraphQL
         /// <summary>
         /// Indicates which GraphType input type this CLR type is mapped to (if used in input context).
         /// </summary>
+        [Obsolete("Please use the [InputType] attribute instead of this property.")]
         public Type? InputType
         {
             get => _mappedToInput;
@@ -74,6 +64,7 @@ namespace GraphQL
         /// <summary>
         /// Indicates which GraphType output type this CLR type is mapped to (if used in output context).
         /// </summary>
+        [Obsolete("Please use the [OutputType] attribute instead of this property.")]
         public Type? OutputType
         {
             get => _mappedToOutput;
@@ -86,6 +77,7 @@ namespace GraphQL
             }
         }
 
+        /// <inheritdoc/>
         public override void Modify(TypeConfig type)
         {
             type.Description = Description;
@@ -95,10 +87,47 @@ namespace GraphQL
                 type.IsTypeOfFunc = t => IsTypeOf.IsAssignableFrom(t.GetType());
         }
 
+        /// <inheritdoc/>
         public override void Modify(FieldConfig field)
         {
             field.Description = Description;
             field.DeprecationReason = DeprecationReason;
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(IGraphType graphType)
+        {
+            if (Name != null)
+            {
+                graphType.Name = Name;
+            }
+
+            if (Description != null)
+                graphType.Description = Description == "" ? null : Description;
+
+            if (DeprecationReason != null)
+                graphType.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(FieldType fieldType, bool isInputType)
+        {
+            if (Name != null)
+            {
+                fieldType.Name = Name;
+            }
+
+            if (Description != null)
+                fieldType.Description = Description == "" ? null : Description;
+
+            if (DeprecationReason != null)
+                fieldType.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
+
+            if (isInputType && _mappedToInput != null)
+                fieldType.Type = _mappedToInput;
+
+            if (!isInputType && _mappedToOutput != null)
+                fieldType.Type = _mappedToOutput;
         }
     }
 

@@ -1,3 +1,5 @@
+using GraphQLParser.AST;
+
 namespace GraphQL.Types
 {
     /// <summary>
