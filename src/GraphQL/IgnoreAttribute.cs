@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace GraphQL
 {
@@ -6,7 +7,8 @@ namespace GraphQL
     /// Does not add the marked property to the auto-registered GraphQL type as a field.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
-    public class IgnoreAttribute : Attribute
+    public class IgnoreAttribute : GraphQLAttribute
     {
+        public override bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => false;
     }
 }

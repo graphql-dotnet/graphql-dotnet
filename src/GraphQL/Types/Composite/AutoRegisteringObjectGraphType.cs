@@ -54,7 +54,12 @@ namespace GraphQL.Types
         {
             foreach (var memberInfo in GetRegisteredMembers())
             {
-                if (memberInfo.IsDefined(typeof(IgnoreAttribute)))
+                bool include = true;
+                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
+                {
+                    include &= attr.ShouldInclude(memberInfo, true);
+                }
+                if (!include)
                     continue;
                 var fieldType = CreateField(memberInfo);
                 if (fieldType != null)
