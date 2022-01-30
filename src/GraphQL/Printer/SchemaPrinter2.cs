@@ -30,18 +30,18 @@ namespace GraphQL.Utilities
         /// </summary>
         public SchemaPrinterOptions2 Options { get; }
 
+        private ASTConverter CreateConverter() => new ASTConverter(new ASTConverterOptions
+        {
+            IncludeDescriptions = Options.IncludeDescriptions,
+            Comparer = Options.Comparer
+        });
+
         /// <summary>
         /// Prints schema in the specified <see cref="TextWriter"/>.
         /// </summary>
         public async ValueTask PrintAsync(ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
-            var converter = new ASTConverter(new ASTConverterOptions
-            {
-                IncludeDescriptions = Options.IncludeDescriptions,
-                Comparer = Options.Comparer
-            });
-
-            var doc = converter.Convert(schema);
+            var doc = CreateConverter().Convert(schema);
             await _astPrinter.PrintAsync(doc, writer, cancellationToken);
         }
 
@@ -50,13 +50,7 @@ namespace GraphQL.Utilities
         /// </summary>
         public async ValueTask PrintSchemaDefinitionAsync(ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
-            var converter = new ASTConverter(new ASTConverterOptions
-            {
-                IncludeDescriptions = Options.IncludeDescriptions,
-                Comparer = Options.Comparer
-            });
-
-            var def = converter.ConvertSchemaDefinition(schema);
+            var def = CreateConverter().ConvertSchemaDefinition(schema);
             if (def != null)
                 await _astPrinter.PrintAsync(def, writer, cancellationToken);
         }
@@ -66,13 +60,16 @@ namespace GraphQL.Utilities
         /// </summary>
         public async ValueTask PrintTypeAsync(IGraphType type, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
-            var converter = new ASTConverter(new ASTConverterOptions
-            {
-                IncludeDescriptions = Options.IncludeDescriptions,
-                Comparer = Options.Comparer
-            });
+            var def = CreateConverter().ConvertTypeDefinition(type, schema);
+            await _astPrinter.PrintAsync(def, writer, cancellationToken);
+        }
 
-            var def = converter.ConvertTypeDefinition(type, schema);
+        /// <summary>
+        /// Prints directive graph type in the specified <see cref="TextWriter"/>.
+        /// </summary>
+        public async ValueTask PrintDirectiveAsync(DirectiveGraphType type, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
+        {
+            var def = CreateConverter().ConvertDirectiveDefinition(type, schema);
             await _astPrinter.PrintAsync(def, writer, cancellationToken);
         }
     }

@@ -105,6 +105,7 @@ namespace GraphQL.Tests.Extensions
                 {
                     Fields = new List<GraphQLObjectField>
                     {
+                        new GraphQLObjectField { Name = new GraphQLName("Name"), Value = new GraphQLNullValue() },
                         new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(0) }
                     }
                 } };

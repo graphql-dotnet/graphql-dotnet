@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -83,20 +84,20 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void prints_directive()
+        public async Task prints_directive()
         {
-            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+            var printer = new SchemaPrinter2(new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeBuiltinDirectives = true });
             var skip = new SkipDirective();
             var arg = skip.Arguments.First();
             arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
-
-            var result = printer.PrintDirective(skip);
-            const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
+            var writer = new StringWriter();
+            await printer.PrintDirectiveAsync(skip, null, writer);
+            const string expected = @"""Directs the executor to skip this field or fragment when the 'if' argument is true.""
 directive @skip(
-  if: Boolean!
-) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
+  ""Skipped when true.""
+  if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(result, "directive", expected, excludeScalars: true);
+            AssertEqual(writer.ToString(), "directive", expected, excludeScalars: true);
         }
 
         [Fact]
@@ -729,14 +730,14 @@ union SingleUnion = Foo", excludeScalars: true);
                     "SomeInput",
 @"input SomeInput {
   age: Int!
-  name: String!
   isDeveloper: Boolean!
+  name: String!
 }"
                 },
                                 {
                     "Query",
 @"type Query {
-  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+  str(argOne: SomeInput! = {age: 42, name: ""Tom"", isDeveloper: true}, argTwo: [SomeInput] = [{age: 12, name: ""Tom1"", isDeveloper: false}, {age: 22, name: ""Tom2"", isDeveloper: true}]): String!
 }"
                 },
             };
@@ -763,10 +764,10 @@ union SingleUnion = Foo", excludeScalars: true);
   names: [String]
 }"
                 },
-                                {
+                {
                     "Query",
 @"type Query {
-  str(argOne: SomeInput2! = { names: null }): String!
+  str(argOne: SomeInput2! = {names: null}): String!
 }"
                 },
             };
@@ -796,15 +797,15 @@ type Query {
                     "SomeInput",
 @"input SomeInput {
   age: Int!
-  name: String!
   isDeveloper: Boolean!
+  name: String!
   unused: Boolean
 }"
                 },
                                 {
                     "Query",
 @"type Query {
-  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+  str(argOne: SomeInput! = {age: 42, name: ""Tom"", isDeveloper: true}, argTwo: [SomeInput] = [{age: 12, name: ""Tom1"", isDeveloper: false}, {age: 22, name: ""Tom2"", isDeveloper: true}]): String!
 }"
                 },
             };
@@ -835,7 +836,7 @@ type Query {
                                 {
                     "Query",
 @"type Query {
-  str(arg: SomeInput = { age: null }): String!
+  str(arg: SomeInput = {age: null}): String!
 }"
                 },
             };

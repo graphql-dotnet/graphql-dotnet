@@ -2285,7 +2285,7 @@ namespace GraphQL.Utilities
         protected virtual GraphQLParser.AST.GraphQLArgumentsDefinition? ConvertArgumentsDefinition(GraphQL.Types.QueryArguments? arguments, System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? comparer, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLDescription? ConvertDescription(GraphQL.Types.IProvideDescription provider) { }
         protected virtual GraphQLParser.AST.GraphQLArguments? ConvertDirectiveArguments(GraphQL.Types.AppliedDirective directive, GraphQL.Types.DirectiveGraphType type) { }
-        protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ConvertDirectiveDefinition(GraphQL.Types.DirectiveGraphType directive, GraphQL.Types.ISchema schema) { }
+        public virtual GraphQLParser.AST.GraphQLDirectiveDefinition ConvertDirectiveDefinition(GraphQL.Types.DirectiveGraphType directive, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLDirectiveLocations ConvertDirectiveLocations(GraphQL.Types.DirectiveGraphType directive) { }
         protected virtual GraphQLParser.AST.GraphQLDirectives? ConvertDirectives(GraphQL.Types.IProvideMetadata provider, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ConvertEnumTypeDefinition(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2492,6 +2492,7 @@ namespace GraphQL.Utilities
         public SchemaPrinter2(GraphQL.Utilities.SchemaPrinterOptions2 options) { }
         public GraphQL.Utilities.SchemaPrinterOptions2 Options { get; }
         public System.Threading.Tasks.ValueTask PrintAsync(GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask PrintDirectiveAsync(GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.ValueTask PrintSchemaDefinitionAsync(GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.ValueTask PrintTypeAsync(GraphQL.Types.IGraphType type, GraphQL.Types.ISchema schema, System.IO.TextWriter writer, System.Threading.CancellationToken cancellationToken = default) { }
     }

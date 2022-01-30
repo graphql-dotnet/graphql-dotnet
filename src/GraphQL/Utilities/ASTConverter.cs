@@ -243,7 +243,7 @@ namespace GraphQL.Utilities
             return locations;
         }
 
-        protected virtual GraphQLDirectiveDefinition ConvertDirectiveDefinition(DirectiveGraphType directive, ISchema schema)
+        public virtual GraphQLDirectiveDefinition ConvertDirectiveDefinition(DirectiveGraphType directive, ISchema schema)
         {
             return new GraphQLDirectiveDefinition
             {

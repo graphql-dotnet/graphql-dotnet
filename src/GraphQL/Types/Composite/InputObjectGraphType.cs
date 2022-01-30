@@ -68,7 +68,8 @@ namespace GraphQL.Types
 
             foreach (var field in Fields)
             {
-                if (!field.ResolvedType!.IsValidDefault(GetFieldValue(field, value)))
+                var (fieldValue, found) = GetFieldValue(field, value);
+                if (found && !field.ResolvedType!.IsValidDefault(fieldValue))
                     return false;
             }
 
@@ -100,13 +101,13 @@ namespace GraphQL.Types
 
             foreach (var field in Fields)
             {
-                var fieldValue = field.ResolvedType!.ToAST(GetFieldValue(field, value));
-                if (fieldValue is not GraphQLNullValue)
+                var (fieldValue, found) = GetFieldValue(field, value);
+                if (found)
                 {
                     objectValue.Fields.Add(new GraphQLObjectField
                     {
                         Name = new GraphQLName(field.Name),
-                        Value = fieldValue
+                        Value = field.ResolvedType!.ToAST(fieldValue)
                     });
                 }
             }
@@ -114,13 +115,14 @@ namespace GraphQL.Types
             return objectValue;
         }
 
-        private static object? GetFieldValue(FieldType field, object? value)
+        private static (object? value, bool found) GetFieldValue(FieldType field, object value)
         {
-            if (value == null)
-                return null;
-
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
             string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+
+            if (value is IDictionary<string, object?> values)
+                return values.TryGetValue(propertyName, out var v) ? (v, true) : (null, false);
+
             PropertyInfo? propertyInfo;
             try
             {
@@ -132,8 +134,8 @@ namespace GraphQL.Types
             }
 
             return propertyInfo?.CanRead == true
-                ? propertyInfo.GetValue(value)
-                : null;
+                ? (propertyInfo.GetValue(value), true)
+                : (null, false);
         }
     }
 }
