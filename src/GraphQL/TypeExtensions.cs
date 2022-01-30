@@ -42,6 +42,30 @@ namespace GraphQL
             => typeof(IGraphType).IsAssignableFrom(type);
 
         /// <summary>
+        /// Determines if the specified type represents a named graph type (not a wrapper type such as <see cref="ListGraphType"/>).
+        /// </summary>
+        internal static bool IsNamedType(this Type type)
+        {
+            if (!IsGraphType(type))
+                return false;
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(NonNullGraphType<>) ||
+                    genericType == typeof(ListGraphType<>))
+                {
+                    return false;
+                }
+            }
+            else if (type == typeof(NonNullGraphType) || type == typeof(ListGraphType))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
         /// </summary>
         /// <param name="type">The indicated type.</param>

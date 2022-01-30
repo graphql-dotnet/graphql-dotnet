@@ -53,7 +53,14 @@ namespace GraphQL.Types
         {
             foreach (var propertyInfo in GetRegisteredProperties())
             {
-                if (propertyInfo.IsDefined(typeof(IgnoreAttribute)))
+                bool include = true;
+                foreach (var attr in propertyInfo.GetCustomAttributes<GraphQLAttribute>())
+                {
+                    include = attr.ShouldInclude(propertyInfo, false);
+                    if (!include)
+                        break;
+                }
+                if (!include)
                     continue;
                 var fieldType = CreateField(propertyInfo);
                 if (fieldType != null)
@@ -66,7 +73,11 @@ namespace GraphQL.Types
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
         protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
-            => AutoRegisteringHelper.CreateField(propertyInfo, false);
+        {
+            var typeInformation = GetTypeInformation(propertyInfo);
+            var graphType = typeInformation.ConstructGraphType();
+            return AutoRegisteringHelper.CreateField(propertyInfo, graphType, false);
+        }
 
         /// <summary>
         /// Returns a list of properties that should have fields created for them.
@@ -75,5 +86,21 @@ namespace GraphQL.Types
             => AutoRegisteringHelper.ExcludeProperties(
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead),
                 _excludedProperties);
+
+        /// <summary>
+        /// Analyzes a property and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
+        /// <br/><br/>
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
+        /// </summary>
+        protected virtual TypeInformation GetTypeInformation(PropertyInfo propertyInfo)
+        {
+            var typeInformation = new TypeInformation(propertyInfo, false);
+            typeInformation.ApplyAttributes();
+            return typeInformation;
+        }
     }
 }

@@ -102,8 +102,40 @@ class Person
 
     [GraphQLAuthorize("Administrators")]
     public int Age { get; set; }
+
+    [Description("Employee's job position")]
+    public string? Title { get; set; }
 }
 ```
+
+#### Nullable reference type attribute interpretation
+
+When the CLR type has nullable reference type annotations, these annotations
+are read and interpreted by GraphQL.NET when constructing the graph type.
+For instance, this is how the following CLR types are mapped to graph types
+after schema initialization:
+
+| CLR type          | Graph type            |
+|-------------------|-----------------------|
+| `string?`         | `StringGraphType`     |
+| `string`          | `NonNullGraphType<StringGraphType>` |
+| `List<int>`       | `NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>` |
+
+CLR type mappings registered in the schema are supported as well.
+
+In addition to the above, if the `[Id]` attribute is marked on the property,
+it will override the interpreted graph type such as in the following examples:
+
+| CLR type marked with `[Id]` | Graph type  |
+|-------------------|-----------------------|
+| `string?`         | `IdGraphType`         |
+| `string`          | `NonNullGraphType<IdGraphType>` |
+| `List<int>`       | `NonNullGraphType<ListGraphType<NonNullGraphType<IdGraphType>>>` |
+
+Custom attributes can also be added to perform the following behavior changes:
+- Override detected underlying CLR type
+- Override detected nullability or list nullability state
+- Override chosen underlying graph type
 
 #### Overridable base functionality
 

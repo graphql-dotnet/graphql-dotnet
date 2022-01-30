@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -164,6 +165,37 @@ namespace GraphQL.Tests.Types
             graphType.Fields.Find("Field11").ShouldBeNull();
         }
 
+        [Theory]
+        [InlineData(nameof(FieldTests.NotNullIntField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(nameof(FieldTests.NullableIntField), typeof(GraphQLClrOutputTypeReference<int>))]
+        [InlineData(nameof(FieldTests.NotNullStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(nameof(FieldTests.NullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
+        [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
+        [InlineData(nameof(FieldTests.NotNullListNotNullStringField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<string>>>>))]
+        [InlineData(nameof(FieldTests.NullableListNullableStringField), typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(nameof(FieldTests.NullableListNotNullStringField), typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<string>>>))]
+        [InlineData(nameof(FieldTests.NotNullEnumerableNullableIntField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        [InlineData(nameof(FieldTests.NotNullEnumerableNotNullIntField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
+        [InlineData(nameof(FieldTests.NullableEnumerableNullableIntField), typeof(ListGraphType<GraphQLClrOutputTypeReference<int>>))]
+        [InlineData(nameof(FieldTests.NullableEnumerableNotNullIntField), typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        [InlineData(nameof(FieldTests.NotNullArrayNullableTupleField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>>))]
+        [InlineData(nameof(FieldTests.NotNullArrayNotNullTupleField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>>>))]
+        [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>))]
+        [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Tuple<int, string>>>>))]
+        [InlineData(nameof(FieldTests.IdField), typeof(NonNullGraphType<IdGraphType>))]
+        [InlineData(nameof(FieldTests.NullableIdField), typeof(IdGraphType))]
+        [InlineData(nameof(FieldTests.EnumerableField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<object>>>))]
+        [InlineData(nameof(FieldTests.CollectionField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<object>>>))]
+        [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
+        [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
+        [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
+        {
+            var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+            var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
+            fieldType.Type.ShouldBe(expectedGraphType);
+        }
+
         [Fact]
         public void DefaultServiceProvider_Should_Create_AutoRegisteringGraphTypes()
         {
@@ -232,6 +264,31 @@ namespace GraphQL.Tests.Types
             public string? Field10 { get; set; }
             [Ignore]
             public string? Field11 { get; set; }
+            public int NotNullIntField { get; set; }
+            public int? NullableIntField { get; set; }
+            public string NotNullStringField { get; set; } = null!;
+            public string? NullableStringField { get; set; }
+            public List<string?> NotNullListNullableStringField { get; set; } = null!;
+            public List<string> NotNullListNotNullStringField { get; set; } = null!;
+            public List<string?>? NullableListNullableStringField { get; set; }
+            public List<string>? NullableListNotNullStringField { get; set; }
+            public IEnumerable<int?> NotNullEnumerableNullableIntField { get; set; } = null!;
+            public IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; } = null!;
+            public IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
+            public IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
+            public Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; } = null!;
+            public Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; } = null!;
+            public Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
+            public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
+            [Id]
+            public int IdField { get; set; }
+            [Id]
+            public int? NullableIdField { get; set; }
+            public IEnumerable EnumerableField { get; set; } = null!;
+            public ICollection CollectionField { get; set; } = null!;
+            public IEnumerable? NullableEnumerableField { get; set; }
+            public ICollection? NullableCollectionField { get; set; }
+            public int?[]?[]? ListOfListOfIntsField { get; set; }
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
