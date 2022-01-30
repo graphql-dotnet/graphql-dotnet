@@ -57,7 +57,9 @@ namespace GraphQL.Types
                 bool include = true;
                 foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
                 {
-                    include &= attr.ShouldInclude(memberInfo, true);
+                    include = attr.ShouldInclude(memberInfo, true);
+                    if (!include)
+                        break;
                 }
                 if (!include)
                     continue;
@@ -87,7 +89,6 @@ namespace GraphQL.Types
             => AutoRegisteringHelper.ExcludeProperties(
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
                 _excludedProperties);
-
 
         /// <summary>
         /// Analyzes a property or field and returns an instance of <see cref="TypeInformation"/>

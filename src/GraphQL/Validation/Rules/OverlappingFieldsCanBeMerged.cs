@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly OverlappingFieldsCanBeMerged Instance = new OverlappingFieldsCanBeMerged();
+        public static readonly OverlappingFieldsCanBeMerged Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
@@ -31,7 +31,7 @@ namespace GraphQL.Validation.Rules
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<GraphQLSelectionSet, CachedField>();
 
-            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>((selectionSet, context) =>
+            return new ValueTask<INodeVisitor?>(new MatchingNodeVisitor<GraphQLSelectionSet>((selectionSet, context) => //TODO:allocation of Action<GraphQLSelectionSet,ValidationContext>
             {
                 var conflicts = FindConflictsWithinSelectionSet(
                         context,
@@ -399,8 +399,8 @@ namespace GraphQL.Validation.Rules
 
             comparedFragmentPairs.Add(fragmentName1, fragmentName2, areMutuallyExclusive);
 
-            var fragment1 = context.GetFragment(fragmentName1);
-            var fragment2 = context.GetFragment(fragmentName2);
+            var fragment1 = context.Document.FindFragmentDefinition(fragmentName1);
+            var fragment2 = context.Document.FindFragmentDefinition(fragmentName2);
 
             if (fragment1 == null || fragment2 == null)
             {
@@ -481,7 +481,7 @@ namespace GraphQL.Validation.Rules
                 return;
             }
 
-            GraphQLFragmentDefinition? fragment = context.GetFragment(fragmentName);
+            GraphQLFragmentDefinition? fragment = context.Document.FindFragmentDefinition(fragmentName);
 
             if (fragment == null)
             {

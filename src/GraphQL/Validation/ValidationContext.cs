@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation
@@ -12,15 +12,9 @@ namespace GraphQL.Validation
     /// <summary>
     /// Provides contextual information about the validation of the document.
     /// </summary>
-    public class ValidationContext : IProvideUserContext
+    public partial class ValidationContext : IProvideUserContext
     {
         private List<ValidationError>? _errors;
-
-        private readonly Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>> _fragments
-            = new Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>>();
-
-        private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>> _variables =
-            new Dictionary<GraphQLOperationDefinition, List<VariableUsage>>();
 
         internal void Reset()
         {
@@ -32,6 +26,7 @@ namespace GraphQL.Validation
             Document = null!;
             TypeInfo = null!;
             UserContext = null!;
+            NonUserContext = null;
             Variables = null!;
             Extensions = null!;
         }
@@ -54,6 +49,12 @@ namespace GraphQL.Validation
         public IDictionary<string, object?> UserContext { get; set; } = null!;
 
         /// <summary>
+        /// Dictionary of temporary data used by validation rules.
+        /// TODO: think about internal reusable fields in TypeInfo
+        /// </summary>
+        internal Dictionary<string, object?>? NonUserContext { get; set; }
+
+        /// <summary>
         /// Returns a list of validation errors for this document.
         /// </summary>
         public IEnumerable<ValidationError> Errors => (IEnumerable<ValidationError>?)_errors ?? Array.Empty<ValidationError>();
@@ -70,6 +71,12 @@ namespace GraphQL.Validation
         public Inputs Extensions { get; set; } = null!;
 
         /// <summary>
+        /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
+        /// defaults to <see cref="CancellationToken.None"/>
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
+
+        /// <summary>
         /// Adds a validation error to the list of validation errors.
         /// </summary>
         public void ReportError(ValidationError error)
@@ -78,56 +85,6 @@ namespace GraphQL.Validation
                 throw new ArgumentNullException(nameof(error), "Must provide a validation error.");
             (_errors ??= new List<ValidationError>()).Add(error);
         }
-
-        /// <summary>
-        /// For a node with a selection set, returns a list of variable references along with what input type each were referenced for.
-        /// </summary>
-        public List<VariableUsage> GetVariables(IHasSelectionSetNode node)
-        {
-            var usages = new List<VariableUsage>();
-            var info = new TypeInfo(Schema);
-
-            var listener = new MatchingNodeVisitor<GraphQLVariable, (List<VariableUsage> usages, TypeInfo info)>(
-                (usages, info),
-                (varRef, context, state) =>
-                {
-                    // GraphQLVariable AST node represents both variable definition and variable usage so check parent node
-                    if (info.GetAncestor(1) is not GraphQLVariableDefinition)
-                        state.usages.Add(new VariableUsage(varRef, state.info.GetInputType()!));
-                });
-
-            new BasicVisitor(info, listener).VisitAsync((ASTNode)node, new BasicVisitor.State(this, default)).GetAwaiter().GetResult(); // actually is sync
-
-            return usages;
-        }
-
-        /// <summary>
-        /// For a specified operation with a document, returns a list of variable references
-        /// along with what input type each was referenced for.
-        /// </summary>
-        public List<VariableUsage> GetRecursiveVariables(GraphQLOperationDefinition operation)
-        {
-            if (_variables.TryGetValue(operation, out var results))
-            {
-                return results;
-            }
-
-            var usages = GetVariables(operation);
-
-            foreach (var fragment in GetRecursivelyReferencedFragments(operation))
-            {
-                usages.AddRange(GetVariables(fragment));
-            }
-
-            _variables[operation] = usages;
-
-            return usages;
-        }
-
-        /// <summary>
-        /// Searches the document for a fragment definition by name and returns it.
-        /// </summary>
-        public GraphQLFragmentDefinition? GetFragment(ROM name) => Document.FindFragmentDefinition(name);
 
         /// <summary>
         /// Returns a list of fragment spreads within the specified node.
@@ -157,47 +114,6 @@ namespace GraphQL.Validation
             }
 
             return spreads;
-        }
-
-        /// <summary>
-        /// For a specified operation within a document, returns a list of all fragment definitions in use.
-        /// </summary>
-        public List<GraphQLFragmentDefinition> GetRecursivelyReferencedFragments(GraphQLOperationDefinition operation)
-        {
-            if (_fragments.TryGetValue(operation, out var results))
-            {
-                return results;
-            }
-
-            var fragments = new List<GraphQLFragmentDefinition>();
-            var nodesToVisit = new Stack<GraphQLSelectionSet>();
-            nodesToVisit.Push(operation.SelectionSet);
-            var collectedNames = new Dictionary<ROM, bool>();
-
-            while (nodesToVisit.Count > 0)
-            {
-                var node = nodesToVisit.Pop();
-
-                foreach (var spread in GetFragmentSpreads(node))
-                {
-                    var fragName = spread.FragmentName.Name;
-                    if (!collectedNames.ContainsKey(fragName))
-                    {
-                        collectedNames[fragName] = true;
-
-                        var fragment = GetFragment(fragName);
-                        if (fragment != null)
-                        {
-                            fragments.Add(fragment);
-                            nodesToVisit.Push(fragment.SelectionSet);
-                        }
-                    }
-                }
-            }
-
-            _fragments[operation] = fragments;
-
-            return fragments;
         }
 
         /// <summary>
@@ -585,6 +501,45 @@ namespace GraphQL.Validation
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Type {type?.Name ?? "<NULL>"} is not a valid input graph type.");
+        }
+    }
+
+    internal static class ValidationContextExtensions
+    {
+        public static void AddListItem<T>(this ValidationContext context, string listKey, T item)
+        {
+            List<T> items;
+            if (context.NonUserContext?.TryGetValue(listKey, out object? obj) == true)
+            {
+                items = (List<T>)obj!;
+                items.Add(item);
+            }
+            else
+            {
+                items = new List<T> { item };
+                (context.NonUserContext ??= new Dictionary<string, object?>()).Add(listKey, items);
+            }
+        }
+
+        public static List<T>? GetList<T>(this ValidationContext context, string listKey, bool reset)
+        {
+#if NETSTANDARD2_1_OR_GREATER
+            object? items = null;
+            return (reset ? context.NonUserContext?.Remove(listKey, out items) : context.NonUserContext?.TryGetValue(listKey, out items)) == true
+                ? (List<T>?)items
+                : null;
+#else
+                if (context.NonUserContext?.TryGetValue(listKey, out object? items) == true)
+                {
+                    if (reset)
+                        context.NonUserContext.Remove(listKey);
+                    return (List<T>?)items;
+                }
+                else
+                {
+                    return null;
+                }
+#endif
         }
     }
 }

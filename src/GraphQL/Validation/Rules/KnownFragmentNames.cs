@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -24,7 +25,7 @@ namespace GraphQL.Validation.Rules
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
         {
             var fragmentName = node.FragmentName.Name;
-            var fragment = context.GetFragment(fragmentName);
+            var fragment = context.Document.FindFragmentDefinition(fragmentName);
             if (fragment == null)
             {
                 context.ReportError(new KnownFragmentNamesError(context, node, fragmentName.StringValue));

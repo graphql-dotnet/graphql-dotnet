@@ -57,7 +57,9 @@ namespace GraphQL.Types
                 bool include = true;
                 foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
                 {
-                    include &= attr.ShouldInclude(memberInfo, true);
+                    include = attr.ShouldInclude(memberInfo, false);
+                    if (!include)
+                        break;
                 }
                 if (!include)
                     continue;

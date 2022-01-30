@@ -35,12 +35,16 @@ namespace GraphQL.Validation.Rules
                 leave: (op, context) =>
                 {
                     var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined;
-                    foreach (var usage in context.GetRecursiveVariables(op))
+                    var usages = context.GetRecursiveVariables(op);
+                    if (usages != null)
                     {
-                        var varName = usage.Node.Name;
-                        if (varNameDef == null || !varNameDef.Contains(varName))
+                        foreach (var usage in usages)
                         {
-                            context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
+                            var varName = usage.Node.Name;
+                            if (varNameDef == null || !varNameDef.Contains(varName))
+                            {
+                                context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
+                            }
                         }
                     }
                 })
