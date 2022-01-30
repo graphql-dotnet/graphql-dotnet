@@ -88,7 +88,6 @@ namespace GraphQL.Types
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
                 _excludedProperties);
 
-
         /// <summary>
         /// Analyzes a property and returns an instance of <see cref="TypeInformation"/>
         /// containing information necessary to select a graph type. Nullable reference annotations
