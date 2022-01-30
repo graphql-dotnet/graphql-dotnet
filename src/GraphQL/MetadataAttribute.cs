@@ -7,11 +7,11 @@ namespace GraphQL
     /// <summary>
     /// Marks a class (graph type) or property (field) with additional metadata.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true)]
     public class MetadataAttribute : GraphQLAttribute
     {
         /// <inheritdoc cref="MetadataAttribute"/>
-        public MetadataAttribute(string key, object value)
+        public MetadataAttribute(string key, object? value)
         {
             Key = key;
             Value = value;
@@ -25,7 +25,7 @@ namespace GraphQL
         /// <summary>
         /// Gets or sets the metadata value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <inheritdoc/>
         public override void Modify(TypeConfig type) => type.WithMetadata(Key, Value);

@@ -157,7 +157,7 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
@@ -299,7 +299,7 @@ namespace GraphQL
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public sealed class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
     {
         public GraphQLMetadataAttribute() { }
@@ -364,18 +364,18 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class IdAttribute : GraphQL.GraphQLAttribute
     {
         public IdAttribute() { }
         public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class IgnoreAttribute : System.Attribute
     {
         public IgnoreAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
     {
         public InputNameAttribute(string name) { }
@@ -383,7 +383,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
         public InputTypeAttribute(System.Type graphType) { }
@@ -428,18 +428,18 @@ namespace GraphQL
     {
         public static System.Collections.Generic.IList<T> Constrained<T>(this T[] array, int count) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=true, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All, AllowMultiple=true)]
     public class MetadataAttribute : GraphQL.GraphQLAttribute
     {
-        public MetadataAttribute(string key, object value) { }
+        public MetadataAttribute(string key, object? value) { }
         public string Key { get; set; }
-        public object Value { get; set; }
+        public object? Value { get; set; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class NameAttribute : GraphQL.GraphQLAttribute
     {
         public NameAttribute(string name) { }
@@ -455,7 +455,7 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {
         public OutputNameAttribute(string name) { }
@@ -463,7 +463,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, Inherited=false)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.All)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
     {
         public OutputTypeAttribute(System.Type graphType) { }
