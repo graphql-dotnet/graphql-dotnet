@@ -14,7 +14,7 @@ namespace GraphQL.Types
     public class TypeInformation
     {
         /// <summary>
-        /// The member being inspected. This is a <see cref="MethodInfo"/> or <see cref="PropertyInfo"/> instance.
+        /// The member being inspected. This is a <see cref="MethodInfo"/>, <see cref="PropertyInfo"/> or <see cref="FieldInfo"/> instance.
         /// </summary>
         public MemberInfo MemberInfo { get; }
 
