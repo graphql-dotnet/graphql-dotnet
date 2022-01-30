@@ -52,11 +52,11 @@ namespace GraphQL.Types
         /// </summary>
         protected virtual IEnumerable<FieldType> ProvideFields()
         {
-            foreach (var propertyInfo in GetRegisteredMembers())
+            foreach (var memberInfo in GetRegisteredMembers())
             {
-                if (propertyInfo.IsDefined(typeof(IgnoreAttribute)))
+                if (memberInfo.IsDefined(typeof(IgnoreAttribute)))
                     continue;
-                var fieldType = CreateField(propertyInfo);
+                var fieldType = CreateField(memberInfo);
                 if (fieldType != null)
                     yield return fieldType;
             }
