@@ -162,9 +162,11 @@ namespace GraphQL
     {
         protected GraphQLAttribute() { }
         public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
+        public virtual void Modify(GraphQL.Types.TypeInformation typeInformation) { }
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+        public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool isInputType) { }
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
     {
@@ -363,10 +365,17 @@ namespace GraphQL
     {
         TSource Source { get; }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public class IdAttribute : GraphQL.GraphQLAttribute
+    {
+        public IdAttribute() { }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false)]
-    public class IgnoreAttribute : System.Attribute
+    public class IgnoreAttribute : GraphQL.GraphQLAttribute
     {
         public IgnoreAttribute() { }
+        public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool isInputType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=false, Inherited=false)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
@@ -1526,6 +1535,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+        protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
@@ -1535,6 +1545,7 @@ namespace GraphQL.Types
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+        protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.PropertyInfo propertyInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
@@ -2164,6 +2175,20 @@ namespace GraphQL.Types
         public bool Contains(GraphQL.Types.IFieldType field) { }
         public GraphQL.Types.FieldType? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
+    }
+    public class TypeInformation
+    {
+        public TypeInformation(System.Reflection.PropertyInfo propertyInfo, bool isInputProperty) { }
+        public TypeInformation(System.Reflection.MemberInfo memberInfo, bool isInputType, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
+        public System.Type? GraphType { get; set; }
+        public bool IsInputType { get; }
+        public bool IsList { get; set; }
+        public bool IsNullable { get; set; }
+        public bool ListIsNullable { get; set; }
+        public System.Reflection.MemberInfo MemberInfo { get; }
+        public System.Type Type { get; set; }
+        public virtual void ApplyAttributes() { }
+        public virtual System.Type ConstructGraphType() { }
     }
     public class UIntGraphType : GraphQL.Types.ScalarGraphType
     {

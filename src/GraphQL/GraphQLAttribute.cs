@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -39,5 +40,18 @@ namespace GraphQL
         public virtual void Modify(FieldType fieldType, bool isInputType)
         {
         }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="TypeInformation"/> as necessary.
+        /// </summary>
+        public virtual void Modify(TypeInformation typeInformation)
+        {
+        }
+
+        /// <summary>
+        /// Determines if a specified member should be included during automatic generation
+        /// of a graph type from a CLR type.
+        /// </summary>
+        public virtual bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => true;
     }
 }
