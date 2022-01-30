@@ -295,7 +295,7 @@ namespace GraphQL.Utilities
         {
             if (field.Arguments?.Count > 0)
             {
-                foreach (var item in field.Arguments.List.ToLookup(f => f.Name))
+                foreach (var item in field.Arguments.List!.ToLookup(f => f.Name))
                 {
                     if (item.Count() > 1)
                         throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name.");
@@ -307,7 +307,7 @@ namespace GraphQL.Utilities
         {
             if (type.Arguments?.Count > 0)
             {
-                foreach (var item in type.Arguments.List.ToLookup(f => f.Name))
+                foreach (var item in type.Arguments.List!.ToLookup(f => f.Name))
                 {
                     if (item.Count() > 1)
                         throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{type.Name}'; no two directive arguments may share the same name.");

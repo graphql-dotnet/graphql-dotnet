@@ -39,20 +39,24 @@ namespace GraphQL.Validation.Rules
                     if (varDefMap == null)
                         return;
 
-                    foreach (var usage in context.GetRecursiveVariables(op))
+                    var usages = context.GetRecursiveVariables(op);
+                    if (usages != null)
                     {
-                        var varName = usage.Node.Name;
-                        if (!varDefMap.TryGetValue(varName, out var varDef))
+                        foreach (var usage in usages)
                         {
-                            return;
-                        }
-
-                        if (varDef != null && usage.Type != null)
-                        {
-                            var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                            if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
+                            var varName = usage.Node.Name;
+                            if (!varDefMap.TryGetValue(varName, out var varDef))
                             {
-                                context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
+                                return;
+                            }
+
+                            if (varDef != null && usage.Type != null)
+                            {
+                                var varType = varDef.Type.GraphTypeFromType(context.Schema);
+                                if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
+                                {
+                                    context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
+                                }
                             }
                         }
                     }

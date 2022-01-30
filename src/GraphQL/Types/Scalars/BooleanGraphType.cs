@@ -32,7 +32,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) => value is bool || value == null;
 
         /// <inheritdoc/>
-        public override GraphQLValue? ToAST(object? value) => value switch
+        public override GraphQLValue ToAST(object? value) => value switch
         {
             bool b => b ? GraphQLValuesCache.True : GraphQLValuesCache.False,
             null => GraphQLValuesCache.Null,

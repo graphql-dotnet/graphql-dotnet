@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -66,6 +67,14 @@ namespace GraphQL.Tests.Initialization
         public void SchemaWithNotFullSpecifiedResolvedType_Should_Throw()
         {
             ShouldThrow<SchemaWithNotFullSpecifiedResolvedType, InvalidOperationException>("The field 'in' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/pull/2707/files#r757949833
+        [Fact]
+        public void SchemaWithInvalidDefault_Should_Throw()
+        {
+            ShouldThrow<SchemaWithInvalidDefault1, InvalidOperationException>("The default value of argument 'argOne' of field 'Object.field' is invalid.");
+            ShouldThrow<SchemaWithInvalidDefault2, InvalidOperationException>("The default value of argument 'argOne' of field 'Object.field' is invalid.");
         }
     }
 
@@ -243,6 +252,54 @@ namespace GraphQL.Tests.Initialization
                 new StringGraphType(),
                 arguments: new QueryArguments(new QueryArgument(stringFilterInputType) { Name = "a" }),
                 resolve: context => "ok");
+        }
+    }
+
+    public class SchemaWithInvalidDefault1 : Schema
+    {
+        public SchemaWithInvalidDefault1()
+        {
+            var root = new ObjectGraphType();
+            root.Field<NonNullGraphType<StringGraphType>>(
+               "field",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<SomeInputType>>
+                   {
+                       Name = "argOne",
+                       DefaultValue = new SomeInput { Names = null }
+                   }));
+            Query = root;
+        }
+
+        public class SomeInputType : InputObjectGraphType<SomeInput>
+        {
+            public SomeInputType()
+            {
+                Name = "SomeInput";
+                Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("names");
+            }
+        }
+
+        public class SomeInput
+        {
+            public IList<string> Names { get; set; }
+        }
+    }
+
+    public class SchemaWithInvalidDefault2 : Schema
+    {
+        public SchemaWithInvalidDefault2()
+        {
+            var root = new ObjectGraphType();
+            root.Field<NonNullGraphType<StringGraphType>>(
+               "field",
+               arguments: new QueryArguments(
+                   new QueryArgument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>
+                   {
+                       Name = "argOne",
+                       DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } }
+                   }));
+            Query = root;
         }
     }
 }

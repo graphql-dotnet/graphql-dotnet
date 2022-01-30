@@ -293,10 +293,10 @@ namespace GraphQL
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
-        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
+        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
+        public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object? value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
@@ -1562,7 +1562,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class ByteGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1705,7 +1705,7 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class EnumerationGraphType<TEnum> : GraphQL.Types.EnumerationGraphType
         where TEnum : System.Enum
@@ -1803,7 +1803,7 @@ namespace GraphQL.Types
     {
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
-        GraphQLParser.AST.GraphQLObjectValue? ToAST(object value);
+        GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
@@ -1826,8 +1826,8 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
-        TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory);
-        TType? GetMetadata<TType>(string key, TType? defaultValue = default);
+        TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
+        TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
     }
     public interface IProvideResolvedType
@@ -1888,7 +1888,7 @@ namespace GraphQL.Types
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
-        public virtual GraphQLParser.AST.GraphQLObjectValue? ToAST(object value) { }
+        public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2039,11 +2039,15 @@ namespace GraphQL.Types
         public virtual object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public abstract object? ParseValue(object? value);
         public virtual object? Serialize(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected GraphQLParser.AST.GraphQLValue ThrowASTConversionError(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowLiteralConversionError(GraphQLParser.AST.GraphQLValue input, string? description = null) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowSerializationError(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowValueConversionError(object? value) { }
-        public virtual GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
@@ -2363,8 +2367,8 @@ namespace GraphQL.Utilities
         public MetadataProvider() { }
         public System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
         public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
-        public TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory) { }
-        public TType? GetMetadata<TType>(string key, TType? defaultValue = default) { }
+        public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
     }
     public static class NameValidator
@@ -2507,7 +2511,7 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class FederatedResolveContext
     {
@@ -2577,7 +2581,7 @@ namespace GraphQL.Validation
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
         public readonly struct State : GraphQLParser.Visitors.IASTVisitorContext
         {
-            public State(GraphQL.Validation.ValidationContext context, System.Threading.CancellationToken cancellationToken) { }
+            public State(GraphQL.Validation.ValidationContext context) { }
             public System.Threading.CancellationToken CancellationToken { get; }
             public GraphQL.Validation.ValidationContext Context { get; }
         }
@@ -2589,14 +2593,14 @@ namespace GraphQL.Validation
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(GraphQL.Validation.ValidationOptions options) { }
+        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
     }
     public interface IDocumentValidator
     {
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "validationResult",
                 "variables"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(GraphQL.Validation.ValidationOptions options);
+        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
     }
     public interface INodeVisitor
     {
@@ -2665,6 +2669,7 @@ namespace GraphQL.Validation
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {
         public ValidationContext() { }
+        public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }
@@ -2674,12 +2679,13 @@ namespace GraphQL.Validation
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Inputs Variables { get; set; }
-        public GraphQLParser.AST.GraphQLFragmentDefinition? GetFragment(GraphQLParser.ROM name) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentSpread> GetFragmentSpreads(GraphQLParser.AST.GraphQLSelectionSet node) { }
-        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
-        public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition> GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(System.Collections.Generic.List<GraphQLParser.AST.GraphQLOperationDefinition> operations) { }
         public GraphQL.Validation.Variables GetVariableValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
-        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQLParser.AST.IHasSelectionSetNode node) { }
+        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
+            where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
@@ -2693,7 +2699,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
         public string Number { get; set; }
     }
-    public class ValidationOptions
+    public readonly struct ValidationOptions
     {
         public ValidationOptions() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
