@@ -184,6 +184,17 @@ With new visitors design from GraphQL-Parser v8 it is possible now to cancel Gra
 at validation stage before actual execution. `DocumentExecuter` uses the same cancellation token
 specified into `ExecutionOptions` to pass into `IDocumentValidator.ValidateAsync`.
 
+### 9. `InputObjectGraphType` supports `ToAST`/`IsValidDefault`
+
+`ToAST` is supported for `InputObjectGraphType` and enables printing a code-first schema that uses
+`InputObjectGraphType` (`ToAST` threw `NotImplementedException` before), i.e. schemas with default
+input objects can be printed out of the box now. `InputObjectGraphType.IsValidDefault` now checks
+all fields on the provided input object value. To revert `IsValidDefault` to v4 behavior use that snippet:
+
+```csharp
+public override bool IsValidDefault(object value) => value is TSourceType;
+``` 
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -399,3 +410,9 @@ string s = writer.ToString();
 `SDLPrinter` is a highly optimized visitor for asynchronous non-blocking SDL output
 into provided `TextWriter`. In the majority of cases it does not allocate memory in
 the managed heap at all.
+
+### 21. Possible breaking changes in `InputObjectGraphType<TSourceType>`
+
+`InputObjectGraphType<TSourceType>.ToAST` and `InputObjectGraphType<TSourceType>.IsValidDefault`
+methods were changed in such a way that now you may be required to also override `ToAST` if you override
+`ParseDictionary`. Changes in those methods are made for earlier error detection and schema printing.

@@ -291,10 +291,10 @@ namespace GraphQL
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
-        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object value) { }
+        public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object value) { }
+        public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object? value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
@@ -1551,7 +1551,7 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class ByteGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1694,7 +1694,7 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class EnumerationGraphType<TEnum> : GraphQL.Types.EnumerationGraphType
         where TEnum : System.Enum
@@ -1792,7 +1792,7 @@ namespace GraphQL.Types
     {
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
-        GraphQLParser.AST.GraphQLObjectValue? ToAST(object value);
+        GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
@@ -1815,8 +1815,8 @@ namespace GraphQL.Types
     public interface IProvideMetadata
     {
         System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
-        TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory);
-        TType? GetMetadata<TType>(string key, TType? defaultValue = default);
+        TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
+        TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
     }
     public interface IProvideResolvedType
@@ -1877,7 +1877,7 @@ namespace GraphQL.Types
         public InputObjectGraphType() { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
-        public virtual GraphQLParser.AST.GraphQLObjectValue? ToAST(object value) { }
+        public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2028,11 +2028,15 @@ namespace GraphQL.Types
         public virtual object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public abstract object? ParseValue(object? value);
         public virtual object? Serialize(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected GraphQLParser.AST.GraphQLValue ThrowASTConversionError(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowLiteralConversionError(GraphQLParser.AST.GraphQLValue input, string? description = null) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowSerializationError(object? value) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected object ThrowValueConversionError(object? value) { }
-        public virtual GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
@@ -2338,8 +2342,8 @@ namespace GraphQL.Utilities
         public MetadataProvider() { }
         public System.Collections.Generic.Dictionary<string, object?> Metadata { get; }
         public void CopyMetadataTo(GraphQL.Types.IProvideMetadata target) { }
-        public TType? GetMetadata<TType>(string key, System.Func<TType?> defaultValueFactory) { }
-        public TType? GetMetadata<TType>(string key, TType? defaultValue = default) { }
+        public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
     }
     public static class NameValidator
@@ -2482,7 +2486,7 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue? ToAST(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class FederatedResolveContext
     {
