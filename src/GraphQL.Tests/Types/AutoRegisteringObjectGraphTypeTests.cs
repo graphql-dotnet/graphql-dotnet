@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -80,6 +79,13 @@ namespace GraphQL.Tests.Types
         {
             var graphType = new TestOverrideDefaultName<TestClass_WithCustomName>();
             graphType.Name.ShouldBe("TestWithCustomName");
+        }
+
+        [Fact]
+        public void Class_RecognizesInheritedAttributes()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<DerivedClass>();
+            graphType.Fields.Find("Field1CustomName").ShouldNotBeNull();
         }
 
         [Fact]
@@ -414,6 +420,16 @@ namespace GraphQL.Tests.Types
             {
                 Name = typeof(T).Name + "Input";
             }
+        }
+
+        private class ParentClass
+        {
+            [Name("Field1CustomName")]
+            public virtual string? Field1 { get; set; }
+        }
+        private class DerivedClass : ParentClass
+        {
+            public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
         }
     }
 }

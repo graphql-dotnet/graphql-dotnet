@@ -8,7 +8,7 @@ namespace GraphQL
     /// Specifies a GraphQL type name for a CLR class, or a field name for a property.
     /// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class NameAttribute : GraphQLAttribute
     {
         private string _name;

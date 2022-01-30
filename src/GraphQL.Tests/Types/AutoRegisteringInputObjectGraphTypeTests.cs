@@ -80,6 +80,13 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void Class_RecognizesInheritedAttributes()
+        {
+            var graphType = new AutoRegisteringInputObjectGraphType<DerivedClass>();
+            graphType.Fields.Find("Field1CustomName").ShouldNotBeNull();
+        }
+
+        [Fact]
         public void Field_RecognizesNameAttribute()
         {
             var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
@@ -397,6 +404,16 @@ namespace GraphQL.Tests.Types
             {
                 Name = typeof(T).Name + "Input";
             }
+        }
+
+        private class ParentClass
+        {
+            [Name("Field1CustomName")]
+            public virtual string? Field1 { get; set; }
+        }
+        private class DerivedClass : ParentClass
+        {
+            public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
         }
     }
 }
