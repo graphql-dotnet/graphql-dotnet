@@ -13,8 +13,8 @@ namespace GraphQL.Tests.Introspection
     public class SchemaIntrospectionTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_core_schema(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -26,14 +26,14 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = serializer.Serialize(executionResult);
 
             ShouldBe(json, "IntrospectionResult".ReadJsonResult());
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema_pascal_case(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_core_schema_pascal_case(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = "IntrospectionQuery".ReadGraphQLRequest();
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = serializer.Serialize(executionResult);
 
             ShouldBe(json, "IntrospectionResult".ReadJsonResult().Replace("\"test\"", "\"Test\""));
         }
@@ -61,8 +61,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_that_default_schema_comparer_gives_original_order_of_fields_and_types(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_that_default_schema_comparer_gives_original_order_of_fields_and_types(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Introspection
 
             static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
-            var json = JsonDocument.Parse(await documentWriter.WriteToStringAsync(executionResult));
+            var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
             var types = json.RootElement
                 .GetProperty("data")
@@ -97,8 +97,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_that_alphabetical_schema_comparer_gives_ordered_fields_and_types(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_that_alphabetical_schema_comparer_gives_ordered_fields_and_types(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -114,7 +114,7 @@ namespace GraphQL.Tests.Introspection
 
             static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
-            var json = JsonDocument.Parse(await documentWriter.WriteToStringAsync(executionResult));
+            var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
             var types = json.RootElement
                 .GetProperty("data")
@@ -154,8 +154,8 @@ namespace GraphQL.Tests.Introspection
         }
 
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_non_null_schema(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task validate_non_null_schema(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -164,7 +164,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = InputObjectBugQuery;
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             ShouldBe(json, InputObjectBugResult);

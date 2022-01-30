@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GraphQL.Execution;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -111,8 +112,8 @@ namespace GraphQL.Tests.Errors
             error.Data.Add("test1", "object1");
             error.Data.Add("test2", 15);
             error.Data.Add("test3", new Dictionary<string, object>() { { "test4", "object4" } });
-            error.AddLocation(5, 6);
-            error.AddLocation(7, 8);
+            error.AddLocation(new Location(5, 6));
+            error.AddLocation(new Location(7, 8));
 
             var info = new ErrorInfoProvider().GetInfo(error);
             info.Message.ShouldBe(error.Message);

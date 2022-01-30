@@ -7,6 +7,7 @@ using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
+using GraphQL.Tests;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,6 @@ namespace GraphQL.DataLoader.Tests
     public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new SubscriptionDocumentExecuter();
-        private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
 
         protected IServiceProvider Services { get; }
 
@@ -86,19 +86,22 @@ namespace GraphQL.DataLoader.Tests
                 opts.Schema = schema;
             }));
 
-            var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
-            var expectedResult = AsyncContext.Run(() => writer.WriteToStringAsync(expectedExecutionResult));
-
-            string additionalInfo = null;
-
-            if (runResult.Errors?.Any() == true)
+            foreach (var writer in GraphQLSerializersTestData.AllWriters)
             {
-                additionalInfo = string.Join(Environment.NewLine, runResult.Errors
-                    .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                    .Select(x => x.InnerException.Message));
-            }
+                var writtenResult = writer.Serialize(runResult);
+                var expectedResult = writer.Serialize(expectedExecutionResult);
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+                string additionalInfo = null;
+
+                if (runResult.Errors?.Any() == true)
+                {
+                    additionalInfo = string.Join(Environment.NewLine, runResult.Errors
+                        .Where(x => x.InnerException is GraphQLSyntaxErrorException)
+                        .Select(x => x.InnerException.Message));
+                }
+
+                writtenResult.ShouldBe(expectedResult, additionalInfo);
+            }
 
             return runResult;
         }
@@ -146,7 +149,7 @@ namespace GraphQL.DataLoader.Tests
 
         public ExecutionResult CreateQueryResult(string result, bool executed = true)
         {
-            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToInputs();
+            object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Deserialize<Inputs>(result);
             return new ExecutionResult { Data = expected, Executed = executed };
         }
     }

@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Validation
 
         public string Query { get; set; }
 
-        public Inputs Inputs { get; set; }
+        public Inputs Inputs { get; set; } = Inputs.Empty;
 
         public IList<IValidationRule> Rules => _rules;
 

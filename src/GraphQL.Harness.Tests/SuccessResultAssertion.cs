@@ -10,7 +10,7 @@ namespace GraphQL.Harness.Tests
         private static readonly string extensionsKey = nameof(ExecutionResult.Extensions).ToLower();
         private readonly string _result;
         private readonly bool _ignoreExtensions;
-        private readonly IDocumentWriter _writer = new DocumentWriter();
+        private readonly IGraphQLTextSerializer _writer = new GraphQLSerializer();
 
         public SuccessResultAssertion(string result, bool ignoreExtensions)
         {
@@ -38,10 +38,10 @@ namespace GraphQL.Harness.Tests
                 {
                     actualResult.Remove(extensionsKey);
                 }
-                actualResultJson = _writer.WriteToStringAsync(actualResult).GetAwaiter().GetResult();
+                actualResultJson = _writer.Serialize(actualResult);
             }
 
-            string expectedResultJson = _writer.WriteToStringAsync(expectedResult).GetAwaiter().GetResult();
+            string expectedResultJson = _writer.Serialize(expectedResult);
 
             if (!actualResultJson.Equals(expectedResultJson))
             {

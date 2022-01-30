@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -31,7 +31,7 @@ namespace GraphQL
 
         protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
-            return context.Operation.OperationType switch
+            return context.Operation.Operation switch
             {
                 OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
                 _ => base.SelectExecutionStrategy(context)

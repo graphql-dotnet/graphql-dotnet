@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -14,7 +15,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, Arguments? astArguments, Variables? variables)
+        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
@@ -38,7 +39,7 @@ namespace GraphQL.Execution
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static ArgumentValue CoerceValue(IGraphType type, IValue? input, Variables? variables = null, object? fieldDefault = null)
+        public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -55,7 +56,7 @@ namespace GraphQL.Execution
                 return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
-            if (input is VariableReference variable)
+            if (input is GraphQLVariable variable)
             {
                 if (variables == null)
                     return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
@@ -69,7 +70,7 @@ namespace GraphQL.Execution
                 return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
             }
 
-            if (input is NullValue)
+            if (input is GraphQLNullValue)
             {
                 return ArgumentValue.NullLiteral;
             }
@@ -78,15 +79,15 @@ namespace GraphQL.Execution
             {
                 var listItemType = listType.ResolvedType!;
 
-                if (input is ListValue list)
+                if (input is GraphQLListValue list)
                 {
-                    var count = list.ValuesList.Count;
+                    var count = list.Values?.Count ?? 0;
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
                     var values = new object?[count];
                     for (int i = 0; i < count; ++i)
-                        values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
+                        values[i] = CoerceValue(listItemType, list.Values![i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
@@ -97,9 +98,9 @@ namespace GraphQL.Execution
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                if (!(input is ObjectValue objectValue))
+                if (!(input is GraphQLObjectValue objectValue))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
+                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                 }
 
                 var obj = new Dictionary<string, object?>();

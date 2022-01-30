@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Subscription;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -102,6 +102,9 @@ namespace GraphQL.Execution
                     throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
+                // The IServiceProvider instance will be disposed at this point, set it to null instead of exposing the disposed object
+                resolveContext.RequestServices = null;
+
                 return subscription
                     .Select(value => BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!))
                     .SelectMany(async executionNode =>
@@ -138,7 +141,7 @@ namespace GraphQL.Execution
                         return new ExecutionResult
                         {
                             Executed = true,
-                            Data = new RootExecutionNode(null, null)
+                            Data = new RootExecutionNode(null!, null)
                             {
                                 SubFields = new ExecutionNode[]
                                 {
@@ -155,7 +158,7 @@ namespace GraphQL.Execution
                                 {
                                     GenerateError(
                                         context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'.",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.Source}'.",
                                         node.Field,
                                         node.ResponsePath,
                                         exception)
@@ -174,7 +177,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode, object source)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType!;
@@ -192,7 +195,7 @@ namespace GraphQL.Execution
         private ExecutionError GenerateError(
             ExecutionContext context,
             string message,
-            Field field,
+            GraphQLField field,
             IEnumerable<object> path,
             Exception? ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }

@@ -1,3 +1,4 @@
+using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -25,5 +26,11 @@ namespace GraphQL
 
         /// <inheritdoc />
         public override void Modify(FieldConfig field) => field.AuthorizeWith(Policy);
+
+        /// <inheritdoc />
+        public override void Modify(IGraphType graphType) => graphType.AuthorizeWith(Policy);
+
+        /// <inheritdoc />
+        public override void Modify(FieldType fieldType, bool isInputType) => fieldType.AuthorizeWith(Policy);
     }
 }

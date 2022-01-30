@@ -41,11 +41,14 @@ namespace GraphQL.Benchmarks
             _ => throw new NotSupportedException()
         };
 
+        private static readonly IGraphQLTextSerializer _newtonsoftJsonSerializer = new NewtonsoftJson.GraphQLSerializer();
+        private static readonly IGraphQLTextSerializer _systemTextJsonSerializer = new SystemTextJson.GraphQLSerializer();
+
         [Benchmark(Baseline = true)]
-        public Inputs NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToInputs(Json);
+        public Inputs NewtonsoftJson() => _newtonsoftJsonSerializer.Deserialize<Inputs>(Json);
 
         [Benchmark]
-        public Inputs SystemTextJson() => GraphQL.SystemTextJson.StringExtensions.ToInputs(Json);
+        public Inputs SystemTextJson() => _systemTextJsonSerializer.Deserialize<Inputs>(Json);
 
         void IBenchmark.RunProfiler()
         {

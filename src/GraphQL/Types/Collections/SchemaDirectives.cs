@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -62,7 +63,7 @@ namespace GraphQL.Types
         /// Searches the directive by its name and returns it.
         /// </summary>
         /// <param name="name">Directive name.</param>
-        public DirectiveGraphType? Find(string name)
+        public DirectiveGraphType? Find(ROM name)
         {
             foreach (var directive in List)
             {

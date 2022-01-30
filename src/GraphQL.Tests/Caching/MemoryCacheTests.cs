@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using GraphQL.Caching;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Caching
         [Fact]
         public async Task Validate_Entry_Is_Cached()
         {
-            var doc = new Document();
+            var doc = new GraphQLDocument();
             var query = "test";
             var memoryCache = new MemoryDocumentCache();
 
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Caching
         [Fact]
         public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
         {
-            var doc = new Document();
+            var doc = new GraphQLDocument();
             var query = "test";
             var memoryCache = new MemoryDocumentCache();
 

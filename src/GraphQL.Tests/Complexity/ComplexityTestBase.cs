@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Complexity
         // For our heuristics in these tests it is assumed that each Field returns on average of two results.
         public ComplexityAnalyzer Analyzer { get; } = new ComplexityAnalyzer();
 
-        public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder();
+        public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder { MaxDepth = 1000 };
 
         public StarWarsTestBase StarWarsTestBase { get; } = new StarWarsBasicQueryTests();
 

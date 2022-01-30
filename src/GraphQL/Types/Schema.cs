@@ -445,7 +445,7 @@ namespace GraphQL.Types
                         var baseType = field.ResolvedType!.GetNamedType();
                         if (baseType is IInputObjectGraphType inputFieldType)
                             ExamineType(inputFieldType, completed, inProcess);
-                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
+                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
                     }
                 }
                 inProcess.Pop();

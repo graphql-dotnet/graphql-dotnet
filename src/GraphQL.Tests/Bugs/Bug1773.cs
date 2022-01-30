@@ -1,6 +1,6 @@
 using System;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Bugs
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
             if (line != 0)
-                error.AddLocation(line, column);
+                error.AddLocation(new Location(line, column));
             error.Path = path;
             if (code != null)
                 error.Code = code;

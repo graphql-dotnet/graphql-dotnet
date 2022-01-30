@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Shouldly;
@@ -15,7 +17,7 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
             Formatting = Formatting.Indented,
             Converters =
             {
-                new InputsConverter()
+                new InputsJsonConverter()
             },
         });
 
@@ -34,6 +36,13 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
                 _jsonSerializer.Serialize(jsonWriter, data);
             }
             return stringWriter.ToString();
+        }
+
+        [Fact]
+        public void Throws_For_Deep_Objects()
+        {
+            var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+            Should.Throw<JsonReaderException>(() => Deserialize<Inputs>(value));
         }
 
         [Fact]
@@ -288,6 +297,26 @@ namespace GraphQL.Tests.Serialization.NewtonsoftJson
   },
   ""Value2"": 123
 }".Trim());
+        }
+
+        [Fact]
+        public void Deserializes_Dates()
+        {
+            var d = new DateTimeOffset(2022, 1, 3, 15, 47, 22, System.TimeSpan.Zero);
+            var json = $"{{ \"date\": \"{d:o}\"}}";
+
+            var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+                Converters =
+                {
+                    new InputsJsonConverter()
+                },
+            });
+
+            var dic = jsonSerializer.Deserialize<Inputs>(new JsonTextReader(new StringReader(json)));
+            dic.ShouldContainKeyAndValue("date", d);
         }
 
         private class Nested

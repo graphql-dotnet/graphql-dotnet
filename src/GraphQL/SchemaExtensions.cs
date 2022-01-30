@@ -194,12 +194,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IDocumentWriter"/>, and returns the result
+        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IGraphQLTextSerializer"/>, and returns the result
         /// </summary>
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
-        /// <param name="documentWriter">An instance of <see cref="IDocumentExecuter"/> to use to serialize the result</param>
+        /// <param name="serializer">An instance of <see cref="IGraphQLTextSerializer"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
-        public static async Task<string> ExecuteAsync(this ISchema schema, IDocumentWriter documentWriter, Action<ExecutionOptions> configure)
+        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLTextSerializer serializer, Action<ExecutionOptions> configure)
         {
             if (configure == null)
             {
@@ -213,7 +213,7 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
+            return serializer.Serialize(result);
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace GraphQL
                         visitor.VisitUnion(union, schema);
                         break;
 
-                    case InterfaceGraphType iface:
+                    case IInterfaceGraphType iface:
                         visitor.VisitInterface(iface, schema);
                         foreach (var field in iface.Fields.List) // List is always non-null
                         {

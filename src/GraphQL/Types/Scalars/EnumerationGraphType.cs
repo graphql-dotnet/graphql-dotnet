@@ -5,8 +5,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -62,18 +63,18 @@ namespace GraphQL.Types
         public EnumValues Values { get; }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            EnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
-            NullValue _ => null,
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name)?.Value ?? ThrowLiteralConversionError(value),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            EnumValue enumValue => Values.FindByName(enumValue.Name) != null,
-            NullValue _ => true,
+            GraphQLEnumValue enumValue => Values.FindByName(enumValue.Name) != null,
+            GraphQLNullValue _ => true,
             _ => false
         };
 
@@ -106,15 +107,15 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override IValue? ToAST(object? value)
+        public override GraphQLValue? ToAST(object? value)
         {
             if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
-                return new NullValue();
+                return GraphQLValuesCache.Null;
 
             var foundByValue = Values.FindByValue(value);
             return foundByValue == null
                 ? ThrowASTConversionError(value)
-                : new EnumValue(foundByValue.Name);
+                : new GraphQLEnumValue { Name = new GraphQLName(foundByValue.Name) };
         }
     }
 
@@ -126,7 +127,7 @@ namespace GraphQL.Types
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
     public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
-        private static readonly EnumCaseAttribute _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
+        private static readonly EnumCaseAttribute? _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnumerationGraphType"/> class.
@@ -204,12 +205,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns an enumeration definition for the specified name.
         /// </summary>
-        internal EnumValueDefinition? FindByName(ReadOnlySpan<char> name)
+        internal EnumValueDefinition? FindByName(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
             {
-                if (name.SequenceEqual(def.Name.AsSpan()))
+                if (def.Name == name)
                     return def;
             }
 

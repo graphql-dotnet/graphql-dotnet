@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,20 +24,20 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-                new MatchingNodeVisitor<ObjectValue>(
+                new MatchingNodeVisitor<GraphQLObjectValue>(
                     enter: (objVal, context) =>
                     {
-                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<ROM, GraphQLValue>>();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                     },
                     leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop()),
 
-                new MatchingNodeVisitor<ObjectField>(
+                new MatchingNodeVisitor<GraphQLObjectField>(
                     leave: (objField, context) =>
                     {
-                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<ROM, GraphQLValue>();
 
                         if (knownNames.TryGetValue(objField.Name, out var value))
                         {

@@ -8,8 +8,8 @@ namespace GraphQL.Tests.Execution
     public class LongTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task LongMaxValueShouldBeSerialized(IDocumentWriter documentWriter)
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public async Task LongMaxValueShouldBeSerialized(IGraphQLTextSerializer serializer)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Execution
                 _.Query = "{ testField }";
             });
 
-            var json = await documentWriter.WriteToStringAsync(executionResult);
+            var json = serializer.Serialize(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             json.ShouldBe(@"{

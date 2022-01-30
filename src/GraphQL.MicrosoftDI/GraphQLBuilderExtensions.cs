@@ -16,7 +16,7 @@ namespace GraphQL.MicrosoftDI
         /// <paramref name="configure"/> for the specified service collection and
         /// registers a default set of services required by GraphQL if they have not already been registered.
         /// <br/><br/>
-        /// Does not include <see cref="IDocumentWriter"/>, and the default <see cref="IDocumentExecuter"/>
+        /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
         public static IServiceCollection AddGraphQL(this IServiceCollection services, Action<IGraphQLBuilder>? configure)

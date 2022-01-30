@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -70,11 +70,11 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public virtual ValueTask<Document?> GetAsync(string query) =>
-            new(_memoryCache.TryGetValue<Document>(query, out var value) ? value : null);
+        public virtual ValueTask<GraphQLDocument?> GetAsync(string query) =>
+            new(_memoryCache.TryGetValue<GraphQLDocument>(query, out var value) ? value : null);
 
         /// <inheritdoc/>
-        public virtual ValueTask SetAsync(string query, Document value)
+        public virtual ValueTask SetAsync(string query, GraphQLDocument value)
         {
             if (value is null)
             {

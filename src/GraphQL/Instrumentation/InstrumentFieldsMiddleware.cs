@@ -11,15 +11,17 @@ namespace GraphQL.Instrumentation
         /// <inheritdoc/>
         public async Task<object?> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
+            var name = context.FieldAst.Name.StringValue; //ISSUE:allocation
+
             var metadata = new Dictionary<string, object?>
             {
                 { "typeName", context.ParentType.Name },
-                { "fieldName", context.FieldAst.Name },
+                { "fieldName", name },
                 { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
                 { "path", context.Path },
             };
 
-            using (context.Metrics.Subject("field", context.FieldAst.Name, metadata))
+            using (context.Metrics.Subject("field", name, metadata))
                 return await next(context).ConfigureAwait(false);
         }
     }

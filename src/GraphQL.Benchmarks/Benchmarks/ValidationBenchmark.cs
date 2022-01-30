@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks
@@ -19,7 +19,7 @@ namespace GraphQL.Benchmarks
         private ISchema _schema;
         private DocumentValidator _validator;
 
-        private Document _introspectionDocument, _fragmentsDocument, _heroDocument;
+        private GraphQLDocument _introspectionDocument, _fragmentsDocument, _heroDocument;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -64,7 +64,13 @@ namespace GraphQL.Benchmarks
             _ = Validate(_heroDocument);
         }
 
-        private IValidationResult Validate(Document document) => _validator.ValidateAsync(_schema, document, document.Operations.First().Variables).GetAwaiter().GetResult().validationResult;
+        private IValidationResult Validate(GraphQLDocument document) => _validator.ValidateAsync(
+            new ValidationOptions
+            {
+                Schema = _schema,
+                Document = document,
+                Operation = document.Definitions.OfType<GraphQLOperationDefinition>().First()
+            }).GetAwaiter().GetResult().validationResult;
 
         void IBenchmark.RunProfiler() => Introspection();
     }

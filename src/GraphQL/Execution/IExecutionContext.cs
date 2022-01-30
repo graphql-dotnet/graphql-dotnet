@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -26,7 +27,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// The parsed GraphQL request
         /// </summary>
-        Document Document { get; }
+        GraphQLDocument Document { get; }
 
         /// <summary>
         /// A list of errors generated during GraphQL request processing
@@ -51,7 +52,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// The GraphQL operation that is being executed
         /// </summary>
-        Operation Operation { get; }
+        GraphQLOperationDefinition Operation { get; }
 
         /// <summary>
         /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers

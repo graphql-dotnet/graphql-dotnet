@@ -1,6 +1,6 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Execution
         {
             object value = null;
             var result = new StringGraphType().ToAST(value);
-            result.ShouldBeOfType<NullValue>();
+            result.ShouldBeOfType<GraphQLNullValue>();
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = new StringGraphType().ToAST("test");
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<StringValue>().Value.ShouldBe("test");
+            result.ShouldBeOfType<GraphQLStringValue>().Value.ShouldBe("test");
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = new BooleanGraphType().ToAST(true);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<BooleanValue>().Value.ShouldBe(true);
+            result.ShouldBeAssignableTo<GraphQLBooleanValue>().Value.ShouldBe("true");
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Execution
             long val = 12345678910111213;
             var result = new LongGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<LongValue>().Value.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12345678910111213");
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Execution
             decimal val = 1234.56789m;
             var result = new DecimalGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<DecimalValue>().Value.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("1234.56789");
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace GraphQL.Tests.Execution
             int val = 123;
             var result = new IntGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<IntValue>().Value.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("123");
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Execution
             double val = 0.42;
             var result = new FloatGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<FloatValue>().Value.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("0.42");
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Execution
             byte value = 12;
             var result = new ByteGraphType().ToAST(value);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<IntValue>().Value.ShouldBe(value);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12");
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution
             sbyte val = -12;
             var result = new SByteGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<IntValue>().Value.ShouldBe(val);
+            result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("-12");
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace GraphQL.Tests.Execution
             var val = new Uri("http://www.wp.pl");
             var result = new UriGraphType().ToAST(val);
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<StringValue>().Value.ShouldBe(val.ToString());
+            result.ShouldBeOfType<GraphQLStringValue>().Value.ShouldBe(val.ToString());
         }
     }
 }

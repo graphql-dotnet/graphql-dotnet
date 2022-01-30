@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
 using Shouldly;
@@ -66,8 +65,9 @@ query {
             new HashSet<List<object>>(paths).ShouldBe(expectedPaths);
         }
 
-        [Fact]
-        public async Task serialization_should_have_correct_case()
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void serialization_should_have_correct_case(IGraphQLTextSerializer writer)
         {
             var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
             var expected = @"{
@@ -88,7 +88,7 @@ query {
   }
 }";
 
-            var result = await Writer.WriteToStringAsync(trace);
+            var result = writer.Serialize(trace);
 
             result.ShouldBeCrossPlat(expected);
         }

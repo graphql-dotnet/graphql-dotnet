@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -211,6 +212,30 @@ namespace GraphQL.Tests.Utilities
         [InlineData(typeof(Task), true, TypeMappingMode.OutputType, null)]
         [InlineData(typeof(Task<string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
         [InlineData(typeof(Task<string>), true, TypeMappingMode.OutputType, null)]
+        [InlineData(typeof(AttributeTest1), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
+        [InlineData(typeof(AttributeTest1), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
+        [InlineData(typeof(AttributeTest2), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
+        [InlineData(typeof(AttributeTest2), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
+        [InlineData(typeof(AttributeTest3), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<AttributeTest3>))]
+        [InlineData(typeof(AttributeTest3), false, TypeMappingMode.InputType, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest3>>))]
+        [InlineData(typeof(AttributeTest1), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
+        [InlineData(typeof(AttributeTest1), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
+        [InlineData(typeof(AttributeTest2), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<AttributeTest2>))]
+        [InlineData(typeof(AttributeTest2), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest2>>))]
+        [InlineData(typeof(AttributeTest3), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
+        [InlineData(typeof(AttributeTest3), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
+        [InlineData(typeof(AttributeTest4), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
+        [InlineData(typeof(AttributeTest4), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
+        [InlineData(typeof(AttributeTest5), true, TypeMappingMode.InputType, typeof(CustomInputGraphType))]
+        [InlineData(typeof(AttributeTest5), false, TypeMappingMode.InputType, typeof(NonNullGraphType<CustomInputGraphType>))]
+        [InlineData(typeof(AttributeTest6), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<AttributeTest6>))]
+        [InlineData(typeof(AttributeTest6), false, TypeMappingMode.InputType, typeof(NonNullGraphType<GraphQLClrInputTypeReference<AttributeTest6>>))]
+        [InlineData(typeof(AttributeTest4), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
+        [InlineData(typeof(AttributeTest4), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
+        [InlineData(typeof(AttributeTest5), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<AttributeTest5>))]
+        [InlineData(typeof(AttributeTest5), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<GraphQLClrOutputTypeReference<AttributeTest5>>))]
+        [InlineData(typeof(AttributeTest6), true, TypeMappingMode.OutputType, typeof(CustomOutputGraphType))]
+        [InlineData(typeof(AttributeTest6), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<CustomOutputGraphType>))]
         public void GetGraphTypeFromType_Matrix(Type type, bool nullable, TypeMappingMode typeMappingMode, Type expectedType)
         {
             if (expectedType == null)
@@ -395,5 +420,32 @@ namespace GraphQL.Tests.Utilities
         private class MappedEnumGraphType : EnumerationGraphType<MappedEnum>
         {
         }
+
+        private class CustomInputGraphType : InputObjectGraphType
+        {
+        }
+
+        private class CustomOutputGraphType : ObjectGraphType
+        {
+        }
+
+        [GraphQLMetadata(InputType = typeof(CustomInputGraphType), OutputType = typeof(CustomOutputGraphType))]
+        private class AttributeTest1 { }
+
+        [GraphQLMetadata(InputType = typeof(CustomInputGraphType))]
+        private class AttributeTest2 { }
+
+        [GraphQLMetadata(OutputType = typeof(CustomOutputGraphType))]
+        private class AttributeTest3 { }
+
+        [InputType(typeof(CustomInputGraphType))]
+        [OutputType(typeof(CustomOutputGraphType))]
+        private class AttributeTest4 { }
+
+        [InputType(typeof(CustomInputGraphType))]
+        private class AttributeTest5 { }
+
+        [OutputType(typeof(CustomOutputGraphType))]
+        private class AttributeTest6 { }
     }
 }

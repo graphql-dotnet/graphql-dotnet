@@ -1,5 +1,4 @@
 using System.Linq;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;

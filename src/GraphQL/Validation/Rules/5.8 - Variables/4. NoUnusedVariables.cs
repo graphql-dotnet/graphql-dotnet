@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -18,20 +17,20 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
+        public static readonly NoUnusedVariables Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedVariablesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<VariableDefinition>((def, context) =>
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((def, context) =>
             {
-                var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<VariableDefinition>();
+                var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<GraphQLVariableDefinition>();
                 varDefs.Add(def);
             }),
 
-            new MatchingNodeVisitor<Operation>(
+            new MatchingNodeVisitor<GraphQLOperationDefinition>(
                 enter: (op, context) => context.TypeInfo.NoUnusedVariables_VariableDefs?.Clear(),
                 leave: (op, context) =>
                 {
@@ -39,17 +38,25 @@ namespace GraphQL.Validation.Rules
                     if (variableDefs == null || variableDefs.Count == 0)
                         return;
 
-                    var usages = context.GetRecursiveVariables(op)
-                        .Select(usage => usage.Node.Name)
-                        .ToList();
+                    var usages = context.GetRecursiveVariables(op);
 
                     foreach (var variableDef in variableDefs)
                     {
-                        var variableName = variableDef.Name;
-                        if (!usages.Contains(variableName))
+                        if (usages == null || !Contains(usages, variableDef))
                         {
                             context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
                         }
+                    }
+
+                    static bool Contains(List<VariableUsage> usages, GraphQLVariableDefinition def)
+                    {
+                        foreach (var usage in usages)
+                        {
+                            if (usage.Node.Name == def.Variable.Name)
+                                return true;
+                        }
+
+                        return false;
                     }
                 })
         );

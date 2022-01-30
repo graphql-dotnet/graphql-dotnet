@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQLParser;
 using Shouldly;
 using Xunit;
 
@@ -82,7 +83,7 @@ namespace GraphQL.Tests.Errors
         public void async_field_with_errors()
         {
             var error = new UnhandledError("Error trying to resolve field 'testasync'.", new Exception());
-            error.AddLocation(1, 3);
+            error.AddLocation(new Location(1, 3));
             error.Path = new[] { "testasync" };
 
             var errors = new ExecutionErrors { error };

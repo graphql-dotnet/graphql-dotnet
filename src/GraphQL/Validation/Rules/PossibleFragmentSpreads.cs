@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -24,7 +25,7 @@ namespace GraphQL.Validation.Rules
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<InlineFragment>((node, context) =>
+            new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
             {
                 var fragType = context.TypeInfo.GetLastType();
                 var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
@@ -35,9 +36,9 @@ namespace GraphQL.Validation.Rules
                 }
             }),
 
-            new MatchingNodeVisitor<FragmentSpread>((node, context) =>
+            new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
             {
-                string fragName = node.Name;
+                var fragName = node.FragmentName.Name;
                 var fragType = getFragmentType(context, fragName);
                 var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
 
@@ -48,10 +49,10 @@ namespace GraphQL.Validation.Rules
             })
         );
 
-        private static IGraphType? getFragmentType(ValidationContext context, string name)
+        private static IGraphType? getFragmentType(ValidationContext context, ROM name)
         {
-            var frag = context.GetFragment(name);
-            return frag?.Type?.GraphTypeFromType(context.Schema);
+            var frag = context.Document.FindFragmentDefinition(name);
+            return frag?.TypeCondition.Type.GraphTypeFromType(context.Schema);
         }
     }
 }

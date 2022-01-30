@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +12,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public NoFragmentCyclesError(ValidationContext context, string fragName, string[] spreadNames, params INode[] nodes)
-            : base(context.Document.OriginalQuery!, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
+        public NoFragmentCyclesError(ValidationContext context, string fragName, string[] spreadNames, params ASTNode[] nodes)
+            : base(context.Document.Source, NUMBER, CycleErrorMessage(fragName, spreadNames), nodes)
         {
         }
 

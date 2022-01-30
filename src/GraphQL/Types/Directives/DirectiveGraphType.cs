@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {

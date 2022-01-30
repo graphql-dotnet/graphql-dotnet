@@ -4,10 +4,10 @@ using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Field = GraphQL.Language.AST.Field;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -19,8 +19,8 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
-        Field FieldAst { get; }
+        /// <summary>The <see cref="GraphQLField"/> AST as derived from the query request.</summary>
+        GraphQLField FieldAst { get; }
 
         /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type.</summary>
         FieldType FieldDefinition { get; }
@@ -52,10 +52,10 @@ namespace GraphQL
         ISchema Schema { get; }
 
         /// <summary>The current GraphQL request, parsed into an AST document.</summary>
-        Document Document { get; }
+        GraphQLDocument Document { get; }
 
         /// <summary>The operation type (i.e. query, mutation, or subscription) of the current GraphQL request.</summary>
-        Operation Operation { get; }
+        GraphQLOperationDefinition Operation { get; }
 
         /// <summary>The input variables of the current GraphQL request.</summary>
         Variables Variables { get; }
@@ -76,7 +76,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        Dictionary<string, Field>? SubFields { get; }
+        Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; }
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.

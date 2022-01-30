@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using GraphQL.Caching;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Caching
         [Fact]
         public async Task Should_Never_Get_A_Cache()
         {
-            var doc = new Document();
+            var doc = new GraphQLDocument();
             var query = "test";
             var memoryCache = DefaultDocumentCache.Instance;
 

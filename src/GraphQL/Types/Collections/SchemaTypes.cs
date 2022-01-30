@@ -10,6 +10,7 @@ using GraphQL.Introspection;
 using GraphQL.Resolvers;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -257,7 +258,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a dictionary that relates type names to graph types.
         /// </summary>
-        protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
+        protected internal virtual Dictionary<ROM, IGraphType> Dictionary { get; } = new Dictionary<ROM, IGraphType>();
         private Dictionary<Type, IGraphType> _typeDictionary;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
@@ -353,11 +354,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type instance from the lookup table by its GraphQL type name.
         /// </summary>
-        public IGraphType? this[string typeName]
+        public IGraphType? this[ROM typeName]
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(typeName))
+                if (typeName.IsEmpty)
                 {
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
-using Example;
+using GraphQL.Transport;
 using Xunit;
 
 namespace GraphQL.Harness.Tests

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
+using GraphQLParser;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -130,8 +131,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "name and nickname are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 21));
                 });
             });
         }
@@ -157,8 +158,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "nickname and name are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 21));
                 });
             });
         }
@@ -185,8 +186,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they have differing arguments"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 21));
                 });
             });
         }
@@ -213,8 +214,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they have differing arguments"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 21));
                 });
             });
         }
@@ -241,8 +242,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they have differing arguments"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 21));
                 });
             });
         }
@@ -296,8 +297,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "a and b are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(7, 21));
-                    e.Locations.Add(new ErrorLocation(10, 21));
+                    e.Locations.Add(new Location(7, 21));
+                    e.Locations.Add(new Location(10, 21));
                 });
             });
         }
@@ -341,8 +342,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "a and b are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(18, 21));
-                    e.Locations.Add(new ErrorLocation(21, 21));
+                    e.Locations.Add(new Location(18, 21));
+                    e.Locations.Add(new Location(21, 21));
                 });
 
                 config.Error(e =>
@@ -354,8 +355,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "c and a are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(14, 25));
-                    e.Locations.Add(new ErrorLocation(18, 21));
+                    e.Locations.Add(new Location(14, 25));
+                    e.Locations.Add(new Location(18, 21));
                 });
 
                 config.Error(e =>
@@ -367,8 +368,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "c and b are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(14, 25));
-                    e.Locations.Add(new ErrorLocation(21, 21));
+                    e.Locations.Add(new Location(14, 25));
+                    e.Locations.Add(new Location(21, 21));
                 });
             });
         }
@@ -409,10 +410,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 25));
-                    e.Locations.Add(new ErrorLocation(6, 21));
-                    e.Locations.Add(new ErrorLocation(7, 25));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 25));
+                    e.Locations.Add(new Location(6, 21));
+                    e.Locations.Add(new Location(7, 25));
                 });
             });
         }
@@ -463,12 +464,12 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 25));
-                    e.Locations.Add(new ErrorLocation(5, 25));
-                    e.Locations.Add(new ErrorLocation(7, 21));
-                    e.Locations.Add(new ErrorLocation(8, 25));
-                    e.Locations.Add(new ErrorLocation(9, 25));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 25));
+                    e.Locations.Add(new Location(5, 25));
+                    e.Locations.Add(new Location(7, 21));
+                    e.Locations.Add(new Location(8, 25));
+                    e.Locations.Add(new Location(9, 25));
                 });
             });
         }
@@ -523,12 +524,12 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(4, 25));
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(8, 21));
-                    e.Locations.Add(new ErrorLocation(9, 25));
-                    e.Locations.Add(new ErrorLocation(10, 29));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(4, 25));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(8, 21));
+                    e.Locations.Add(new Location(9, 25));
+                    e.Locations.Add(new Location(10, 29));
                 });
             });
         }
@@ -576,10 +577,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(4, 25));
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(7, 25));
-                    e.Locations.Add(new ErrorLocation(8, 29));
+                    e.Locations.Add(new Location(4, 25));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(7, 25));
+                    e.Locations.Add(new Location(8, 29));
                 });
             });
         }
@@ -635,10 +636,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(12, 25));
-                    e.Locations.Add(new ErrorLocation(13, 29));
-                    e.Locations.Add(new ErrorLocation(15, 25));
-                    e.Locations.Add(new ErrorLocation(16, 29));
+                    e.Locations.Add(new Location(12, 25));
+                    e.Locations.Add(new Location(13, 29));
+                    e.Locations.Add(new Location(15, 25));
+                    e.Locations.Add(new Location(16, 29));
                 });
             });
         }
@@ -701,12 +702,12 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(3, 21));
-                    e.Locations.Add(new ErrorLocation(11, 21));
-                    e.Locations.Add(new ErrorLocation(15, 21));
-                    e.Locations.Add(new ErrorLocation(6, 21));
-                    e.Locations.Add(new ErrorLocation(22, 21));
-                    e.Locations.Add(new ErrorLocation(18, 21));
+                    e.Locations.Add(new Location(3, 21));
+                    e.Locations.Add(new Location(11, 21));
+                    e.Locations.Add(new Location(15, 21));
+                    e.Locations.Add(new Location(6, 21));
+                    e.Locations.Add(new Location(22, 21));
+                    e.Locations.Add(new Location(18, 21));
                 });
             });
         }
@@ -793,8 +794,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "name and nickname are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(4, 21));
-                    e.Locations.Add(new ErrorLocation(5, 21));
+                    e.Locations.Add(new Location(4, 21));
+                    e.Locations.Add(new Location(5, 21));
                 });
             });
         }
@@ -830,8 +831,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they return conflicting types Int and String!"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(8, 29));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(8, 29));
                 });
             });
         }
@@ -896,8 +897,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they return conflicting types Int and String"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(8, 29));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(8, 29));
                 });
             });
         }
@@ -975,10 +976,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(31, 21));
-                    e.Locations.Add(new ErrorLocation(39, 21));
-                    e.Locations.Add(new ErrorLocation(34, 21));
-                    e.Locations.Add(new ErrorLocation(42, 21));
+                    e.Locations.Add(new Location(31, 21));
+                    e.Locations.Add(new Location(39, 21));
+                    e.Locations.Add(new Location(34, 21));
+                    e.Locations.Add(new Location(42, 21));
                 });
             });
         }
@@ -1014,8 +1015,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they return conflicting types String! and String"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(8, 29));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(8, 29));
                 });
             });
         }
@@ -1055,8 +1056,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they return conflicting types [StringBox] and StringBox"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(10, 29));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(10, 29));
                 });
             });
 
@@ -1090,8 +1091,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "they return conflicting types StringBox and [StringBox]"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(10, 29));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(10, 29));
                 });
             });
 
@@ -1133,8 +1134,8 @@ namespace GraphQL.Tests.Validation
                             Msg = "scalar and unrelatedField are different fields"
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(6, 33));
-                    e.Locations.Add(new ErrorLocation(7, 33));
+                    e.Locations.Add(new Location(6, 33));
+                    e.Locations.Add(new Location(7, 33));
                 });
             });
         }
@@ -1184,10 +1185,10 @@ namespace GraphQL.Tests.Validation
                             }
                         }
                     });
-                    e.Locations.Add(new ErrorLocation(5, 29));
-                    e.Locations.Add(new ErrorLocation(6, 33));
-                    e.Locations.Add(new ErrorLocation(10, 29));
-                    e.Locations.Add(new ErrorLocation(11, 33));
+                    e.Locations.Add(new Location(5, 29));
+                    e.Locations.Add(new Location(6, 33));
+                    e.Locations.Add(new Location(10, 29));
+                    e.Locations.Add(new Location(11, 33));
                 });
             });
         }

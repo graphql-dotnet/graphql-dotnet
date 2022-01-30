@@ -1,6 +1,6 @@
 using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
@@ -38,7 +38,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void Reads_BigInt_Literals()
         {
-            Assert.Equal(18446744073709551615ul, (ulong)type.ParseLiteral(new BigIntValue(System.Numerics.BigInteger.Parse("18446744073709551615"))));
+            Assert.Equal(18446744073709551615ul, (ulong)type.ParseLiteral(new GraphQLIntValue(System.Numerics.BigInteger.Parse("18446744073709551615"))));
         }
     }
 }

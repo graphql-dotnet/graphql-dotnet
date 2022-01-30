@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Introspection;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationType = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Utilities
 {
@@ -22,6 +19,16 @@ namespace GraphQL.Utilities
         protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private GraphQLSchemaDefinition? _schemaDef;
 
+        private IgnoreOptions CreateIgnoreOptions()
+        {
+            var options = IgnoreOptions.None;
+            if (IgnoreComments)
+                options |= IgnoreOptions.Comments;
+            if (IgnoreLocations)
+                options |= IgnoreOptions.Locations;
+            return options;
+        }
+
         /// <summary>
         /// This <see cref="IServiceProvider"/> is used to create required objects during building schema.
         /// <br/><br/>
@@ -31,9 +38,15 @@ namespace GraphQL.Utilities
 
         /// <summary>
         /// Specifies whether to ignore comments when parsing GraphQL document.
-        /// By default, all comments are ignored
+        /// By default, all comments are ignored.
         /// </summary>
         public bool IgnoreComments { get; set; } = true;
+
+        /// <summary>
+        /// Specifies whether to ignore token locations when parsing GraphQL document.
+        /// By default, all token locations are taken into account.
+        /// </summary>
+        public bool IgnoreLocations { get; set; }
 
         /// <summary>
         /// Allows to successfully build the schema even if types are found that are not registered int <see cref="Types"/>.
@@ -59,14 +72,14 @@ namespace GraphQL.Utilities
         /// <returns>Created schema.</returns>
         public virtual Schema Build(string typeDefinitions)
         {
-            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
+            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = CreateIgnoreOptions() });
             Validate(document);
             return BuildSchemaFrom(document);
         }
 
         protected virtual void Validate(GraphQLDocument document)
         {
-            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name!.Value);
+            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().ToLookup(def => def.Name!.Value);
             var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
             if (duplicates.Length > 0)
             {
@@ -86,75 +99,68 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var directives = new List<DirectiveGraphType>();
 
-            foreach (var def in document.Definitions!)
+            foreach (var def in document.Definitions)
             {
-                switch (def.Kind)
+                if (def is GraphQLSchemaDefinition schemaDef)
                 {
-                    case ASTNodeKind.SchemaDefinition:
+                    _schemaDef = schemaDef;
+                    schema.SetAstType(schemaDef);
+                }
+                else if (def is GraphQLObjectTypeDefinition objDef)
+                {
+                    var type = ToObjectGraphType(objDef);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLObjectTypeExtension ext)
+                {
+                    //TODO: rewrite and add support for other extensions
+                    var typeDef = new GraphQLObjectTypeDefinition
                     {
-                        _schemaDef = def.As<GraphQLSchemaDefinition>();
-                        schema.SetAstType(_schemaDef);
-                        break;
-                    }
-
-                    case ASTNodeKind.ObjectTypeDefinition:
-                    {
-                        var type = ToObjectGraphType(def.As<GraphQLObjectTypeDefinition>());
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.TypeExtensionDefinition:
-                    {
-                        var type = ToObjectGraphType(def.As<GraphQLTypeExtensionDefinition>().Definition!, true);
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.InterfaceTypeDefinition:
-                    {
-                        var type = ToInterfaceType(def.As<GraphQLInterfaceTypeDefinition>());
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.EnumTypeDefinition:
-                    {
-                        var type = ToEnumerationType(def.As<GraphQLEnumTypeDefinition>());
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.UnionTypeDefinition:
-                    {
-                        var type = ToUnionType(def.As<GraphQLUnionTypeDefinition>());
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.InputObjectTypeDefinition:
-                    {
-                        var type = ToInputObjectType(def.As<GraphQLInputObjectTypeDefinition>());
-                        _types[type.Name] = type;
-                        break;
-                    }
-
-                    case ASTNodeKind.DirectiveDefinition:
-                    {
-                        var directive = ToDirective(def.As<GraphQLDirectiveDefinition>());
-                        directives.Add(directive);
-                        break;
-                    }
+                        Comments = ext.Comments,
+                        Description = null,
+                        Directives = ext.Directives,
+                        Fields = ext.Fields,
+                        Interfaces = ext.Interfaces,
+                        Location = ext.Location,
+                        Name = ext.Name,
+                    };
+                    var type = ToObjectGraphType(typeDef, true);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLInterfaceTypeDefinition ifaceDef)
+                {
+                    var type = ToInterfaceType(ifaceDef);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLEnumTypeDefinition enumDef)
+                {
+                    var type = ToEnumerationType(enumDef);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLUnionTypeDefinition unionDef)
+                {
+                    var type = ToUnionType(unionDef);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLInputObjectTypeDefinition inputDef)
+                {
+                    var type = ToInputObjectType(inputDef);
+                    _types[type.Name] = type;
+                }
+                else if (def is GraphQLDirectiveDefinition directiveDef)
+                {
+                    var directive = ToDirective(directiveDef);
+                    directives.Add(directive);
                 }
             }
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.Comment?.Text.ToString();
+                schema.Description = _schemaDef.MergeComments();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {
-                    var typeName = (string)operationTypeDef.Type!.Name!.Value;
+                    var typeName = (string)operationTypeDef.Type!.Name; //TODO:alloc
                     var type = GetType(typeName) as IObjectGraphType;
 
                     switch (operationTypeDef.Operation)
@@ -207,7 +213,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
             return operationDefinition == null
                 ? type.Name == "Subscription"
-                : type.Name == operationDefinition.Type!.Name!.Value;
+                : type.Name == operationDefinition.Type!.Name;
         }
 
         private void AssertKnownType(TypeConfig typeConfig)
@@ -230,7 +236,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
-            var name = (string)astType.Name!.Value;
+            var name = (string)astType.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -241,21 +247,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (!isExtensionType)
             {
-                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.Comment?.Text.ToString();
+                type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.MergeComments();
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
             typeConfig.CopyMetadataTo(type);
 
-            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (IsSubscriptionType(type))
-            {
-                constructFieldType = ToSubscriptionFieldType;
-            }
-            else
-            {
-                constructFieldType = ToFieldType;
-            }
+            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType = IsSubscriptionType(type)
+                ? ToSubscriptionFieldType
+                : ToFieldType;
 
             if (astType.Fields != null)
             {
@@ -266,7 +266,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (astType.Interfaces != null)
             {
                 foreach (var i in astType.Interfaces)
-                    type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name!.Value));
+                    type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name)); //TODO:alloc
             }
 
             if (isExtensionType)
@@ -330,7 +330,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name!.Value);
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:alloc
             InitializeField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -338,14 +338,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver
             };
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
             field.SetAstType(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
@@ -359,7 +359,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name!.Value);
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:alloc
             InitializeSubscriptionField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -367,7 +367,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new EventStreamFieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -376,7 +376,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             fieldConfig.CopyMetadataTo(field);
 
-            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments);
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
             field.SetAstType(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
@@ -390,7 +390,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var fieldConfig = typeConfig.FieldFor((string)inputDef.Name!.Value);
+            var fieldConfig = typeConfig.FieldFor((string)inputDef.Name); //TODO:alloc
             InitializeField(fieldConfig, typeConfig.Type);
 
             AssertKnownField(fieldConfig, typeConfig);
@@ -398,7 +398,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var field = new FieldType
             {
                 Name = fieldConfig.Name,
-                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString(),
+                Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
                 ResolvedType = ToGraphType(inputDef.Type!),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
             }.SetAstType(inputDef);
@@ -410,7 +410,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
-            var name = (string)interfaceDef.Name!.Value;
+            var name = (string)interfaceDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -418,7 +418,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InterfaceGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(interfaceDef);
 
@@ -437,7 +437,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
-            var name = (string)unionDef.Name!.Value;
+            var name = (string)unionDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -445,7 +445,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new UnionGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
             }.SetAstType(unionDef);
 
@@ -457,7 +457,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 foreach (var x in unionDef.Types)
                 {
-                    string n = (string)x.Name!.Value;
+                    string n = (string)x.Name; //TODO:alloc
                     type.AddPossibleType(((GetType(n) ?? new GraphQLTypeReference(n)) as IObjectGraphType)!);
                 }
             }
@@ -467,7 +467,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
-            var name = (string)inputDef.Name!.Value;
+            var name = (string)inputDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -475,7 +475,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new InputObjectGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
             }.SetAstType(inputDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -493,7 +493,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
-            var name = (string)enumDef.Name!.Value;
+            var name = (string)enumDef.Name; //TODO:alloc
             var typeConfig = Types.For(name);
 
             AssertKnownType(typeConfig);
@@ -501,7 +501,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var type = new EnumerationGraphType
             {
                 Name = name,
-                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.Comment?.Text.ToString(),
+                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.MergeComments(),
             }.SetAstType(enumDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
@@ -517,21 +517,18 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var result = new DirectiveGraphType((string)directiveDef.Name!.Value)
+            var result = new DirectiveGraphType(directiveDef.Name.StringValue) //ISSUE:allocation
             {
-                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.Comment?.Text.ToString(),
+                Description = directiveDef.Description?.Value.ToString() ?? directiveDef.MergeComments(),
                 Repeatable = directiveDef.Repeatable,
-                Arguments = ToQueryArguments(directiveDef.Arguments)
+                Arguments = ToQueryArguments(directiveDef.Arguments?.Items)
             };
 
-            if (directiveDef.Locations?.Count > 0) // just in case
+            if (directiveDef.Locations.Items.Count > 0) // just in case
             {
-                foreach (var location in directiveDef.Locations)
+                foreach (var location in directiveDef.Locations.Items)
                 {
-                    if (__DirectiveLocation.Instance.Values.FindByName(location.Value)?.Value is DirectiveLocation l)
-                        result.Locations.Add(l);
-                    else
-                        throw new InvalidOperationException($"Directive '{result.Name}' has an unknown directive location '{location.Value}'.");
+                    result.Locations.Add(location);
                 }
             }
 
@@ -540,12 +537,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type enumType)
         {
-            var name = (string)valDef.Name!.Value;
+            var name = (string)valDef.Name; //TODO:alloc
             return new EnumValueDefinition
             {
                 Value = enumType == null ? name : Enum.Parse(enumType, name, true),
                 Name = name,
-                Description = valDef.Description?.Value.ToString() ?? valDef.Comment?.Text.ToString()
+                Description = valDef.Description?.Value.ToString() ?? valDef.MergeComments()
                 // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
                 //DeprecationReason = ???
             }.SetAstType(valDef);
@@ -557,7 +554,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = argumentConfig.Name,
                 DefaultValue = argumentConfig.DefaultValue ?? inputDef.DefaultValue,
-                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.Comment?.Text.ToString()
+                Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments()
             }.SetAstType(inputDef);
 
             argumentConfig.CopyMetadataTo(argument);
@@ -584,7 +581,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 case ASTNodeKind.NamedType:
                 {
                     var namedType = (GraphQLNamedType)astType;
-                    var name = (string)namedType.Name!.Value;
+                    var name = (string)namedType.Name; //TODO:alloc
                     var type = GetType(name);
                     return type ?? new GraphQLTypeReference(name);
                 }
@@ -597,144 +594,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         //TODO: add support for directive arguments
         private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition>? arguments)
         {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name!.Value), a)));
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name), a))); //TODO:alloc
         }
 
         private QueryArguments ToQueryArguments(FieldConfig fieldConfig, List<GraphQLInputValueDefinition>? arguments)
         {
-            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name!.Value), a)));
-        }
-    }
-
-    internal static class Extensions
-    {
-        public static TNode As<TNode>(this ASTNode node) where TNode : ASTNode
-        {
-            return node as TNode ?? throw new InvalidOperationException($"Node should be of type '{typeof(TNode).Name}' but it is of type '{node?.GetType().Name}'.");
-        }
-
-        public static object? ToValue(this GraphQLValue source)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            switch (source.Kind)
-            {
-                case ASTNodeKind.NullValue:
-                {
-                    return null;
-                }
-                case ASTNodeKind.StringValue:
-                {
-                    var str = source as GraphQLScalarValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (string)str!.Value;
-                }
-                case ASTNodeKind.IntValue:
-                {
-                    var str = source as GraphQLScalarValue;
-
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    if (Int.TryParse(str!.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
-                    {
-                        return intResult;
-                    }
-
-                    // If the value doesn't fit in an integer, revert to using long...
-                    if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
-                    {
-                        return longResult;
-                    }
-
-                    // If the value doesn't fit in an long, revert to using decimal...
-                    if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
-                    {
-                        return decimalResult;
-                    }
-
-                    // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
-                    {
-                        return bigIntegerResult;
-                    }
-
-                    throw new InvalidOperationException($"Invalid number {str.Value}");
-                }
-                case ASTNodeKind.FloatValue:
-                {
-                    var str = source as GraphQLScalarValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-
-                    // the idea is to see if there is a loss of accuracy of value
-                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    if (Double.TryParse(
-                        str!.Value,
-                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                        CultureInfo.InvariantCulture,
-                        out double dbl) == false)
-                    {
-                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
-                    }
-
-                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
-                    if (Decimal.TryParse(
-                        str.Value,
-                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                        CultureInfo.InvariantCulture,
-                        out decimal dec))
-                    {
-                        // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
-                        var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
-                        decimal temp = new decimal(dbl);
-                        var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
-                        if (!decBits.Equals(dblAsDecBits))
-                            return dec;
-                    }
-
-                    return dbl;
-                }
-                case ASTNodeKind.BooleanValue:
-                {
-                    var str = source as GraphQLScalarValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (str!.Value.Length == 4).Boxed(); /*true.Length=4*/
-                }
-                case ASTNodeKind.EnumValue:
-                {
-                    var str = source as GraphQLScalarValue;
-                    Debug.Assert(str != null, nameof(str) + " != null");
-                    return (string)str!.Value;
-                }
-                case ASTNodeKind.ObjectValue:
-                {
-                    var obj = source as GraphQLObjectValue;
-                    var values = new Dictionary<string, object?>();
-
-                    Debug.Assert(obj != null, nameof(obj) + " != null");
-                    if (obj!.Fields != null)
-                    {
-                        foreach (var f in obj.Fields)
-                            values[(string)f.Name!.Value] = ToValue(f.Value!);
-                    }
-
-                    return values;
-                }
-                case ASTNodeKind.ListValue:
-                {
-                    var list = source as GraphQLListValue;
-                    Debug.Assert(list != null, nameof(list) + " != null");
-
-                    if (list!.Values == null)
-                        return Array.Empty<object>();
-
-                    object?[] values = list.Values.Select(ToValue).ToArray();
-                    return values;
-                }
-                default:
-                    throw new InvalidOperationException($"Unsupported value type {source.Kind}");
-            }
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:alloc
         }
     }
 }

@@ -57,7 +57,7 @@ namespace GraphQL.StarWars.Extensions
                 PageInfo = new PageInfo
                 {
                     EndCursor = endCursor,
-                    HasNextPage = endCursor == null ? false : cursor != endCursor,
+                    HasNextPage = endCursor != null && cursor != endCursor,
                 }
             };
         }

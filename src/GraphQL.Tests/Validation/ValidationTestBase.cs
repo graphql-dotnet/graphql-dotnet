@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser.AST;
 using Shouldly;
 
 namespace GraphQL.Tests.Validation
@@ -96,7 +96,14 @@ namespace GraphQL.Tests.Validation
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.ValidateAsync(schema, document, document.Operations.FirstOrDefault()?.Variables, rules, variables: variables).Result.validationResult;
+            return validator.ValidateAsync(new ValidationOptions
+            {
+                Schema = schema,
+                Document = document,
+                Rules = rules,
+                Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault(),
+                Variables = variables
+            }).Result.validationResult;
         }
     }
 }

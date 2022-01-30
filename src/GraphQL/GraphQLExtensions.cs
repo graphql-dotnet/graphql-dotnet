@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL
 {
@@ -360,8 +364,6 @@ namespace GraphQL
             return false;
         }
 
-        private static readonly NullValue _null = new NullValue();
-
         /// <summary>
         /// Returns a value indicating whether the provided value is a valid default value
         /// for the specified input graph type.
@@ -373,7 +375,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
+                return value != null && nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)
@@ -417,7 +419,7 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static IValue ToAST(this IGraphType type, object value)
+        public static GraphQLValue ToAST(this IGraphType type, object value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -426,7 +428,7 @@ namespace GraphQL
             {
                 var astValue = ToAST(nonnull.ResolvedType!, value);
 
-                if (astValue is NullValue)
+                if (astValue is GraphQLNullValue)
                     throw new InvalidOperationException($"Unable to get an AST representation of {(value == null ? "null" : $"'{value}'")} value for type '{nonnull}'.");
 
                 return astValue;
@@ -439,7 +441,7 @@ namespace GraphQL
 
             if (value == null)
             {
-                return _null;
+                return GraphQLValuesCache.Null;
             }
 
             // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
@@ -448,14 +450,14 @@ namespace GraphQL
             {
                 var itemType = listType.ResolvedType!;
 
-                if (!(value is string) && value is IEnumerable list)
+                if (value is not string && value is IEnumerable list)
                 {
                     var values = list
                         .Cast<object>()
                         .Select(item => ToAST(itemType, item))
                         .ToList();
 
-                    return new ListValue(values);
+                    return new GraphQLListValue { Values = values };
                 }
 
                 return ToAST(itemType, value);
@@ -469,6 +471,159 @@ namespace GraphQL
             }
 
             throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use {type.GetType().Name} '{type}'");
+        }
+
+        internal static string? MergeComments(this ASTNode node)
+        {
+            string? merged = null;
+            if (node.Comments?.Count > 0)
+            {
+                //TODO: rewrite this when migrating from comments to descriptions
+                for (int i = 0; i < node.Comments!.Count; ++i)
+                {
+                    merged += node.Comments[i].Value;
+                    if (i < node.Comments.Count - 1)
+                        merged += Environment.NewLine;
+                }
+            }
+            return merged;
+        }
+
+        // optimized version of Print(this ASTNode node) for primitive values
+        internal static string Print(this IGraphType type, object value)
+        {
+            return (type, value) switch
+            {
+                (StringGraphType, string s) when s.IndexOfAny(_escapes) == -1 => "\"" + s + "\"",
+                (BooleanGraphType, false) => "false",
+                (BooleanGraphType, true) => "true",
+                _ => type.ToAST(value).Print(),
+            };
+        }
+
+        private static readonly char[] _escapes = new char[] { '\b', '\f', '\n', '\r', '\t', '\\', '"' };
+
+        /// <summary>
+        /// Returns a string representation of the specified node.
+        /// </summary>
+        internal static string Print(this ASTNode node)
+        {
+            var writer = new StringWriter();
+            _sdlPrinter.PrintAsync(node, writer).GetAwaiter().GetResult(); // actually is sync
+            return writer.ToString()!;
+        }
+
+        private static readonly SDLPrinter _sdlPrinter = new();
+
+        internal static object? ParseAnyLiteral(this GraphQLValue value) => value switch
+        {
+            GraphQLObjectValue v => ParseObject(v),
+            GraphQLListValue v => ParseList(v),
+            GraphQLIntValue v => ParseInt(v),
+            GraphQLFloatValue v => ParseFloat(v),
+            GraphQLStringValue v => v.Value.Length == 0 ? string.Empty : (string)v.Value,
+            GraphQLBooleanValue v => (v.Value == "true").Boxed(),
+            GraphQLEnumValue e => e.Name.StringValue, //TODO:think about it later if/when refactoring federation
+            GraphQLNullValue _ => null,
+            _ => ThrowLiteralConversionError(value)
+        };
+
+        private static readonly ReadOnlyDictionary<string, object?> _empty = new(new Dictionary<string, object?>());
+
+        private static IDictionary<string, object?> ParseObject(GraphQLObjectValue v)
+        {
+            if (v.Fields == null || v.Fields.Count == 0)
+            {
+                return _empty;
+            }
+            else
+            {
+                var @object = new Dictionary<string, object?>(v.Fields.Count);
+                foreach (var field in v.Fields)
+                    @object.Add(field.Name.StringValue, ParseAnyLiteral(field.Value));
+                return @object;
+            }
+        }
+
+        private static IList<object?> ParseList(GraphQLListValue v)
+        {
+            if (v.Values == null || v.Values.Count == 0)
+            {
+                return Array.Empty<object?>();
+            }
+            else
+            {
+                var array = new object?[v.Values.Count];
+                for (int i = 0; i < v.Values.Count; ++i)
+                    array[i] = ParseAnyLiteral(v.Values[i]);
+                return array;
+            }
+        }
+
+        private static object ParseInt(GraphQLIntValue v)
+        {
+            if (v.Value.Length == 0)
+                throw new InvalidOperationException("Invalid number (empty string)");
+
+            if (Int.TryParse(v.Value, out int intResult))
+            {
+                return intResult;
+            }
+
+            // If the value doesn't fit in an integer, revert to using long...
+            if (Long.TryParse(v.Value, out long longResult))
+            {
+                return longResult;
+            }
+
+            // If the value doesn't fit in an long, revert to using decimal...
+            if (Decimal.TryParse(v.Value, out decimal decimalResult))
+            {
+                return decimalResult;
+            }
+
+            // If the value doesn't fit in an decimal, revert to using BigInteger...
+            if (BigInt.TryParse(v.Value, out var bigIntegerResult))
+            {
+                return bigIntegerResult;
+            }
+
+            // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger via an invalid query
+            throw new InvalidOperationException($"Invalid number {v.Value}");
+        }
+
+        private static object ParseFloat(GraphQLFloatValue v)
+        {
+            if (v.Value.Length == 0)
+                throw new InvalidOperationException("Invalid number (empty string)");
+
+            // the idea is to see if there is a loss of accuracy of value
+            // for example, 12.1 or 12.11 is double but 12.10 is decimal
+            if (!Double.TryParse(v.Value, out double dbl))
+            {
+                ThrowLiteralConversionError(v);
+            }
+
+            //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+            if (Decimal.TryParse(v.Value, out decimal dec))
+            {
+                // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
+                var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
+                decimal temp = new decimal(dbl);
+                var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
+                if (!decBits.Equals(dblAsDecBits))
+                    return dec;
+            }
+
+            return dbl;
+        }
+
+        private static object ThrowLiteralConversionError(GraphQLValue input, string? description = null)
+        {
+            var value = input is IHasValueNode node ? node.Value.ToString() : input?.ToString();
+            if (description != null)
+                description = "; " + description;
+            throw new InvalidOperationException($"Unable to convert '{value}' literal from AST representation to any possible type{description}");
         }
     }
 }
