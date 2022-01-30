@@ -6,10 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.1.1" />
-    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="5.1.1" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.1.1" />
-    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="5.1.1" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
