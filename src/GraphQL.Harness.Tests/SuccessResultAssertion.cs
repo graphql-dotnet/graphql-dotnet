@@ -1,3 +1,4 @@
+using System.IO;
 using Alba;
 using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,13 @@ namespace GraphQL.Harness.Tests
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
             var expectedResult = CreateQueryResult(_result);
-            string actualResultJson = ex.ReadBody(context);
+
+            // for Alba v4
+            // string actualResultJson = ex.ReadBody(context);
+
+            // for Alba v6 [ScenarioAssertionException.ReadBody internal]
+            context.Request.Body.Position = 0;
+            string actualResultJson = new StreamReader(context.Response.Body).ReadToEnd();
 
             if (_ignoreExtensions)
             {

@@ -32,6 +32,6 @@ namespace GraphQL.Utilities.Federation
         public override bool IsValidDefault(object value) => true;
 
         /// <inheritdoc/>
-        public override GraphQLValue? ToAST(object? value) => ThrowASTConversionError(value);
+        public override GraphQLValue ToAST(object? value) => ThrowASTConversionError(value);
     }
 }

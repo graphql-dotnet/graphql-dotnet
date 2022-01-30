@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -168,7 +169,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="value">The value to convert. May be <see langword="null"/>.</param>
         /// <returns>AST representation of the specified value. Returning <see langword="null"/> indicates a failed conversion. Returning <see cref="GraphQLNullValue"/> is valid.</returns>
-        public virtual GraphQLValue? ToAST(object? value)
+        public virtual GraphQLValue ToAST(object? value)
         {
             var serialized = Serialize(value);
             return serialized switch
@@ -196,6 +197,7 @@ namespace GraphQL.Types
         /// Throws an exception indicating that a value cannot be converted to its AST representation. Typically called by
         /// <see cref="ToAST(object)"/> if the provided object (an internal representation) is not valid for this scalar type.
         /// </summary>
+        [DoesNotReturn]
         protected internal GraphQLValue ThrowASTConversionError(object? value)
         {
             throw new InvalidOperationException($"Unable to convert '{value ?? "(null)"}' to its AST representation for the scalar type '{Name}'.");
@@ -205,6 +207,7 @@ namespace GraphQL.Types
         /// Throws an exception indicating that an AST scalar node cannot be converted to a value. Typically called by
         /// <see cref="ParseLiteral(GraphQLValue)"/> if the node type is invalid or cannot be parsed.
         /// </summary>
+        [DoesNotReturn]
         protected object ThrowLiteralConversionError(GraphQLValue input, string? description = null)
         {
             var value = input is IHasValueNode node ? node.Value.ToString() : input?.ToString();
@@ -223,6 +226,7 @@ namespace GraphQL.Types
         /// This also may be called for serialization errors during <see cref="ToAST(object)"/>, since <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/>
         /// by default, which by default calls <see cref="ParseValue(object)"/>.
         /// </remarks>
+        [DoesNotReturn]
         protected object ThrowValueConversionError(object? value)
         {
             throw new InvalidOperationException($"Unable to convert '{value ?? "(null)"}' to the scalar type '{Name}'");
@@ -238,6 +242,7 @@ namespace GraphQL.Types
         /// of <see cref="ToAST(object)"/> calls <see cref="Serialize(object)"/> to serialize the value before converting the
         /// result to an AST node.
         /// </remarks>
+        [DoesNotReturn]
         protected object ThrowSerializationError(object? value)
         {
             throw new InvalidOperationException($"Unable to serialize '{value ?? "(null)"}' to the scalar type '{Name}'.");

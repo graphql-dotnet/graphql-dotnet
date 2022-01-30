@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net6;net5</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alba" Version="4.0.0" />
+    <PackageReference Include="Alba" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

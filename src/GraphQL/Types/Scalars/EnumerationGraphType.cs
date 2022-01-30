@@ -107,7 +107,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override GraphQLValue? ToAST(object? value)
+        public override GraphQLValue ToAST(object? value)
         {
             if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
                 return GraphQLValuesCache.Null;

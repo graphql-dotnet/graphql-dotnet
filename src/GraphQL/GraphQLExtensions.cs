@@ -368,7 +368,7 @@ namespace GraphQL
         /// Returns a value indicating whether the provided value is a valid default value
         /// for the specified input graph type.
         /// </summary>
-        public static bool IsValidDefault(this IGraphType type, object value)
+        public static bool IsValidDefault(this IGraphType type, object? value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -389,7 +389,7 @@ namespace GraphQL
             {
                 var itemType = listType.ResolvedType!;
 
-                if (!(value is string) && value is IEnumerable list)
+                if (value is not string && value is IEnumerable list)
                 {
                     foreach (var item in list)
                     {
@@ -419,7 +419,7 @@ namespace GraphQL
         /// Attempts to serialize a value into an AST representation for a specified graph type.
         /// May throw exceptions during the serialization process.
         /// </summary>
-        public static GraphQLValue ToAST(this IGraphType type, object value)
+        public static GraphQLValue ToAST(this IGraphType type, object? value)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
