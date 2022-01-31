@@ -102,12 +102,12 @@ namespace GraphQL.Types
         /// Initializes an instance containing type information necessary to select a graph type.
         /// The instance is populated based on inspecting the type and NRT annotations on the specified property.
         /// </summary>
-        public TypeInformation(PropertyInfo propertyInfo, bool isInputProperty)
-            : this(propertyInfo, isInputProperty, propertyInfo.PropertyType, false, false, false, null)
+        public TypeInformation(PropertyInfo propertyInfo, bool isInput)
+            : this(propertyInfo, isInput, propertyInfo.PropertyType, false, false, false, null)
         {
-            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInputProperty);
+            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInput);
 
-            ProcessTypeTree(typeTree, isInputProperty);
+            ProcessTypeTree(typeTree, isInput);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace GraphQL.Types
         /// Flattens a complex <see cref="NullabilityInfo"/> structure into a list of types and nullability flags.
         /// <see cref="Nullable{T}"/> structs return their underlying type rather than <see cref="Nullable{T}"/>.
         /// </summary>
-        private static List<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInputProperty)
+        private static List<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInput)
         {
             var list = new List<(Type, NullabilityState)>(info.GenericTypeArguments.Length + 1);
             RecursiveLoop(info);
@@ -221,7 +221,7 @@ namespace GraphQL.Types
                     }
                     else
                     {
-                        list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                        list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                     }
                     foreach (var t in info.GenericTypeArguments)
                     {
@@ -230,12 +230,12 @@ namespace GraphQL.Types
                 }
                 else if (info.ElementType != null)
                 {
-                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                     RecursiveLoop(info.ElementType);
                 }
                 else
                 {
-                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                 }
             }
         }

@@ -2180,7 +2180,7 @@ namespace GraphQL.Types
     {
         public TypeInformation(System.Reflection.MethodInfo methodInfo) { }
         public TypeInformation(System.Reflection.FieldInfo fieldInfo, bool isInput) { }
-        public TypeInformation(System.Reflection.PropertyInfo propertyInfo, bool isInputProperty) { }
+        public TypeInformation(System.Reflection.PropertyInfo propertyInfo, bool isInput) { }
         public TypeInformation(System.Reflection.MemberInfo memberInfo, bool isInputType, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
         public System.Type? GraphType { get; set; }
         public bool IsInputType { get; }
