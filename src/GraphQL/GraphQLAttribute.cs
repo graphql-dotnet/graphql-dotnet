@@ -8,7 +8,7 @@ namespace GraphQL
     /// <summary>
     /// Allows additional configuration to be applied to a type or field definition.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = true)]
     public abstract class GraphQLAttribute : Attribute
     {
         /// <summary>
@@ -45,6 +45,20 @@ namespace GraphQL
         /// Updates the properties of the specified <see cref="TypeInformation"/> as necessary.
         /// </summary>
         public virtual void Modify(TypeInformation typeInformation)
+        {
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="ArgumentInformation{TReturnType}"/> as necessary.
+        /// </summary>
+        public virtual void Modify<TReturnType>(ArgumentInformation<TReturnType> argumentInformation)
+        {
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
+        /// </summary>
+        public virtual void Modify(QueryArgument queryArgument)
         {
         }
 

@@ -330,6 +330,32 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Looks for a <see cref="DescriptionAttribute"/> on the specified parameter and returns
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
+        /// returns XML documentation on the specified member, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
+        /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
+        /// </summary>
+        public static string? Description(this ParameterInfo parameterInfo)
+        {
+            string? description = null;
+
+            if (GlobalSwitches.EnableReadDescriptionFromAttributes)
+            {
+                description = (parameterInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+                if (description != null)
+                    return description;
+            }
+
+            if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+            {
+                description = parameterInfo.GetXmlDocumentation();
+            }
+
+            return description;
+        }
+
+        /// <summary>
         /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
         /// the <see cref="ObsoleteAttribute.Message">message</see>, if any. Note that behavior of this
         /// method depends from <see cref="GlobalSwitches.EnableReadDeprecationReasonFromAttributes"/> setting.

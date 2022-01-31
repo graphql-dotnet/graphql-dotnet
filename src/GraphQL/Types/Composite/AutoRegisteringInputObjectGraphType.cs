@@ -77,7 +77,9 @@ namespace GraphQL.Types
         {
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            return AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, true);
+            return fieldType;
         }
 
         /// <summary>

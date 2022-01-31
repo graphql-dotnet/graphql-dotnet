@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -45,21 +44,23 @@ namespace GraphQL.Types
                 DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
                 DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
-                Resolver = isInputType ? null : MemberResolver.Create(memberInfo),
             };
             if (isInputType)
             {
                 fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
             }
 
+            return fieldType;
+        }
+
+        internal static void ApplyFieldAttributes(MemberInfo memberInfo, FieldType fieldType, bool isInputType)
+        {
             // Apply derivatives of GraphQLAttribute
             var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);
             }
-
-            return fieldType;
         }
 
         private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
@@ -71,6 +72,52 @@ namespace GraphQL.Types
                 return m2.Member.Name;
 
             throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
+        }
+
+        internal static LambdaExpression GetParameterExpression(ParameterInfo param, QueryArgument queryArgument)
+        {
+            //pull/create the default value
+            object? defaultValue = null;
+            if (param.ParameterType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(param.ParameterType);
+            }
+
+            //construct a call to ResolveFieldContextExtensions.GetArgument, passing in the appropriate default value
+            var getArgumentMethodTyped = _getArgumentMethod.MakeGenericMethod(param.ParameterType);
+            var resolveFieldContextParameter = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            var queryArgumentExpression = Expression.Constant(queryArgument, typeof(QueryArgument));
+            //e.g. Func<IResolveFieldContext, int> = (context) => ResolveFieldContextExtensions.GetArgument<int>(context, queryArgument.Name, queryArgument.DefaultValue);
+            var expr = Expression.Call(getArgumentMethodTyped, resolveFieldContextParameter, queryArgumentExpression);
+
+            return Expression.Lambda(
+                expr,
+                resolveFieldContextParameter);
+        }
+
+
+        private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
+        private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
+        {
+            // GetArgument changes null values to DefaultValue even if null is explicitly specified,
+            // so do not use GetArgument here
+            return context.TryGetArgument(typeof(T), queryArgument.Name, out var value)
+                ? (T?)value
+                : (T?)queryArgument.DefaultValue;
+        }
+
+        private static readonly PropertyInfo _sourceProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
+        /// <summary>
+        /// Returns an expression that gets the source and casts it to the specified type.
+        /// </summary>
+        internal static LambdaExpression GetSourceExpression(Type sourceType)
+        {
+            //retrieve the value and cast it to the specified type
+            //e.g. Func<IResolveFieldContext, TSourceType> = (context) => (TSourceType)context.Source;
+            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            return Expression.Lambda(
+                Expression.Convert(Expression.Property(param, _sourceProperty), sourceType),
+                param);
         }
     }
 }
