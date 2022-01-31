@@ -41,10 +41,8 @@ namespace GraphQL.Resolvers
         }
 
         private static readonly ConcurrentDictionary<MemberInfo, MemberResolver> _resolverDictionary = new();
-        private static readonly Func<MemberInfo, MemberResolver> _createFunc
-            = (MemberInfo memberInfo) => new MemberResolver(memberInfo);
         public static MemberResolver Create(MemberInfo memberInfo)
-            => _resolverDictionary.GetOrAdd(memberInfo, _createFunc);
+            => _resolverDictionary.GetOrAdd(memberInfo, info => new MemberResolver(info));
 
         public object? Resolve(IResolveFieldContext context) => _resolver(context.Source);
     }
