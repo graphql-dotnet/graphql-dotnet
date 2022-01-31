@@ -199,7 +199,6 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
         [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
-        [InlineData("TaskIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
         [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
         [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
         [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
@@ -208,12 +207,6 @@ namespace GraphQL.Tests.Types
             var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
             var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
             fieldType.Type.ShouldBe(expectedGraphType);
-        }
-
-        public void Field_RemovesAsyncSuffix()
-        {
-            var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
-            var fieldType = graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
         }
 
         [Fact]
@@ -343,7 +336,6 @@ namespace GraphQL.Tests.Types
             public ICollection? NullableCollectionField { get; set; }
             public int?[]?[]? ListOfListOfIntsField { get; set; }
             public Task<string> TaskStringField() => null!;
-            public Task<int> TaskIntFieldAsync() => Task.FromResult(0);
             public IDataLoaderResult<string?> DataLoaderNullableStringField() => null!;
             public IDataLoaderResult<string>? NullableDataLoaderStringField() => null!;
             public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField() => null!;
