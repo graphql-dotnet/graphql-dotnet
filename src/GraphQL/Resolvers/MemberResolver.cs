@@ -24,7 +24,7 @@ namespace GraphQL.Resolvers
                         : Expression.Convert(parameter, methodInfo.DeclaringType!),
                     methodInfo),
                 PropertyInfo propertyInfo => Expression.MakeMemberAccess(
-                    (propertyInfo.GetMethod ?? throw new ArgumentOutOfRangeException(nameof(memberInfo), "Property does not have get method.")).IsStatic
+                    (propertyInfo.GetMethod ?? throw new ArgumentOutOfRangeException(nameof(memberInfo), $"Property '{propertyInfo.Name}' does not have get method.")).IsStatic
                         ? null
                         : Expression.Convert(parameter, propertyInfo.DeclaringType!),
                     propertyInfo),
