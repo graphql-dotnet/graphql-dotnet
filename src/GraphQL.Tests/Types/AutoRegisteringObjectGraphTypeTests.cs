@@ -266,6 +266,7 @@ namespace GraphQL.Tests.Types
         [InlineData("Field4", 4)]
         [InlineData("Field5", 5)]
         [InlineData("Field6AltName", 6)]
+        [InlineData("Field7", 7)]
         public void FieldResolversWork(string fieldName, object expected)
         {
             var graph = new TestFieldSupport<TestClass>();
