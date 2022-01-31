@@ -8,7 +8,7 @@ namespace GraphQL
     /// <summary>
     /// Allows additional configuration to be applied to a type or field definition.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public abstract class GraphQLAttribute : Attribute
     {
         /// <summary>

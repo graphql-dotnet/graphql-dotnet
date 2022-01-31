@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -32,19 +33,27 @@ namespace GraphQL.Types
                 ? properties
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
-        internal static FieldType CreateField(PropertyInfo propertyInfo, Type graphType, bool isInputType)
+        /// <summary>
+        /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
+        /// </summary>
+        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
             {
-                Name = propertyInfo.Name,
-                Description = propertyInfo.Description(),
-                DeprecationReason = propertyInfo.ObsoleteMessage(),
+                Name = memberInfo.Name,
+                Description = memberInfo.Description(),
+                DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
-                DefaultValue = isInputType ? propertyInfo.DefaultValue() : null,
+                DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
+                Resolver = isInputType ? null : MemberResolver.Create(memberInfo),
             };
+            if (isInputType)
+            {
+                fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+            }
 
             // Apply derivatives of GraphQLAttribute
-            var attributes = propertyInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);

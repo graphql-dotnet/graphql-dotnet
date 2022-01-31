@@ -52,44 +52,46 @@ namespace GraphQL.Types
         /// </summary>
         protected virtual IEnumerable<FieldType> ProvideFields()
         {
-            foreach (var propertyInfo in GetRegisteredProperties())
+            foreach (var memberInfo in GetRegisteredMembers())
             {
                 bool include = true;
-                foreach (var attr in propertyInfo.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
                 {
-                    include = attr.ShouldInclude(propertyInfo, true);
+                    include = attr.ShouldInclude(memberInfo, true);
                     if (!include)
                         break;
                 }
                 if (!include)
                     continue;
-                var fieldType = CreateField(propertyInfo);
+                var fieldType = CreateField(memberInfo);
                 if (fieldType != null)
                     yield return fieldType;
             }
         }
 
         /// <summary>
-        /// Processes the specified property and returns a <see cref="FieldType"/>.
+        /// Processes the specified property or field and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
-        protected virtual FieldType? CreateField(PropertyInfo propertyInfo)
+        protected virtual FieldType? CreateField(MemberInfo memberInfo)
         {
-            var typeInformation = GetTypeInformation(propertyInfo);
+            var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            return AutoRegisteringHelper.CreateField(propertyInfo, graphType, true);
+            return AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
         }
 
         /// <summary>
-        /// Returns a list of properties that should have fields created for them.
+        /// Returns a list of properties or fields that should have fields created for them.
+        /// Unless overridden, returns a list of public instance writable properties,
+        /// including properties on inherited classes.
         /// </summary>
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
+        protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
             => AutoRegisteringHelper.ExcludeProperties(
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
                 _excludedProperties);
 
         /// <summary>
-        /// Analyzes a property and returns an instance of <see cref="TypeInformation"/>
+        /// Analyzes a property or field and returns an instance of <see cref="TypeInformation"/>
         /// containing information necessary to select a graph type. Nullable reference annotations
         /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
         /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
@@ -97,9 +99,14 @@ namespace GraphQL.Types
         /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
         /// attributes to change graph type selection behavior.
         /// </summary>
-        protected virtual TypeInformation GetTypeInformation(PropertyInfo propertyInfo)
+        protected virtual TypeInformation GetTypeInformation(MemberInfo memberInfo)
         {
-            var typeInformation = new TypeInformation(propertyInfo, true);
+            var typeInformation = memberInfo switch
+            {
+                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, true),
+                FieldInfo fieldInfo => new TypeInformation(fieldInfo, true),
+                _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties and fields are supported."),
+            };
             typeInformation.ApplyAttributes();
             return typeInformation;
         }

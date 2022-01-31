@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -77,6 +79,13 @@ namespace GraphQL.Tests.Types
         {
             var graphType = new TestOverrideDefaultName<TestClass_WithCustomName>();
             graphType.Name.ShouldBe("TestWithCustomName");
+        }
+
+        [Fact]
+        public void Class_RecognizesInheritedAttributes()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<DerivedClass>();
+            graphType.Fields.Find("Field1CustomName").ShouldNotBeNull();
         }
 
         [Fact]
@@ -189,6 +198,10 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
+        [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
+        [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
+        [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
         public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
         {
             var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
@@ -204,13 +217,14 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void RegistersReadablePropertiesOnly()
+        public void RegistersReadablePropertiesAndMethodsOnly()
         {
             var inputType = new AutoRegisteringObjectGraphType<TestClass>();
             inputType.Fields.Find("Field1").ShouldNotBeNull();
             inputType.Fields.Find("Field2").ShouldNotBeNull();
             inputType.Fields.Find("Field3").ShouldBeNull();
-            inputType.Fields.Find("Field4").ShouldBeNull();
+            inputType.Fields.Find("Field4").ShouldNotBeNull();
+            inputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
@@ -220,7 +234,8 @@ namespace GraphQL.Tests.Types
             inputType.Fields.Find("Field1").ShouldBeNull();
             inputType.Fields.Find("Field2").ShouldNotBeNull();
             inputType.Fields.Find("Field3").ShouldBeNull();
-            inputType.Fields.Find("Field4").ShouldBeNull();
+            inputType.Fields.Find("Field4").ShouldNotBeNull();
+            inputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
@@ -236,6 +251,38 @@ namespace GraphQL.Tests.Types
             var graph = new TestChangingFieldList<TestClass>();
             graph.Fields.Count.ShouldBe(1);
             graph.Fields.Find("Field1").ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void CanAddFieldInfos()
+        {
+            var graph = new TestFieldSupport<TestClass>();
+            graph.Fields.Find("Field5").ShouldNotBeNull();
+        }
+
+        [Theory]
+        [InlineData("Field1", 1)]
+        [InlineData("Field2", 2)]
+        [InlineData("Field4", 4)]
+        [InlineData("Field5", 5)]
+        [InlineData("Field6AltName", 6)]
+        [InlineData("Field7", 7)]
+        public void FieldResolversWork(string fieldName, object expected)
+        {
+            var graph = new TestFieldSupport<TestClass>();
+            var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
+            var resolver = field.Resolver.ShouldNotBeNull();
+            var obj = new TestClass();
+            var actual = resolver.Resolve(new ResolveFieldContext
+            {
+                Source = obj,
+                FieldDefinition = new FieldType { Name = fieldName },
+            });
+            if (actual is Task task)
+            {
+                actual = ((dynamic)task).Result;
+            }
+            actual.ShouldBe(expected);
         }
 
         private class FieldTests
@@ -289,21 +336,31 @@ namespace GraphQL.Tests.Types
             public IEnumerable? NullableEnumerableField { get; set; }
             public ICollection? NullableCollectionField { get; set; }
             public int?[]?[]? ListOfListOfIntsField { get; set; }
+            public Task<string> TaskStringField() => null!;
+            public IDataLoaderResult<string?> DataLoaderNullableStringField() => null!;
+            public IDataLoaderResult<string>? NullableDataLoaderStringField() => null!;
+            public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField() => null!;
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
         {
             protected override IEnumerable<FieldType> ProvideFields()
             {
-                yield return CreateField(GetRegisteredProperties().First(x => x.Name == "Field1"))!;
+                yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
             }
+        }
+
+        private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
+        {
+            protected override IEnumerable<MemberInfo> GetRegisteredMembers()
+                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public));
         }
 
         private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
         {
-            protected override FieldType CreateField(PropertyInfo propertyInfo)
+            protected override FieldType CreateField(MemberInfo memberInfo)
             {
-                var field = base.CreateField(propertyInfo)!;
+                var field = base.CreateField(memberInfo)!;
                 field.Name += "Prop";
                 return field;
             }
@@ -311,10 +368,14 @@ namespace GraphQL.Tests.Types
 
         private class TestClass
         {
-            public int Field1 { get; set; }
-            public int Field2 { get; }
+            public int Field1 { get; set; } = 1;
+            public int Field2 => 2;
             public int Field3 { set { } }
-            public int Field4() => 0;
+            public int Field4() => 4;
+            public int Field5 = 5;
+            [Name("Field6AltName")]
+            public int Field6 => 6;
+            public Task<int> Field7 => Task.FromResult(7);
         }
 
         [Name("TestWithCustomName")]
@@ -360,6 +421,16 @@ namespace GraphQL.Tests.Types
             {
                 Name = typeof(T).Name + "Input";
             }
+        }
+
+        private class ParentClass
+        {
+            [Name("Field1CustomName")]
+            public virtual string? Field1 { get; set; }
+        }
+        private class DerivedClass : ParentClass
+        {
+            public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
         }
     }
 }
