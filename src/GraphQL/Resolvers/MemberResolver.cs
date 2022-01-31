@@ -28,11 +28,11 @@ namespace GraphQL.Resolvers
                         ? null
                         : Expression.Convert(parameter, propertyInfo.DeclaringType!),
                     propertyInfo),
-                FieldInfo propertyInfo => Expression.MakeMemberAccess(
-                    propertyInfo.IsStatic
+                FieldInfo fieldInfo => Expression.MakeMemberAccess(
+                    fieldInfo.IsStatic
                         ? null
-                        : Expression.Convert(parameter, propertyInfo.DeclaringType!),
-                    propertyInfo),
+                        : Expression.Convert(parameter, fieldInfo.DeclaringType!),
+                    fieldInfo),
                 _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties, methods and fields are supported."),
             };
             var convertToObjectExpression = Expression.Convert(expression, typeof(object));
