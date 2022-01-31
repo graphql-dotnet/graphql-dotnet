@@ -529,16 +529,16 @@ namespace GraphQL.Validation
                 ? (List<T>?)items
                 : null;
 #else
-                if (context.NonUserContext?.TryGetValue(listKey, out object? items) == true)
-                {
-                    if (reset)
-                        context.NonUserContext.Remove(listKey);
-                    return (List<T>?)items;
-                }
-                else
-                {
-                    return null;
-                }
+            if (context.NonUserContext?.TryGetValue(listKey, out object? items) == true)
+            {
+                if (reset)
+                    context.NonUserContext.Remove(listKey);
+                return (List<T>?)items;
+            }
+            else
+            {
+                return null;
+            }
 #endif
         }
     }
