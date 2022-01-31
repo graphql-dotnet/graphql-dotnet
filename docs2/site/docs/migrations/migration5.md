@@ -191,6 +191,9 @@ automatically-generated graph types:
 | ProvideFields    | Returns a set of generated fields                                    | Adding additional fields to the generated set |
 | CreateField      | Creates a `FieldType` from a `MemberInfo`                            | Applying custom behavior to field generation |
 
+Note that if you override `GetRegisteredMembers` to include private properties or fields for
+an input graph, you may also need to override `ParseDictionary` as well.
+
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
 
