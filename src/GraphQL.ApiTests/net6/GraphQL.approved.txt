@@ -452,6 +452,10 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    public class MissingRequestServicesException : System.InvalidOperationException
+    {
+        public MissingRequestServicesException() { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
     public class NameAttribute : GraphQL.GraphQLAttribute
     {
