@@ -2227,7 +2227,8 @@ namespace GraphQL.Types
         public TypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         public TypeInformation(System.Reflection.FieldInfo fieldInfo, bool isInput) { }
         public TypeInformation(System.Reflection.PropertyInfo propertyInfo, bool isInput) { }
-        public TypeInformation(System.Reflection.MemberInfo memberInfo, System.Reflection.ParameterInfo? parameterInfo, bool isInputType, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
+        public TypeInformation(System.Reflection.ParameterInfo parameterInfo, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
+        public TypeInformation(System.Reflection.MemberInfo memberInfo, bool isInputType, System.Type type, bool isNullable, bool isList, bool listIsNullable, System.Type? graphType) { }
         public System.Type? GraphType { get; set; }
         public bool IsInputType { get; }
         public bool IsList { get; set; }
