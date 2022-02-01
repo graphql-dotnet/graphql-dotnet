@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Utilities
         {
             var printer = new SchemaPrinter2(options);
             var writer = new StringWriter();
-            printer.PrintAsync(schema, writer).GetAwaiter().GetResult();
+            printer.PrintSchemaAsync(schema, writer).GetAwaiter().GetResult();
             return Environment.NewLine + writer.ToString();
         }
 

@@ -39,7 +39,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Prints schema in the specified <see cref="TextWriter"/>.
         /// </summary>
-        public async ValueTask PrintAsync(ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
+        public async ValueTask PrintSchemaAsync(ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
             var doc = CreateConverter().Convert(schema);
             await _astPrinter.PrintAsync(doc, writer, cancellationToken);
