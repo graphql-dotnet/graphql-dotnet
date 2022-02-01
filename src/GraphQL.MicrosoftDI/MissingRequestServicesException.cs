@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.MicrosoftDI
 {
     internal class MissingRequestServicesException : InvalidOperationException

@@ -1,10 +1,8 @@
-using System;
 using System.Numerics;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

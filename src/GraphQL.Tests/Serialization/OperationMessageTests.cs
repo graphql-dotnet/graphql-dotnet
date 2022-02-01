@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using GraphQL.Transport;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Serialization
 {

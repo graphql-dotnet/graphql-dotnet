@@ -1,8 +1,5 @@
-using System;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

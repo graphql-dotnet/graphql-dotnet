@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQLParser;
 using GraphQLParser.AST;

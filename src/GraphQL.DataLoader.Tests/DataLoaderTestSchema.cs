@@ -1,4 +1,3 @@
-using System;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Types;
 

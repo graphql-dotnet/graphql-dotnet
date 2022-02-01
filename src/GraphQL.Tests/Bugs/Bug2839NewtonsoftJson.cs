@@ -1,10 +1,8 @@
-using System;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

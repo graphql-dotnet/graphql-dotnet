@@ -1,8 +1,4 @@
-using System;
-using System.Linq;
 using GraphQL.Validation.Complexity;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Complexity
 {

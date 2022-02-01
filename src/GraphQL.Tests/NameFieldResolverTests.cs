@@ -1,8 +1,5 @@
-using System;
 using GraphQL.Resolvers;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests
 {

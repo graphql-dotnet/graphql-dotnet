@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity

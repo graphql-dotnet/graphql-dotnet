@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;

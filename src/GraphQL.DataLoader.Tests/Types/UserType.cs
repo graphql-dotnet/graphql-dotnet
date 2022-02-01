@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Types;

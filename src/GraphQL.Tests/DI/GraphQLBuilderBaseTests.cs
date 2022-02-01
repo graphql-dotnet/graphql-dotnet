@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -7,8 +6,6 @@ using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.DI
 {

@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Utilities
 {
     internal static class ServiceProviderExtensions

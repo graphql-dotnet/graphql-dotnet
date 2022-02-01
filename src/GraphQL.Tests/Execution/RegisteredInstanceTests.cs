@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

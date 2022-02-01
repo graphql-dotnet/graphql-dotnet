@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Types;
@@ -6,8 +5,6 @@ using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

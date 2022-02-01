@@ -1,8 +1,5 @@
-using System.Linq;
 using GraphQL.Execution;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Language
 {

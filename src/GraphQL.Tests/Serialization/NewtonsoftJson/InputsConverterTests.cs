@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Serialization.NewtonsoftJson
 {

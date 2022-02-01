@@ -1,6 +1,5 @@
 using GraphQL.Conversion;
 using GraphQL.Types;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

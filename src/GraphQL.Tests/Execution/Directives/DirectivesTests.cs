@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using Xunit;
 
 namespace GraphQL.Tests.Execution.Directives
 {

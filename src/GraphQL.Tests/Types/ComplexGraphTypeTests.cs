@@ -1,15 +1,10 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {

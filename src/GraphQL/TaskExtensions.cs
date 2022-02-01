@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace GraphQL

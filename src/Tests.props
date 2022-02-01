@@ -18,4 +18,9 @@
     <PackageReference Include="Moq" Version="4.16.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Shouldly" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
 </Project>

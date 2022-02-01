@@ -1,6 +1,3 @@
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.Tests.Complexity
 {
     public class ComplexityTestsWithLimits : ComplexityTestBase

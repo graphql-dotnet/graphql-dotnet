@@ -1,12 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

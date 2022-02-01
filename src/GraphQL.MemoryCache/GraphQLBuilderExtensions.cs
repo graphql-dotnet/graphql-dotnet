@@ -1,4 +1,3 @@
-using System;
 using GraphQL.DI;
 
 namespace GraphQL.Caching

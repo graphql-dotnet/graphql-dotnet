@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.Tests.Execution
 {
     public abstract class InputConversionTestsBase

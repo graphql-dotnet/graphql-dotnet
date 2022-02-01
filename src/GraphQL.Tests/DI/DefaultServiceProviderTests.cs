@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.Tests.DI
 {
     public class DefaultServiceProviderTests
