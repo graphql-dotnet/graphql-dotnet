@@ -111,19 +111,5 @@ namespace GraphQL.Types
                 ? (T?)value
                 : (T?)queryArgument.DefaultValue;
         }
-
-        private static readonly PropertyInfo _sourceProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
-        /// <summary>
-        /// Returns an expression that gets the source and casts it to the specified type.
-        /// </summary>
-        internal static LambdaExpression GetSourceExpression(Type sourceType)
-        {
-            //retrieve the value and cast it to the specified type
-            //e.g. Func<IResolveFieldContext, TSourceType> = (context) => (TSourceType)context.Source;
-            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-            return Expression.Lambda(
-                Expression.Convert(Expression.Property(param, _sourceProperty), sourceType),
-                param);
-        }
     }
 }
