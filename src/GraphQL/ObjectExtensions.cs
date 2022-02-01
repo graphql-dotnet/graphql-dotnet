@@ -169,6 +169,25 @@ namespace GraphQL
                     object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
+                else
+                {
+                    FieldInfo? fieldInfo;
+
+                    try
+                    {
+                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    }
+                    catch (AmbiguousMatchException)
+                    {
+                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                    }
+
+                    if (fieldInfo != null)
+                    {
+                        object? value = GetPropertyValue(item.Value, fieldInfo.FieldType, field?.ResolvedType);
+                        fieldInfo.SetValue(obj, value);
+                    }
+                }
             }
 
             return obj;

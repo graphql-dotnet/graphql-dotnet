@@ -8,7 +8,7 @@ namespace GraphQL
     /// Specifies a GraphQL type name for a CLR class when used as an output type.
     /// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class OutputNameAttribute : GraphQLAttribute
     {
         private string _name;

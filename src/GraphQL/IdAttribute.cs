@@ -6,7 +6,7 @@ namespace GraphQL
     /// <summary>
     /// Specifies that a property will be mapped to <see cref="IdGraphType"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class IdAttribute : GraphQLAttribute
     {
         /// <inheritdoc/>

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 
 namespace GraphQL.Types
 {
@@ -12,7 +14,7 @@ namespace GraphQL.Types
     public class TypeInformation
     {
         /// <summary>
-        /// The member being inspected.
+        /// The member being inspected. This is a <see cref="MethodInfo"/>, <see cref="PropertyInfo"/> or <see cref="FieldInfo"/> instance.
         /// </summary>
         public MemberInfo MemberInfo { get; }
 
@@ -100,11 +102,44 @@ namespace GraphQL.Types
         /// Initializes an instance containing type information necessary to select a graph type.
         /// The instance is populated based on inspecting the type and NRT annotations on the specified property.
         /// </summary>
-        public TypeInformation(PropertyInfo propertyInfo, bool isInputProperty)
-            : this(propertyInfo, isInputProperty, propertyInfo.PropertyType, false, false, false, null)
+        public TypeInformation(PropertyInfo propertyInfo, bool isInput)
+            : this(propertyInfo, isInput, propertyInfo.PropertyType, false, false, false, null)
         {
-            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInputProperty);
+            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInput);
 
+            ProcessTypeTree(typeTree, isInput);
+        }
+
+        /// <summary>
+        /// Initializes an instance containing type information necessary to select a graph type.
+        /// The instance is populated based on inspecting the type and NRT annotations on the specified field.
+        /// </summary>
+        public TypeInformation(FieldInfo fieldInfo, bool isInput)
+            : this(fieldInfo, isInput, fieldInfo.FieldType, false, false, false, null)
+        {
+            var typeTree = Interpret(new NullabilityInfoContext().Create(fieldInfo), isInput);
+
+            ProcessTypeTree(typeTree, isInput);
+        }
+
+        /// <summary>
+        /// Initializes an instance containing type information necessary to select a graph type.
+        /// The instance is populated based on inspecting the type and NRT annotations on the specified method.
+        /// </summary>
+        public TypeInformation(MethodInfo methodInfo)
+            : this(methodInfo, false, methodInfo.ReturnType, false, false, false, null)
+        {
+            var typeTree = Interpret(new NullabilityInfoContext().Create(methodInfo.ReturnParameter), false);
+
+            ProcessTypeTree(typeTree, false);
+        }
+
+        /// <summary>
+        /// Populates the <see cref="Type"/>, <see cref="IsNullable"/>, <see cref="IsList"/> and <see cref="ListIsNullable"/>
+        /// properties of this instance from a provided <paramref name="typeTree"/>.
+        /// </summary>
+        private void ProcessTypeTree(List<(Type Type, NullabilityState Nullable)> typeTree, bool isInput)
+        {
             foreach (var type in typeTree)
             {
                 //detect list types, but not lists of lists
@@ -114,7 +149,7 @@ namespace GraphQL.Types
                     {
                         //unwrap type and mark as list
                         IsList = true;
-                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                        ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
                         continue;
                     }
                     if (type.Type.IsGenericType)
@@ -123,7 +158,8 @@ namespace GraphQL.Types
                         {
                             //unwrap type and mark as list
                             IsList = true;
-                            ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                            ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
+                            IsNullable = false;
                             continue;
                         }
                     }
@@ -131,12 +167,31 @@ namespace GraphQL.Types
                     {
                         //assume list of nullable object
                         IsList = true;
-                        ListIsNullable = type.Nullable != NullabilityState.NotNull;
+                        ListIsNullable = IsNullable || type.Nullable != NullabilityState.NotNull;
+                        IsNullable = false;
+                        break;
+                    }
+                }
+                if (!isInput)
+                {
+                    if (type.Type.IsGenericType)
+                    {
+                        var genericType = type.Type.GetGenericTypeDefinition();
+                        if (genericType == typeof(Task<>) || genericType == typeof(IDataLoaderResult<>))
+                        {
+                            //unwrap type
+                            IsNullable |= type.Nullable != NullabilityState.NotNull;
+                            continue;
+                        }
+                    }
+                    if (type.Type == typeof(IDataLoaderResult))
+                    {
+                        //assume nullable object
                         break;
                     }
                 }
                 //found match
-                IsNullable = type.Nullable != NullabilityState.NotNull;
+                IsNullable |= type.Nullable != NullabilityState.NotNull;
                 Type = type.Type;
                 return;
             }
@@ -149,7 +204,7 @@ namespace GraphQL.Types
         /// Flattens a complex <see cref="NullabilityInfo"/> structure into a list of types and nullability flags.
         /// <see cref="Nullable{T}"/> structs return their underlying type rather than <see cref="Nullable{T}"/>.
         /// </summary>
-        private static List<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInputProperty)
+        private static List<(Type Type, NullabilityState Nullable)> Interpret(NullabilityInfo info, bool isInput)
         {
             var list = new List<(Type, NullabilityState)>(info.GenericTypeArguments.Length + 1);
             RecursiveLoop(info);
@@ -166,7 +221,7 @@ namespace GraphQL.Types
                     }
                     else
                     {
-                        list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                        list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                     }
                     foreach (var t in info.GenericTypeArguments)
                     {
@@ -175,12 +230,12 @@ namespace GraphQL.Types
                 }
                 else if (info.ElementType != null)
                 {
-                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                     RecursiveLoop(info.ElementType);
                 }
                 else
                 {
-                    list.Add((info.Type, isInputProperty ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
                 }
             }
         }
