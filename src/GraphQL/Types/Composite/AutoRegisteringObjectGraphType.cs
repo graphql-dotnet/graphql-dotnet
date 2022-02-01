@@ -135,6 +135,10 @@ namespace GraphQL.Types
         private ArgumentInformation GetArgumentInformationInternal<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
             => GetArgumentInformation<TReturnType>(fieldType, parameterInfo);
 
+        /// <summary>
+        /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
+        /// to the specified <see cref="QueryArgument"/>.
+        /// </summary>
         protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         {
             // Apply derivatives of GraphQLAttribute
@@ -148,6 +152,8 @@ namespace GraphQL.Types
         /// <summary>
         /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation{TReturnType}"/>
         /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
+        /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
+        /// to the returned <see cref="ArgumentInformation{TReturnType}"/> instance.
         /// </summary>
         protected virtual ArgumentInformation<TReturnType> GetArgumentInformation<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
         {
