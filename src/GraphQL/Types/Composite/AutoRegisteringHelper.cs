@@ -53,6 +53,9 @@ namespace GraphQL.Types
             return fieldType;
         }
 
+        /// <summary>
+        /// Applies <see cref="GraphQLAttribute"/>s defined on <paramref name="memberInfo"/> to <paramref name="fieldType"/>.
+        /// </summary>
         internal static void ApplyFieldAttributes(MemberInfo memberInfo, FieldType fieldType, bool isInputType)
         {
             // Apply derivatives of GraphQLAttribute
@@ -74,17 +77,14 @@ namespace GraphQL.Types
             throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
         }
 
-        internal static LambdaExpression GetParameterExpression(ParameterInfo param, QueryArgument queryArgument)
+        /// <summary>
+        /// Constructs a lambda expression for a field resolver to return the specified query argument
+        /// from the resolve context.
+        /// </summary>
+        internal static LambdaExpression GetParameterExpression(Type parameterType, QueryArgument queryArgument)
         {
-            //pull/create the default value
-            object? defaultValue = null;
-            if (param.ParameterType.IsValueType)
-            {
-                defaultValue = Activator.CreateInstance(param.ParameterType);
-            }
-
             //construct a call to ResolveFieldContextExtensions.GetArgument, passing in the appropriate default value
-            var getArgumentMethodTyped = _getArgumentMethod.MakeGenericMethod(param.ParameterType);
+            var getArgumentMethodTyped = _getArgumentMethod.MakeGenericMethod(parameterType);
             var resolveFieldContextParameter = Expression.Parameter(typeof(IResolveFieldContext), "context");
             var queryArgumentExpression = Expression.Constant(queryArgument, typeof(QueryArgument));
             //e.g. Func<IResolveFieldContext, int> = (context) => ResolveFieldContextExtensions.GetArgument<int>(context, queryArgument.Name, queryArgument.DefaultValue);
@@ -95,8 +95,14 @@ namespace GraphQL.Types
                 resolveFieldContextParameter);
         }
 
-
         private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
+        /// <summary>
+        /// Returns the value for the specified query argument, or the default value of the query argument
+        /// if a value was not specified in the request.
+        /// <br/><br/>
+        /// Unlike <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>,
+        /// the default value is not returned if <see langword="null"/> was supplied.
+        /// </summary>
         private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
         {
             // GetArgument changes null values to DefaultValue even if null is explicitly specified,

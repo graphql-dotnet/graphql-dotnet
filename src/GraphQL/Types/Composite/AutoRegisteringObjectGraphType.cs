@@ -123,7 +123,7 @@ namespace GraphQL.Types
                     queryArguments.Add(queryArgument);
                 }
                 expression ??= AutoRegisteringHelper.GetParameterExpression(
-                    parameterInfo,
+                    parameterInfo.ParameterType,
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }

@@ -65,6 +65,5 @@ namespace GraphQL.Resolvers
         }
 
         public object? Resolve(IResolveFieldContext context) => _resolver(context);
-
     }
 }
