@@ -28,7 +28,7 @@ namespace GraphQL
         {
         }
 
-        protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
+        protected override IExecutionStrategy SelectExecutionStrategy(Execution.ExecutionContext context)
         {
             return context.Operation.Operation switch
             {

@@ -240,7 +240,7 @@ namespace GraphQL.Benchmarks
             private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();
             public ExecutionResult Execute()
             {
-                var context = new ExecutionContext
+                var context = new Execution.ExecutionContext
                 {
                     Document = Document,
                     Schema = Schema,

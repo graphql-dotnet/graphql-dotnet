@@ -1,6 +1,7 @@
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL.Tests.Execution
 {
