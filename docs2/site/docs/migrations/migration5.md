@@ -137,7 +137,7 @@ Custom attributes can also be added to perform the following behavior changes:
 - Override detected nullability or list nullability state
 - Override chosen underlying graph type
 
-#### Method support for `AutoRegisteringObjectGraphType<T>` instances
+#### Method and argument support for `AutoRegisteringObjectGraphType<T>` instances
 
 Methods will be detected and added to fields on the graph. Asynchronous methods
 and data loader methods are supported such as shown in the below example:
@@ -150,6 +150,63 @@ and data loader methods are supported such as shown in the below example:
 The above example assumes that the `Person` CLR type was mapped to `PersonGraphType`
 in the schema CLR type mappings.
 
+Arguments are also added as query arguments to the field, and recognize default values
+and other attributes set on the parameter. Certain argument types are recognized and
+treated special; special fields do not add a query argument to the field:
+
+| Argument type                     | Value passed to the method   |
+|-----------------------------------|------------------------------|
+| `IResolveFieldContext`            | The field resolver's context |
+| `CancellationToken`               | The cancellation token from the resolve context |
+| Any, tagged with `[FromServices]` | Pulls the service of the argument type from the `RequestServices` property of the resolve context |
+
+Also note:
+- Asynchronous methods that end in `Async` have the "Async" suffix removed from the default field name.
+- Methods tagged with `[Scoped]` (when using `GraphQL.MicrosoftDI`) create a service scope for the field resolver's execution.
+
+This allows for code such as the following:
+
+```csharp
+[Name("Person")]
+public class Human
+{
+    [Id]
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+
+    [Name("Orders")]
+    [Scoped]
+    public async Task<IEnumerable<Order>> GetOrdersAsync(
+        [FromServices] MyDbContext db,
+        CancellationToken token,
+        [Name("Sort")] SortOrder sortOrder = SortOrder.Date)
+    {
+        var query = db.Orders.Where(x => x.HumanId == Id);
+
+        if (sortOrder == SortOrder.Date)
+            query = query.OrderByDesc(x => x.OrderDate);
+
+        return query.ToListAsync(token);
+    }
+}
+
+public enum SortOrder
+{
+    Date
+}
+```
+
+The above code would generate a GraphQL schema like this:
+
+```gql
+type Person {
+  id: ID!
+  name: String!
+  orders(sort: SortOrder! = DATE): [Order!]!
+}
+```
+
 #### CLR field support
 
 CLR fields are not automatically added to graph types, but can be added by overriding
@@ -159,8 +216,7 @@ the `GetRegisteredMembers` method of a `AutoRegisteringObjectGraphType<T>` or
 #### Overridable base functionality
 
 The classes can be overridden, providing the ability to customize behavior of automatically
-generated graph types. For instance, to exclude properties marked with a custom attribute
-called `[InternalUse]` you could write this:
+generated graph types. For instance, to exclude properties of a certain type, you could write this:
 
 ```csharp
 private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
@@ -170,7 +226,7 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
         var props = GetRegisteredProperties();
         foreach (var prop in props)
         {
-            if (prop.IsDefined(typeof(InternalUseAttribute)))
+            if (prop.PropertyType != typeof(MyType))
                 yield return CreateField(prop);
         }
     }
@@ -179,6 +235,9 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
 
 Similarly, by overriding `CreateField` you can change the default name, description,
 graph type, or other information applied to each generated field.
+
+Most of these changes can be performed by attributes, but by creating a derived class you can
+change default behavior without needing to add attributes to all of your data models.
 
 These `protected` methods can be overridden to provide the following customizations to
 automatically-generated graph types:
@@ -190,6 +249,8 @@ automatically-generated graph types:
 | GetRegisteredMembers | Returns the set of properties, methods and fields to be automatically configured | Filtering internal properties; sorting the property list; including fields; excluding methods |
 | ProvideFields    | Returns a set of generated fields                                    | Adding additional fields to the generated set |
 | CreateField      | Creates a `FieldType` from a `MemberInfo`                            | Applying custom behavior to field generation |
+| GetTypeInformation | Parses a CLR type and NRT annotations to return a graph type       | Use a specific graph type for a certain CLR type |
+| GetArgumentInformation | Parses a method argument to return a query argument or expression | Return an expression for specific types, such as a user context |
 
 Note that if you override `GetRegisteredMembers` to include private properties or fields for
 an input graph, you may also need to override `ParseDictionary` as well.
@@ -204,25 +265,29 @@ services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAut
 Then any graph type defined as `AutoRegisteringObjectGraphType<...>` will use your custom
 type instead.
 
-#### Graphs and fields recognize attributes to control initialization behavior
+#### Graphs, fields and arguments recognize attributes to control initialization behavior
 
 Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
-CLR class or one if its properties and is configured for the graph or field type. New attributes have been
-updated or added for convenience as follows:
+CLR class or one if its properties, fields, methods or method arguments and is configured for the graph,
+field type or query argument. New attributes have been updated or added for convenience as follows:
 
 | Attribute            | Description        |
 |----------------------|--------------------|
-| `[Name]`             | Specifies a GraphQL name for a CLR class or property |
-| `[InputName]`        | Specifies a GraphQL name for an input CLR class or property |
-| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or property |
-| `[InputType]`        | Specifies a graph type for a field on an input model |
+| `[Name]`             | Specifies a GraphQL name for a CLR class, member or method parameter |
+| `[InputName]`        | Specifies a GraphQL name for an input CLR class, member or method parameter |
+| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or member |
+| `[InputType]`        | Specifies a graph type for a field on an input model, or for a query argument |
 | `[OutputType]`       | Specifies a graph type for a field on an output model |
-| `[Ignore]`           | Indicates that a CLR property should not be mapped to a field |
-| `[Metadata]`         | Specifies custom metadata to be added to the graph type or field |
+| `[Ignore]`           | Indicates that a CLR member should not be mapped to a field |
+| `[Metadata]`         | Specifies custom metadata to be added to the graph type, field or query argument |
+| `[Scoped]`           | For methods, specifies to create a DI service scope during resolver execution |
+| `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
 | `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
-Custom attributes can be easily added to control any other initialization of graphs or fields.
+Note: `[Scoped]` is provided through the GraphQL.MicrosoftDI NuGet package.
+
+Custom attributes can be easily added to control any other initialization of graphs, fields or query arguments.
 
 ### 7. More strict behavior of FloatGraphType for special values
 
