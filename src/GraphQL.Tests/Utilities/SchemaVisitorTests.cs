@@ -196,7 +196,7 @@ namespace GraphQL.Tests.Utilities
             enumType.HasAppliedDirectives().ShouldBeTrue();
             enumType.GetAppliedDirectives().Count.ShouldBe(1);
 
-            var enumValue = new EnumValueDefinition();
+            var enumValue = new EnumValueDefinition("UNUSED", null);
             enumValue.ApplyDirective("enumValue");
             enumValue.HasAppliedDirectives().ShouldBeTrue();
             enumValue.GetAppliedDirectives().Count.ShouldBe(1);

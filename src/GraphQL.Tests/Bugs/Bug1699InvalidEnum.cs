@@ -203,9 +203,9 @@ namespace GraphQL.Tests.Bugs
     {
         public Bug1699CustomEnumGraphType()
         {
-            AddValue(new EnumValueDefinition() { Name = "ISGRUMPY", Value = Bug1699Enum.Grumpy });
-            AddValue(new EnumValueDefinition() { Name = "ISHAPPY", Value = Bug1699Enum.Happy });
-            AddValue(new EnumValueDefinition() { Name = "ISSLEEPY", Value = 2 });
+            AddValue(new EnumValueDefinition("ISGRUMPY", Bug1699Enum.Grumpy));
+            AddValue(new EnumValueDefinition("ISHAPPY", Bug1699Enum.Happy));
+            AddValue(new EnumValueDefinition("ISSLEEPY", 2));
         }
     }
 }

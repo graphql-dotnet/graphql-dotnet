@@ -241,7 +241,7 @@ namespace GraphQL
                 {
                     case EnumerationGraphType e:
                         visitor.VisitEnum(e, schema);
-                        foreach (var value in e.Values.List) // List is always non-null
+                        foreach (var value in e.Values) //ISSUE:allocation
                             visitor.VisitEnumValue(value, e, schema);
                         break;
 

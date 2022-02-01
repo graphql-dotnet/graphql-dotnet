@@ -16,11 +16,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly UniqueFragmentNames Instance = new UniqueFragmentNames();
+        public static readonly UniqueFragmentNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueFragmentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.FragmentsCount() > 1 ? _nodeVisitor : null);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 1 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((fragmentDefinition, context) =>
             {

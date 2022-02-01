@@ -16,11 +16,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
+        public static readonly UniqueOperationNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {

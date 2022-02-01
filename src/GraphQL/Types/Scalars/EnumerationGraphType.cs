@@ -24,7 +24,7 @@ namespace GraphQL.Types
         /// </summary>
         public EnumerationGraphType()
         {
-            Values = new EnumValues();
+            Values = CreateValues();
         }
 
         /// <summary>
@@ -36,11 +36,9 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.</param>
         public void AddValue(string name, string? description, object? value, string? deprecationReason = null)
         {
-            AddValue(new EnumValueDefinition
+            AddValue(new EnumValueDefinition(name, value)
             {
-                Name = name,
                 Description = description,
-                Value = value,
                 DeprecationReason = deprecationReason
             });
         }
@@ -60,7 +58,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the allowed set of enumeration values.
         /// </summary>
-        public EnumValues Values { get; }
+        public EnumValuesBase Values { get; }
+
+        protected virtual EnumValuesBase CreateValues() => new EnumValues();
 
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
@@ -97,10 +97,14 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object? Serialize(object? value)
         {
-            if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
+            var foundByValue = Values.FindByValue(value);
+
+            // NOTE: for backward compatibility - keep or remove?
+            // See public void allow_null(Type graphType)
+            // g.Serialize(null).ShouldBeNull();
+            if (foundByValue == null && value == null)
                 return null;
 
-            var foundByValue = Values.FindByValue(value);
             return foundByValue == null
                 ? ThrowSerializationError(value)
                 : foundByValue.Name;
@@ -156,6 +160,8 @@ namespace GraphQL.Types
             }
         }
 
+        protected override EnumValuesBase CreateValues() => new EnumValues<TEnum>();
+
         /// <summary>
         /// Changes the case of the specified enum name.
         /// By default changes it to constant case (uppercase, using underscores to separate words).
@@ -164,13 +170,8 @@ namespace GraphQL.Types
             => _caseAttr == null ? val.ToConstantCase() : _caseAttr.ChangeEnumCase(val);
     }
 
-    /// <summary>
-    /// A class that represents a set of enumeration definitions.
-    /// </summary>
-    public class EnumValues : IEnumerable<EnumValueDefinition>
+    public abstract class EnumValuesBase : IEnumerable<EnumValueDefinition>
     {
-        internal List<EnumValueDefinition> List { get; } = new List<EnumValueDefinition>();
-
         /// <summary>
         /// Returns an enumeration definition for the specified name and <see langword="null"/> if not found.
         /// </summary>
@@ -179,33 +180,44 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets the count of enumeration definitions.
         /// </summary>
-        public int Count => List.Count;
+        public abstract int Count { get; }
 
         /// <summary>
         /// Adds an enumeration definition to the set.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(EnumValueDefinition value) => List.Add(value ?? throw new ArgumentNullException(nameof(value)));
+        public abstract void Add(EnumValueDefinition value);
 
         /// <summary>
         /// Returns an enumeration definition for the specified name.
         /// </summary>
-        public EnumValueDefinition? FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-        {
-            // DO NOT USE LINQ ON HOT PATH
-            foreach (var def in List)
-            {
-                if (def.Name.Equals(name, comparison))
-                    return def;
-            }
-
-            return null;
-        }
+        public abstract EnumValueDefinition? FindByName(ROM name);
 
         /// <summary>
-        /// Returns an enumeration definition for the specified name.
+        /// Returns an enumeration definition for the specified value.
         /// </summary>
-        internal EnumValueDefinition? FindByName(ROM name)
+        public abstract EnumValueDefinition? FindByValue(object? value);
+
+        public abstract IEnumerator<EnumValueDefinition> GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    /// <summary>
+    /// A class that represents a set of enumeration definitions.
+    /// </summary>
+    public class EnumValues : EnumValuesBase
+    {
+        private List<EnumValueDefinition> List { get; } = new List<EnumValueDefinition>();
+
+        /// <inheritdoc/>
+        public override int Count => List.Count;
+
+        /// <inheritdoc/>
+        public override void Add(EnumValueDefinition value) => List.Add(value ?? throw new ArgumentNullException(nameof(value)));
+
+        /// <inheritdoc/>
+        public override EnumValueDefinition? FindByName(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in List)
@@ -217,14 +229,12 @@ namespace GraphQL.Types
             return null;
         }
 
-        /// <summary>
-        /// Returns an enumeration definition for the specified value.
-        /// </summary>
-        public EnumValueDefinition? FindByValue(object? value)
+        /// <inheritdoc/>
+        public override EnumValueDefinition? FindByValue(object? value)
         {
             if (value is Enum)
             {
-                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())); //TODO: allocation, move work with enums into new generic class
+                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())); //ISSUE:allocation
             }
 
             // DO NOT USE LINQ ON HOT PATH
@@ -237,10 +247,53 @@ namespace GraphQL.Types
             return null;
         }
 
-        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        public IEnumerator<EnumValueDefinition> GetEnumerator() => List.GetEnumerator();
+        public override IEnumerator<EnumValueDefinition> GetEnumerator() => List.GetEnumerator();
+    }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public class EnumValues<TEnum> : EnumValuesBase where TEnum : Enum
+    {
+        private Dictionary<ROM, EnumValueDefinition> DictionaryByName { get; } = new();
+        private Dictionary<TEnum, EnumValueDefinition> DictionaryByValue { get; } = new();
+
+        /// <inheritdoc/>
+        public override int Count => DictionaryByName.Count;
+
+        /// <inheritdoc/>
+        public override void Add(EnumValueDefinition value)
+        {
+            if (value.Value is not TEnum e)
+                throw new ArgumentException($"Only values of {typeof(TEnum).Name} supported", nameof(value));
+
+            DictionaryByName[value.Name] = value;
+            DictionaryByValue[e] = value;
+        }
+
+        /// <inheritdoc/>
+        public override EnumValueDefinition? FindByName(ROM name)
+        {
+            return DictionaryByName.TryGetValue(name, out var def)
+                ? def
+                : null;
+        }
+
+        /// <inheritdoc/>
+        public override EnumValueDefinition? FindByValue(object? value)
+        {
+            // fast path
+            if (value is TEnum e)
+                return DictionaryByValue.TryGetValue(e, out var def) ? def : null;
+
+            // slow path - for example from Serialize(int)
+            foreach (var item in DictionaryByName)
+            {
+                if (Equals(item.Value.UnderlyingValue, value))
+                    return item.Value;
+            }
+
+            return null;
+        }
+
+        public override IEnumerator<EnumValueDefinition> GetEnumerator() => DictionaryByName.Values.GetEnumerator();
     }
 
     /// <summary>
@@ -249,10 +302,19 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name}: {Value}")]
     public class EnumValueDefinition : MetadataProvider, IProvideDescription, IProvideDeprecationReason
     {
+        public EnumValueDefinition(string name, object? value)
+        {
+            Name = name;
+            Value = value;
+            UnderlyingValue = value is Enum
+                ? Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()))
+                : value;
+        }
+
         /// <summary>
         /// The name of the enumeration member, as exposed through the GraphQL endpoint (e.g. "RED").
         /// </summary>
-        public string Name { get; set; } = null!;
+        public string Name { get; }
 
         /// <summary>
         /// A description of the enumeration member.
@@ -268,26 +330,15 @@ namespace GraphQL.Types
             set => this.SetDeprecationReason(value);
         }
 
-        private object? _value;
         /// <summary>
         /// The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).
         /// </summary>
-        public object? Value
-        {
-            get => _value;
-            set
-            {
-                _value = value;
-                if (value is Enum)
-                    value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
-                UnderlyingValue = value;
-            }
-        }
+        public object? Value { get; }
 
         /// <summary>
         /// When mapped to a member of an <see cref="Enum"/>, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
         /// </summary>
-        internal object? UnderlyingValue { get; set; }
+        internal object? UnderlyingValue { get; }
     }
 
     /// <summary>
