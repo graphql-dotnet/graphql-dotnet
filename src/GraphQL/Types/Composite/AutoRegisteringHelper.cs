@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace GraphQL.Types
 {
@@ -48,6 +49,14 @@ namespace GraphQL.Types
             if (isInputType)
             {
                 fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+            }
+            if (!isInputType &&
+                memberInfo is MethodInfo methodInfo &&
+                fieldType.Name.EndsWith("Async") &&
+                methodInfo.ReturnType.IsGenericType &&
+                methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                fieldType.Name = fieldType.Name.Substring(0, fieldType.Name.Length - 5);
             }
 
             return fieldType;

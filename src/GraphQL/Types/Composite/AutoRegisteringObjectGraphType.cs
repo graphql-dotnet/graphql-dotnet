@@ -81,10 +81,6 @@ namespace GraphQL.Types
             var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
             if (memberInfo is MethodInfo methodInfo)
             {
-                if (fieldType.Name.EndsWith("Async") && methodInfo.ReturnType.IsGenericType && methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    fieldType.Name = fieldType.Name.Substring(0, fieldType.Name.Length - 5);
-                }
                 var (queryArguments, resolver) = BuildMethodResolver(methodInfo, fieldType);
                 fieldType.Arguments = queryArguments;
                 fieldType.Resolver = resolver;
