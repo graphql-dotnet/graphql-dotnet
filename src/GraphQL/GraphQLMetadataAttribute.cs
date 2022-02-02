@@ -6,7 +6,7 @@ namespace GraphQL
     /// <summary>
     /// Attribute for specifying additional information when matching a CLR type to a corresponding GraphType.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
     public sealed class GraphQLMetadataAttribute : GraphQLAttribute
     {
         private Type? _mappedToInput;
@@ -94,12 +94,23 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
+        public override void Modify(EnumValueDefinition enumValueDefinition)
+        {
+            if (Name != null)
+                enumValueDefinition.Name = Name;
+
+            if (Description != null)
+                enumValueDefinition.Description = Description == "" ? null : Description;
+
+            if (DeprecationReason != null)
+                enumValueDefinition.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
+        }
+
+        /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
         {
             if (Name != null)
-            {
                 graphType.Name = Name;
-            }
 
             if (Description != null)
                 graphType.Description = Description == "" ? null : Description;
@@ -115,9 +126,7 @@ namespace GraphQL
         public override void Modify(FieldType fieldType, bool isInputType)
         {
             if (Name != null)
-            {
                 fieldType.Name = Name;
-            }
 
             if (Description != null)
                 fieldType.Description = Description == "" ? null : Description;
