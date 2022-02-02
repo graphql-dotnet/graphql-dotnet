@@ -1,4 +1,3 @@
-using System;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Resolvers;

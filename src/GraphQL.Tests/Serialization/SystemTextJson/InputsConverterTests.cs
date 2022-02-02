@@ -1,9 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using GraphQL.SystemTextJson;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Serialization.SystemTextJson
 {

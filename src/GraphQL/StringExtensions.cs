@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL
 {
     /// <summary>

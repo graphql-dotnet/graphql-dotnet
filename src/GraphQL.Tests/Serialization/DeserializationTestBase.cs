@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Numerics;
-using Shouldly;
 
 namespace GraphQL.Tests.Serialization
 {

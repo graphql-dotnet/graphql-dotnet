@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
@@ -244,7 +240,7 @@ namespace GraphQL.Benchmarks
             private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();
             public ExecutionResult Execute()
             {
-                var context = new ExecutionContext
+                var context = new Execution.ExecutionContext
                 {
                     Document = Document,
                     Schema = Schema,

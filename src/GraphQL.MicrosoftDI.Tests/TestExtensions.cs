@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-using Shouldly;
-
 namespace GraphQL.MicrosoftDI.Tests
 {
     internal static class TestExtensions

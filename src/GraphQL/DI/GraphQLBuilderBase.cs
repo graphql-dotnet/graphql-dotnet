@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Types;

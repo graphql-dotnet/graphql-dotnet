@@ -1,6 +1,4 @@
-using System;
 using GraphQL.Types;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

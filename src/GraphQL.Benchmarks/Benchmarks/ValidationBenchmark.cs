@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using GraphQL.Execution;
 using GraphQL.StarWars;

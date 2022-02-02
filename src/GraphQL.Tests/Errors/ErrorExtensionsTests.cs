@@ -1,7 +1,5 @@
-using System;
 using GraphQL.Types;
 using GraphQLParser;
-using Xunit;
 
 namespace GraphQL.Tests.Errors
 {

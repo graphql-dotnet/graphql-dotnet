@@ -1,7 +1,5 @@
 using System.Net;
-using System.Threading.Tasks;
 using GraphQL.Transport;
-using Xunit;
 
 namespace GraphQL.Harness.Tests
 {

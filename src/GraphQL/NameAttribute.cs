@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Conversion;
 using GraphQL.Types;
 

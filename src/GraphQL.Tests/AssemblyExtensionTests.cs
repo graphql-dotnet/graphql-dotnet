@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Types;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests
 {

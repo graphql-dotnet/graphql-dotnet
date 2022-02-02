@@ -1,10 +1,7 @@
 #if NET6_0_OR_GREATER
 
-using System;
 using System.Globalization;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {

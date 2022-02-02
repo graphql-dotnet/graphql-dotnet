@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Attributes;
 using GraphQL.Caching;
 using GraphQL.Execution;

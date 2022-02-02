@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;

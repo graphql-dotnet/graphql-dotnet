@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Introspection;
 using GraphQL.Types;
 

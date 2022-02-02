@@ -1,11 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
-using Microsoft.AspNetCore.Http;
 
 namespace Example
 {

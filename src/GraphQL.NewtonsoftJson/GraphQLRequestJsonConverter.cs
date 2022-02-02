@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Transport;
 using Newtonsoft.Json;
 

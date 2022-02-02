@@ -1,4 +1,3 @@
-using System;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types

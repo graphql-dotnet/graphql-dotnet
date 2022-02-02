@@ -1,12 +1,7 @@
-using System;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Introspection
 {

@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
-using Shouldly;
 
 namespace GraphQL.Tests.Validation
 {

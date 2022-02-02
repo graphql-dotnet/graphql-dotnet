@@ -1,7 +1,4 @@
-using System;
 using GraphQL.Utilities;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {

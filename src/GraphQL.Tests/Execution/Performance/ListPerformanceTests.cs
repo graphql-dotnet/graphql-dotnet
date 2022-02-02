@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace GraphQL.Tests.Execution.Performance

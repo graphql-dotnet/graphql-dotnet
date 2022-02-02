@@ -1,4 +1,3 @@
-using System;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 

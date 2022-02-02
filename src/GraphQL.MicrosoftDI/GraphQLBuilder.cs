@@ -1,8 +1,6 @@
 #nullable enable
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
