@@ -146,6 +146,17 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void toast_should_work_with_null_values()
+        {
+            var en = new EnumerationGraphType();
+            en.AddValue("one", null, 100500);
+            en.AddValue("two", null, null);
+
+            en.ToAST(100500).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("one");
+            en.ToAST(null).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("two");
+        }
+
+        [Fact]
         public void toAST_returns_enum_value()
         {
             type.ToAST(Colors.Red)

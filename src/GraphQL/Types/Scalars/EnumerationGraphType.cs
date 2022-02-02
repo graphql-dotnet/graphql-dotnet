@@ -99,26 +99,18 @@ namespace GraphQL.Types
         {
             var foundByValue = Values.FindByValue(value);
 
-            // NOTE: for backward compatibility - keep or remove?
-            // See public void allow_null(Type graphType)
-            // g.Serialize(null).ShouldBeNull();
-            if (foundByValue == null && value == null)
-                return null;
-
             return foundByValue == null
-                ? ThrowSerializationError(value)
+                ? value == null ? null : ThrowSerializationError(value)
                 : foundByValue.Name;
         }
 
         /// <inheritdoc/>
         public override GraphQLValue ToAST(object? value)
         {
-            if (value == null) // TODO: why? null as internal value may be mapped to some external enumeration name
-                return GraphQLValuesCache.Null;
-
             var foundByValue = Values.FindByValue(value);
+
             return foundByValue == null
-                ? ThrowASTConversionError(value)
+                ? value == null ? GraphQLValuesCache.Null : ThrowASTConversionError(value)
                 : new GraphQLEnumValue { Name = new GraphQLName(foundByValue.Name) };
         }
     }
