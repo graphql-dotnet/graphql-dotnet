@@ -195,7 +195,7 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void respects_GraphQLAttributes()
+        public void respects_attributes()
         {
             var test = new EnumerationGraphType<EnumAttributeTest>();
             test.Name.ShouldBe("EnumTest");
