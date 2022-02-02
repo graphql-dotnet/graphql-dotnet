@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace GraphQL.Types
 {

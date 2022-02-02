@@ -1,4 +1,3 @@
-using System;
 using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 
