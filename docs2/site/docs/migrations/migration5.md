@@ -312,7 +312,23 @@ all fields on the provided input object value. To revert `IsValidDefault` to v4 
 
 ```csharp
 public override bool IsValidDefault(object value) => value is TSourceType;
-``` 
+```
+
+### 10. `EnumerationGraphType<T>` enhancements
+
+The following new attributes are detected on auto-generated enum graph types:
+
+| Attribute     | Description                                        |
+|---------------|----------------------------------------------------|
+| `[Name]`      | Specifies the name of the enum type or value       |
+| `[Ignore]`    | Does not add the enum value to the enum type       |
+| `[Metadata]`  | Adds the specified metadata to enum type or value  |
+
+As before, you can still use the `[Description]` or `[Obsolete]` attributes to add
+descriptions or deprecation reasons to enum graph types or enum values.
+
+You can also derive from `GraphQLAttribute` to create your own attributes to modify
+enum graph types or enum values as they are being built by `EnumerationGraphType<T>`.
 
 ## Breaking Changes
 

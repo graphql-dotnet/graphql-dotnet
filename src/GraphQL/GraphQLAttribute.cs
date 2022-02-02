@@ -32,6 +32,13 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Updates the properties of the specified <see cref="EnumValueDefinition"/> as necessary.
+        /// </summary>
+        public virtual void Modify(EnumValueDefinition enumValueDefinition)
+        {
+        }
+
+        /// <summary>
         /// Updates the properties of the specified <see cref="FieldType"/> as necessary.
         /// </summary>
         /// <param name="fieldType">The <see cref="FieldType"/> to update.</param>
@@ -64,7 +71,9 @@ namespace GraphQL
         /// <summary>
         /// Determines if a specified member should be included during automatic generation
         /// of a graph type from a CLR type.
+        /// <br/><br/>
+        /// When called for enumeration values, <paramref name="isInputType"/> is <see langword="null"/>.
         /// </summary>
-        public virtual bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => true;
+        public virtual bool ShouldInclude(MemberInfo memberInfo, bool? isInputType) => true;
     }
 }
