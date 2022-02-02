@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using GraphQL.Execution;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Builders
 {

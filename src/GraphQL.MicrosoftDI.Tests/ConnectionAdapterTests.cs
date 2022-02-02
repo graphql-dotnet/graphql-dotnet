@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.MicrosoftDI.Tests
 {

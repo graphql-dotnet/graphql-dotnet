@@ -1,7 +1,5 @@
 using GraphQL.Types;
 using GraphQL.Types.Relay;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types.Relay
 {

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -23,7 +21,7 @@ namespace GraphQL.Utilities
 
         #region Object
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Objects
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Objects
         // Object types have the potential to be invalid if incorrectly defined.
         // This set of rules must be adhered to by every Object type in a GraphQL schema.
         /// <inheritdoc/>
@@ -92,7 +90,7 @@ namespace GraphQL.Utilities
 
         #region Interface
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Interfaces
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Interfaces
         // Interface types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
         public override void VisitInterface(IInterfaceGraphType type, ISchema schema)
@@ -154,7 +152,7 @@ namespace GraphQL.Utilities
 
         #region Input Object
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Input-Objects
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Input-Objects
         // Input Object types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
         public override void VisitInputObject(IInputObjectGraphType type, ISchema schema)
@@ -204,7 +202,7 @@ namespace GraphQL.Utilities
 
         #endregion
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Unions
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Unions
         // Union types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
         public override void VisitUnion(UnionGraphType type, ISchema schema)
@@ -219,7 +217,7 @@ namespace GraphQL.Utilities
             // Similarly, wrapping types must not be member types of a Union.
         }
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Enums
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Enums
         // Enum types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
         public override void VisitEnum(EnumerationGraphType type, ISchema schema)
@@ -229,7 +227,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"An Enum type '{type.Name}' must define one or more unique enum values.");
         }
 
-        // See 'Type Validation' section in https://spec.graphql.org/June2018/#sec-Type-System.Directives
+        // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Type-System.Directives
         // Directive types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
         public override void VisitDirective(DirectiveGraphType type, ISchema schema)

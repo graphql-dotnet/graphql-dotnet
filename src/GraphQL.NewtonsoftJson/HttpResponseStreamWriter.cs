@@ -3,11 +3,8 @@
 
 // A copy from https://github.com/aspnet/HttpAbstractions/blob/057fc816fab1062700959cdaad2a32e9d85efca6/src/Microsoft.AspNetCore.WebUtilities/HttpResponseStreamWriter.cs
 
-using System;
 using System.Buffers;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GraphQL.NewtonsoftJson
 {

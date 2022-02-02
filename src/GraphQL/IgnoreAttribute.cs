@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 namespace GraphQL
@@ -9,6 +8,7 @@ namespace GraphQL
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class IgnoreAttribute : GraphQLAttribute
     {
-        public override bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => false;
+        /// <inheritdoc/>
+        public override bool ShouldInclude(MemberInfo memberInfo, bool? isInputType) => false;
     }
 }

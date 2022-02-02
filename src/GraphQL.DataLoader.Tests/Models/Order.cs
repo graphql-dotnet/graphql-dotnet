@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.DataLoader.Tests.Models
 {
     public class Order

@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using System.Text;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

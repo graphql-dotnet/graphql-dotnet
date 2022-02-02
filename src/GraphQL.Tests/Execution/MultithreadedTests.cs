@@ -1,10 +1,5 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

@@ -1,4 +1,3 @@
-using System;
 using GraphQL.StarWars.IoC;
 using Microsoft.Extensions.DependencyInjection;
 

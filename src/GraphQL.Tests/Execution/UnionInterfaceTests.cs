@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -7,7 +6,7 @@ namespace GraphQL
     /// <summary>
     /// Marks a class (graph type) or property (field) with additional metadata.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true)]
     public class MetadataAttribute : GraphQLAttribute
     {
         /// <inheritdoc cref="MetadataAttribute"/>
@@ -32,6 +31,9 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public override void Modify(FieldConfig field) => field.WithMetadata(Key, Value);
+
+        /// <inheritdoc/>
+        public override void Modify(EnumValueDefinition enumValueDefinition) => enumValueDefinition.WithMetadata(Key, Value);
 
         /// <inheritdoc/>
         public override void Modify(IGraphType graphType) => graphType.WithMetadata(Key, Value);

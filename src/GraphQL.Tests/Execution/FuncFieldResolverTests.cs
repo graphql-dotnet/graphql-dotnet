@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Resolvers;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

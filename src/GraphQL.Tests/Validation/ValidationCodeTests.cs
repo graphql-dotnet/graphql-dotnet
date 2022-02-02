@@ -1,8 +1,5 @@
-using System;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Validation
 {

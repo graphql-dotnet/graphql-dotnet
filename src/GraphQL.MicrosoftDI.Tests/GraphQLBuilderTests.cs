@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.MicrosoftDI.Tests
 {

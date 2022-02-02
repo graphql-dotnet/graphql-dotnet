@@ -1,7 +1,6 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using GraphQLParser.AST;
-using Xunit;
 
 namespace GraphQL.Tests.Validation
 {

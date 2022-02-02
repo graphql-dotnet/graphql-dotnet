@@ -1,6 +1,5 @@
 using GraphQL.Utilities;
 using GraphQL.Utilities.Federation;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities.Federation
 {

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;

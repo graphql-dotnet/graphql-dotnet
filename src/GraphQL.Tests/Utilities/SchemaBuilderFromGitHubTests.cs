@@ -1,7 +1,6 @@
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {

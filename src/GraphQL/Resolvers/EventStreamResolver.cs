@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Reflection;
 using GraphQL.Subscription;
 using GraphQL.Utilities;

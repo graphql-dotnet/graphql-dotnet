@@ -1,4 +1,3 @@
-using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection

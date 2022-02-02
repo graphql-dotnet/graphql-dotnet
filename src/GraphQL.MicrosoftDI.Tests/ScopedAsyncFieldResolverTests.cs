@@ -1,7 +1,3 @@
-using System.Threading.Tasks;
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.MicrosoftDI.Tests
 {
     public class ScopedAsyncFieldResolverTests : ScopedContextBase

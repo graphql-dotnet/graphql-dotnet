@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;

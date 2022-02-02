@@ -1,9 +1,6 @@
-using System;
 using System.Text;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

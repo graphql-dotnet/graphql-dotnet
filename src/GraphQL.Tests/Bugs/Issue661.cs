@@ -1,10 +1,7 @@
-using System;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

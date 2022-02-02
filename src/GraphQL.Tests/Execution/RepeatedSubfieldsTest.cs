@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL.Tests.Execution
 {
