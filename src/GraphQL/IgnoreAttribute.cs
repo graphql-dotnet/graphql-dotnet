@@ -9,6 +9,6 @@ namespace GraphQL
     public class IgnoreAttribute : GraphQLAttribute
     {
         /// <inheritdoc/>
-        public override bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => false;
+        public override bool ShouldInclude(MemberInfo memberInfo, bool? isInputType) => false;
     }
 }

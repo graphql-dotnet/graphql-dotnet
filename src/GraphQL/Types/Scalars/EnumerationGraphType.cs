@@ -160,7 +160,7 @@ namespace GraphQL.Types
                 bool ignore = false;
                 foreach (var attr in member.GetCustomAttributes<GraphQLAttribute>())
                 {
-                    if (!attr.ShouldInclude(member, true))
+                    if (!attr.ShouldInclude(member, null))
                     {
                         ignore = true;
                         break;

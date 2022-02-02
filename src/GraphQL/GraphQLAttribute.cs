@@ -57,7 +57,9 @@ namespace GraphQL
         /// <summary>
         /// Determines if a specified member should be included during automatic generation
         /// of a graph type from a CLR type.
+        /// <br/><br/>
+        /// When called for enumeration values, <paramref name="isInputType"/> is <see langword="null"/>.
         /// </summary>
-        public virtual bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => true;
+        public virtual bool ShouldInclude(MemberInfo memberInfo, bool? isInputType) => true;
     }
 }
