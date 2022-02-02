@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using GraphQL.Tests.StarWars;
-using Shouldly;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace GraphQL.Tests.Execution.Performance

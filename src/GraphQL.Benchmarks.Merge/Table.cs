@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL.Benchmarks.Merge
 {
     internal sealed class Table

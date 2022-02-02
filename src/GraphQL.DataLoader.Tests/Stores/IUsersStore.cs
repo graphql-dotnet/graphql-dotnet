@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 
 namespace GraphQL.DataLoader.Tests.Stores

@@ -1,10 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Tests.Utilities;
 using GraphQLParser;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Errors
 {

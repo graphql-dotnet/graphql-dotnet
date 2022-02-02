@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {

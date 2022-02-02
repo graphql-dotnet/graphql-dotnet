@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace GraphQL.DataLoader
 {
     /// <inheritdoc cref="IDataLoaderContextAccessor"/>

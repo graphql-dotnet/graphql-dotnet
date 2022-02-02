@@ -1,6 +1,3 @@
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.Tests.Bugs
 {
     public class Bug1652

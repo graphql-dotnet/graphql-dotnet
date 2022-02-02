@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types.Collections
 {

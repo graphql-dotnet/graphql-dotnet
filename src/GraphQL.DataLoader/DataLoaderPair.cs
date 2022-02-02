@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     //this class could always be unsealed, but it seems pointless, as

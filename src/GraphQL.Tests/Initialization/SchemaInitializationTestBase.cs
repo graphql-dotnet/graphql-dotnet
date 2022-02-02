@@ -1,6 +1,4 @@
-using System;
 using GraphQL.Types;
-using Shouldly;
 
 namespace GraphQL.Tests.Initialization
 {

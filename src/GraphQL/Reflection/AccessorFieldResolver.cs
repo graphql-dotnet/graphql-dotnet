@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Resolvers;
 
 namespace GraphQL.Reflection

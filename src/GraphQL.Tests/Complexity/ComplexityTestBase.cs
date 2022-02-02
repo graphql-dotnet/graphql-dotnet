@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Tests.StarWars;
 using GraphQL.Validation.Complexity;

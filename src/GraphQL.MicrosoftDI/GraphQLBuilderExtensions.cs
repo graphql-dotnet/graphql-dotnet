@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using GraphQL.DI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;

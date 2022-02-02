@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Xunit;
-
 namespace GraphQL.Tests.StarWars
 {
     public class StarWarsBasicQueryTests : StarWarsTestBase

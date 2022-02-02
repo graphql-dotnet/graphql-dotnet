@@ -1,8 +1,5 @@
-using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Caching
 {

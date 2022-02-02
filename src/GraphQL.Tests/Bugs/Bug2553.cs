@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Text.Json;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

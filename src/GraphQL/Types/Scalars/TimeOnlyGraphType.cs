@@ -1,6 +1,5 @@
 #if NET6_0_OR_GREATER
 
-using System;
 using System.Globalization;
 using GraphQLParser;
 using GraphQLParser.AST;

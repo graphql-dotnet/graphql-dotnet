@@ -1,6 +1,3 @@
-using Shouldly;
-using Xunit;
-
 namespace GraphQL.MicrosoftDI.Tests
 {
     public class ScopedFieldResolverTests : ScopedContextBase

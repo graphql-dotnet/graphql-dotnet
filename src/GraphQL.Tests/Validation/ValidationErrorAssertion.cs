@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQLParser;
 
 namespace GraphQL.Tests.Validation

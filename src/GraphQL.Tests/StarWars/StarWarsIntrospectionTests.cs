@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace GraphQL.Tests.StarWars
 {
     public class StarWarsIntrospectionTests : StarWarsTestBase

@@ -1,8 +1,5 @@
-using System;
 using System.Globalization;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {

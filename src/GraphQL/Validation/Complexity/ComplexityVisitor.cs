@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 

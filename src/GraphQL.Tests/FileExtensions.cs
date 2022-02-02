@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace GraphQL.Tests
 {
     internal static class FileExtensions

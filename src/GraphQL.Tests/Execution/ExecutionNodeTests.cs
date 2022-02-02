@@ -1,9 +1,6 @@
-using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

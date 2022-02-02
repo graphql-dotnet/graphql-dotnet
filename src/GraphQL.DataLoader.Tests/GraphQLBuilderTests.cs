@@ -1,9 +1,6 @@
-using System;
 using GraphQL.DI;
 using GraphQL.Execution;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.DataLoader.Tests
 {

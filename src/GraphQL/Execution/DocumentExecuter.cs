@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -10,6 +6,7 @@ using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {

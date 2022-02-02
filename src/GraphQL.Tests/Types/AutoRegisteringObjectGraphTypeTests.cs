@@ -1,19 +1,12 @@
 #nullable enable
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {
