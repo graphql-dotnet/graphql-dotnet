@@ -193,5 +193,39 @@ namespace GraphQL.Tests.Types
             OneOne,
             TwoTwo
         }
+
+        [Fact]
+        public void respects_GraphQLAttributes()
+        {
+            var test = new EnumerationGraphType<EnumAttributeTest>();
+            test.Name.ShouldBe("EnumTest");
+            test.Description.ShouldBe("Test description");
+            test.DeprecationReason.ShouldBe("Test obsolete");
+            test.GetMetadata<string>("Key1").ShouldBe("Value1");
+            test.Values.Count.ShouldBe(2);
+            var value1 = test.Values.FindByName("CUSTOM_NAME").ShouldNotBeNull();
+            value1.Value.ShouldBe(EnumAttributeTest.Enum1);
+            value1.Description.ShouldBe("Custom enum value");
+            var value2 = test.Values.FindByName("ENUM_2").ShouldNotBeNull();
+            value2.Value.ShouldBe(EnumAttributeTest.Enum2);
+            value2.GetMetadata<string>("Key2").ShouldBe("Value2");
+            test.Values.FindByName("IGNORED").ShouldBeNull();
+        }
+
+        [Name("EnumTest")]
+        [Description("Test description")]
+        [Obsolete("Test obsolete")]
+        [Metadata("Key1", "Value1")]
+        private enum EnumAttributeTest
+        {
+            [Ignore]
+            Ignored,
+            [Name("CUSTOM_NAME")]
+            [Description("Custom enum value")]
+            Enum1,
+            [Metadata("Key2", "Value2")]
+            [Obsolete("Deprecated enum value")]
+            Enum2,
+        }
     }
 }

@@ -33,6 +33,9 @@ namespace GraphQL
         public override void Modify(FieldConfig field) => field.WithMetadata(Key, Value);
 
         /// <inheritdoc/>
+        public override void Modify(EnumValueDefinition enumValueDefinition) => enumValueDefinition.WithMetadata(Key, Value);
+
+        /// <inheritdoc/>
         public override void Modify(IGraphType graphType) => graphType.WithMetadata(Key, Value);
 
         /// <inheritdoc/>

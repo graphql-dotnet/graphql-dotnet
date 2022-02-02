@@ -28,6 +28,10 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
+        public override void Modify(EnumValueDefinition enumValueDefinition)
+            => enumValueDefinition.Name = Name;
+
+        /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
             => graphType.Name = Name;
 

@@ -157,12 +157,18 @@ namespace GraphQL.Types
                     Description = description,
                     DeprecationReason = deprecation,
                 };
+                bool ignore = false;
                 foreach (var attr in member.GetCustomAttributes<GraphQLAttribute>())
                 {
                     if (!attr.ShouldInclude(member, true))
-                        continue;
+                    {
+                        ignore = true;
+                        break;
+                    }
                     attr.Modify(enumValue);
                 }
+                if (ignore)
+                    continue;
                 AddValue(enumValue);
             }
 

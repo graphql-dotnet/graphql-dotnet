@@ -94,12 +94,23 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
+        public override void Modify(EnumValueDefinition enumValueDefinition)
+        {
+            if (Name != null)
+                enumValueDefinition.Name = Name;
+
+            if (Description != null)
+                enumValueDefinition.Description = Description == "" ? null : Description;
+
+            if (DeprecationReason != null)
+                enumValueDefinition.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
+        }
+
+        /// <inheritdoc/>
         public override void Modify(IGraphType graphType)
         {
             if (Name != null)
-            {
                 graphType.Name = Name;
-            }
 
             if (Description != null)
                 graphType.Description = Description == "" ? null : Description;
@@ -115,9 +126,7 @@ namespace GraphQL
         public override void Modify(FieldType fieldType, bool isInputType)
         {
             if (Name != null)
-            {
                 fieldType.Name = Name;
-            }
 
             if (Description != null)
                 fieldType.Description = Description == "" ? null : Description;
