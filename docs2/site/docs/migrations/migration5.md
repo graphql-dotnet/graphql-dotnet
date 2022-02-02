@@ -247,7 +247,7 @@ all fields on the provided input object value. To revert `IsValidDefault` to v4 
 
 ```csharp
 public override bool IsValidDefault(object value) => value is TSourceType;
-``` 
+```
 
 ### 10. `EnumerationGraphType<T>` enhancements
 
