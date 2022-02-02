@@ -8,6 +8,7 @@ namespace GraphQL
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class IgnoreAttribute : GraphQLAttribute
     {
+        /// <inheritdoc/>
         public override bool ShouldInclude(MemberInfo memberInfo, bool isInputType) => false;
     }
 }

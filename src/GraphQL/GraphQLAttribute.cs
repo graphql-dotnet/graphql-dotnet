@@ -32,6 +32,13 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Updates the properties of the specified <see cref="EnumValueDefinition"/> as necessary.
+        /// </summary>
+        public virtual void Modify(EnumValueDefinition enumValueDefinition)
+        {
+        }
+
+        /// <summary>
         /// Updates the properties of the specified <see cref="FieldType"/> as necessary.
         /// </summary>
         /// <param name="fieldType">The <see cref="FieldType"/> to update.</param>

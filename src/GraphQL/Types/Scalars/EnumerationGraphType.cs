@@ -140,16 +140,35 @@ namespace GraphQL.Types
                 name: ChangeEnumCase(e.name),
                 value: Enum.Parse(type, e.name),
                 description: e.member.Description(),
-                deprecation: e.member.ObsoleteMessage()
+                deprecation: e.member.ObsoleteMessage(),
+                member: e.member
             ));
 
             Name = type.Name.ToPascalCase();
             Description ??= typeof(TEnum).Description();
             DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
-            foreach (var (name, value, description, deprecation) in enumGraphData)
+            foreach (var (name, value, description, deprecation, member) in enumGraphData)
             {
-                AddValue(name, description, value, deprecation);
+                var enumValue = new EnumValueDefinition
+                {
+                    Name = name,
+                    Value = value,
+                    Description = description,
+                    DeprecationReason = deprecation,
+                };
+                foreach (var attr in member.GetCustomAttributes<GraphQLAttribute>())
+                {
+                    if (!attr.ShouldInclude(member, true))
+                        continue;
+                    attr.Modify(enumValue);
+                }
+                AddValue(enumValue);
+            }
+
+            foreach (var attr in type.GetCustomAttributes<GraphQLAttribute>())
+            {
+                attr.Modify(this);
             }
         }
 
