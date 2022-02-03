@@ -1685,7 +1685,7 @@ namespace GraphQL.Types
         public EnumValueDefinition(string name, object? value) { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
-        public string Name { get; }
+        public string Name { get; set; }
         public object? Value { get; }
     }
     public class EnumValues : GraphQL.Types.EnumValuesBase

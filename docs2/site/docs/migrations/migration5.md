@@ -516,3 +516,9 @@ services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegis
 The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
 and now supports returning both properties and fields, although fields are not included
 with the default implementation. Override the method in a derived class to include fields.
+
+### 24. `EnumerationGraphType` parses exact names
+
+Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationGraphType`.
+In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
+and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
