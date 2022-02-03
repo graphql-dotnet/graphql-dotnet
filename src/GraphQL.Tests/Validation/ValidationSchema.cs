@@ -45,9 +45,9 @@ namespace GraphQL.Tests.Validation
         public DogCommand()
         {
             Name = "DogCommand";
-            AddValue("SIT", "", 0);
-            AddValue("HEAL", "", 1);
-            AddValue("DOWN", "", 2);
+            AddValue("SIT", 0);
+            AddValue("HEAL", 1);
+            AddValue("DOWN", 2);
         }
     }
 
@@ -80,8 +80,8 @@ namespace GraphQL.Tests.Validation
     {
         public FurColor()
         {
-            AddValue("Brown", "", 0);
-            AddValue("Yellow", "", 1);
+            AddValue("Brown", 0);
+            AddValue("Yellow", 1);
         }
     }
 

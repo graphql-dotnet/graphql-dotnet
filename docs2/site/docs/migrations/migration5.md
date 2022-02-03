@@ -522,3 +522,9 @@ with the default implementation. Override the method in a derived class to inclu
 Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationGraphType`.
 In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
 and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
+
+### 25. `EnumerationGraphType.AddValue` changes
+
+`description` argument from `EnumerationGraphType.AddValue` method was marked as optional
+and moved after `value` argument. If you use this method and set descriptions, you will need
+to change the order of arguments.

@@ -2044,9 +2044,9 @@ type Zebra {
             public RgbEnum()
             {
                 Name = "RGB";
-                AddValue("RED", "Red!", 0, "Use green!");
-                AddValue("GREEN", "Green!", 1);
-                AddValue("BLUE", "Blue!", 2);
+                AddValue("RED", 0, "Red!", "Use green!");
+                AddValue("GREEN", 1, "Green!");
+                AddValue("BLUE", 2, "Blue!");
             }
         }
     }
