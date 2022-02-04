@@ -6,7 +6,13 @@
 # https://github.com/actions/labeler/blob/master/README.md
 
 name: Labeler
-on: [pull_request_target]
+on:
+  pull_request_target:
+    types:
+      - opened        # when PR is opened
+      - edited        # when PR is edited
+      - synchronize   # when code is added
+      - reopened      # when a closed PR is reopened
 
 jobs:
   label:
