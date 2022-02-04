@@ -199,7 +199,7 @@ public enum SortOrder
 
 The above code would generate a GraphQL schema like this:
 
-```gql
+```graphql
 type Person {
   id: ID!
   name: String!
