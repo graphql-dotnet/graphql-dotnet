@@ -1728,8 +1728,8 @@ namespace GraphQL.Types
     {
         public EnumerationGraphType() { }
         public GraphQL.Types.EnumValuesBase Values { get; }
-        public void AddValue(GraphQL.Types.EnumValueDefinition value) { }
-        public void AddValue(string name, object? value, string? description = null, string? deprecationReason = null) { }
+        public void Add(GraphQL.Types.EnumValueDefinition value) { }
+        public void Add(string name, object? value, string? description = null, string? deprecationReason = null) { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
         protected virtual GraphQL.Types.EnumValuesBase CreateValues() { }

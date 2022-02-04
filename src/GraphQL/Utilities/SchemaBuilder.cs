@@ -505,7 +505,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (enumDef.Values?.Count > 0) // just in case
             {
                 foreach (var value in enumDef.Values)
-                    type.AddValue(ToEnumValue(value, typeConfig.Type!));
+                    type.Add(ToEnumValue(value, typeConfig.Type!));
             }
 
             return type;

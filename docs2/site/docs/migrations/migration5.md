@@ -527,4 +527,6 @@ and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type
 
 `description` argument from `EnumerationGraphType.AddValue` method was marked as optional
 and moved after `value` argument. If you use this method and set descriptions, you will need
-to change the order of arguments.
+to change the order of arguments. Since changing the order of arguments in some cases can remain
+invisible to the caller and lead to hardly detected bugs, the method name has been changed from
+`AddValue` to `Add`.

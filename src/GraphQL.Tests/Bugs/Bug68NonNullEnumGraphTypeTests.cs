@@ -105,7 +105,7 @@ namespace GraphQL.Tests.Bugs
 
                 var name = DeriveEnumValueName(enumMember.Name);
 
-                AddValue(name, Enum.Parse(type, enumName));
+                Add(name, Enum.Parse(type, enumName));
             }
         }
 

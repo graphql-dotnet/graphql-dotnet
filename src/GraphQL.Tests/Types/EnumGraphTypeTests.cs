@@ -103,7 +103,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void does_not_allow_nulls_to_be_added()
         {
-            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null));
         }
 
         [Fact]
@@ -134,8 +134,8 @@ namespace GraphQL.Tests.Types
         public void serialize_should_work_with_null_values()
         {
             var en = new EnumerationGraphType();
-            en.AddValue("one", 100500);
-            en.AddValue("two", null);
+            en.Add("one", 100500);
+            en.Add("two", null);
 
             en.Serialize(100500).ShouldBe("one");
             en.Serialize(null).ShouldBe("two");
@@ -145,8 +145,8 @@ namespace GraphQL.Tests.Types
         public void toast_should_work_with_null_values()
         {
             var en = new EnumerationGraphType();
-            en.AddValue("one", 100500);
-            en.AddValue("two", null);
+            en.Add("one", 100500);
+            en.Add("two", null);
 
             en.ToAST(100500).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("one");
             en.ToAST(null).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("two");

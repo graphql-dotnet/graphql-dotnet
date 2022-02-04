@@ -184,9 +184,9 @@ namespace GraphQL.Tests.Execution
         {
             Name = "Gender";
             Description = "User gender";
-            AddValue("NotSpecified", Gender.NotSpecified, "NotSpecified gender.");
-            AddValue("Male", Gender.Male, "gender Male");
-            AddValue("Female", Gender.Female, "gender female");
+            Add("NotSpecified", Gender.NotSpecified, "NotSpecified gender.");
+            Add("Male", Gender.Male, "gender Male");
+            Add("Female", Gender.Female, "gender female");
         }
     }
 

@@ -28,9 +28,9 @@ namespace GraphQL.Types
         /// <param name="value">The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).</param>
         /// <param name="description">A description of the enumeration member.</param>
         /// <param name="deprecationReason">The reason this enumeration member has been deprecated; <see langword="null"/> if this member has not been deprecated.</param>
-        public void AddValue(string name, object? value, string? description = null, string? deprecationReason = null)
+        public void Add(string name, object? value, string? description = null, string? deprecationReason = null)
         {
-            AddValue(new EnumValueDefinition(name, value)
+            Add(new EnumValueDefinition(name, value)
             {
                 Description = description,
                 DeprecationReason = deprecationReason
@@ -40,7 +40,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a value to the allowed set of enumeration values.
         /// </summary>
-        public void AddValue(EnumValueDefinition value)
+        public void Add(EnumValueDefinition value)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -160,7 +160,7 @@ namespace GraphQL.Types
                 }
                 if (ignore)
                     continue;
-                AddValue(enumValue);
+                Add(enumValue);
             }
 
             foreach (var attr in type.GetCustomAttributes<GraphQLAttribute>())
