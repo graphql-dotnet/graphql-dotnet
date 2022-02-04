@@ -12,7 +12,7 @@ namespace GraphQL
         /// <inheritdoc/>
         public override void Modify(FieldType fieldType, bool isInputType)
         {
-            if (fieldType.Resolver == null)
+            if (isInputType || fieldType.Resolver == null)
                 return;
 
             fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
