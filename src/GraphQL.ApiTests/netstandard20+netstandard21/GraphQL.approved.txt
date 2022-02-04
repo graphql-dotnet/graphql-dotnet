@@ -1682,30 +1682,50 @@ namespace GraphQL.Types
     }
     public class EnumValueDefinition : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription
     {
-        public EnumValueDefinition() { }
+        public EnumValueDefinition(string name, object? value) { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public object? Value { get; set; }
+        public object? Value { get; }
     }
-    public class EnumValues : System.Collections.Generic.IEnumerable<GraphQL.Types.EnumValueDefinition>, System.Collections.IEnumerable
+    public class EnumValues : GraphQL.Types.EnumValuesBase
     {
         public EnumValues() { }
-        public int Count { get; }
+        public override int Count { get; }
+        public override void Add(GraphQL.Types.EnumValueDefinition value) { }
+        public override GraphQL.Types.EnumValueDefinition? FindByName(GraphQLParser.ROM name) { }
+        public override GraphQL.Types.EnumValueDefinition? FindByValue(object? value) { }
+        public override System.Collections.Generic.IEnumerator<GraphQL.Types.EnumValueDefinition> GetEnumerator() { }
+    }
+    public abstract class EnumValuesBase : System.Collections.Generic.IEnumerable<GraphQL.Types.EnumValueDefinition>, System.Collections.IEnumerable
+    {
+        protected EnumValuesBase() { }
+        public abstract int Count { get; }
         public GraphQL.Types.EnumValueDefinition? this[string name] { get; }
-        public void Add(GraphQL.Types.EnumValueDefinition value) { }
-        public GraphQL.Types.EnumValueDefinition? FindByName(string name, System.StringComparison comparison = 5) { }
-        public GraphQL.Types.EnumValueDefinition? FindByValue(object? value) { }
-        public System.Collections.Generic.IEnumerator<GraphQL.Types.EnumValueDefinition> GetEnumerator() { }
+        public abstract void Add(GraphQL.Types.EnumValueDefinition value);
+        public abstract GraphQL.Types.EnumValueDefinition? FindByName(GraphQLParser.ROM name);
+        public abstract GraphQL.Types.EnumValueDefinition? FindByValue(object? value);
+        public abstract System.Collections.Generic.IEnumerator<GraphQL.Types.EnumValueDefinition> GetEnumerator();
+    }
+    public class EnumValues<TEnum> : GraphQL.Types.EnumValuesBase
+        where TEnum : System.Enum
+    {
+        public EnumValues() { }
+        public override int Count { get; }
+        public override void Add(GraphQL.Types.EnumValueDefinition value) { }
+        public override GraphQL.Types.EnumValueDefinition? FindByName(GraphQLParser.ROM name) { }
+        public override GraphQL.Types.EnumValueDefinition? FindByValue(object? value) { }
+        public override System.Collections.Generic.IEnumerator<GraphQL.Types.EnumValueDefinition> GetEnumerator() { }
     }
     public class EnumerationGraphType : GraphQL.Types.ScalarGraphType
     {
         public EnumerationGraphType() { }
-        public GraphQL.Types.EnumValues Values { get; }
-        public void AddValue(GraphQL.Types.EnumValueDefinition value) { }
-        public void AddValue(string name, string? description, object? value, string? deprecationReason = null) { }
+        public GraphQL.Types.EnumValuesBase Values { get; }
+        public void Add(GraphQL.Types.EnumValueDefinition value) { }
+        public void Add(string name, object? value, string? description = null, string? deprecationReason = null) { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
+        protected virtual GraphQL.Types.EnumValuesBase CreateValues() { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
@@ -1716,6 +1736,7 @@ namespace GraphQL.Types
     {
         public EnumerationGraphType() { }
         protected virtual string ChangeEnumCase(string val) { }
+        protected override GraphQL.Types.EnumValuesBase CreateValues() { }
     }
     public class EventStreamFieldType : GraphQL.Types.FieldType
     {

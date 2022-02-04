@@ -14,11 +14,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
+        public static readonly NoFragmentCycles Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
         {

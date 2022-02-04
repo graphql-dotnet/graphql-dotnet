@@ -68,9 +68,9 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void adds_values_from_enum_custom_casing()
+        public void adds_values_from_enum_custom_casing_should_throw()
         {
-            type.ParseValue("rED").ShouldBe(Colors.Red);
+            Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' to the scalar type 'Colors'");
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void does_not_allow_nulls_to_be_added()
         {
-            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null));
         }
 
         [Fact]
@@ -128,6 +128,28 @@ namespace GraphQL.Tests.Types
         public void serialize_by_name_throws()
         {
             Should.Throw<InvalidOperationException>(() => type.Serialize("RED"));
+        }
+
+        [Fact]
+        public void serialize_should_work_with_null_values()
+        {
+            var en = new EnumerationGraphType();
+            en.Add("one", 100500);
+            en.Add("two", null);
+
+            en.Serialize(100500).ShouldBe("one");
+            en.Serialize(null).ShouldBe("two");
+        }
+
+        [Fact]
+        public void toast_should_work_with_null_values()
+        {
+            var en = new EnumerationGraphType();
+            en.Add("one", 100500);
+            en.Add("two", null);
+
+            en.ToAST(100500).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("one");
+            en.ToAST(null).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("two");
         }
 
         [Fact]

@@ -17,11 +17,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
+        public static readonly PossibleFragmentSpreads Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="PossibleFragmentSpreadsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>

@@ -133,7 +133,7 @@ namespace GraphQL.Introspection
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
 
                         int index = 0;
-                        foreach (var def in type.Values.List)
+                        foreach (var def in type.Values) //ISSUE:allocation
                         {
                             if ((includeDeprecated || string.IsNullOrWhiteSpace(def.DeprecationReason)) && await context.Schema.Filter.AllowEnumValue(type, def).ConfigureAwait(false))
                                 enumValueDefinitions[index++] = def;
