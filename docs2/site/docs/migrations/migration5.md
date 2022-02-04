@@ -236,8 +236,8 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
 Similarly, by overriding `CreateField` you can change the default name, description,
 graph type, or other information applied to each generated field.
 
-Most of these changes can be performed by attributes, but by creating a derived class you can
-change default behavior without needing to add attributes to all of your data models.
+Most of these changes can be performed declaratively by attributes, but by creating a derived class you can
+change default behavior imperatively without needing to add attributes to all of your data models.
 
 These `protected` methods can be overridden to provide the following customizations to
 automatically-generated graph types:
