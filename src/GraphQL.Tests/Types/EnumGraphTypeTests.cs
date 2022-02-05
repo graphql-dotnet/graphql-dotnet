@@ -101,6 +101,20 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void parse_native_clr_enum_value()
+        {
+            type.CanParseValue(Colors.Red).ShouldBeTrue();
+            type.ParseValue(Colors.Red).ShouldBe(Colors.Red);
+        }
+
+        [Fact]
+        public void parse_native_clr_enum_value_when_not_defined()
+        {
+            type.CanParseValue((Colors)100500).ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' to the scalar type 'Colors'");
+        }
+
+        [Fact]
         public void does_not_allow_nulls_to_be_added()
         {
             Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null));

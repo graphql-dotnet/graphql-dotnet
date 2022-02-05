@@ -1735,8 +1735,10 @@ namespace GraphQL.Types
         where TEnum : System.Enum
     {
         public EnumerationGraphType() { }
+        public override bool CanParseValue(object? value) { }
         protected virtual string ChangeEnumCase(string val) { }
         protected override GraphQL.Types.EnumValuesBase CreateValues() { }
+        public override object? ParseValue(object? value) { }
     }
     public class EventStreamFieldType : GraphQL.Types.FieldType
     {

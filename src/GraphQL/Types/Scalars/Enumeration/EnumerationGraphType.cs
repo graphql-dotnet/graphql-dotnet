@@ -115,7 +115,8 @@ namespace GraphQL.Types
     /// Also it can get descriptions for enum fields from the XML comments.
     /// </summary>
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
-    public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType
+        where TEnum : Enum
     {
         private static readonly EnumCaseAttribute? _caseAttr = typeof(TEnum).GetCustomAttribute<EnumCaseAttribute>();
 
@@ -170,6 +171,20 @@ namespace GraphQL.Types
         }
 
         protected override EnumValuesBase CreateValues() => new EnumValues<TEnum>();
+
+        /// <inheritdoc/>
+        public override object? ParseValue(object? value) => value switch
+        {
+            TEnum _ => Values.FindByValue(value)?.Value ?? ThrowValueConversionError(value), // no boxing
+            _ => base.ParseValue(value)
+        };
+
+        /// <inheritdoc/>
+        public override bool CanParseValue(object? value) => value switch
+        {
+            TEnum _ => Enum.IsDefined(typeof(TEnum), value), // no boxing
+            _ => base.CanParseValue(value)
+        };
 
         /// <summary>
         /// Changes the case of the specified enum name.
