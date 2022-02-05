@@ -84,20 +84,18 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Constructs a lambda expression for a field resolver to return the specified query argument
-        /// from the resolve context.
+        /// from the resolve context. The returned lambda is similar to the following:
+        /// <code>context =&gt; context.GetArgument&lt;T&gt;(queryArgument.Name, queryArgument.DefaultValue)</code>
         /// </summary>
         internal static LambdaExpression GetParameterExpression(Type parameterType, QueryArgument queryArgument)
         {
-            //construct a call to ResolveFieldContextExtensions.GetArgument, passing in the appropriate default value
+            //construct a typed call to AutoRegisteringHelper.GetArgumentInternal, passing in queryArgument
             var getArgumentMethodTyped = _getArgumentMethod.MakeGenericMethod(parameterType);
             var resolveFieldContextParameter = Expression.Parameter(typeof(IResolveFieldContext), "context");
             var queryArgumentExpression = Expression.Constant(queryArgument, typeof(QueryArgument));
-            //e.g. Func<IResolveFieldContext, int> = (context) => ResolveFieldContextExtensions.GetArgument<int>(context, queryArgument.Name, queryArgument.DefaultValue);
+            //e.g. Func<IResolveFieldContext, int> = (context) => AutoRegisteringHelper.GetArgumentInternal<int>(context, queryArgument);
             var expr = Expression.Call(getArgumentMethodTyped, resolveFieldContextParameter, queryArgumentExpression);
-
-            return Expression.Lambda(
-                expr,
-                resolveFieldContextParameter);
+            return Expression.Lambda(expr, resolveFieldContextParameter);
         }
 
         private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
@@ -106,7 +104,8 @@ namespace GraphQL.Types
         /// if a value was not specified in the request.
         /// <br/><br/>
         /// Unlike <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>,
-        /// the default value is not returned if <see langword="null"/> was supplied.
+        /// the default value is not returned if <see langword="null"/> was explicitly supplied within the query.
+        /// The default value is only returned if no value was supplied to the query.
         /// </summary>
         private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
         {
