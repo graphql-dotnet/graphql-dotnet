@@ -288,7 +288,8 @@ namespace GraphQL.Tests.Types
             }
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<string>("testService");
-            context.RequestServices = serviceCollection.BuildServiceProvider();
+            using var provider = serviceCollection.BuildServiceProvider();
+            context.RequestServices = provider;
             fieldType.Resolver.ShouldNotBeNull();
             fieldType.Resolver!.Resolve(context).ShouldBe(expected);
         }
