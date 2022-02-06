@@ -4,8 +4,8 @@ using System.Reflection;
 namespace GraphQL.Resolvers
 {
     /// <summary>
-    /// A field resolver for a specific <see cref="MemberInfo"/>.
-    /// Returns the value of the field or property, or for methods, calls the method and returns the value of the method.
+    /// A field resolver for a specific <see cref="MethodInfo"/>.
+    /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
     internal class MethodResolver : IFieldResolver
     {
