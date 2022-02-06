@@ -97,7 +97,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Builds a query argument or expression from this instance.
         /// <br/><br/>
-        /// If a query argument is returned, it will be added to field type.
+        /// If a query argument is returned, it will be added to the arguments list of the field type.
         /// <br/><br/>
         /// If an expression is returned, it will be used to populate the method argument within the field resolver;
         /// if not, the query argument's value will be used to populate the method argument within the field resolver.
