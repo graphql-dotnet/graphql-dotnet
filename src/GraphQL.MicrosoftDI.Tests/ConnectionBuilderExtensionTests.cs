@@ -39,7 +39,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .Resolve()
                 .WithScope()
                 .Resolve(context => "hello");
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
             VerifyScoped();
         }
 
@@ -50,7 +50,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var builder = graph.Connection<StringGraphType>();
             var field = builder.FieldType;
             builder.ResolveScoped(context => "hello");
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
             VerifyScoped();
         }
 
@@ -65,7 +65,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithService<string>()
                 .Resolve((context, value) => value);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
             VerifyScoped();
         }
 
@@ -81,7 +81,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<string>()
                 .WithService<int>()
                 .Resolve((context, value, v2) => value + v2);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
             VerifyScoped();
         }
 
@@ -98,7 +98,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<int>()
                 .WithService<short>()
                 .Resolve((context, value, v2, v3) => value + v2 + v3);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello23");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
             VerifyScoped();
         }
 
@@ -116,7 +116,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<short>()
                 .WithService<byte>()
                 .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello234");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
             VerifyScoped();
         }
 
@@ -135,7 +135,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<byte>()
                 .WithService<long>()
                 .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2345");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
             VerifyScoped();
         }
 
@@ -150,7 +150,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithServices<string, int>()
                 .Resolve((context, value, v2) => value + v2);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
             VerifyScoped();
         }
 
@@ -165,7 +165,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithServices<string, int, short>()
                 .Resolve((context, value, v2, v3) => value + v2 + v3);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello23");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
             VerifyScoped();
         }
 
@@ -180,7 +180,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithServices<string, int, short, byte>()
                 .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello234");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
             VerifyScoped();
         }
 
@@ -195,7 +195,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithScope()
                 .WithServices<string, int, short, byte, long>()
                 .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-            field.Resolver.Resolve(_scopedContext).ShouldBe("hello2345");
+            field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
             VerifyScoped();
         }
 
@@ -208,7 +208,7 @@ namespace GraphQL.MicrosoftDI.Tests
             builder
                 .Resolve()
                 .Resolve(context => "hello");
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello");
             VerifyUnscoped();
         }
 
@@ -222,7 +222,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .Resolve()
                 .WithService<string>()
                 .Resolve((context, value) => value);
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello");
             VerifyUnscoped();
         }
 
@@ -237,7 +237,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<string>()
                 .WithService<int>()
                 .Resolve((context, value, v2) => value + v2);
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello2");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello2");
             VerifyUnscoped();
         }
 
@@ -253,7 +253,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<int>()
                 .WithService<short>()
                 .Resolve((context, value, v2, v3) => value + v2 + v3);
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello23");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello23");
             VerifyUnscoped();
         }
 
@@ -270,7 +270,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<short>()
                 .WithService<byte>()
                 .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4);
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello234");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello234");
             VerifyUnscoped();
         }
 
@@ -288,7 +288,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<byte>()
                 .WithService<long>()
                 .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBe("hello2345");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello2345");
             VerifyUnscoped();
         }
 
@@ -302,7 +302,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .Resolve()
                 .WithScope()
                 .ResolveAsync(context => Task.FromResult<object>("hello"));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
             VerifyScoped();
         }
 
@@ -313,7 +313,7 @@ namespace GraphQL.MicrosoftDI.Tests
             var builder = graph.Connection<StringGraphType>();
             var field = builder.FieldType;
             builder.ResolveScopedAsync(context => Task.FromResult<object>("hello"));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
             VerifyScoped();
         }
 
@@ -328,7 +328,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<string>()
                 .WithScope()
                 .ResolveAsync((context, value) => Task.FromResult<object>(value));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
             VerifyScoped();
         }
 
@@ -344,7 +344,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<int>()
                 .WithScope()
                 .ResolveAsync((context, value, v2) => Task.FromResult<object>(value + v2));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello2");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2");
             VerifyScoped();
         }
 
@@ -361,7 +361,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<short>()
                 .WithScope()
                 .ResolveAsync((context, value, v2, v3) => Task.FromResult<object>(value + v2 + v3));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello23");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello23");
             VerifyScoped();
         }
 
@@ -379,7 +379,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<byte>()
                 .WithScope()
                 .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello234");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello234");
             VerifyScoped();
         }
 
@@ -398,7 +398,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<long>()
                 .WithScope()
                 .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5));
-            field.Resolver.Resolve(_scopedContext).ShouldBeTask("hello2345");
+            field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2345");
             VerifyScoped();
         }
 
@@ -411,7 +411,7 @@ namespace GraphQL.MicrosoftDI.Tests
             builder
                 .Resolve()
                 .ResolveAsync(context => Task.FromResult<object>("hello"));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
             VerifyUnscoped();
         }
 
@@ -425,7 +425,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .Resolve()
                 .WithService<string>()
                 .ResolveAsync((context, value) => Task.FromResult<object>(value));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
             VerifyUnscoped();
         }
 
@@ -440,7 +440,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<string>()
                 .WithService<int>()
                 .ResolveAsync((context, value, v2) => Task.FromResult<object>(value + v2));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello2");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2");
             VerifyUnscoped();
         }
 
@@ -456,7 +456,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<int>()
                 .WithService<short>()
                 .ResolveAsync((context, value, v2, v3) => Task.FromResult<object>(value + v2 + v3));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello23");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello23");
             VerifyUnscoped();
         }
 
@@ -473,7 +473,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<short>()
                 .WithService<byte>()
                 .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello234");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello234");
             VerifyUnscoped();
         }
 
@@ -491,7 +491,7 @@ namespace GraphQL.MicrosoftDI.Tests
                 .WithService<byte>()
                 .WithService<long>()
                 .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5));
-            field.Resolver.Resolve(_unscopedConnectionContext).ShouldBeTask("hello2345");
+            field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2345");
             VerifyUnscoped();
         }
     }
