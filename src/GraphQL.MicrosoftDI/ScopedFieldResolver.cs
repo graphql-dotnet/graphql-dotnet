@@ -20,10 +20,8 @@ namespace GraphQL.MicrosoftDI
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
             };
         }
     }
@@ -40,10 +38,8 @@ namespace GraphQL.MicrosoftDI
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
             };
         }
     }
