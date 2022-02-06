@@ -538,4 +538,4 @@ invisible to the caller and lead to hardly detected bugs, the method name has be
 
 Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`. Now the class
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
-but sets the default date parsing behavior in the settings to string parsing.
+but sets the default date parsing behavior set to 'none'.
