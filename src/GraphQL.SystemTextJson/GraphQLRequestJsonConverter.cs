@@ -94,8 +94,10 @@ namespace GraphQL.SystemTextJson
                         request.Extensions = JsonSerializer.Deserialize<Inputs>(ref reader, options);
                         break;
                     default:
-                        //unrecognized key
-                        throw new JsonException();
+                        if (!reader.Read())
+                            throw new JsonException();
+                        reader.Skip();
+                        break;
                 }
             }
 

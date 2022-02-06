@@ -1,7 +1,6 @@
 #nullable enable
 
 using GraphQL.DI;
-using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {

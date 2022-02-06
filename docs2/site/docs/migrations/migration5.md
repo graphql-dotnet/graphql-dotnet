@@ -423,6 +423,9 @@ public static class StringExtensions
 }
 ```
 
+The new `Read` and `Deserialize` methods of the `Newtonsoft.Json` implementation
+will default to reading dates as strings unless configured otherwise in the settings.
+
 ### 17. The `WriteToStringAsync` extension methods have been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
@@ -530,3 +533,9 @@ and moved after `value` argument. If you use this method and set descriptions, y
 to change the order of arguments. Since changing the order of arguments in some cases can remain
 invisible to the caller and lead to hardly detected bugs, the method name has been changed from
 `AddValue` to `Add`.
+
+### 26. The settings class provided to `GraphQL.NewtonsoftJson.GraphQLSerializer` has changed.
+
+Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`. Now the class
+is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
+but sets the default date parsing behavior set to 'none'.

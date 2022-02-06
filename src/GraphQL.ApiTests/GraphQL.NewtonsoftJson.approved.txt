@@ -19,8 +19,8 @@ namespace GraphQL.NewtonsoftJson
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<Newtonsoft.Json.JsonSerializerSettings, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings, System.IServiceProvider>? action) { }
     }
     public class GraphQLContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
@@ -50,12 +50,12 @@ namespace GraphQL.NewtonsoftJson
     {
         public GraphQLSerializer() { }
         public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(GraphQL.NewtonsoftJson.JsonSerializerSettings serializerSettings) { }
         protected GraphQLSerializer(Newtonsoft.Json.JsonSerializer jsonSerializer) { }
-        public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
-        public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
+        public GraphQLSerializer(System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings> configureSerializerSettings) { }
         public GraphQLSerializer(bool indent) { }
-        public GraphQLSerializer(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public GraphQLSerializer(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(GraphQL.NewtonsoftJson.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         protected Newtonsoft.Json.JsonSerializer Serializer { get; }
         public T Deserialize<T>(string json) { }
@@ -73,6 +73,10 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class JsonSerializerSettings : Newtonsoft.Json.JsonSerializerSettings
+    {
+        public JsonSerializerSettings() { }
     }
     public class OperationMessageJsonConverter : Newtonsoft.Json.JsonConverter
     {
