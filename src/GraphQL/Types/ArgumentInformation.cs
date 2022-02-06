@@ -155,7 +155,7 @@ namespace GraphQL.Types
         /// Gets or sets a delegate in the form of a <see cref="LambdaExpression"/> to be used to populate
         /// this method argument while building the field resolver.
         /// <br/><br/>
-        /// If not set, a query argument will be added to the field and the argument's value will be used
+        /// If not set, a query argument will be added to the field arguments list and the argument's value will be used
         /// to populate the method argument while building the field resolver.
         /// <br/><br/>
         /// The lambda must be of the type <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;&gt;
