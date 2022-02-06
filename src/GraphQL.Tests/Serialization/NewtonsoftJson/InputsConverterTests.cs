@@ -1,5 +1,6 @@
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
+using JsonSerializerSettings = GraphQL.NewtonsoftJson.JsonSerializerSettings;
 
 namespace GraphQL.Tests.Serialization.NewtonsoftJson
 {

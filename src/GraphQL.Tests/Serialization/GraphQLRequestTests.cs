@@ -117,8 +117,10 @@ namespace GraphQL.Tests.Serialization
         [ClassData(typeof(GraphQLSerializersTestData))]
         public void Reads_GraphQLRequest_IsCaseSensitive(IGraphQLTextSerializer serializer)
         {
-            var test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-            Should.Throw<Exception>(() => serializer.Deserialize<GraphQLRequest>(test));
+            var test = $"{{\"query\":\"hello\",\"Variables\":{ExampleJson}}}";
+            var actual = serializer.Deserialize<GraphQLRequest>(test);
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
         }
 
         [Theory]
