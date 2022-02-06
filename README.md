@@ -10,7 +10,7 @@
 [![codecov](https://codecov.io/gh/graphql-dotnet/graphql-dotnet/branch/master/graph/badge.svg?token=iXZo1jZvFo)](https://codecov.io/gh/graphql-dotnet/graphql-dotnet)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/alerts/)
 [![Language grade: C#](https://img.shields.io/lgtm/grade/csharp/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/context:csharp)
-
+TEST
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
 

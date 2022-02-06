@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    //[RPlotExporter, CsvMeasurementsExporter]
+    //[RPlotExporter, CsvMeasurementsExporter] //TEST
     public class SerializationBenchmark : IBenchmark
     {
         private IServiceProvider _provider;
