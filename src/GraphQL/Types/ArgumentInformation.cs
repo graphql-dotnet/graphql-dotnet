@@ -124,10 +124,10 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc/>
-    public class ArgumentInformation<TReturnType> : ArgumentInformation
+    public class ArgumentInformation<TParameterType> : ArgumentInformation
     {
         /// <inheritdoc cref="ArgumentInformation.ArgumentInformation(ParameterInfo, Type, FieldType, TypeInformation, LambdaExpression?)"/>
-        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation, Expression<Func<IResolveFieldContext, TReturnType>>? expression)
+        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation, Expression<Func<IResolveFieldContext, TParameterType>>? expression)
             : base(ValidateParameterInfo(parameterInfo), sourceType, fieldType, typeInformation, expression)
         {
         }
@@ -139,14 +139,14 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Validates that the <see cref="ParameterInfo"/> supplied to the constructor has a return type
-        /// that matches the <typeparamref name="TReturnType"/> of this instance.
+        /// Validates that the <see cref="ParameterInfo"/> supplied to the constructor has a parameter type
+        /// that matches the <typeparamref name="TParameterType"/> of this instance.
         /// </summary>
         private static ParameterInfo ValidateParameterInfo(ParameterInfo parameterInfo)
         {
-            if (parameterInfo.ParameterType != typeof(TReturnType))
+            if (parameterInfo.ParameterType != typeof(TParameterType))
             {
-                throw new ArgumentOutOfRangeException(nameof(parameterInfo), $"Parameter must have a return type of {typeof(TReturnType).Name}.");
+                throw new ArgumentOutOfRangeException(nameof(parameterInfo), $"Parameter must have a return type of {typeof(TParameterType).Name}.");
             }
             return parameterInfo;
         }
@@ -157,10 +157,13 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// If not set, a query argument will be added to the field and the argument's value will be used
         /// to populate the method argument while building the field resolver.
+        /// <br/><br/>
+        /// The lambda must be of the type <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;&gt;
+        /// where <typeparamref name="TParameterType"/> is the parameter type.
         /// </summary>
-        public new Expression<Func<IResolveFieldContext, TReturnType>>? Expression
+        public new Expression<Func<IResolveFieldContext, TParameterType>>? Expression
         {
-            get => (Expression<Func<IResolveFieldContext, TReturnType>>?)base.Expression;
+            get => (Expression<Func<IResolveFieldContext, TParameterType>>?)base.Expression;
             set => base.Expression = value;
         }
 

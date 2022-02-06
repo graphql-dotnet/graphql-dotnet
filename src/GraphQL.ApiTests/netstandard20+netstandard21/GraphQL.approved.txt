@@ -1563,11 +1563,11 @@ namespace GraphQL.Types
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
     }
-    public class ArgumentInformation<TReturnType> : GraphQL.Types.ArgumentInformation
+    public class ArgumentInformation<TParameterType> : GraphQL.Types.ArgumentInformation
     {
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TReturnType>>? expression) { }
-        public new System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TReturnType>>? Expression { get; set; }
+        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType>>? expression) { }
+        public new System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType>>? Expression { get; set; }
         public virtual void ApplyAttributes() { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
