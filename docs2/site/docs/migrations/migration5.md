@@ -156,7 +156,7 @@ treated special; special fields do not add a query argument to the field:
 
 | Argument type                     | Value passed to the method   |
 |-----------------------------------|------------------------------|
-| `IResolveFieldContext`            | The field resolver's context |
+| `IResolveFieldContext`            | The field resolver's context; useful in advanced scenarios |
 | `CancellationToken`               | The cancellation token from the resolve context |
 | Any, tagged with `[FromServices]` | Pulls the service of the argument type from the `RequestServices` property of the resolve context |
 
