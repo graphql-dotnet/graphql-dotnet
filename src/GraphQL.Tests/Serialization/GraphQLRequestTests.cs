@@ -173,6 +173,17 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_GraphQLRequest_List_NotCaseSensitive(IGraphQLTextSerializer serializer)
+        {
+            var test = @"{""VARIABLES"":{""date"":""2015-12-22T10:10:10+03:00""}}";
+            var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
+            actual.Count.ShouldBe(1);
+            actual[0].Query.ShouldBeNull();
+            actual[0].Variables.ShouldBeNull();
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
         public void Reads_GraphQLRequest_List_Multiple_Items(IGraphQLTextSerializer serializer)
         {
             var test = $"[{{\"query\":\"hello\",\"variables\":{ExampleJson}}},{{\"query\":\"hello2\"}}]";

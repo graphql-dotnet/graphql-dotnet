@@ -103,8 +103,6 @@ namespace GraphQL.NewtonsoftJson
                         request.Extensions = serializer.Deserialize<Inputs>(reader);
                         break;
                     default:
-                        if (!reader.Read())
-                            throw new JsonException();
                         reader.Skip();
                         break;
                 }
