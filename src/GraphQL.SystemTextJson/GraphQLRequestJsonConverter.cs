@@ -95,7 +95,6 @@ namespace GraphQL.SystemTextJson
                         break;
                     default:
                         if (!reader.Read())
-                            //unexpected end of data
                             throw new JsonException();
                         reader.Skip();
                         break;
