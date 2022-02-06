@@ -102,7 +102,7 @@ namespace GraphQL.Types
         /// If an expression is returned, it will be used to populate the method argument within the field resolver;
         /// if not, the query argument's value will be used to populate the method argument within the field resolver.
         /// <br/><br/>
-        /// The default implemenatation will return either a <see cref="QueryArgument"/> or <see cref="LambdaExpression"/>
+        /// The default implementation will return either a <see cref="QueryArgument"/> or <see cref="LambdaExpression"/>
         /// instance; not both. It is possible to return both, in which case the query argument will be added to the
         /// field and the expression will be used to populate the method argument within the field resolver.
         /// You cannot return <see langword="null"/> for both the query argument and expression.
