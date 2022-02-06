@@ -19,9 +19,11 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
+        public ValueTask<TReturnType?> ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<TReturnType?>(_resolver(context));
 
-        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<object?>(_resolver(context));
     }
 
     /// <summary>
@@ -151,8 +153,10 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
+        public ValueTask<TReturnType?> ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<TReturnType?>(_resolver(context));
 
-        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<object?>(_resolver(context));
     }
 }

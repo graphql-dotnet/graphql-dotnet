@@ -13,7 +13,7 @@ namespace GraphQL.Reflection
             _serviceProvider = serviceProvider;
         }
 
-        public object? Resolve(IResolveFieldContext context)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
@@ -27,7 +27,7 @@ namespace GraphQL.Reflection
                 throw new InvalidOperationException($"Could not resolve an instance of {_accessor.DeclaringType.Name} to execute {parentType}{context.FieldAst.Name}");
             }
 
-            return _accessor.GetValue(target, arguments);
+            return _accessor.GetValue(target, arguments).ToValueTask();
         }
     }
 }

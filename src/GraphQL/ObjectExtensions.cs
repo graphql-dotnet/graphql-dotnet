@@ -346,5 +346,37 @@ namespace GraphQL
 
             return false;
         }
+
+        //TODO: eliminate this inefficient method (currently used by AccessorFieldResolver and DelegateFieldModelBinderResolver)
+        internal static ValueTask<object?> ToValueTask(this object? value)
+        {
+            if (value == null)
+                return default;
+
+            if (value is Task task)
+            {
+                return ConvertTask(task);
+            }
+
+            var type = value.GetType();
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
+            {
+                return (ValueTask<object?>)_convertValueTaskAsyncMethod
+                    .MakeGenericMethod(type.GetGenericArguments()[0])
+                    .Invoke(null, new object[] { value });
+            }
+
+            return new ValueTask<object?>(value);
+
+            async ValueTask<object?> ConvertTask(Task task)
+            {
+                await task.ConfigureAwait(false);
+                return task.GetResult();
+            }
+        }
+
+        private static readonly MethodInfo _convertValueTaskAsyncMethod = typeof(ObjectExtensions).GetMethod(nameof(ConvertValueTaskAsync), BindingFlags.NonPublic | BindingFlags.Static)!;
+        private static async ValueTask<object?> ConvertValueTaskAsync<T>(ValueTask<T> task)
+            => await task.ConfigureAwait(false);
     }
 }

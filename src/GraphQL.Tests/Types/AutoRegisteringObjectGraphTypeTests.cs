@@ -261,21 +261,17 @@ namespace GraphQL.Tests.Types
         [InlineData("Field5", 5)]
         [InlineData("Field6AltName", 6)]
         [InlineData("Field7", 7)]
-        public void FieldResolversWork(string fieldName, object expected)
+        public async Task FieldResolversWork(string fieldName, object expected)
         {
             var graph = new TestFieldSupport<TestClass>();
             var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
             var resolver = field.Resolver.ShouldNotBeNull();
             var obj = new TestClass();
-            var actual = resolver.Resolve(new ResolveFieldContext
+            var actual = await resolver.ResolveAsync(new ResolveFieldContext
             {
                 Source = obj,
                 FieldDefinition = new FieldType { Name = fieldName },
             });
-            if (actual is Task task)
-            {
-                actual = ((dynamic)task).Result;
-            }
             actual.ShouldBe(expected);
         }
 

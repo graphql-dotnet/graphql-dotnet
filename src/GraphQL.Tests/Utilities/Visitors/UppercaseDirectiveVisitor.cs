@@ -25,9 +25,9 @@ namespace GraphQL.Tests.Utilities.Visitors
             if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
-                field.Resolver = new FuncFieldResolver<object>(context =>
+                Func<IResolveFieldContext, ValueTask<object>> func = async context =>
                 {
-                    object result = inner.Resolve(context);
+                    object result = await inner.ResolveAsync(context);
 
                     return result switch
                     {
@@ -35,7 +35,8 @@ namespace GraphQL.Tests.Utilities.Visitors
                         Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
                         _ => result
                     };
-                });
+                };
+                field.Resolver = new AsyncFieldResolver<object>(func);
             }
         }
     }
@@ -51,14 +52,15 @@ namespace GraphQL.Tests.Utilities.Visitors
             if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
-                field.Resolver = new AsyncFieldResolver<object>(async context =>
+                Func<IResolveFieldContext, ValueTask<object>> func = async context =>
                 {
                     object result = await inner.ResolveAsync(context);
 
                     return result is string str
                         ? str.ToUpperInvariant()
                         : result;
-                });
+                };
+                field.Resolver = new AsyncFieldResolver<object>(func);
             }
         }
     }

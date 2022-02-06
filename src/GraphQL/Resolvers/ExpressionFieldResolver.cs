@@ -22,8 +22,10 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TProperty? Resolve(IResolveFieldContext context) => _property((TSourceType)context.Source!);
+        public ValueTask<TProperty?> ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<TProperty?>(_property((TSourceType)context.Source!));
 
-        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
+            => new ValueTask<object?>(_property((TSourceType)context.Source!));
     }
 }

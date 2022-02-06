@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<NumberHolderType>(
+            FieldAsync<NumberHolderType>(
                 "promiseToChangeTheNumber",
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType>
@@ -150,11 +150,11 @@ namespace GraphQL.Tests.Execution
                         DefaultValue = 0
                     }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
                     var root = context.Source as Root;
                     var change = context.GetArgument<int>("newNumber");
-                    return root.PromiseToChangeTheNumberAsync(change);
+                    return await root.PromiseToChangeTheNumberAsync(change);
                 }
             );
 
@@ -175,7 +175,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<NumberHolderType>(
+            FieldAsync<NumberHolderType>(
                 "promiseAndFailToChangeTheNumber",
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType>
@@ -184,10 +184,10 @@ namespace GraphQL.Tests.Execution
                         DefaultValue = 0
                     }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
                     var change = context.GetArgument<int>("newNumber");
-                    return Root.PromiseAndFailToChangeTheNumberAsync(change);
+                    return await Root.PromiseAndFailToChangeTheNumberAsync(change);
                 }
             );
 
@@ -207,7 +207,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<DateTimeHolderType>(
+            FieldAsync<DateTimeHolderType>(
                 "promiseToChangeTheDateTime",
                 arguments: new QueryArguments(
                     new QueryArgument<DateTimeGraphType>
@@ -215,11 +215,11 @@ namespace GraphQL.Tests.Execution
                         Name = "newDateTime"
                     }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
                     var root = context.Source as Root;
                     var change = context.GetArgument<DateTime>("newDateTime");
-                    return root.PromiseToChangeTheDateTimeAsync(change);
+                    return await root.PromiseToChangeTheDateTimeAsync(change);
                 }
             );
 
@@ -239,7 +239,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<DateTimeHolderType>(
+            FieldAsync<DateTimeHolderType>(
                 "promiseAndFailToChangeTheDateTime",
                 arguments: new QueryArguments(
                     new QueryArgument<DateTimeGraphType>
@@ -247,10 +247,10 @@ namespace GraphQL.Tests.Execution
                         Name = "newDateTime"
                     }
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
                     var change = context.GetArgument<DateTime>("newDateTime");
-                    return Root.PromiseAndFailToChangeTheDateTimeAsync(change);
+                    return await Root.PromiseAndFailToChangeTheDateTimeAsync(change);
                 }
             );
 

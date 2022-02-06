@@ -21,7 +21,7 @@ namespace Example
             Debug.Assert(data != null);
         }
 
-        public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             Interlocked.Increment(ref _count);
 

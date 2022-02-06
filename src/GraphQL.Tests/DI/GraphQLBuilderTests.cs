@@ -886,7 +886,7 @@ namespace GraphQL.Tests.DI
                 _builder.AddMiddleware<MyMiddleware>(install, serviceLifetime);
             }
             runSchemaConfigs?.Invoke();
-            FieldMiddlewareDelegate fieldResolver = _ => null;
+            FieldMiddlewareDelegate fieldResolver = _ => default;
             var middlewareTransform = schema.FieldMiddleware.Build();
             if (middlewareTransform != null)
             {
@@ -929,7 +929,7 @@ namespace GraphQL.Tests.DI
                 _builder.AddMiddleware(instance, install);
             }
             runSchemaConfigs?.Invoke();
-            FieldMiddlewareDelegate fieldResolver = _ => null;
+            FieldMiddlewareDelegate fieldResolver = _ => default;
             var middlewareTransform = schema.FieldMiddleware.Build();
             if (middlewareTransform != null)
             {
@@ -1431,7 +1431,7 @@ namespace GraphQL.Tests.DI
         private class MyMiddleware : IFieldMiddleware
         {
             public bool RanMiddleware { get; set; } = false;
-            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+            public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 RanMiddleware = true;
                 return next(context);

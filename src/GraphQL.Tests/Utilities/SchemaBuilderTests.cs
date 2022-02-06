@@ -702,7 +702,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void builds_with_customized_clr_type()
+        public async Task builds_with_customized_clr_type()
         {
             var definitions = @"
                 type Query {
@@ -725,7 +725,7 @@ namespace GraphQL.Tests.Utilities
             fieldType.DeprecationReason.ShouldBe("Test4");
             fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
             var context = new ResolveFieldContext() { Source = new TestType() };
-            fieldType.Resolver.Resolve(context).ShouldBeOfType<string>().ShouldBe("value");
+            (await fieldType.Resolver.ResolveAsync(context)).ShouldBeOfType<string>().ShouldBe("value");
         }
 
         [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]

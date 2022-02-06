@@ -6,7 +6,7 @@ namespace GraphQL.Instrumentation
     public class InstrumentFieldsMiddleware : IFieldMiddleware
     {
         /// <inheritdoc/>
-        public async Task<object?> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             var name = context.FieldAst.Name.StringValue; //ISSUE:allocation
 

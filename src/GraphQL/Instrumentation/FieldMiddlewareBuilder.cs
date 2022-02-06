@@ -28,7 +28,7 @@ namespace GraphQL.Instrumentation
             return this;
         }
 
-        private static readonly FieldMiddlewareDelegate _defaultDelegate = context => Task.FromResult(NameFieldResolver.Instance.Resolve(context));
+        private static readonly FieldMiddlewareDelegate _defaultDelegate = context => NameFieldResolver.Instance.ResolveAsync(context);
 
         /// <inheritdoc/>
         public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()

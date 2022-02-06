@@ -23,17 +23,17 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public object? Resolve(IResolveFieldContext context)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             try
             {
-                return _resolver.DynamicInvoke(arguments);
+                return _resolver.DynamicInvoke(arguments).ToValueTask();
             }
             catch (TargetInvocationException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
-                return null; // never executed, necessary only for intellisense
+                return default; // never executed, necessary only for intellisense
             }
         }
     }

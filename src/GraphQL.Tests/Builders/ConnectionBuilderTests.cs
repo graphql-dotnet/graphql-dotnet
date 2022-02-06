@@ -115,7 +115,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_define_simple_connection_with_resolver()
+        public async Task can_define_simple_connection_with_resolver()
         {
             var type = new ObjectGraphType();
 
@@ -149,7 +149,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-            var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
+            var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
@@ -201,7 +201,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as Connection<Child>;
 
             result.ShouldNotBeNull();
@@ -255,7 +255,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
             result.ShouldNotBeNull();
@@ -332,7 +332,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as ParentChildrenConnection;
 
             result.ShouldNotBeNull();
@@ -389,25 +389,25 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void should_use_pagesize()
+        public async Task should_use_pagesize()
         {
             var graph = new ObjectGraphType();
             graph.Connection<ChildType>()
                 .Name("connection")
                 .PageSize(10)
                 .Resolve(context => context.First);
-            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBe(10);
+            (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
         }
 
         [Fact]
-        public void should_use_pagesize_async()
+        public async Task should_use_pagesize_async()
         {
             var graph = new ObjectGraphType();
             graph.Connection<ChildType>()
                 .Name("connection")
                 .PageSize(10)
                 .ResolveAsync(context => Task.FromResult<object>(context.First));
-            graph.Fields.Find("connection").Resolver.Resolve(new ResolveFieldContext()).ShouldBeOfType<Task<object>>().Result.ShouldBe(10);
+            (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
         }
 
         public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>

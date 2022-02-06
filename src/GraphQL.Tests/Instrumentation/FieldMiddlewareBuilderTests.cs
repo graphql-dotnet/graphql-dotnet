@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Instrumentation
         [Fact]
         public void middleware_can_override()
         {
-            _builder.Use(next => context => Task.FromResult<object>("One"));
+            _builder.Use(next => context => new ValueTask<object>("One"));
 
             _builder.BuildResolve().Invoke(_context).Result.ShouldBe("One");
         }
@@ -129,7 +129,7 @@ namespace GraphQL.Tests.Instrumentation
                 return context =>
                 {
                     context.Errors.Add(new ExecutionError("Custom error"));
-                    return Task.FromResult((object)null);
+                    return default;
                 };
             });
 
@@ -151,7 +151,7 @@ namespace GraphQL.Tests.Instrumentation
                 return context =>
                 {
                     context.Errors.Add(new ExecutionError("Custom error", additionalData));
-                    return Task.FromResult((object)null);
+                    return default;
                 };
             });
 
@@ -175,7 +175,7 @@ namespace GraphQL.Tests.Instrumentation
 
         public class SimpleMiddleware : IFieldMiddleware
         {
-            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+            public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 using (context.Metrics.Subject("class", "from class"))
                 {

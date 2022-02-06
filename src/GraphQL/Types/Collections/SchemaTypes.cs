@@ -342,7 +342,7 @@ namespace GraphQL.Types
 
                         var fieldMiddlewareDelegate = transform(context => inner.ResolveAsync(context));
 
-                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                        field.Resolver = new AsyncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                     }
                 }
             }

@@ -23,7 +23,13 @@ namespace GraphQL.Tests
                 Name = "Anyone"
             };
 
-            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldDefinition = new GraphQL.Types.FieldType { Name = name }, FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) } });
+            Func<object> result = () => NameFieldResolver.Instance.ResolveAsync(
+                new ResolveFieldContext
+                {
+                    Source = person,
+                    FieldDefinition = new GraphQL.Types.FieldType { Name = name },
+                    FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) }
+                }).GetAwaiter().GetResult();
 
             if (throws)
                 Should.Throw<InvalidOperationException>(() => result());
