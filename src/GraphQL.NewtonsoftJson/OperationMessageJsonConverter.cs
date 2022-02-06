@@ -27,8 +27,11 @@ namespace GraphQL.NewtonsoftJson
         {
             var request = (OperationMessage)value;
             writer.WriteStartObject();
-            writer.WritePropertyName(TYPE_KEY);
-            writer.WriteValue(request.Type);
+            if (request.Type != null)
+            {
+                writer.WritePropertyName(TYPE_KEY);
+                writer.WriteValue(request.Type);
+            }
             if (request.Id != null)
             {
                 writer.WritePropertyName(ID_KEY);
@@ -74,8 +77,8 @@ namespace GraphQL.NewtonsoftJson
                         request.Payload = serializer.Deserialize<JObject>(reader);
                         break;
                     default:
-                        //unrecognized key
-                        throw new JsonException();
+                        reader.Skip();
+                        break;
                 }
             }
 
