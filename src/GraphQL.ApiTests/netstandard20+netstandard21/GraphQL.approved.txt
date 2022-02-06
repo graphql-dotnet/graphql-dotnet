@@ -147,7 +147,7 @@ namespace GraphQL
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
         public FromServicesAttribute() { }
-        public override void Modify<TReturnType>(GraphQL.Types.ArgumentInformation<TReturnType> argumentInformation) { }
+        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation<TParameterType> argumentInformation) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -174,7 +174,7 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-        public virtual void Modify<TReturnType>(GraphQL.Types.ArgumentInformation<TReturnType> argumentInformation) { }
+        public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation<TParameterType> argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
