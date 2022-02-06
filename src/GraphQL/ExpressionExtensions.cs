@@ -5,7 +5,7 @@ namespace GraphQL
     internal static class ExpressionExtensions
     {
         /// <summary>
-        /// Replaces all occurrances of <paramref name="oldParameter"/> with <paramref name="newBody"/> within <paramref name="expression"/>.
+        /// Replaces all occurrences of <paramref name="oldParameter"/> with <paramref name="newBody"/> within <paramref name="expression"/>.
         /// </summary>
         public static Expression Replace(this Expression expression, ParameterExpression oldParameter, Expression newBody)
         {
