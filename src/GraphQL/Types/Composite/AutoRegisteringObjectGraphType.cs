@@ -124,8 +124,8 @@ namespace GraphQL.Types
         }
 
         private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance);
-        private ArgumentInformation GetArgumentInformationInternal<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
-            => GetArgumentInformation<TReturnType>(fieldType, parameterInfo);
+        private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
+            => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
