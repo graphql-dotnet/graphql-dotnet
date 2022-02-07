@@ -78,8 +78,8 @@ namespace GraphQL.Types
         /// to populate the method argument while building the field resolver.
         /// <br/><br/>
         /// The delegate must be of the type
-        /// <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, TReturnType&gt;&gt;
-        /// where TReturnType matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
+        /// <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, TParameterType&gt;&gt;
+        /// where TParameterType matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
         /// </summary>
         public LambdaExpression? Expression
         {
