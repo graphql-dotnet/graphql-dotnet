@@ -35,6 +35,9 @@ namespace GraphQL.Resolvers
                     throw new InvalidOperationException("A supplied expression is not a lambda delegate of type Func<IResolveFieldContext, T>.");
                 }
                 var replaced = expr.Body.Replace(expr.Parameters[0], resolveFieldContextParameter);
+                // reduce unnessessary convertion by unwrapping expression so there is no double conversion one line later
+                if (replaced is UnaryExpression unary && unary.NodeType == ExpressionType.Convert && unary.Operand.Type == methodParameters[i].ParameterType)
+                    replaced = unary.Operand;
                 expressionBodies[i] = replaced.Type == methodParameters[i].ParameterType ? replaced : Expression.Convert(replaced, methodParameters[i].ParameterType);
             }
 

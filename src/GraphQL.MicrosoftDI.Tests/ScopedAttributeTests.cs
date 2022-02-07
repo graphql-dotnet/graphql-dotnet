@@ -35,12 +35,26 @@ namespace GraphQL.MicrosoftDI.Tests
             (await (Task<object>)scopedAsyncFieldResolver.Resolve(context)).ShouldBe("0 1");
             Class1.DisposedCount.ShouldBe(4);
             unscopedFieldResolver.Resolve(context).ShouldBe("3 4");
+
+            var hardcodedValueResolver = graphType.Fields.Find(nameof(TestClass.FieldWithHardcodedValue))!.Resolver!;
+            hardcodedValueResolver.Resolve(context).ShouldBe("85");
+
             rootServiceProvider.Dispose();
             Class1.DisposedCount.ShouldBe(5);
         }
 
+        public class HardcodedValueAttribute : GraphQLAttribute
+        {
+            public override void Modify(ArgumentInformation argumentInformation)
+            {
+                argumentInformation.Expression = context => 85;
+            }
+        }
+
         private class TestClass
         {
+            public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
+
             public string UnscopedField([FromServices] Class1 arg1, [FromServices] Class2 arg2)
             {
                 return $"{arg1.Value++} {arg2.Value}";
