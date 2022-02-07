@@ -363,6 +363,29 @@ namespace GraphQL.Tests.Types
             actual.ShouldBe(expected);
         }
 
+        [Fact]
+        public void CustomHardcodedArgumentAttributesWork()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
+            var fieldType = graphType.Fields.Find(nameof(CustomHardcodedArgumentAttributeTestClass.FieldWithHardcodedValue))!;
+            var resolver = fieldType.Resolver!;
+            resolver.Resolve(new ResolveFieldContext
+            {
+                Source = new CustomHardcodedArgumentAttributeTestClass(),
+            }).ShouldBe("85");
+        }
+
+        private class CustomHardcodedArgumentAttributeTestClass
+        {
+            public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
+        }
+
+        private class HardcodedValueAttribute : GraphQLAttribute
+        {
+            public override void Modify(ArgumentInformation argumentInformation)
+                => argumentInformation.SetExpression(context => 85);
+        }
+
         private class FieldTests
         {
             [Name("Test1")]

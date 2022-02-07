@@ -86,9 +86,31 @@ namespace GraphQL.Types
             get => _expression;
             set
             {
-                if (value != null && (value.ReturnType != ParameterInfo.ParameterType || value.Parameters.Count != 1 || value.Parameters[0].Type != typeof(IResolveFieldContext)))
+                if (value != null)
                 {
-                    throw new ArgumentException($"Value must be a lambda expression delegate of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.");
+                    bool valid = value.Parameters.Count == 1 && value.Parameters[0].Type == typeof(IResolveFieldContext);
+                    if (valid)
+                    {
+                        if (value.ReturnType != ParameterInfo.ParameterType)
+                        {
+                            if (value.Body is UnaryExpression unaryExpression &&
+                                unaryExpression.NodeType == ExpressionType.Convert &&
+                                unaryExpression.Operand.Type == ParameterInfo.ParameterType)
+                            {
+                                value = System.Linq.Expressions.Expression.Lambda(
+                                    unaryExpression.Operand,
+                                    value.Parameters[0]);
+                            }
+                            else
+                            {
+                                valid = false;
+                            }
+                        }
+                    }
+                    if (!valid)
+                    {
+                        throw new ArgumentException($"Value must be a lambda expression delegate of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.");
+                    }
                 }
                 _expression = value;
             }
@@ -106,7 +128,7 @@ namespace GraphQL.Types
             if (argumentDelegate == null)
                 throw new ArgumentNullException(nameof(argumentDelegate));
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
-                throw new InvalidOperationException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}.");
+                throw new ArgumentException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.", nameof(argumentDelegate));
 
             Expression = (Expression<Func<IResolveFieldContext, TParameterType?>>)(context => argumentDelegate(context));
         }
