@@ -161,9 +161,9 @@ namespace GraphQL.Types
         /// The lambda must be of the type <see cref="Expression{TDelegate}">Expression</see>&lt;<see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;&gt;
         /// where <typeparamref name="TParameterType"/> is the parameter type.
         /// </summary>
-        public new Expression<Func<IResolveFieldContext, TParameterType>>? Expression
+        public new Expression<Func<IResolveFieldContext, TParameterType?>>? Expression
         {
-            get => (Expression<Func<IResolveFieldContext, TParameterType>>?)base.Expression;
+            get => (Expression<Func<IResolveFieldContext, TParameterType?>>?)base.Expression;
             set => base.Expression = value;
         }
 

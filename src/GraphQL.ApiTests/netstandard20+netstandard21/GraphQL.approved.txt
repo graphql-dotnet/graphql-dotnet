@@ -1567,7 +1567,7 @@ namespace GraphQL.Types
     {
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
         public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType>>? expression) { }
-        public new System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType>>? Expression { get; set; }
+        public new System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType?>>? Expression { get; set; }
         public virtual void ApplyAttributes() { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
