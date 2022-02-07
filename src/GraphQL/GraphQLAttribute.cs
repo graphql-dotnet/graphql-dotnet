@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -54,10 +55,28 @@ namespace GraphQL
         {
         }
 
+        private static readonly MethodInfo _modifyMethod = typeof(GraphQLAttribute)
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => x.Name == nameof(GraphQLAttribute.Modify) && x.IsGenericMethod)
+            .Single();
+        private static readonly ConcurrentDictionary<Type, MethodInfo> _typedModifyMethods = new();
+
         /// <summary>
-        /// Updates the properties of the specified <see cref="ArgumentInformation{TParameterType}"/> as necessary.
+        /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
         /// </summary>
-        public virtual void Modify<TParameterType>(ArgumentInformation<TParameterType> argumentInformation)
+        public virtual void Modify(ArgumentInformation argumentInformation)
+        {
+            var typedMethod = _typedModifyMethods.GetOrAdd(
+                argumentInformation.ParameterInfo.ParameterType,
+                type => _modifyMethod.MakeGenericMethod(type));
+            typedMethod.Invoke(this, new object[] { argumentInformation });
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
+        /// <typeparamref name="TParameterType"/> represents the return type of the parameter.
+        /// </summary>
+        public virtual void Modify<TParameterType>(ArgumentInformation argumentInformation)
         {
         }
 

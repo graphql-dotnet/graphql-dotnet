@@ -142,15 +142,15 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation{TReturnType}"/>
+        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>
         /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
         /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
-        /// to the returned <see cref="ArgumentInformation{TReturnType}"/> instance.
+        /// to the returned <see cref="ArgumentInformation"/> instance.
         /// </summary>
-        protected virtual ArgumentInformation<TReturnType> GetArgumentInformation<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
+        protected virtual ArgumentInformation GetArgumentInformation<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
         {
             var typeInformation = GetTypeInformation(parameterInfo);
-            var argumentInfo = new ArgumentInformation<TReturnType>(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
+            var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
             argumentInfo.ApplyAttributes();
             return argumentInfo;
         }
