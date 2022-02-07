@@ -167,6 +167,7 @@ namespace GraphQL
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
+        public virtual void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
         public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
         public virtual void Modify(GraphQL.Types.QueryArgument queryArgument) { }

@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -112,25 +111,15 @@ namespace GraphQL.Types
             Expression = (Expression<Func<IResolveFieldContext, TParameterType?>>)(context => argumentDelegate(context));
         }
 
-        private static readonly MethodInfo _modifyMethod = typeof(GraphQLAttribute)
-            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-            .Where(x => x.Name == nameof(GraphQLAttribute.Modify) && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(ArgumentInformation))
-            .Single();
-        private static readonly ConcurrentDictionary<Type, MethodInfo> _typedModifyMethods = new();
-
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes pulled from the <see cref="ArgumentInformation.ParameterInfo">ParameterInfo</see> onto this instance.
         /// </summary>
         public virtual void ApplyAttributes()
         {
             var attributes = ParameterInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
-            if (attributes.Length == 0)
-                return;
-            var methodInfo = _typedModifyMethods.GetOrAdd(ParameterInfo.ParameterType,
-                type => _modifyMethod.MakeGenericMethod(type));
             foreach (var attr in attributes)
             {
-                methodInfo.Invoke(attr, new object[] { this });
+                ((GraphQLAttribute)attr).Modify(this);
             }
         }
 
