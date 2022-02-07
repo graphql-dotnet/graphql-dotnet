@@ -77,9 +77,9 @@ namespace GraphQL.Tests.Types
             var error = Should.Throw<ArgumentNullException>(() => info.SetExpression<int>(null!));
         }
 
-        private readonly MethodInfo _testMethodInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod))!;
-        private readonly ParameterInfo _testParameterInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod))!.GetParameters()[0]!;
-        public void TestMethod(int arg)
+        private readonly MethodInfo _testMethodInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;
+        private readonly ParameterInfo _testParameterInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod), BindingFlags.NonPublic | BindingFlags.Instance)!.GetParameters()[0]!;
+        private void TestMethod(int arg)
         {
         }
     }
