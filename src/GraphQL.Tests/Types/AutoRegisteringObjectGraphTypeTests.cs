@@ -4,7 +4,9 @@ using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
 using GraphQL.DataLoader;
+using GraphQL.Execution;
 using GraphQL.Types;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types
 {
@@ -193,6 +195,7 @@ namespace GraphQL.Tests.Types
         [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrOutputTypeReference<object>>))]
         [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
         [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+        [InlineData("TaskIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
         [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
         [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
         [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
@@ -204,32 +207,113 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void Field_RemovesAsyncSuffix()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+            var fieldType = graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
+        }
+
+        [Fact]
         public void DefaultServiceProvider_Should_Create_AutoRegisteringGraphTypes()
         {
             var provider = new DefaultServiceProvider();
             provider.GetService(typeof(AutoRegisteringObjectGraphType<TestClass>)).ShouldNotBeNull();
         }
 
+        [Theory]
+        [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+        [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
+        [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+        [InlineData(nameof(ArgumentTests.WithNullableDefaultString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
+        [InlineData(nameof(ArgumentTests.WithCancellationToken), "cancellationToken", null)]
+        [InlineData(nameof(ArgumentTests.WithResolveFieldContext), "context", null)]
+        [InlineData(nameof(ArgumentTests.WithFromServices), "arg1", null)]
+        [InlineData(nameof(ArgumentTests.NamedArg), "arg1", null)]
+        [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+        [InlineData(nameof(ArgumentTests.IdArg), "arg1", typeof(NonNullGraphType<IdGraphType>))]
+        [InlineData(nameof(ArgumentTests.TypedArg), "arg1", typeof(StringGraphType))]
+        [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+        [InlineData(nameof(ArgumentTests.MultipleArgs), "arg2", typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
+        public void Argument_VerifyType(string fieldName, string argumentName, Type? argumentGraphType)
+        {
+            var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
+            var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
+            var argument = fieldType.Arguments?.Find(argumentName);
+            if (argumentGraphType != null)
+            {
+                argument.ShouldNotBeNull($"Argument '{argumentName}' of field '{fieldName}' could not be found.");
+                argument.Type.ShouldBe(argumentGraphType);
+            }
+            else
+            {
+                argument.ShouldBeNull($"Argument '{argumentName}' of field '{fieldName}' should not exist but does.");
+            }
+        }
+
+        [Theory]
+        [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", "hello", null, "hello")]
+        [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", "hello", null, "hello")]
+        [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", null, null, null)]
+        [InlineData(nameof(ArgumentTests.WithNullableString), null, null, null, null)]
+        [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", "hello", null, "hello")]
+        [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", null, null, null)]
+        [InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")]
+        [InlineData(nameof(ArgumentTests.WithCancellationToken), null, null, null, true)]
+        [InlineData(nameof(ArgumentTests.WithFromServices), null, null, null, "testService")]
+        [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", "hello", null, "hello")]
+        [InlineData(nameof(ArgumentTests.IdArg), "arg1", "hello", null, "hello")]
+        [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", "123", null, 123)]
+        [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", 123, null, 123)]
+        [InlineData(nameof(ArgumentTests.TypedArg), "arg1", "123", null, 123)]
+        [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", "hello", 123, "hello123")]
+        public void Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
+        {
+            var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
+            var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            var context = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, ArgumentValue>(),
+                CancellationToken = cts.Token,
+                Source = new ArgumentTests(),
+            };
+            if (arg1Name != null)
+            {
+                context.Arguments.Add(arg1Name, new ArgumentValue(arg1Value, ArgumentSource.Variable));
+            }
+            if (arg2Value.HasValue)
+            {
+                context.Arguments.Add("arg2", new ArgumentValue(arg2Value, ArgumentSource.Variable));
+            }
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<string>("testService");
+            using var provider = serviceCollection.BuildServiceProvider();
+            context.RequestServices = provider;
+            fieldType.Resolver.ShouldNotBeNull();
+            fieldType.Resolver!.Resolve(context).ShouldBe(expected);
+        }
+
         [Fact]
         public void RegistersReadablePropertiesAndMethodsOnly()
         {
-            var inputType = new AutoRegisteringObjectGraphType<TestClass>();
-            inputType.Fields.Find("Field1").ShouldNotBeNull();
-            inputType.Fields.Find("Field2").ShouldNotBeNull();
-            inputType.Fields.Find("Field3").ShouldBeNull();
-            inputType.Fields.Find("Field4").ShouldNotBeNull();
-            inputType.Fields.Find("Field5").ShouldBeNull();
+            var outputType = new AutoRegisteringObjectGraphType<TestClass>();
+            outputType.Fields.Find("Field1").ShouldNotBeNull();
+            outputType.Fields.Find("Field2").ShouldNotBeNull();
+            outputType.Fields.Find("Field3").ShouldBeNull();
+            outputType.Fields.Find("Field4").ShouldNotBeNull();
+            outputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
         public void SkipsSpecifiedProperties()
         {
-            var inputType = new AutoRegisteringObjectGraphType<TestClass>(x => x.Field1);
-            inputType.Fields.Find("Field1").ShouldBeNull();
-            inputType.Fields.Find("Field2").ShouldNotBeNull();
-            inputType.Fields.Find("Field3").ShouldBeNull();
-            inputType.Fields.Find("Field4").ShouldNotBeNull();
-            inputType.Fields.Find("Field5").ShouldBeNull();
+            var outputType = new AutoRegisteringObjectGraphType<TestClass>(x => x.Field1);
+            outputType.Fields.Find("Field1").ShouldBeNull();
+            outputType.Fields.Find("Field2").ShouldNotBeNull();
+            outputType.Fields.Find("Field3").ShouldBeNull();
+            outputType.Fields.Find("Field4").ShouldNotBeNull();
+            outputType.Fields.Find("Field5").ShouldBeNull();
         }
 
         [Fact]
@@ -277,6 +361,29 @@ namespace GraphQL.Tests.Types
                 actual = ((dynamic)task).Result;
             }
             actual.ShouldBe(expected);
+        }
+
+        [Fact]
+        public void CustomHardcodedArgumentAttributesWork()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
+            var fieldType = graphType.Fields.Find(nameof(CustomHardcodedArgumentAttributeTestClass.FieldWithHardcodedValue))!;
+            var resolver = fieldType.Resolver!;
+            resolver.Resolve(new ResolveFieldContext
+            {
+                Source = new CustomHardcodedArgumentAttributeTestClass(),
+            }).ShouldBe("85");
+        }
+
+        private class CustomHardcodedArgumentAttributeTestClass
+        {
+            public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
+        }
+
+        private class HardcodedValueAttribute : GraphQLAttribute
+        {
+            public override void Modify(ArgumentInformation argumentInformation)
+                => argumentInformation.SetDelegate(context => 85);
         }
 
         private class FieldTests
@@ -331,9 +438,26 @@ namespace GraphQL.Tests.Types
             public ICollection? NullableCollectionField { get; set; }
             public int?[]?[]? ListOfListOfIntsField { get; set; }
             public Task<string> TaskStringField() => null!;
+            public Task<int> TaskIntFieldAsync() => Task.FromResult(0);
             public IDataLoaderResult<string?> DataLoaderNullableStringField() => null!;
             public IDataLoaderResult<string>? NullableDataLoaderStringField() => null!;
             public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField() => null!;
+        }
+
+        private class ArgumentTests
+        {
+            public string? WithNonNullString(string arg1) => arg1;
+            public string? WithNullableString(string? arg1) => arg1;
+            public string? WithDefaultString(string arg1 = "test") => arg1;
+            public string? WithNullableDefaultString(string? arg1 = "test") => arg1;
+            public bool WithCancellationToken(CancellationToken cancellationToken) => cancellationToken.IsCancellationRequested;
+            public string? WithResolveFieldContext(IResolveFieldContext context) => (string?)context.Source;
+            public string WithFromServices([FromServices] string arg1) => arg1;
+            public string NamedArg([Name("arg1rename")] string arg1) => arg1;
+            public string IdArg([Id] string arg1) => arg1;
+            public int IdIntArg([Id] int arg1) => arg1;
+            public int TypedArg([InputType(typeof(StringGraphType))] int arg1) => arg1;
+            public string MultipleArgs(string arg1, int arg2) => arg1 + arg2.ToString();
         }
 
         private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>

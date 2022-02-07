@@ -30,7 +30,7 @@ namespace GraphQL
                 : defaultValue;
         }
 
-        private static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
+        internal static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);

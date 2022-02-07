@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -42,21 +41,34 @@ namespace GraphQL.Types
                 DeprecationReason = memberInfo.ObsoleteMessage(),
                 Type = graphType,
                 DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
-                Resolver = isInputType ? null : MemberResolver.Create(memberInfo),
             };
             if (isInputType)
             {
                 fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
             }
+            if (!isInputType &&
+                memberInfo is MethodInfo methodInfo &&
+                fieldType.Name.EndsWith("Async") &&
+                methodInfo.ReturnType.IsGenericType &&
+                methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                fieldType.Name = fieldType.Name.Substring(0, fieldType.Name.Length - 5);
+            }
 
+            return fieldType;
+        }
+
+        /// <summary>
+        /// Applies <see cref="GraphQLAttribute"/>s defined on <paramref name="memberInfo"/> to <paramref name="fieldType"/>.
+        /// </summary>
+        internal static void ApplyFieldAttributes(MemberInfo memberInfo, FieldType fieldType, bool isInputType)
+        {
             // Apply derivatives of GraphQLAttribute
             var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);
             }
-
-            return fieldType;
         }
 
         private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object?>> expression)
@@ -68,6 +80,40 @@ namespace GraphQL.Types
                 return m2.Member.Name;
 
             throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Constructs a lambda expression for a field resolver to return the specified query argument
+        /// from the resolve context. The returned lambda is similar to the following:
+        /// <code>context =&gt; context.GetArgument&lt;T&gt;(queryArgument.Name, queryArgument.DefaultValue)</code>
+        /// </summary>
+        internal static LambdaExpression GetParameterExpression(Type parameterType, QueryArgument queryArgument)
+        {
+            //construct a typed call to AutoRegisteringHelper.GetArgumentInternal, passing in queryArgument
+            var getArgumentMethodTyped = _getArgumentMethod.MakeGenericMethod(parameterType);
+            var resolveFieldContextParameter = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            var queryArgumentExpression = Expression.Constant(queryArgument, typeof(QueryArgument));
+            //e.g. Func<IResolveFieldContext, int> = (context) => AutoRegisteringHelper.GetArgumentInternal<int>(context, queryArgument);
+            var expr = Expression.Call(getArgumentMethodTyped, resolveFieldContextParameter, queryArgumentExpression);
+            return Expression.Lambda(expr, resolveFieldContextParameter);
+        }
+
+        private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
+        /// <summary>
+        /// Returns the value for the specified query argument, or the default value of the query argument
+        /// if a value was not specified in the request.
+        /// <br/><br/>
+        /// Unlike <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>,
+        /// the default value is not returned if <see langword="null"/> was explicitly supplied within the query.
+        /// The default value is only returned if no value was supplied to the query.
+        /// </summary>
+        private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
+        {
+            // GetArgument changes null values to DefaultValue even if null is explicitly specified,
+            // so do not use GetArgument here
+            return context.TryGetArgument(typeof(T), queryArgument.Name, out var value)
+                ? (T?)value
+                : (T?)queryArgument.DefaultValue;
         }
     }
 }

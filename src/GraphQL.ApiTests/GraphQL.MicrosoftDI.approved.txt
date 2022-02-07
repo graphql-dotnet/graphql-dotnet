@@ -160,3 +160,12 @@ namespace GraphQL.MicrosoftDI
         public object GetService(System.Type serviceType) { }
     }
 }
+namespace GraphQL
+{
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public class ScopedAttribute : GraphQL.GraphQLAttribute
+    {
+        public ScopedAttribute() { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+}

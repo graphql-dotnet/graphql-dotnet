@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -5,9 +6,9 @@ using GraphQL.Utilities;
 namespace GraphQL
 {
     /// <summary>
-    /// Allows additional configuration to be applied to a type or field definition.
+    /// Allows additional configuration to be applied to a type, field or query argument definition.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = true)]
     public abstract class GraphQLAttribute : Attribute
     {
         /// <summary>
@@ -51,6 +52,38 @@ namespace GraphQL
         /// Updates the properties of the specified <see cref="TypeInformation"/> as necessary.
         /// </summary>
         public virtual void Modify(TypeInformation typeInformation)
+        {
+        }
+
+        private static readonly MethodInfo _modifyMethod = typeof(GraphQLAttribute)
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .Where(x => x.Name == nameof(GraphQLAttribute.Modify) && x.IsGenericMethod)
+            .Single();
+        private static readonly ConcurrentDictionary<Type, MethodInfo> _typedModifyMethods = new();
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
+        /// </summary>
+        public virtual void Modify(ArgumentInformation argumentInformation)
+        {
+            var typedMethod = _typedModifyMethods.GetOrAdd(
+                argumentInformation.ParameterInfo.ParameterType,
+                type => _modifyMethod.MakeGenericMethod(type));
+            typedMethod.Invoke(this, new object[] { argumentInformation });
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
+        /// <typeparamref name="TParameterType"/> represents the return type of the parameter.
+        /// </summary>
+        public virtual void Modify<TParameterType>(ArgumentInformation argumentInformation)
+        {
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
+        /// </summary>
+        public virtual void Modify(QueryArgument queryArgument)
         {
         }
 
