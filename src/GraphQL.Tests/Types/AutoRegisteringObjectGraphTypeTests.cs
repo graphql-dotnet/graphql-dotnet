@@ -383,7 +383,7 @@ namespace GraphQL.Tests.Types
         private class HardcodedValueAttribute : GraphQLAttribute
         {
             public override void Modify(ArgumentInformation argumentInformation)
-                => argumentInformation.SetExpression(context => 85);
+                => argumentInformation.SetDelegate(context => 85);
         }
 
         private class FieldTests

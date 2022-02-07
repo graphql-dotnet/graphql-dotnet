@@ -118,12 +118,13 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Sets a delegate to be used to populate this method argument while building the field resolver.
+        /// An expression is generated that calls <paramref name="argumentDelegate"/> and stored within <see cref="Expression"/>.
         /// <br/><br/>
         /// The delegate must be of the type
         /// <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;
         /// where <typeparamref name="TParameterType"/> matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
         /// </summary>
-        public void SetExpression<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
+        public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
         {
             if (argumentDelegate == null)
                 throw new ArgumentNullException(nameof(argumentDelegate));

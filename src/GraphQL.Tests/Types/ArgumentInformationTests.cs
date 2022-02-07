@@ -55,29 +55,28 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void SetExpression_Parses_Int()
+        public void SetDelegate_Parses_Int()
         {
             var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-            info.SetExpression(context => 23);
+            info.SetDelegate(context => 23);
             info.Expression!.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
         }
 
         [Fact]
-        public void SetExpression_Throws_For_Invalid_Type()
+        public void SetDelegate_Throws_For_Invalid_Type()
         {
             var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-            var error = Should.Throw<ArgumentException>(() => info.SetExpression(context => "hello"));
+            var error = Should.Throw<ArgumentException>(() => info.SetDelegate(context => "hello"));
             error.Message.ShouldStartWith("Delegate must be of type Func<IResolveFieldContext, Int32>.");
         }
 
         [Fact]
-        public void SetExpression_Throws_For_Null()
+        public void SetDelegate_Throws_For_Null()
         {
             var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-            var error = Should.Throw<ArgumentNullException>(() => info.SetExpression<int>(null!));
+            var error = Should.Throw<ArgumentNullException>(() => info.SetDelegate<int>(null!));
         }
 
-        private readonly MethodInfo _testMethodInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;
         private readonly ParameterInfo _testParameterInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod), BindingFlags.NonPublic | BindingFlags.Instance)!.GetParameters()[0]!;
         private void TestMethod(int arg)
         {

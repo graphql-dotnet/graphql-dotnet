@@ -147,7 +147,7 @@ namespace GraphQL.Types
         /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
         /// to the returned <see cref="ArgumentInformation"/> instance.
         /// </summary>
-        protected virtual ArgumentInformation GetArgumentInformation<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
+        protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
         {
             var typeInformation = GetTypeInformation(parameterInfo);
             var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
