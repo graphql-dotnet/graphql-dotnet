@@ -147,7 +147,7 @@ namespace GraphQL
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
         public FromServicesAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation<TParameterType> argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -167,6 +167,7 @@ namespace GraphQL
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
+        public virtual void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
         public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
         public virtual void Modify(GraphQL.Types.QueryArgument queryArgument) { }
@@ -174,7 +175,6 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-        public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation<TParameterType> argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
@@ -1549,26 +1549,20 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerator<GraphQL.Types.AppliedDirective> GetEnumerator() { }
         public int Remove(string name) { }
     }
-    public abstract class ArgumentInformation
+    public class ArgumentInformation
     {
-        protected ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
-        protected ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.LambdaExpression? expression) { }
-        public System.Linq.Expressions.LambdaExpression? Expression { get; set; }
+        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
+        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, object>>? expression) { }
+        public System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, object>>? Expression { get; set; }
         public GraphQL.Types.FieldType FieldType { get; }
         public System.Reflection.ParameterInfo ParameterInfo { get; }
         public System.Type SourceType { get; }
         public GraphQL.Types.TypeInformation TypeInformation { get; }
+        public virtual void ApplyAttributes() { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "QueryArgument",
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
-    }
-    public class ArgumentInformation<TParameterType> : GraphQL.Types.ArgumentInformation
-    {
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType>>? expression) { }
-        public new System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TParameterType?>>? Expression { get; set; }
-        public virtual void ApplyAttributes() { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
@@ -1591,7 +1585,7 @@ namespace GraphQL.Types
         protected System.ValueTuple<GraphQL.Types.QueryArguments?, GraphQL.Resolvers.IFieldResolver> BuildMethodResolver(System.Reflection.MethodInfo methodInfo, GraphQL.Types.FieldType fieldType) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
-        protected virtual GraphQL.Types.ArgumentInformation<TReturnType> GetArgumentInformation<TReturnType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }

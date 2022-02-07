@@ -30,11 +30,12 @@ namespace GraphQL.Resolvers
             for (int i = 0; i < methodArgumentExpressions.Count; i++)
             {
                 var expr = methodArgumentExpressions[i];
-                if (expr.Parameters.Count != 1 || expr.Parameters[0].Type != typeof(IResolveFieldContext) || expr.ReturnType != methodParameters[i].ParameterType)
+                if (expr.Parameters.Count != 1 || expr.Parameters[0].Type != typeof(IResolveFieldContext))
                 {
-                    throw new InvalidOperationException($"A supplied expression is not a lambda delegate of type Func<IResolveFieldContext, {methodParameters[i].ParameterType.Name}>.");
+                    throw new InvalidOperationException("A supplied expression is not a lambda delegate of type Func<IResolveFieldContext, T>.");
                 }
-                expressionBodies[i] = expr.Body.Replace(expr.Parameters[0], resolveFieldContextParameter);
+                var replaced = expr.Body.Replace(expr.Parameters[0], resolveFieldContextParameter);
+                expressionBodies[i] = replaced.Type == methodParameters[i].ParameterType ? replaced : Expression.Convert(replaced, methodParameters[i].ParameterType);
             }
 
             // create the method call expression

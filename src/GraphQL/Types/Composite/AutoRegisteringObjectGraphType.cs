@@ -105,9 +105,7 @@ namespace GraphQL.Types
             QueryArguments queryArguments = new();
             foreach (var parameterInfo in methodInfo.GetParameters())
             {
-                var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
-                    .MakeGenericMethod(parameterInfo.ParameterType)
-                    .Invoke(this, new object[] { fieldType, parameterInfo })!;
+                var argumentInfo = GetArgumentInformation(fieldType, parameterInfo);
                 var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
                 if (queryArgument != null)
                 {
@@ -122,10 +120,6 @@ namespace GraphQL.Types
             var resolver = new MethodResolver(methodInfo, expressions);
             return (queryArguments, resolver);
         }
-
-        private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance);
-        private ArgumentInformation GetArgumentInformationInternal<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
-            => GetArgumentInformation<TReturnType>(fieldType, parameterInfo);
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
@@ -142,15 +136,15 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation{TReturnType}"/>
+        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>
         /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
         /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
-        /// to the returned <see cref="ArgumentInformation{TReturnType}"/> instance.
+        /// to the returned <see cref="ArgumentInformation"/> instance.
         /// </summary>
-        protected virtual ArgumentInformation<TReturnType> GetArgumentInformation<TReturnType>(FieldType fieldType, ParameterInfo parameterInfo)
+        protected virtual ArgumentInformation GetArgumentInformation(FieldType fieldType, ParameterInfo parameterInfo)
         {
             var typeInformation = GetTypeInformation(parameterInfo);
-            var argumentInfo = new ArgumentInformation<TReturnType>(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
+            var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
             argumentInfo.ApplyAttributes();
             return argumentInfo;
         }

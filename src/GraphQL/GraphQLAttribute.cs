@@ -55,9 +55,9 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Updates the properties of the specified <see cref="ArgumentInformation{TParameterType}"/> as necessary.
+        /// Updates the properties of the specified <see cref="ArgumentInformation"/> as necessary.
         /// </summary>
-        public virtual void Modify<TParameterType>(ArgumentInformation<TParameterType> argumentInformation)
+        public virtual void Modify(ArgumentInformation argumentInformation)
         {
         }
 
