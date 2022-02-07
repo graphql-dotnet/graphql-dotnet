@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Types
         {
             var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
             var error = Should.Throw<ArgumentException>(() => info.SetExpression(context => "hello"));
-            error.Message.ShouldBe("Delegate must be of type Func<IResolveFieldContext, Int32>. (Parameter 'argumentDelegate')");
+            error.Message.ShouldStartWith("Delegate must be of type Func<IResolveFieldContext, Int32>.");
         }
 
         [Fact]
