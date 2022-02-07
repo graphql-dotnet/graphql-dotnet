@@ -10,11 +10,8 @@ namespace GraphQL
     public class FromServicesAttribute : GraphQLAttribute
     {
         /// <inheritdoc/>
-        public override void Modify<TParameterType>(ArgumentInformation<TParameterType> argumentInformation)
-            => argumentInformation.Expression = context => GetRequiredService<TParameterType>(context);
-
-        private static TServiceType GetRequiredService<TServiceType>(IResolveFieldContext context)
-            => (context.RequestServices ?? throw new MissingRequestServicesException())
-                .GetRequiredService<TServiceType>();
+        public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+            => argumentInformation.SetExpression(context => (context.RequestServices ?? throw new MissingRequestServicesException())
+                .GetRequiredService<TParameterType>());
     }
 }
