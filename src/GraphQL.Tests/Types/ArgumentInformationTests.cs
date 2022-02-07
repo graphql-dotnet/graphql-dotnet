@@ -78,6 +78,7 @@ namespace GraphQL.Tests.Types
         }
 
         private readonly ParameterInfo _testParameterInfo = typeof(ArgumentInformationTests).GetMethod(nameof(TestMethod), BindingFlags.NonPublic | BindingFlags.Instance)!.GetParameters()[0]!;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Necessary for tests")]
         private void TestMethod(int arg)
         {
         }
