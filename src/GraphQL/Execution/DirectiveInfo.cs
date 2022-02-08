@@ -44,7 +44,7 @@ namespace GraphQL.Execution
         {
             bool exists = TryGetArgument(argumentType, name, out object? result);
             return exists
-                ? result ?? defaultValue
+                ? result
                 : defaultValue;
         }
 
