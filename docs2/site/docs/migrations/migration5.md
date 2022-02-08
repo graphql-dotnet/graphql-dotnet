@@ -330,6 +330,20 @@ descriptions or deprecation reasons to enum graph types or enum values.
 You can also derive from `GraphQLAttribute` to create your own attributes to modify
 enum graph types or enum values as they are being built by `EnumerationGraphType<T>`.
 
+### 11. Ability to get directives and their arguments values
+
+Now you may get directives along with their arguments that have been provided in the GraphQL query request.
+New APIs are similar to ones used for field arguments:
+
+```csharp
+Field<StringGraphType>("myField", resolve: context =>
+{
+    var dir = ctx.GetDirective("myDirective");
+    var arg = dir.GetArgument<string>("arg");
+    ...
+});
+```
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -385,20 +399,22 @@ services.AddGraphQL(builder => builder
 
 ### 8. `GraphQLBuilderBase.Initialize` was renamed to `RegisterDefaultServices`
 
-### 9. `schema`, `variableDefinitions` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
+### 9. `ExecutionHelper.GetArgumentValues` was renamed to `GetArguments`
+
+### 10. `schema`, `variableDefinitions` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
 
 Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `ValidationContext.Variables` properties
 
-### 10. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
+### 11. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
 
-### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
+### 12. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
 
-### 12. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
+### 13. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
 
 Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
 If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
 
-### 13. Changes caused by GraphQL-Parser v8
+### 14. Changes caused by GraphQL-Parser v8
 
 - The `GraphQL.Language.AST` namespace and all classes from it have been removed in favor of ones
   from `GraphQLParser.AST` namespace in GraphQL-Parser project. Examples of changed usages:
@@ -428,7 +444,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
 - All scalars works with `GraphQLParser.AST.GraphQLValue` instead of `GraphQL.Language.AST.IValue`
 - `IInputObjectGraphType.ToAST` returns `GraphQLParser.AST.GraphQLObjectValue` instead of `GraphQL.Language.AST.IValue`
 
-### 14. Classes and members marked as obsolete have been removed
+### 15. Classes and members marked as obsolete have been removed
 
 The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
 
@@ -451,13 +467,13 @@ read-only instead of read-write, such as `Field.Alias`.
 Various classes' constructors in the `GraphQL.Language.AST` namespace have been
 removed in favor of other constructors.
 
-### 15. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
+### 16. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
 
 As such, the `DocumentWriter` classes have been renamed to `GraphQLSerializer`, and the
 `AddDocumentWriter` extension method for `IGraphQLBuilder` has been renamed to `AddSerializer`.
 The `WriteAsync` method's functionality has not changed.
 
-### 16. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
+### 17. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
 
 Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
 `Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation. Note that
@@ -491,7 +507,7 @@ public static class StringExtensions
 The new `Read` and `Deserialize` methods of the `Newtonsoft.Json` implementation
 will default to reading dates as strings unless configured otherwise in the settings.
 
-### 17. The `WriteToStringAsync` extension methods have been removed.
+### 18. The `WriteToStringAsync` extension methods have been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
 The asynchronous text serialization methods have been removed as the underlying serialization
@@ -501,12 +517,12 @@ The `WriteAsync()` method can be used to asynchronously serialize to a stream. H
 the `Newtonsoft.Json` serializer does not support asynchronous serialization, so synchronous
 calls are made to the underlying stream. Only `System.Text.Json` supports asynchronous writing.
 
-### 18. Other changes to the serialization infrastructure
+### 19. Other changes to the serialization infrastructure
 
 - `InputsConverter` renamed to `InputsJsonConverter`
 - `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
 
-### 19. `GraphQLMetadataAttribute` cannot be applied to graph type classes
+### 20. `GraphQLMetadataAttribute` cannot be applied to graph type classes
 
 The `[GraphQLMetadata]` attribute is designed to be used for schema-first configurations
 and has not changed in this regard. For code-first graph definitions, please set the
@@ -524,7 +540,7 @@ public class HumanType : ObjectGraphType<Human>
 }
 ```
 
-### 20. `AstPrinter` class was removed
+### 21. `AstPrinter` class was removed
 
 `AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project.
 
@@ -549,13 +565,13 @@ string s = writer.ToString();
 into provided `TextWriter`. In the majority of cases it does not allocate memory in
 the managed heap at all.
 
-### 21. Possible breaking changes in `InputObjectGraphType<TSourceType>`
+### 22. Possible breaking changes in `InputObjectGraphType<TSourceType>`
 
 `InputObjectGraphType<TSourceType>.ToAST` and `InputObjectGraphType<TSourceType>.IsValidDefault`
 methods were changed in such a way that now you may be required to also override `ToAST` if you override
 `ParseDictionary`. Changes in those methods are made for earlier error detection and schema printing.
 
-### 22. `AutoRegisteringObjectGraphType` changes
+### 23. `AutoRegisteringObjectGraphType` changes
 
 The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
 and now supports properties, methods and fields, although fields are not included
@@ -579,19 +595,19 @@ Register this class within your DI engine like this:
 services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
 ```
 
-### 23. `AutoRegisteringInputObjectGraphType` changes
+### 24. `AutoRegisteringInputObjectGraphType` changes
 
 The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
 and now supports returning both properties and fields, although fields are not included
 with the default implementation. Override the method in a derived class to include fields.
 
-### 24. `EnumerationGraphType` parses exact names
+### 25. `EnumerationGraphType` parses exact names
 
 Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationGraphType`.
 In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
 and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
 
-### 25. `EnumerationGraphType.AddValue` changes
+### 26. `EnumerationGraphType.AddValue` changes
 
 `description` argument from `EnumerationGraphType.AddValue` method was marked as optional
 and moved after `value` argument. If you use this method and set descriptions, you will need
@@ -599,7 +615,7 @@ to change the order of arguments. Since changing the order of arguments in some 
 invisible to the caller and lead to hardly detected bugs, the method name has been changed from
 `AddValue` to `Add`.
 
-### 26. The settings class provided to `GraphQL.NewtonsoftJson.GraphQLSerializer` has changed.
+### 27. The settings class provided to `GraphQL.NewtonsoftJson.GraphQLSerializer` has changed.
 
 Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`. Now the class
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
