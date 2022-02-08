@@ -1,5 +1,4 @@
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
