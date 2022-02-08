@@ -162,7 +162,7 @@ namespace GraphQL.MicrosoftDI
 }
 namespace GraphQL
 {
-    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Method)]
     public class ScopedAttribute : GraphQL.GraphQLAttribute
     {
         public ScopedAttribute() { }
