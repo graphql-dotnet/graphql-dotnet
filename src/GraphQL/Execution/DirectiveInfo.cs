@@ -35,7 +35,7 @@ namespace GraphQL.Execution
         {
             bool exists = TryGetArgument(typeof(TType), name, out object? result);
             return exists
-                ? (TType)result
+                ? (TType)result!
                 : defaultValue;
         }
 
