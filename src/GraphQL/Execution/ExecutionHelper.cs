@@ -46,9 +46,7 @@ namespace GraphQL.Execution
         public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
-            {
                 return null;
-            }
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
