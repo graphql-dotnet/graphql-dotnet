@@ -27,7 +27,7 @@ namespace GraphQL.Types
             if (List != null && List.Contains(directive))
                 throw new InvalidOperationException("Already exists");
 
-            (List ??= new List<AppliedDirective>()).Add(directive);
+            (List ??= new()).Add(directive);
         }
 
         /// <summary>

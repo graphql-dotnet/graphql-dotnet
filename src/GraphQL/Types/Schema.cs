@@ -224,7 +224,7 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+            (_visitors ??= new()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
         }
 
         /// <inheritdoc/>
@@ -241,7 +241,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
             }
 
-            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
+            if (!(_visitorTypes ??= new()).Contains(type))
                 _visitorTypes.Add(type);
         }
 
@@ -251,7 +251,7 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            (_additionalInstances ??= new List<IGraphType>()).Add(type ?? throw new ArgumentNullException(nameof(type)));
+            (_additionalInstances ??= new()).Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         /// <inheritdoc/>
@@ -268,7 +268,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
             }
 
-            _additionalTypes ??= new List<Type>();
+            _additionalTypes ??= new();
 
             if (!_additionalTypes.Contains(type))
                 _additionalTypes.Add(type);
@@ -296,7 +296,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType, Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new List<(Type, Type)>()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
         }
 
         /// <inheritdoc/>

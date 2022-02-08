@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Rules
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
             {
-                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<ROM>();
+                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new();
                 varNameDef.Add(varDef.Variable.Name);
             }),
 

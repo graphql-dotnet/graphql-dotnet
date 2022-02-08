@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<GraphQLDirective>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<GraphQLArgument>((argument, context) =>
             {
-                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<ROM, GraphQLArgument>();
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new();
                 var argName = argument.Name;
                 if (knownArgs.TryGetValue(argName, out var arg))
                 {

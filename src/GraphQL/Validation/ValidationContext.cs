@@ -79,7 +79,7 @@ namespace GraphQL.Validation
         {
             if (error == null)
                 throw new ArgumentNullException(nameof(error), "Must provide a validation error.");
-            (_errors ??= new List<ValidationError>()).Add(error);
+            (_errors ??= new()).Add(error);
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace GraphQL.Validation
                     }
 
                     if (!match)
-                        (unknownFields ??= new List<string>(1)).Add(key);
+                        (unknownFields ??= new(1)).Add(key);
                 }
 
                 if (unknownFields?.Count > 0)
@@ -431,7 +431,7 @@ namespace GraphQL.Validation
                         {
                             string? error = IsValidLiteralValue(ofType, listValue.Values[index]);
                             if (error != null)
-                                (errors ??= new List<string>()).Add($"In element #{index + 1}: [{error}]");
+                                (errors ??= new()).Add($"In element #{index + 1}: [{error}]");
                         }
                     }
 
@@ -463,7 +463,7 @@ namespace GraphQL.Validation
                     var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
-                        (errors ??= new List<string>()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
+                        (errors ??= new()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
                     }
                 }
 
@@ -476,11 +476,11 @@ namespace GraphQL.Validation
                     {
                         string? error = IsValidLiteralValue(field.ResolvedType!, fieldAst.Value);
                         if (error != null)
-                            (errors ??= new List<string>()).Add($"In field '{field.Name}': [{error}]");
+                            (errors ??= new()).Add($"In field '{field.Name}': [{error}]");
                     }
                     else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
                     {
-                        (errors ??= new List<string>()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                        (errors ??= new()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
                     }
                 }
 
@@ -513,7 +513,7 @@ namespace GraphQL.Validation
             else
             {
                 items = new List<T> { item };
-                (context.NonUserContext ??= new Dictionary<string, object?>()).Add(listKey, items);
+                (context.NonUserContext ??= new()).Add(listKey, items);
             }
         }
 

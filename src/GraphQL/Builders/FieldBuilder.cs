@@ -192,7 +192,7 @@ namespace GraphQL.Builders
                 Name = name,
             };
             configure?.Invoke(arg);
-            FieldType.Arguments ??= new QueryArguments();
+            FieldType.Arguments ??= new();
             FieldType.Arguments.Add(arg);
             return this;
         }

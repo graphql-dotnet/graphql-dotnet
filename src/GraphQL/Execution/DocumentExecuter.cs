@@ -227,7 +227,7 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                (result ??= new ExecutionResult()).AddError(ex);
+                (result ??= new()).AddError(ex);
             }
             catch (Exception ex)
             {
@@ -242,11 +242,11 @@ namespace GraphQL
                     ex = exceptionContext.Exception;
                 }
 
-                (result ??= new ExecutionResult()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
+                (result ??= new()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
             }
             finally
             {
-                result ??= new ExecutionResult();
+                result ??= new();
                 result.Perf = metrics.Finish();
                 if (executionOccurred)
                     result.Executed = true;

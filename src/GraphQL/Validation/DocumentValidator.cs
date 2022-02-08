@@ -90,7 +90,7 @@ namespace GraphQL.Validation
                             {
                                 var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
-                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                                    (variableVisitors ??= new()).Add(variableVisitor);
                             }
                             var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                             if (visitor != null)
@@ -105,7 +105,7 @@ namespace GraphQL.Validation
                             {
                                 var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
-                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                                    (variableVisitors ??= new()).Add(variableVisitor);
                             }
                             var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                             if (visitor != null)

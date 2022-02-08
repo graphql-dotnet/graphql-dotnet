@@ -25,7 +25,7 @@ namespace GraphQL.Validation.Rules
                 new MatchingNodeVisitor<GraphQLObjectValue>(
                     enter: (objVal, context) =>
                     {
-                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<ROM, GraphQLValue>>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
@@ -35,7 +35,7 @@ namespace GraphQL.Validation.Rules
                 new MatchingNodeVisitor<GraphQLObjectField>(
                     leave: (objField, context) =>
                     {
-                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<ROM, GraphQLValue>();
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new();
 
                         if (knownNames.TryGetValue(objField.Name, out var value))
                         {
