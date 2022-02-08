@@ -32,9 +32,9 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver) : base(GetScopedResolver(resolver)) { }
+        public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, TReturnType> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        private static Func<IResolveFieldContext, TReturnType?> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             return context =>
             {

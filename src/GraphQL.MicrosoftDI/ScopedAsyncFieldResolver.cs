@@ -15,9 +15,9 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public ScopedAsyncFieldResolver(Func<IResolveFieldContext, Task<TReturnType>> resolver) : base(GetScopedResolver(resolver)) { }
+        public ScopedAsyncFieldResolver(Func<IResolveFieldContext, Task<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, Task<TReturnType>> GetScopedResolver(Func<IResolveFieldContext, Task<TReturnType>> resolver)
+        private static Func<IResolveFieldContext, Task<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext, Task<TReturnType?>> resolver)
         {
             return async (context) =>
             {
@@ -33,9 +33,9 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public ScopedAsyncFieldResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver) : base(GetScopedResolver(resolver)) { }
+        public ScopedAsyncFieldResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, Task<TReturnType>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
+        private static Func<IResolveFieldContext, Task<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             return async (context) =>
             {
