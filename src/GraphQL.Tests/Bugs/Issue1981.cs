@@ -26,21 +26,18 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void Should_Throw_On_Unknown_Directives()
+        public void Should_Ignore_Unknown_Directives()
         {
             var query = @"
 {
-  fieldWithoutDirectives @oops
+  fieldWithoutDirectives @unknown
 }
 ";
             var expected = @"{
   ""fieldWithoutDirectives"": null
 }";
-            // empty validation rules to bypass vslidation error from KnownDirectivesInAllowedLocations
-            var res = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, rules: Array.Empty<IValidationRule>());
-            res.Errors[0].Code.ShouldBe("ARGUMENT_OUT_OF_RANGE");
-            res.Errors[0].Message.ShouldBe("Error trying to resolve field 'fieldWithoutDirectives'.");
-            res.Errors[0].InnerException.Message.ShouldStartWith("Unknown directive 'oops' for field 'fieldWithoutDirectives'.");
+            // empty validation rules to bypass validation error from KnownDirectivesInAllowedLocations
+            AssertQuerySuccess(query, expected, rules: Array.Empty<IValidationRule>());
         }
     }
 

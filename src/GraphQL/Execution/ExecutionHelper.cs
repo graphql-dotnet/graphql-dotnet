@@ -21,15 +21,19 @@ namespace GraphQL.Execution
             if (field.Directives == null || field.Directives.Count == 0)
                 return null;
 
-            var directives = new Dictionary<string, IDictionary<string, ArgumentValue>>(field.Directives.Count);
+            Dictionary<string, IDictionary<string, ArgumentValue>>? directives = null;
 
             foreach (var dir in field.Directives.Items)
             {
                 var dirDefinition = schema.Directives.Find(dir.Name);
-                if (dirDefinition == null)
-                    throw new ArgumentOutOfRangeException(nameof(field), $"Unknown directive '{dir.Name.StringValue}' for field '{field.Name.StringValue}'.");
 
-                directives[dirDefinition.Name] = GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments;
+                // KnownDirectivesInAllowedLocations validation rule should handle unknown directives, so
+                // if someone purposely removed the validation rule, it would ignore unknown directives
+                // while executing the request
+                if (dirDefinition == null)
+                    continue;
+
+                (directives ??= new())[dirDefinition.Name] = GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments;
             }
 
             return directives;
