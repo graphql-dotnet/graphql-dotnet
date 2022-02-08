@@ -29,8 +29,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Returns the value of the specified directive argument, or <paramref name="defaultValue"/> when
-        /// unspecified or when specified as <see langword="null"/>. Field and variable default values take
-        /// precedence over the <paramref name="defaultValue"/> parameter.
+        /// unspecified. Variable default values take precedence over the <paramref name="defaultValue"/> parameter.
         /// </summary>
         public TType GetArgument<TType>(string name, TType defaultValue = default!)
         {
