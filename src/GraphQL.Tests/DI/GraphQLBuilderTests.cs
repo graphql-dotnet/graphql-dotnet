@@ -1280,6 +1280,40 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddExecutionEngineSelector -
+        [Fact]
+        public void AddExecutionStrategySelector()
+        {
+            MockSetupRegister<IExecutionStrategySelector, TestExecutionStrategySelector>();
+            _builder.AddExecutionStrategySelector<TestExecutionStrategySelector>();
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionEngineSelector_Instance()
+        {
+            var instance = new TestExecutionStrategySelector();
+            MockSetupRegister<IExecutionStrategySelector>(instance);
+            _builder.AddExecutionStrategySelector(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionEngineSelector_Factory()
+        {
+            var factory = MockSetupRegister<IExecutionStrategySelector>();
+            _builder.AddExecutionStrategySelector(factory);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionEngineSelector_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((TestExecutionStrategySelector)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((Func<IServiceProvider, TestExecutionStrategySelector>)null));
+        }
+        #endregion
+
         #region - GraphQL.MemoryCache: AddMemoryCache -
         [Fact]
         public void AddMemoryCache()
@@ -1396,6 +1430,14 @@ namespace GraphQL.Tests.DI
         }
 
         private class TestSchema : Schema
+        {
+        }
+
+        private class TestExecutionStrategySelector : DefaultExecutionStrategySelector
+        {
+        }
+
+        private class TestExecutionStrategy : ParallelExecutionStrategy
         {
         }
 
