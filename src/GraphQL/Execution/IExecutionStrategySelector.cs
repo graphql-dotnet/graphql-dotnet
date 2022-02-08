@@ -1,5 +1,3 @@
-using GraphQLParser.AST;
-
 namespace GraphQL.Execution
 {
     /// <summary>
