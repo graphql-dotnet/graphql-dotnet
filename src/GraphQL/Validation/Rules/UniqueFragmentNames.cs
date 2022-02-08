@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((fragmentDefinition, context) =>
             {
-                var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<ROM, GraphQLFragmentDefinition>();
+                var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new();
 
                 var fragmentName = fragmentDefinition.FragmentName.Name;
                 if (knownFragments.TryGetValue(fragmentName, out var frag)) // .NET 2.2+ has TryAdd

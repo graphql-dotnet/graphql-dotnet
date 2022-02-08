@@ -226,7 +226,7 @@ namespace GraphQL.Execution
         /// <returns>A list of collected fields</returns>
         protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
-            fields ??= new Dictionary<string, (GraphQLField field, FieldType fieldType)>();
+            fields ??= new();
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
             int countOfSpreads = GetFragmentSpreads(selectionSet);

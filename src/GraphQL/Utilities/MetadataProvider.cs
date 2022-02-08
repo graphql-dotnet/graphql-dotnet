@@ -11,7 +11,7 @@ namespace GraphQL.Utilities
         private Dictionary<string, object?>? _metadata;
 
         /// <inheritdoc />
-        public Dictionary<string, object?> Metadata => _metadata ??= new Dictionary<string, object?>();
+        public Dictionary<string, object?> Metadata => _metadata ??= new();
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, TType defaultValue = default!)

@@ -42,7 +42,7 @@ namespace GraphQL.Validation
                 {
                     var items = GetRecursivelyReferencedFragments(operation);
                     if (items != null)
-                        (fragments ??= new List<GraphQLFragmentDefinition>()).AddRange(items);
+                        (fragments ??= new()).AddRange(items);
                 }
                 return fragments;
             }

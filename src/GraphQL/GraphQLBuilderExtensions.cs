@@ -249,7 +249,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
             => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
 
@@ -257,7 +257,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
             => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
 
@@ -271,7 +271,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -284,7 +284,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -300,7 +300,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -313,7 +313,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -329,7 +329,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -342,7 +342,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;

@@ -60,7 +60,7 @@ namespace GraphQL
         /// </summary>
         public void AddLocation(Location location)
         {
-            (Locations ??= new List<Location>()).Add(location);
+            (Locations ??= new()).Add(location);
         }
 
         private void SetCode(Exception? exception)
