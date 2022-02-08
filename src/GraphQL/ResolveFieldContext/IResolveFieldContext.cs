@@ -39,6 +39,16 @@ namespace GraphQL
         /// </summary>
         IDictionary<string, ArgumentValue>? Arguments { get; }
 
+        //TODO: change comments or/and add new methods
+
+        /// <summary>
+        /// A dictionary of directives with their arguments passed to the field, or <see langword="null"/> if no directives were defined for the field.
+        /// It is recommended to use the <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// and <see cref="ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
+        /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
+        /// </summary>
+        IDictionary<string, IDictionary<string, ArgumentValue>>? Directives { get; }
+
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object? RootValue { get; }
 

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
@@ -9,9 +10,34 @@ namespace GraphQL.Execution
     /// </summary>
     public static class ExecutionHelper
     {
+        private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+
         /// <summary>
-        /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
-        /// or variables as specified by the document.
+        /// Returns a dictionary of directives with their arguments values for a field.
+        /// Values will be retrieved from literals or variables as specified by the document.
+        /// </summary>
+        public static IDictionary<string, IDictionary<string, ArgumentValue>>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
+        {
+            if (field.Directives == null || field.Directives.Count == 0)
+                return null;
+
+            var directives = new Dictionary<string, IDictionary<string, ArgumentValue>>(field.Directives.Count);
+
+            foreach (var dir in field.Directives.Items)
+            {
+                var dirDefinition = schema.Directives.Find(dir.Name);
+                if (dirDefinition == null)
+                    throw new ArgumentOutOfRangeException(nameof(field), $"Unknown directive '{dir.Name.StringValue}' for field '{field.Name.StringValue}'.");
+
+                directives[dirDefinition.Name] = GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments;
+            }
+
+            return directives;
+        }
+
+        /// <summary>
+        /// Returns a dictionary of arguments and their values for a field or directive.
+        /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
         public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {

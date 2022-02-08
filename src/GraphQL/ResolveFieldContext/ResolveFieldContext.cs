@@ -27,6 +27,9 @@ namespace GraphQL
         public IDictionary<string, ArgumentValue>? Arguments { get; set; }
 
         /// <inheritdoc/>
+        public IDictionary<string, IDictionary<string, ArgumentValue>>? Directives { get; set; }
+
+        /// <inheritdoc/>
         public object? RootValue { get; set; }
 
         /// <inheritdoc/>
@@ -95,6 +98,7 @@ namespace GraphQL
             ParentType = context.ParentType;
             Parent = context.Parent;
             Arguments = context.Arguments;
+            Directives = context.Directives;
             Schema = context.Schema;
             Document = context.Document;
             RootValue = context.RootValue;
