@@ -30,6 +30,6 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc/>
         public Task<object?> Resolve(IResolveFieldContext context) => _resolverFunc(context);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context) => _resolverFunc(context);
+        object? IFieldResolver.Resolve(IResolveFieldContext context) => _resolverFunc(context);
     }
 }
