@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitSchema(ISchema schema) => SetDescription(schema);
 
-        public override void VisitDirective(DirectiveGraphType type, ISchema schema) => SetDescription(type);
+        public override void VisitDirective(Directive directive, ISchema schema) => SetDescription(directive);
 
         public override void VisitScalar(ScalarGraphType type, ISchema schema) => SetDescription(type);
 
@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Utilities.Visitors
 
         public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => SetDescription(argument);
 
-        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => SetDescription(argument);
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => SetDescription(argument);
 
         public override void VisitInterface(IInterfaceGraphType type, ISchema schema) => SetDescription(type);
 

@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Introspection
             }
         }
 
-        private class TraitsDirective : DirectiveGraphType
+        private class TraitsDirective : Directive
         {
             public override bool? Introspectable => true;
 

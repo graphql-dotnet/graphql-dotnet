@@ -903,9 +903,9 @@ namespace GraphQL.Execution
     }
     public class DirectiveInfo
     {
-        public DirectiveInfo(GraphQL.Types.DirectiveGraphType directive, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> arguments) { }
+        public DirectiveInfo(GraphQL.Types.Directive directive, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> arguments) { }
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> Arguments { get; }
-        public GraphQL.Types.DirectiveGraphType Directive { get; }
+        public GraphQL.Types.Directive Directive { get; }
         public object? GetArgument(System.Type argumentType, string name, object? defaultValue = null) { }
         public TType GetArgument<TType>(string name, TType defaultValue = default) { }
     }
@@ -1272,7 +1272,7 @@ namespace GraphQL.Introspection
     public class AlphabeticalSchemaComparer : GraphQL.Introspection.ISchemaComparer
     {
         public AlphabeticalSchemaComparer() { }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.Directive> DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
@@ -1281,7 +1281,7 @@ namespace GraphQL.Introspection
     public class DefaultSchemaComparer : GraphQL.Introspection.ISchemaComparer
     {
         public DefaultSchemaComparer() { }
-        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.Directive>? DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
@@ -1293,7 +1293,7 @@ namespace GraphQL.Introspection
         protected static readonly System.Threading.Tasks.Task<bool> Forbidden;
         public DefaultSchemaFilter() { }
         public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument) { }
-        public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive) { }
+        public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.Directive directive) { }
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
@@ -1306,7 +1306,7 @@ namespace GraphQL.Introspection
     }
     public interface ISchemaComparer
     {
-        System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType>? DirectiveComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.Directive>? DirectiveComparer { get; }
         System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
         System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field);
         System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
@@ -1315,7 +1315,7 @@ namespace GraphQL.Introspection
     public interface ISchemaFilter
     {
         System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument);
-        System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive);
+        System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.Directive directive);
         System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue);
         System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field);
         System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type);
@@ -1356,7 +1356,7 @@ namespace GraphQL.Introspection
     {
         public @__AppliedDirective() { }
     }
-    public class @__Directive : GraphQL.Types.ObjectGraphType<GraphQL.Types.DirectiveGraphType>
+    public class @__Directive : GraphQL.Types.ObjectGraphType<GraphQL.Types.Directive>
     {
         public @__Directive(bool allowAppliedDirectives = false, bool allowRepeatable = false) { }
     }
@@ -1706,21 +1706,15 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
-    public class DeprecatedDirective : GraphQL.Types.DirectiveGraphType
+    public class DeprecatedDirective : GraphQL.Types.Directive
     {
         public DeprecatedDirective() { }
         public override bool? Introspectable { get; }
     }
-    public class DirectiveArgument
+    public class Directive : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
     {
-        public DirectiveArgument(string name) { }
-        public string Name { get; set; }
-        public object? Value { get; set; }
-    }
-    public class DirectiveGraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
-    {
-        public DirectiveGraphType(string name, params GraphQLParser.AST.DirectiveLocation[] locations) { }
-        public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQLParser.AST.DirectiveLocation> locations) { }
+        public Directive(string name, params GraphQLParser.AST.DirectiveLocation[] locations) { }
+        public Directive(string name, System.Collections.Generic.IEnumerable<GraphQLParser.AST.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments? Arguments { get; set; }
         public string? Description { get; set; }
         public virtual bool? Introspectable { get; }
@@ -1729,6 +1723,12 @@ namespace GraphQL.Types
         public bool Repeatable { get; set; }
         public override string ToString() { }
         public virtual void Validate(GraphQL.Types.AppliedDirective applied) { }
+    }
+    public class DirectiveArgument
+    {
+        public DirectiveArgument(string name) { }
+        public string Name { get; set; }
+        public object? Value { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Enum, AllowMultiple=false)]
     public abstract class EnumCaseAttribute : System.Attribute
@@ -1958,7 +1958,7 @@ namespace GraphQL.Types
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
     }
-    public class IncludeDirective : GraphQL.Types.DirectiveGraphType
+    public class IncludeDirective : GraphQL.Types.Directive
     {
         public IncludeDirective() { }
     }
@@ -2001,7 +2001,7 @@ namespace GraphQL.Types
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
     }
-    public class LengthDirective : GraphQL.Types.DirectiveGraphType
+    public class LengthDirective : GraphQL.Types.Directive
     {
         public LengthDirective() { }
         public override bool? Introspectable { get; }
@@ -2179,17 +2179,17 @@ namespace GraphQL.Types
         public static GraphQL.Types.Schema For<TSchemaBuilder>(string typeDefinitions, System.Action<TSchemaBuilder>? configure = null)
             where TSchemaBuilder : GraphQL.Utilities.SchemaBuilder, new () { }
     }
-    public class SchemaDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType>, System.Collections.IEnumerable
+    public class SchemaDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.Directive>, System.Collections.IEnumerable
     {
         public SchemaDirectives() { }
         public int Count { get; }
         public virtual GraphQL.Types.DeprecatedDirective Deprecated { get; }
         public virtual GraphQL.Types.IncludeDirective Include { get; }
         public virtual GraphQL.Types.SkipDirective Skip { get; }
-        public GraphQL.Types.DirectiveGraphType? Find(GraphQLParser.ROM name) { }
-        public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveGraphType> GetEnumerator() { }
-        public void Register(GraphQL.Types.DirectiveGraphType directive) { }
-        public void Register(params GraphQL.Types.DirectiveGraphType[] directives) { }
+        public GraphQL.Types.Directive? Find(GraphQLParser.ROM name) { }
+        public System.Collections.Generic.IEnumerator<GraphQL.Types.Directive> GetEnumerator() { }
+        public void Register(GraphQL.Types.Directive directive) { }
+        public void Register(params GraphQL.Types.Directive[] directives) { }
     }
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
@@ -2217,7 +2217,7 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
-    public class SkipDirective : GraphQL.Types.DirectiveGraphType
+    public class SkipDirective : GraphQL.Types.Directive
     {
         public SkipDirective() { }
     }
@@ -2376,8 +2376,8 @@ namespace GraphQL.Utilities
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.AppliedDirectivesValidationVisitor Instance;
-        public void VisitDirective(GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
+        public void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2402,8 +2402,8 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
-        public virtual void VisitDirective(GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2434,8 +2434,8 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
-        void VisitDirective(GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema);
-        void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema);
+        void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
+        void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
         void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
         void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema);
@@ -2486,7 +2486,7 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.IGraphType? GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
-        protected virtual GraphQL.Types.DirectiveGraphType ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
+        protected virtual GraphQL.Types.Directive ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
@@ -2513,7 +2513,7 @@ namespace GraphQL.Utilities
         public virtual string PrintComment(string? comment, string indentation = "", bool firstInBlock = true) { }
         public string PrintDeprecation(string? reason) { }
         public string PrintDescription(string? description, string indentation = "", bool firstInBlock = true) { }
-        public string PrintDirective(GraphQL.Types.DirectiveGraphType directive) { }
+        public string PrintDirective(GraphQL.Types.Directive directive) { }
         public string PrintEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
         public string PrintFilteredSchema(System.Func<string, bool> directiveFilter, System.Func<string, bool> typeFilter) { }
@@ -2543,8 +2543,8 @@ namespace GraphQL.Utilities
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.SchemaValidationVisitor Instance;
-        public override void VisitDirective(GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.DirectiveGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
+        public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public override void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2747,7 +2747,7 @@ namespace GraphQL.Validation
         public void Enter(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQLParser.AST.ASTNode? GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument? GetArgument() { }
-        public GraphQL.Types.DirectiveGraphType? GetDirective() { }
+        public GraphQL.Types.Directive? GetDirective() { }
         public GraphQL.Types.FieldType? GetFieldDef(int index = 0) { }
         public GraphQL.Types.IGraphType? GetInputType(int index = 0) { }
         public GraphQL.Types.IGraphType? GetLastType(int index = 0) { }
@@ -2895,7 +2895,7 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class KnownArgumentNamesError : GraphQL.Validation.ValidationError
     {
-        public KnownArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument node, GraphQL.Types.DirectiveGraphType directive) { }
+        public KnownArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument node, GraphQL.Types.Directive directive) { }
         public KnownArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument node, GraphQL.Types.FieldType fieldDef, GraphQL.Types.IGraphType parentType) { }
     }
     [System.Serializable]

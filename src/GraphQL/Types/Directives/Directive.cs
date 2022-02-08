@@ -7,13 +7,13 @@ namespace GraphQL.Types
     /// Directives are used by the GraphQL runtime as a way of modifying execution
     /// behavior. Type system creators will usually not create these directly.
     /// </summary>
-    public class DirectiveGraphType : MetadataProvider, INamedType, IProvideDescription
+    public class Directive : MetadataProvider, INamedType, IProvideDescription
     {
         /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
         /// <param name="name">The directive name within the GraphQL schema.</param>
-        internal DirectiveGraphType(string name)
+        internal Directive(string name)
         {
             Name = name;
         }
@@ -23,7 +23,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="name">The directive name within the GraphQL schema.</param>
         /// <param name="locations">A list of locations where the directive can be applied.</param>
-        public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
+        public Directive(string name, IEnumerable<DirectiveLocation> locations)
         {
             if (locations == null)
                 throw new ArgumentNullException(nameof(locations));
@@ -40,7 +40,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="name">The directive name within the GraphQL schema.</param>
         /// <param name="locations">A list of locations where the directive can be applied.</param>
-        public DirectiveGraphType(string name, params DirectiveLocation[] locations)
+        public Directive(string name, params DirectiveLocation[] locations)
         {
             if (locations == null)
                 throw new ArgumentNullException(nameof(locations));

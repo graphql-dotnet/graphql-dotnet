@@ -11,7 +11,7 @@ namespace GraphQL.Execution
         /// Creates an instance of <see cref="DirectiveInfo"/> with the specified
         /// directive definition and directive arguments.
         /// </summary>
-        public DirectiveInfo(DirectiveGraphType directive, IDictionary<string, ArgumentValue> arguments)
+        public DirectiveInfo(Directive directive, IDictionary<string, ArgumentValue> arguments)
         {
             Directive = directive;
             Arguments = arguments;
@@ -20,7 +20,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Directive definition.
         /// </summary>
-        public DirectiveGraphType Directive { get; }
+        public Directive Directive { get; }
 
         /// <summary>
         /// Dictionary of directive arguments.

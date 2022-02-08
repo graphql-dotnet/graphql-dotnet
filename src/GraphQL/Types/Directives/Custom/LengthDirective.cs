@@ -12,7 +12,7 @@ namespace GraphQL.Types
     /// feature is enabled on schema. Use <see cref="InputFieldsAndArgumentsOfCorrectLength"/> validation
     /// rule if you want to enable checking for the length of arguments and input fields.
     /// </summary>
-    public class LengthDirective : DirectiveGraphType
+    public class LengthDirective : Directive
     {
         /// <inheritdoc/>
         public override bool? Introspectable => true;

@@ -135,10 +135,10 @@ namespace GraphQL.Tests.Utilities
             ";
 
             var schema = Schema.For(definitions);
-            schema.Directives.Register(new DirectiveGraphType("public", DirectiveLocation.Schema));
-            schema.Directives.Register(new DirectiveGraphType("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
-            schema.Directives.Register(new DirectiveGraphType("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
-            schema.Directives.Register(new DirectiveGraphType("some", DirectiveLocation.FieldDefinition) { Repeatable = true });
+            schema.Directives.Register(new Directive("public", DirectiveLocation.Schema));
+            schema.Directives.Register(new Directive("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
+            schema.Directives.Register(new Directive("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
+            schema.Directives.Register(new Directive("some", DirectiveLocation.FieldDefinition) { Repeatable = true });
             schema.Initialized.ShouldBe(false);
             schema.Initialize();
 

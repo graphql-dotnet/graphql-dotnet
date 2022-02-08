@@ -230,10 +230,10 @@ namespace GraphQL.Utilities
         // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Type-System.Directives
         // Directive types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
-        public override void VisitDirective(DirectiveGraphType type, ISchema schema)
+        public override void VisitDirective(Directive directive, ISchema schema)
         {
-            if (type.Locations.Count == 0)
-                throw new InvalidOperationException($"Directive '{type.Name}' must have locations");
+            if (directive.Locations.Count == 0)
+                throw new InvalidOperationException($"Directive '{directive.Name}' must have locations");
 
             // 1. A directive definition must not contain the use of a directive which references itself directly.
             // TODO:
@@ -243,28 +243,28 @@ namespace GraphQL.Utilities
             // TODO:
 
             // 3
-            if (type.Name.StartsWith("__"))
-                throw new InvalidOperationException($"The directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
+            if (directive.Name.StartsWith("__"))
+                throw new InvalidOperationException($"The directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
 
-            ValidateDirectiveArgumentsUniqueness(type);
+            ValidateDirectiveArgumentsUniqueness(directive);
         }
 
         /// <inheritdoc/>
-        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema)
+        public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema)
         {
             // 4.1
             if (argument.Name.StartsWith("__"))
-                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must not have a name which begins with the __ (two underscores).");
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
 
             if (!HasFullSpecifiedResolvedType(argument))
-                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
 
             if (argument.ResolvedType is GraphQLTypeReference)
-                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
 
             // 4.2
             if (!argument.ResolvedType!.IsInputType())
-                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{type.Name}' must be an input type.");
+                throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type.");
 
             // validate default
             if (argument.DefaultValue is GraphQLValue value)
@@ -273,7 +273,7 @@ namespace GraphQL.Utilities
             }
             else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
             {
-                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{type.Name}' is invalid.");
+                throw new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{directive.Name}' is invalid.");
             }
         }
 
@@ -301,14 +301,14 @@ namespace GraphQL.Utilities
             }
         }
 
-        private void ValidateDirectiveArgumentsUniqueness(DirectiveGraphType type)
+        private void ValidateDirectiveArgumentsUniqueness(Directive directive)
         {
-            if (type.Arguments?.Count > 0)
+            if (directive.Arguments?.Count > 0)
             {
-                foreach (var item in type.Arguments.List!.ToLookup(f => f.Name))
+                foreach (var item in directive.Arguments.List!.ToLookup(f => f.Name))
                 {
                     if (item.Count() > 1)
-                        throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{type.Name}'; no two directive arguments may share the same name.");
+                        throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{directive.Name}'; no two directive arguments may share the same name.");
                 }
             }
         }

@@ -300,12 +300,12 @@ namespace GraphQL.Tests.Validation
             this.RegisterType<Alien>();
 
             Directives.Register(
-                new DirectiveGraphType("onQuery", DirectiveLocation.Query),
-                new DirectiveGraphType("onMutation", DirectiveLocation.Mutation),
-                new DirectiveGraphType("directiveA", DirectiveLocation.Field),
-                new DirectiveGraphType("directiveB", DirectiveLocation.Field),
-                new DirectiveGraphType("directive", DirectiveLocation.Field),
-                new DirectiveGraphType("rep", DirectiveLocation.Field) { Repeatable = true },
+                new Directive("onQuery", DirectiveLocation.Query),
+                new Directive("onMutation", DirectiveLocation.Mutation),
+                new Directive("directiveA", DirectiveLocation.Field),
+                new Directive("directiveB", DirectiveLocation.Field),
+                new Directive("directive", DirectiveLocation.Field),
+                new Directive("rep", DirectiveLocation.Field) { Repeatable = true },
 
                 new LengthDirective()
             );
