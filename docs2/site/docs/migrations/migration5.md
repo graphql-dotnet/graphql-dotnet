@@ -330,6 +330,20 @@ descriptions or deprecation reasons to enum graph types or enum values.
 You can also derive from `GraphQLAttribute` to create your own attributes to modify
 enum graph types or enum values as they are being built by `EnumerationGraphType<T>`.
 
+### 11. Ability to get directives and their arguments values
+
+Now you may get directives along with their arguments that have been provided in the GraphQL query request.
+New APIs are similar to ones used for field arguments:
+
+```csharp
+Field<StringGraphType>("myField", resolve: context =>
+{
+    var dir = ctx.GetDirective("myDirective");
+    var arg = dir.GetArgument<string>("arg");
+    ...
+});
+```
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate

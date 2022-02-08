@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Bugs
                 dir1Info.GetArgument<bool>("if").ShouldBeFalse();
                 dir1Info.GetArgument("notexists", "12345").ShouldBe("12345");
 
-                var dir2Info = ctx.Directives["include"];
+                var dir2Info = ctx.GetDirective("include");
                 dir2Info.Arguments.Count.ShouldBe(1);
                 dir2Info.Arguments["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Literal);
                 dir2Info.Arguments["if"].Value.ShouldBe(true);
