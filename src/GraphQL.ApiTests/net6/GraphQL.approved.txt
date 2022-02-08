@@ -916,10 +916,8 @@ namespace GraphQL.Execution
     }
     public class DefaultExecutionStrategySelector : GraphQL.Execution.IExecutionStrategySelector
     {
-        public DefaultExecutionStrategySelector() { }
         public DefaultExecutionStrategySelector(System.Collections.Generic.IEnumerable<GraphQL.Execution.ExecutionStrategyRegistration> registrations) { }
-        public DefaultExecutionStrategySelector(GraphQL.Execution.IExecutionStrategy queryExecutionStrategy, GraphQL.Execution.IExecutionStrategy mutationExecutionStrategy, GraphQL.Execution.IExecutionStrategy? subscriptionExecutionStrategy = null) { }
-        public virtual GraphQL.Execution.IExecutionStrategy Select(GraphQLParser.AST.OperationType operationType) { }
+        public virtual GraphQL.Execution.IExecutionStrategy Select(GraphQL.Execution.ExecutionContext context) { }
     }
     public class DirectiveInfo
     {
@@ -1116,7 +1114,7 @@ namespace GraphQL.Execution
     }
     public interface IExecutionStrategySelector
     {
-        GraphQL.Execution.IExecutionStrategy Select(GraphQLParser.AST.OperationType operationType);
+        GraphQL.Execution.IExecutionStrategy Select(GraphQL.Execution.ExecutionContext context);
     }
     public interface IParentExecutionNode
     {

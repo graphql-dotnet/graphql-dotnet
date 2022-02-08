@@ -12,39 +12,9 @@ namespace GraphQL.Execution
         /// <see cref="ParallelExecutionStrategy"/> for <see cref="OperationType.Query"/> and
         /// <see cref="SerialExecutionStrategy"/> for <see cref="OperationType.Mutation"/>.
         /// </summary>
-        public DefaultExecutionStrategySelector()
+        internal DefaultExecutionStrategySelector()
             : this(Array.Empty<ExecutionStrategyRegistration>())
         {
-        }
-
-        /// <summary>
-        /// Initializes an instance that returns the specified registrations.
-        /// </summary>
-        public DefaultExecutionStrategySelector(IExecutionStrategy queryExecutionStrategy, IExecutionStrategy mutationExecutionStrategy, IExecutionStrategy? subscriptionExecutionStrategy = null)
-            : this(GetRegistrations(queryExecutionStrategy, mutationExecutionStrategy, subscriptionExecutionStrategy))
-        {
-        }
-
-        private static ExecutionStrategyRegistration[] GetRegistrations(IExecutionStrategy queryExecutionStrategy, IExecutionStrategy mutationExecutionStrategy, IExecutionStrategy? subscriptionExecutionStrategy)
-        {
-            if (queryExecutionStrategy == null)
-                throw new ArgumentNullException(nameof(queryExecutionStrategy));
-            if (mutationExecutionStrategy == null)
-                throw new ArgumentNullException(nameof(mutationExecutionStrategy));
-
-            if (subscriptionExecutionStrategy == null)
-                return new ExecutionStrategyRegistration[] {
-                    new ExecutionStrategyRegistration(queryExecutionStrategy, OperationType.Query),
-                    new ExecutionStrategyRegistration(mutationExecutionStrategy, OperationType.Mutation),
-                };
-            else
-            {
-                return new ExecutionStrategyRegistration[] {
-                    new ExecutionStrategyRegistration(queryExecutionStrategy, OperationType.Query),
-                    new ExecutionStrategyRegistration(mutationExecutionStrategy, OperationType.Mutation),
-                    new ExecutionStrategyRegistration(subscriptionExecutionStrategy, OperationType.Subscription),
-                };
-            }
         }
 
         /// <summary>
@@ -60,8 +30,10 @@ namespace GraphQL.Execution
         }
 
         /// <inheritdoc/>
-        public virtual IExecutionStrategy Select(OperationType operationType)
+        public virtual IExecutionStrategy Select(ExecutionContext context)
         {
+            var operationType = context.Operation.Operation;
+
             foreach (var registration in _registrations)
             {
                 if (registration.Operation == operationType)

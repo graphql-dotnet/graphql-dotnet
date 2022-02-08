@@ -319,6 +319,6 @@ namespace GraphQL
         /// for example it can be SubscriptionExecutionStrategy from GraphQL.SystemReactive.
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
-            => _executionStrategySelector.Select(context.Operation.Operation);
+            => _executionStrategySelector.Select(context);
     }
 }
