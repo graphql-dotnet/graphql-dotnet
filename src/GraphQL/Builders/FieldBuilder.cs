@@ -130,7 +130,7 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
-        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>

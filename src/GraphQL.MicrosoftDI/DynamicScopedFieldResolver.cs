@@ -9,9 +9,9 @@ namespace GraphQL.MicrosoftDI
     /// to create a dependency injection scope. Then it calls the specified <see cref="IFieldResolver"/>, passing the scoped service provider
     /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
     /// </summary>
-    internal class DynamicScopedFieldResolver : IFieldResolver<Task<object>>
+    internal class DynamicScopedFieldResolver : IFieldResolver<Task<object?>>
     {
-        private readonly Func<IResolveFieldContext, Task<object>> _resolverFunc;
+        private readonly Func<IResolveFieldContext, Task<object?>> _resolverFunc;
 
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
@@ -28,7 +28,7 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public Task<object> Resolve(IResolveFieldContext context) => _resolverFunc(context);
+        public Task<object?> Resolve(IResolveFieldContext context) => _resolverFunc(context);
 
         object IFieldResolver.Resolve(IResolveFieldContext context) => _resolverFunc(context);
     }
