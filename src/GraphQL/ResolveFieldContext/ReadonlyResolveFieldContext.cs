@@ -42,7 +42,7 @@ namespace GraphQL
         }
 
         private IDictionary<string, ArgumentValue>? GetArguments()
-            => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
+            => ExecutionHelper.GetArguments(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
 
         private IDictionary<string, DirectiveInfo>? GetDirectives()
             => ExecutionHelper.GetDirectives(_executionNode.Field, _executionContext.Variables, _executionContext.Schema);

@@ -33,7 +33,7 @@ namespace GraphQL.Execution
                 if (dirDefinition == null)
                     continue;
 
-                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
+                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArguments(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
             }
 
             return directives;
@@ -43,7 +43,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive.
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
+        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
                 return null;
