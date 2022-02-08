@@ -63,7 +63,7 @@ namespace GraphQL
 
         public IDictionary<string, ArgumentValue>? Arguments => _baseContext.Arguments;
 
-        public IDictionary<string, IDictionary<string, ArgumentValue>>? Directives => _baseContext.Directives;
+        public IDictionary<string, DirectiveInfo>? Directives => _baseContext.Directives;
 
         public object? RootValue => _baseContext.RootValue;
 

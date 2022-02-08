@@ -10,6 +10,32 @@ namespace GraphQL
     public static class ResolveFieldContextExtensions
     {
         /// <summary>
+        /// Determines if currently executed field has any directives provided in the GraphQL query request.
+        /// </summary>
+        public static bool HasDirectives(this IResolveFieldContext context)
+        {
+            return context.Directives?.Count > 0;
+        }
+
+        /// <summary>
+        /// Determines if the specified directive has been provided in the GraphQL query request for currently executed field.
+        /// </summary>
+        public static bool HasDirective(this IResolveFieldContext context, string name)
+        {
+            return context.Directives != null && context.Directives.ContainsKey(name);
+        }
+
+        /// <summary>
+        /// Gets directive provided in the GraphQL query request by its name.
+        /// </summary>
+        public static DirectiveInfo? GetDirective(this IResolveFieldContext context, string name)
+        {
+            return context.Directives != null && context.Directives.TryGetValue(name, out var value)
+                ? value
+                : null;
+        }
+
+        /// <summary>
         /// Returns the value of the specified field argument, or <paramref name="defaultValue"/> when unspecified or when specified as <see langword="null"/>.
         /// Field and variable default values take precedence over the <paramref name="defaultValue"/> parameter.
         /// </summary>

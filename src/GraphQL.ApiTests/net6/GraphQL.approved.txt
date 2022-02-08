@@ -350,7 +350,7 @@ namespace GraphQL
         System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
         GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         System.Threading.CancellationToken CancellationToken { get; }
-        System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? Directives { get; }
+        System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; }
         GraphQLParser.AST.GraphQLDocument Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
         GraphQLParser.AST.GraphQLField FieldAst { get; }
@@ -500,7 +500,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
         public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? Directives { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; }
         public GraphQLParser.AST.GraphQLDocument Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
         public GraphQLParser.AST.GraphQLField FieldAst { get; }
@@ -531,7 +531,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; set; }
         public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? Directives { get; set; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
@@ -563,8 +563,11 @@ namespace GraphQL
         public static GraphQL.IResolveFieldContext<TSource> Copy<TSource>(this GraphQL.IResolveFieldContext<TSource> context) { }
         public static object? GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object? defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
+        public static GraphQL.Execution.DirectiveInfo? GetDirective(this GraphQL.IResolveFieldContext context, string name) { }
         public static object? GetOutputExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
+        public static bool HasDirective(this GraphQL.IResolveFieldContext context, string name) { }
+        public static bool HasDirectives(this GraphQL.IResolveFieldContext context) { }
         public static void SetOutputExtension(this GraphQL.IResolveFieldContext context, string path, object? value) { }
     }
     public class ResolveFieldContext<TSource> : GraphQL.ResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>
@@ -898,6 +901,14 @@ namespace GraphQL.Execution
         public override bool PropagateNull() { }
         public override object? ToValue() { }
     }
+    public class DirectiveInfo
+    {
+        public DirectiveInfo(GraphQL.Types.DirectiveGraphType directive, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> arguments) { }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> Arguments { get; }
+        public GraphQL.Types.DirectiveGraphType Directive { get; }
+        public object? GetArgument(System.Type argumentType, string name, object? defaultValue = null) { }
+        public TType GetArgument<TType>(string name, TType defaultValue = default) { }
+    }
     public abstract class DocumentError : GraphQL.ExecutionError
     {
         public DocumentError(string message) { }
@@ -964,7 +975,7 @@ namespace GraphQL.Execution
     {
         public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue? input, GraphQL.Validation.Variables? variables = null, object? fieldDefault = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue>? GetArgumentValues(GraphQL.Types.QueryArguments? definitionArguments, GraphQLParser.AST.GraphQLArguments? astArguments, GraphQL.Validation.Variables? variables) { }
-        public static System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? GetDirectives(GraphQLParser.AST.GraphQLField field, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(GraphQLParser.AST.GraphQLField field, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema) { }
     }
     public abstract class ExecutionNode
     {

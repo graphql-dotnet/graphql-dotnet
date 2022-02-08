@@ -27,7 +27,7 @@ namespace GraphQL
         public IDictionary<string, ArgumentValue>? Arguments { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, IDictionary<string, ArgumentValue>>? Directives { get; set; }
+        public IDictionary<string, DirectiveInfo>? Directives { get; set; }
 
         /// <inheritdoc/>
         public object? RootValue { get; set; }

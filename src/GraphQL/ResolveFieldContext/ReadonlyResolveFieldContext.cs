@@ -16,7 +16,7 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue>? _arguments;
-        private IDictionary<string, IDictionary<string, ArgumentValue>>? _directives;
+        private IDictionary<string, DirectiveInfo>? _directives;
         private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
@@ -44,7 +44,7 @@ namespace GraphQL
         private IDictionary<string, ArgumentValue>? GetArguments()
             => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
 
-        private IDictionary<string, IDictionary<string, ArgumentValue>>? GetDirectives()
+        private IDictionary<string, DirectiveInfo>? GetDirectives()
             => ExecutionHelper.GetDirectives(_executionNode.Field, _executionContext.Variables, _executionContext.Schema);
 
         /// <inheritdoc/>
@@ -82,7 +82,7 @@ namespace GraphQL
         public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= GetArguments();
 
         /// <inheritdoc/>
-        public IDictionary<string, IDictionary<string, ArgumentValue>>? Directives => _directives ??= GetDirectives();
+        public IDictionary<string, DirectiveInfo>? Directives => _directives ??= GetDirectives();
 
         /// <inheritdoc/>
         public object? RootValue => _executionContext.RootValue;

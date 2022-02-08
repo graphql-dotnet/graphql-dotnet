@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Bugs
 }
 ";
             var expected = @"{
-  ""fieldWithoutDirectives"": null
+  ""fieldWithoutDirectives"": ""4""
 }";
             // empty validation rules to bypass validation error from KnownDirectivesInAllowedLocations
             AssertQuerySuccess(query, expected, rules: Array.Empty<IValidationRule>());
@@ -57,47 +57,62 @@ namespace GraphQL.Tests.Bugs
             Field<StringGraphType>("fieldWith2Literal", resolve: ctx =>
             {
                 ctx.Directives.ShouldNotBeNull();
+                ctx.HasDirectives().ShouldBeTrue();
                 ctx.Directives.Count.ShouldBe(2);
 
-                var dir1Args = ctx.Directives["skip"];
-                dir1Args.Count.ShouldBe(1);
-                dir1Args["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Literal);
-                dir1Args["if"].Value.ShouldBe(false);
+                ctx.HasDirective("skip").ShouldBeTrue();
+                ctx.HasDirective("include").ShouldBeTrue();
+                ctx.HasDirective("ooops").ShouldBeFalse();
 
-                var dir2Args = ctx.Directives["include"];
-                dir2Args.Count.ShouldBe(1);
-                dir2Args["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Literal);
-                dir2Args["if"].Value.ShouldBe(true);
+                var dir1Info = ctx.Directives["skip"];
+                dir1Info.Arguments.Count.ShouldBe(1);
+                dir1Info.Arguments["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Literal);
+                dir1Info.Arguments["if"].Value.ShouldBe(false);
+                dir1Info.GetArgument<bool>("if").ShouldBeFalse();
+                dir1Info.GetArgument("notexists", "12345").ShouldBe("12345");
+
+                var dir2Info = ctx.Directives["include"];
+                dir2Info.Arguments.Count.ShouldBe(1);
+                dir2Info.Arguments["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Literal);
+                dir2Info.Arguments["if"].Value.ShouldBe(true);
+                dir2Info.GetArgument<bool>("if").ShouldBeTrue();
 
                 return "1";
             });
             Field<StringGraphType>("fieldWithVariable", resolve: ctx =>
             {
                 ctx.Directives.ShouldNotBeNull();
+                ctx.HasDirectives().ShouldBeTrue();
                 ctx.Directives.Count.ShouldBe(1);
 
-                var dir1Args = ctx.Directives["include"];
-                dir1Args.Count.ShouldBe(1);
-                dir1Args["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Variable);
-                dir1Args["if"].Value.ShouldBe(true);
+                ctx.HasDirective("include").ShouldBeTrue();
+                ctx.HasDirective("ooops").ShouldBeFalse();
+
+                var dir1Info = ctx.Directives["include"];
+                dir1Info.Arguments.Count.ShouldBe(1);
+                dir1Info.Arguments["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.Variable);
+                dir1Info.Arguments["if"].Value.ShouldBe(true);
+                dir1Info.GetArgument<bool>("if").ShouldBeTrue();
 
                 return "2";
             });
             Field<StringGraphType>("fieldWithVariableDefault", resolve: ctx =>
             {
                 ctx.Directives.ShouldNotBeNull();
+                ctx.HasDirectives().ShouldBeTrue();
                 ctx.Directives.Count.ShouldBe(1);
 
-                var dir1Args = ctx.Directives["include"];
-                dir1Args.Count.ShouldBe(1);
-                dir1Args["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.VariableDefault);
-                dir1Args["if"].Value.ShouldBe(true);
+                var dir1Info = ctx.Directives["include"];
+                dir1Info.Arguments.Count.ShouldBe(1);
+                dir1Info.Arguments["if"].Source.ShouldBe(GraphQL.Execution.ArgumentSource.VariableDefault);
+                dir1Info.Arguments["if"].Value.ShouldBe(true);
 
                 return "3";
             });
             Field<StringGraphType>("fieldWithoutDirectives", resolve: ctx =>
             {
                 ctx.Directives.ShouldBeNull();
+                ctx.HasDirectives().ShouldBeFalse();
                 return "4";
             });
         }

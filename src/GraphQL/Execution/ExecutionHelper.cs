@@ -16,12 +16,12 @@ namespace GraphQL.Execution
         /// Returns a dictionary of directives with their arguments values for a field.
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static IDictionary<string, IDictionary<string, ArgumentValue>>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
         {
             if (field.Directives == null || field.Directives.Count == 0)
                 return null;
 
-            Dictionary<string, IDictionary<string, ArgumentValue>>? directives = null;
+            Dictionary<string, DirectiveInfo>? directives = null;
 
             foreach (var dir in field.Directives.Items)
             {
@@ -33,7 +33,7 @@ namespace GraphQL.Execution
                 if (dirDefinition == null)
                     continue;
 
-                (directives ??= new())[dirDefinition.Name] = GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments;
+                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArgumentValues(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
             }
 
             return directives;
