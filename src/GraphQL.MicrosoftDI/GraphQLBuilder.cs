@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Collections;
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;

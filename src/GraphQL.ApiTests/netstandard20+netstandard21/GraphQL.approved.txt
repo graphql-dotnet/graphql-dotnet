@@ -686,7 +686,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
-        public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object> resolver) { }
+        public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object?> resolver) { }
         public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
@@ -718,7 +718,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize) { }
-        public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType> resolver) { }
+        public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType?> resolver) { }
         public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Create<TNodeType>(string name = "default")
