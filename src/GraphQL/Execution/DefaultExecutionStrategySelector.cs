@@ -12,7 +12,7 @@ namespace GraphQL.Execution
         /// <see cref="ParallelExecutionStrategy"/> for <see cref="OperationType.Query"/> and
         /// <see cref="SerialExecutionStrategy"/> for <see cref="OperationType.Mutation"/>.
         /// </summary>
-        internal DefaultExecutionStrategySelector()
+        public DefaultExecutionStrategySelector()
             : this(Array.Empty<ExecutionStrategyRegistration>())
         {
         }
@@ -24,9 +24,7 @@ namespace GraphQL.Execution
         /// </summary>
         public DefaultExecutionStrategySelector(IEnumerable<ExecutionStrategyRegistration> registrations)
         {
-            _registrations = registrations is ExecutionStrategyRegistration[] array
-                ? array
-                : (registrations ?? throw new ArgumentNullException(nameof(registrations))).ToArray();
+            _registrations = (registrations ?? throw new ArgumentNullException(nameof(registrations))).ToArray();
         }
 
         /// <inheritdoc/>

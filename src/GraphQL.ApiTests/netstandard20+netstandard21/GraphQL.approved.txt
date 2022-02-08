@@ -916,6 +916,7 @@ namespace GraphQL.Execution
     }
     public class DefaultExecutionStrategySelector : GraphQL.Execution.IExecutionStrategySelector
     {
+        public DefaultExecutionStrategySelector() { }
         public DefaultExecutionStrategySelector(System.Collections.Generic.IEnumerable<GraphQL.Execution.ExecutionStrategyRegistration> registrations) { }
         public virtual GraphQL.Execution.IExecutionStrategy Select(GraphQL.Execution.ExecutionContext context) { }
     }
