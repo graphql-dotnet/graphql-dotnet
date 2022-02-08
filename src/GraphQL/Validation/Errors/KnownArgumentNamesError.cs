@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, DirectiveGraphType directive)
+        public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, Directive directive)
             : base(context.Document.Source, NUMBER,
                 UnknownDirectiveArgMessage(
                     node.Name.StringValue,

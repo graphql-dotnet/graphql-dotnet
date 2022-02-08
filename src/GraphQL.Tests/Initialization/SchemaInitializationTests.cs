@@ -99,7 +99,7 @@ namespace GraphQL.Tests.Initialization
             Directives.Register(new MyDirective());
         }
 
-        public class MyDirective : DirectiveGraphType
+        public class MyDirective : Directive
         {
             public MyDirective()
                 : base("my", DirectiveLocation.Field)
@@ -183,7 +183,7 @@ namespace GraphQL.Tests.Initialization
 
     public class SchemaWithNullDirectiveArgumentWhenShouldBeNonNull : Schema
     {
-        public class TestDirective : DirectiveGraphType
+        public class TestDirective : Directive
         {
             public TestDirective()
                 : base("test", DirectiveLocation.Schema, DirectiveLocation.FieldDefinition)

@@ -14,7 +14,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitDirective(DirectiveGraphType type, ISchema schema)
+        public virtual void VisitDirective(Directive directive, ISchema schema)
         {
         }
 
@@ -59,7 +59,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc />
-        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema)
+        public virtual void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema)
         {
         }
 

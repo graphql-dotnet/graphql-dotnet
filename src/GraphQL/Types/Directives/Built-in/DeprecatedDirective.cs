@@ -5,7 +5,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Used to declare element of a GraphQL schema as deprecated.
     /// </summary>
-    public class DeprecatedDirective : DirectiveGraphType
+    public class DeprecatedDirective : Directive
     {
         /// <inheritdoc/>
         public override bool? Introspectable => true;

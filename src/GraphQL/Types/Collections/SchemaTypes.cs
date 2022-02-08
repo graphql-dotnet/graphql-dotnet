@@ -530,7 +530,7 @@ namespace GraphQL.Types
             }
         }
 
-        private void HandleDirective(DirectiveGraphType directive, TypeCollectionContext context)
+        private void HandleDirective(Directive directive, TypeCollectionContext context)
         {
             if (directive.Arguments?.Count > 0)
             {

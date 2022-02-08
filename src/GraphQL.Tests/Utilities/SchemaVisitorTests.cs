@@ -100,7 +100,7 @@ namespace GraphQL.Tests.Utilities
                       query: Query
                     }
             ");
-            schema.Directives.Register(new DirectiveGraphType("description",
+            schema.Directives.Register(new Directive("description",
                 DirectiveLocation.Schema, DirectiveLocation.Union, DirectiveLocation.Interface, DirectiveLocation.Object,
                 DirectiveLocation.InputObject, DirectiveLocation.FieldDefinition, DirectiveLocation.InputFieldDefinition,
                 DirectiveLocation.ArgumentDefinition, DirectiveLocation.Enum, DirectiveLocation.EnumValue)

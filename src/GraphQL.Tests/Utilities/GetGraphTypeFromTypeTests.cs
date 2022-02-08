@@ -328,7 +328,7 @@ namespace GraphQL.Tests.Utilities
             {
                 Query = query
             };
-            var directive = new DirectiveGraphType("MyDirective")
+            var directive = new Directive("MyDirective")
             {
                 Arguments = new QueryArguments
                 {
