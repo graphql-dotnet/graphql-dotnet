@@ -1,5 +1,6 @@
 using GraphQL.Introspection;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -196,6 +197,36 @@ namespace GraphQL
 
                    return Array.Empty<AppliedDirective>();
                });
+        }
+
+        /// <summary>
+        /// Applies directives from desired AST node to the specified schema element.
+        /// </summary>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.</param>
+        /// <param name="node">AST node to apply directives from</param>
+        /// <returns></returns>
+        public static TMetadataProvider ApplyDirectivesFrom<TMetadataProvider, TNode>(this TMetadataProvider provider, TNode node)
+            where TMetadataProvider : IProvideMetadata
+            where TNode : ASTNode, IHasDirectivesNode
+        {
+            if (node.Directives?.Count > 0)
+            {
+                foreach (var directive in node.Directives!)
+                {
+                    provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
+                    {
+                        if (directive.Arguments?.Count > 0)
+                        {
+                            foreach (var arg in directive.Arguments)
+                                d.AddArgument(new DirectiveArgument(arg.Name.StringValue) { Value = arg.Value.ParseAnyLiteral() }); //ISSUE:allocation
+                        }
+                    });
+                }
+            }
+
+            return provider;
         }
     }
 }

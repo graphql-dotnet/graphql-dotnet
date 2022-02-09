@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
@@ -30,20 +29,20 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            return type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
+            return type.IsInputObjectType() ? "" : PrintFederatedDirectives(type);
         }
 
-        public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
+        public string PrintFederatedDirectives(IProvideMetadata type)
         {
             Schema?.Initialize();
 
-            var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
-            if (astDirectives == null)
+            var directives = type.GetAppliedDirectives();
+            if (directives == null)
                 return "";
 
             var dirs = string.Join(
                 " ",
-                astDirectives
+                directives
                     .Where(x => IsFederatedDirective((string)x.Name)) //TODO:alloc
                     .Select(PrintAstDirective)
             );
@@ -51,18 +50,19 @@ namespace GraphQL.Utilities.Federation
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive)
+        public string PrintAstDirective(AppliedDirective directive)
         {
             Schema?.Initialize();
 
-            return directive.Print();
+            var astDirective = new ASTConverter().ConvertDirective(directive, Schema);
+            return astDirective.Print();
         }
 
         public override string PrintObject(IObjectGraphType type)
         {
             Schema?.Initialize();
 
-            var isExtension = type!.IsExtensionType();
+            var isExtension = type!.IsExtensionType() == true;
 
             var interfaces = type!.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = " & ";
@@ -84,7 +84,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            var isExtension = type.IsExtensionType();
+            var isExtension = type.IsExtensionType() == true;
             var extended = isExtension ? "extend " : "";
 
             return FormatDescription(type.Description) + "{1}interface {2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, PrintFields(type));
@@ -104,7 +104,7 @@ namespace GraphQL.Utilities.Federation
                     Args = PrintArgs(x),
                     Description = FormatDescription(x.Description, "  "),
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
-                    FederatedDirectives = PrintFederatedDirectivesFromAst(x)
+                    FederatedDirectives = PrintFederatedDirectives(x)
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(

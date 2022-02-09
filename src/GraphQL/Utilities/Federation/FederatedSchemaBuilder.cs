@@ -142,6 +142,7 @@ namespace GraphQL.Utilities.Federation
         {
             var entity = new EntityGraphType();
 
+            //TODO: deal with 'x as IObjectGraphType', @key may be places on object OR interface
             var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
             foreach (var e in entities)
             {
@@ -163,27 +164,6 @@ namespace GraphQL.Utilities.Federation
         }
 
         private bool IsEntity(IGraphType type)
-        {
-            if (type.IsInputObjectType())
-            {
-                return false;
-            }
-
-            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
-            if (directive != null)
-                return true;
-
-            var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null)
-                return false;
-
-            var keyDir = Directive(ast.Directives!, "key");
-            return keyDir != null;
-        }
-
-        private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
-        {
-            return directives?.FirstOrDefault(x => x.Name == name);
-        }
+            => (type is IObjectGraphType || type is IInterfaceGraphType) && type.FindAppliedDirective("key") != null;
     }
 }

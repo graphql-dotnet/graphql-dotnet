@@ -45,7 +45,7 @@ namespace GraphQL.Utilities
         public bool IgnoreLocations { get; set; }
 
         /// <summary>
-        /// Allows to successfully build the schema even if types are found that are not registered int <see cref="Types"/>.
+        /// Allows to successfully build the schema even if types are found that are not registered in <see cref="Types"/>.
         /// <br/>
         /// By default <see langword="true"/>.
         /// </summary>
@@ -100,7 +100,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 if (def is GraphQLSchemaDefinition schemaDef)
                 {
                     _schemaDef = schemaDef;
-                    schema.SetAstType(schemaDef);
+                    schema.ApplyDirectivesFrom(schemaDef);
                 }
                 else if (def is GraphQLObjectTypeDefinition objDef)
                 {
@@ -265,13 +265,17 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     type.AddResolvedInterface(new GraphQLTypeReference((string)i.Name)); //TODO:alloc
             }
 
+            type.ApplyDirectivesFrom(astType);
+
             if (isExtensionType)
             {
-                type.AddExtensionAstType(astType);
+                if (type.IsExtensionType() == null)
+                    type.SetIsExtensionType(true);
             }
             else
             {
-                type.SetAstType(astType);
+                type.SetIsExtensionType(false);
+
                 OverrideDeprecationReason(type, typeConfig.DeprecationReason);
             }
 
@@ -343,7 +347,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
-            field.SetAstType(fieldDef);
+            field.ApplyDirectivesFrom(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
             return field;
@@ -374,7 +378,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
 
-            field.SetAstType(fieldDef);
+            field.ApplyDirectivesFrom(fieldDef);
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
             return field;
@@ -397,7 +401,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
                 ResolvedType = ToGraphType(inputDef.Type!),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
-            }.SetAstType(inputDef);
+            }.ApplyDirectivesFrom(inputDef);
 
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
@@ -416,7 +420,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Name = name,
                 Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
-            }.SetAstType(interfaceDef);
+            }.ApplyDirectivesFrom(interfaceDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -443,7 +447,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Name = name,
                 Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.MergeComments(),
                 ResolveType = typeConfig.ResolveType,
-            }.SetAstType(unionDef);
+            }.ApplyDirectivesFrom(unionDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -472,7 +476,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
-            }.SetAstType(inputDef);
+            }.ApplyDirectivesFrom(inputDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -498,7 +502,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = name,
                 Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.MergeComments(),
-            }.SetAstType(enumDef);
+            }.ApplyDirectivesFrom(enumDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -539,7 +543,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = valDef.Description?.Value.ToString() ?? valDef.MergeComments()
                 // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
                 //DeprecationReason = ???
-            }.SetAstType(valDef);
+            }.ApplyDirectivesFrom(valDef);
         }
 
         protected virtual QueryArgument ToArgument(ArgumentConfig argumentConfig, GraphQLInputValueDefinition inputDef)
@@ -549,7 +553,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Name = argumentConfig.Name,
                 DefaultValue = argumentConfig.DefaultValue ?? inputDef.DefaultValue,
                 Description = argumentConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments()
-            }.SetAstType(inputDef);
+            }.ApplyDirectivesFrom(inputDef);
 
             argumentConfig.CopyMetadataTo(argument);
 

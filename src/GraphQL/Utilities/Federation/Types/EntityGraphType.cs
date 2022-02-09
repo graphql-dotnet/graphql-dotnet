@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {

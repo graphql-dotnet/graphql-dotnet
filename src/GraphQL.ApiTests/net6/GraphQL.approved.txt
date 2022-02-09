@@ -44,6 +44,9 @@ namespace GraphQL
         public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static TMetadataProvider SetDirectivesFrom<TMetadataProvider, TNode>(this TMetadataProvider provider, TNode node)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata
+            where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasDirectivesNode { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
     public sealed class DoNotMapClrTypeAttribute : System.Attribute
@@ -586,6 +589,8 @@ namespace GraphQL
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
+            where TSchema : GraphQL.Types.ISchema { }
+        public static TSchema EnableFederation<TSchema>(this TSchema schema)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
@@ -2401,6 +2406,7 @@ namespace GraphQL.Utilities
         public virtual GraphQLParser.AST.GraphQLDocument Convert(GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLArgumentsDefinition? ConvertArgumentsDefinition(GraphQL.Types.QueryArguments? arguments, System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? comparer, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLDescription? ConvertDescription(GraphQL.Types.IProvideDescription provider) { }
+        public virtual GraphQLParser.AST.GraphQLDirective ConvertDirective(GraphQL.Types.AppliedDirective applied, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLArguments? ConvertDirectiveArguments(GraphQL.Types.AppliedDirective appliedDirective, GraphQL.Types.Directive directive) { }
         public virtual GraphQLParser.AST.GraphQLDirectiveDefinition ConvertDirectiveDefinition(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         protected virtual GraphQLParser.AST.GraphQLDirectiveLocations ConvertDirectiveLocations(GraphQL.Types.Directive directive) { }
@@ -2728,9 +2734,9 @@ namespace GraphQL.Utilities.Federation
         public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
         public bool IsFederatedDirective(string directiveName) { }
         public bool IsFederatedType(string typeName) { }
-        public string PrintAstDirective(GraphQLParser.AST.GraphQLDirective directive) { }
+        public string PrintAstDirective(GraphQL.Types.AppliedDirective directive) { }
         public string PrintFederatedDirectives(GraphQL.Types.IGraphType type) { }
-        public string PrintFederatedDirectivesFromAst(GraphQL.Types.IProvideMetadata type) { }
+        public string PrintFederatedDirectives(GraphQL.Types.IProvideMetadata type) { }
         public string PrintFederatedSchema() { }
         public override string PrintFields(GraphQL.Types.IComplexGraphType type) { }
         public override string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }

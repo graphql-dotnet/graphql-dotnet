@@ -14,7 +14,7 @@ namespace GraphQL.Utilities.Federation
         /// Initializes a new instance of the 'extends' directive.
         /// </summary>
         public ExtendsDirective()
-            : base("extends", DirectiveLocation.Object | DirectiveLocation.Interface)
+            : base("extends", DirectiveLocation.Object, DirectiveLocation.Interface)
         {
             Description = "Alternative for 'extend type'";
         }

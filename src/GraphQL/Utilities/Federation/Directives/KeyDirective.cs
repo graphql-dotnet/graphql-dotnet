@@ -15,7 +15,7 @@ namespace GraphQL.Utilities.Federation
         /// Initializes a new instance of the 'key' directive.
         /// </summary>
         public KeyDirective()
-            : base("key", DirectiveLocation.Object | DirectiveLocation.Interface)
+            : base("key", DirectiveLocation.Object, DirectiveLocation.Interface)
         {
             Description = "The @key directive is used to indicate a combination of fields that can be used to uniquely identify and fetch an object or interface.";
             Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<FieldSetScalarGraphType>>

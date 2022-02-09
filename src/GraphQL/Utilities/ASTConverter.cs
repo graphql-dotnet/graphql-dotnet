@@ -216,16 +216,20 @@ namespace GraphQL.Utilities
 
             foreach (var applied in appliedDirectives)
             {
-                var directive = schema.Directives.Find(applied.Name);
-                var dir = new GraphQLDirective
-                {
-                    Name = new GraphQLName(applied.Name),
-                    Arguments = ConvertDirectiveArguments(applied, directive!),
-                };
-                directives.Items.Add(dir);
+                directives.Items.Add(ConvertDirective(applied, schema));
             }
 
             return directives;
+        }
+
+        public virtual GraphQLDirective ConvertDirective(AppliedDirective applied, ISchema schema)
+        {
+            var directive = schema.Directives.Find(applied.Name);
+            return new GraphQLDirective
+            {
+                Name = new GraphQLName(applied.Name),
+                Arguments = ConvertDirectiveArguments(applied, directive!),
+            };
         }
 
         protected virtual GraphQLDirectiveLocations ConvertDirectiveLocations(Directive directive)
