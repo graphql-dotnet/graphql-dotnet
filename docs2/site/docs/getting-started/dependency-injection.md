@@ -105,7 +105,7 @@ with the underlying dependency injection framework. The `Services` property retu
 
 | Method         | Description |
 |----------------|-------------|
-| `Register`     | Registers a service within the DI framework |
+| `Register`     | Registers a service within the DI framework replacing existing registration if needed |
 | `TryRegister`  | Registers a service within the DI framework if it has not already been registered |
 
 To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:
