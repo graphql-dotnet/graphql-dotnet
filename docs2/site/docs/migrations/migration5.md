@@ -344,6 +344,77 @@ Field<StringGraphType>("myField", resolve: context =>
 });
 ```
 
+### 12. The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
+
+Previously, in order to change the execution strategy for a specific operation -- for instance,
+using a serial execution strategy for 'query' operation types -- required creating a custom
+document executer and overriding the `SelectExecutionStrategy` method.
+
+Now, for DI configurations, you can call the `.AddExecutionStrategy<T>(OperationType)` method to
+provide this configuration without overriding the method. See below for an example.
+
+```csharp
+// === GraphQL.NET v4 ===
+public class SerialDocumentExecuter : DocumentExecuter
+{
+    public SerialDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
+        : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations)
+    {
+    }
+
+    protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
+    {
+        return context.Operation.Operation switch
+        {
+            OperationType.Query => SerialExecutionStrategy.Instance,
+            _ => base.SelectExecutionStrategy(context)
+        };
+    }
+}
+
+// within Startup.cs
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>()
+    .AddDocumentExecuter<SerialDocumentExecuter>();
+
+
+// === GraphQL.NET v5 ===
+
+// within Startup.cs
+services.AddGraphQL(builder => builder
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>()
+    .AddExecutionStrategy<SerialExecutionStrategy>(OperationType.Query));
+```
+
+You can also register your own implementation of `IExecutionStrategySelector` which can inspect the
+`ExecutionContext` to make additional decisions before selecting an execution strategy.
+
+```csharp
+public class MyExecutionStrategySelector : IExecutionStrategySelector
+{
+    public virtual IExecutionStrategy Select(ExecutionContext context)
+    {
+        return context.Operation.Operation switch
+        {
+            OperationType.Query => ParallelExecutionStrategy.Instance,
+            OperationType.Mutation => SerialExecutionStrategy.Instance,
+            OperationType.Subscription => throw new NotSupportedException(),
+            _ => throw new InvalidOperationException()
+        };
+    }
+}
+
+// within Startup.cs
+servcies.AddGraphQL(builder => builder
+    // other configuration here
+    .AddExecutionStrategySelector<MyExecutionStrategySelector>());
+```
+
+The `DocumentExecuter.SelectExecutionStrategy` method is still available to be overridden for
+backwards compatibility but may be removed in the next major version.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -622,3 +693,25 @@ invisible to the caller and lead to hardly detected bugs, the method name has be
 Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`. Now the class
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
 but sets the default date parsing behavior set to 'none'.
+
+### 29. `SubscriptionDocumentExecuter` and `.AddSubscriptionDocumentExecuter()` have been deprecated.
+
+While these can continue to be used for the lifetime of v5, it is now suggested to use the
+`.AddSubscriptionExecutionStrategy()` builder method instead:
+
+```csharp
+// v4
+services.AddGraphQL()
+   .AddSchema<StarWarsSchema>()
+   .AddSubscriptionDocumentExecuter();
+
+// v5
+services.AddGraphQL(builder => builder
+   .AddSchema<StarWarsSchema>()
+   .AddSubscriptionExecutionStrategy());
+```
+
+For more details on the new approach to execution strategy selection, please review the new feature above titled:
+
+> The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
+

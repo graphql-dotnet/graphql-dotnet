@@ -314,9 +314,14 @@ namespace GraphQL
         /// <br/><br/>
         /// Typically the strategy is selected based on the type of operation.
         /// <br/><br/>
-        /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
-        /// <see cref="SerialExecutionStrategy"/>. Subscription operations return a special strategy defined in some separate project,
-        /// for example it can be SubscriptionExecutionStrategy from GraphQL.SystemReactive.
+        /// By default, the selection is handled by the <see cref="IExecutionStrategySelector"/> implementation passed to the
+        /// constructor, which will select an execution strategy based on a set of <see cref="ExecutionStrategyRegistration"/>
+        /// instances passed to it.
+        /// <br/><br/>
+        /// For the <see cref="DefaultExecutionStrategySelector"/> without any registrations,
+        /// query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
+        /// <see cref="SerialExecutionStrategy"/>. Subscription operations will need a special strategy defined in a separate
+        /// project, such as SubscriptionExecutionStrategy from GraphQL.SystemReactive.
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
             => _executionStrategySelector.Select(context);
