@@ -1,7 +1,6 @@
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
