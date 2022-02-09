@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;

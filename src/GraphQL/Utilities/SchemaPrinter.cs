@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -194,7 +191,7 @@ namespace GraphQL.Utilities
                 IObjectGraphType objectGraphType => PrintObject(objectGraphType),
                 IInterfaceGraphType interfaceGraphType => PrintInterface(interfaceGraphType),
                 UnionGraphType unionGraphType => PrintUnion(unionGraphType),
-                DirectiveGraphType directiveGraphType => PrintDirective(directiveGraphType),  //TODO: DirectiveGraphType does not inherit IGraphType
+                Directive directiveGraphType => PrintDirective(directiveGraphType),  //TODO: DirectiveGraphType does not inherit IGraphType
                 IInputObjectGraphType input => PrintInputObject(input),
                 _ => throw new InvalidOperationException($"Unknown GraphType '{type.GetType().Name}' with name '{type.Name}'")
             };
@@ -318,7 +315,7 @@ namespace GraphQL.Utilities
             return desc;
         }
 
-        public string PrintDirective(DirectiveGraphType directive)
+        public string PrintDirective(Directive directive)
         {
             Schema?.Initialize();
 

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
@@ -13,7 +8,6 @@ using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Nito.AsyncEx;
-using Shouldly;
 
 namespace GraphQL.DataLoader.Tests
 {

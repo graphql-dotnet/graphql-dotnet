@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.Utilities;
 using GraphQLParser;
 
@@ -71,7 +69,7 @@ namespace GraphQL.Types
 
             NameValidator.ValidateName(argument.Name, NamedElement.Argument);
 
-            (List ??= new List<QueryArgument>()).Add(argument);
+            (List ??= new()).Add(argument);
         }
 
         /// <summary>

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
+using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -77,7 +74,85 @@ namespace GraphQL.Types
         {
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            return AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
+            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
+            if (memberInfo is MethodInfo methodInfo)
+            {
+                var (queryArguments, resolver) = BuildMethodResolver(methodInfo, fieldType);
+                fieldType.Arguments = queryArguments;
+                fieldType.Resolver = resolver;
+            }
+            else
+            {
+                fieldType.Resolver = MemberResolver.Create(memberInfo);
+            }
+            // apply field attributes after resolver has been set
+            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, false);
+            return fieldType;
+        }
+
+        /// <summary>
+        /// Retuns a list of query arguments within a <see cref="QueryArguments"/> instance, and a
+        /// <see cref="IFieldResolver"/> instance, for the specified field.
+        /// </summary>
+        protected (QueryArguments? QueryArguments, IFieldResolver Resolver) BuildMethodResolver(MethodInfo methodInfo, FieldType fieldType)
+        {
+            if (methodInfo.GetParameters().Length == 0)
+            {
+                return (null, MemberResolver.Create(methodInfo));
+            }
+
+            List<LambdaExpression> expressions = new();
+            QueryArguments queryArguments = new();
+            foreach (var parameterInfo in methodInfo.GetParameters())
+            {
+                var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
+                    .MakeGenericMethod(parameterInfo.ParameterType)
+                    .Invoke(this, new object[] { fieldType, parameterInfo })!;
+                var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
+                if (queryArgument != null)
+                {
+                    ApplyArgumentAttributes(parameterInfo, queryArgument);
+                    queryArguments.Add(queryArgument);
+                }
+                expression ??= AutoRegisteringHelper.GetParameterExpression(
+                    parameterInfo.ParameterType,
+                    queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+                expressions.Add(expression);
+            }
+            var resolver = new MethodResolver(methodInfo, expressions);
+            return (queryArguments, resolver);
+        }
+
+        private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
+        private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
+            => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
+
+        /// <summary>
+        /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
+        /// to the specified <see cref="QueryArgument"/>.
+        /// </summary>
+        protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
+        {
+            // Apply derivatives of GraphQLAttribute
+            var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
+            foreach (var attr in attributes)
+            {
+                attr.Modify(queryArgument);
+            }
+        }
+
+        /// <summary>
+        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>
+        /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
+        /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
+        /// to the returned <see cref="ArgumentInformation"/> instance.
+        /// </summary>
+        protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
+        {
+            var typeInformation = GetTypeInformation(parameterInfo);
+            var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
+            argumentInfo.ApplyAttributes();
+            return argumentInfo;
         }
 
         /// <summary>
@@ -97,8 +172,7 @@ namespace GraphQL.Types
                     !x.ContainsGenericParameters && // exclude methods with open generics
                     !x.IsSpecialName &&             // exclude methods generated for properties
                     x.ReturnType != typeof(void) && // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task) && // exclude methods which do not return a value
-                    x.GetParameters().Length == 0); // exclude methods which contain arguments
+                    x.ReturnType != typeof(Task));  // exclude methods which do not return a value
             return props.Concat<MemberInfo>(methods);
         }
 
@@ -120,6 +194,22 @@ namespace GraphQL.Types
                 FieldInfo fieldInfo => new TypeInformation(fieldInfo, false),
                 _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties, methods and fields are supported."),
             };
+            typeInformation.ApplyAttributes();
+            return typeInformation;
+        }
+
+        /// <summary>
+        /// Analyzes a method argument and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
+        /// <br/><br/>
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
+        /// </summary>
+        protected virtual TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
+        {
+            var typeInformation = new TypeInformation(parameterInfo);
             typeInformation.ApplyAttributes();
             return typeInformation;
         }

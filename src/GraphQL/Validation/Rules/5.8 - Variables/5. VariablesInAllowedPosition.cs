@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -16,17 +12,17 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
+        public static readonly VariablesInAllowedPosition Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="VariablesInAllowedPositionError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLVariableDefinition>(
                 (varDefAst, context) =>
                 {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<ROM, GraphQLVariableDefinition>();
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new();
                     varDefMap[varDefAst.Variable.Name] = varDefAst;
                 }
             ),

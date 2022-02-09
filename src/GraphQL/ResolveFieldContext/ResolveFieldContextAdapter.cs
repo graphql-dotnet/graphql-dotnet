@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -65,6 +62,8 @@ namespace GraphQL
         public IResolveFieldContext? Parent => _baseContext.Parent;
 
         public IDictionary<string, ArgumentValue>? Arguments => _baseContext.Arguments;
+
+        public IDictionary<string, DirectiveInfo>? Directives => _baseContext.Directives;
 
         public object? RootValue => _baseContext.RootValue;
 

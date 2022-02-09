@@ -1,5 +1,4 @@
 using GraphQL.Tests.Execution;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {

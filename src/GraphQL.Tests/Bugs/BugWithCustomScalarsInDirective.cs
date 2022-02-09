@@ -1,7 +1,5 @@
-using System;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
@@ -39,7 +37,7 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class LinkDirective : DirectiveGraphType
+    public class LinkDirective : Directive
     {
         public LinkDirective() : base("link", DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface)
         {
@@ -47,7 +45,7 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class SomeDirective : DirectiveGraphType
+    public class SomeDirective : Directive
     {
         public SomeDirective() : base("some", DirectiveLocation.Scalar)
         {

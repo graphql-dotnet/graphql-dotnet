@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL
 {
@@ -31,7 +28,7 @@ namespace GraphQL
         public virtual void Add(ExecutionError error)
         {
             lock (_lock)
-                (List ??= new List<ExecutionError>()).Add(error ?? throw new ArgumentNullException(nameof(error)));
+                (List ??= new()).Add(error ?? throw new ArgumentNullException(nameof(error)));
         }
 
         /// <summary>

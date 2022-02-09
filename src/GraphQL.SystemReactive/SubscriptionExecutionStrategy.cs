@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -53,7 +50,7 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var arguments = ExecutionHelper.GetArgumentValues(
+            var arguments = ExecutionHelper.GetArguments(
                 node.FieldDefinition!.Arguments,
                 node.Field!.Arguments,
                 context.Variables);

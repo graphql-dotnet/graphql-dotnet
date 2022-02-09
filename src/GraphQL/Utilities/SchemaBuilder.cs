@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -97,7 +93,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             PreConfigure(schema);
 
-            var directives = new List<DirectiveGraphType>();
+            var directives = new List<Directive>();
 
             foreach (var def in document.Definitions)
             {
@@ -509,15 +505,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (enumDef.Values?.Count > 0) // just in case
             {
                 foreach (var value in enumDef.Values)
-                    type.AddValue(ToEnumValue(value, typeConfig.Type!));
+                    type.Add(ToEnumValue(value, typeConfig.Type!));
             }
 
             return type;
         }
 
-        protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
+        protected virtual Directive ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var result = new DirectiveGraphType(directiveDef.Name.StringValue) //ISSUE:allocation
+            var result = new Directive(directiveDef.Name.StringValue) //ISSUE:allocation
             {
                 Description = directiveDef.Description?.Value.ToString() ?? directiveDef.MergeComments(),
                 Repeatable = directiveDef.Repeatable,
@@ -538,10 +534,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type enumType)
         {
             var name = (string)valDef.Name; //TODO:alloc
-            return new EnumValueDefinition
+            return new EnumValueDefinition(name, enumType == null ? name : Enum.Parse(enumType, name, true))
             {
-                Value = enumType == null ? name : Enum.Parse(enumType, name, true),
-                Name = name,
                 Description = valDef.Description?.Value.ToString() ?? valDef.MergeComments()
                 // TODO: SchemaFirst configuration (TypeConfig/FieldConfig) does not allow to specify DeprecationReason for enum values
                 //DeprecationReason = ???

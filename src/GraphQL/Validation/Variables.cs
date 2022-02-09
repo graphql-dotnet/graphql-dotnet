@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Execution;
 using GraphQLParser;
 
@@ -29,7 +26,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Adds a variable to the list.
         /// </summary>
-        public virtual void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+        public virtual void Add(Variable variable) => (_variables ??= new()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <summary>
         /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.

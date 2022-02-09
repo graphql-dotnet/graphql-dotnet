@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
@@ -72,8 +69,8 @@ namespace GraphQL
                         bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
                         if (matched)
                         {
-                            (values ??= new List<object>()).Add(keyValue.Value);
-                            (keys ??= new List<string>()).Add(keyValue.Key);
+                            (values ??= new()).Add(keyValue.Value);
+                            (keys ??= new()).Add(keyValue.Key);
                         }
                         return matched;
                     }))
@@ -84,7 +81,7 @@ namespace GraphQL
                     // Then check for default values if any
                     if (p.HasDefaultValue)
                     {
-                        (values ??= new List<object>()).Add(p.DefaultValue);
+                        (values ??= new()).Add(p.DefaultValue);
                         return true;
                     }
 

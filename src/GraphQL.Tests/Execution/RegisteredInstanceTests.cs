@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -203,7 +199,7 @@ type root {
                 Comparer = new AlphabeticalSchemaComparer()
             });
             var writer = new StringWriter();
-            printer.PrintAsync(s, writer).GetAwaiter().GetResult();
+            printer.PrintSchemaAsync(s, writer).GetAwaiter().GetResult();
             return writer.ToString();
         }
 

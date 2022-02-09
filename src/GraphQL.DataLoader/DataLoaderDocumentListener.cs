@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Validation;
 
@@ -27,7 +26,7 @@ namespace GraphQL.DataLoader
         /// <inheritdoc/>
         public Task BeforeExecutionAsync(IExecutionContext context)
         {
-            _accessor.Context ??= new DataLoaderContext();
+            _accessor.Context ??= new();
 
             return Task.CompletedTask;
         }

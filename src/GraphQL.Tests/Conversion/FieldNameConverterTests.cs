@@ -1,8 +1,6 @@
 using GraphQL.Conversion;
 using GraphQL.Tests.Execution;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Conversion
 {

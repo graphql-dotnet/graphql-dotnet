@@ -1,8 +1,5 @@
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Introspection
 {
@@ -48,7 +45,7 @@ namespace GraphQL.Tests.Introspection
             }
         }
 
-        private class TraitsDirective : DirectiveGraphType
+        private class TraitsDirective : Directive
         {
             public override bool? Introspectable => true;
 

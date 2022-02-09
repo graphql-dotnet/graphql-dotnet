@@ -18,4 +18,8 @@
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Remove="System.Net.Http.Json" />
+  </ItemGroup>
+
 </Project>

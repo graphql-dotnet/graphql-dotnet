@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
@@ -16,11 +15,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
+        public static readonly ProvidedNonNullArguments Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="ProvidedNonNullArgumentsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLField>(leave: (node, context) =>

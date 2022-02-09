@@ -1,8 +1,5 @@
 using System.Globalization;
-using System.Linq;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Extensions
 {

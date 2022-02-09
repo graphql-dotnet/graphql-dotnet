@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -77,7 +74,9 @@ namespace GraphQL.Types
         {
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            return AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, true);
+            return fieldType;
         }
 
         /// <summary>

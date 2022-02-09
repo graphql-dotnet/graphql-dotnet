@@ -1,8 +1,6 @@
-using System;
 #if NETSTANDARD2_1
 using System.Diagnostics.CodeAnalysis;
 #endif
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
@@ -332,7 +330,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
+        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -359,7 +357,7 @@ namespace GraphQL.Builders
             });
         }
 
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+        private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
         {
             if (context.First.HasValue && context.Last.HasValue)
             {

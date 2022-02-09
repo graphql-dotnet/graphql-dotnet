@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL.StarWars.IoC
 {
     public interface ISimpleContainer : IDisposable, IServiceProvider

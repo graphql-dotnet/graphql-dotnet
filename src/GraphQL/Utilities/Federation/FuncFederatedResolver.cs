@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace GraphQL.Utilities.Federation
 {
     public class FuncFederatedResolver<T> : IFederatedResolver

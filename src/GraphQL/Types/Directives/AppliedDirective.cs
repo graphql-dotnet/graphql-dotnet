@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -49,7 +47,7 @@ namespace GraphQL.Types
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            (List ??= new List<DirectiveArgument>()).Add(argument);
+            (List ??= new()).Add(argument);
 
             return this;
         }

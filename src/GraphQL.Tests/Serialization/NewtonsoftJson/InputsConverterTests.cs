@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
-using Shouldly;
-using Xunit;
+using JsonSerializerSettings = GraphQL.NewtonsoftJson.JsonSerializerSettings;
 
 namespace GraphQL.Tests.Serialization.NewtonsoftJson
 {

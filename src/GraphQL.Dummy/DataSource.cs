@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace GraphQL.Dummy
 {
     public static class DataSource

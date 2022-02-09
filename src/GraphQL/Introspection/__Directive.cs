@@ -1,4 +1,3 @@
-using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -7,7 +6,7 @@ namespace GraphQL.Introspection
     /// <summary>
     /// The <c>__Directive</c> introspection type represents a directive that a server supports.
     /// </summary>
-    public class __Directive : ObjectGraphType<DirectiveGraphType>
+    public class __Directive : ObjectGraphType<Directive>
     {
         /// <summary>
         /// Initializes a new instance of the <c>__Directive</c> introspection type.

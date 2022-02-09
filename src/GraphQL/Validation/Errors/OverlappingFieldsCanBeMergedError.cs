@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using GraphQLParser.AST;
 using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 

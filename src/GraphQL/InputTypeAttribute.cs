@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -6,7 +5,7 @@ namespace GraphQL
     /// <summary>
     /// Specifies an input graph type mapping for the CLR class or property marked with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
     public class InputTypeAttribute : GraphQLAttribute
     {
         private Type _inputType = null!;
@@ -40,6 +39,12 @@ namespace GraphQL
             {
                 fieldType.Type = _inputType;
             }
+        }
+
+        /// <inheritdoc/>
+        public override void Modify(QueryArgument queryArgument)
+        {
+            queryArgument.Type = _inputType;
         }
     }
 }

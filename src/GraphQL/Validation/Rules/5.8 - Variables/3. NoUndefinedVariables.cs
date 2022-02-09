@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -17,16 +14,16 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
+        public static readonly NoUndefinedVariables Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoUndefinedVariablesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
             {
-                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<ROM>();
+                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new();
                 varNameDef.Add(varDef.Variable.Name);
             }),
 

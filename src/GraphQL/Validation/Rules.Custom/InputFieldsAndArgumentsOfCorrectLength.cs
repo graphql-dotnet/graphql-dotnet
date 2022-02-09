@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
@@ -48,11 +47,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new InputFieldsAndArgumentsOfCorrectLength();
+        public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="InputFieldsAndArgumentsOfCorrectLengthError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLArgument>((arg, context) => CheckLength(arg, arg.Value, context.TypeInfo.GetArgument(), context)),

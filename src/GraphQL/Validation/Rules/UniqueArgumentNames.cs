@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -17,18 +14,18 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
+        public static readonly UniqueArgumentNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLField>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<GraphQLDirective>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<GraphQLArgument>((argument, context) =>
             {
-                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<ROM, GraphQLArgument>();
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new();
                 var argName = argument.Name;
                 if (knownArgs.TryGetValue(argName, out var arg))
                 {

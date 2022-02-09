@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -28,6 +25,9 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IDictionary<string, ArgumentValue>? Arguments { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<string, DirectiveInfo>? Directives { get; set; }
 
         /// <inheritdoc/>
         public object? RootValue { get; set; }
@@ -98,6 +98,7 @@ namespace GraphQL
             ParentType = context.ParentType;
             Parent = context.Parent;
             Arguments = context.Arguments;
+            Directives = context.Directives;
             Schema = context.Schema;
             Document = context.Document;
             RootValue = context.RootValue;

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -16,11 +14,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
+        public static readonly KnownArgumentNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="KnownArgumentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((node, context) =>
         {

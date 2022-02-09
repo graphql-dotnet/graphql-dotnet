@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
@@ -20,11 +16,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
+        public static readonly FieldsOnCorrectType Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="FieldsOnCorrectTypeError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(_nodeVisitor);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLField>((node, context) =>
         {

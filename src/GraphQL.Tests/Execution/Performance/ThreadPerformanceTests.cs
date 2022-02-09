@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Execution.Performance
 {

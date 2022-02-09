@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -41,7 +40,7 @@ namespace GraphQL.Introspection
         /// Returns a boolean indicating whether the specified directive should be returned within the introspection query.
         /// </summary>
         /// <param name="directive">The directive to consider.</param>
-        Task<bool> AllowDirective(DirectiveGraphType directive);
+        Task<bool> AllowDirective(Directive directive);
     }
 
     /// <summary>
@@ -75,7 +74,7 @@ namespace GraphQL.Introspection
         public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => Allowed;
 
         /// <inheritdoc/>
-        public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
+        public virtual Task<bool> AllowDirective(Directive directive)
         {
             if (directive.Introspectable.HasValue)
                 return directive.Introspectable.Value ? Allowed : Forbidden;

@@ -1,6 +1,4 @@
-using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -241,7 +239,7 @@ namespace GraphQL
                 {
                     case EnumerationGraphType e:
                         visitor.VisitEnum(e, schema);
-                        foreach (var value in e.Values.List) // List is always non-null
+                        foreach (var value in e.Values) //ISSUE:allocation
                             visitor.VisitEnumValue(value, e, schema);
                         break;
 
@@ -321,7 +319,7 @@ namespace GraphQL
                 }
             }
 
-            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => Replace(argument);
+            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => Replace(argument);
 
             public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
 

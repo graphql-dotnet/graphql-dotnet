@@ -1,10 +1,6 @@
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Tests.Utilities.Visitors;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -104,7 +100,7 @@ namespace GraphQL.Tests.Utilities
                       query: Query
                     }
             ");
-            schema.Directives.Register(new DirectiveGraphType("description",
+            schema.Directives.Register(new Directive("description",
                 DirectiveLocation.Schema, DirectiveLocation.Union, DirectiveLocation.Interface, DirectiveLocation.Object,
                 DirectiveLocation.InputObject, DirectiveLocation.FieldDefinition, DirectiveLocation.InputFieldDefinition,
                 DirectiveLocation.ArgumentDefinition, DirectiveLocation.Enum, DirectiveLocation.EnumValue)
@@ -196,7 +192,7 @@ namespace GraphQL.Tests.Utilities
             enumType.HasAppliedDirectives().ShouldBeTrue();
             enumType.GetAppliedDirectives().Count.ShouldBe(1);
 
-            var enumValue = new EnumValueDefinition();
+            var enumValue = new EnumValueDefinition("UNUSED", null);
             enumValue.ApplyDirective("enumValue");
             enumValue.HasAppliedDirectives().ShouldBeTrue();
             enumValue.GetAppliedDirectives().Count.ShouldBe(1);

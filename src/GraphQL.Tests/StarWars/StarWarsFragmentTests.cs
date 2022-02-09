@@ -1,7 +1,6 @@
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
-using Xunit;
 
 namespace GraphQL.Tests.StarWars
 {

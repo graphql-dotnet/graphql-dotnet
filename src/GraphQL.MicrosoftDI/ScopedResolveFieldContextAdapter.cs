@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -26,7 +23,7 @@ namespace GraphQL.MicrosoftDI
             {
                 try
                 {
-                    Source = (TSource)baseContext.Source;
+                    Source = (TSource)baseContext.Source!;
                 }
                 catch (InvalidCastException)
                 {
@@ -44,11 +41,13 @@ namespace GraphQL.MicrosoftDI
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IResolveFieldContext Parent => _baseContext.Parent;
+        public IResolveFieldContext? Parent => _baseContext.Parent;
 
-        public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
+        public IDictionary<string, ArgumentValue>? Arguments => _baseContext.Arguments;
 
-        public object RootValue => _baseContext.RootValue;
+        public IDictionary<string, DirectiveInfo>? Directives => _baseContext.Directives;
+
+        public object? RootValue => _baseContext.RootValue;
 
         public ISchema Schema => _baseContext.Schema;
 
@@ -68,17 +67,17 @@ namespace GraphQL.MicrosoftDI
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)> SubFields => _baseContext.SubFields;
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
 
-        public IDictionary<string, object> UserContext => _baseContext.UserContext;
+        public IDictionary<string, object?> UserContext => _baseContext.UserContext;
 
-        public IReadOnlyDictionary<string, object> InputExtensions => _baseContext.InputExtensions;
+        public IReadOnlyDictionary<string, object?> InputExtensions => _baseContext.InputExtensions;
 
-        public IDictionary<string, object> OutputExtensions => _baseContext.OutputExtensions;
+        public IDictionary<string, object?> OutputExtensions => _baseContext.OutputExtensions;
 
-        object IResolveFieldContext.Source => _baseContext.Source;
+        object? IResolveFieldContext.Source => _baseContext.Source;
 
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }

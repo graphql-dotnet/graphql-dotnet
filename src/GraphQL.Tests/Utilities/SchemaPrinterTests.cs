@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -122,7 +115,7 @@ directive @skip(
         [Fact]
         public void prints_directive_without_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query);
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query);
             string result = new SchemaPrinter(null).PrintDirective(d);
             result.ShouldBe("directive @my on FIELD | QUERY");
         }
@@ -130,7 +123,7 @@ directive @skip(
         [Fact]
         public void prints_repeatable_directive_without_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
             string result = new SchemaPrinter(null).PrintDirective(d);
             result.ShouldBe("directive @my repeatable on FIELD | QUERY");
         }
@@ -138,7 +131,7 @@ directive @skip(
         [Fact]
         public void prints_repeatable_directive_with_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query)
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query)
             {
                 Repeatable = true,
                 Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
@@ -1930,9 +1923,9 @@ type Zebra {
             public RgbEnum()
             {
                 Name = "RGB";
-                AddValue("RED", "Red!", 0, "Use green!");
-                AddValue("GREEN", "Green!", 1);
-                AddValue("BLUE", "Blue!", 2);
+                Add("RED", 0, "Red!", "Use green!");
+                Add("GREEN", 1, "Green!");
+                Add("BLUE", 2, "Blue!");
             }
         }
     }

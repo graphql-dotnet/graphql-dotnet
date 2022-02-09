@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Transport;
@@ -18,8 +17,11 @@ namespace GraphQL.SystemTextJson
         public override void Write(Utf8JsonWriter writer, OperationMessage value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName(TYPE_KEY);
-            writer.WriteStringValue(value.Type);
+            if (value.Type != null)
+            {
+                writer.WritePropertyName(TYPE_KEY);
+                writer.WriteStringValue(value.Type);
+            }
             if (value.Id != null)
             {
                 writer.WritePropertyName(ID_KEY);
@@ -67,8 +69,8 @@ namespace GraphQL.SystemTextJson
                         request.Payload = JsonSerializer.Deserialize<JsonElement?>(ref reader, options);
                         break;
                     default:
-                        //unrecognized key
-                        throw new JsonException();
+                        reader.Skip();
+                        break;
                 }
             }
 

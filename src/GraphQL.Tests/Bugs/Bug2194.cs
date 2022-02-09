@@ -1,10 +1,6 @@
-using System;
-using System.IO;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
@@ -22,7 +18,7 @@ namespace GraphQL.Tests.Bugs
                     Comparer = new AlphabeticalSchemaComparer()
                 });
                 var writer = new StringWriter();
-                printer.PrintAsync(new Bug2194Schema(), writer).GetAwaiter().GetResult();
+                printer.PrintSchemaAsync(new Bug2194Schema(), writer).GetAwaiter().GetResult();
                 writer.ToString().ShouldBe("Bug2194".ReadSDL());
             });
         }

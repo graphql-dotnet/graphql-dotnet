@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace GraphQL.DI // TODO: think about namespaces!
 {
     /// <summary>

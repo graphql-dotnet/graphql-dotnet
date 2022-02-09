@@ -1,10 +1,7 @@
-using System;
 using System.Globalization;
 using System.Numerics;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {

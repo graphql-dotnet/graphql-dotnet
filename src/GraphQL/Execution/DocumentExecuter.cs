@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -10,6 +6,7 @@ using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -230,7 +227,7 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                (result ??= new ExecutionResult()).AddError(ex);
+                (result ??= new()).AddError(ex);
             }
             catch (Exception ex)
             {
@@ -245,11 +242,11 @@ namespace GraphQL
                     ex = exceptionContext.Exception;
                 }
 
-                (result ??= new ExecutionResult()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
+                (result ??= new()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
             }
             finally
             {
-                result ??= new ExecutionResult();
+                result ??= new();
                 result.Perf = metrics.Finish();
                 if (executionOccurred)
                     result.Executed = true;

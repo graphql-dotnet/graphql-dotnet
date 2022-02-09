@@ -5,7 +5,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Used to conditionally skip (exclude) fields or fragments.
     /// </summary>
-    public class SkipDirective : DirectiveGraphType
+    public class SkipDirective : Directive
     {
         /// <summary>
         /// Initializes a new instance of the 'skip' directive.

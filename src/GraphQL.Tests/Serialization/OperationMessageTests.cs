@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using GraphQL.Transport;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Serialization
 {
@@ -70,7 +67,7 @@ namespace GraphQL.Tests.Serialization
         {
             var message = new OperationMessage();
             var actual = serializer.Serialize(message);
-            var expected = @"{""type"":null}";
+            var expected = @"{}";
             actual.ShouldBeCrossPlatJson(expected);
         }
     }

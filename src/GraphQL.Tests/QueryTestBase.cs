@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.StarWars.IoC;
@@ -10,7 +5,6 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
-using Shouldly;
 
 namespace GraphQL.Tests
 {

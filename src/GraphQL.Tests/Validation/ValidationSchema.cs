@@ -45,9 +45,9 @@ namespace GraphQL.Tests.Validation
         public DogCommand()
         {
             Name = "DogCommand";
-            AddValue("SIT", "", 0);
-            AddValue("HEAL", "", 1);
-            AddValue("DOWN", "", 2);
+            Add("SIT", 0);
+            Add("HEAL", 1);
+            Add("DOWN", 2);
         }
     }
 
@@ -80,8 +80,8 @@ namespace GraphQL.Tests.Validation
     {
         public FurColor()
         {
-            AddValue("Brown", "", 0);
-            AddValue("Yellow", "", 1);
+            Add("Brown", 0);
+            Add("Yellow", 1);
         }
     }
 
@@ -300,12 +300,12 @@ namespace GraphQL.Tests.Validation
             this.RegisterType<Alien>();
 
             Directives.Register(
-                new DirectiveGraphType("onQuery", DirectiveLocation.Query),
-                new DirectiveGraphType("onMutation", DirectiveLocation.Mutation),
-                new DirectiveGraphType("directiveA", DirectiveLocation.Field),
-                new DirectiveGraphType("directiveB", DirectiveLocation.Field),
-                new DirectiveGraphType("directive", DirectiveLocation.Field),
-                new DirectiveGraphType("rep", DirectiveLocation.Field) { Repeatable = true },
+                new Directive("onQuery", DirectiveLocation.Query),
+                new Directive("onMutation", DirectiveLocation.Mutation),
+                new Directive("directiveA", DirectiveLocation.Field),
+                new Directive("directiveB", DirectiveLocation.Field),
+                new Directive("directive", DirectiveLocation.Field),
+                new Directive("rep", DirectiveLocation.Field) { Repeatable = true },
 
                 new LengthDirective()
             );

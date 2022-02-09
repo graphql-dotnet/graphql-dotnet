@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -17,17 +14,17 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
+        public static readonly NoFragmentCycles Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new ValueTask<INodeVisitor?>(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
         {
-            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<ROM>();
-            var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<GraphQLFragmentSpread>();
-            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<ROM, int>();
+            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new();
+            var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new();
+            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new();
             if (!visitedFrags.Contains(node.FragmentName.Name))
             {
                 detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);

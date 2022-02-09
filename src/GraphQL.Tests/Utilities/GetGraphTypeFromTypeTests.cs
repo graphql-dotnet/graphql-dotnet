@@ -1,13 +1,8 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -333,7 +328,7 @@ namespace GraphQL.Tests.Utilities
             {
                 Query = query
             };
-            var directive = new DirectiveGraphType("MyDirective")
+            var directive = new Directive("MyDirective")
             {
                 Arguments = new QueryArguments
                 {

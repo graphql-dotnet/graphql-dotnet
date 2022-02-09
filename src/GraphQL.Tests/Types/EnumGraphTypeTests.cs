@@ -1,10 +1,6 @@
-using System;
 using System.ComponentModel;
-using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -72,9 +68,9 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void adds_values_from_enum_custom_casing()
+        public void adds_values_from_enum_custom_casing_should_throw()
         {
-            type.ParseValue("rED").ShouldBe(Colors.Red);
+            Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' to the scalar type 'Colors'");
         }
 
         [Fact]
@@ -105,9 +101,23 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void parse_native_clr_enum_value()
+        {
+            type.CanParseValue(Colors.Red).ShouldBeTrue();
+            type.ParseValue(Colors.Red).ShouldBe(Colors.Red);
+        }
+
+        [Fact]
+        public void parse_native_clr_enum_value_when_not_defined()
+        {
+            type.CanParseValue((Colors)100500).ShouldBeFalse();
+            Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' to the scalar type 'Colors'");
+        }
+
+        [Fact]
         public void does_not_allow_nulls_to_be_added()
         {
-            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null));
         }
 
         [Fact]
@@ -132,6 +142,28 @@ namespace GraphQL.Tests.Types
         public void serialize_by_name_throws()
         {
             Should.Throw<InvalidOperationException>(() => type.Serialize("RED"));
+        }
+
+        [Fact]
+        public void serialize_should_work_with_null_values()
+        {
+            var en = new EnumerationGraphType();
+            en.Add("one", 100500);
+            en.Add("two", null);
+
+            en.Serialize(100500).ShouldBe("one");
+            en.Serialize(null).ShouldBe("two");
+        }
+
+        [Fact]
+        public void toast_should_work_with_null_values()
+        {
+            var en = new EnumerationGraphType();
+            en.Add("one", 100500);
+            en.Add("two", null);
+
+            en.ToAST(100500).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("one");
+            en.ToAST(null).ShouldBeOfType<GraphQLEnumValue>().Name.Value.ShouldBe("two");
         }
 
         [Fact]
@@ -196,6 +228,40 @@ namespace GraphQL.Tests.Types
         {
             OneOne,
             TwoTwo
+        }
+
+        [Fact]
+        public void respects_attributes()
+        {
+            var test = new EnumerationGraphType<EnumAttributeTest>();
+            test.Name.ShouldBe("EnumTest");
+            test.Description.ShouldBe("Test description");
+            test.DeprecationReason.ShouldBe("Test obsolete");
+            test.GetMetadata<string>("Key1").ShouldBe("Value1");
+            test.Values.Count.ShouldBe(2);
+            var value1 = test.Values.FindByName("CUSTOM_NAME").ShouldNotBeNull();
+            value1.Value.ShouldBe(EnumAttributeTest.Enum1);
+            value1.Description.ShouldBe("Custom enum value");
+            var value2 = test.Values.FindByName("ENUM_2").ShouldNotBeNull();
+            value2.Value.ShouldBe(EnumAttributeTest.Enum2);
+            value2.GetMetadata<string>("Key2").ShouldBe("Value2");
+            test.Values.FindByName("IGNORED").ShouldBeNull();
+        }
+
+        [Name("EnumTest")]
+        [Description("Test description")]
+        [Obsolete("Test obsolete")]
+        [Metadata("Key1", "Value1")]
+        private enum EnumAttributeTest
+        {
+            [Ignore]
+            Ignored,
+            [Name("CUSTOM_NAME")]
+            [Description("Custom enum value")]
+            Enum1,
+            [Metadata("Key2", "Value2")]
+            [Obsolete("Deprecated enum value")]
+            Enum2,
         }
     }
 }

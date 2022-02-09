@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -62,7 +60,7 @@ namespace GraphQL
         /// </summary>
         public void AddLocation(Location location)
         {
-            (Locations ??= new List<Location>()).Add(location);
+            (Locations ??= new()).Add(location);
         }
 
         private void SetCode(Exception? exception)

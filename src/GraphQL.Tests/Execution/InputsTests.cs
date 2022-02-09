@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -185,9 +184,9 @@ namespace GraphQL.Tests.Execution
         {
             Name = "Gender";
             Description = "User gender";
-            AddValue("NotSpecified", "NotSpecified gender.", Gender.NotSpecified);
-            AddValue("Male", "gender Male", Gender.Male);
-            AddValue("Female", "gender female", Gender.Female);
+            Add("NotSpecified", Gender.NotSpecified, "NotSpecified gender.");
+            Add("Male", Gender.Male, "gender Male");
+            Add("Female", Gender.Female, "gender female");
         }
     }
 

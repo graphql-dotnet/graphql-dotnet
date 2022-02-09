@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -12,8 +10,6 @@ using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Moq;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.DI
 {
@@ -1351,7 +1347,7 @@ namespace GraphQL.Tests.DI
         {
             MockSetupRegister<IGraphQLSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
             MockSetupRegister<IGraphQLTextSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
-            MockSetupConfigureNull<Newtonsoft.Json.JsonSerializerSettings>();
+            MockSetupConfigureNull<JsonSerializerSettings>();
             _builder.AddNewtonsoftJson();
             Verify();
         }
@@ -1361,7 +1357,7 @@ namespace GraphQL.Tests.DI
         {
             MockSetupRegister<IGraphQLSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
             MockSetupRegister<IGraphQLTextSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
-            var options = MockSetupConfigure1<Newtonsoft.Json.JsonSerializerSettings>();
+            var options = MockSetupConfigure1<JsonSerializerSettings>();
             _builder.AddNewtonsoftJson(options);
             Verify();
         }
@@ -1371,7 +1367,7 @@ namespace GraphQL.Tests.DI
         {
             MockSetupRegister<IGraphQLSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
             MockSetupRegister<IGraphQLTextSerializer, NewtonsoftJson.GraphQLSerializer>(ServiceLifetime.Singleton, true);
-            var options = MockSetupConfigure2<Newtonsoft.Json.JsonSerializerSettings>();
+            var options = MockSetupConfigure2<JsonSerializerSettings>();
             _builder.AddNewtonsoftJson(options);
             Verify();
         }

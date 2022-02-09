@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQLParser;
@@ -84,7 +82,7 @@ namespace GraphQL
         /// <returns>Reference to this.</returns>
         public ExecutionResult AddError(ExecutionError error)
         {
-            (Errors ??= new ExecutionErrors()).Add(error);
+            (Errors ??= new()).Add(error);
             return this;
         }
 
@@ -97,7 +95,7 @@ namespace GraphQL
         {
             if (errors?.Count > 0)
             {
-                Errors ??= new ExecutionErrors(errors.Count);
+                Errors ??= new(errors.Count);
 
                 foreach (var error in errors.List!)
                     Errors.Add(error);

@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
@@ -109,7 +105,7 @@ namespace GraphQL.Tests.Bugs
 
                 var name = DeriveEnumValueName(enumMember.Name);
 
-                AddValue(name, null, Enum.Parse(type, enumName));
+                Add(name, Enum.Parse(type, enumName));
             }
         }
 

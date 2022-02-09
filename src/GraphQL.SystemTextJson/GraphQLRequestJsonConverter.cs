@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Transport;
@@ -95,8 +94,8 @@ namespace GraphQL.SystemTextJson
                         request.Extensions = JsonSerializer.Deserialize<Inputs>(ref reader, options);
                         break;
                     default:
-                        //unrecognized key
-                        throw new JsonException();
+                        reader.Skip();
+                        break;
                 }
             }
 

@@ -1,6 +1,3 @@
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -67,9 +64,9 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Prints directive graph type in the specified <see cref="TextWriter"/>.
         /// </summary>
-        public async ValueTask PrintDirectiveAsync(DirectiveGraphType type, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
+        public async ValueTask PrintDirectiveAsync(Directive directive, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
-            var def = CreateConverter().ConvertDirectiveDefinition(type, schema);
+            var def = CreateConverter().ConvertDirectiveDefinition(directive, schema);
             await _astPrinter.PrintAsync(def, writer, cancellationToken);
         }
     }

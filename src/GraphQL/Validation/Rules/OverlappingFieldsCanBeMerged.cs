@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser;
@@ -148,7 +145,7 @@ namespace GraphQL.Validation.Rules
 
                             if (conflict != null)
                             {
-                                (conflicts ??= new List<Conflict>()).Add(conflict);
+                                (conflicts ??= new()).Add(conflict);
                             }
                         }
                     }
@@ -565,7 +562,7 @@ namespace GraphQL.Validation.Rules
 
                             if (conflict != null)
                             {
-                                (conflicts ??= new List<Conflict>()).Add(conflict);
+                                (conflicts ??= new()).Add(conflict);
                             }
                         }
                     }

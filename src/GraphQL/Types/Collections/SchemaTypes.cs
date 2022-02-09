@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
@@ -533,7 +530,7 @@ namespace GraphQL.Types
             }
         }
 
-        private void HandleDirective(DirectiveGraphType directive, TypeCollectionContext context)
+        private void HandleDirective(Directive directive, TypeCollectionContext context)
         {
             if (directive.Arguments?.Count > 0)
             {

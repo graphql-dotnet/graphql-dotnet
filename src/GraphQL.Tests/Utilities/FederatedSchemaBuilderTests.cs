@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Utilities.Federation;
-using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {

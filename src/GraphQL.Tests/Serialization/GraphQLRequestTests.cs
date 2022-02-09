@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Transport;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Serialization
 {
@@ -122,8 +117,10 @@ namespace GraphQL.Tests.Serialization
         [ClassData(typeof(GraphQLSerializersTestData))]
         public void Reads_GraphQLRequest_IsCaseSensitive(IGraphQLTextSerializer serializer)
         {
-            var test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-            Should.Throw<Exception>(() => serializer.Deserialize<GraphQLRequest>(test));
+            var test = $"{{\"query\":\"hello\",\"Variables\":{ExampleJson}}}";
+            var actual = serializer.Deserialize<GraphQLRequest>(test);
+            actual.Query.ShouldBe("hello");
+            actual.Variables.ShouldBeNull();
         }
 
         [Theory]
@@ -172,6 +169,17 @@ namespace GraphQL.Tests.Serialization
             Verify(request.Variables);
             var request2 = actual.Last();
             request2.Query.ShouldBe("dummy");
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_GraphQLRequest_List_NotCaseSensitive(IGraphQLTextSerializer serializer)
+        {
+            var test = @"{""VARIABLES"":{""date"":""2015-12-22T10:10:10+03:00""},""query"":""test""}";
+            var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
+            actual.Count.ShouldBe(1);
+            actual[0].Query.ShouldBe("test");
+            actual[0].Variables.ShouldBeNull();
         }
 
         [Theory]

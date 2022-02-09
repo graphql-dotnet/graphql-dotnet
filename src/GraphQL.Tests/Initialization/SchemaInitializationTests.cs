@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQLParser.AST;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.Tests.Initialization
 {
@@ -76,6 +72,13 @@ namespace GraphQL.Tests.Initialization
             ShouldThrow<SchemaWithInvalidDefault1, InvalidOperationException>("The default value of argument 'argOne' of field 'Object.field' is invalid.");
             ShouldThrow<SchemaWithInvalidDefault2, InvalidOperationException>("The default value of argument 'argOne' of field 'Object.field' is invalid.");
         }
+
+        [Fact]
+        public void SchemaWithEnumWithoutValues_Should_Throw()
+        {
+            ShouldThrow<SchemaWithEnumWithoutValues1, InvalidOperationException>("An Enum type 'EnumWithoutValues' must define one or more unique enum values.");
+            ShouldThrow<SchemaWithEnumWithoutValues2, InvalidOperationException>("An Enum type 'Enumeration' must define one or more unique enum values.");
+        }
     }
 
     public class EmptyQuerySchema : Schema
@@ -96,7 +99,7 @@ namespace GraphQL.Tests.Initialization
             Directives.Register(new MyDirective());
         }
 
-        public class MyDirective : DirectiveGraphType
+        public class MyDirective : Directive
         {
             public MyDirective()
                 : base("my", DirectiveLocation.Field)
@@ -180,7 +183,7 @@ namespace GraphQL.Tests.Initialization
 
     public class SchemaWithNullDirectiveArgumentWhenShouldBeNonNull : Schema
     {
-        public class TestDirective : DirectiveGraphType
+        public class TestDirective : Directive
         {
             public TestDirective()
                 : base("test", DirectiveLocation.Schema, DirectiveLocation.FieldDefinition)
@@ -300,6 +303,28 @@ namespace GraphQL.Tests.Initialization
                        DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } }
                    }));
             Query = root;
+        }
+    }
+
+    public class SchemaWithEnumWithoutValues1 : Schema
+    {
+        public enum EnumWithoutValues
+        {
+        }
+
+        public SchemaWithEnumWithoutValues1()
+        {
+            var type = new EnumerationGraphType<EnumWithoutValues>();
+            RegisterType(type);
+        }
+    }
+
+    public class SchemaWithEnumWithoutValues2 : Schema
+    {
+        public SchemaWithEnumWithoutValues2()
+        {
+            var type = new EnumerationGraphType();
+            RegisterType(type);
         }
     }
 }

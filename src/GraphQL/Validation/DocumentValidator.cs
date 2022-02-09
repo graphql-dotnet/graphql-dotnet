@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -93,7 +90,7 @@ namespace GraphQL.Validation
                             {
                                 var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
-                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                                    (variableVisitors ??= new()).Add(variableVisitor);
                             }
                             var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                             if (visitor != null)
@@ -108,7 +105,7 @@ namespace GraphQL.Validation
                             {
                                 var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
-                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                                    (variableVisitors ??= new()).Add(variableVisitor);
                             }
                             var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                             if (visitor != null)

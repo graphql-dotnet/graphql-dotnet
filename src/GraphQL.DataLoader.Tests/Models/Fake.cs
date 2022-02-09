@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Bogus;
 
 namespace GraphQL.DataLoader.Tests.Models

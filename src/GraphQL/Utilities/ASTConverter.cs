@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -182,22 +180,22 @@ namespace GraphQL.Utilities
             return argumentsDef;
         }
 
-        protected virtual GraphQLArguments? ConvertDirectiveArguments(AppliedDirective directive, DirectiveGraphType type)
+        protected virtual GraphQLArguments? ConvertDirectiveArguments(AppliedDirective appliedDirective, Directive directive)
         {
-            if (directive.ArgumentsCount == 0)
+            if (appliedDirective.ArgumentsCount == 0)
                 return null;
 
             var arguments = new GraphQLArguments
             {
-                Items = new List<GraphQLArgument>(directive.ArgumentsCount)
+                Items = new List<GraphQLArgument>(appliedDirective.ArgumentsCount)
             };
 
-            foreach (var dirArg in directive.List!)
+            foreach (var dirArg in appliedDirective.List!)
             {
                 var arg = new GraphQLArgument
                 {
                     Name = new GraphQLName(dirArg.Name),
-                    Value = dirArg.Value == null ? GraphQLValuesCache.Null : ConvertValue(dirArg.Value, type.Arguments!.Find(dirArg.Name)!.ResolvedType!)! //TODO: ???
+                    Value = dirArg.Value == null ? GraphQLValuesCache.Null : ConvertValue(dirArg.Value, directive.Arguments!.Find(dirArg.Name)!.ResolvedType!)! //TODO: ???
                 };
                 arguments.Items.Add(arg);
             }
@@ -230,7 +228,7 @@ namespace GraphQL.Utilities
             return directives;
         }
 
-        protected virtual GraphQLDirectiveLocations ConvertDirectiveLocations(DirectiveGraphType directive)
+        protected virtual GraphQLDirectiveLocations ConvertDirectiveLocations(Directive directive)
         {
             var locations = new GraphQLDirectiveLocations
             {
@@ -243,7 +241,7 @@ namespace GraphQL.Utilities
             return locations;
         }
 
-        public virtual GraphQLDirectiveDefinition ConvertDirectiveDefinition(DirectiveGraphType directive, ISchema schema)
+        public virtual GraphQLDirectiveDefinition ConvertDirectiveDefinition(Directive directive, ISchema schema)
         {
             return new GraphQLDirectiveDefinition
             {
@@ -272,7 +270,7 @@ namespace GraphQL.Utilities
                 Items = new List<GraphQLEnumValueDefinition>(type.Values.Count)
             };
 
-            foreach (var enumValue in type.Values.List.OrderBy(Options.Comparer?.EnumValueComparer(type)))
+            foreach (var enumValue in type.Values.OrderBy(Options.Comparer?.EnumValueComparer(type)))
             {
                 var def = new GraphQLEnumValueDefinition
                 {

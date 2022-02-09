@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQLParser;
 
 namespace GraphQL.Types
@@ -8,9 +6,9 @@ namespace GraphQL.Types
     /// <summary>
     /// A class that represents a list of directives supported by the schema.
     /// </summary>
-    public class SchemaDirectives : IEnumerable<DirectiveGraphType>
+    public class SchemaDirectives : IEnumerable<Directive>
     {
-        internal List<DirectiveGraphType> List { get; } = new List<DirectiveGraphType>();
+        internal List<Directive> List { get; } = new List<Directive>();
 
         /// <summary>
         /// Returns an instance of the predefined 'include' directive.
@@ -38,7 +36,7 @@ namespace GraphQL.Types
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// </summary>
-        public void Register(DirectiveGraphType directive)
+        public void Register(Directive directive)
         {
             if (directive == null)
                 throw new ArgumentNullException(nameof(directive));
@@ -53,7 +51,7 @@ namespace GraphQL.Types
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// </summary>
-        public void Register(params DirectiveGraphType[] directives)
+        public void Register(params Directive[] directives)
         {
             foreach (var directive in directives)
                 Register(directive);
@@ -63,7 +61,7 @@ namespace GraphQL.Types
         /// Searches the directive by its name and returns it.
         /// </summary>
         /// <param name="name">Directive name.</param>
-        public DirectiveGraphType? Find(ROM name)
+        public Directive? Find(ROM name)
         {
             foreach (var directive in List)
             {
@@ -75,7 +73,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        public IEnumerator<DirectiveGraphType> GetEnumerator() => List.GetEnumerator();
+        public IEnumerator<Directive> GetEnumerator() => List.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

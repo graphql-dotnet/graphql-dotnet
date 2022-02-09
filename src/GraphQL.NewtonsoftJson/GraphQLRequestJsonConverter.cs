@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Transport;
 using Newtonsoft.Json;
 
@@ -104,8 +103,8 @@ namespace GraphQL.NewtonsoftJson
                         request.Extensions = serializer.Deserialize<Inputs>(reader);
                         break;
                     default:
-                        //unrecognized key
-                        throw new JsonException();
+                        reader.Skip();
+                        break;
                 }
             }
 

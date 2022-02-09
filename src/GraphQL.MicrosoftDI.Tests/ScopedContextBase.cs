@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
