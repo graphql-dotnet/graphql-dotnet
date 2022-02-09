@@ -11,11 +11,17 @@ namespace GraphQL.Utilities
     {
         private readonly ASTPrinter _astPrinter;
 
+        /// <summary>
+        /// Creates an instance of <see cref="SchemaPrinter2"/> with default options.
+        /// </summary>
         public SchemaPrinter2()
             : this(new SchemaPrinterOptions2())
         {
         }
 
+        /// <summary>
+        /// Creates an instance of <see cref="SchemaPrinter2"/> with the specified options.
+        /// </summary>
         public SchemaPrinter2(SchemaPrinterOptions2 options)
         {
             Options = options;
