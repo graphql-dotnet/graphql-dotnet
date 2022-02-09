@@ -4,12 +4,15 @@ using GraphQLParser.AST;
 namespace GraphQL.Utilities.Federation
 {
     /// <summary>
-    /// Represents a type unknown within this portion of the federated schema.
+    /// The _Any scalar is used to pass representations of entities from
+    /// external services into the root _entities field for execution.
+    /// <br/>
+    /// <see href="https://www.apollographql.com/docs/federation/federation-spec/#scalar-_any"/>
     /// </summary>
     public class AnyScalarGraphType : ScalarGraphType
     {
         /// <summary>
-        /// Initializes a new instance of this class.
+        /// Initializes a new instance of <see cref="AnyScalarGraphType"/>.
         /// </summary>
         public AnyScalarGraphType()
         {

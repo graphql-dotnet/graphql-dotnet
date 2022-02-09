@@ -3,6 +3,14 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
+    /// <summary>
+    /// A custom scalar type that is used to represent a set of fields.Grammatically, a field set
+    /// is a <see href="https://spec.graphql.org/October2021/#SelectionSet">selection set</see>
+    /// minus the braces. This means it can represent a single field "upc", multiple fields
+    /// "id countryCode", and even nested selection sets "id organization { id }".
+    /// <br/>
+    /// <see href="https://www.apollographql.com/docs/federation/federation-spec/#scalar-_fieldset"/>
+    /// </summary>
     public class FieldSetScalarGraphType : ScalarGraphType
     {
         public FieldSetScalarGraphType()

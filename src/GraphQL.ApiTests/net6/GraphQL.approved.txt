@@ -2708,6 +2708,10 @@ namespace GraphQL.Utilities.Federation
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
+    public class EntityGraphType : GraphQL.Types.UnionGraphType
+    {
+        public EntityGraphType() { }
+    }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
