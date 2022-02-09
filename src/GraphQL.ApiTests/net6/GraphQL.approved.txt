@@ -1812,14 +1812,6 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver? AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver? Subscriber { get; set; }
     }
-    public class ExtendsDirective : GraphQL.Types.Directive
-    {
-        public ExtendsDirective() { }
-    }
-    public class ExternalDirective : GraphQL.Types.Directive
-    {
-        public ExternalDirective() { }
-    }
     public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
@@ -2019,10 +2011,6 @@ namespace GraphQL.Types
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
     }
-    public class KeyDirective : GraphQL.Types.Directive
-    {
-        public KeyDirective() { }
-    }
     public class LengthDirective : GraphQL.Types.Directive
     {
         public LengthDirective() { }
@@ -2093,10 +2081,6 @@ namespace GraphQL.Types
         public int Count { get; }
         public bool Contains(GraphQL.Types.IObjectGraphType type) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IObjectGraphType> GetEnumerator() { }
-    }
-    public class ProvidesDirective : GraphQL.Types.Directive
-    {
-        public ProvidesDirective() { }
     }
     public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideResolvedType
     {
@@ -2712,6 +2696,14 @@ namespace GraphQL.Utilities.Federation
     {
         public EntityGraphType() { }
     }
+    public class ExtendsDirective : GraphQL.Types.Directive
+    {
+        public ExtendsDirective() { }
+    }
+    public class ExternalDirective : GraphQL.Types.Directive
+    {
+        public ExternalDirective() { }
+    }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
@@ -2762,6 +2754,14 @@ namespace GraphQL.Utilities.Federation
     public interface IFederatedResolver
     {
         System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
+    }
+    public class KeyDirective : GraphQL.Types.Directive
+    {
+        public KeyDirective() { }
+    }
+    public class ProvidesDirective : GraphQL.Types.Directive
+    {
+        public ProvidesDirective() { }
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {

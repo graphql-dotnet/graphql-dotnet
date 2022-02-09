@@ -138,21 +138,17 @@ namespace GraphQL.Utilities.Federation
             return true;
         }
 
-        private UnionGraphType BuildEntityGraphType()
+        private EntityGraphType BuildEntityGraphType()
         {
-            var union = new UnionGraphType
-            {
-                Name = "_Entity",
-                Description = "A union of all types that use the @key directive"
-            };
+            var entity = new EntityGraphType();
 
             var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
             foreach (var e in entities)
             {
-                union.AddPossibleType(e!);
+                entity.AddPossibleType(e!);
             }
 
-            union.ResolveType = x =>
+            entity.ResolveType = x =>
             {
                 if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
                 {
@@ -163,7 +159,7 @@ namespace GraphQL.Utilities.Federation
                 return new GraphQLTypeReference(x.GetType().Name);
             };
 
-            return union;
+            return entity;
         }
 
         private bool IsEntity(IGraphType type)

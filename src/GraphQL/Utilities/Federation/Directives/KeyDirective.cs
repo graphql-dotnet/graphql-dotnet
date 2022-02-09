@@ -1,7 +1,7 @@
-using GraphQL.Utilities.Federation;
+using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Utilities.Federation
 {
     /// <summary>
     /// The @key directive is used to indicate a combination of fields that

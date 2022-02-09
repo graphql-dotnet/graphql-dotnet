@@ -1,6 +1,7 @@
+using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Utilities.Federation
 {
     /// <summary>
     /// Optional directive for some libraries such as graphql-java that don't have native

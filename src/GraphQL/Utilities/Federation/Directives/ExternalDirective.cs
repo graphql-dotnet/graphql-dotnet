@@ -1,6 +1,7 @@
+using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Utilities.Federation
 {
     /// <summary>
     /// The @external directive is used to mark a field as owned by another service.

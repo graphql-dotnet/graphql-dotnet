@@ -14,6 +14,7 @@ namespace GraphQL.Utilities.Federation
         public EntityGraphType()
         {
             Name = "_Entity";
+            Description = "A union of all types that use the @key directive";
         }
     }
 }
