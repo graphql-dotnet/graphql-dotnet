@@ -30,7 +30,6 @@ namespace GraphQL.Types
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();
-            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
@@ -38,10 +37,13 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Applies default configuration settings to this graph type prior to applying <see cref="GraphQLAttribute"/> attributes.
-        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to this class.
+        /// Applies default configuration settings to this graph type along with any <see cref="GraphQLAttribute"/> attributes marked on <typeparamref name="TSourceType"/>.
+        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to <typeparamref name="TSourceType"/>.
         /// </summary>
-        protected virtual void ConfigureGraph() { }
+        protected virtual void ConfigureGraph()
+        {
+            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
+        }
 
         /// <summary>
         /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
