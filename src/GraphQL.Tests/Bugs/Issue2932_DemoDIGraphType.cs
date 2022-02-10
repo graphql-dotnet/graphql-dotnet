@@ -166,7 +166,7 @@ namespace GraphQL.Tests.Bugs
                 AutoRegisteringHelper.ApplyGraphQLAttributes<DIObject>(this); //this should be public for this sample to work
             }
 
-            // only process methods declared directly on DIObject marked with [Name]
+            // only process methods declared directly on DIObject -- not anything declared on TSourceType
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
             {
                 return typeof(DIObject)
