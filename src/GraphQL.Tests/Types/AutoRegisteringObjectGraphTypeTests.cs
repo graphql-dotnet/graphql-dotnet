@@ -377,6 +377,16 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void ErrorWithNoDefaultConstructorWhenSourceNull()
+        {
+            var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
+            var context = new ResolveFieldContext();
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true));
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test"));
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(1));
+        }
+
+        [Fact]
         public void WorksWithNullSource()
         {
             var graphType = new TestFieldSupport<DefaultConstructorTest>();
