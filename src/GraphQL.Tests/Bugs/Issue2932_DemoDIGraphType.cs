@@ -15,6 +15,7 @@ namespace GraphQL.Tests.Bugs
             Services.Singleton<DIGraphType<SampleGraph, SampleSource>>();
             Services.Scoped<Service1>();
             Services.Scoped<Service2>();
+            // note: in this example, SampleGraph is not registered, but is created for every field resolver (except static methods) -- see DIGraphType.MemberInstanceFunc
         }
 
         [Fact]
