@@ -1640,7 +1640,7 @@ namespace GraphQL.Types
                 "QueryArguments",
                 "Resolver"})]
         protected System.ValueTuple<GraphQL.Types.QueryArguments?, GraphQL.Resolvers.IFieldResolver> BuildFieldResolver(System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType) { }
-        protected virtual System.Linq.Expressions.Expression<System.Func<GraphQL.IResolveFieldContext, TSourceType>> BuildSourceExpression() { }
+        protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }

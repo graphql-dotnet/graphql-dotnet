@@ -91,7 +91,7 @@ namespace GraphQL.Types
             if (memberInfo is PropertyInfo propertyInfo)
             {
                 var getMethod = propertyInfo.GetMethod ?? throw new InvalidOperationException("No 'get' method for the supplied property.");
-                var resolver = new MethodResolver(getMethod, BuildSourceExpression(), Array.Empty<LambdaExpression>());
+                var resolver = new MethodResolver(getMethod, BuildMemberInstanceExpression(memberInfo), Array.Empty<LambdaExpression>());
                 return (null, resolver);
             }
             else if (memberInfo is MethodInfo methodInfo)
@@ -114,12 +114,12 @@ namespace GraphQL.Types
                         queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                     expressions.Add(expression);
                 }
-                var resolver = new MethodResolver(methodInfo, BuildSourceExpression(), expressions);
+                var resolver = new MethodResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
                 return (queryArguments, resolver);
             }
             else if (memberInfo is FieldInfo fieldInfo)
             {
-                var sourceExpression = BuildSourceExpression();
+                var sourceExpression = BuildMemberInstanceExpression(memberInfo);
                 var param = sourceExpression.Parameters[0];
                 var body = Expression.Convert(
                     Expression.MakeMemberAccess(sourceExpression.Body, fieldInfo),
@@ -139,15 +139,18 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
+        /// Returns a lambda expression that will be used by the field resolver to access the member.
+        /// <br/><br/>
+        /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
         /// <br/><br/>
         /// By default this returns the <see cref="IResolveFieldContext.Source"/> property, or a new instance if the source is <see langword="null"/>.
         /// </summary>
-        protected virtual Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression()
+        /// <param name="memberInfo">The member being called or accessed.</param>
+        protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
             => _sourceExpression;
 
-        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = BuildSourceExpressionInternal();
-        private static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpressionInternal()
+        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = BuildSourceExpression();
+        private static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression()
         {
             // determine if there is an empty constructor for TSourceType
             var defaultConstructor = typeof(TSourceType).GetConstructor(Array.Empty<Type>());
