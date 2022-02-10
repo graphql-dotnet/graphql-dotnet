@@ -364,6 +364,29 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void WorksWithNoDefaultConstructor()
+        {
+            var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
+            var context = new ResolveFieldContext
+            {
+                Source = new NoDefaultConstructorTest(true)
+            };
+            graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
+            graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
+            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(1);
+        }
+
+        [Fact]
+        public void WorksWithNullSource()
+        {
+            var graphType = new TestFieldSupport<DefaultConstructorTest>();
+            var context = new ResolveFieldContext();
+            graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
+            graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
+            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(1);
+        }
+
+        [Fact]
         public void CustomHardcodedArgumentAttributesWork()
         {
             var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
@@ -384,6 +407,25 @@ namespace GraphQL.Tests.Types
         {
             public override void Modify(ArgumentInformation argumentInformation)
                 => argumentInformation.SetDelegate(context => 85);
+        }
+
+        private class NoDefaultConstructorTest
+        {
+            public NoDefaultConstructorTest(bool value)
+            {
+                Example1 = value;
+            }
+
+            public bool Example1 { get; set; }
+            public string Example2() => "test";
+            public int Example3 = 1;
+        }
+
+        private class DefaultConstructorTest
+        {
+            public bool Example1 { get; set; } = true;
+            public string Example2() => "test";
+            public int Example3 = 1;
         }
 
         private class FieldTests
