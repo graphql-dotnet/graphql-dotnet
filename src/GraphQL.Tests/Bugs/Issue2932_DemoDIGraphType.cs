@@ -13,6 +13,8 @@ namespace GraphQL.Tests.Bugs
         {
             Services.Singleton<TestSchema>();
             Services.Singleton<DIGraphType<SampleGraph, SampleSource>>();
+            Services.Scoped<Service1>();
+            Services.Scoped<Service2>();
         }
 
         [Fact]
@@ -25,9 +27,6 @@ namespace GraphQL.Tests.Bugs
             //   - attributes can be pulled from another class instead of TSourceType
             //
             // note: this is just an example of what can be done, and does not necessarily indicate a preferred programming pattern
-
-            Services.Scoped<Service1>();
-            Services.Scoped<Service2>();
 
             AssertQuerySuccess(
                 @"
