@@ -69,7 +69,8 @@ namespace GraphQL
             var typedMethod = _typedModifyMethods.GetOrAdd(
                 argumentInformation.ParameterInfo.ParameterType,
                 type => _modifyMethod.MakeGenericMethod(type));
-            typedMethod.Invoke(this, new object[] { argumentInformation });
+            var func = (Action<ArgumentInformation>)typedMethod.CreateDelegate(typeof(Action<ArgumentInformation>), this);
+            func(argumentInformation);
         }
 
         /// <summary>

@@ -397,6 +397,12 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void TestExceptionBubbling()
+        {
+            Should.Throw<Exception>(() => new AutoRegisteringObjectGraphType<TestExceptionBubblingClass>()).Message.ShouldBe("Test");
+        }
+
+        [Fact]
         public void CustomHardcodedArgumentAttributesWork()
         {
             var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
@@ -602,6 +608,19 @@ namespace GraphQL.Tests.Types
         private class DerivedClass : ParentClass
         {
             public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
+        }
+
+        private class TestExceptionBubblingClass
+        {
+            public string Test([TestExceptionBubbling] string arg) => null!;
+        }
+
+        private class TestExceptionBubblingAttribute : GraphQLAttribute
+        {
+            public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+            {
+                throw new Exception("Test");
+            }
         }
     }
 }

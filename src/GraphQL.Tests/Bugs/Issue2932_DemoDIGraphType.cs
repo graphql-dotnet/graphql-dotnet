@@ -200,6 +200,8 @@ namespace GraphQL.Tests.Bugs
         {
             public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
             {
+                if (argumentInformation.ParameterInfo.ParameterType != argumentInformation.SourceType)
+                    throw new InvalidOperationException("Source parameters must match TSourceType.");
                 argumentInformation.SetDelegate(context => (TParameterType)context.Source!);
             }
         }

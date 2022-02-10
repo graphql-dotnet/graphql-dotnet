@@ -102,9 +102,9 @@ namespace GraphQL.Types
                 QueryArguments queryArguments = new();
                 foreach (var parameterInfo in methodInfo.GetParameters())
                 {
-                    var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
-                        .MakeGenericMethod(parameterInfo.ParameterType)
-                        .Invoke(this, new object[] { fieldType, parameterInfo })!;
+                    var getArgumentInfoMethodInfo = _getArgumentInformationInternalMethodInfo.MakeGenericMethod(parameterInfo.ParameterType);
+                    var getArgumentInfoMethod = (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
+                    var argumentInfo = getArgumentInfoMethod(fieldType, parameterInfo);
                     var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
                     if (queryArgument != null)
                     {

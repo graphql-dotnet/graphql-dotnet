@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Runtime.ExceptionServices;
+
 namespace GraphQL
 {
     /// <summary>
