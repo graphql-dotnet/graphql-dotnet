@@ -30,7 +30,7 @@ namespace GraphQL.Tests
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
         }
 
-        public ISimpleContainer Services { get; set; }
+        public TIocContainer Services { get; set; }
 
         /// <summary>
         /// WARNING! By default each time you access this property a new schema instance is created.
@@ -146,6 +146,7 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
+                options.RequestServices = Services;
             }).GetAwaiter().GetResult();
 
             foreach (var writer in GraphQLSerializersTestData.AllWriters)

@@ -64,6 +64,11 @@ namespace GraphQL.Tests
             _services.AddSingleton(provider => instanceCreator());
         }
 
+        public void Scoped<TService>() where TService : class
+        {
+            _services.AddScoped<TService>();
+        }
+
         public void Dispose()
         {
             _provider.Dispose();

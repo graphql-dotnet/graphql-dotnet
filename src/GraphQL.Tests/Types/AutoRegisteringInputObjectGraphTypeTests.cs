@@ -398,6 +398,7 @@ namespace GraphQL.Tests.Types
             protected override void ConfigureGraph()
             {
                 Name = typeof(T).Name + "Input";
+                base.ConfigureGraph();
             }
         }
 
