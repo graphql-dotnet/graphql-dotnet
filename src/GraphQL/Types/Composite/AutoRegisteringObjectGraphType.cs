@@ -11,7 +11,6 @@ namespace GraphQL.Types
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// Also it can get descriptions for fields from the XML comments.
     /// </summary>
-    /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
@@ -75,16 +74,9 @@ namespace GraphQL.Types
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
             var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
-            if (memberInfo is MethodInfo methodInfo)
-            {
-                var (queryArguments, resolver) = BuildMethodResolver(methodInfo, fieldType);
-                fieldType.Arguments = queryArguments;
-                fieldType.Resolver = resolver;
-            }
-            else
-            {
-                fieldType.Resolver = MemberResolver.Create(memberInfo);
-            }
+            var (queryArguments, resolver) = BuildFieldResolver(memberInfo, fieldType);
+            fieldType.Arguments = queryArguments;
+            fieldType.Resolver = resolver;
             // apply field attributes after resolver has been set
             AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, false);
             return fieldType;
@@ -94,33 +86,95 @@ namespace GraphQL.Types
         /// Retuns a list of query arguments within a <see cref="QueryArguments"/> instance, and a
         /// <see cref="IFieldResolver"/> instance, for the specified field.
         /// </summary>
-        protected (QueryArguments? QueryArguments, IFieldResolver Resolver) BuildMethodResolver(MethodInfo methodInfo, FieldType fieldType)
+        protected (QueryArguments? QueryArguments, IFieldResolver Resolver) BuildFieldResolver(MemberInfo memberInfo, FieldType fieldType)
         {
-            if (methodInfo.GetParameters().Length == 0)
+            if (memberInfo is PropertyInfo propertyInfo)
             {
-                return (null, MemberResolver.Create(methodInfo));
+                var getMethod = propertyInfo.GetMethod ?? throw new InvalidOperationException("No 'get' method for the supplied property.");
+                var resolver = new MethodResolver(getMethod, BuildSourceExpression(), Array.Empty<LambdaExpression>());
+                return (null, resolver);
             }
-
-            List<LambdaExpression> expressions = new();
-            QueryArguments queryArguments = new();
-            foreach (var parameterInfo in methodInfo.GetParameters())
+            else if (memberInfo is MethodInfo methodInfo)
             {
-                var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
-                    .MakeGenericMethod(parameterInfo.ParameterType)
-                    .Invoke(this, new object[] { fieldType, parameterInfo })!;
-                var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-                if (queryArgument != null)
+                List<LambdaExpression> expressions = new();
+                QueryArguments queryArguments = new();
+                foreach (var parameterInfo in methodInfo.GetParameters())
                 {
-                    ApplyArgumentAttributes(parameterInfo, queryArgument);
-                    queryArguments.Add(queryArgument);
+                    var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
+                        .MakeGenericMethod(parameterInfo.ParameterType)
+                        .Invoke(this, new object[] { fieldType, parameterInfo })!;
+                    var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
+                    if (queryArgument != null)
+                    {
+                        ApplyArgumentAttributes(parameterInfo, queryArgument);
+                        queryArguments.Add(queryArgument);
+                    }
+                    expression ??= AutoRegisteringHelper.GetParameterExpression(
+                        parameterInfo.ParameterType,
+                        queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+                    expressions.Add(expression);
                 }
-                expression ??= AutoRegisteringHelper.GetParameterExpression(
-                    parameterInfo.ParameterType,
-                    queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
-                expressions.Add(expression);
+                var resolver = new MethodResolver(methodInfo, BuildSourceExpression(), expressions);
+                return (queryArguments, resolver);
             }
-            var resolver = new MethodResolver(methodInfo, expressions);
-            return (queryArguments, resolver);
+            else if (memberInfo is FieldInfo fieldInfo)
+            {
+                var sourceExpression = BuildSourceExpression();
+                var param = sourceExpression.Parameters[0];
+                var body = Expression.Convert(
+                    Expression.MakeMemberAccess(sourceExpression.Body, fieldInfo),
+                    typeof(object));
+                var lambda = Expression.Lambda<Func<IResolveFieldContext, object?>>(body, param);
+                var func = lambda.Compile();
+                return (null, new FuncFieldResolver<object>(func));
+            }
+            else if (memberInfo == null)
+            {
+                throw new ArgumentNullException(nameof(memberInfo));
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
+            }
+        }
+
+        /// <summary>
+        /// Returns a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
+        /// <br/><br/>
+        /// By default this returns the <see cref="IResolveFieldContext.Source"/> property, or a new instance if the source is <see langword="null"/>.
+        /// </summary>
+        protected virtual Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression()
+            => _sourceExpression;
+
+        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = BuildSourceExpressionInternal();
+        private static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpressionInternal()
+        {
+            // determine if there is an empty constructor for TSourceType
+            var defaultConstructor = typeof(TSourceType).GetConstructor(Array.Empty<Type>());
+            // if not, just cast context.Source
+            if (defaultConstructor == null)
+            {
+                return context => (TSourceType)context.Source!;
+            }
+            // if so, return context => (TSourceType)context.Source ?? new TSourceType();
+            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            var sourceVariable = Expression.Variable(typeof(TSourceType), "source");
+            var resolveFieldContextSourceParameter = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
+            var sourceExpression = Expression.MakeMemberAccess(param, resolveFieldContextSourceParameter);
+            var setVariable = Expression.Assign(sourceVariable, sourceExpression);
+            var body = Expression.Condition(
+                Expression.Equal(sourceVariable, Expression.Constant(null, typeof(object))),
+                Expression.New(defaultConstructor),
+                Expression.Convert(
+                   sourceVariable,
+                   typeof(TSourceType)));
+            var block = Expression.Block(
+                typeof(TSourceType),
+                new ParameterExpression[] { sourceVariable },
+                setVariable,
+                body);
+            var lambda = Expression.Lambda(block, param);
+            return (Expression<Func<IResolveFieldContext, TSourceType>>)lambda;
         }
 
         private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
