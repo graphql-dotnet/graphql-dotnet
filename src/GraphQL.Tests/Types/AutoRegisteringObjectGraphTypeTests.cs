@@ -612,7 +612,7 @@ namespace GraphQL.Tests.Types
 
         private class TestExceptionBubblingClass
         {
-            public string Test([TestExceptionBubbling] string arg) => null!;
+            public string Test([TestExceptionBubbling] string arg) => arg;
         }
 
         private class TestExceptionBubblingAttribute : GraphQLAttribute
