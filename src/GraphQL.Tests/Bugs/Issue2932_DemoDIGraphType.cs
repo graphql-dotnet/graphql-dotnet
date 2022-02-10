@@ -21,7 +21,8 @@ namespace GraphQL.Tests.Bugs
             // tests the following functionality can be implemented in a derived class:
             //   - members can pull from another type rather than only TSourceType
             //   - instance can pull from DI rather than context.Source
-            //   - attributes can be pulled from another class rather than TSourceType
+            //   - static members do not create an instance
+            //   - attributes can be pulled from another class instead of TSourceType
             //
             // note: this is just an example of what can be done, and does not necessarily indicate a preferred programming pattern
 
@@ -157,20 +158,19 @@ namespace GraphQL.Tests.Bugs
         {
             protected override void ConfigureGraph()
             {
-                // allow attribtes to be set on TSourceType or DIObject
+                // do not configure attributes set on TSourceType
+                // base.ConfigureGraph();
 
-                // configure attributes set on TSourceType
-                base.ConfigureGraph();
-
-                // configure attributes set on DIObject
-                AutoRegisteringHelper.ApplyGraphQLAttributes<DIObject>(this); //this should be public for this sample to work
+                // configure attributes set on DIObject instead
+                // todo: AutoRegisteringHelper.ApplyGraphQLAttributes should be public for this sample to work as written
+                AutoRegisteringHelper.ApplyGraphQLAttributes<DIObject>(this);
             }
 
             // only process methods declared directly on DIObject -- not anything declared on TSourceType
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
             {
                 return typeof(DIObject)
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static);
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
             }
 
             // each field resolver will build a new instance of DIObject
