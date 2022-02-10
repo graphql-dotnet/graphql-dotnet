@@ -161,13 +161,15 @@ namespace GraphQL.Types
             var sourceVariable = Expression.Variable(typeof(TSourceType), "source");
             var resolveFieldContextSourceParameter = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
             var sourceExpression = Expression.MakeMemberAccess(param, resolveFieldContextSourceParameter);
-            var setVariable = Expression.Assign(sourceVariable, sourceExpression);
+            var setVariable = Expression.Assign(
+                sourceVariable,
+                Expression.Convert(
+                    sourceExpression,
+                    typeof(TSourceType)));
             var body = Expression.Condition(
                 Expression.Equal(sourceVariable, Expression.Constant(null, typeof(object))),
                 Expression.New(defaultConstructor),
-                Expression.Convert(
-                   sourceVariable,
-                   typeof(TSourceType)));
+                sourceVariable);
             var block = Expression.Block(
                 typeof(TSourceType),
                 new ParameterExpression[] { sourceVariable },
