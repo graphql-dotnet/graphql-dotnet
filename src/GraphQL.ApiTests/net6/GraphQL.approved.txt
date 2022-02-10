@@ -61,6 +61,7 @@ namespace GraphQL
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
@@ -231,6 +232,18 @@ namespace GraphQL
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddErrorInfoProvider<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider :  class, GraphQL.Execution.IErrorInfoProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, GraphQLParser.AST.OperationType operationType)
+            where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TExecutionStrategy> executionStrategyFactory, GraphQLParser.AST.OperationType operationType)
+            where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategy executionStrategy, GraphQLParser.AST.OperationType operationType)
+            where TExecutionStrategy :  class, GraphQL.Execution.IExecutionStrategy { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TExecutionStrategySelector> executionStrategySelectorFactory)
+            where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
+        public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
+            where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
@@ -901,6 +914,12 @@ namespace GraphQL.Execution
         public override bool PropagateNull() { }
         public override object? ToValue() { }
     }
+    public class DefaultExecutionStrategySelector : GraphQL.Execution.IExecutionStrategySelector
+    {
+        public DefaultExecutionStrategySelector() { }
+        public DefaultExecutionStrategySelector(System.Collections.Generic.IEnumerable<GraphQL.Execution.ExecutionStrategyRegistration> registrations) { }
+        public virtual GraphQL.Execution.IExecutionStrategy Select(GraphQL.Execution.ExecutionContext context) { }
+    }
     public class DirectiveInfo
     {
         public DirectiveInfo(GraphQL.Types.Directive directive, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue> arguments) { }
@@ -1024,6 +1043,23 @@ namespace GraphQL.Execution
         protected virtual bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQLParser.AST.IHasDirectivesNode node) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }
+    public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
+    {
+        protected ExecutionStrategyRegistration(GraphQL.Execution.ExecutionStrategyRegistration original) { }
+        public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
+        protected virtual System.Type EqualityContract { get; }
+        public GraphQLParser.AST.OperationType Operation { get; set; }
+        public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
+        public virtual GraphQL.Execution.ExecutionStrategyRegistration <Clone>$() { }
+        public void Deconstruct(out GraphQL.Execution.IExecutionStrategy Strategy, out GraphQLParser.AST.OperationType Operation) { }
+        public virtual bool Equals(GraphQL.Execution.ExecutionStrategyRegistration? other) { }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
+        protected virtual bool PrintMembers(System.Text.StringBuilder builder) { }
+        public override string ToString() { }
+        public static bool operator !=(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
+        public static bool operator ==(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
+    }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
         public GraphQLDocumentBuilder() { }
@@ -1076,6 +1112,10 @@ namespace GraphQL.Execution
                 "field",
                 "fieldType"})]
         System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? GetSubFields(GraphQL.Execution.ExecutionContext executionContext, GraphQL.Execution.ExecutionNode executionNode);
+    }
+    public interface IExecutionStrategySelector
+    {
+        GraphQL.Execution.IExecutionStrategy Select(GraphQL.Execution.ExecutionContext context);
     }
     public interface IParentExecutionNode
     {

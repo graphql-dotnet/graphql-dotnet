@@ -9,6 +9,7 @@ using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 using Moq;
 
 namespace GraphQL.Tests.DI
@@ -1280,6 +1281,101 @@ namespace GraphQL.Tests.DI
         }
         #endregion
 
+        #region - AddExecutionStrategySelector -
+        [Fact]
+        public void AddExecutionStrategySelector()
+        {
+            MockSetupRegister<IExecutionStrategySelector, TestExecutionStrategySelector>();
+            _builder.AddExecutionStrategySelector<TestExecutionStrategySelector>();
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategySelector_Instance()
+        {
+            var instance = new TestExecutionStrategySelector();
+            MockSetupRegister<IExecutionStrategySelector>(instance);
+            _builder.AddExecutionStrategySelector(instance);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategySelector_Factory()
+        {
+            var factory = MockSetupRegister<IExecutionStrategySelector>();
+            _builder.AddExecutionStrategySelector(factory);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategySelector_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((TestExecutionStrategySelector)null));
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((Func<IServiceProvider, TestExecutionStrategySelector>)null));
+        }
+        #endregion
+
+        #region - AddExecutionStrategy -
+        [Fact]
+        public void AddExecutionStrategy()
+        {
+            MockSetupRegister<TestExecutionStrategy, TestExecutionStrategy>();
+            _builderMock.Setup(x => x.Register(typeof(ExecutionStrategyRegistration), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
+                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
+                {
+                    var instance = new TestExecutionStrategy();
+                    var providerMock = new Mock<IServiceProvider>(MockBehavior.Strict);
+                    providerMock.Setup(x => x.GetService(typeof(TestExecutionStrategy))).Returns(instance);
+                    var reg = factory(providerMock.Object).ShouldBeOfType<ExecutionStrategyRegistration>();
+                    reg.Strategy.ShouldBe(instance);
+                    reg.Operation.ShouldBe(OperationType.Mutation);
+                    return _builderMock.Object;
+                }).Verifiable();
+            _builder.AddExecutionStrategy<TestExecutionStrategy>(OperationType.Mutation);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategy_Instance()
+        {
+            var instance = new TestExecutionStrategy();
+            _builderMock.Setup(x => x.Register(typeof(ExecutionStrategyRegistration), It.IsAny<ExecutionStrategyRegistration>(), false))
+                .Returns<Type, ExecutionStrategyRegistration, bool>((_, reg, _) =>
+                {
+                    reg.Strategy.ShouldBe(instance);
+                    reg.Operation.ShouldBe(OperationType.Mutation);
+                    return _builderMock.Object;
+                }).Verifiable();
+            _builder.AddExecutionStrategy(instance, OperationType.Mutation);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategy_Factory()
+        {
+            var instance = new TestExecutionStrategy();
+            Func<IServiceProvider, IExecutionStrategy> func = (provider) => instance;
+            _builderMock.Setup(x => x.Register(typeof(ExecutionStrategyRegistration), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
+                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
+                {
+                    var providerMock = new Mock<IServiceProvider>(MockBehavior.Strict);
+                    var reg = factory(providerMock.Object).ShouldBeOfType<ExecutionStrategyRegistration>();
+                    reg.Strategy.ShouldBe(instance);
+                    reg.Operation.ShouldBe(OperationType.Mutation);
+                    return _builderMock.Object;
+                }).Verifiable();
+            _builder.AddExecutionStrategy(func, OperationType.Mutation);
+            Verify();
+        }
+
+        [Fact]
+        public void AddExecutionStrategy_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((TestExecutionStrategy)null, OperationType.Mutation));
+            Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((Func<IServiceProvider, TestExecutionStrategy>)null, OperationType.Mutation));
+        }
+        #endregion
+
         #region - GraphQL.MemoryCache: AddMemoryCache -
         [Fact]
         public void AddMemoryCache()
@@ -1396,6 +1492,14 @@ namespace GraphQL.Tests.DI
         }
 
         private class TestSchema : Schema
+        {
+        }
+
+        private class TestExecutionStrategySelector : DefaultExecutionStrategySelector
+        {
+        }
+
+        private class TestExecutionStrategy : ParallelExecutionStrategy
         {
         }
 
