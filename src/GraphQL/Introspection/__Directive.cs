@@ -34,9 +34,30 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
-                resolve: context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>()
-            );
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
+                resolve: async context =>
+                {
+                    var source = context.Source;
+                    if (source.Arguments?.Count > 0)
+                    {
+                        var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
+
+                        int index = 0;
+                        foreach (var argument in source.Arguments.List!)
+                        {
+                            if (await context.Schema.Filter.AllowArgument(source, argument).ConfigureAwait(false))
+                                arguments[index++] = argument;
+                        }
+
+                        var comparer = context.Schema.Comparer.ArgumentComparer(source);
+                        if (comparer != null)
+                            Array.Sort(arguments, 0, index, comparer);
+
+                        return arguments.Constrained(index);
+                    }
+
+                    return Array.Empty<QueryArgument>();
+                });
 
             if (allowRepeatable)
                 Field<NonNullGraphType<BooleanGraphType>>("isRepeatable", resolve: context => context.Source!.Repeatable);

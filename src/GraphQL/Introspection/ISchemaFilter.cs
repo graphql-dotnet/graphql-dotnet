@@ -30,6 +30,13 @@ namespace GraphQL.Introspection
         Task<bool> AllowArgument(IFieldType field, QueryArgument argument);
 
         /// <summary>
+        /// Returns a boolean indicating whether the specified argument should be returned within the introspection query.
+        /// </summary>
+        /// <param name="directive">The directive to which the argument belongs.</param>
+        /// <param name="argument">The argument to consider.</param>
+        Task<bool> AllowArgument(Directive directive, QueryArgument argument);
+
+        /// <summary>
         /// Returns a boolean indicating whether the specified enumeration value should be returned within the introspection query.
         /// </summary>
         /// <param name="parent">The enumeration to which the enumeration value belongs.</param>
@@ -69,6 +76,9 @@ namespace GraphQL.Introspection
 
         /// <inheritdoc/>
         public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument) => Allowed;
+
+        /// <inheritdoc/>
+        public virtual Task<bool> AllowArgument(Directive directive, QueryArgument argument) => Allowed;
 
         /// <inheritdoc/>
         public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue) => Allowed;

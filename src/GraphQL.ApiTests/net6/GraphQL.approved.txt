@@ -39,14 +39,14 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static TMetadataProvider ApplyDirectivesFrom<TMetadataProvider, TNode>(this TMetadataProvider provider, TNode node)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata
+            where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasDirectivesNode { }
         public static GraphQL.Types.AppliedDirective? FindAppliedDirective(this GraphQL.Types.IProvideMetadata provider, string name) { }
         public static GraphQL.Types.AppliedDirectives? GetAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool HasAppliedDirectives(this GraphQL.Types.IProvideMetadata provider) { }
         public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        public static TMetadataProvider SetDirectivesFrom<TMetadataProvider, TNode>(this TMetadataProvider provider, TNode node)
-            where TMetadataProvider : GraphQL.Types.IProvideMetadata
-            where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasDirectivesNode { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
     public sealed class DoNotMapClrTypeAttribute : System.Attribute
@@ -1339,6 +1339,7 @@ namespace GraphQL.Introspection
         protected static readonly System.Threading.Tasks.Task<bool> Allowed;
         protected static readonly System.Threading.Tasks.Task<bool> Forbidden;
         public DefaultSchemaFilter() { }
+        public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.Directive directive, GraphQL.Types.QueryArgument argument) { }
         public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument) { }
         public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.Directive directive) { }
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
@@ -1362,6 +1363,7 @@ namespace GraphQL.Introspection
     }
     public interface ISchemaFilter
     {
+        System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.Directive directive, GraphQL.Types.QueryArgument argument);
         System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument);
         System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.Directive directive);
         System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue);
@@ -2152,10 +2154,6 @@ namespace GraphQL.Types
         public GraphQL.Types.QueryArgument? Find(GraphQLParser.ROM name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
-    public class RequiresDirective : GraphQL.Types.Directive
-    {
-        public RequiresDirective() { }
-    }
     public class ResolvedInterfaces : System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType>, System.Collections.IEnumerable
     {
         public ResolvedInterfaces() { }
@@ -2808,6 +2806,10 @@ namespace GraphQL.Utilities.Federation
     public class ProvidesDirective : GraphQL.Types.Directive
     {
         public ProvidesDirective() { }
+    }
+    public class RequiresDirective : GraphQL.Types.Directive
+    {
+        public RequiresDirective() { }
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {

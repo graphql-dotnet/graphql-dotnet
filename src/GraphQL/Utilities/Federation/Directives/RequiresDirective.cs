@@ -1,7 +1,7 @@
-using GraphQL.Utilities.Federation;
+using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Utilities.Federation
 {
     /// <summary>
     /// The @requires directive is used to annotate the required input fieldset from a base type for a resolver.

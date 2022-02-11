@@ -43,7 +43,7 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 directives
-                    .Where(x => IsFederatedDirective((string)x.Name)) //TODO:alloc
+                    .Where(x => IsFederatedDirective(x.Name))
                     .Select(PrintAstDirective)
             );
 
