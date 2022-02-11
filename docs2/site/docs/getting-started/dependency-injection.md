@@ -45,14 +45,14 @@ How you integrate this into your system will depend on the dependency injection 
 ## Dependency Injection Registration Helpers
 
 GraphQL.NET provides an `IGraphQLBuilder` interface which encapsulates the configuration methods of a dependency injection framework, to provide an
-abstract method of configuring a dependency injection framework to work with GraphQL.NET. This interface is returned from a DI-provider-specific
-setup method (typically called `AddGraphQL()`), at which point you can call extension methods on the interface to configure this library. A simple
-example is below:
+abstract method of configuring a dependency injection framework to work with GraphQL.NET. This interface is provided through a configuration delegate
+from a DI-provider-specific setup method (typically called `AddGraphQL()`), at which point you can call extension methods on the interface to
+configure this library. A simple example is below:
 
 ```csharp
-services.AddGraphQL()
+services.AddGraphQL(builder => builder
     .AddSystemTextJson()
-    .AddSchema<MySchema>();
+    .AddSchema<MySchema>());
 ```
 
 The interface also allows configuration of the schema during initialization, and configuration of the execution at runtime. In this manner, adding
@@ -61,12 +61,13 @@ configuration.
 
 The `AddGraphQL()` method will register default implementations of the following services within the dependency injection framework:
 
-* `IDocumentExecuter` - which does not support subscriptions
+* `IDocumentExecuter`
 * `IDocumentBuilder`
 * `IDocumentValidator`
 * `IComplexityAnalyzer` - which is not used unless configured within `ExecutionOptions`
 * `IErrorInfoProvider`
 * `IDocumentCache` - an implemenation which does not cache documents
+* `IExecutionStrategySelector` - which does not support subscriptions by default
 
 A list of the available extension methods is below:
 
@@ -79,25 +80,33 @@ A list of the available extension methods is below:
 | `AddDocumentExecuter<>` | Registers the specified document executer; useful when needed to change the execution strategy utilized | |
 | `AddDocumentListener<>` | Registers the specified document listener and configures execution to use it | |
 | `AddErrorInfoProvider`  | Registers a custom error info provider or configures the default error info provider | |
+| `AddExecutionStrategy`  | Registers an `ExecutionStrategyRegistration` for the selected execution strategy and operation type | |
+| `AddExecutionStrategySelector` | Registers the specified execution strategy selector | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `AddMetrics`            | Registers and enables metrics depending on the supplied arguments | |
 | `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
-| `AddNewtonsoftJson`     | Registers the document writer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
+| `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
-| `AddSubscriptionDocumentExecuter` | Registers the document executer that has subscription support | GraphQL.SystemReactive | |
-| `AddSystemTextJson`     | Registers the document writer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
+| `AddSubscriptionExecutionStrategy` | Registers an `ExecutionStrategyRegistration` for subscription support | GraphQL.SystemReactive | |
+| `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
-| `Register`              | Used by extension methods to register services within the DI framework | |
-| `TryRegister`           | Used by extension methods to register services within the DI framework when they have not already been registered | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
+
+Custom `IGraphQLBuilder` extension methods typically rely on the `Services` property of the builder in order to register services
+with the underlying dependency injection framework. The `Services` property returns a `IServiceRegister` interface which has these methods:
+
+| Method         | Description |
+|----------------|-------------|
+| `Register`     | Registers a service within the DI framework replacing existing registration if needed |
+| `TryRegister`  | Registers a service within the DI framework if it has not already been registered |
 
 To use the `AddGraphQL` method, you will need to install the proper nuget package for your DI provider. See list below:
 
@@ -161,10 +170,9 @@ Note that if any of the graph types directly or indirectly implement `IDisposabl
 injection provider, or their `Dispose` methods will not be called. Any dependencies of graph types that implement
 `IDisposable` will be disposed of properly, regardless of whether the graph type is registered within the service provider.
 
-You can also use the `services.AddGraphTypes()` extension method from the [server](https://github.com/graphql-dotnet/server)
-project to scan the calling assembly for classes that implement `IGraphType` and register them all as singletons
-within the service provider. Mark your class with `DoNotRegisterAttribute` if you want to skip registration.
-For additional options and overloads of this method, see [GraphQLBuilderCoreExtensions.cs](https://github.com/graphql-dotnet/server/blob/master/src/Core/Extensions/GraphQLBuilderCoreExtensions.cs).
+You can also use the `.AddGraphTypes()` builder method to scan the calling or specified assembly for classes that implement
+`IGraphType` and register them all as transients within the service provider. Mark your class with `DoNotRegisterAttribute` if you
+want to skip registration.
 
 ## Nancy TinyIoCContainer
 
