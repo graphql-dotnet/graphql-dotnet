@@ -86,7 +86,7 @@ namespace GraphQL.Tests.Bugs
                     arguments: new QueryArguments(
                         new QueryArgument<NonNullGraphType<IntGraphType>>() { Name = "id" },
                         new QueryArgument<NonNullGraphType<StringGraphType>>() { Name = "name" }),
-                    resolve: context => new SampleSource() { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
+                    resolve: context => new SampleSource { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
             }
         }
 
