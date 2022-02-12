@@ -270,7 +270,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void TestBasicClassNoExtraFields()
         {
-            var graphType = new AutoRegisteringObjectGraphType<TestBasicClass>();
+            var graphType = new AutoRegisteringInputObjectGraphType<TestBasicClass>();
             graphType.Fields.Find("Id").ShouldNotBeNull();
             graphType.Fields.Find("Name").ShouldNotBeNull();
             graphType.Fields.Count.ShouldBe(2);
@@ -279,7 +279,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void TestBasicRecordNoExtraFields()
         {
-            var graphType = new AutoRegisteringObjectGraphType<TestBasicRecord>();
+            var graphType = new AutoRegisteringInputObjectGraphType<TestBasicRecord>();
             graphType.Fields.Find("Id").ShouldNotBeNull();
             graphType.Fields.Find("Name").ShouldNotBeNull();
             graphType.Fields.Count.ShouldBe(2);
