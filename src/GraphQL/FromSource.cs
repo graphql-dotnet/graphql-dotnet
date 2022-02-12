@@ -2,9 +2,13 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Specifies that the method argument should be pulled from <see cref="IResolveFieldContext.Source"/>,
+    /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public class FromSourceAttribute : GraphQLAttribute
     {
+        /// <inheritdoc/>
         public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
         {
             if (!argumentInformation.ParameterInfo.ParameterType.IsAssignableFrom(argumentInformation.SourceType))
