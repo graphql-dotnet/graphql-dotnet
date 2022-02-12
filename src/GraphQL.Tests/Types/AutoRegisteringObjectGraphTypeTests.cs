@@ -381,9 +381,12 @@ namespace GraphQL.Tests.Types
         {
             var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
             var context = new ResolveFieldContext();
-            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context));
-            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context));
-            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context));
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
         }
 
         [Fact]
