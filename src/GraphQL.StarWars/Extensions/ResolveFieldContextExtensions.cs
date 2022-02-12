@@ -57,7 +57,7 @@ public static class ResolveFieldContextExtensions
             PageInfo = new PageInfo
             {
                 EndCursor = endCursor,
-                HasNextPage = endCursor == null ? false : cursor != endCursor,
+                HasNextPage = endCursor != null && cursor != endCursor,
             }
         };
     }

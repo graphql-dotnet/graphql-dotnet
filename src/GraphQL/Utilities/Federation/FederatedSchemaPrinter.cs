@@ -66,10 +66,6 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            // Do not return an empty query type: "Query { }" as it is not valid as part of the sdl.
-            if (type != null && string.Equals(type.Name, "Query", StringComparison.Ordinal) && !type.Fields.Any(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name)))
-                return string.Empty;
-
             var isExtension = type!.IsExtensionType();
 
             var interfaces = type!.ResolvedInterfaces.List.Select(x => x.Name).ToList();
@@ -82,7 +78,10 @@ namespace GraphQL.Utilities.Federation
 
             var extended = isExtension ? "extend " : "";
 
-            return FormatDescription(type.Description) + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
+            if (type.Fields.Any(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name)))
+                return FormatDescription(type.Description) + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
+            else
+                return FormatDescription(type.Description) + "{0}type {1}{2}{3}".ToFormat(extended, type.Name, implementedInterfaces, federatedDirectives);
         }
 
         public override string PrintInterface(IInterfaceGraphType type)

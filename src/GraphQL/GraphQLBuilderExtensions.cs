@@ -174,7 +174,16 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, TSchema schema)
             where TSchema : class, ISchema
-            => schema == null ? throw new ArgumentNullException(nameof(schema)) : AddSchema(builder, _ => schema, ServiceLifetime.Singleton);
+        {
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            // Register the service with the DI provider as TSchema, overwriting any existing registration
+            // Also register the service as ISchema if not already registered.
+            builder.TryRegisterAsBoth<ISchema, TSchema>(schema);
+
+            return builder;
+        }
 
         /// <inheritdoc cref="AddSchema{TSchema}(IGraphQLBuilder, ServiceLifetime)"/>
         public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchema> schemaFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
