@@ -158,38 +158,7 @@ namespace GraphQL.Types
         protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
             => _sourceExpression;
 
-        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = BuildSourceExpression();
-        private static Expression<Func<IResolveFieldContext, TSourceType>> BuildSourceExpression()
-        {
-            // determine if there is an empty constructor for TSourceType
-            var defaultConstructor = typeof(TSourceType).GetConstructor(Array.Empty<Type>());
-            // if not, just cast context.Source
-            if (defaultConstructor == null)
-            {
-                return context => (TSourceType)context.Source!;
-            }
-            // if so, return context => (TSourceType)context.Source ?? new TSourceType();
-            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-            var sourceVariable = Expression.Variable(typeof(TSourceType), "source");
-            var resolveFieldContextSourceParameter = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
-            var sourceExpression = Expression.MakeMemberAccess(param, resolveFieldContextSourceParameter);
-            var setVariable = Expression.Assign(
-                sourceVariable,
-                Expression.Convert(
-                    sourceExpression,
-                    typeof(TSourceType)));
-            var body = Expression.Condition(
-                Expression.Equal(sourceVariable, Expression.Constant(null, typeof(object))),
-                Expression.New(defaultConstructor),
-                sourceVariable);
-            var block = Expression.Block(
-                typeof(TSourceType),
-                new ParameterExpression[] { sourceVariable },
-                setVariable,
-                body);
-            var lambda = Expression.Lambda(block, param);
-            return (Expression<Func<IResolveFieldContext, TSourceType>>)lambda;
-        }
+        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = context => (TSourceType)context.Source!;
 
         private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
         private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
@@ -233,9 +202,9 @@ namespace GraphQL.Types
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         {
             var props = AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead),
+                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static).Where(x => x.CanRead),
                 _excludedProperties);
-            var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 .Where(x =>
                     !x.ContainsGenericParameters &&               // exclude methods with open generics
                     !x.IsSpecialName &&                           // exclude methods generated for properties
