@@ -162,7 +162,7 @@ namespace GraphQL.Types
             => _sourceExpression;
 
         private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-            = context => (TSourceType)context.Source! ?? ThrowSourceNullException();
+            = context => (TSourceType?)context.Source ?? ThrowSourceNullException();
 
         private static TSourceType ThrowSourceNullException()
         {
