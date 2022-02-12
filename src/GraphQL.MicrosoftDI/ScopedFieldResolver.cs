@@ -20,10 +20,8 @@ namespace GraphQL.MicrosoftDI
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
             };
         }
     }
@@ -34,16 +32,14 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver) : base(GetScopedResolver(resolver)) { }
+        public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, TReturnType> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        private static Func<IResolveFieldContext, TReturnType?> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             return context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
             };
         }
     }

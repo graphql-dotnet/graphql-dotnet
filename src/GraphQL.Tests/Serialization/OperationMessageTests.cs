@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Serialization
         {
             var message = new OperationMessage();
             var actual = serializer.Serialize(message);
-            var expected = @"{""type"":null}";
+            var expected = @"{}";
             actual.ShouldBeCrossPlatJson(expected);
         }
     }

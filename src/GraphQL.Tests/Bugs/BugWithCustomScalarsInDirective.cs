@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class LinkDirective : DirectiveGraphType
+    public class LinkDirective : Directive
     {
         public LinkDirective() : base("link", DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface)
         {
@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class SomeDirective : DirectiveGraphType
+    public class SomeDirective : Directive
     {
         public SomeDirective() : base("some", DirectiveLocation.Scalar)
         {

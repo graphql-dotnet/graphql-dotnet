@@ -8,6 +8,7 @@ using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -249,7 +250,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
             => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
 
@@ -257,7 +258,7 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
             => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
 
@@ -271,7 +272,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -284,7 +285,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -300,7 +301,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -313,7 +314,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -329,7 +330,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -342,7 +343,7 @@ namespace GraphQL
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -950,6 +951,102 @@ namespace GraphQL
                     options.EnableMetrics = true;
                 }
             });
+            return builder;
+        }
+        #endregion
+
+        #region - AddExecutionStrategySelector -
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            builder.Services.Register<IExecutionStrategySelector, TExecutionStrategySelector>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <paramref name="executionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            if (executionStrategySelector == null)
+                throw new ArgumentNullException(nameof(executionStrategySelector));
+
+            builder.Services.Register<IExecutionStrategySelector>(executionStrategySelector);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>, using the supplied factory delegate.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder, Func<IServiceProvider, TExecutionStrategySelector> executionStrategySelectorFactory)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            builder.Services.Register<IExecutionStrategySelector>(executionStrategySelectorFactory ?? throw new ArgumentNullException(nameof(executionStrategySelectorFactory)), ServiceLifetime.Singleton);
+            return builder;
+        }
+        #endregion
+
+        #region - AddExecutionStrategy -
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategy"/> with the dependency injection framework as
+        /// a singleton, and registers an <see cref="ExecutionStrategyRegistration"/> for this <typeparamref name="TExecutionStrategy"/>
+        /// configured for the selected <paramref name="operationType"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            builder.Services.Register<TExecutionStrategy>(ServiceLifetime.Singleton);
+            builder.Services.Register(
+                provider => new ExecutionStrategyRegistration(
+                    provider.GetRequiredService<TExecutionStrategy>(),
+                    operationType),
+                ServiceLifetime.Singleton);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a <see cref="ExecutionStrategyRegistration"/> with the dependency injection framework
+        /// for the specified <paramref name="executionStrategy"/> and <paramref name="operationType"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, TExecutionStrategy executionStrategy, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            if (executionStrategy == null)
+                throw new ArgumentNullException(nameof(executionStrategy));
+
+            builder.Services.Register(
+                new ExecutionStrategyRegistration(
+                    executionStrategy,
+                    operationType));
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an <see cref="ExecutionStrategyRegistration"/> with the dependency injection framework
+        /// as a singleton for the specified <typeparamref name="TExecutionStrategy"/> and <paramref name="operationType"/>,
+        /// using the supplied factory delegate.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, Func<IServiceProvider, TExecutionStrategy> executionStrategyFactory, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            if (executionStrategyFactory == null)
+                throw new ArgumentNullException(nameof(executionStrategyFactory));
+
+            builder.Services.Register(
+                provider => new ExecutionStrategyRegistration(
+                    executionStrategyFactory(provider),
+                    operationType),
+                ServiceLifetime.Singleton);
+
             return builder;
         }
         #endregion

@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Rules
                 return;
             }
 
-            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<ROM>();
+            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new();
 
             if (!frequency.Add(op.Name))
             {

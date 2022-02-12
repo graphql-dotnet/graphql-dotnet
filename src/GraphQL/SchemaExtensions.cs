@@ -319,7 +319,7 @@ namespace GraphQL
                 }
             }
 
-            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => Replace(argument);
+            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => Replace(argument);
 
             public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
 

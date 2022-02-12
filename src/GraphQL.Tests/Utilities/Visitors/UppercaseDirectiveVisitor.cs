@@ -5,7 +5,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Utilities.Visitors
 {
-    public class UpperDirective : DirectiveGraphType
+    public class UpperDirective : Directive
     {
         public UpperDirective()
             : base("upper", DirectiveLocation.FieldDefinition)

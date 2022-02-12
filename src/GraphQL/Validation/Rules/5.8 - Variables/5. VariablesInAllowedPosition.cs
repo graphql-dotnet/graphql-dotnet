@@ -1,6 +1,5 @@
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
@@ -23,7 +22,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<GraphQLVariableDefinition>(
                 (varDefAst, context) =>
                 {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<ROM, GraphQLVariableDefinition>();
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new();
                     varDefMap[varDefAst.Variable.Name] = varDefAst;
                 }
             ),

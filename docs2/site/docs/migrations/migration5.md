@@ -137,7 +137,7 @@ Custom attributes can also be added to perform the following behavior changes:
 - Override detected nullability or list nullability state
 - Override chosen underlying graph type
 
-#### Method support for `AutoRegisteringObjectGraphType<T>` instances
+#### Method and argument support for `AutoRegisteringObjectGraphType<T>` instances
 
 Methods will be detected and added to fields on the graph. Asynchronous methods
 and data loader methods are supported such as shown in the below example:
@@ -150,6 +150,63 @@ and data loader methods are supported such as shown in the below example:
 The above example assumes that the `Person` CLR type was mapped to `PersonGraphType`
 in the schema CLR type mappings.
 
+Arguments are also added as query arguments to the field, and recognize default values
+and other attributes set on the parameter. Certain argument types are recognized and
+treated special; special fields do not add a query argument to the field:
+
+| Argument type                     | Value passed to the method   |
+|-----------------------------------|------------------------------|
+| `IResolveFieldContext`            | The field resolver's context; useful in advanced scenarios |
+| `CancellationToken`               | The cancellation token from the resolve context |
+| Any, tagged with `[FromServices]` | Pulls the service of the argument type from the `RequestServices` property of the resolve context |
+
+Also note:
+- Asynchronous methods that end in `Async` have the "Async" suffix removed from the default field name.
+- Methods tagged with `[Scoped]` (when using `GraphQL.MicrosoftDI`) create a service scope for the field resolver's execution.
+
+This allows for code such as the following:
+
+```csharp
+[Name("Person")]
+public class Human
+{
+    [Id]
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+
+    [Name("Orders")]
+    [Scoped]
+    public async Task<IEnumerable<Order>> GetOrdersAsync(
+        [FromServices] MyDbContext db,
+        CancellationToken token,
+        [Name("Sort")] SortOrder sortOrder = SortOrder.Date)
+    {
+        var query = db.Orders.Where(x => x.HumanId == Id);
+
+        if (sortOrder == SortOrder.Date)
+            query = query.OrderByDesc(x => x.OrderDate);
+
+        return query.ToListAsync(token);
+    }
+}
+
+public enum SortOrder
+{
+    Date
+}
+```
+
+The above code would generate a GraphQL schema like this:
+
+```graphql
+type Person {
+  id: ID!
+  name: String!
+  orders(sort: SortOrder! = DATE): [Order!]!
+}
+```
+
 #### CLR field support
 
 CLR fields are not automatically added to graph types, but can be added by overriding
@@ -159,8 +216,7 @@ the `GetRegisteredMembers` method of a `AutoRegisteringObjectGraphType<T>` or
 #### Overridable base functionality
 
 The classes can be overridden, providing the ability to customize behavior of automatically
-generated graph types. For instance, to exclude properties marked with a custom attribute
-called `[InternalUse]` you could write this:
+generated graph types. For instance, to exclude properties of a certain type, you could write this:
 
 ```csharp
 private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
@@ -170,7 +226,7 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
         var props = GetRegisteredProperties();
         foreach (var prop in props)
         {
-            if (prop.IsDefined(typeof(InternalUseAttribute)))
+            if (prop.PropertyType != typeof(MyType))
                 yield return CreateField(prop);
         }
     }
@@ -179,6 +235,9 @@ private class CustomAutoObjectType<T> : AutoRegisteringObjectGraphType<T>
 
 Similarly, by overriding `CreateField` you can change the default name, description,
 graph type, or other information applied to each generated field.
+
+Most of these changes can be performed declaratively by attributes, but by creating a derived class you can
+change default behavior imperatively without needing to add attributes to all of your data models.
 
 These `protected` methods can be overridden to provide the following customizations to
 automatically-generated graph types:
@@ -190,6 +249,8 @@ automatically-generated graph types:
 | GetRegisteredMembers | Returns the set of properties, methods and fields to be automatically configured | Filtering internal properties; sorting the property list; including fields; excluding methods |
 | ProvideFields    | Returns a set of generated fields                                    | Adding additional fields to the generated set |
 | CreateField      | Creates a `FieldType` from a `MemberInfo`                            | Applying custom behavior to field generation |
+| GetTypeInformation | Parses a CLR type and NRT annotations to return a graph type       | Use a specific graph type for a certain CLR type |
+| GetArgumentInformation | Parses a method argument to return a query argument or expression | Return an expression for specific types, such as a user context |
 
 Note that if you override `GetRegisteredMembers` to include private properties or fields for
 an input graph, you may also need to override `ParseDictionary` as well.
@@ -204,25 +265,29 @@ services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAut
 Then any graph type defined as `AutoRegisteringObjectGraphType<...>` will use your custom
 type instead.
 
-#### Graphs and fields recognize attributes to control initialization behavior
+#### Graphs, fields and arguments recognize attributes to control initialization behavior
 
 Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
-CLR class or one if its properties and is configured for the graph or field type. New attributes have been
-updated or added for convenience as follows:
+CLR class or one if its properties, fields, methods or method arguments and is configured for the graph,
+field type or query argument. New attributes have been updated or added for convenience as follows:
 
 | Attribute            | Description        |
 |----------------------|--------------------|
-| `[Name]`             | Specifies a GraphQL name for a CLR class or property |
-| `[InputName]`        | Specifies a GraphQL name for an input CLR class or property |
-| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or property |
-| `[InputType]`        | Specifies a graph type for a field on an input model |
+| `[Name]`             | Specifies a GraphQL name for a CLR class, member or method parameter |
+| `[InputName]`        | Specifies a GraphQL name for an input CLR class, member or method parameter |
+| `[OutputName]`       | Specifies a GraphQL name for an output CLR class or member |
+| `[InputType]`        | Specifies a graph type for a field on an input model, or for a query argument |
 | `[OutputType]`       | Specifies a graph type for a field on an output model |
-| `[Ignore]`           | Indicates that a CLR property should not be mapped to a field |
-| `[Metadata]`         | Specifies custom metadata to be added to the graph type or field |
+| `[Ignore]`           | Indicates that a CLR member should not be mapped to a field |
+| `[Metadata]`         | Specifies custom metadata to be added to the graph type, field or query argument |
+| `[Scoped]`           | For methods, specifies to create a DI service scope during resolver execution |
+| `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
 | `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
-Custom attributes can be easily added to control any other initialization of graphs or fields.
+Note: `[Scoped]` is provided through the GraphQL.MicrosoftDI NuGet package.
+
+Custom attributes can be easily added to control any other initialization of graphs, fields or query arguments.
 
 ### 7. More strict behavior of FloatGraphType for special values
 
@@ -264,6 +329,91 @@ descriptions or deprecation reasons to enum graph types or enum values.
 
 You can also derive from `GraphQLAttribute` to create your own attributes to modify
 enum graph types or enum values as they are being built by `EnumerationGraphType<T>`.
+
+### 11. Ability to get directives and their arguments values
+
+Now you may get directives along with their arguments that have been provided in the GraphQL query request.
+New APIs are similar to ones used for field arguments:
+
+```csharp
+Field<StringGraphType>("myField", resolve: context =>
+{
+    var dir = ctx.GetDirective("myDirective");
+    var arg = dir.GetArgument<string>("arg");
+    ...
+});
+```
+
+### 12. The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
+
+Previously, in order to change the execution strategy for a specific operation -- for instance,
+using a serial execution strategy for 'query' operation types -- required creating a custom
+document executer and overriding the `SelectExecutionStrategy` method.
+
+Now, for DI configurations, you can call the `.AddExecutionStrategy<T>(OperationType)` method to
+provide this configuration without overriding the method. See below for an example.
+
+```csharp
+// === GraphQL.NET v4 ===
+public class SerialDocumentExecuter : DocumentExecuter
+{
+    public SerialDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
+        : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations)
+    {
+    }
+
+    protected override IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
+    {
+        return context.Operation.Operation switch
+        {
+            OperationType.Query => SerialExecutionStrategy.Instance,
+            _ => base.SelectExecutionStrategy(context)
+        };
+    }
+}
+
+// within Startup.cs
+services.AddGraphQL()
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>()
+    .AddDocumentExecuter<SerialDocumentExecuter>();
+
+
+// === GraphQL.NET v5 ===
+
+// within Startup.cs
+services.AddGraphQL(builder => builder
+    .AddSystemTextJson()
+    .AddSchema<StarWarsSchema>()
+    .AddExecutionStrategy<SerialExecutionStrategy>(OperationType.Query));
+```
+
+You can also register your own implementation of `IExecutionStrategySelector` which can inspect the
+`ExecutionContext` to make additional decisions before selecting an execution strategy.
+
+```csharp
+public class MyExecutionStrategySelector : IExecutionStrategySelector
+{
+    public virtual IExecutionStrategy Select(ExecutionContext context)
+    {
+        return context.Operation.Operation switch
+        {
+            OperationType.Query => ParallelExecutionStrategy.Instance,
+            OperationType.Mutation => SerialExecutionStrategy.Instance,
+            OperationType.Subscription => throw new NotSupportedException(),
+            _ => throw new InvalidOperationException()
+        };
+    }
+}
+
+// within Startup.cs
+servcies.AddGraphQL(builder => builder
+    // other configuration here
+    .AddExecutionStrategySelector<MyExecutionStrategySelector>());
+```
+
+The `DocumentExecuter.SelectExecutionStrategy` method is still available to be overridden for
+backwards compatibility but may be removed in the next major version.
 
 ## Breaking Changes
 
@@ -320,20 +470,24 @@ services.AddGraphQL(builder => builder
 
 ### 8. `GraphQLBuilderBase.Initialize` was renamed to `RegisterDefaultServices`
 
-### 9. `schema`, `variableDefinitions` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
+### 9. `ExecutionHelper.GetArgumentValues` was renamed to `GetArguments`
+
+### 10. `DirectiveGraphType` was renamed to `Directive`
+
+### 11. `schema`, `variableDefinitions` and `variables` arguments were removed from `ValidationContext.GetVariableValues`
 
 Use `ValidationContext.Schema`, `ValidationContext.Operation.Variables` and `ValidationContext.Variables` properties
 
-### 10. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
+### 12. `ValidationContext.OperationName` was changed to `ValidationContext.Operation`
 
-### 11. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
+### 13. All arguments from `IDocumentValidator.ValidateAsync` were wrapped into `ValidationOptions` struct
 
-### 12. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
+### 14. All methods from `IGraphQLBuilder` were moved into `IServiceRegister` interface
 
 Use `IGraphQLBuilder.Services` property if you need to register services into DI container.
 If you use provided extension methods upon `IGraphQLBuilder` then your code does not require any changes.
 
-### 13. Changes caused by GraphQL-Parser v8
+### 15. Changes caused by GraphQL-Parser v8
 
 - The `GraphQL.Language.AST` namespace and all classes from it have been removed in favor of ones
   from `GraphQLParser.AST` namespace in GraphQL-Parser project. Examples of changed usages:
@@ -363,7 +517,7 @@ If you use provided extension methods upon `IGraphQLBuilder` then your code does
 - All scalars works with `GraphQLParser.AST.GraphQLValue` instead of `GraphQL.Language.AST.IValue`
 - `IInputObjectGraphType.ToAST` returns `GraphQLParser.AST.GraphQLObjectValue` instead of `GraphQL.Language.AST.IValue`
 
-### 14. Classes and members marked as obsolete have been removed
+### 16. Classes and members marked as obsolete have been removed
 
 The following classes and members that were marked with `[Obsolete]` in v4 have been removed:
 
@@ -386,13 +540,13 @@ read-only instead of read-write, such as `Field.Alias`.
 Various classes' constructors in the `GraphQL.Language.AST` namespace have been
 removed in favor of other constructors.
 
-### 15. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
+### 17. `IDocumentWriter` has been renamed to `IGraphQLSerializer` and related changes.
 
 As such, the `DocumentWriter` classes have been renamed to `GraphQLSerializer`, and the
 `AddDocumentWriter` extension method for `IGraphQLBuilder` has been renamed to `AddSerializer`.
 The `WriteAsync` method's functionality has not changed.
 
-### 16. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
+### 18. Extension methods for parsing variables (e.g. `ToInputs`) have been removed.
 
 Please use the `Read<Inputs>()` method of an `IGraphQLSerializer` implementation, or the
 `Deserialize<Inputs>()` method of an `IGraphQLTextSerializer` implementation. Note that
@@ -423,7 +577,10 @@ public static class StringExtensions
 }
 ```
 
-### 17. The `WriteToStringAsync` extension methods have been removed.
+The new `Read` and `Deserialize` methods of the `Newtonsoft.Json` implementation
+will default to reading dates as strings unless configured otherwise in the settings.
+
+### 19. The `WriteToStringAsync` extension methods have been removed.
 
 Please use the `Serialize()` method of an `IGraphQLTextSerializer` implementation.
 The asynchronous text serialization methods have been removed as the underlying serialization
@@ -433,12 +590,12 @@ The `WriteAsync()` method can be used to asynchronously serialize to a stream. H
 the `Newtonsoft.Json` serializer does not support asynchronous serialization, so synchronous
 calls are made to the underlying stream. Only `System.Text.Json` supports asynchronous writing.
 
-### 18. Other changes to the serialization infrastructure
+### 20. Other changes to the serialization infrastructure
 
 - `InputsConverter` renamed to `InputsJsonConverter`
 - `ExecutionResultContractResolver` renamed to `GraphQLContractResolver`
 
-### 19. `GraphQLMetadataAttribute` cannot be applied to graph type classes
+### 21. `GraphQLMetadataAttribute` cannot be applied to graph type classes
 
 The `[GraphQLMetadata]` attribute is designed to be used for schema-first configurations
 and has not changed in this regard. For code-first graph definitions, please set the
@@ -456,7 +613,7 @@ public class HumanType : ObjectGraphType<Human>
 }
 ```
 
-### 20. `AstPrinter` class was removed
+### 22. `AstPrinter` class was removed
 
 `AstPrinter` class was removed in favor of `SDLPrinter` from GraphQL-Parser project.
 
@@ -481,13 +638,13 @@ string s = writer.ToString();
 into provided `TextWriter`. In the majority of cases it does not allocate memory in
 the managed heap at all.
 
-### 21. Possible breaking changes in `InputObjectGraphType<TSourceType>`
+### 23. Possible breaking changes in `InputObjectGraphType<TSourceType>`
 
 `InputObjectGraphType<TSourceType>.ToAST` and `InputObjectGraphType<TSourceType>.IsValidDefault`
 methods were changed in such a way that now you may be required to also override `ToAST` if you override
 `ParseDictionary`. Changes in those methods are made for earlier error detection and schema printing.
 
-### 22. `AutoRegisteringObjectGraphType` changes
+### 24. `AutoRegisteringObjectGraphType` changes
 
 The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
 and now supports properties, methods and fields, although fields are not included
@@ -511,22 +668,50 @@ Register this class within your DI engine like this:
 services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
 ```
 
-### 23. `AutoRegisteringInputObjectGraphType` changes
+### 25. `AutoRegisteringInputObjectGraphType` changes
 
 The protected method `GetRegisteredProperties` has been renamed to `GetRegisteredMembers`
 and now supports returning both properties and fields, although fields are not included
 with the default implementation. Override the method in a derived class to include fields.
 
-### 24. `EnumerationGraphType` parses exact names
+### 26. `EnumerationGraphType` parses exact names
 
 Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationGraphType`.
 In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
 and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
 
-### 25. `EnumerationGraphType.AddValue` changes
+### 27. `EnumerationGraphType.AddValue` changes
 
 `description` argument from `EnumerationGraphType.AddValue` method was marked as optional
 and moved after `value` argument. If you use this method and set descriptions, you will need
 to change the order of arguments. Since changing the order of arguments in some cases can remain
 invisible to the caller and lead to hardly detected bugs, the method name has been changed from
 `AddValue` to `Add`.
+
+### 28. The settings class provided to `GraphQL.NewtonsoftJson.GraphQLSerializer` has changed.
+
+Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`. Now the class
+is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
+but sets the default date parsing behavior set to 'none'.
+
+### 29. `SubscriptionDocumentExecuter` and `.AddSubscriptionDocumentExecuter()` have been deprecated.
+
+While these can continue to be used for the lifetime of v5, it is now suggested to use the
+`.AddSubscriptionExecutionStrategy()` builder method instead:
+
+```csharp
+// v4
+services.AddGraphQL()
+   .AddSchema<StarWarsSchema>()
+   .AddSubscriptionDocumentExecuter();
+
+// v5
+services.AddGraphQL(builder => builder
+   .AddSchema<StarWarsSchema>()
+   .AddSubscriptionExecutionStrategy());
+```
+
+For more details on the new approach to execution strategy selection, please review the new feature above titled:
+
+> The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
+

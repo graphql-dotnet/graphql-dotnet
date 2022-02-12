@@ -130,7 +130,7 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
-        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
@@ -192,7 +192,7 @@ namespace GraphQL.Builders
                 Name = name,
             };
             configure?.Invoke(arg);
-            FieldType.Arguments ??= new QueryArguments();
+            FieldType.Arguments ??= new();
             FieldType.Arguments.Add(arg);
             return this;
         }

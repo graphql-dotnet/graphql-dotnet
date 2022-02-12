@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
@@ -9,16 +10,43 @@ namespace GraphQL.Execution
     /// </summary>
     public static class ExecutionHelper
     {
+        private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+
         /// <summary>
-        /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
-        /// or variables as specified by the document.
+        /// Returns a dictionary of directives with their arguments values for a field.
+        /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArgumentValues(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
+        {
+            if (field.Directives == null || field.Directives.Count == 0)
+                return null;
+
+            Dictionary<string, DirectiveInfo>? directives = null;
+
+            foreach (var dir in field.Directives.Items)
+            {
+                var dirDefinition = schema.Directives.Find(dir.Name);
+
+                // KnownDirectivesInAllowedLocations validation rule should handle unknown directives, so
+                // if someone purposely removed the validation rule, it would ignore unknown directives
+                // while executing the request
+                if (dirDefinition == null)
+                    continue;
+
+                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArguments(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
+            }
+
+            return directives;
+        }
+
+        /// <summary>
+        /// Returns a dictionary of arguments and their values for a field or directive.
+        /// Values will be retrieved from literals or variables as specified by the document.
+        /// </summary>
+        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
-            {
                 return null;
-            }
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 

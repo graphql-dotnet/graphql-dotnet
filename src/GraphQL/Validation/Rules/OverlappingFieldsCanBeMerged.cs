@@ -145,7 +145,7 @@ namespace GraphQL.Validation.Rules
 
                             if (conflict != null)
                             {
-                                (conflicts ??= new List<Conflict>()).Add(conflict);
+                                (conflicts ??= new()).Add(conflict);
                             }
                         }
                     }
@@ -562,7 +562,7 @@ namespace GraphQL.Validation.Rules
 
                             if (conflict != null)
                             {
-                                (conflicts ??= new List<Conflict>()).Add(conflict);
+                                (conflicts ??= new()).Add(conflict);
                             }
                         }
                     }

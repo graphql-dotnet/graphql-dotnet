@@ -11,7 +11,6 @@ namespace GraphQL.Types
     /// Also it can get descriptions for fields from the XML comments.
     /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
     /// </summary>
-    /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
@@ -30,7 +29,6 @@ namespace GraphQL.Types
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();
-            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
@@ -38,10 +36,13 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Applies default configuration settings to this graph type prior to applying <see cref="GraphQLAttribute"/> attributes.
-        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to this class.
+        /// Applies default configuration settings to this graph type along with any <see cref="GraphQLAttribute"/> attributes marked on <typeparamref name="TSourceType"/>.
+        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to <typeparamref name="TSourceType"/>.
         /// </summary>
-        protected virtual void ConfigureGraph() { }
+        protected virtual void ConfigureGraph()
+        {
+            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
+        }
 
         /// <summary>
         /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
@@ -74,7 +75,9 @@ namespace GraphQL.Types
         {
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            return AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
+            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, true);
+            return fieldType;
         }
 
         /// <summary>

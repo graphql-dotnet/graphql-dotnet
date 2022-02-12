@@ -34,6 +34,7 @@ namespace GraphQL.Tests.DI
             mock.Setup(b => b.TryRegister(typeof(IComplexityAnalyzer), typeof(ComplexityAnalyzer), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();
+            mock.Setup(b => b.TryRegister(typeof(IExecutionStrategySelector), typeof(DefaultExecutionStrategySelector), ServiceLifetime.Singleton)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder.ServiceRegister).Verifiable();
             mock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<IConfigureExecutionOptions>(), false)).Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
             {

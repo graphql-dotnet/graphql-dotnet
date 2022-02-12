@@ -93,7 +93,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             PreConfigure(schema);
 
-            var directives = new List<DirectiveGraphType>();
+            var directives = new List<Directive>();
 
             foreach (var def in document.Definitions)
             {
@@ -511,9 +511,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
-        protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
+        protected virtual Directive ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var result = new DirectiveGraphType(directiveDef.Name.StringValue) //ISSUE:allocation
+            var result = new Directive(directiveDef.Name.StringValue) //ISSUE:allocation
             {
                 Description = directiveDef.Description?.Value.ToString() ?? directiveDef.MergeComments(),
                 Repeatable = directiveDef.Repeatable,

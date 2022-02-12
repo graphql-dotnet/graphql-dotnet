@@ -48,6 +48,7 @@ namespace GraphQL.DI
             Services.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
+            Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
 
             // configure relay graph types
             Services.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);

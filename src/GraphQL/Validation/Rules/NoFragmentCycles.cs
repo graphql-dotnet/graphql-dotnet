@@ -22,9 +22,9 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
         {
-            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<ROM>();
-            var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<GraphQLFragmentSpread>();
-            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<ROM, int>();
+            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new();
+            var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new();
+            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new();
             if (!visitedFrags.Contains(node.FragmentName.Name))
             {
                 detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);

@@ -11,12 +11,14 @@ namespace GraphQL.Execution
 }
 namespace GraphQL
 {
+    [System.Obsolete("Please use the AddSubscriptionExecutionStrategy() builder method.")]
     public class SubscriptionDocumentExecuter : GraphQL.DocumentExecuter
     {
         public SubscriptionDocumentExecuter() { }
         public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
         public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
+        public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
         protected override GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
 }
@@ -24,6 +26,8 @@ namespace GraphQL.SystemReactive
 {
     public static class GraphQLBuilderExtensions
     {
+        [System.Obsolete("Please use AddSubscriptionExecutionStrategy()")]
         public static GraphQL.DI.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
 }

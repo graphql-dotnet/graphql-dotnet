@@ -90,6 +90,16 @@ namespace GraphQL.Tests.Serialization
             Verify(variables);
         }
 
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void InputsDecodesDatesAsStrings(IGraphQLTextSerializer serializer)
+        {
+            var date = new DateTimeOffset(2022, 2, 6, 12, 26, 53, TimeSpan.FromHours(-5));
+            var dateStr = date.ToString("O");
+            var actual = serializer.Deserialize<Inputs>($"{{\"date\":\"{dateStr}\"}}");
+            actual.ShouldContainKeyAndValue("date", dateStr);
+        }
+
         private class TestClass1
         {
             public string Query { get; set; }

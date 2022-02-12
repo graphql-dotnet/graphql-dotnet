@@ -7,6 +7,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL
 {
+    [Obsolete("Please use the AddSubscriptionExecutionStrategy() builder method.")]
     public class SubscriptionDocumentExecuter : DocumentExecuter
     {
         public SubscriptionDocumentExecuter()
@@ -25,6 +26,11 @@ namespace GraphQL
 
         public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
             : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations)
+        {
+        }
+
+        public SubscriptionDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations, IExecutionStrategySelector executionStrategySelector)
+            : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations, executionStrategySelector)
         {
         }
 

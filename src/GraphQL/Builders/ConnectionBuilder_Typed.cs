@@ -239,7 +239,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -267,7 +267,7 @@ namespace GraphQL.Builders
             });
         }
 
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+        private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
         {
             if (context.First.HasValue && context.Last.HasValue)
             {

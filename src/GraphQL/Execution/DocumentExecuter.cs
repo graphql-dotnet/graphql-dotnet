@@ -22,6 +22,7 @@ namespace GraphQL
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
         private readonly IConfigureExecutionOptions[]? _configurations;
+        private readonly IExecutionStrategySelector _executionStrategySelector;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
@@ -59,12 +60,23 @@ namespace GraphQL
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations, new DefaultExecutionStrategySelector())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
+        /// </summary>
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations, IExecutionStrategySelector executionStrategySelector)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
             _configurations = configurations?.ToArray();
+            _executionStrategySelector = executionStrategySelector ?? throw new ArgumentNullException(nameof(executionStrategySelector));
         }
 
         /// <inheritdoc/>
@@ -227,7 +239,7 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                (result ??= new ExecutionResult()).AddError(ex);
+                (result ??= new()).AddError(ex);
             }
             catch (Exception ex)
             {
@@ -242,11 +254,11 @@ namespace GraphQL
                     ex = exceptionContext.Exception;
                 }
 
-                (result ??= new ExecutionResult()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
+                (result ??= new()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
             }
             finally
             {
-                result ??= new ExecutionResult();
+                result ??= new();
                 result.Perf = metrics.Finish();
                 if (executionOccurred)
                     result.Executed = true;
@@ -302,20 +314,16 @@ namespace GraphQL
         /// <br/><br/>
         /// Typically the strategy is selected based on the type of operation.
         /// <br/><br/>
-        /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
-        /// <see cref="SerialExecutionStrategy"/>. Subscription operations return a special strategy defined in some separate project,
-        /// for example it can be SubscriptionExecutionStrategy from GraphQL.SystemReactive.
+        /// By default, the selection is handled by the <see cref="IExecutionStrategySelector"/> implementation passed to the
+        /// constructor, which will select an execution strategy based on a set of <see cref="ExecutionStrategyRegistration"/>
+        /// instances passed to it.
+        /// <br/><br/>
+        /// For the <see cref="DefaultExecutionStrategySelector"/> without any registrations,
+        /// query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
+        /// <see cref="SerialExecutionStrategy"/>. Subscription operations will need a special strategy defined in a separate
+        /// project, such as SubscriptionExecutionStrategy from GraphQL.SystemReactive.
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
-        {
-            // TODO: Should we use cached instances of the default execution strategies?
-            return context.Operation.Operation switch
-            {
-                OperationType.Query => ParallelExecutionStrategy.Instance,
-                OperationType.Mutation => SerialExecutionStrategy.Instance,
-                OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
-                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.Operation}")
-            };
-        }
+            => _executionStrategySelector.Select(context);
     }
 }

@@ -16,7 +16,7 @@ namespace GraphQL.Validation
         private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
         private readonly Stack<FieldType?> _fieldDefStack = new Stack<FieldType?>();
         private readonly Stack<ASTNode> _ancestorStack = new Stack<ASTNode>();
-        private DirectiveGraphType? _directive;
+        private Directive? _directive;
         private QueryArgument? _argument;
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns the last directive specified, or <see langword="null"/> if none.
         /// </summary>
-        public DirectiveGraphType? GetDirective() => _directive;
+        public Directive? GetDirective() => _directive;
 
         /// <summary>
         /// Returns the last query argument matched, or <see langword="null"/> if none.

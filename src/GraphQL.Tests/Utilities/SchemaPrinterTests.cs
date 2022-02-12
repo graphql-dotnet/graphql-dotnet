@@ -112,7 +112,7 @@ directive @skip(
         [Fact]
         public void prints_directive_without_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query);
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query);
             string result = new SchemaPrinter(null).PrintDirective(d);
             result.ShouldBe("directive @my on FIELD | QUERY");
         }
@@ -120,7 +120,7 @@ directive @skip(
         [Fact]
         public void prints_repeatable_directive_without_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
             string result = new SchemaPrinter(null).PrintDirective(d);
             result.ShouldBe("directive @my repeatable on FIELD | QUERY");
         }
@@ -128,7 +128,7 @@ directive @skip(
         [Fact]
         public void prints_repeatable_directive_with_arguments()
         {
-            var d = new DirectiveGraphType("my", DirectiveLocation.Field, DirectiveLocation.Query)
+            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query)
             {
                 Repeatable = true,
                 Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
