@@ -211,7 +211,9 @@ namespace GraphQL.Types
                     x.ReturnType != typeof(void) &&               // exclude methods which do not return a value
                     x.ReturnType != typeof(Task) &&               // exclude methods which do not return a value
                     x.GetBaseDefinition() == x &&                 // exclude methods which override an inherited class' method (e.g. GetHashCode)
-                    x.Name != "Equals" && x.Name != "<Clone>$");  // exclude methods generated for record types
+                                                                  // exclude by signature: bool Equals(TSourceType)
+                    !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
+                    x.Name != "<Clone>$");                        // exclude methods generated for record types
             return props.Concat<MemberInfo>(methods);
         }
 
