@@ -11,14 +11,19 @@ namespace GraphQL.Resolvers
     {
         private readonly Func<IResolveFieldContext, object?> _resolver;
 
-        private static readonly PropertyInfo _resolveFieldContextSourceParameter = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
-        public MethodResolver(MethodInfo methodInfo, List<LambdaExpression> methodArgumentExpressions)
+        public MethodResolver(MethodInfo methodInfo, LambdaExpression sourceExpression, IList<LambdaExpression> methodArgumentExpressions)
         {
             // verify that the expressions provided match the number of parameters
             var methodParameters = methodInfo.GetParameters();
             if (methodArgumentExpressions.Count != methodParameters.Length)
             {
                 throw new InvalidOperationException("The number of expressions must equal the number of method parameters.");
+            }
+            if (sourceExpression.Parameters.Count != 1 ||
+                sourceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
+                !methodInfo.DeclaringType!.IsAssignableFrom(sourceExpression.ReturnType))
+            {
+                throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {methodInfo.DeclaringType!.Name}>.", nameof(sourceExpression));
             }
 
             // create a parameter expression for IResolveFieldContext
@@ -42,11 +47,9 @@ namespace GraphQL.Resolvers
                 Expression.Call(
                     methodInfo.IsStatic
                         ? null
-                        : Expression.Convert(
-                            Expression.MakeMemberAccess(
-                                resolveFieldContextParameter,
-                                _resolveFieldContextSourceParameter),
-                            methodInfo.DeclaringType!),
+                        : sourceExpression.Body.Replace(
+                            sourceExpression.Parameters[0],
+                            resolveFieldContextParameter),
                     methodInfo,
                     expressionBodies);
 

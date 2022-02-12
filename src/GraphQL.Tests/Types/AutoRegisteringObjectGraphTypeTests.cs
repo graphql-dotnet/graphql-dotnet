@@ -364,6 +364,79 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void WorksWithNoDefaultConstructor()
+        {
+            var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
+            var context = new ResolveFieldContext
+            {
+                Source = new NoDefaultConstructorTest(true)
+            };
+            graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
+            graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
+            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(1);
+        }
+
+        [Fact]
+        public void ThrowsWhenSourceNull()
+        {
+            var graphType = new TestFieldSupport<NullSourceFailureTest>();
+            var context = new ResolveFieldContext();
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+        }
+
+        [Fact]
+        public void ThrowsWhenSourceNull_Struct()
+        {
+            var graphType = new TestFieldSupport<NullSourceStructFailureTest>();
+            var context = new ResolveFieldContext();
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+        }
+
+        [Fact]
+        public void WorksWithNullSource()
+        {
+            var graphType = new TestFieldSupport<NullSourceTest>();
+            var context = new ResolveFieldContext();
+            graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
+            graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
+            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(3);
+        }
+
+        [Fact]
+        public void TestExceptionBubbling()
+        {
+            Should.Throw<Exception>(() => new AutoRegisteringObjectGraphType<TestExceptionBubblingClass>()).Message.ShouldBe("Test");
+        }
+
+        [Fact]
+        public void TestBasicClassNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicClass>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void TestBasicRecordNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicRecord>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
         public void CustomHardcodedArgumentAttributesWork()
         {
             var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
@@ -384,6 +457,39 @@ namespace GraphQL.Tests.Types
         {
             public override void Modify(ArgumentInformation argumentInformation)
                 => argumentInformation.SetDelegate(context => 85);
+        }
+
+        private class NoDefaultConstructorTest
+        {
+            public NoDefaultConstructorTest(bool value)
+            {
+                Example1 = value;
+            }
+
+            public bool Example1 { get; set; }
+            public string Example2() => "test";
+            public int Example3 = 1;
+        }
+
+        private class NullSourceTest
+        {
+            public static bool Example1 { get; set; } = true;
+            public static string Example2() => "test";
+            public static int Example3 = 3;
+        }
+
+        private class NullSourceFailureTest
+        {
+            public bool Example1 { get; set; } = true;
+            public string Example2() => "test";
+            public int Example3 = 3;
+        }
+
+        private struct NullSourceStructFailureTest
+        {
+            public bool Example1 { get; set; } = true;
+            public string Example2() => "test";
+            public int Example3 = 3;
         }
 
         private class FieldTests
@@ -471,7 +577,7 @@ namespace GraphQL.Tests.Types
         private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
         {
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public));
+                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public));
         }
 
         private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
@@ -538,6 +644,7 @@ namespace GraphQL.Tests.Types
             protected override void ConfigureGraph()
             {
                 Name = typeof(T).Name + "Input";
+                base.ConfigureGraph();
             }
         }
 
@@ -549,6 +656,27 @@ namespace GraphQL.Tests.Types
         private class DerivedClass : ParentClass
         {
             public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
+        }
+
+        private class TestExceptionBubblingClass
+        {
+            public string Test([TestExceptionBubbling] string arg) => arg;
+        }
+
+        private class TestExceptionBubblingAttribute : GraphQLAttribute
+        {
+            public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+            {
+                throw new Exception("Test");
+            }
+        }
+
+        private record TestBasicRecord(int Id, string Name);
+
+        private class TestBasicClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = null!;
         }
     }
 }

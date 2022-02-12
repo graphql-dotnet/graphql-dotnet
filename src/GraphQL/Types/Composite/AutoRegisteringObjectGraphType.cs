@@ -11,7 +11,6 @@ namespace GraphQL.Types
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// Also it can get descriptions for fields from the XML comments.
     /// </summary>
-    /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
@@ -30,7 +29,6 @@ namespace GraphQL.Types
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();
-            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
@@ -38,10 +36,13 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Applies default configuration settings to this graph type prior to applying <see cref="GraphQLAttribute"/> attributes.
-        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to this class.
+        /// Applies default configuration settings to this graph type along with any <see cref="GraphQLAttribute"/> attributes marked on <typeparamref name="TSourceType"/>.
+        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to <typeparamref name="TSourceType"/>.
         /// </summary>
-        protected virtual void ConfigureGraph() { }
+        protected virtual void ConfigureGraph()
+        {
+            AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
+        }
 
         /// <summary>
         /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
@@ -75,52 +76,97 @@ namespace GraphQL.Types
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
             var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
-            if (memberInfo is MethodInfo methodInfo)
-            {
-                var (queryArguments, resolver) = BuildMethodResolver(methodInfo, fieldType);
-                fieldType.Arguments = queryArguments;
-                fieldType.Resolver = resolver;
-            }
-            else
-            {
-                fieldType.Resolver = MemberResolver.Create(memberInfo);
-            }
+            BuildFieldType(fieldType, memberInfo);
             // apply field attributes after resolver has been set
             AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, false);
             return fieldType;
         }
 
         /// <summary>
-        /// Retuns a list of query arguments within a <see cref="QueryArguments"/> instance, and a
-        /// <see cref="IFieldResolver"/> instance, for the specified field.
+        /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
+        /// any existing configuration within <see cref="FieldType.Arguments"/> and <see cref="FieldType.Resolver"/>.
+        /// <br/><br/>
+        /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
+        /// member from <see cref="IResolveFieldContext.Source"/>.
+        /// <br/><br/>
+        /// For methods, method arguments are iterated and processed by
+        /// <see cref="GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
+        /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
         /// </summary>
-        protected (QueryArguments? QueryArguments, IFieldResolver Resolver) BuildMethodResolver(MethodInfo methodInfo, FieldType fieldType)
+        protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
-            if (methodInfo.GetParameters().Length == 0)
+            if (memberInfo is PropertyInfo propertyInfo)
             {
-                return (null, MemberResolver.Create(methodInfo));
+                var getMethod = propertyInfo.GetMethod ?? throw new InvalidOperationException("No 'get' method for the supplied property.");
+                var resolver = new MethodResolver(getMethod, BuildMemberInstanceExpression(memberInfo), Array.Empty<LambdaExpression>());
+                fieldType.Arguments = null;
+                fieldType.Resolver = resolver;
             }
-
-            List<LambdaExpression> expressions = new();
-            QueryArguments queryArguments = new();
-            foreach (var parameterInfo in methodInfo.GetParameters())
+            else if (memberInfo is MethodInfo methodInfo)
             {
-                var argumentInfo = (ArgumentInformation?)_getArgumentInformationInternalMethodInfo
-                    .MakeGenericMethod(parameterInfo.ParameterType)
-                    .Invoke(this, new object[] { fieldType, parameterInfo })!;
-                var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-                if (queryArgument != null)
+                List<LambdaExpression> expressions = new();
+                QueryArguments queryArguments = new();
+                foreach (var parameterInfo in methodInfo.GetParameters())
                 {
-                    ApplyArgumentAttributes(parameterInfo, queryArgument);
-                    queryArguments.Add(queryArgument);
+                    var getArgumentInfoMethodInfo = _getArgumentInformationInternalMethodInfo.MakeGenericMethod(parameterInfo.ParameterType);
+                    var getArgumentInfoMethod = (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
+                    var argumentInfo = getArgumentInfoMethod(fieldType, parameterInfo);
+                    var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
+                    if (queryArgument != null)
+                    {
+                        ApplyArgumentAttributes(parameterInfo, queryArgument);
+                        queryArguments.Add(queryArgument);
+                    }
+                    expression ??= AutoRegisteringHelper.GetParameterExpression(
+                        parameterInfo.ParameterType,
+                        queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+                    expressions.Add(expression);
                 }
-                expression ??= AutoRegisteringHelper.GetParameterExpression(
-                    parameterInfo.ParameterType,
-                    queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
-                expressions.Add(expression);
+                var resolver = new MethodResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
+                fieldType.Arguments = queryArguments;
+                fieldType.Resolver = resolver;
             }
-            var resolver = new MethodResolver(methodInfo, expressions);
-            return (queryArguments, resolver);
+            else if (memberInfo is FieldInfo fieldInfo)
+            {
+                var sourceExpression = BuildMemberInstanceExpression(memberInfo);
+                var param = sourceExpression.Parameters[0];
+                var body = Expression.Convert(
+                    Expression.MakeMemberAccess(
+                        fieldInfo.IsStatic ? null : sourceExpression.Body,
+                        fieldInfo),
+                    typeof(object));
+                var lambda = Expression.Lambda<Func<IResolveFieldContext, object?>>(body, param);
+                var func = lambda.Compile();
+                fieldType.Arguments = null;
+                fieldType.Resolver = new FuncFieldResolver<object>(func);
+            }
+            else if (memberInfo == null)
+            {
+                throw new ArgumentNullException(nameof(memberInfo));
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
+            }
+        }
+
+        /// <summary>
+        /// Returns a lambda expression that will be used by the field resolver to access the member.
+        /// <br/><br/>
+        /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
+        /// <br/><br/>
+        /// By default this returns the <see cref="IResolveFieldContext.Source"/> property.
+        /// </summary>
+        /// <param name="memberInfo">The member being called or accessed.</param>
+        protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
+            => _sourceExpression;
+
+        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
+            = context => (TSourceType)(context.Source ?? ThrowSourceNullException());
+
+        private static object ThrowSourceNullException()
+        {
+            throw new NullReferenceException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
         }
 
         private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -165,14 +211,19 @@ namespace GraphQL.Types
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         {
             var props = AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead),
+                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static).Where(x => x.CanRead),
                 _excludedProperties);
-            var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            var isRecord = typeof(TSourceType).GetMethods().Any(x => x.Name == "<Clone>$");
+            var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 .Where(x =>
-                    !x.ContainsGenericParameters && // exclude methods with open generics
-                    !x.IsSpecialName &&             // exclude methods generated for properties
-                    x.ReturnType != typeof(void) && // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task));  // exclude methods which do not return a value
+                    !x.ContainsGenericParameters &&               // exclude methods with open generics
+                    !x.IsSpecialName &&                           // exclude methods generated for properties
+                    x.ReturnType != typeof(void) &&               // exclude methods which do not return a value
+                    x.ReturnType != typeof(Task) &&               // exclude methods which do not return a value
+                    x.GetBaseDefinition() == x &&                 // exclude methods which override an inherited class' method (e.g. GetHashCode)
+                                                                  // exclude methods generated for record types: bool Equals(TSourceType)
+                    !(isRecord && x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
+                    x.Name != "<Clone>$");                        // exclude methods generated for record types
             return props.Concat<MemberInfo>(methods);
         }
 
