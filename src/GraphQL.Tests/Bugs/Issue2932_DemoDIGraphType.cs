@@ -194,16 +194,5 @@ namespace GraphQL.Tests.Bugs
             public TSourceType Source => (TSourceType)Context.Source!;
             public CancellationToken RequestAborted => Context.CancellationToken;
         }
-
-        [AttributeUsage(AttributeTargets.Parameter)]
-        public class FromSourceAttribute : GraphQLAttribute
-        {
-            public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
-            {
-                if (argumentInformation.ParameterInfo.ParameterType != argumentInformation.SourceType)
-                    throw new InvalidOperationException("Source parameters must match TSourceType.");
-                argumentInformation.SetDelegate(context => (TParameterType)context.Source!);
-            }
-        }
     }
 }

@@ -389,11 +389,10 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void WorksWithNullSource()
         {
-            var graphType = new TestFieldSupport<DefaultConstructorTest>();
+            var graphType = new AutoRegisteringObjectGraphType<NullSourceTest>();
             var context = new ResolveFieldContext();
             graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
             graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
-            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(1);
         }
 
         [Fact]
@@ -455,11 +454,10 @@ namespace GraphQL.Tests.Types
             public int Example3 = 1;
         }
 
-        private class DefaultConstructorTest
+        private class NullSourceTest
         {
-            public bool Example1 { get; set; } = true;
-            public string Example2() => "test";
-            public int Example3 = 1;
+            public static bool Example1 { get; set; } = true;
+            public static string Example2() => "test";
         }
 
         private class FieldTests
