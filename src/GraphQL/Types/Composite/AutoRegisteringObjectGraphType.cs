@@ -89,7 +89,8 @@ namespace GraphQL.Types
         /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
         /// member from <see cref="IResolveFieldContext.Source"/>.
         /// <br/><br/>
-        /// For methods, method arguments are iterated and processed by (...crefs to other methods here...), building
+        /// For methods, method arguments are iterated and processed by
+        /// <see cref="GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
         /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
         /// </summary>
         protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
