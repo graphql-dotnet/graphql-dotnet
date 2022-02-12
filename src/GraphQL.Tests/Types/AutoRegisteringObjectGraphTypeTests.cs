@@ -389,10 +389,11 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void WorksWithNullSource()
         {
-            var graphType = new AutoRegisteringObjectGraphType<NullSourceTest>();
+            var graphType = new TestFieldSupport<NullSourceTest>();
             var context = new ResolveFieldContext();
             graphType.Fields.Find("Example1")!.Resolver!.Resolve(context).ShouldBe(true);
             graphType.Fields.Find("Example2")!.Resolver!.Resolve(context).ShouldBe("test");
+            graphType.Fields.Find("Example3")!.Resolver!.Resolve(context).ShouldBe(3);
         }
 
         [Fact]
@@ -458,6 +459,7 @@ namespace GraphQL.Tests.Types
         {
             public static bool Example1 { get; set; } = true;
             public static string Example2() => "test";
+            public static int Example3 = 3;
         }
 
         private class FieldTests
@@ -545,7 +547,7 @@ namespace GraphQL.Tests.Types
         private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
         {
             protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public));
+                => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public));
         }
 
         private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>

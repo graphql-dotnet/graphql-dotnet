@@ -131,7 +131,9 @@ namespace GraphQL.Types
                 var sourceExpression = BuildMemberInstanceExpression(memberInfo);
                 var param = sourceExpression.Parameters[0];
                 var body = Expression.Convert(
-                    Expression.MakeMemberAccess(sourceExpression.Body, fieldInfo),
+                    Expression.MakeMemberAccess(
+                        fieldInfo.IsStatic ? null : sourceExpression.Body,
+                        fieldInfo),
                     typeof(object));
                 var lambda = Expression.Lambda<Func<IResolveFieldContext, object?>>(body, param);
                 var func = lambda.Compile();
