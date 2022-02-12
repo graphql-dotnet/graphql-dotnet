@@ -152,7 +152,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
         /// <br/><br/>
-        /// By default this returns the <see cref="IResolveFieldContext.Source"/> property, or a new instance if the source is <see langword="null"/>.
+        /// By default this returns the <see cref="IResolveFieldContext.Source"/> property.
         /// </summary>
         /// <param name="memberInfo">The member being called or accessed.</param>
         protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
