@@ -150,6 +150,12 @@ namespace GraphQL
         public FromServicesAttribute() { }
         public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    public class FromSourceAttribute : GraphQL.GraphQLAttribute
+    {
+        public FromSourceAttribute() { }
+        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+    }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
         public FuncServiceProvider(System.Func<System.Type, object?> resolver) { }
