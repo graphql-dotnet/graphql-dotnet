@@ -6,35 +6,34 @@ using Microsoft.Extensions.Options;
 
 namespace Example
 {
-    public class GraphQLMiddleware
+    public class GraphQLMiddleware : IMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IGraphQLSerializer _serializer;
+        private readonly ISchema _schema;
 
         public GraphQLMiddleware(
-            RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IGraphQLSerializer serializer)
+            IGraphQLSerializer serializer,
+            ISchema schema)
         {
-            _next = next;
             _settings = options.Value;
             _executer = executer;
             _serializer = serializer;
+            _schema = schema;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
-        public async Task Invoke(HttpContext context, ISchema schema)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             if (!IsGraphQLRequest(context))
             {
-                await _next(context);
+                await next(context);
                 return;
             }
 
-            await ExecuteAsync(context, schema);
+            await ExecuteAsync(context);
         }
 
         private bool IsGraphQLRequest(HttpContext context)
@@ -43,7 +42,7 @@ namespace Example
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
-        private async Task ExecuteAsync(HttpContext context, ISchema schema)
+        private async Task ExecuteAsync(HttpContext context)
         {
             var start = DateTime.UtcNow;
 
@@ -51,7 +50,7 @@ namespace Example
 
             var result = await _executer.ExecuteAsync(options =>
             {
-                options.Schema = schema;
+                options.Schema = _schema;
                 options.Query = request.Query;
                 options.OperationName = request.OperationName;
                 options.Variables = request.Variables;
