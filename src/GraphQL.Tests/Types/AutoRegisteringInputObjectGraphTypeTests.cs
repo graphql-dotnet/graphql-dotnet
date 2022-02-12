@@ -267,6 +267,24 @@ namespace GraphQL.Tests.Types
             actual.Field6.ShouldBe(16);
         }
 
+        [Fact]
+        public void TestBasicClassNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicClass>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void TestBasicRecordNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicRecord>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
         private class FieldTests
         {
             [Name("Test1")]
@@ -410,6 +428,14 @@ namespace GraphQL.Tests.Types
         private class DerivedClass : ParentClass
         {
             public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
+        }
+
+        private record TestBasicRecord(int Id, string Name);
+
+        private class TestBasicClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = null!;
         }
     }
 }
