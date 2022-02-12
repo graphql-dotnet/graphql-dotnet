@@ -76,25 +76,30 @@ namespace GraphQL.Types
             var typeInformation = GetTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
             var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
-            var (queryArguments, resolver) = BuildFieldResolver(memberInfo, fieldType);
-            fieldType.Arguments = queryArguments;
-            fieldType.Resolver = resolver;
+            BuildFieldType(fieldType, memberInfo);
             // apply field attributes after resolver has been set
             AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, false);
             return fieldType;
         }
 
         /// <summary>
-        /// Retuns a list of query arguments within a <see cref="QueryArguments"/> instance, and a
-        /// <see cref="IFieldResolver"/> instance, for the specified field.
+        /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
+        /// any existing configuration within <see cref="FieldType.Arguments"/> and <see cref="FieldType.Resolver"/>.
+        /// <br/><br/>
+        /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
+        /// member from <see cref="IResolveFieldContext.Source"/>.
+        /// <br/><br/>
+        /// For methods, method arguments are iterated and processed by (...crefs to other methods here...), building
+        /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
         /// </summary>
-        protected (QueryArguments? QueryArguments, IFieldResolver Resolver) BuildFieldResolver(MemberInfo memberInfo, FieldType fieldType)
+        protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {
                 var getMethod = propertyInfo.GetMethod ?? throw new InvalidOperationException("No 'get' method for the supplied property.");
                 var resolver = new MethodResolver(getMethod, BuildMemberInstanceExpression(memberInfo), Array.Empty<LambdaExpression>());
-                return (null, resolver);
+                fieldType.Arguments = null;
+                fieldType.Resolver = resolver;
             }
             else if (memberInfo is MethodInfo methodInfo)
             {
@@ -117,7 +122,8 @@ namespace GraphQL.Types
                     expressions.Add(expression);
                 }
                 var resolver = new MethodResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
-                return (queryArguments, resolver);
+                fieldType.Arguments = queryArguments;
+                fieldType.Resolver = resolver;
             }
             else if (memberInfo is FieldInfo fieldInfo)
             {
@@ -128,7 +134,8 @@ namespace GraphQL.Types
                     typeof(object));
                 var lambda = Expression.Lambda<Func<IResolveFieldContext, object?>>(body, param);
                 var func = lambda.Compile();
-                return (null, new FuncFieldResolver<object>(func));
+                fieldType.Arguments = null;
+                fieldType.Resolver = new FuncFieldResolver<object>(func);
             }
             else if (memberInfo == null)
             {
