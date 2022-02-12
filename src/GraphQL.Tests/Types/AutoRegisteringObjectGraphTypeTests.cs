@@ -403,6 +403,24 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void TestBasicClassNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicClass>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void TestBasicRecordNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicRecord>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
         public void CustomHardcodedArgumentAttributesWork()
         {
             var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
@@ -621,6 +639,14 @@ namespace GraphQL.Tests.Types
             {
                 throw new Exception("Test");
             }
+        }
+
+        private record TestBasicRecord(int Id, string Name);
+
+        private class TestBasicClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = null!;
         }
     }
 }
