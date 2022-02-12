@@ -161,7 +161,13 @@ namespace GraphQL.Types
         protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
             => _sourceExpression;
 
-        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression = context => (TSourceType)context.Source!;
+        private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
+            = context => (TSourceType)context.Source! ?? ThrowSourceNullException();
+
+        private static TSourceType ThrowSourceNullException()
+        {
+            throw new NullReferenceException($"IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+        }
 
         private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
         private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
