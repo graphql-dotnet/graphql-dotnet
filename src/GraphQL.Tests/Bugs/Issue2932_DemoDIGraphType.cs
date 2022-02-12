@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void TestDIAutoRegisteringGraphType()
         {
-            // tests the following functionality can be implemented in a derived class:
+            // tests the following functionality that can be implemented in a derived class:
             //   - members can pull from another type rather than only TSourceType
             //   - instance can pull from DI rather than context.Source
             //   - static members do not create an instance
