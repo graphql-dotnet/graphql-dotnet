@@ -377,9 +377,22 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void ErrorWithNoDefaultConstructorWhenSourceNull()
+        public void ThrowsWhenSourceNull()
         {
-            var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
+            var graphType = new TestFieldSupport<NullSourceFailureTest>();
+            var context = new ResolveFieldContext();
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example2")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example3")!.Resolver!.Resolve(context))
+                .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+        }
+
+        [Fact]
+        public void ThrowsWhenSourceNull_Struct()
+        {
+            var graphType = new TestFieldSupport<NullSourceStructFailureTest>();
             var context = new ResolveFieldContext();
             Should.Throw<NullReferenceException>(() => graphType.Fields.Find("Example1")!.Resolver!.Resolve(context))
                 .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
@@ -463,6 +476,20 @@ namespace GraphQL.Tests.Types
             public static bool Example1 { get; set; } = true;
             public static string Example2() => "test";
             public static int Example3 = 3;
+        }
+
+        private class NullSourceFailureTest
+        {
+            public bool Example1 { get; set; } = true;
+            public string Example2() => "test";
+            public int Example3 = 3;
+        }
+
+        private struct NullSourceStructFailureTest
+        {
+            public bool Example1 { get; set; } = true;
+            public string Example2() => "test";
+            public int Example3 = 3;
         }
 
         private class FieldTests
