@@ -2,7 +2,6 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
-
     [AttributeUsage(AttributeTargets.Parameter)]
     public class FromSourceAttribute : GraphQLAttribute
     {
