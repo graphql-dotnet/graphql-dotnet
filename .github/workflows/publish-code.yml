@@ -75,7 +75,7 @@ jobs:
         working-directory: docs2/public
         run: zip -r ../../src/out/Documentation.zip .
       - name: Upload Nuget packages and documentation as release artifacts
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |

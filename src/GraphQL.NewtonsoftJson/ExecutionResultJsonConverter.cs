@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using GraphQL.Execution;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
@@ -11,13 +12,23 @@ namespace GraphQL.NewtonsoftJson
     public class ExecutionResultJsonConverter : JsonConverter
     {
         private readonly IErrorInfoProvider _errorInfoProvider;
+        private readonly NamingStrategy _namingStrategy;
 
         /// <summary>
         /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/>.
         /// </summary>
         public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
+            : this(errorInfoProvider, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/> and <see cref="NamingStrategy"/>.
+        /// </summary>
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider, NamingStrategy namingStrategy)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
+            _namingStrategy = namingStrategy;
         }
 
         /// <inheritdoc/>
@@ -67,7 +78,10 @@ namespace GraphQL.NewtonsoftJson
                     writer.WriteStartObject();
                     foreach (var childNode in objectExecutionNode.SubFields)
                     {
-                        writer.WritePropertyName(childNode.Name);
+                        var propName = childNode.Name;
+                        if (_namingStrategy != null)
+                            propName = _namingStrategy.GetPropertyName(propName, false);
+                        writer.WritePropertyName(propName);
                         WriteExecutionNode(writer, childNode, serializer);
                     }
                     writer.WriteEndObject();
