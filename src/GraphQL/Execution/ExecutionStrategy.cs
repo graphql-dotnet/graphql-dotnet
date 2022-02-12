@@ -278,21 +278,15 @@ namespace GraphQL.Execution
             {
                 string name = field.Alias ?? field.Name;
 
-                if (fields.TryGetValue(name, out Field original))
-                {
-                    // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
-                    fields[name] = new Field(original.AliasNode, original.NameNode)
+                fields[name] = fields.TryGetValue(name, out var original)
+                    ? new Field(original.AliasNode, original.NameNode) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
                         Arguments = original.Arguments,
                         SelectionSet = original.SelectionSet!.Merge(field.SelectionSet!),
                         Directives = original.Directives,
                         SourceLocation = original.SourceLocation,
-                    };
-                }
-                else
-                {
-                    fields[name] = field;
-                }
+                    }
+                    : field;
             }
         }
 
@@ -356,14 +350,14 @@ namespace GraphQL.Execution
             }
             else
             {
-                foreach (object d in data)
+                foreach (object? d in data)
                     SetArrayItemNode(d);
             }
 
             parent.Items = arrayItems;
 
             // local function uses 'struct closure' without heap allocation
-            void SetArrayItemNode(object d)
+            void SetArrayItemNode(object? d)
             {
                 var node = BuildExecutionNode(parent, itemType, parent.Field!, parent.FieldDefinition!, index++);
                 node.Result = d;

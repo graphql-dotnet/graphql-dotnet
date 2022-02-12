@@ -20,11 +20,10 @@ namespace GraphQL.Tests.Bugs
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             using var cts = new CancellationTokenSource();
             ISchema schema = new Bug781Schema(cts);
-            string result = null;
 
             try
             {
-                result = await schema.ExecuteAsync(options =>
+                _ = await schema.ExecuteAsync(options =>
                 {
                     options.Query = query;
                     options.CancellationToken = cts.Token;

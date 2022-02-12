@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Bugs
             var de = new DocumentExecuter();
             try
             {
-                var ret = await de.ExecuteAsync(new ExecutionOptions
+                _ = await de.ExecuteAsync(new ExecutionOptions
                 {
                     Query = "{a b}",
                     Schema = new MySchema(),

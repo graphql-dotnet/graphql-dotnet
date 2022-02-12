@@ -56,6 +56,7 @@ namespace GraphQL.Harness
             // add infrastructure stuff
             services.AddHttpContextAccessor();
             services.AddLogging(builder => builder.AddConsole());
+            services.AddSingleton<GraphQLMiddleware>();
 
             // add options configuration
             services.Configure<GraphQLSettings>(Configuration);

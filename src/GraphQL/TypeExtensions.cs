@@ -108,7 +108,7 @@ namespace GraphQL
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
-                if (isNullable == false)
+                if (!isNullable)
                 {
                     throw new ArgumentOutOfRangeException(nameof(isNullable),
                         $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
@@ -133,6 +133,7 @@ namespace GraphQL
             }
             else
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
                 if (attr != null)
                 {
@@ -142,6 +143,20 @@ namespace GraphQL
                         graphType = attr.OutputType;
                     else if (attr.InputType == attr.OutputType) // scalar
                         graphType = attr.InputType;
+                }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                if (mode == TypeMappingMode.InputType)
+                {
+                    var inputAttr = type.GetCustomAttribute<InputTypeAttribute>();
+                    if (inputAttr != null)
+                        graphType = inputAttr.InputType;
+                }
+                else if (mode == TypeMappingMode.OutputType)
+                {
+                    var outputAttr = type.GetCustomAttribute<OutputTypeAttribute>();
+                    if (outputAttr != null)
+                        graphType = outputAttr.OutputType;
                 }
 
                 if (graphType == null)

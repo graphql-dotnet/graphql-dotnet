@@ -354,14 +354,9 @@ namespace GraphQL.Utilities
         {
             if (Options.IncludeDescriptions)
             {
-                if (Options.PrintDescriptionsAsComments)
-                {
-                    return PrintComment(description, indentation);
-                }
-                else
-                {
-                    return PrintDescription(description, indentation);
-                }
+                return Options.PrintDescriptionsAsComments
+                    ? PrintComment(description, indentation)
+                    : PrintDescription(description, indentation);
             }
             return "";
         }
@@ -407,11 +402,11 @@ namespace GraphQL.Utilities
                     PropertyInfo propertyInfo;
                     try
                     {
-                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)!;
                     }
                     catch (AmbiguousMatchException)
                     {
-                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                        propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
                     }
 
                     propertyValue = propertyInfo.GetValue(value);

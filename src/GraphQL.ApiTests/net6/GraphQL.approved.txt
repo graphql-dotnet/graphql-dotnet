@@ -49,12 +49,12 @@ namespace GraphQL
         public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
     public sealed class DoNotMapClrTypeAttribute : System.Attribute
     {
         public DoNotMapClrTypeAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
     public sealed class DoNotRegisterAttribute : System.Attribute
     {
         public DoNotRegisterAttribute() { }
@@ -175,7 +175,7 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
@@ -313,16 +313,18 @@ namespace GraphQL
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method)]
     public sealed class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
     {
         public GraphQLMetadataAttribute() { }
         public GraphQLMetadataAttribute(string name) { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        [System.Obsolete("Please use the [InputType] attribute instead of this property.")]
         public System.Type? InputType { get; set; }
         public System.Type? IsTypeOf { get; set; }
         public string? Name { get; set; }
+        [System.Obsolete("Please use the [OutputType] attribute instead of this property.")]
         public System.Type? OutputType { get; set; }
         public GraphQL.ResolverType ResolverType { get; set; }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
@@ -362,6 +364,12 @@ namespace GraphQL
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
         TSource Source { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class InputTypeAttribute : System.Attribute
+    {
+        public InputTypeAttribute(System.Type graphType) { }
+        public System.Type InputType { get; set; }
     }
     public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
@@ -408,6 +416,12 @@ namespace GraphQL
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class OutputTypeAttribute : System.Attribute
+    {
+        public OutputTypeAttribute(System.Type graphType) { }
+        public System.Type OutputType { get; set; }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
@@ -1836,13 +1850,13 @@ namespace GraphQL.Types
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }
-        public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
         public AutoRegisteringObjectGraphType() { }
-        public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[]? excludedProperties) { }
+        public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
@@ -2013,7 +2027,7 @@ namespace GraphQL.Types
         [System.ComponentModel.Description("Location adjacent to an input object field definition.")]
         InputFieldDefinition = 17,
     }
-    [System.AttributeUsage(System.AttributeTargets.Enum | System.AttributeTargets.All, AllowMultiple=false)]
+    [System.AttributeUsage(System.AttributeTargets.Enum, AllowMultiple=false)]
     public abstract class EnumCaseAttribute : System.Attribute
     {
         protected EnumCaseAttribute() { }

@@ -208,20 +208,20 @@ namespace GraphQL
         /// </summary>
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType>? resolve = null)
         {
-            resolve ??= t => (IGraphType)Activator.CreateInstance(t);
+            resolve ??= t => (IGraphType)Activator.CreateInstance(t)!;
 
             if (type.IsGenericType)
             {
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
-                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
+                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type)!;
                     nonNull.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
                     return nonNull;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
                 {
-                    var list = (ListGraphType)Activator.CreateInstance(type);
+                    var list = (ListGraphType)Activator.CreateInstance(type)!;
                     list.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
                     return list;
                 }
@@ -406,7 +406,7 @@ namespace GraphQL
 
             if (type is NonNullGraphType nonNullGraphType)
             {
-                return value == null ? false : nonNullGraphType.ResolvedType!.IsValidDefault(value);
+                return value != null && nonNullGraphType.ResolvedType!.IsValidDefault(value);
             }
 
             if (value == null)

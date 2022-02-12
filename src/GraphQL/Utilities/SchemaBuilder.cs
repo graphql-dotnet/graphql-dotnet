@@ -248,15 +248,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             typeConfig.CopyMetadataTo(type);
 
-            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (IsSubscriptionType(type))
-            {
-                constructFieldType = ToSubscriptionFieldType;
-            }
-            else
-            {
-                constructFieldType = ToFieldType;
-            }
+            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType = IsSubscriptionType(type)
+                ? ToSubscriptionFieldType
+                : ToFieldType;
 
             if (astType.Fields != null)
             {
@@ -670,11 +664,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    if (Double.TryParse(
+                    if (!Double.TryParse(
                         str!.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
-                        out double dbl) == false)
+                        out double dbl))
                     {
                         dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
                     }
