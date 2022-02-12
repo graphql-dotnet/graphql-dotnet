@@ -199,10 +199,12 @@ namespace GraphQL.Types
                 _excludedProperties);
             var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 .Where(x =>
-                    !x.ContainsGenericParameters && // exclude methods with open generics
-                    !x.IsSpecialName &&             // exclude methods generated for properties
-                    x.ReturnType != typeof(void) && // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task));  // exclude methods which do not return a value
+                    !x.ContainsGenericParameters &&               // exclude methods with open generics
+                    !x.IsSpecialName &&                           // exclude methods generated for properties
+                    x.ReturnType != typeof(void) &&               // exclude methods which do not return a value
+                    x.ReturnType != typeof(Task) &&               // exclude methods which do not return a value
+                    x.GetBaseDefinition() == x &&                 // exclude methods which override an inherited class' method (e.g. GetHashCode)
+                    x.Name != "Equals" && x.Name != "<Clone>$");  // exclude methods generated for record types
             return props.Concat<MemberInfo>(methods);
         }
 
