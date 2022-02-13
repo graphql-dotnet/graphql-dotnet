@@ -6,11 +6,6 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/2392
     public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_OverrideBuiltInScalars_Alt.MySchema>
     {
-        public Issue2392_OverrideBuiltInScalars_Alt()
-        {
-            Services.Singleton<MySchema>();
-        }
-
         [Fact]
         public void replace_not_scalar_should_throw()
         {

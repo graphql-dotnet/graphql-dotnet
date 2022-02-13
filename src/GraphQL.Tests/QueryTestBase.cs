@@ -1,6 +1,7 @@
 using GraphQL.Conversion;
+using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.StarWars.IoC;
+using GraphQL.Tests.DI;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
@@ -8,36 +9,40 @@ using GraphQLParser.Exceptions;
 
 namespace GraphQL.Tests
 {
-    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder, SimpleContainer>
-        where TSchema : Schema
-    {
-    }
-
-    public class QueryTestBase<TSchema, TIocContainer> : QueryTestBase<TSchema, GraphQLDocumentBuilder, TIocContainer>
+    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder>
        where TSchema : Schema
-       where TIocContainer : ISimpleContainer, new()
     {
     }
 
-    public class QueryTestBase<TSchema, TDocumentBuilder, TIocContainer>
+    [PrepareDependencyInjection]
+    public class QueryTestBase<TSchema, TDocumentBuilder>
         where TSchema : Schema
         where TDocumentBuilder : IDocumentBuilder, new()
-        where TIocContainer : ISimpleContainer, new()
     {
         public QueryTestBase()
         {
-            Services = new TIocContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
         }
 
-        public TIocContainer Services { get; set; }
+        // WARNING: it is not static only for discoverability
+        // WARNING: do not set any instance data inside
+        // WARNING: method works on temporaly created instance
+        public virtual void RegisterServices(IServiceRegister Services)
+        {
+            Services.TryRegister(typeof(TSchema), typeof(TSchema), ServiceLifetime.Singleton);
+        }
 
-        /// <summary>
-        /// WARNING! By default each time you access this property a new schema instance is created.
-        /// <br/>
-        /// Call Services.Singleton&lt;TSchema&gt;(); in your test constructor to configure schema as singleton.
-        /// </summary>
-        public TSchema Schema => Services.Get<TSchema>();
+        private IServiceProvider _serviceProvider;
+
+        // 1. get is not used by any test
+        // 2. set is needed for some tests like MultithreadedTests/ComplexityTestBase that create an instance of test class manually
+        public IServiceProvider ServiceProvider
+        {
+            private get => _serviceProvider ??= PrepareDependencyInjectionAttribute.CurrentServiceProvider;
+            set => _serviceProvider = value;
+        }
+
+        public TSchema Schema => (TSchema)ServiceProvider.GetService(typeof(TSchema)) ?? throw new InvalidOperationException("Schema was not specified in DI container");
 
         public IDocumentExecuter Executer { get; private set; }
 
@@ -146,7 +151,7 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
-                options.RequestServices = Services;
+                options.RequestServices = ServiceProvider;
             }).GetAwaiter().GetResult();
 
             foreach (var writer in GraphQLSerializersTestData.AllWriters)

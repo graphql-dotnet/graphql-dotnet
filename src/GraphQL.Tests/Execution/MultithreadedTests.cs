@@ -1,5 +1,6 @@
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Execution
 {
@@ -31,12 +32,18 @@ namespace GraphQL.Tests.Execution
 
             // run a single execution and record the number of times the resolver executed
             starWarsTest = new StarWarsTestBase();
+            //ISSUE: manually created test instance with ServiceProvider
+            var builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
+            starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
             starWarsTest.Schema.FieldMiddleware = middleware;
             await testExecution();
             var correctCount = count;
 
             // test initializing the schema first, followed by 3 simultaneous executions
             starWarsTest = new StarWarsTestBase();
+            //ISSUE: manually created test instance with ServiceProvider
+            builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
+            starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
             starWarsTest.Schema.FieldMiddleware = middleware;
             await testExecution();
             count = 0;
@@ -49,6 +56,9 @@ namespace GraphQL.Tests.Execution
             // test three simultaneous executions on an uninitialized schema
             count = 0;
             starWarsTest = new StarWarsTestBase();
+            //ISSUE: manually created test instance with ServiceProvider
+            builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
+            starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
             starWarsTest.Schema.FieldMiddleware = middleware;
             t1 = Task.Run(testExecution);
             t2 = Task.Run(testExecution);

@@ -2,14 +2,15 @@
 
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.DI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType.TestSchema, MsDiContainer>
+    public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType.TestSchema>
     {
-        public Issue2932_DemoDIGraphType()
+        public override void RegisterServices(IServiceRegister Services)
         {
             Services.Singleton<TestSchema>();
             Services.Singleton<DIGraphType<SampleGraph, SampleSource>>();

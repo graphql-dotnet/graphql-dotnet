@@ -1,11 +1,12 @@
+using GraphQL.DI;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class BugWithCustomScalarsInDirective : QueryTestBase<BugWithCustomScalarsInDirectiveSchema, MsDiContainer>
+    public class BugWithCustomScalarsInDirective : QueryTestBase<BugWithCustomScalarsInDirectiveSchema>
     {
-        public BugWithCustomScalarsInDirective()
+        public override void RegisterServices(IServiceRegister Services)
         {
             Services.Register<BugWithCustomScalarsInDirectiveSchema>();
             Services.Register<BugWithCustomScalarsInDirectiveQuery>();
