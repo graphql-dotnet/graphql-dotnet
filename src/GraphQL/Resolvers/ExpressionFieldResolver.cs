@@ -5,12 +5,14 @@ namespace GraphQL.Resolvers
     /// <summary>
     /// Returns a value from the field's graph type's source object, based on a predefined expression.
     /// <br/><br/>
+    /// Supports asynchronous return types.
+    /// <br/><br/>
     /// Note: this class uses dynamic compilation and therefore allocates a relatively large amount of
     /// memory in managed heap, ~1KB. Do not use this class in cases with limited memory requirements.
     /// </summary>
-    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver<TProperty>
+    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver
     {
-        private readonly Func<TSourceType, TProperty> _property;
+        private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
         /// <summary>
         /// Initializes a new instance that runs the specified expression when resolving a field.
@@ -18,14 +20,11 @@ namespace GraphQL.Resolvers
         /// <param name="property"></param>
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
         {
-            _property = property.Compile();
+            _resolver = MemberResolver.BuildFunction(property);
         }
 
         /// <inheritdoc/>
-        public ValueTask<TProperty?> ResolveAsync(IResolveFieldContext context)
-            => new ValueTask<TProperty?>(_property((TSourceType)context.Source!));
-
         ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
-            => new ValueTask<object?>(_property((TSourceType)context.Source!));
+            => _resolver(context);
     }
 }

@@ -6,24 +6,39 @@ namespace GraphQL.Resolvers
     /// <summary>
     /// When resolving a field, this implementation calls a predefined <see cref="Func{T, TResult}"/> and returns the result
     /// </summary>
-    public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TReturnType> : IFieldResolver
     {
-        private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
+        private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
         /// <summary>
         /// Initializes a new instance that runs the specified delegate when resolving a field.
         /// </summary>
         public FuncFieldResolver(Func<IResolveFieldContext, TReturnType?> resolver)
         {
-            _resolver = resolver;
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            _resolver = context => new ValueTask<object?>(resolver(context));
+        }
+
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType?})"/>
+        public FuncFieldResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
+        {
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            if (typeof(TReturnType) == typeof(object))
+            {
+                _resolver = (Func<IResolveFieldContext, ValueTask<object?>>)(object)resolver;
+            }
+            else
+            {
+                _resolver = async context => await resolver(context).ConfigureAwait(false);
+            }
         }
 
         /// <inheritdoc/>
-        public ValueTask<TReturnType?> ResolveAsync(IResolveFieldContext context)
-            => new ValueTask<TReturnType?>(_resolver(context));
-
-        ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
-            => new ValueTask<object?>(_resolver(context));
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
     }
 
     /// <summary>
@@ -31,7 +46,7 @@ namespace GraphQL.Resolvers
     /// <br/><br/>
     /// This implementation provides a typed <see cref="IResolveFieldContext{TSource}"/> to the resolver function.
     /// </summary>
-    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
     {
         private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
         private static ResolveFieldContextAdapter<TSourceType>? _sharedAdapter;

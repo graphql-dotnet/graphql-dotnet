@@ -29,13 +29,4 @@ namespace GraphQL.Resolvers
         /// </summary>
         ValueTask<object?> ResolveAsync(IResolveFieldContext context);
     }
-
-    /// <inheritdoc cref="IFieldResolver"/>
-    public interface IFieldResolver<T> : IFieldResolver
-    {
-        /// <summary>
-        /// Returns an object or <see langword="null"/> for the specified field. If <typeparamref name="T"/> is a <see cref="Task{TResult}"/>, then this task will be awaited to obtain the actual object.
-        /// </summary>
-        new ValueTask<T?> ResolveAsync(IResolveFieldContext context);
-    }
 }

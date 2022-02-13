@@ -25,18 +25,12 @@ namespace GraphQL.Tests.Utilities.Visitors
             if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
-                Func<IResolveFieldContext, ValueTask<object>> func = async context =>
+                field.Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     object result = await inner.ResolveAsync(context);
 
-                    return result switch
-                    {
-                        string str => str?.ToUpperInvariant(),
-                        Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
-                        _ => result
-                    };
-                };
-                field.Resolver = new AsyncFieldResolver<object>(func);
+                    return result is string str ? str.ToUpperInvariant() : result;
+                });
             }
         }
     }
@@ -52,15 +46,12 @@ namespace GraphQL.Tests.Utilities.Visitors
             if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
-                Func<IResolveFieldContext, ValueTask<object>> func = async context =>
+                field.Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     object result = await inner.ResolveAsync(context);
 
-                    return result is string str
-                        ? str.ToUpperInvariant()
-                        : result;
-                };
-                field.Resolver = new AsyncFieldResolver<object>(func);
+                    return result is string str ? str.ToUpperInvariant() : result;
+                });
             }
         }
     }

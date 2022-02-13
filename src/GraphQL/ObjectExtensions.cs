@@ -361,9 +361,20 @@ namespace GraphQL
             var type = value.GetType();
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
             {
-                return (ValueTask<object?>)_convertValueTaskAsyncMethod
-                    .MakeGenericMethod(type.GetGenericArguments()[0])
-                    .Invoke(null, new object[] { value });
+                if (type == typeof(ValueTask<object?>))
+                    return (ValueTask<object?>)value;
+
+                var func = _valueTaskConvertDictionary.GetOrAdd(type,
+                    static type2 =>
+                    {
+                        var underlyingType = type2.GetGenericArguments()[0];
+                        var newDelegate = _convertValueTaskAsyncMethod
+                            .MakeGenericMethod(underlyingType)
+                            .CreateDelegate(typeof(Func<object, ValueTask<object?>>));
+                        return (Func<object, ValueTask<object?>>)newDelegate;
+                    });
+
+                return func(value);
             }
 
             return new ValueTask<object?>(value);
@@ -375,8 +386,9 @@ namespace GraphQL
             }
         }
 
+        private static readonly ConcurrentDictionary<Type, Func<object, ValueTask<object?>>> _valueTaskConvertDictionary = new();
         private static readonly MethodInfo _convertValueTaskAsyncMethod = typeof(ObjectExtensions).GetMethod(nameof(ConvertValueTaskAsync), BindingFlags.NonPublic | BindingFlags.Static)!;
-        private static async ValueTask<object?> ConvertValueTaskAsync<T>(ValueTask<T> task)
-            => await task.ConfigureAwait(false);
+        private static async ValueTask<object?> ConvertValueTaskAsync<T>(object value)
+            => await ((ValueTask<T>)value).ConfigureAwait(false);
     }
 }
