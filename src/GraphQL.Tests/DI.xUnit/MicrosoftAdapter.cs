@@ -1,4 +1,4 @@
-﻿using GraphQL.DI;
+using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.DI;
