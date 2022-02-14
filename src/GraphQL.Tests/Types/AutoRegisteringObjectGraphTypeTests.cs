@@ -437,6 +437,35 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void TestBasicRecordStructNoExtraFields()
+        {
+            var graphType = new AutoRegisteringObjectGraphType<TestBasicRecordStruct>();
+            graphType.Fields.Find("Id").ShouldNotBeNull();
+            graphType.Fields.Find("Name").ShouldNotBeNull();
+            graphType.Fields.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public void TestStruct()
+        {
+            var graphType = new TestFieldSupport<TestStructModel>();
+            graphType.Name.ShouldBe("Test");
+            graphType.Fields.Count.ShouldBe(3);
+            var context = new ResolveFieldContext
+            {
+                Source = new TestStructModel(),
+                Arguments = new Dictionary<string, ArgumentValue>
+                {
+                    { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
+                },
+            };
+            graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe(1);
+            graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+            graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe("Example");
+            graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe("testExample1");
+        }
+
+        [Fact]
         public void CustomHardcodedArgumentAttributesWork()
         {
             var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
@@ -673,10 +702,22 @@ namespace GraphQL.Tests.Types
 
         private record TestBasicRecord(int Id, string Name);
 
+        private record struct TestBasicRecordStruct(int Id, string Name);
+
         private class TestBasicClass
         {
             public int Id { get; set; }
             public string Name { get; set; } = null!;
+        }
+
+        [Name("Test")]
+        public struct TestStructModel
+        {
+            [Id]
+            public int Id { get; set; } = 1;
+            public static string Name = "Example";
+            [Name("IdAndName")]
+            public string IdName(string prefix) => prefix + Name + Id.ToString();
         }
     }
 }
