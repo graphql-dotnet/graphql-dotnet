@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Tests.DI;
+namespace GraphQL.Tests.DI;
 
 internal interface IDependencyInjectionAdapter
 {
