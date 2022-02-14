@@ -16,6 +16,7 @@ namespace GraphQL.Tests.DI;
 /// and descendants (not marked with [DependencyInjectionData]) work with the first DI provider from
 /// <see cref="DependencyInjectionAdapterData"/>.
 /// </summary>
+// TODO: remove or rewrite this class; should support theories in conjuction with multiple DI providers
 internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttribute
 {
     private static readonly AsyncLocal<MethodInfo> _currentMethod = new();
