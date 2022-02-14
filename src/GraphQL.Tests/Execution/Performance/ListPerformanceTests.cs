@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GraphQL.DI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Xunit.Abstractions;
@@ -10,10 +11,6 @@ namespace GraphQL.Tests.Execution.Performance
         public ListPerformanceTests(ITestOutputHelper output)
         {
             _output = output;
-
-            Services.Register<PeopleType>();
-
-            Services.Singleton(new ListPerformanceSchema(new SimpleContainerAdapter(Services)));
 
             _people = new List<Person>();
 
@@ -55,6 +52,12 @@ namespace GraphQL.Tests.Execution.Performance
 
                 _people.Add(person);
             }
+        }
+
+        public override void RegisterServices(IServiceRegister Services)
+        {
+            Services.Transient<PeopleType>();
+            Services.Singleton<ListPerformanceSchema>();
         }
 
         private readonly ITestOutputHelper _output;

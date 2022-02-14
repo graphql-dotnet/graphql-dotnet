@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GraphQL.DI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -6,11 +7,11 @@ namespace GraphQL.Tests.Execution.Performance
 {
     public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.ThreadPerformanceSchema>
     {
-        public ThreadPerformanceTests()
+        public override void RegisterServices(IServiceRegister Services)
         {
-            Services.Register<PerfQuery>();
-
-            Services.Singleton(() => new ThreadPerformanceSchema(new SimpleContainerAdapter(Services)));
+            Services.Transient<PerfQuery>();
+            Services.Transient<PerfMutation>();
+            Services.Singleton<ThreadPerformanceSchema>();
         }
 
         public class PerfQuery : ObjectGraphType<object>

@@ -6,12 +6,7 @@ namespace GraphQL.Tests.StarWars
 {
     public class StarWarsSubFieldsTests : StarWarsTestBase
     {
-        public StarWarsSubFieldsTests() : base()
-        {
-            RootQuery = (StarWarsQuery)Schema.Query;
-        }
-
-        public StarWarsQuery RootQuery;
+        public StarWarsQuery RootQuery => (StarWarsQuery)Schema.Query;
 
         [Fact]
         public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
