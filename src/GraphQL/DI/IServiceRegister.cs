@@ -21,7 +21,7 @@ namespace GraphQL.DI
 
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency
-        /// injection provider if a service of the same type (and the same implementation type
+        /// injection provider if a service of the same type (and of the same implementation type
         /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
         /// has not already been registered.
         /// </summary>
