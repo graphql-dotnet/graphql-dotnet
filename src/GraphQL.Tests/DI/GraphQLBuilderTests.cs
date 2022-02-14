@@ -176,7 +176,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void TryRegister()
         {
-            _builderMock.Setup(x => x.Services.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
             _builder.Services.TryRegister<Class1>(ServiceLifetime.Transient);
             Verify();
         }
@@ -184,7 +184,7 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void TryRegisterImplementation()
         {
-            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
             _builder.Services.TryRegister<Interface1, Class1>(ServiceLifetime.Transient);
             Verify();
         }
@@ -193,7 +193,7 @@ namespace GraphQL.Tests.DI
         public void TryRegister_Instance()
         {
             var instance = new Class1();
-            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), instance)).Returns(_builder).Verifiable();
+            _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), instance, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.Services.TryRegister<Interface1>(instance);
             Verify();
         }
@@ -202,7 +202,7 @@ namespace GraphQL.Tests.DI
         public void TryRegister_Factory()
         {
             Func<IServiceProvider, Class1> factory = _ => null;
-            _builderMock.Setup(b => b.Services.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.Services.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.Services.TryRegister(factory, ServiceLifetime.Transient);
             Verify();
         }
@@ -243,7 +243,7 @@ namespace GraphQL.Tests.DI
         public void AddSchema()
         {
             _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>();
             Verify();
         }
@@ -259,7 +259,7 @@ namespace GraphQL.Tests.DI
         public void AddSchema_Scoped()
         {
             _builderMock.Setup(b => b.Register(typeof(TestSchema), typeof(TestSchema), ServiceLifetime.Scoped, false)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), typeof(TestSchema), ServiceLifetime.Scoped, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.AddSchema<TestSchema>(ServiceLifetime.Scoped);
             Verify();
         }
@@ -269,7 +269,7 @@ namespace GraphQL.Tests.DI
         {
             Func<IServiceProvider, TestSchema> factory = _ => null;
             _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.AddSchema(factory);
             Verify();
         }
@@ -279,7 +279,7 @@ namespace GraphQL.Tests.DI
         {
             var schema = new TestSchema();
             _builderMock.Setup(b => b.Register(typeof(TestSchema), schema, false)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), schema)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ISchema), schema, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
             _builder.AddSchema(schema);
             Verify();
         }
@@ -672,17 +672,17 @@ namespace GraphQL.Tests.DI
             mockAssembly.Setup(x => x.GetTypes()).Returns(typeList).Verifiable();
             var assembly = mockAssembly.Object;
 
-            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
 
-            _builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(MyScalar), typeof(MyScalar), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(MyScalar), typeof(MyScalar), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
 
             _builder.AddGraphTypes(assembly);
             Verify();
@@ -691,22 +691,22 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddGraphTypes_StarWars()
         {
-            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
 
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.CharacterInterface), typeof(GraphQL.StarWars.Types.CharacterInterface), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.DroidType), typeof(GraphQL.StarWars.Types.DroidType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanInputType), typeof(GraphQL.StarWars.Types.HumanInputType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanType), typeof(GraphQL.StarWars.Types.HumanType), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.EpisodeEnum), typeof(GraphQL.StarWars.Types.EpisodeEnum), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsQuery), typeof(GraphQL.StarWars.StarWarsQuery), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
-            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsMutation), typeof(GraphQL.StarWars.StarWarsMutation), ServiceLifetime.Transient)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.CharacterInterface), typeof(GraphQL.StarWars.Types.CharacterInterface), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.DroidType), typeof(GraphQL.StarWars.Types.DroidType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanInputType), typeof(GraphQL.StarWars.Types.HumanInputType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.HumanType), typeof(GraphQL.StarWars.Types.HumanType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.Types.EpisodeEnum), typeof(GraphQL.StarWars.Types.EpisodeEnum), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsQuery), typeof(GraphQL.StarWars.StarWarsQuery), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
+            _builderMock.Setup(b => b.TryRegister(typeof(GraphQL.StarWars.StarWarsMutation), typeof(GraphQL.StarWars.StarWarsMutation), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
 
             _builder.AddGraphTypes(typeof(GraphQL.StarWars.Types.Droid).Assembly);
             Verify();
@@ -716,7 +716,7 @@ namespace GraphQL.Tests.DI
         public void AddGraphTypes_CallingAssembly()
         {
             var builderMock = new Mock<IGraphQLBuilderAndServiceRegister>(MockBehavior.Loose);
-            builderMock.Setup(b => b.Services.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient)).Returns(builderMock.Object).Verifiable();
+            builderMock.Setup(b => b.Services.TryRegister(typeof(MyGraph), typeof(MyGraph), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builderMock.Object).Verifiable();
             builderMock.Object.AddGraphTypes();
             builderMock.Verify();
         }
