@@ -56,7 +56,7 @@ namespace GraphQL.Tests.Execution.Performance
 
         public override void RegisterServices(IServiceRegister Services)
         {
-            Services.Register<PeopleType>();
+            Services.Transient<PeopleType>();
             Services.Singleton<ListPerformanceSchema>();
         }
 

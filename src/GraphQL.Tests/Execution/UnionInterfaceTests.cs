@@ -48,11 +48,11 @@ namespace GraphQL.Tests.Execution
 
         public override void RegisterServices(IServiceRegister Services)
         {
-            Services.Register<DogType>();
-            Services.Register<CatType>();
-            Services.Register<PetType>();
-            Services.Register<PersonType>();
-            Services.Register<NamedType>();
+            Services.Transient<DogType>();
+            Services.Transient<CatType>();
+            Services.Transient<PetType>();
+            Services.Transient<PersonType>();
+            Services.Transient<NamedType>();
             Services.Singleton<UnionSchema>();
         }
 

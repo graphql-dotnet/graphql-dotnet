@@ -4,8 +4,7 @@ namespace GraphQL.Tests
 {
     internal static class ServiceRegisterExtensions
     {
-        //TODO: rename to transient
-        public static void Register<TService>(this IServiceRegister register)
+        public static void Transient<TService>(this IServiceRegister register)
         {
             register.Register(typeof(TService), typeof(TService), ServiceLifetime.Transient);
         }

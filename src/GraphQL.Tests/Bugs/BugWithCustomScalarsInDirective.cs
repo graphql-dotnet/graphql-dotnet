@@ -8,8 +8,8 @@ namespace GraphQL.Tests.Bugs
     {
         public override void RegisterServices(IServiceRegister Services)
         {
-            Services.Register<BugWithCustomScalarsInDirectiveSchema>();
-            Services.Register<BugWithCustomScalarsInDirectiveQuery>();
+            Services.Transient<BugWithCustomScalarsInDirectiveSchema>();
+            Services.Transient<BugWithCustomScalarsInDirectiveQuery>();
         }
 
         [Fact]

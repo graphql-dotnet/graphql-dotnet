@@ -9,8 +9,8 @@ namespace GraphQL.Tests.Execution.Performance
     {
         public override void RegisterServices(IServiceRegister Services)
         {
-            Services.Register<PerfQuery>();
-            Services.Register<PerfMutation>();
+            Services.Transient<PerfQuery>();
+            Services.Transient<PerfMutation>();
             Services.Singleton<ThreadPerformanceSchema>();
         }
 
