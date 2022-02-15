@@ -298,11 +298,14 @@ namespace GraphQL
             where TImplementation :  class, TService { }
         public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance)
-            where TService :  class { }
         public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TService> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime)
             where TService :  class { }
-        public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime)
+        public static GraphQL.DI.IServiceRegister TryRegister<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance, GraphQL.DI.RegistrationCompareMode mode = 0)
+            where TService :  class { }
+        public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
+            where TService :  class
+            where TImplementation :  class, TService { }
+        public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TImplementation> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
             where TService :  class
             where TImplementation :  class, TService { }
     }

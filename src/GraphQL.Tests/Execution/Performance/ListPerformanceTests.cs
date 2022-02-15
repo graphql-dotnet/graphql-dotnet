@@ -54,10 +54,10 @@ namespace GraphQL.Tests.Execution.Performance
             }
         }
 
-        public override void RegisterServices(IServiceRegister Services)
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Transient<PeopleType>();
-            Services.Singleton<ListPerformanceSchema>();
+            register.Transient<PeopleType>();
+            register.Singleton<ListPerformanceSchema>();
         }
 
         private readonly ITestOutputHelper _output;

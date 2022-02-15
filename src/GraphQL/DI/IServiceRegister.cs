@@ -34,7 +34,7 @@ namespace GraphQL.DI
         /// has not already been registered.
         /// <br/><br/>
         /// With <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>, it is required
-        /// that <paramref name="implementationFactory"/ is a strongly typed delegate with a return type
+        /// that <paramref name="implementationFactory"/> is a strongly typed delegate with a return type
         /// of a specific implementation type.
         /// </summary>
         IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);

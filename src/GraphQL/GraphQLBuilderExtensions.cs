@@ -55,14 +55,25 @@ namespace GraphQL
             => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
         /// <summary>
-        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
-        /// of the same type has not already been registered.
-        /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency
+        /// injection provider if a service of the same type (and of the same implementation type
+        /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
+        /// has not already been registered. An instance of <typeparamref name="TImplementation"/>
+        /// will be created when an instance is needed.
         /// </summary>
-        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
-            => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime);
+            => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, mode);
+
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
+        /// of the same type has not already been registered.
+        /// </summary>
+        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+            where TService : class
+            where TImplementation : class, TService
+            => services.TryRegister(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime, mode);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
@@ -76,9 +87,9 @@ namespace GraphQL
         /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider
         /// if a service of the same type has not already been registered.
         /// </summary>
-        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, TService implementationInstance)
+        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, TService implementationInstance, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
-            => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)));
+            => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), mode);
 
         /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IServiceRegister Configure<TOptions>(this IServiceRegister services, Action<TOptions>? action)
