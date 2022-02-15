@@ -8,7 +8,7 @@ namespace GraphQL.DI
     {
         /// <summary>
         /// Registers the service with the dependency injection provider
-        /// if a service of the same type has not already been registered.
+        /// if a service of the same service type has not already been registered.
         /// </summary>
         ServiceType,
 
