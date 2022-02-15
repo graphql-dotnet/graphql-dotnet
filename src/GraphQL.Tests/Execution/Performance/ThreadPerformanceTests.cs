@@ -7,11 +7,11 @@ namespace GraphQL.Tests.Execution.Performance
 {
     public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.ThreadPerformanceSchema>
     {
-        public override void RegisterServices(IServiceRegister Services)
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Transient<PerfQuery>();
-            Services.Transient<PerfMutation>();
-            Services.Singleton<ThreadPerformanceSchema>();
+            register.Transient<PerfQuery>();
+            register.Transient<PerfMutation>();
+            register.Singleton<ThreadPerformanceSchema>();
         }
 
         public class PerfQuery : ObjectGraphType<object>

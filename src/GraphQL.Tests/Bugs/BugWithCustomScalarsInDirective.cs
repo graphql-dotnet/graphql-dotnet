@@ -6,10 +6,10 @@ namespace GraphQL.Tests.Bugs
 {
     public class BugWithCustomScalarsInDirective : QueryTestBase<BugWithCustomScalarsInDirectiveSchema>
     {
-        public override void RegisterServices(IServiceRegister Services)
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Transient<BugWithCustomScalarsInDirectiveSchema>();
-            Services.Transient<BugWithCustomScalarsInDirectiveQuery>();
+            register.Transient<BugWithCustomScalarsInDirectiveSchema>();
+            register.Transient<BugWithCustomScalarsInDirectiveQuery>();
         }
 
         [Fact]

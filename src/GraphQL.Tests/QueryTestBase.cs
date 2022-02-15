@@ -27,9 +27,9 @@ namespace GraphQL.Tests
         // WARNING: it is not static only for discoverability
         // WARNING: do not set any instance data inside
         // WARNING: method works on temporaly created instance
-        public virtual void RegisterServices(IServiceRegister Services)
+        public virtual void RegisterServices(IServiceRegister register)
         {
-            Services.TryRegister(typeof(TSchema), typeof(TSchema), ServiceLifetime.Singleton);
+            register.TryRegister(typeof(TSchema), typeof(TSchema), ServiceLifetime.Singleton);
         }
 
         private IServiceProvider _serviceProvider;

@@ -46,14 +46,14 @@ namespace GraphQL.Tests.Execution
             };
         }
 
-        public override void RegisterServices(IServiceRegister Services)
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Transient<DogType>();
-            Services.Transient<CatType>();
-            Services.Transient<PetType>();
-            Services.Transient<PersonType>();
-            Services.Transient<NamedType>();
-            Services.Singleton<UnionSchema>();
+            register.Transient<DogType>();
+            register.Transient<CatType>();
+            register.Transient<PetType>();
+            register.Transient<PersonType>();
+            register.Transient<NamedType>();
+            register.Singleton<UnionSchema>();
         }
 
         [Fact]

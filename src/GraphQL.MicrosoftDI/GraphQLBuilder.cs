@@ -124,38 +124,59 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
+        public IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationFactory == null)
                 throw new ArgumentNullException(nameof(implementationFactory));
 
-            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime)));
+            var descriptor = new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime));
+            if (mode == RegistrationCompareMode.ServiceType)
+                ServiceCollection.TryAdd(descriptor);
+            else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
+                ServiceCollection.TryAddEnumerable(descriptor);
+            else
+                throw new ArgumentOutOfRangeException(nameof(mode));
+
             return this;
         }
 
         /// <inheritdoc/>
-        public IServiceRegister TryRegister(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime)
+        public IServiceRegister TryRegister(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationType == null)
                 throw new ArgumentNullException(nameof(implementationType));
 
-            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime)));
+            var descriptor = new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime));
+            if (mode == RegistrationCompareMode.ServiceType)
+                ServiceCollection.TryAdd(descriptor);
+            else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
+                ServiceCollection.TryAddEnumerable(descriptor);
+            else
+                throw new ArgumentOutOfRangeException(nameof(mode));
+
             return this;
         }
 
         /// <inheritdoc/>
-        public IServiceRegister TryRegister(Type serviceType, object implementationInstance)
+        public IServiceRegister TryRegister(Type serviceType, object implementationInstance, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationInstance == null)
                 throw new ArgumentNullException(nameof(implementationInstance));
 
-            ServiceCollection.TryAdd(new ServiceDescriptor(serviceType, implementationInstance));
+            var descriptor = new ServiceDescriptor(serviceType, implementationInstance);
+            if (mode == RegistrationCompareMode.ServiceType)
+                ServiceCollection.TryAdd(descriptor);
+            else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
+                ServiceCollection.TryAddEnumerable(descriptor);
+            else
+                throw new ArgumentOutOfRangeException(nameof(mode));
+
             return this;
         }
 
