@@ -9,6 +9,7 @@ on:
       - develop
     paths:
       - src/**
+      - .github/workflows/**
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
