@@ -137,7 +137,7 @@ namespace GraphQL.MicrosoftDI
             else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
                 ServiceCollection.TryAddEnumerable(descriptor);
             else
-                throw new NotSupportedException(mode.ToString());
+                throw new ArgumentOutOfRangeException(nameof(mode));
 
             return this;
         }
