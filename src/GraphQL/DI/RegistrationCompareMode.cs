@@ -1,8 +1,8 @@
 namespace GraphQL.DI
 {
     /// <summary>
-    /// Mode used for <see cref="IServiceRegister.TryRegister(Type, Type, ServiceLifetime, RegistrationCompareMode)">IServiceRegister.TryRegister</see>
-    /// methods family.
+    /// Comparison mode used for <see cref="IServiceRegister.TryRegister(Type, Type, ServiceLifetime, RegistrationCompareMode)">IServiceRegister.TryRegister</see>
+    /// methods.
     /// </summary>
     public enum RegistrationCompareMode
     {
