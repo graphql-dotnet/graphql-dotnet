@@ -18,6 +18,10 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <PackageReadmeFile Condition="'$(IsPackable)' == 'true'">README.md</PackageReadmeFile>
     <NoWarn>$(NoWarn);1591</NoWarn> <!--TODO: temporary solution-->
+    <!--https://docs.microsoft.com/en-us/dotnet/fundamentals/package-validation/overview-->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!--<EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>-->
+    <!--<EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>-->
   </PropertyGroup>
 
   <ItemGroup>
