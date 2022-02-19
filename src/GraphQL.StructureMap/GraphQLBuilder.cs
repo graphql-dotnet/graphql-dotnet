@@ -16,7 +16,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
         Registry = registry ?? throw new ArgumentNullException(nameof(registry));
         configure?.Invoke(this);
         RegisterDefaultServices();
-        // Registry.For<IServiceProvider>(Lifecycles.Container).Use<StructureMapResolver>();
+        Registry.For<IServiceProvider>(Lifecycles.Container).Use<ServiceProviderAdapter>();
     }
 
     private static ILifecycle TranslateLifetime(ServiceLifetime serviceLifetime)
@@ -40,11 +40,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
     {
         if (replace)
         {
-            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).ClearAll().Use(implementationType);
+            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).ClearAll().Add(implementationType);
         }
         else
         {
-            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).Use(implementationType);
+            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).Add(implementationType);
         }
 
         return this;
@@ -54,11 +54,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
     {
         if (replace)
         {
-            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).ClearAll().Use(context => implementationFactory(context.GetInstance<IServiceProvider>()));
+            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).ClearAll().Add(context => implementationFactory(context.GetInstance<IServiceProvider>()));
         }
         else
         {
-            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).Use(context => implementationFactory(context.GetInstance<IServiceProvider>()));
+            Registry.For(serviceType, TranslateLifetime(serviceLifetime)).Add(context => implementationFactory(context.GetInstance<IServiceProvider>()));
         }
 
         return this;
@@ -68,11 +68,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
     {
         if (replace)
         {
-            Registry.For(serviceType, Lifecycles.Singleton).ClearAll().Use(implementationInstance);
+            Registry.For(serviceType, Lifecycles.Singleton).ClearAll().Add(implementationInstance);
         }
         else
         {
-            Registry.For(serviceType, Lifecycles.Singleton).Use(implementationInstance);
+            Registry.For(serviceType, Lifecycles.Singleton).Add(implementationInstance);
         }
 
         return this;
@@ -85,14 +85,13 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
         if (implementationType == null)
             throw new ArgumentNullException(nameof(implementationType));
 
-        //var descriptor = new ServiceDescriptor(serviceType, implementationType, TranslateLifetime(serviceLifetime));
         if (mode == RegistrationCompareMode.ServiceType)
         {
-            //  ServiceCollection.TryAdd(descriptor);
+            Register(serviceType, implementationType, serviceLifetime);
         }
         else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
         {
-            // ServiceCollection.TryAddEnumerable(descriptor);
+            Register(serviceType, implementationType, serviceLifetime);
         }
         else
             throw new ArgumentOutOfRangeException(nameof(mode));
@@ -107,14 +106,13 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
         if (implementationFactory == null)
             throw new ArgumentNullException(nameof(implementationFactory));
 
-        // var descriptor = new ServiceDescriptor(serviceType, implementationFactory, TranslateLifetime(serviceLifetime));
         if (mode == RegistrationCompareMode.ServiceType)
         {
-            // ServiceCollection.TryAdd(descriptor);
+            Register(serviceType, implementationFactory, serviceLifetime);
         }
         else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
         {
-            // ServiceCollection.TryAddEnumerable(descriptor);
+            Register(serviceType, implementationFactory, serviceLifetime);
         }
         else
             throw new ArgumentOutOfRangeException(nameof(mode));
@@ -129,14 +127,13 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
         if (implementationInstance == null)
             throw new ArgumentNullException(nameof(implementationInstance));
 
-        //var descriptor = new ServiceDescriptor(serviceType, implementationInstance);
         if (mode == RegistrationCompareMode.ServiceType)
         {
-            // ServiceCollection.TryAdd(descriptor);
+            Register(serviceType, implementationInstance);
         }
         else if (mode == RegistrationCompareMode.ServiceTypeAndImplementationType)
         {
-            // ServiceCollection.TryAddEnumerable(descriptor);
+            Register(serviceType, implementationInstance);
         }
         else
             throw new ArgumentOutOfRangeException(nameof(mode));

@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);IDE0060;xUnit1026</NoWarn> <!--Remove unused parameter 'container' if it is not part of a shipped public API/Theory method 'name' on test class 'class' does not use parameter 'container'.-->
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
     <TargetFramework>net6</TargetFramework>
   </PropertyGroup>

@@ -1,6 +1,5 @@
 using GraphQL.DI;
 using GraphQL.StructureMap;
-using Microsoft.Extensions.DependencyInjection;
 using StructureMap;
 
 namespace GraphQL.Tests.DI;
@@ -15,5 +14,5 @@ internal sealed class StructureMapAdapter : IDependencyInjectionAdapter
         _builder = new GraphQLBuilder(new Registry(), b => configure(b.Services));
     }
 
-    public IServiceProvider ServiceProvider => _provider ??= ((Registry)_builder.Registry).BuildServiceProvider();
+    public IServiceProvider ServiceProvider => _provider ??= new ServiceProviderAdapter(new Container((Registry)_builder.Registry));
 }

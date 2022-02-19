@@ -18,8 +18,10 @@ namespace GraphQL.StructureMap
     {
         public static StructureMap.IRegistry AddGraphQL(this StructureMap.IRegistry registry, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
     }
-    public static class RegistryExtensions
+    public sealed class ServiceProviderAdapter : System.IServiceProvider
     {
-        public static System.IServiceProvider BuildServiceProvider(this StructureMap.Registry registry) { }
+        public ServiceProviderAdapter(StructureMap.IContainer container) { }
+        public StructureMap.IContainer Container { get; }
+        public object GetService(System.Type serviceType) { }
     }
 }
