@@ -364,13 +364,13 @@ If you have a PR with some breaking changes, then please target it to the `devel
 
 ## Backers
 
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
+Thank you to all our backers! 🙏 [Back this project](https://opencollective.com/graphql-net#backer).
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
 
 ## Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/graphql-net#sponsor).
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Sponsor this project](https://opencollective.com/graphql-net#sponsor).
 
 <a href="https://opencollective.com/graphql-net/sponsor/0/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/0/avatar.svg"></a>
 <a href="https://opencollective.com/graphql-net/sponsor/1/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/1/avatar.svg"></a>
