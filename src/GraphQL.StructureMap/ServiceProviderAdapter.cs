@@ -1,4 +1,4 @@
-﻿using StructureMap;
+using StructureMap;
 
 namespace GraphQL.StructureMap;
 
