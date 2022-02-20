@@ -33,6 +33,13 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceRegister
     public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
         where TOptions : class, new()
     {
+        //this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
+        //if (action != null)
+        //{
+        //    // This is used instead of "normal" services.Configure(configureOptions) to pass IServiceProvider to user code.
+        //    this.Register<IConfigureOptions<TOptions>>(services => new ConfigureNamedOptions<TOptions>(Options.DefaultName, opt => action(opt, services)), ServiceLifetime.Singleton);
+        //}
+
         return this;
     }
 
