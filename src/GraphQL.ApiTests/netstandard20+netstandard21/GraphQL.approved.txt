@@ -2532,6 +2532,7 @@ namespace GraphQL.Utilities
         public bool AllowUnknownTypes { get; set; }
         public bool IgnoreComments { get; set; }
         public bool IgnoreLocations { get; set; }
+        public bool RunConfigurations { get; set; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.Schema Build(string typeDefinitions) { }
