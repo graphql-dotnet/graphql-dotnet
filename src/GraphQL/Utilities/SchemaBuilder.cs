@@ -94,9 +94,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             // Also see Schema.Validate
         }
 
+        protected virtual Schema CreateSchema() => new(ServiceProvider, runConfigurations: RunConfigurations);
+
         private Schema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema(ServiceProvider, runConfigurations: RunConfigurations);
+            var schema = CreateSchema();
 
             PreConfigure(schema);
 
