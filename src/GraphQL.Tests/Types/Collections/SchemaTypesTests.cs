@@ -1,8 +1,8 @@
 using GraphQL.DI;
 using GraphQL.StarWars;
-using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace GraphQL.Tests.Types.Collections
@@ -13,12 +13,20 @@ namespace GraphQL.Tests.Types.Collections
         public void does_not_request_instance_more_than_once()
         {
             // configure DI provider
-            var services = new SimpleContainer();
-            services.Singleton<StarWarsData>();
+            var services = new ServiceCollection();
+            services.AddSingleton<StarWarsData>();
+            services.AddSingleton<StarWarsQuery>();
+            services.AddSingleton<StarWarsMutation>();
+            services.AddSingleton<HumanType>();
+            services.AddSingleton<HumanInputType>();
+            services.AddSingleton<DroidType>();
+            services.AddSingleton<CharacterInterface>();
+            services.AddSingleton<EpisodeEnum>();
+            using var provider = services.BuildServiceProvider();
 
             // mock it so we can verify behavior
             var mock = new Mock<IServiceProvider>(MockBehavior.Loose);
-            mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => services.Get(type));
+            mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => provider.GetService(type));
 
             // run test
             var schema = new StarWarsSchema(mock.Object);

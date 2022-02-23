@@ -1,3 +1,4 @@
+using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 
@@ -5,15 +6,18 @@ namespace GraphQL.Tests.StarWars
 {
     public class StarWarsTestBase : QueryTestBase<StarWarsSchema>
     {
-        public StarWarsTestBase()
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Singleton(new StarWarsData());
-            Services.Register<StarWarsQuery>();
-            Services.Register<HumanType>();
-            Services.Register<DroidType>();
-            Services.Register<CharacterInterface>();
+            register.Singleton(new StarWarsData());
+            register.Transient<StarWarsQuery>();
+            register.Transient<StarWarsMutation>();
+            register.Transient<HumanType>();
+            register.Transient<HumanInputType>();
+            register.Transient<DroidType>();
+            register.Transient<CharacterInterface>();
+            register.Transient<EpisodeEnum>();
 
-            Services.Singleton(new StarWarsSchema(new SimpleContainerAdapter(Services)));
+            register.Singleton<StarWarsSchema>();
         }
     }
 }

@@ -82,15 +82,39 @@ namespace GraphQL.SystemTextJson
         private static object ReadNumber(ref Utf8JsonReader reader)
         {
             if (reader.TryGetInt32(out int i))
+            {
                 return i;
+            }
             else if (reader.TryGetInt64(out long l))
+            {
                 return l;
+            }
             else if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
+            {
                 return bi;
-            else if (reader.TryGetDouble(out double d))
-                return d;
-            else if (reader.TryGetDecimal(out decimal dm))
-                return dm;
+            }
+            else
+            {
+                bool isDouble = reader.TryGetDouble(out double dbl);
+                bool isDecimal = reader.TryGetDecimal(out decimal dec);
+
+                if (isDouble && !isDecimal)
+                    return dbl;
+
+                if (!isDouble && isDecimal)
+                    return dec;
+
+                if (isDouble && isDecimal)
+                {
+                    // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
+                    var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
+                    decimal temp = new(dbl);
+                    var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
+                    return decBits.Equals(dblAsDecBits)
+                        ? dbl
+                        : dec;
+                }
+            }
 
             var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
 #if NETSTANDARD2_0

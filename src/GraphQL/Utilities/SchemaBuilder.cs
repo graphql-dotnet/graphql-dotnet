@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GraphQL.DI;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -62,6 +63,12 @@ namespace GraphQL.Utilities
         public TypeSettings Types { get; } = new TypeSettings();
 
         /// <summary>
+        /// If <see langword="true"/>, pulls registered <see cref="IConfigureSchema"/>
+        /// instances from <see cref="ServiceProvider"/> and executes them.
+        /// </summary>
+        public bool RunConfigurations { get; set; } = true;
+
+        /// <summary>
         /// Builds schema from string.
         /// </summary>
         /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
@@ -87,9 +94,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             // Also see Schema.Validate
         }
 
+        protected virtual Schema CreateSchema() => new(ServiceProvider, runConfigurations: RunConfigurations);
+
         private Schema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema(ServiceProvider);
+            var schema = CreateSchema();
 
             PreConfigure(schema);
 

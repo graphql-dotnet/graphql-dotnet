@@ -605,7 +605,7 @@ namespace GraphQL
             {
                 // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
                 var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
-                decimal temp = new decimal(dbl);
+                decimal temp = new(dbl);
                 var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
                 if (!decBits.Equals(dblAsDecBits))
                     return dec;

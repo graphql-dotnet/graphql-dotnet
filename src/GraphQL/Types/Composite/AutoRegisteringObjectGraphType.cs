@@ -204,7 +204,6 @@ namespace GraphQL.Types
             var props = AutoRegisteringHelper.ExcludeProperties(
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static).Where(x => x.CanRead),
                 _excludedProperties);
-            var isRecord = typeof(TSourceType).GetMethods().Any(x => x.Name == "<Clone>$");
             var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
                 .Where(x =>
                     !x.ContainsGenericParameters &&               // exclude methods with open generics
@@ -213,7 +212,7 @@ namespace GraphQL.Types
                     x.ReturnType != typeof(Task) &&               // exclude methods which do not return a value
                     x.GetBaseDefinition() == x &&                 // exclude methods which override an inherited class' method (e.g. GetHashCode)
                                                                   // exclude methods generated for record types: bool Equals(TSourceType)
-                    !(isRecord && x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
+                    !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
                     x.Name != "<Clone>$");                        // exclude methods generated for record types
             return props.Concat<MemberInfo>(methods);
         }

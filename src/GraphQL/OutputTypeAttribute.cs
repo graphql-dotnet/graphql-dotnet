@@ -5,7 +5,7 @@ namespace GraphQL
     /// <summary>
     /// Specifies an output graph type mapping for the CLR class or property marked with this attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class OutputTypeAttribute : GraphQLAttribute
     {
         private Type _outputType = null!;

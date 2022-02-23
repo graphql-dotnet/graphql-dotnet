@@ -1,3 +1,4 @@
+using GraphQL.DI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
@@ -10,13 +11,6 @@ namespace GraphQL.Tests.Execution
 
         public UnionInterfaceTests()
         {
-            Services.Register<DogType>();
-            Services.Register<CatType>();
-            Services.Register<PetType>();
-            Services.Register<PersonType>();
-
-            Services.Singleton(new UnionSchema(new SimpleContainerAdapter(Services)));
-
             var garfield = new Cat
             {
                 Name = "Garfield",
@@ -50,6 +44,16 @@ namespace GraphQL.Tests.Execution
                     odie
                 }
             };
+        }
+
+        public override void RegisterServices(IServiceRegister register)
+        {
+            register.Transient<DogType>();
+            register.Transient<CatType>();
+            register.Transient<PetType>();
+            register.Transient<PersonType>();
+            register.Transient<NamedType>();
+            register.Singleton<UnionSchema>();
         }
 
         [Fact]

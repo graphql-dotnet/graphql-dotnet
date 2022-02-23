@@ -1,3 +1,6 @@
+using GraphQL.Tests.StarWars;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace GraphQL.Tests.Serialization
 {
     /// <summary>
@@ -157,7 +160,9 @@ namespace GraphQL.Tests.Serialization
         [ClassData(typeof(GraphQLSerializersTestData))]
         public async Task Synchronous_and_Async_Works_Same(IGraphQLTextSerializer serializer)
         {
-            var schema = new GraphQL.StarWars.StarWarsSchema(new GraphQL.StarWars.IoC.SimpleContainer());
+            //ISSUE: manually created test instance with ServiceProvider
+            var builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => new StarWarsTestBase().RegisterServices(b.Services));
+            var schema = new GraphQL.StarWars.StarWarsSchema(builder.ServiceCollection.BuildServiceProvider());
             var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
             {
                 Schema = schema,

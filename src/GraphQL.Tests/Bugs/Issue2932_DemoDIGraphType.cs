@@ -2,19 +2,20 @@
 
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.DI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType.TestSchema, MsDiContainer>
+    public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType.TestSchema>
     {
-        public Issue2932_DemoDIGraphType()
+        public override void RegisterServices(IServiceRegister register)
         {
-            Services.Singleton<TestSchema>();
-            Services.Singleton<DIGraphType<SampleGraph, SampleSource>>();
-            Services.Scoped<Service1>();
-            Services.Scoped<Service2>();
+            register.Singleton<TestSchema>();
+            register.Singleton<DIGraphType<SampleGraph, SampleSource>>();
+            register.Scoped<Service1>();
+            register.Scoped<Service2>();
             // note: in this example, SampleGraph is not registered, but is created for every field resolver (except static methods) -- see DIGraphType.MemberInstanceFunc
         }
 
