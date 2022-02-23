@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-         dotnet-version: '6.0.x'
+         dotnet-version: '6.0.102'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
@@ -31,8 +31,9 @@ jobs:
       working-directory: src
       run: dotnet restore
 
-    - name: Build solution
-      working-directory: src
+    - name: Build CodeQL solution
+      # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/troubleshooting-the-codeql-workflow#reduce-the-amount-of-code-being-analyzed-in-a-single-workflow
+      working-directory: codeql
       run: dotnet build --no-restore
 
     - name: Perform CodeQL Analysis
