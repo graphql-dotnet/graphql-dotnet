@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\GraphQL\Shim\DecimalData.cs" Link="DecimalData.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
