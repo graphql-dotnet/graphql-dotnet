@@ -11,64 +11,79 @@ namespace GraphQL.Types
         /// Does not build accompanying query arguments for detected method parameters.
         /// Does not allow overriding build behavior.
         /// <br/><br/>
-        /// If <paramref name="sourceExpression"/> is <see langword="null"/> then a default source expression is used as follows:
+        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
         /// <code>context =&gt; (SourceType)context.Source</code>
         /// </summary>
-        internal static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? sourceExpression)
+        internal static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
         {
             // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
             // but it does not provide the ability to override any behavior, and it does not return or
             // build query arguments
             if (memberInfo is FieldInfo fieldInfo)
             {
-                return new MemberResolver(fieldInfo, sourceExpression);
+                return new MemberResolver(fieldInfo, instanceExpression);
             }
             else if (memberInfo is PropertyInfo propertyInfo)
             {
-                return new MemberResolver(propertyInfo, sourceExpression);
+                return new MemberResolver(propertyInfo, instanceExpression);
             }
             else if (memberInfo is MethodInfo methodInfo)
             {
-                var arguments = BuildMethodArguments(methodInfo, sourceType, fieldType);
-                return new MemberResolver(methodInfo, arguments, sourceExpression);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
+                var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
+                return new MemberResolver(methodInfo, arguments, instanceExpression);
             }
 
-            static IList<LambdaExpression> BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
-            {
-                List<LambdaExpression> expressions = new();
-                foreach (var parameterInfo in methodInfo.GetParameters())
-                {
-                    var typeInformation = new TypeInformation(parameterInfo);
-                    typeInformation.ApplyAttributes(); // typically this is unnecessary, since this is primarily used to control the graph type of generated query arguments
-                    var argumentInfo = new ArgumentInformation(parameterInfo, sourceType, fieldType, typeInformation);
-                    argumentInfo.ApplyAttributes(); // necessary to allow [FromSource], [FromServices] and similar attributes to work
-                    var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-                    if (queryArgument != null)
-                    {
-                        // even though the query argument is not used, it is necessary to apply attributes to the generated argument in case the name is overridden,
-                        // as the generated query argument's name is used within the expression for the call to GetArgument
-                        var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
-                        foreach (var attr in attributes)
-                            attr.Modify(queryArgument);
-                    }
-                    expression ??= GetParameterExpression(
-                        parameterInfo.ParameterType,
-                        queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
-                    expressions.Add(expression);
-                }
-                return expressions;
-            }
+            throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
         }
 
         /// <summary>
-        /// Builds the following source expression:
+        /// Constructs an event stream resolver for the specified method.
+        /// Does not build accompanying query arguments for detected method parameters.
+        /// Does not allow overriding build behavior.
+        /// <br/><br/>
+        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// </summary>
+        internal static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        {
+            // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
+            // but it does not provide the ability to override any behavior, and it does not return or
+            // build query arguments
+            var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
+            return new EventStreamMethodResolver(methodInfo, arguments, instanceExpression);
+        }
+
+        private static IList<LambdaExpression> BuildFieldResolver_BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
+        {
+            List<LambdaExpression> expressions = new();
+            foreach (var parameterInfo in methodInfo.GetParameters())
+            {
+                var typeInformation = new TypeInformation(parameterInfo);
+                typeInformation.ApplyAttributes(); // typically this is unnecessary, since this is primarily used to control the graph type of generated query arguments
+                var argumentInfo = new ArgumentInformation(parameterInfo, sourceType, fieldType, typeInformation);
+                argumentInfo.ApplyAttributes(); // necessary to allow [FromSource], [FromServices] and similar attributes to work
+                var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
+                if (queryArgument != null)
+                {
+                    // even though the query argument is not used, it is necessary to apply attributes to the generated argument in case the name is overridden,
+                    // as the generated query argument's name is used within the expression for the call to GetArgument
+                    var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
+                    foreach (var attr in attributes)
+                        attr.Modify(queryArgument);
+                }
+                expression ??= GetParameterExpression(
+                    parameterInfo.ParameterType,
+                    queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
+                expressions.Add(expression);
+            }
+            return expressions;
+        }
+
+        /// <summary>
+        /// Builds the following instance expression:
         /// <code>context =&gt; context.Source as TSourceType ?? (context.RequestServices ?? serviceProvider).GetService(sourceType) ?? throw new InvalidOperationException(...)</code>
         /// </summary>
-        internal static LambdaExpression BuildSourceExpressionForSchemaBuilder(Type sourceType, IServiceProvider serviceProvider)
+        internal static LambdaExpression BuildInstanceExpressionForSchemaBuilder(Type sourceType, IServiceProvider serviceProvider)
         {
             // exception cannot occur here, so don't worry catching TargetInvokeException
             return (LambdaExpression)_buildSourceExpressionForSchemaBuilderInternalMethodInfo

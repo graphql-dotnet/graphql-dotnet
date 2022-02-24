@@ -13,8 +13,8 @@ namespace GraphQL.Resolvers
         private readonly Func<IResolveFieldContext, object?> _resolver;
 
         /// <summary>
-        /// Initializes an instance for the specified field, using a default source expression of:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// Initializes an instance for the specified field, using a default instance expression of:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
         public MemberResolver(FieldInfo fieldInfo)
             : this(fieldInfo, null)
@@ -22,33 +22,33 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
-        /// Initializes an instance for the specified field, using the specified source expression to access the instance of the field.
-        /// If <paramref name="sourceExpression"/> is <see langword="null"/> then a default source expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// Initializes an instance for the specified field, using the specified instance expression to access the instance of the field.
+        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(FieldInfo fieldInfo, LambdaExpression? sourceExpression)
+        public MemberResolver(FieldInfo fieldInfo, LambdaExpression? instanceExpression)
         {
             if (fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
-            sourceExpression ??= BuildDefaultSourceExpression(fieldInfo.DeclaringType);
+            instanceExpression ??= BuildDefaultInstanceExpression(fieldInfo.DeclaringType);
 
-            if (sourceExpression.Parameters.Count != 1 ||
-                sourceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
-                !fieldInfo.DeclaringType!.IsAssignableFrom(sourceExpression.ReturnType))
+            if (instanceExpression.Parameters.Count != 1 ||
+                instanceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
+                !fieldInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType))
             {
-                throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {fieldInfo.DeclaringType!.Name}>.", nameof(sourceExpression));
+                throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {fieldInfo.DeclaringType!.Name}>.", nameof(instanceExpression));
             }
 
             var methodCallExpr = Expression.MakeMemberAccess(
-                fieldInfo.IsStatic ? null : sourceExpression.Body,
+                fieldInfo.IsStatic ? null : instanceExpression.Body,
                 fieldInfo);
 
-            _resolver = BuildFunction(sourceExpression.Parameters[0], methodCallExpr);
+            _resolver = BuildFieldResolver(instanceExpression.Parameters[0], methodCallExpr);
         }
 
         /// <summary>
-        /// Initializes an instance for the specified property, using a default source expression of:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// Initializes an instance for the specified property, using a default instance expression of:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
         public MemberResolver(PropertyInfo propertyInfo)
             : this(propertyInfo, null)
@@ -56,18 +56,18 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
-        /// Initializes an instance for the specified property, using the specified source expression to access the instance of the property.
-        /// If <paramref name="sourceExpression"/> is <see langword="null"/> then a default source expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// Initializes an instance for the specified property, using the specified instance expression to access the instance of the property.
+        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(PropertyInfo propertyInfo, LambdaExpression? sourceExpression)
-            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException("No 'get' method for the supplied property.", nameof(propertyInfo)), Array.Empty<LambdaExpression>(), sourceExpression)
+        public MemberResolver(PropertyInfo propertyInfo, LambdaExpression? instanceExpression)
+            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException("No 'get' method for the supplied property.", nameof(propertyInfo)), Array.Empty<LambdaExpression>(), instanceExpression)
         {
         }
 
         /// <summary>
-        /// Initializes an instance for the specified method and arguments, using a default source expression of:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// Initializes an instance for the specified method and arguments, using a default instance expression of:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// The method argument expressions must have return types that match those of the method arguments.
         /// </summary>
         public MemberResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions)
@@ -76,17 +76,17 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
-        /// Initializes an instance for the specified method, using the specified source expression to access the instance of the method,
+        /// Initializes an instance for the specified method, using the specified instance expression to access the instance of the method,
         /// along with a list of arguments to be passed to the method. The method argument expressions must have return types that match
         /// those of the method arguments.
-        /// If <paramref name="sourceExpression"/> is <see langword="null"/> then a default source expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions, LambdaExpression? sourceExpression)
+        public MemberResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions, LambdaExpression? instanceExpression)
         {
             if (methodInfo == null)
                 throw new ArgumentNullException(nameof(methodInfo));
-            sourceExpression ??= BuildDefaultSourceExpression(methodInfo.DeclaringType);
+            instanceExpression ??= BuildDefaultInstanceExpression(methodInfo.DeclaringType);
             if (methodArgumentExpressions == null)
                 throw new ArgumentNullException(nameof(methodArgumentExpressions));
             // verify that the expressions provided match the number of parameters
@@ -95,11 +95,11 @@ namespace GraphQL.Resolvers
             {
                 throw new InvalidOperationException("The number of expressions must equal the number of method parameters.");
             }
-            if (sourceExpression.Parameters.Count != 1 ||
-                sourceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
-                !methodInfo.DeclaringType!.IsAssignableFrom(sourceExpression.ReturnType))
+            if (instanceExpression.Parameters.Count != 1 ||
+                instanceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
+                !methodInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType))
             {
-                throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {methodInfo.DeclaringType!.Name}>.", nameof(sourceExpression));
+                throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {methodInfo.DeclaringType!.Name}>.", nameof(instanceExpression));
             }
 
             // create a parameter expression for IResolveFieldContext
@@ -123,19 +123,19 @@ namespace GraphQL.Resolvers
                 Expression.Call(
                     methodInfo.IsStatic
                         ? null
-                        : sourceExpression.Body.Replace(
-                            sourceExpression.Parameters[0],
+                        : instanceExpression.Body.Replace(
+                            instanceExpression.Parameters[0],
                             resolveFieldContextParameter),
                     methodInfo,
                     expressionBodies);
 
-            _resolver = BuildFunction(resolveFieldContextParameter, methodCallExpr);
+            _resolver = BuildFieldResolver(resolveFieldContextParameter, methodCallExpr);
         }
 
         /// <summary>
         /// Creates an appropriate resolver function based on the return type of the expression body.
         /// </summary>
-        private static Func<IResolveFieldContext, object?> BuildFunction(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        protected virtual Func<IResolveFieldContext, object?> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
             // convert the result to type object
             var convertExpr = Expression.Convert(bodyExpression, typeof(object));
@@ -150,15 +150,19 @@ namespace GraphQL.Resolvers
         }
 
         private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
-        private static LambdaExpression BuildDefaultSourceExpression(Type sourceType)
+        /// <summary>
+        /// Returns the following lambda:
+        /// <code>context =&gt; (TType)context.Source</code>
+        /// </summary>
+        protected static LambdaExpression BuildDefaultInstanceExpression(Type type)
         {
             var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
             var body = Expression.MakeMemberAccess(param, _sourcePropertyInfo);
-            var castExpr = Expression.Convert(body, sourceType);
+            var castExpr = Expression.Convert(body, type);
             return Expression.Lambda(castExpr, param);
         }
 
         /// <inheritdoc/>
-        public object? Resolve(IResolveFieldContext context) => _resolver(context);
+        public virtual object? Resolve(IResolveFieldContext context) => _resolver(context);
     }
 }

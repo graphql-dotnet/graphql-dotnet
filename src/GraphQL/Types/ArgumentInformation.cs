@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Subscription;
 
 namespace GraphQL.Types
 {
@@ -29,7 +30,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Initializes a new instance with the specified parameters.
-        /// If the parameter type is <see cref="IResolveFieldContext"/> or <see cref="CancellationToken"/>,
+        /// If the parameter type is <see cref="IResolveFieldContext"/>, <see cref="IResolveEventStreamContext"/> or <see cref="CancellationToken"/>,
         /// an expression is generated for the parameter and set within <see cref="Expression"/>; otherwise
         /// <see cref="Expression"/> is set to <see langword="null"/>.
         /// </summary>
@@ -39,6 +40,11 @@ namespace GraphQL.Types
             if (parameterInfo.ParameterType == typeof(IResolveFieldContext))
             {
                 Expression<Func<IResolveFieldContext, IResolveFieldContext>> expr = x => x;
+                Expression = expr;
+            }
+            else if (parameterInfo.ParameterType == typeof(IResolveEventStreamContext))
+            {
+                Expression<Func<IResolveFieldContext, IResolveEventStreamContext>> expr = x => (IResolveEventStreamContext)x;
                 Expression = expr;
             }
             else if (parameterInfo.ParameterType == typeof(CancellationToken))

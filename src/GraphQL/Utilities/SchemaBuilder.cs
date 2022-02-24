@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using GraphQL.DI;
 using GraphQL.Reflection;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -298,7 +297,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     config.ResolverAccessor.MethodInfo,
                     null, // unknown source type
                     null, // unknown FieldType
-                    AutoRegisteringHelper.BuildSourceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {
@@ -315,12 +314,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (config.ResolverAccessor != null && config.SubscriberAccessor != null)
             {
-                //config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
                 config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
                     config.ResolverAccessor.MethodInfo,
                     null, // unknown source type
                     null, // unknown FieldType
-                    AutoRegisteringHelper.BuildSourceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
+
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {
@@ -328,14 +327,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         a.Modify(config);
                 }
 
-                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, ServiceProvider);
-                }
-                else
-                {
-                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, ServiceProvider);
-                }
+                config.AsyncSubscriber = AutoRegisteringHelper.BuildEventStreamResolver(
+                    config.SubscriberAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
             }
         }
 
