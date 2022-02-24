@@ -37,9 +37,20 @@ namespace GraphQL.Resolvers
         /// <inheritdoc/>
         protected override Func<IResolveFieldContext, object?> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
+            _eventStreamResolver = BuildEventStreamResolver(resolveFieldContextParameter, bodyExpression);
+            return context => context.Source;
+        }
+
+        /// <summary>
+        /// Creates an appropriate event stream resolver function based on the return type of the expression body.
+        /// </summary>
+        protected virtual Func<IResolveFieldContext, Task<IObservable<object?>>> BuildEventStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        {
+            Expression? taskBodyExpression = null;
+
             if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
-                return Complete(bodyExpression);
+                taskBodyExpression = bodyExpression;
             }
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
             {
@@ -49,7 +60,7 @@ namespace GraphQL.Resolvers
                     var innerType = type.GetGenericArguments()[0];
                     if (!innerType.IsValueType)
                     {
-                        return Complete(Expression.Call(_castFromTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
+                        taskBodyExpression = Expression.Call(_castFromTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression);
                     }
                 }
             }
@@ -58,18 +69,17 @@ namespace GraphQL.Resolvers
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
                 if (!innerType.IsValueType)
                 {
-                    return Complete(Expression.Call(_castFromObservableMethodInfo.MakeGenericMethod(innerType), bodyExpression));
+                    taskBodyExpression = Expression.Call(_castFromObservableMethodInfo.MakeGenericMethod(innerType), bodyExpression);
                 }
             }
 
-            throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type.");
-
-            Func<IResolveFieldContext, object?> Complete(Expression bodyExpression)
+            if (taskBodyExpression == null)
             {
-                var lambda = Expression.Lambda<Func<IResolveFieldContext, Task<IObservable<object?>>>>(bodyExpression, resolveFieldContextParameter);
-                _eventStreamResolver = lambda.Compile();
-                return context => context.Source;
+                throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type.");
             }
+
+            var lambda = Expression.Lambda<Func<IResolveFieldContext, Task<IObservable<object?>>>>(taskBodyExpression, resolveFieldContextParameter);
+            return lambda.Compile();
         }
 
         private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
