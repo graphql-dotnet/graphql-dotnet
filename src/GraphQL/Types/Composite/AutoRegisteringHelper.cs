@@ -98,7 +98,6 @@ namespace GraphQL.Types
         {
             var source = context.Source;
 
-            //TODO: change to use context.RequestServices instead of serviceProvider
             var target = typeof(T).IsInstanceOfType(source)
                 ? (T)source!
                 : (T?)(context.RequestServices ?? serviceProvider).GetService(typeof(T));
