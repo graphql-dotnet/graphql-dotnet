@@ -46,9 +46,6 @@ namespace GraphQL.Types
         /// </summary>
         internal static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
         {
-            // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
-            // but it does not provide the ability to override any behavior, and it does not return or
-            // build query arguments
             var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
             return new EventStreamMethodResolver(methodInfo, arguments, instanceExpression);
         }
