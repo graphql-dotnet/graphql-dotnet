@@ -293,7 +293,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (config.ResolverAccessor != null)
             {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                //config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
+                    config.ResolverAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildSourceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {
@@ -310,7 +315,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (config.ResolverAccessor != null && config.SubscriberAccessor != null)
             {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                //config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
+                    config.ResolverAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildSourceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {

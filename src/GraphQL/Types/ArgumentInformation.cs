@@ -18,11 +18,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation, LambdaExpression? expression)
+        public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation, LambdaExpression? expression)
         {
             ParameterInfo = parameterInfo ?? throw new ArgumentNullException(nameof(parameterInfo));
-            FieldType = fieldType ?? throw new ArgumentNullException(nameof(fieldType));
-            SourceType = sourceType ?? throw new ArgumentNullException(nameof(sourceType));
+            FieldType = fieldType; // ?? throw new ArgumentNullException(nameof(fieldType));
+            SourceType = sourceType; // ?? throw new ArgumentNullException(nameof(sourceType));
             TypeInformation = typeInformation ?? throw new ArgumentNullException(nameof(typeInformation));
             Expression = expression;
         }
@@ -33,7 +33,7 @@ namespace GraphQL.Types
         /// an expression is generated for the parameter and set within <see cref="Expression"/>; otherwise
         /// <see cref="Expression"/> is set to <see langword="null"/>.
         /// </summary>
-        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation)
+        public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation)
             : this(parameterInfo, sourceType, fieldType, typeInformation, null)
         {
             if (parameterInfo.ParameterType == typeof(IResolveFieldContext))
@@ -57,12 +57,12 @@ namespace GraphQL.Types
         /// The expected type of <see cref="IResolveFieldContext.Source"/>.
         /// Should equal <c>TSourceType</c> within <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
         /// </summary>
-        public Type SourceType { get; }
+        public Type? SourceType { get; }
 
         /// <summary>
         /// The <see cref="Types.FieldType"/> that the query argument will be added to.
         /// </summary>
-        public FieldType FieldType { get; }
+        public FieldType? FieldType { get; }
 
         /// <summary>
         /// The parsed type information of the method parameter.
@@ -139,10 +139,10 @@ namespace GraphQL.Types
         /// </summary>
         public virtual void ApplyAttributes()
         {
-            var attributes = ParameterInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            var attributes = ParameterInfo.GetCustomAttributes<GraphQLAttribute>();
             foreach (var attr in attributes)
             {
-                ((GraphQLAttribute)attr).Modify(this);
+                attr.Modify(this);
             }
         }
 

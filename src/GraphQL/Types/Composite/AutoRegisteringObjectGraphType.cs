@@ -97,8 +97,7 @@ namespace GraphQL.Types
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {
-                var getMethod = propertyInfo.GetMethod ?? throw new InvalidOperationException("No 'get' method for the supplied property.");
-                var resolver = new MethodResolver(getMethod, BuildMemberInstanceExpression(memberInfo), Array.Empty<LambdaExpression>());
+                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
             }
@@ -122,23 +121,15 @@ namespace GraphQL.Types
                         queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                     expressions.Add(expression);
                 }
-                var resolver = new MethodResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
+                var resolver = new MemberResolver(methodInfo, expressions, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = queryArguments;
                 fieldType.Resolver = resolver;
             }
             else if (memberInfo is FieldInfo fieldInfo)
             {
-                var sourceExpression = BuildMemberInstanceExpression(memberInfo);
-                var param = sourceExpression.Parameters[0];
-                var body = Expression.Convert(
-                    Expression.MakeMemberAccess(
-                        fieldInfo.IsStatic ? null : sourceExpression.Body,
-                        fieldInfo),
-                    typeof(object));
-                var lambda = Expression.Lambda<Func<IResolveFieldContext, object?>>(body, param);
-                var func = lambda.Compile();
+                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
-                fieldType.Resolver = new FuncFieldResolver<object>(func);
+                fieldType.Resolver = resolver;
             }
             else if (memberInfo == null)
             {
