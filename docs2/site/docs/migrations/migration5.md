@@ -282,6 +282,8 @@ field type or query argument. New attributes have been updated or added for conv
 | `[Metadata]`         | Specifies custom metadata to be added to the graph type, field or query argument |
 | `[Scoped]`           | For methods, specifies to create a DI service scope during resolver execution |
 | `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
+| `[FromSource]`       | For method parameters, specifies that the argument value should be the context 'Source' |
+| `[FromUserContext]`  | For method parameters, specifies that the argument value should be the user context |
 | `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
@@ -414,6 +416,64 @@ servcies.AddGraphQL(builder => builder
 
 The `DocumentExecuter.SelectExecutionStrategy` method is still available to be overridden for
 backwards compatibility but may be removed in the next major version.
+
+### 13. Schema builder improvements for reflected methods
+
+When configuring a CLR method for a field, the method arguments now allow the use of all of
+the new attributes available to `AutoRegisteringObjectGraphType`, such as `[FromServices]`.
+Field resolvers are now precompiled, resulting in faster performance.
+
+As always, when the CLR type is not the source type, the CLR type is pulled from DI.
+Now the CLR type will be pulled from `context.RequestServices` to allow for scoped instances.
+If `RequestServices` is `null`, the root DI provider will be used as it was before.
+
+Note that existing methods will require the use of `[FromSource]` and `[FromUserContext]` for
+applicable method arguments.
+
+```csharp
+// v4
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    // DI-injected services are always pulled from the root DI provider, so scoped services are not supported
+    private readonly Repository _repo;
+    public DroidType(Repository repo)
+    {
+        _repo = repo;
+    }
+
+    public int Id(Droid source) => source.Id;
+
+    public IEnumerable<Droid> Friends(Droid source) => _repo.FriendsOf(source.Id);
+}
+
+// v5
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    // scoped services are supported, so long as ExecutionOptions.RequestServices is set
+    private readonly Repository _repo;
+    public DroidType(Repository repo)
+    {
+        _repo = repo;
+    }
+
+    // requires use of [FromSource]
+    public int Id([FromSource] Droid source) => source.Id;
+
+    public IEnumerable<Droid> Friends([FromSource] Droid source) => _repo.FriendsOf(source.Id);
+}
+
+// v5 alternate
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    public int Id([FromSource] Droid source) => source.Id;
+
+    // only inject Repostiory where needed
+    public IEnumerable<Droid> Friends([FromSource] Droid source, [FromServices] Repository repo) => repo.FriendsOf(source.Id);
+}
+```
 
 ## Breaking Changes
 
@@ -715,3 +775,6 @@ For more details on the new approach to execution strategy selection, please rev
 
 > The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
 
+### 30. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+
+See New Features: 'Schema builder improvements for reflected methods' above.
