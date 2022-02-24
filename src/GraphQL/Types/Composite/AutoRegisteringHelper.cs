@@ -85,7 +85,7 @@ namespace GraphQL.Types
             // exception cannot occur here, so don't worry catching TargetInvokeException
             return (LambdaExpression)_buildSourceExpressionForSchemaBuilderInternalMethodInfo
                 .MakeGenericMethod(sourceType)
-                .Invoke(null, new object[] { serviceProvider });
+                .Invoke(null, new object[] { serviceProvider })!;
         }
 
         private static readonly MethodInfo _buildSourceExpressionForSchemaBuilderInternalMethodInfo = typeof(AutoRegisteringHelper).GetMethod(nameof(BuildSourceExpressionForSchemaBuilderInternal), BindingFlags.Static | BindingFlags.NonPublic);
