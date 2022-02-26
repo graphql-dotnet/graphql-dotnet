@@ -32,7 +32,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Setup .NET Core SDKs
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: |
             3.1.x
