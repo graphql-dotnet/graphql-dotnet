@@ -135,9 +135,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
+        internal static EventStreamFieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
-            var fieldType = new FieldType()
+            var fieldType = new EventStreamFieldType()
             {
                 Name = memberInfo.Name,
                 Description = memberInfo.Description(),
