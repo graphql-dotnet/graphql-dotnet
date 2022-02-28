@@ -1,26 +1,95 @@
 using System.Reactive.Linq;
 using GraphQL.Subscription;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription
 {
     public class SubscriptionWithAutoGraphTypeTests
     {
-
-        public SubscriptionWithAutoGraphTypeTests()
-        {
-            SubscriptionSchemaWithReflection.Initialize(new Chat());
-        }
-
+        private readonly Chat Chat = new Chat();
 
         protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
             var executer = new SubscriptionDocumentExecuter();
+            var services = new ServiceCollection();
+            services.AddSingleton<IChat>(Chat);
+            var provider = services.BuildServiceProvider();
+
+            options.Schema = new SubscriptionSchemaWithAutoGraphType();
+            options.RequestServices = provider;
 
             var result = await executer.ExecuteAsync(options);
 
             result.ShouldBeOfType<SubscriptionExecutionResult>();
 
             return (SubscriptionExecutionResult)result;
+        }
+
+        [Fact]
+        public async Task SubscribeGetAll()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now.Date
+            };
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
+            });
+
+            Chat.AddMessageGetAll(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            var data = message.Data.ToDict();
+            data.ShouldNotBeNull();
+            data["messageGetAll"].ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async Task SubscribeToContent()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now.Date
+            };
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription newMessageContent { newMessageContent }",
+            });
+
+            Chat.AddMessage(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            var data = message.Data.ToDict();
+            data.ShouldNotBeNull();
+            data["newMessageContent"].ShouldNotBeNull();
+            data["newMessageContent"].ToString().ShouldBe("test");
         }
 
         [Fact]
@@ -35,20 +104,16 @@ namespace GraphQL.Tests.Subscription
                     DisplayName = "test",
                     Id = "1"
                 },
-                SentAt = DateTime.Now
+                SentAt = DateTime.Now.Date
             };
-
-            var chat = SubscriptionSchemaWithReflection.Chat;
-            var schema = SubscriptionSchemaWithReflection.Schema;
 
             /* When */
             var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-                Schema = schema
             });
 
-            chat.AddMessage(addedMessage);
+            Chat.AddMessage(addedMessage);
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
@@ -72,20 +137,16 @@ namespace GraphQL.Tests.Subscription
                     DisplayName = "test",
                     Id = "1"
                 },
-                SentAt = DateTime.Now
+                SentAt = DateTime.Now.Date
             };
-
-            var chat = SubscriptionSchemaWithReflection.Chat;
-            var schema = SubscriptionSchemaWithReflection.Schema;
 
             /* When */
             var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
-                Schema = schema
             });
 
-            chat.AddMessage(addedMessage);
+            Chat.AddMessage(addedMessage);
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
@@ -109,24 +170,20 @@ namespace GraphQL.Tests.Subscription
                     DisplayName = "test",
                     Id = "1"
                 },
-                SentAt = DateTime.Now
+                SentAt = DateTime.Now.Date
             };
-
-            var chat = SubscriptionSchemaWithReflection.Chat;
-            var schema = SubscriptionSchemaWithReflection.Schema;
 
             /* When */
             var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
-                Schema = schema,
                 Variables = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })
             });
 
-            chat.AddMessage(addedMessage);
+            Chat.AddMessage(addedMessage);
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
@@ -149,24 +206,20 @@ namespace GraphQL.Tests.Subscription
                     DisplayName = "test",
                     Id = "1"
                 },
-                SentAt = DateTime.Now
+                SentAt = DateTime.Now.Date
             };
-
-            var chat = SubscriptionSchemaWithReflection.Chat;
-            var schema = SubscriptionSchemaWithReflection.Schema;
 
             /* When */
             var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
-                Schema = schema,
                 Variables = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })
             });
 
-            chat.AddMessage(addedMessage);
+            Chat.AddMessage(addedMessage);
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
@@ -180,18 +233,13 @@ namespace GraphQL.Tests.Subscription
         [Fact]
         public async Task OnError()
         {
-            /* Given */
-            var chat = SubscriptionSchemaWithReflection.Chat;
-            var schema = SubscriptionSchemaWithReflection.Schema;
-
             /* When */
             var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-                Schema = schema
             });
 
-            chat.AddError(new Exception("test"));
+            Chat.AddError(new Exception("test"));
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();

@@ -167,7 +167,7 @@ namespace GraphQL.Types
             if (g == typeof(IObservable<>))
                 return true;
             if (g == typeof(Task<>) || g == typeof(ValueTask<>))
-                return IsObservable(g.GetGenericArguments()[0]);
+                return IsObservable(type.GetGenericArguments()[0]);
             return false;
         }
 
