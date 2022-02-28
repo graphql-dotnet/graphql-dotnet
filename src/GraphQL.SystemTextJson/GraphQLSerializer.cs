@@ -129,7 +129,7 @@ namespace GraphQL.SystemTextJson
                 SerializerOptions.Converters.Add(new ApolloTraceJsonConverter());
             }
 
-            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(System.Numerics.BigInteger))))
             {
                 SerializerOptions.Converters.Add(new JsonConverterBigInteger());
             }
