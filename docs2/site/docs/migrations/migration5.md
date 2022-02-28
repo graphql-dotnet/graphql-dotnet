@@ -784,3 +784,20 @@ See New Features: 'Schema builder and `FieldDelegate` improvements for reflected
 ### 31. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
 See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
+
+### 32. Code removed to support prior implementation of FieldDelegate and schema builder
+
+The following classes and methods have been removed:
+
+- The `EventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter has been removed.
+- The `AsyncEventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter has been removed.
+- The `ReflectionHelper.BuildArguments` method has been removed.
+
+You may use the following classes and methods as replacements:
+
+- The `MemberResolver` class is an `IFieldResolver` implementation for a property, method or field. Expressions are passed
+  to the constructor for the instance (and if applicable, method arguments), which is immediately compiled.
+- The `EventStreamMethodResolver` class is an `IEventStreamResolver` implementation for a method that returns an `IObservable<T>`
+  or `Task<IObservable<T>>`. It also implements provides a basic `IFieldResolver` implementation for subscription fields.
+- The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
+- The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.

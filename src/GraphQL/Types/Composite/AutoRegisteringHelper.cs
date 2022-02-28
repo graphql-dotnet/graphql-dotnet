@@ -4,7 +4,7 @@ using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
-    internal static class AutoRegisteringHelper
+    public static class AutoRegisteringHelper
     {
         /// <summary>
         /// Constructs a field resolver for the specified field, property or method.
@@ -14,7 +14,7 @@ namespace GraphQL.Types
         /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
         /// <code>context =&gt; (SourceType)context.Source</code>
         /// </summary>
-        internal static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        public static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
         {
             // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
             // but it does not provide the ability to override any behavior, and it does not return or
@@ -44,7 +44,7 @@ namespace GraphQL.Types
         /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
         /// <code>context =&gt; (SourceType)context.Source</code>
         /// </summary>
-        internal static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        public static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
         {
             var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
             return new EventStreamMethodResolver(methodInfo, arguments, instanceExpression);

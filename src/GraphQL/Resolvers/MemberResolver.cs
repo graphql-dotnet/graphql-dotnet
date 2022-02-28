@@ -8,7 +8,7 @@ namespace GraphQL.Resolvers
     /// Returns the specified field or property, or for methods, calls the specified method (with the specified arguments)
     /// and returns the value of the method.
     /// </summary>
-    internal class MemberResolver : IFieldResolver
+    public class MemberResolver : IFieldResolver
     {
         private readonly Func<IResolveFieldContext, object?> _resolver;
 
