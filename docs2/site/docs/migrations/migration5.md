@@ -470,7 +470,7 @@ class DroidType
 {
     public int Id([FromSource] Droid source) => source.Id;
 
-    // only inject Repostiory where needed
+    // only inject Repository where needed
     public IEnumerable<Droid> Friends([FromSource] Droid source, [FromServices] Repository repo) => repo.FriendsOf(source.Id);
 }
 ```
