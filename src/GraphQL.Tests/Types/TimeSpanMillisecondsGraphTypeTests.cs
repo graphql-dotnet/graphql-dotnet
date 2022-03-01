@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Numerics;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -5,7 +7,31 @@ namespace GraphQL.Tests.Types
 {
     public class TimeSpanMillisecondsGraphTypeTests
     {
-        private readonly TimeSpanMillisecondsGraphType _type = new TimeSpanMillisecondsGraphType();
+        public class TimeSpanMillisecondsGraphTypeTestsData : IEnumerable<object[]>
+        {
+            public IEnumerator<object[]> GetEnumerator()
+            {
+                yield return new object[] { (byte)1 };
+                yield return new object[] { (sbyte)2 };
+                yield return new object[] { (short)3 };
+                yield return new object[] { (ushort)4 };
+                yield return new object[] { (int)5 };
+                yield return new object[] { (uint)6 };
+                yield return new object[] { (long)7 };
+                yield return new object[] { (ulong)8 };
+                yield return new object[] { new BigInteger(9) };
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private readonly TimeSpanMillisecondsGraphType _type = new();
+
+        [Fact]
+        public void parsevalue_throws()
+        {
+            CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.ParseValue("foo")));
+        }
 
         [Fact]
         public void serialize_string_throws()
@@ -13,25 +39,14 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.Serialize("foo")));
         }
 
-        [Fact]
-        public void serialize_long()
+        [Theory]
+        [ClassData(typeof(TimeSpanMillisecondsGraphTypeTestsData))]
+        public void serialize_numerics(object value)
         {
             CultureTestHelper.UseCultures(() =>
             {
-                long input = 1;
-                var actual = _type.Serialize(input);
-                actual.ShouldBe(input);
-            });
-        }
-
-        [Fact]
-        public void serialize_int()
-        {
-            CultureTestHelper.UseCultures(() =>
-            {
-                int input = 1;
-                var actual = _type.Serialize(input);
-                actual.ShouldBe(input);
+                var actual = _type.Serialize(value);
+                actual.ShouldBeOfType<long>().ShouldBe(value is BigInteger b ? (long)b : Convert.ToInt64(value));
             });
         }
 
@@ -81,19 +96,12 @@ namespace GraphQL.Tests.Types
         }
 
         [Theory]
-        [InlineData((byte)1)]
-        [InlineData((sbyte)2)]
-        [InlineData((short)3)]
-        [InlineData((ushort)4)]
-        [InlineData((int)5)]
-        [InlineData((uint)6)]
-        [InlineData((long)7)]
-        [InlineData((ulong)8)]
+        [ClassData(typeof(TimeSpanMillisecondsGraphTypeTestsData))]
         public void parsevalue_to_timespan(object value)
         {
             CultureTestHelper.UseCultures(() =>
             {
-                var expected = TimeSpan.FromMilliseconds(Convert.ToDouble(value));
+                var expected = TimeSpan.FromMilliseconds(value is BigInteger b ? (double)b : Convert.ToDouble(value));
 
                 var actual = _type.ParseValue(value);
 
@@ -119,6 +127,18 @@ namespace GraphQL.Tests.Types
         public void coerces_long_to_timespan()
         {
             CultureTestHelper.UseCultures(() => _type.ParseValue(12345678L).ShouldBe(new TimeSpan(0, 3, 25, 45, 678)));
+        }
+
+        [Fact]
+        public void coerces_bigint_to_timespan()
+        {
+            CultureTestHelper.UseCultures(() => _type.ParseValue(new BigInteger(15)).ShouldBe(TimeSpan.FromMilliseconds(15)));
+        }
+
+        [Fact]
+        public void coerces_timespan_to_timespan()
+        {
+            CultureTestHelper.UseCultures(() => _type.ParseValue(TimeSpan.FromSeconds(15)).ShouldBe(TimeSpan.FromSeconds(15)));
         }
     }
 }
