@@ -83,8 +83,9 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
-        /// any existing configuration within <see cref="FieldType.Arguments"/> and <see cref="FieldType.Resolver"/>.
+        /// Configures query arguments and a field resolver for the specified <see cref="EventStreamFieldType"/>, overwriting
+        /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
+        /// and <see cref="EventStreamFieldType.AsyncSubscriber"/>.
         /// <br/><br/>
         /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
         /// member from <see cref="IResolveFieldContext.Source"/>.
@@ -93,13 +94,14 @@ namespace GraphQL.Types
         /// <see cref="GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
         /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
         /// </summary>
-        protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
+        protected void BuildFieldType(EventStreamFieldType fieldType, MemberInfo memberInfo)
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {
                 var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
+                fieldType.AsyncSubscriber = null;
             }
             else if (memberInfo is MethodInfo methodInfo)
             {
@@ -121,15 +123,27 @@ namespace GraphQL.Types
                         queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                     expressions.Add(expression);
                 }
-                var resolver = new MemberResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
+                var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
+                if (IsObservable(methodInfo.ReturnType))
+                {
+                    var resolver = new EventStreamMethodResolver(methodInfo, expressions, memberInstanceExpression);
+                    fieldType.Resolver = resolver;
+                    fieldType.AsyncSubscriber = resolver;
+                }
+                else
+                {
+                    var resolver = new MemberResolver(methodInfo, expressions, memberInstanceExpression);
+                    fieldType.Resolver = resolver;
+                    fieldType.AsyncSubscriber = null;
+                }
                 fieldType.Arguments = queryArguments;
-                fieldType.Resolver = resolver;
             }
             else if (memberInfo is FieldInfo fieldInfo)
             {
                 var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
+                fieldType.AsyncSubscriber = null;
             }
             else if (memberInfo == null)
             {
@@ -139,6 +153,22 @@ namespace GraphQL.Types
             {
                 throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
             }
+        }
+
+        /// <summary>
+        /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
+        /// </summary>
+        private static bool IsObservable(Type type)
+        {
+            if (!type.IsGenericType)
+                return false;
+
+            var g = type.GetGenericTypeDefinition();
+            if (g == typeof(IObservable<>))
+                return true;
+            if (g == typeof(Task<>) || g == typeof(ValueTask<>))
+                return IsObservable(type.GetGenericArguments()[0]);
+            return false;
         }
 
         /// <summary>

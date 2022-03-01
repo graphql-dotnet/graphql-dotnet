@@ -17,16 +17,6 @@ namespace GraphQL.Tests.Serialization.SystemTextJson
             }
         };
 
-        private readonly JsonSerializerOptions _optionsWriter = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            Converters =
-            {
-                new JsonConverterBigInteger(),
-            }
-        };
-
         [Fact]
         public void Throws_For_Deep_Objects()
         {

@@ -210,6 +210,19 @@ namespace GraphQL.Types
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
+            IFieldResolver? resolver = null;
+
+            if (resolve != null)
+            {
+                // create an instance expression that points to the instance represented by the delegate
+                // for instance, if the delegate represents obj.MyMethod,
+                // then the lambda would be: _ => obj
+                var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+                var body = Expression.Constant(resolve.Method.IsStatic ? null : resolve.Target, resolve.Method.DeclaringType);
+                var lambda = Expression.Lambda(body, param);
+                resolver = AutoRegisteringHelper.BuildFieldResolver(resolve.Method, null, null, lambda);
+            }
+
             return AddField(new FieldType
             {
                 Name = name,
@@ -217,9 +230,7 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = typeof(TGraphType),
                 Arguments = arguments,
-                Resolver = resolve != null
-                    ? new DelegateFieldModelBinderResolver(resolve)
-                    : null
+                Resolver = resolver,
             });
         }
 
