@@ -13,24 +13,15 @@ namespace GraphQL.Resolvers
         private Func<IResolveFieldContext, Task<IObservable<object?>>> _eventStreamResolver = null!;
 
         /// <summary>
-        /// Initializes an instance for the specified method and arguments, using a default instance expression of:
-        /// <code>context =&gt; (SourceType)context.Source</code>
-        /// The method argument expressions must have return types that match those of the method arguments.
-        /// </summary>
-        public EventStreamMethodResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions)
-            : this(methodInfo, methodArgumentExpressions, null)
-        {
-        }
-
-        /// <summary>
         /// Initializes an instance for the specified method, using the specified instance expression to access the instance of the method,
         /// along with a list of arguments to be passed to the method. The method argument expressions must have return types that match
         /// those of the method arguments.
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// <br/><br/>
+        /// An example of an instance expression would be as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public EventStreamMethodResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions, LambdaExpression? instanceExpression)
-            : base(methodInfo, methodArgumentExpressions, instanceExpression)
+        public EventStreamMethodResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
+            : base(methodInfo, instanceExpression, methodArgumentExpressions)
         {
         }
 

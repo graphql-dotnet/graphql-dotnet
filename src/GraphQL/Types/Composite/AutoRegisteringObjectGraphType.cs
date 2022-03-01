@@ -121,7 +121,7 @@ namespace GraphQL.Types
                         queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                     expressions.Add(expression);
                 }
-                var resolver = new MemberResolver(methodInfo, expressions, BuildMemberInstanceExpression(memberInfo));
+                var resolver = new MemberResolver(methodInfo, BuildMemberInstanceExpression(memberInfo), expressions);
                 fieldType.Arguments = queryArguments;
                 fieldType.Resolver = resolver;
             }
