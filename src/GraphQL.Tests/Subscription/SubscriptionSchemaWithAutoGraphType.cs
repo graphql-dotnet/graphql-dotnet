@@ -13,9 +13,9 @@ public class SubscriptionSchemaWithAutoGraphType : Schema
         Mutation = new AutoRegisteringObjectGraphType<MutationType>();
         Subscription = new AutoRegisteringObjectGraphType<SubscriptionType>();
 
-        RegisterTypeMapping(typeof(Message), typeof(AutoRegisteringObjectGraphType<Message>));
-        RegisterTypeMapping(typeof(MessageFrom), typeof(AutoRegisteringObjectGraphType<MessageFrom>));
-        RegisterTypeMapping(typeof(ReceivedMessage), typeof(AutoRegisteringInputObjectGraphType<ReceivedMessage>));
+        this.AutoRegister<Message>();
+        this.AutoRegister<MessageFrom>();
+        this.AutoRegister<ReceivedMessage>();
     }
 
     public class QueryType
