@@ -12,10 +12,18 @@ namespace GraphQL
         /// <inheritdoc/>
         public override void Modify(FieldType fieldType, bool isInputType)
         {
-            if (isInputType || fieldType.Resolver == null)
+            if (isInputType)
                 return;
 
-            fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
+            if (fieldType.Resolver != null)
+            {
+                fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
+            }
+
+            if (fieldType is EventStreamFieldType eventStreamFieldType && eventStreamFieldType.AsyncSubscriber != null)
+            {
+                eventStreamFieldType.AsyncSubscriber = new DynamicScopedEventStreamResolver(eventStreamFieldType.AsyncSubscriber);
+            }
         }
     }
 }
