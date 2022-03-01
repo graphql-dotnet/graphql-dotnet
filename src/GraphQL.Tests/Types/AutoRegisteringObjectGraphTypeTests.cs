@@ -442,7 +442,7 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void TestStruct()
+        public async Task TestStruct()
         {
             var graphType = new TestFieldSupport<TestStructModel>();
             graphType.Name.ShouldBe("Test");
@@ -455,10 +455,10 @@ namespace GraphQL.Tests.Types
                     { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
                 },
             };
-            graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe(1);
+            (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
             graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
-            graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe("Example");
-            graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.Resolve(context).ShouldBe("testExample1");
+            (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
+            (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
         }
 
         [Fact]

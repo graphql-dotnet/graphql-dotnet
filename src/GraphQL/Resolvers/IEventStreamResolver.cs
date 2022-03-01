@@ -4,21 +4,11 @@ namespace GraphQL.Resolvers
 {
     public interface IEventStreamResolver
     {
-        IObservable<object?> Subscribe(IResolveEventStreamContext context);
+        ValueTask<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context);
     }
 
-    public interface IEventStreamResolver<out T> : IEventStreamResolver
+    public interface IEventStreamResolver<T> : IEventStreamResolver
     {
-        new IObservable<T?> Subscribe(IResolveEventStreamContext context);
-    }
-
-    public interface IAsyncEventStreamResolver
-    {
-        Task<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context);
-    }
-
-    public interface IAsyncEventStreamResolver<T> : IAsyncEventStreamResolver
-    {
-        new Task<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context);
+        new ValueTask<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context);
     }
 }

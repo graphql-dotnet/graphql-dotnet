@@ -327,7 +327,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         a.Modify(config);
                 }
 
-                config.AsyncSubscriber = AutoRegisteringHelper.BuildEventStreamResolver(
+                config.Subscriber = AutoRegisteringHelper.BuildEventStreamResolver(
                     config.SubscriberAccessor.MethodInfo,
                     null, // unknown source type
                     null, // unknown FieldType
@@ -382,7 +382,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
-                AsyncSubscriber = fieldConfig.AsyncSubscriber,
             };
 
             fieldConfig.CopyMetadataTo(field);

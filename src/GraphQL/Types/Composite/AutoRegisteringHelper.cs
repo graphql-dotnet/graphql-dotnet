@@ -44,7 +44,7 @@ namespace GraphQL.Types
         /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
         /// <code>context =&gt; (SourceType)context.Source</code>
         /// </summary>
-        public static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        public static IEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
         {
             var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
             return new EventStreamMethodResolver(methodInfo, arguments, instanceExpression);

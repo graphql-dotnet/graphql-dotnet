@@ -137,6 +137,11 @@ namespace GraphQL.Resolvers
         /// </summary>
         protected virtual Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
+            return BuildFieldResolverInternal(resolveFieldContextParameter, bodyExpression);
+        }
+
+        internal static Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolverInternal(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        {
             Expression? valueTaskExpr = null;
 
             if (bodyExpression.Type == typeof(ValueTask<object?>))

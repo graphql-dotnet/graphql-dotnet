@@ -17,10 +17,9 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Initializes a new instance that runs the specified expression when resolving a field.
         /// </summary>
-        /// <param name="property"></param>
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
         {
-            _resolver = MemberResolver.BuildFunction(property);
+            _resolver = MemberResolver.BuildFieldResolverInternal(property.Parameters[0], property.Body);
         }
 
         /// <inheritdoc/>

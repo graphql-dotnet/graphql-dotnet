@@ -101,7 +101,7 @@ namespace GraphQL.Types
                 var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
-                fieldType.AsyncSubscriber = null;
+                fieldType.Subscriber = null;
             }
             else if (memberInfo is MethodInfo methodInfo)
             {
@@ -128,13 +128,13 @@ namespace GraphQL.Types
                 {
                     var resolver = new EventStreamMethodResolver(methodInfo, expressions, memberInstanceExpression);
                     fieldType.Resolver = resolver;
-                    fieldType.AsyncSubscriber = resolver;
+                    fieldType.Subscriber = resolver;
                 }
                 else
                 {
                     var resolver = new MemberResolver(methodInfo, expressions, memberInstanceExpression);
                     fieldType.Resolver = resolver;
-                    fieldType.AsyncSubscriber = null;
+                    fieldType.Subscriber = null;
                 }
                 fieldType.Arguments = queryArguments;
             }
@@ -143,7 +143,7 @@ namespace GraphQL.Types
                 var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
-                fieldType.AsyncSubscriber = null;
+                fieldType.Subscriber = null;
             }
             else if (memberInfo == null)
             {

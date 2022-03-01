@@ -4,7 +4,7 @@ namespace GraphQL.MicrosoftDI.Tests
     {
         public static void ShouldBeTask(this ValueTask<object> value, object expected)
         {
-            value.Result.ShouldBe(expected);
+            value.AsTask().Result.ShouldBe(expected);
         }
     }
 }

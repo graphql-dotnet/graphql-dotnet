@@ -1,10 +1,8 @@
-using GraphQL.Reflection;
 using GraphQL.Subscription;
-using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
 {
-    public class AsyncEventStreamResolver<T> : IAsyncEventStreamResolver<T>
+    public class AsyncEventStreamResolver<T> : IEventStreamResolver<T>
     {
         private readonly Func<IResolveEventStreamContext, Task<IObservable<T?>>> _subscriber;
 
@@ -14,16 +12,17 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context) => _subscriber(context);
+        public ValueTask<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<T?>>(_subscriber(context));
 
-        async Task<IObservable<object?>> IAsyncEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
+        async ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
         {
             var result = await SubscribeAsync(context).ConfigureAwait(false);
             return (IObservable<object?>)result;
         }
     }
 
-    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IAsyncEventStreamResolver<TReturnType>
+    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
     {
         private readonly Func<IResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType?>>> _subscriber;
 
@@ -33,9 +32,10 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<TReturnType?>> SubscribeAsync(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
+        public ValueTask<IObservable<TReturnType?>> SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<TReturnType?>>(_subscriber(context.As<TSourceType>()));
 
-        async Task<IObservable<object?>> IAsyncEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
+        async ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
         {
             var result = await SubscribeAsync(context).ConfigureAwait(false);
             return (IObservable<object?>)result;
