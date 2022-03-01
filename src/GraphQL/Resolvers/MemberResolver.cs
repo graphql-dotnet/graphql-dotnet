@@ -46,7 +46,7 @@ namespace GraphQL.Resolvers
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
         public MemberResolver(PropertyInfo propertyInfo, LambdaExpression instanceExpression)
-            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException("No 'get' method for the supplied property.", nameof(propertyInfo)), instanceExpression, Array.Empty<LambdaExpression>())
+            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException($"No 'get' method for the supplied {propertyInfo.Name} property.", nameof(propertyInfo)), instanceExpression, Array.Empty<LambdaExpression>())
         {
         }
 
