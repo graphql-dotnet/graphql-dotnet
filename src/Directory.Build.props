@@ -20,10 +20,6 @@
     <NoWarn>$(NoWarn);1591</NoWarn> <!--TODO: temporary solution-->
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" Condition="'$(IsPackable)' == 'true'" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />

@@ -7,14 +7,14 @@ namespace GraphQL.Types
     internal static class AutoRegisteringHelper
     {
         /// <summary>
-        /// Constructs a field resolver for the specified field, property or method.
+        /// Constructs a field resolver for the specified field, property or method with the specified instance expression.
         /// Does not build accompanying query arguments for detected method parameters.
         /// Does not allow overriding build behavior.
         /// <br/><br/>
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// An example of an instance expression would be as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        internal static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        internal static IFieldResolver BuildFieldResolver(MemberInfo memberInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
         {
             // this entire method is a simplification of AutoRegisteringObjectGraphType.BuildFieldType
             // but it does not provide the ability to override any behavior, and it does not return or
@@ -30,24 +30,24 @@ namespace GraphQL.Types
             else if (memberInfo is MethodInfo methodInfo)
             {
                 var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
-                return new MemberResolver(methodInfo, arguments, instanceExpression);
+                return new MemberResolver(methodInfo, instanceExpression, arguments);
             }
 
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
         }
 
         /// <summary>
-        /// Constructs an event stream resolver for the specified method.
+        /// Constructs an event stream resolver for the specified method with the specified instance expression.
         /// Does not build accompanying query arguments for detected method parameters.
         /// Does not allow overriding build behavior.
         /// <br/><br/>
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
-        /// <code>context =&gt; (SourceType)context.Source</code>
+        /// An example of an instance expression would be as follows:
+        /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        internal static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression? instanceExpression)
+        internal static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
         {
             var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
-            return new EventStreamMethodResolver(methodInfo, arguments, instanceExpression);
+            return new EventStreamMethodResolver(methodInfo, instanceExpression, arguments);
         }
 
         private static IList<LambdaExpression> BuildFieldResolver_BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
