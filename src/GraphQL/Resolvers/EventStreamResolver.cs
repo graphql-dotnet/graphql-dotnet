@@ -33,26 +33,4 @@ namespace GraphQL.Resolvers
 
         IObservable<object?> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object?>)Subscribe(context);
     }
-
-    public class EventStreamResolver : IEventStreamResolver
-    {
-        private readonly IAccessor _accessor;
-        private readonly IServiceProvider _serviceProvider;
-
-        public EventStreamResolver(IAccessor accessor, IServiceProvider serviceProvider)
-        {
-            _accessor = accessor;
-            _serviceProvider = serviceProvider;
-        }
-
-        public IObservable<object?> Subscribe(IResolveEventStreamContext context)
-        {
-            var parameters = _accessor.Parameters;
-            object?[]? arguments = ReflectionHelper.BuildArguments(parameters, context);
-            object target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
-            return (IObservable<object?>)_accessor.GetValue(target, arguments)!;
-        }
-
-        IObservable<object?> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => Subscribe(context);
-    }
 }

@@ -8,7 +8,7 @@ namespace GraphQL.Resolvers
     /// A precompiled event stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
-    internal class EventStreamMethodResolver : MemberResolver, IAsyncEventStreamResolver
+    public class EventStreamMethodResolver : MemberResolver, IAsyncEventStreamResolver
     {
         private Func<IResolveFieldContext, Task<IObservable<object?>>> _eventStreamResolver = null!;
 

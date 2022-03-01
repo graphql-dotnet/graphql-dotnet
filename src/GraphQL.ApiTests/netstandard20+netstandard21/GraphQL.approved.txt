@@ -1469,10 +1469,6 @@ namespace GraphQL.Reflection
 }
 namespace GraphQL.Resolvers
 {
-    public class AsyncEventStreamResolver : GraphQL.Resolvers.IAsyncEventStreamResolver
-    {
-        public AsyncEventStreamResolver(GraphQL.Reflection.IAccessor accessor, System.IServiceProvider serviceProvider) { }
-    }
     public class AsyncEventStreamResolver<T> : GraphQL.Resolvers.IAsyncEventStreamResolver, GraphQL.Resolvers.IAsyncEventStreamResolver<T>
     {
         public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<T?>>> subscriber) { }
@@ -1493,15 +1489,12 @@ namespace GraphQL.Resolvers
         public AsyncFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public System.Threading.Tasks.Task<TReturnType?> Resolve(GraphQL.IResolveFieldContext context) { }
     }
-    public class DelegateFieldModelBinderResolver : GraphQL.Resolvers.IFieldResolver
+    public class EventStreamMethodResolver : GraphQL.Resolvers.MemberResolver, GraphQL.Resolvers.IAsyncEventStreamResolver
     {
-        public DelegateFieldModelBinderResolver(System.Delegate resolver) { }
-        public object? Resolve(GraphQL.IResolveFieldContext context) { }
-    }
-    public class EventStreamResolver : GraphQL.Resolvers.IEventStreamResolver
-    {
-        public EventStreamResolver(GraphQL.Reflection.IAccessor accessor, System.IServiceProvider serviceProvider) { }
-        public System.IObservable<object?> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
+        public EventStreamMethodResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<object?>>> BuildEventStreamResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
+        protected override System.Func<GraphQL.IResolveFieldContext, object?> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
+        public System.Threading.Tasks.Task<System.IObservable<object?>> SubscribeAsync(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class EventStreamResolver<T> : GraphQL.Resolvers.IEventStreamResolver, GraphQL.Resolvers.IEventStreamResolver<T>
     {
@@ -1555,6 +1548,14 @@ namespace GraphQL.Resolvers
     public interface IFieldResolver<out T> : GraphQL.Resolvers.IFieldResolver
     {
         T? Resolve(GraphQL.IResolveFieldContext context);
+    }
+    public class MemberResolver : GraphQL.Resolvers.IFieldResolver
+    {
+        public MemberResolver(System.Reflection.FieldInfo fieldInfo, System.Linq.Expressions.LambdaExpression instanceExpression) { }
+        public MemberResolver(System.Reflection.PropertyInfo propertyInfo, System.Linq.Expressions.LambdaExpression instanceExpression) { }
+        public MemberResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
+        protected virtual System.Func<GraphQL.IResolveFieldContext, object?> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
+        public virtual object? Resolve(GraphQL.IResolveFieldContext context) { }
     }
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
     {
@@ -1640,6 +1641,11 @@ namespace GraphQL.Types
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
+    }
+    public static class AutoRegisteringHelper
+    {
+        public static GraphQL.Resolvers.IAsyncEventStreamResolver BuildEventStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
+        public static GraphQL.Resolvers.IFieldResolver BuildFieldResolver(System.Reflection.MemberInfo memberInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
