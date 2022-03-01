@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace GraphQL.Resolvers
 {
@@ -19,8 +20,14 @@ namespace GraphQL.Resolvers
         /// </summary>
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
         {
-            _resolver = MemberResolver.BuildFieldResolverInternal(property.Parameters[0], property.Body);
+            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            var source = Expression.MakeMemberAccess(param, _sourcePropertyInfo);
+            var cast = Expression.Convert(source, typeof(TSourceType));
+            var body = property.Body.Replace(property.Parameters[0], cast);
+            _resolver = MemberResolver.BuildFieldResolverInternal(param, body);
         }
+
+        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source));
 
         /// <inheritdoc/>
         ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)
