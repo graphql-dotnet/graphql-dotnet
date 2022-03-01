@@ -25,7 +25,7 @@ namespace GraphQL.Resolvers
     public interface IFieldResolver
     {
         /// <summary>
-        /// Returns an object, <see langword="null"/>, or a <see cref="Task{TResult}"/> for the specified field. If a task is returned, then this task will be awaited to obtain the actual object.
+        /// Returns an <see cref="ValueTask{TResult}"/> wrapping an object or <see langword="null"/> for the specified field.
         /// </summary>
         ValueTask<object?> ResolveAsync(IResolveFieldContext context);
     }

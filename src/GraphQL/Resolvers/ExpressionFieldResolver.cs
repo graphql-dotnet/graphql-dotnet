@@ -17,6 +17,7 @@ namespace GraphQL.Resolvers
 
         /// <summary>
         /// Initializes a new instance that runs the specified expression when resolving a field.
+        /// <see cref="Task{TResult}"/> and <see cref="ValueTask{TResult}"/> return types are also supported.
         /// </summary>
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
         {
