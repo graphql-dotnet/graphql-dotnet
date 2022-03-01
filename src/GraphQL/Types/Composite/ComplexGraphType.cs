@@ -218,7 +218,7 @@ namespace GraphQL.Types
                 // for instance, if the delegate represents obj.MyMethod,
                 // then the lambda would be: _ => obj
                 var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-                var body = Expression.Constant(resolve.Method.IsStatic ? null : resolve.Target, resolve.Method.DeclaringType);
+                var body = Expression.Constant(resolve.Target, resolve.Method.DeclaringType);
                 var lambda = Expression.Lambda(body, param);
                 resolver = AutoRegisteringHelper.BuildFieldResolver(resolve.Method, null, null, lambda);
             }
