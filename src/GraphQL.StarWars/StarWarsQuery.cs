@@ -18,7 +18,7 @@ public class StarWarsQuery : ObjectGraphType<object>
             resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"))
         );
 
-        Func<IResolveFieldContext, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
+        Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
 
         FieldDelegate<DroidType>(
             "droid",
