@@ -156,6 +156,12 @@ namespace GraphQL
         public FromSourceAttribute() { }
         public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    public class FromUserContextAttribute : GraphQL.GraphQLAttribute
+    {
+        public FromUserContextAttribute() { }
+        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+    }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
         public FuncServiceProvider(System.Func<System.Type, object?> resolver) { }
@@ -1621,15 +1627,15 @@ namespace GraphQL.Types
     }
     public class ArgumentInformation
     {
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation) { }
-        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type sourceType, GraphQL.Types.FieldType fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.LambdaExpression? expression) { }
+        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation) { }
+        public ArgumentInformation(System.Reflection.ParameterInfo parameterInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, GraphQL.Types.TypeInformation typeInformation, System.Linq.Expressions.LambdaExpression? expression) { }
         public System.Linq.Expressions.LambdaExpression? Expression { get; set; }
-        public GraphQL.Types.FieldType FieldType { get; }
+        public GraphQL.Types.FieldType? FieldType { get; }
         public System.Reflection.ParameterInfo ParameterInfo { get; }
-        public System.Type SourceType { get; }
+        public System.Type? SourceType { get; }
         public GraphQL.Types.TypeInformation TypeInformation { get; }
         public virtual void ApplyAttributes() { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
                 "QueryArgument",
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }

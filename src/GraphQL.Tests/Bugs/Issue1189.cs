@@ -80,8 +80,8 @@ namespace GraphQL.Tests.Bugs
     [GraphQLMetadata("Droid", IsTypeOf = typeof(Issue1189_Droid))]
     public class Issue1189_DroidType_ExecutionError
     {
-        public string Id(Issue1189_Droid droid) => droid.Id;
-        public string Name(Issue1189_Droid droid) => droid.Name;
+        public string Id([FromSource] Issue1189_Droid droid) => droid.Id;
+        public string Name([FromSource] Issue1189_Droid droid) => droid.Name;
 
         public Issue1189_Character Friend()
             => throw new ExecutionError("Error Message");
@@ -90,8 +90,8 @@ namespace GraphQL.Tests.Bugs
     [GraphQLMetadata("Droid", IsTypeOf = typeof(Issue1189_Droid))]
     public class Issue1189_DroidType_Exception
     {
-        public string Id(Issue1189_Droid droid) => droid.Id;
-        public string Name(Issue1189_Droid droid) => droid.Name;
+        public string Id([FromSource] Issue1189_Droid droid) => droid.Id;
+        public string Name([FromSource] Issue1189_Droid droid) => droid.Name;
 
         public Issue1189_Character Friend()
             => throw new Exception("Error Message");

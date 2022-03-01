@@ -859,7 +859,7 @@ namespace GraphQL.Tests.Utilities
     [GraphQLMetadata("Query")]
     internal class ParametersType
     {
-        public bool Source(object source) => source != null;
+        public bool Source([FromSource] object source) => source != null;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string Resolve(IResolveFieldContext context) => "Resolved";
@@ -867,16 +867,16 @@ namespace GraphQL.Tests.Utilities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
-        public string UserContext(MyUserContext context) => context.Name;
+        public string UserContext([FromUserContext] MyUserContext context) => context.Name;
 
-        public string UserContextWithParam(MyUserContext context, string id) => $"{context.Name} {id}";
+        public string UserContextWithParam([FromUserContext] MyUserContext context, string id) => $"{context.Name} {id}";
 
-        public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
+        public bool Three(IResolveFieldContext resolveContext, [FromSource] object source, [FromUserContext] MyUserContext context)
         {
             return resolveContext != null && context != null && source != null;
         }
 
-        public bool Four(IResolveFieldContext resolveContext, object source, MyUserContext context, int id)
+        public bool Four(IResolveFieldContext resolveContext, [FromSource] object source, [FromUserContext] MyUserContext context, int id)
         {
             return resolveContext != null && context != null && source != null && id != 0;
         }

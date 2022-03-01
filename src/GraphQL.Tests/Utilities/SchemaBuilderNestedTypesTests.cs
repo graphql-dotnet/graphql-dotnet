@@ -82,19 +82,15 @@ namespace GraphQL.Tests.Utilities
             public string Name { get; set; }
         }
 
-        public class MyUserContext
-        {
-        }
-
         // [GraphQLMetadata("Droid", IsTypeOf = typeof(Droid))]
         public class DroidType
         {
-            public string Id(Droid droid) => droid.Id;
+            public string Id([FromSource] Droid droid) => droid.Id;
 
-            public string Name(Droid droid) => droid.Name;
+            public string Name([FromSource] Droid droid) => droid.Name;
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
-            public Character Friend(MyUserContext context)
+            public Character Friend()
             {
                 return new Character { Name = "C3-PO" };
             }
