@@ -126,13 +126,13 @@ namespace GraphQL.Types
                 var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
                 if (IsObservable(methodInfo.ReturnType))
                 {
-                    var resolver = new EventStreamMethodResolver(methodInfo, expressions, memberInstanceExpression);
+                    var resolver = new EventStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
                     fieldType.AsyncSubscriber = resolver;
                 }
                 else
                 {
-                    var resolver = new MemberResolver(methodInfo, expressions, memberInstanceExpression);
+                    var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
                     fieldType.AsyncSubscriber = null;
                 }

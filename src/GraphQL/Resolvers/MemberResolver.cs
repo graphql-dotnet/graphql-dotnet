@@ -13,24 +13,17 @@ namespace GraphQL.Resolvers
         private readonly Func<IResolveFieldContext, object?> _resolver;
 
         /// <summary>
-        /// Initializes an instance for the specified field, using a default instance expression of:
-        /// <code>context =&gt; (TSourceType)context.Source</code>
-        /// </summary>
-        public MemberResolver(FieldInfo fieldInfo)
-            : this(fieldInfo, null)
-        {
-        }
-
-        /// <summary>
         /// Initializes an instance for the specified field, using the specified instance expression to access the instance of the field.
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <br/><br/>
+        /// An example of an instance expression would be as follows:
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(FieldInfo fieldInfo, LambdaExpression? instanceExpression)
+        public MemberResolver(FieldInfo fieldInfo, LambdaExpression instanceExpression)
         {
             if (fieldInfo == null)
                 throw new ArgumentNullException(nameof(fieldInfo));
-            instanceExpression ??= BuildDefaultInstanceExpression(fieldInfo.DeclaringType);
+            if (instanceExpression == null)
+                throw new ArgumentNullException(nameof(instanceExpression));
 
             if (instanceExpression.Parameters.Count != 1 ||
                 instanceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
@@ -47,31 +40,13 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
-        /// Initializes an instance for the specified property, using a default instance expression of:
-        /// <code>context =&gt; (TSourceType)context.Source</code>
-        /// </summary>
-        public MemberResolver(PropertyInfo propertyInfo)
-            : this(propertyInfo, null)
-        {
-        }
-
-        /// <summary>
         /// Initializes an instance for the specified property, using the specified instance expression to access the instance of the property.
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <br/><br/>
+        /// An example of an instance expression would be as follows:
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(PropertyInfo propertyInfo, LambdaExpression? instanceExpression)
-            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException("No 'get' method for the supplied property.", nameof(propertyInfo)), Array.Empty<LambdaExpression>(), instanceExpression)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance for the specified method and arguments, using a default instance expression of:
-        /// <code>context =&gt; (TSourceType)context.Source</code>
-        /// The method argument expressions must have return types that match those of the method arguments.
-        /// </summary>
-        public MemberResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions)
-            : this(methodInfo, methodArgumentExpressions, null)
+        public MemberResolver(PropertyInfo propertyInfo, LambdaExpression instanceExpression)
+            : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException($"No 'get' method for the supplied {propertyInfo.Name} property.", nameof(propertyInfo)), instanceExpression, Array.Empty<LambdaExpression>())
         {
         }
 
@@ -79,14 +54,16 @@ namespace GraphQL.Resolvers
         /// Initializes an instance for the specified method, using the specified instance expression to access the instance of the method,
         /// along with a list of arguments to be passed to the method. The method argument expressions must have return types that match
         /// those of the method arguments.
-        /// If <paramref name="instanceExpression"/> is <see langword="null"/> then a default instance expression is used as follows:
+        /// <br/><br/>
+        /// An example of an instance expression would be as follows:
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public MemberResolver(MethodInfo methodInfo, IList<LambdaExpression> methodArgumentExpressions, LambdaExpression? instanceExpression)
+        public MemberResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
         {
             if (methodInfo == null)
                 throw new ArgumentNullException(nameof(methodInfo));
-            instanceExpression ??= BuildDefaultInstanceExpression(methodInfo.DeclaringType);
+            if (instanceExpression == null)
+                throw new ArgumentNullException(nameof(instanceExpression));
             if (methodArgumentExpressions == null)
                 throw new ArgumentNullException(nameof(methodArgumentExpressions));
             // verify that the expressions provided match the number of parameters
@@ -147,19 +124,6 @@ namespace GraphQL.Resolvers
 
             // compile the lambda expression
             return lambdaExpr.Compile();
-        }
-
-        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
-        /// <summary>
-        /// Returns the following lambda:
-        /// <code>context =&gt; (TType)context.Source</code>
-        /// </summary>
-        protected static LambdaExpression BuildDefaultInstanceExpression(Type type)
-        {
-            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-            var body = Expression.MakeMemberAccess(param, _sourcePropertyInfo);
-            var castExpr = Expression.Convert(body, type);
-            return Expression.Lambda(castExpr, param);
         }
 
         /// <inheritdoc/>
