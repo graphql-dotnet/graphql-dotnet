@@ -346,49 +346,5 @@ namespace GraphQL
 
             return false;
         }
-
-        //TODO: eliminate this inefficient method (currently used by AccessorFieldResolver and DelegateFieldModelBinderResolver)
-        internal static ValueTask<object?> ToValueTask(this object? value)
-        {
-            if (value == null)
-                return default;
-
-            if (value is Task task)
-            {
-                return ConvertTask(task);
-            }
-
-            var type = value.GetType();
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
-            {
-                if (type == typeof(ValueTask<object?>))
-                    return (ValueTask<object?>)value;
-
-                var func = _valueTaskConvertDictionary.GetOrAdd(type,
-                    static type2 =>
-                    {
-                        var underlyingType = type2.GetGenericArguments()[0];
-                        var newDelegate = _convertValueTaskAsyncMethod
-                            .MakeGenericMethod(underlyingType)
-                            .CreateDelegate(typeof(Func<object, ValueTask<object?>>));
-                        return (Func<object, ValueTask<object?>>)newDelegate;
-                    });
-
-                return func(value);
-            }
-
-            return new ValueTask<object?>(value);
-
-            async ValueTask<object?> ConvertTask(Task task)
-            {
-                await task.ConfigureAwait(false);
-                return task.GetResult();
-            }
-        }
-
-        private static readonly ConcurrentDictionary<Type, Func<object, ValueTask<object?>>> _valueTaskConvertDictionary = new();
-        private static readonly MethodInfo _convertValueTaskAsyncMethod = typeof(ObjectExtensions).GetMethod(nameof(ConvertValueTaskAsync), BindingFlags.NonPublic | BindingFlags.Static)!;
-        private static async ValueTask<object?> ConvertValueTaskAsync<T>(object value)
-            => await ((ValueTask<T>)value).ConfigureAwait(false);
     }
 }
