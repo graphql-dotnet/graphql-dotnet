@@ -491,8 +491,6 @@ This will result in a substantial speed increase for schemas that use field midd
 In addition, `ValueTask<T>` return types are supported for fields built on CLR methods via the schema builder,
 fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
 
-TODO: `ValueTask<T>` support via `FieldAsync` and resolver builder methods.
-
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
