@@ -486,6 +486,13 @@ interfaces have been slightly changed to have methods with `ValueTask` signature
 - `IEventStreamResolver` (`IAsyncEventStreamResolver` has been removed)
 - `IFieldMiddleware`
 
+This will result in a substantial speed increase for schemas that use field middleware.
+
+In addition, `ValueTask<T>` return types are supported for fields built on CLR methods via the schema builder,
+fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
+
+TODO: `ValueTask<T>` support via `FieldAsync` and resolver builder methods.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -842,11 +849,12 @@ These properties have been removed:
 Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
 
 In addition, it is required that any asynchronous fields must use an appropriate asynchronous field builder method or
-asynchronous field resolver.
+asynchronous field resolver, and inferred methods (built by the schema builder, `FieldDelegate`, or `AutoRegisteringObjectGraphType`)
+must be strongly typed.
 
 ```csharp
 // works in v4, not in v5
-Field<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
+Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
 
 // works in v4 or v5
 FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
