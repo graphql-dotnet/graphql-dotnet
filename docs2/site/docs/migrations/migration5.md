@@ -789,10 +789,10 @@ See New Features: 'Schema builder and `FieldDelegate` improvements for reflected
 
 The following classes and methods have been removed:
 
-- The `EventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter has been removed.
-- The `AsyncEventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter has been removed.
-- The `DelegateFieldModelBinderResolver` class has been removed.
-- The `ReflectionHelper.BuildArguments` method has been removed.
+- The `EventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter.
+- The `AsyncEventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter.
+- The `DelegateFieldModelBinderResolver` class.
+- The `ReflectionHelper.BuildArguments` method.
 
 You may use the following classes and methods as replacements:
 
