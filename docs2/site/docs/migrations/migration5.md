@@ -818,18 +818,28 @@ The following interfaces have been modified to support a `ValueTask` pipeline:
 
 - `IFieldResolver`
 - `IEventStreamResolver`
-- `IFieldMiddleware`
+- `IFieldMiddleware` and `FieldMiddlewareDelegate`
 
 The following interfaces have been removed:
 
 - `IAsyncEventStreamResolver`
+
+All classes which implemented the above interfaces have been modified as necessary:
+
+- `AsyncEventStreamResolver`
+- `AsyncFieldResolver`
+- `EventStreamResolver`
+- `ExpressionFieldResolver`
+- `FuncFieldResolver`
+- `NameFieldResolver`
+- `InstrumentFieldsMiddleware`
 
 These properties have been removed:
 
 - `EventStreamFieldType.AsyncSubscriber`
 - `FieldConfig.AsyncSubscriber`
 
-Any direct implementation of these interfaces or properties will need to be modified to fit the new design.
+Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
 
 In addition, it is required that any asynchronous fields must use an appropriate asynchronous field builder method or
 asynchronous field resolver.
