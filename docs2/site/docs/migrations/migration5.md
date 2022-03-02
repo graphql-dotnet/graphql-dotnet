@@ -862,14 +862,14 @@ FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetD
 AddField(new FieldType
 {
     Name = "hero",
-    Resolver = new Resolvers.FuncFieldResolver<Task<Droid>>(context => data.GetDroidByIdAsync("3")),
+    Resolver = new FuncFieldResolver<Task<Droid>>(context => data.GetDroidByIdAsync("3")),
 });
 
 // works in v4 or v5
 AddField(new FieldType
 {
     Name = "hero",
-    Resolver = new Resolvers.AsyncFieldResolver<Droid>(context => data.GetDroidByIdAsync("3")),
+    Resolver = new AsyncFieldResolver<Droid>(context => data.GetDroidByIdAsync("3")),
 });
 
 
