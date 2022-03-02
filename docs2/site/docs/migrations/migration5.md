@@ -417,7 +417,7 @@ servcies.AddGraphQL(builder => builder
 The `DocumentExecuter.SelectExecutionStrategy` method is still available to be overridden for
 backwards compatibility but may be removed in the next major version.
 
-### 13. Schema builder improvements for reflected methods
+### 13. Schema builder and `FieldDelegate` improvements for reflected methods
 
 When configuring a CLR method for a field, the method arguments now allow the use of all of
 the new attributes available to `AutoRegisteringObjectGraphType`, such as `[FromServices]`.
@@ -474,6 +474,8 @@ class DroidType
     public IEnumerable<Droid> Friends([FromSource] Droid source, [FromServices] Repository repo) => repo.FriendsOf(source.Id);
 }
 ```
+
+Similar changes may be necessary when using `FieldDelegate` to assign a field resolver.
 
 ## Breaking Changes
 
@@ -777,4 +779,8 @@ For more details on the new approach to execution strategy selection, please rev
 
 ### 30. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
-See New Features: 'Schema builder improvements for reflected methods' above.
+See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
+
+### 31. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+
+See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
