@@ -799,6 +799,6 @@ You may use the following classes and methods as replacements:
 - The `MemberResolver` class is an `IFieldResolver` implementation for a property, method or field. Expressions are passed
   to the constructor for the instance (and if applicable, method arguments), which is immediately compiled.
 - The `EventStreamMethodResolver` class is an `IEventStreamResolver` implementation for a method that returns an `IObservable<T>`
-  or `Task<IObservable<T>>`. It also implements provides a basic `IFieldResolver` implementation for subscription fields.
+  or `Task<IObservable<T>>`. It also provides a basic `IFieldResolver` implementation for subscription fields.
 - The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
 - The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
