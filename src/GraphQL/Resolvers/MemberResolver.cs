@@ -113,10 +113,9 @@ namespace GraphQL.Resolvers
         /// Creates an appropriate resolver function based on the return type of the expression body.
         /// </summary>
         protected virtual Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
-        {
-            return BuildFieldResolverInternal(resolveFieldContextParameter, bodyExpression);
-        }
+            => BuildFieldResolverInternal(resolveFieldContextParameter, bodyExpression);
 
+        /// <inheritdoc cref="BuildFieldResolver(ParameterExpression, Expression)"/>
         internal static Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolverInternal(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
             Expression? valueTaskExpr = null;
@@ -125,11 +124,19 @@ namespace GraphQL.Resolvers
             {
                 valueTaskExpr = bodyExpression;
             }
+            else if (bodyExpression.Type == typeof(Task<object?>))
+            {
+                // e.g. valueTask = new ValueTask<object>(body);
+                var valueTaskType = typeof(ValueTask<object?>);
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<object?>) });
+                valueTaskExpr = Expression.New(constructor, bodyExpression);
+            }
             else if (bodyExpression.Type.IsGenericType)
             {
                 var genericType = bodyExpression.Type.GetGenericTypeDefinition();
                 if (genericType == typeof(ValueTask<>))
                 {
+                    // e.g. valueTask = MarshalValueTask(body);
                     var underlyingType = bodyExpression.Type.GetGenericArguments()[0];
                     var method = _marshalValueTaskAsyncMethod.MakeGenericMethod(underlyingType);
                     valueTaskExpr = Expression.Call(
@@ -138,6 +145,7 @@ namespace GraphQL.Resolvers
                 }
                 else if (genericType == typeof(Task<>))
                 {
+                    // e.g. valueTask = MarshalTask(body);
                     var underlyingType = bodyExpression.Type.GetGenericArguments()[0];
                     var method = _marshalTaskAsyncMethod.MakeGenericMethod(underlyingType);
                     valueTaskExpr = Expression.Call(
@@ -149,10 +157,12 @@ namespace GraphQL.Resolvers
             if (valueTaskExpr == null)
             {
                 // convert the result to type object
+                // e.g. var convert = (object)body;
                 Expression convertExpr = bodyExpression.Type == typeof(object)
                     ? bodyExpression
                     : Expression.Convert(bodyExpression, typeof(object));
 
+                // e.g. valueTask = new ValueTask<object>(convert);
                 var valueTaskType = typeof(ValueTask<object?>);
                 var constructor = valueTaskType.GetConstructor(new Type[] { typeof(object) });
                 valueTaskExpr = Expression.New(constructor, convertExpr);
