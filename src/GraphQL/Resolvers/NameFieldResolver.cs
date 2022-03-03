@@ -29,7 +29,7 @@ namespace GraphQL.Resolvers
         private static ValueTask<object?> Resolve(IResolveFieldContext context, string? name)
         {
             if (context.Source == null || name == null)
-                return new ValueTask<object?>(null);
+                return default;
 
             // We use reflection to create a delegate to access the property/method
             // Then cache the delegate
