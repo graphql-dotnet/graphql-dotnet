@@ -37,7 +37,7 @@ jobs:
           dotnet-version: |
             3.1.x
             5.0.x
-            6.0.102
+            6.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -51,9 +51,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: |
-          dotnet format --no-restore --verify-no-changes --severity warn whitespace --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix whitespace issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn analyzers --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix analyzers issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn style --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix style issues" && exit 1)
+          dotnet format --no-restore --verify-no-changes --severity warn --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
