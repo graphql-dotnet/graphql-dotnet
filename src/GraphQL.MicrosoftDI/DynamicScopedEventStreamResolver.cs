@@ -10,14 +10,14 @@ namespace GraphQL.MicrosoftDI
     /// to create a dependency injection scope. Then it calls the specified <see cref="IAsyncEventStreamResolver"/>, passing the scoped service provider
     /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
     /// </summary>
-    internal class DynamicScopedEventStreamResolver : IAsyncEventStreamResolver
+    internal class DynamicScopedEventStreamResolver : IEventStreamResolver
     {
-        private readonly Func<IResolveEventStreamContext, Task<IObservable<object?>>> _resolverFunc;
+        private readonly Func<IResolveEventStreamContext, ValueTask<IObservable<object?>>> _resolverFunc;
 
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public DynamicScopedEventStreamResolver(IAsyncEventStreamResolver resolver)
+        public DynamicScopedEventStreamResolver(IEventStreamResolver resolver)
         {
             _resolverFunc = async context =>
             {
@@ -27,6 +27,6 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc/>
-        public Task<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _resolverFunc(context);
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _resolverFunc(context);
     }
 }
