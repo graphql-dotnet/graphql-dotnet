@@ -851,7 +851,7 @@ asynchronous field resolver, and inferred methods (built by the schema builder, 
 must be strongly typed.
 
 ```csharp
-// works in v4, not in v5
+// works in v4, not in v5 (throws in runtime)
 Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
 
 // works in v4 or v5
