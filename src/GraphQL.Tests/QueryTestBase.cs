@@ -87,6 +87,33 @@ namespace GraphQL.Tests
                 unhandledExceptionDelegate);
         }
 
+        public Task<ExecutionResult> AssertQueryWithErrorsAsync(
+            string query,
+            string expected,
+            Inputs variables = null,
+            object root = null,
+            IDictionary<string, object> userContext = null,
+            CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
+            int expectedErrorCount = 0,
+            bool renderErrors = false,
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
+            bool executed = true)
+        {
+            var queryResult = CreateQueryResult(expected, executed: executed);
+            return AssertQueryIgnoreErrorsAsync(
+                query,
+                queryResult,
+                variables,
+                root,
+                userContext,
+                cancellationToken,
+                rules,
+                expectedErrorCount,
+                renderErrors,
+                unhandledExceptionDelegate);
+        }
+
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
@@ -99,7 +126,28 @@ namespace GraphQL.Tests
             bool renderErrors = false,
             Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null)
         {
-            var runResult = Executer.ExecuteAsync(options =>
+            return AssertQueryIgnoreErrorsAsync(
+                query, expectedExecutionResult, variables, root,
+                userContext, cancellationToken, rules,
+                expectedErrorCount, renderErrors, unhandledExceptionDelegate)
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        public async Task<ExecutionResult> AssertQueryIgnoreErrorsAsync(
+            string query,
+            ExecutionResult expectedExecutionResult,
+            Inputs variables = null,
+            object root = null,
+            IDictionary<string, object> userContext = null,
+            CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
+            int expectedErrorCount = 0,
+            bool renderErrors = false,
+            Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null)
+        {
+            var schema = Schema;
+            var runResult = await Executer.ExecuteAsync(options =>
             {
                 options.Schema = Schema;
                 options.Query = query;
@@ -109,7 +157,7 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
-            }).GetAwaiter().GetResult();
+            });
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 

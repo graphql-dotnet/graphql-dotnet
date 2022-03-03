@@ -318,8 +318,8 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
         }
 
-        [Fact(Skip = "Hangs test runner")]
-        public void evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
+        [Fact]
+        public async Task evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
         {
             var query = @"
                 mutation M {
@@ -362,7 +362,7 @@ namespace GraphQL.Tests.Execution
                   ""sixth"": null
                 }";
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
+            var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
             result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
             var last = result.Errors.Last();
             last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
@@ -413,8 +413,8 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
         }
 
-        [Fact(Skip = "hangs test runner")]
-        public void evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
+        [Fact]
+        public async Task evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
         {
             var query = @"
                 mutation M {
@@ -457,7 +457,7 @@ namespace GraphQL.Tests.Execution
                   ""sixth"": null
                 }";
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
+            var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
             result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
             var last = result.Errors.Last();
             last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
