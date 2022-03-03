@@ -54,8 +54,8 @@ namespace GraphQL.MicrosoftDI.Tests
                 Source = new TestClass(),
                 RequestServices = rootServiceProvider,
             };
-            var unscopedSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!).AsyncSubscriber!;
-            var scopedAsyncSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!).AsyncSubscriber!;
+            var unscopedSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!).Subscriber!;
+            var scopedAsyncSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!).Subscriber!;
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("1 2"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("2 3"));
