@@ -20,16 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="xunit.runner.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="xunit.runner.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GraphQL.Dummy\GraphQL.Dummy.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
