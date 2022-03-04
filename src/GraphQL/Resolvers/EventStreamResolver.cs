@@ -1,16 +1,16 @@
 namespace GraphQL.Resolvers
 {
-    public class EventStreamResolver<T> : IEventStreamResolver
+    public class EventStreamResolver<TReturnType> : IEventStreamResolver
     {
         private readonly Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _subscriber;
 
-        public EventStreamResolver(Func<IResolveFieldContext, IObservable<T?>> subscriber)
+        public EventStreamResolver(Func<IResolveFieldContext, IObservable<TReturnType?>> subscriber)
         {
             if (subscriber == null)
                 throw new ArgumentNullException(nameof(subscriber));
 
-            if (typeof(T).IsValueType)
-                throw new InvalidOperationException("The generic type T must not be a value type.");
+            if (typeof(TReturnType).IsValueType)
+                throw new InvalidOperationException("The generic type TReturnType must not be a value type.");
 
             _subscriber = context => new ValueTask<IObservable<object?>>((IObservable<object?>)subscriber(context));
         }
@@ -29,7 +29,7 @@ namespace GraphQL.Resolvers
                 throw new ArgumentNullException(nameof(subscriber));
 
             if (typeof(TReturnType).IsValueType)
-                throw new InvalidOperationException("The generic type T must not be a value type.");
+                throw new InvalidOperationException("The generic type TReturnType must not be a value type.");
 
             _subscriber = context => new ValueTask<IObservable<object?>>((IObservable<object?>)subscriber(context.As<TSourceType>()));
         }
