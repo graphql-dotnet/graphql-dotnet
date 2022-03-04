@@ -1,5 +1,4 @@
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI
@@ -12,7 +11,7 @@ namespace GraphQL.MicrosoftDI
     /// </summary>
     internal class DynamicScopedEventStreamResolver : IEventStreamResolver
     {
-        private readonly Func<IResolveEventStreamContext, ValueTask<IObservable<object?>>> _resolverFunc;
+        private readonly Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _resolverFunc;
 
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
@@ -22,11 +21,11 @@ namespace GraphQL.MicrosoftDI
             _resolverFunc = async context =>
             {
                 using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
-                return await resolver.SubscribeAsync(new ScopedResolveEventStreamContextAdapter(context, scope.ServiceProvider)).ConfigureAwait(false);
+                return await resolver.SubscribeAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _resolverFunc(context);
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _resolverFunc(context);
     }
 }

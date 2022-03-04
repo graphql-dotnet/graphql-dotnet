@@ -34,9 +34,6 @@ namespace GraphQL.Execution
 
             foreach (var node in nodes)
             {
-                if (!(node.FieldDefinition is EventStreamFieldType))
-                    continue;
-
                 var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
 
                 if (stream != null)
@@ -50,45 +47,19 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var arguments = ExecutionHelper.GetArguments(
-                node.FieldDefinition!.Arguments,
-                node.Field!.Arguments,
-                context.Variables);
-
             object? source = (node.Parent != null)
                 ? node.Parent.Result
                 : context.RootValue;
 
             try
             {
-                var resolveContext = new ResolveEventStreamContext
-                {
-                    FieldAst = node.Field,
-                    FieldDefinition = node.FieldDefinition,
-                    ParentType = node.GetParentType(context.Schema)!,
-                    Arguments = arguments,
-                    Source = source,
-                    Schema = context.Schema,
-                    Document = context.Document,
-                    RootValue = context.RootValue,
-                    UserContext = context.UserContext,
-                    Operation = context.Operation,
-                    Variables = context.Variables,
-                    CancellationToken = context.CancellationToken,
-                    Metrics = context.Metrics,
-                    Errors = context.Errors,
-                    Path = node.Path,
-                    RequestServices = context.RequestServices,
-                };
-
-                var eventStreamField = node.FieldDefinition as EventStreamFieldType;
-
+                var resolveContext = new ResolveFieldContext(new ReadonlyResolveFieldContext(node, context));
 
                 IObservable<object?> subscription;
 
-                if (eventStreamField?.Subscriber != null)
+                if (node.FieldDefinition?.Subscriber != null)
                 {
-                    subscription = await eventStreamField.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
+                    subscription = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else
                 {

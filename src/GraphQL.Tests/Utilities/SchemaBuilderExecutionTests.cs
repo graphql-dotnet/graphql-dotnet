@@ -215,7 +215,6 @@ namespace GraphQL.Tests.Utilities
             schema.Query.Name.ShouldBe("CustomQuery");
             schema.Mutation.Name.ShouldBe("CustomMutation");
             schema.Subscription.Name.ShouldBe("CustomSubscription");
-            schema.Subscription.Fields.All(f => f is EventStreamFieldType).ShouldBeTrue();
         }
 
         [Theory]

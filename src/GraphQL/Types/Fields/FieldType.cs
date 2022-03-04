@@ -75,5 +75,10 @@ namespace GraphQL.Types
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
         /// </summary>
         public IFieldResolver? Resolver { get; set; }
+
+        /// <summary>
+        /// Gets or sets a subscription resolver for the field. Only applicable to subscription fields.
+        /// </summary>
+        public IEventStreamResolver? Subscriber { get; set; }
     }
 }

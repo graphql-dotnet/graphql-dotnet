@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
 {
@@ -106,6 +105,6 @@ namespace GraphQL.Resolvers
             => await task.ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _eventStreamResolver(context);
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _eventStreamResolver(context);
     }
 }

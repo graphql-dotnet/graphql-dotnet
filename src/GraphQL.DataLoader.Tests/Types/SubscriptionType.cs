@@ -1,7 +1,6 @@
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Tests.Types
@@ -15,7 +14,7 @@ namespace GraphQL.DataLoader.Tests.Types
 
             Name = "Subscription";
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "orderAdded",
                 Type = typeof(OrderType),
@@ -29,7 +28,7 @@ namespace GraphQL.DataLoader.Tests.Types
             return context.Source as Order;
         }
 
-        private IObservable<Order> Subscribe(IResolveEventStreamContext context)
+        private IObservable<Order> Subscribe(IResolveFieldContext context)
         {
             return ordersStore.GetOrderObservable();
         }
