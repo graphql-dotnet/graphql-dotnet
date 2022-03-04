@@ -92,11 +92,12 @@ namespace GraphQL.Tests.Execution
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, string>(context =>
+            Func<IResolveFieldContext<int?>, string> func1 = context =>
             {
                 rfc1 = context;
                 throw new Exception();
-            });
+            };
+            var ffr1 = new FuncFieldResolver<int?, string>(func1);
             var ffr2 = new FuncFieldResolver<int?, string>(context =>
             {
                 rfc2 = context;

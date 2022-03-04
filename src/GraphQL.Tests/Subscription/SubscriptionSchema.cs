@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
@@ -24,7 +23,7 @@ namespace GraphQL.Tests.Subscription
         public ChatSubscriptions(IChat chat)
         {
             _chat = chat;
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "messageAdded",
                 Type = typeof(MessageType),
@@ -32,7 +31,7 @@ namespace GraphQL.Tests.Subscription
                 Subscriber = new EventStreamResolver<Message>(Subscribe)
             });
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "messageAddedByUser",
                 Arguments = new QueryArguments(
@@ -43,7 +42,7 @@ namespace GraphQL.Tests.Subscription
                 Subscriber = new EventStreamResolver<Message>(SubscribeById)
             });
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "messageAddedAsync",
                 Type = typeof(MessageType),
@@ -51,7 +50,7 @@ namespace GraphQL.Tests.Subscription
                 Subscriber = new AsyncEventStreamResolver<Message>(SubscribeAsync)
             });
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "messageAddedByUserAsync",
                 Arguments = new QueryArguments(
@@ -62,7 +61,7 @@ namespace GraphQL.Tests.Subscription
                 Subscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
             });
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "messageGetAll",
                 Type = typeof(ListGraphType<MessageType>),
@@ -70,7 +69,7 @@ namespace GraphQL.Tests.Subscription
                 Subscriber = new EventStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
             });
 
-            AddField(new EventStreamFieldType
+            AddField(new FieldType
             {
                 Name = "newMessageContent",
                 Type = typeof(StringGraphType),
@@ -79,7 +78,7 @@ namespace GraphQL.Tests.Subscription
             });
         }
 
-        private IObservable<Message> SubscribeById(IResolveEventStreamContext context)
+        private IObservable<Message> SubscribeById(IResolveFieldContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -88,7 +87,7 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private async Task<IObservable<Message>> SubscribeByIdAsync(IResolveEventStreamContext context)
+        private async Task<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -103,12 +102,12 @@ namespace GraphQL.Tests.Subscription
             return message;
         }
 
-        private IObservable<Message> Subscribe(IResolveEventStreamContext context)
+        private IObservable<Message> Subscribe(IResolveFieldContext context)
         {
             return _chat.Messages();
         }
 
-        private Task<IObservable<Message>> SubscribeAsync(IResolveEventStreamContext context)
+        private Task<IObservable<Message>> SubscribeAsync(IResolveFieldContext context)
         {
             return _chat.MessagesAsync();
         }

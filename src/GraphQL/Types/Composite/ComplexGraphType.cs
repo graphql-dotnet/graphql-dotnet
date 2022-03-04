@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using GraphQL.Builders;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQLParser;
@@ -333,11 +332,11 @@ namespace GraphQL.Types
             string? description = null,
             QueryArguments? arguments = null,
             Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-            Func<IResolveEventStreamContext, IObservable<object?>>? subscribe = null,
+            Func<IResolveFieldContext, IObservable<object?>>? subscribe = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new EventStreamFieldType
+            return AddField(new FieldType
             {
                 Name = name,
                 Description = description,
@@ -358,11 +357,11 @@ namespace GraphQL.Types
             string? description = null,
             QueryArguments? arguments = null,
             Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-            Func<IResolveEventStreamContext, Task<IObservable<object?>>>? subscribeAsync = null,
+            Func<IResolveFieldContext, Task<IObservable<object?>>>? subscribeAsync = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new EventStreamFieldType
+            return AddField(new FieldType
             {
                 Name = name,
                 Description = description,

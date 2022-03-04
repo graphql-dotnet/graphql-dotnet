@@ -1,5 +1,4 @@
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
@@ -33,9 +32,9 @@ namespace GraphQL.Builders
         /// <summary>
         /// Returns the generated field.
         /// </summary>
-        public EventStreamFieldType FieldType { get; }
+        public FieldType FieldType { get; }
 
-        private FieldBuilder(EventStreamFieldType fieldType)
+        private FieldBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -47,7 +46,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the field.</param>
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
         {
-            var fieldType = new EventStreamFieldType
+            var fieldType = new FieldType
             {
                 Name = name,
                 ResolvedType = type,
@@ -59,7 +58,7 @@ namespace GraphQL.Builders
         /// <inheritdoc cref="Create(IGraphType, string)"/>
         public static FieldBuilder<TSourceType, TReturnType> Create(Type? type = null, string name = "default")
         {
-            var fieldType = new EventStreamFieldType
+            var fieldType = new FieldType
             {
                 Name = name,
                 Type = type,
@@ -206,13 +205,13 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType?>> subscribe)
+        public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> subscribe)
         {
             FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
             return this;
         }
 
-        public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType?>>> subscribeAsync)
+        public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> subscribeAsync)
         {
             FieldType.Subscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
             return this;

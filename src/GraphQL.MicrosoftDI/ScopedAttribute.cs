@@ -20,9 +20,9 @@ namespace GraphQL
                 fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
             }
 
-            if (fieldType is EventStreamFieldType eventStreamFieldType && eventStreamFieldType.Subscriber != null)
+            if (fieldType.Subscriber != null)
             {
-                eventStreamFieldType.Subscriber = new DynamicScopedEventStreamResolver(eventStreamFieldType.Subscriber);
+                fieldType.Subscriber = new DynamicScopedEventStreamResolver(fieldType.Subscriber);
             }
         }
     }

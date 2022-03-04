@@ -1,38 +1,40 @@
-using GraphQL.Subscription;
-
 namespace GraphQL.Resolvers
 {
-    public class EventStreamResolver<T> : IEventStreamResolver<T>
+    public class EventStreamResolver<T> : IEventStreamResolver
     {
-        private readonly Func<IResolveEventStreamContext, IObservable<T?>> _subscriber;
+        private readonly Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _subscriber;
 
-        public EventStreamResolver(
-            Func<IResolveEventStreamContext, IObservable<T?>> subscriber)
+        public EventStreamResolver(Func<IResolveFieldContext, IObservable<T?>> subscriber)
         {
-            _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
+            if (subscriber == null)
+                throw new ArgumentNullException(nameof(subscriber));
+
+            if (typeof(T).IsValueType)
+                throw new InvalidOperationException("The generic type T must not be a value type.");
+
+            _subscriber = context => new ValueTask<IObservable<object?>>((IObservable<object?>)subscriber(context));
         }
 
-        public ValueTask<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context)
-            => new ValueTask<IObservable<T?>>(_subscriber(context));
-
-        ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
-            => new ValueTask<IObservable<object?>>((IObservable<object?>)_subscriber(context));
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context)
+            => _subscriber(context);
     }
 
-    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
+    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver
     {
-        private readonly Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType?>> _subscriber;
+        private readonly Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _subscriber;
 
-        public EventStreamResolver(
-            Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType?>> subscriber)
+        public EventStreamResolver(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> subscriber)
         {
-            _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
+            if (subscriber == null)
+                throw new ArgumentNullException(nameof(subscriber));
+
+            if (typeof(TReturnType).IsValueType)
+                throw new InvalidOperationException("The generic type T must not be a value type.");
+
+            _subscriber = context => new ValueTask<IObservable<object?>>((IObservable<object?>)subscriber(context.As<TSourceType>()));
         }
 
-        public ValueTask<IObservable<TReturnType?>> SubscribeAsync(IResolveEventStreamContext context)
-            => new ValueTask<IObservable<TReturnType?>>(_subscriber(context.As<TSourceType>()));
-
-        ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
-            => new ValueTask<IObservable<object?>>((IObservable<object?>)_subscriber(context.As<TSourceType>()));
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context)
+            => _subscriber(context);
     }
 }

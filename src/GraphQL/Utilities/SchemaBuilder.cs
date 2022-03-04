@@ -375,7 +375,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownField(fieldConfig, typeConfig);
 
-            var field = new EventStreamFieldType
+            var field = new FieldType
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),

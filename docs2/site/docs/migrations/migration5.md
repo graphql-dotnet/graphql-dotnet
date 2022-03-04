@@ -491,6 +491,9 @@ This will result in a substantial speed increase for schemas that use field midd
 In addition, `ValueTask<T>` return types are supported for fields built on CLR methods via the schema builder,
 fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
 
+When manually instantiating a field or subscription resolver, you may use a delegate that return a `ValueTask` by
+using new constructors available on the `FuncFieldResolver` or `EventStreamResolver` classes.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -841,7 +844,7 @@ All classes which implemented the above interfaces have been modified as necessa
 
 These properties have been removed:
 
-- `EventStreamFieldType.AsyncSubscriber`
+- `EventStreamFieldType.AsyncSubscriber` (note: the `EventStreamFieldType` class was removed and the `Subscriber` property moved to the `FieldType` class)
 - `FieldConfig.AsyncSubscriber`
 
 Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
@@ -893,3 +896,16 @@ FieldDelegate<DroidType>(
     resolve: func
 );
 ```
+
+### 34. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
+
+Please use the `IResolveFieldContext` interface and the `ResolveFieldContext` class instead. No other changes are required.
+
+### 34. `EventStreamFieldType` class removed
+
+Please use `FieldType` instead. The `Subscriber` property has been moved to the `FieldType` class so no other changes should be required.
+The `AsyncSubscriber` property has been removed as described above.
+
+### 35. `IEventStreamResolver<T>` interface removed
+
+For custom resolver implementations, please implement `IEventStreamResolver` instead.

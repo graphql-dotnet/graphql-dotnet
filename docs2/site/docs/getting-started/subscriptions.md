@@ -31,7 +31,7 @@ public class ChatSubscriptions : ObjectGraphType
   {
     _chat = chat;
 
-    AddField(new EventStreamFieldType
+    AddField(new FieldType
     {
       Name = "messageAdded",
       Type = typeof(MessageType),

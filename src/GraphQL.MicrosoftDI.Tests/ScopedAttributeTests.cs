@@ -1,4 +1,3 @@
-using GraphQL.Subscription;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -49,13 +48,13 @@ namespace GraphQL.MicrosoftDI.Tests
             serviceCollection.AddScoped<Class2>();
             var rootServiceProvider = serviceCollection.BuildServiceProvider(false);
             var graphType = new AutoRegisteringObjectGraphType<TestClass>();
-            var context = new ResolveEventStreamContext
+            var context = new ResolveFieldContext
             {
                 Source = new TestClass(),
                 RequestServices = rootServiceProvider,
             };
-            var unscopedSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!).Subscriber!;
-            var scopedAsyncSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!).Subscriber!;
+            var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.Subscriber!;
+            var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.Subscriber!;
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("1 2"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("2 3"));
