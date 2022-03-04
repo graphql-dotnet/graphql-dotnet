@@ -83,9 +83,9 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Configures query arguments and a field resolver for the specified <see cref="EventStreamFieldType"/>, overwriting
+        /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
         /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
-        /// and <see cref="EventStreamFieldType.Subscriber"/>.
+        /// and <see cref="FieldType.Subscriber"/>.
         /// <br/><br/>
         /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
         /// member from <see cref="IResolveFieldContext.Source"/>.
@@ -94,7 +94,7 @@ namespace GraphQL.Types
         /// <see cref="GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
         /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
         /// </summary>
-        protected void BuildFieldType(EventStreamFieldType fieldType, MemberInfo memberInfo)
+        protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
             if (memberInfo is PropertyInfo propertyInfo)
             {

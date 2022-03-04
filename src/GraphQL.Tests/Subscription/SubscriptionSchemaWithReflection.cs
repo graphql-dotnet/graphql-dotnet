@@ -1,5 +1,4 @@
 using System.Reactive.Linq;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
@@ -43,7 +42,7 @@ namespace GraphQL.Tests.Subscription
     public class Subscription
     {
         [GraphQLMetadata(Name = "messageAdded", ResolverType = ResolverType.Subscriber)]
-        public IObservable<Message> SubscribeMessageAdded(IResolveEventStreamContext context)
+        public IObservable<Message> SubscribeMessageAdded(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.Messages();
         }
@@ -55,7 +54,7 @@ namespace GraphQL.Tests.Subscription
         }
 
         [GraphQLMetadata(Name = "messageGetAll", ResolverType = ResolverType.Subscriber)]
-        public IObservable<List<Message>> SubscribeMessageGetAll(IResolveEventStreamContext context)
+        public IObservable<List<Message>> SubscribeMessageGetAll(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
         }
@@ -67,7 +66,7 @@ namespace GraphQL.Tests.Subscription
         }
 
         [GraphQLMetadata(Name = "messageAddedByUser", ResolverType = ResolverType.Subscriber)]
-        public IObservable<Message> SubscribeMessageAddedByUser(IResolveEventStreamContext context, string id)
+        public IObservable<Message> SubscribeMessageAddedByUser(IResolveFieldContext context, string id)
         {
             var messages = SubscriptionSchemaWithReflection.Chat.Messages();
             return messages.Where(message => message.From.Id == id);
@@ -80,7 +79,7 @@ namespace GraphQL.Tests.Subscription
         }
 
         [GraphQLMetadata(Name = "messageAddedAsync", ResolverType = ResolverType.Subscriber)]
-        public Task<IObservable<Message>> SubscribeMessageAddedAsync(IResolveEventStreamContext context)
+        public Task<IObservable<Message>> SubscribeMessageAddedAsync(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesAsync();
         }
@@ -92,7 +91,7 @@ namespace GraphQL.Tests.Subscription
         }
 
         [GraphQLMetadata(Name = "messageAddedByUserAsync", ResolverType = ResolverType.Subscriber)]
-        public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(IResolveEventStreamContext context, string id)
+        public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(IResolveFieldContext context, string id)
         {
             var messages = await SubscriptionSchemaWithReflection.Chat.MessagesAsync();
             return messages.Where(message => message.From.Id == id);

@@ -133,11 +133,11 @@ namespace GraphQL.Types
                 : properties.Where(propertyInfo => !excludedProperties!.Any(p => GetPropertyName(p) == propertyInfo.Name));
 
         /// <summary>
-        /// Creates a <see cref="EventStreamFieldType"/> for the specified <see cref="MemberInfo"/>.
+        /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static EventStreamFieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
+        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
-            var fieldType = new EventStreamFieldType()
+            var fieldType = new FieldType()
             {
                 Name = memberInfo.Name,
                 Description = memberInfo.Description(),
