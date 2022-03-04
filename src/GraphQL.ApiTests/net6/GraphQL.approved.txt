@@ -1495,9 +1495,9 @@ namespace GraphQL.Resolvers
         protected override System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context) { }
     }
-    public class EventStreamResolver<T> : GraphQL.Resolvers.IEventStreamResolver
+    public class EventStreamResolver<TReturnType> : GraphQL.Resolvers.IEventStreamResolver
     {
-        public EventStreamResolver(System.Func<GraphQL.IResolveFieldContext, System.IObservable<T?>> subscriber) { }
+        public EventStreamResolver(System.Func<GraphQL.IResolveFieldContext, System.IObservable<TReturnType?>> subscriber) { }
         public System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class EventStreamResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IEventStreamResolver
