@@ -49,7 +49,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void should_return_the_right_type()
+        public async Task should_return_the_right_type()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -63,8 +63,9 @@ namespace GraphQL.Tests.Builders
             fields[0].Type.ShouldBe(typeof(StringGraphType));
 
             var context = new ResolveFieldContext();
-            fields[0].Resolver.Resolve(context).GetType().ShouldBe(typeof(string));
-            fields[0].Resolver.Resolve(context).ShouldBe("SomeString");
+            var result = await fields[0].Resolver.ResolveAsync(context);
+            result.GetType().ShouldBe(typeof(string));
+            result.ShouldBe("SomeString");
         }
 
         [Fact]
@@ -136,7 +137,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_determine_whether_argument_exists_in_resolver()
+        public async Task can_determine_whether_argument_exists_in_resolver()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<IntGraphType>()
@@ -156,7 +157,7 @@ namespace GraphQL.Tests.Builders
             field.Arguments[0].Description.ShouldBe("desc1");
             field.Arguments[0].Type.ShouldBe(typeof(StringGraphType));
             field.Arguments[0].DefaultValue.ShouldBe("12345");
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -166,7 +167,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void getting_unspecified_argument_in_resolver_yields_null()
+        public async Task getting_unspecified_argument_in_resolver_yields_null()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -178,7 +179,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
@@ -186,7 +187,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void getting_unspecified_argument_in_resolver_yields_overridden_default_value()
+        public async Task getting_unspecified_argument_in_resolver_yields_overridden_default_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -198,7 +199,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
@@ -206,7 +207,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_nullable_argument_with_value()
+        public async Task can_get_nullable_argument_with_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -218,7 +219,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -229,7 +230,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_nullable_argument_with_null_value()
+        public async Task can_get_nullable_argument_with_null_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -241,7 +242,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -252,7 +253,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_nullable_argument_missing_value()
+        public async Task can_get_nullable_argument_missing_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -264,7 +265,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
@@ -272,7 +273,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_enum_argument()
+        public async Task can_get_enum_argument()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -284,7 +285,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -295,7 +296,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_enum_argument_with_overriden_default_value()
+        public async Task can_get_enum_argument_with_overriden_default_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -307,7 +308,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
@@ -315,7 +316,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_list_argument()
+        public async Task can_get_list_argument()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -327,7 +328,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -338,7 +339,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_get_collection_argument()
+        public async Task can_get_collection_argument()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -350,7 +351,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -362,7 +363,7 @@ namespace GraphQL.Tests.Builders
 
 
         [Fact]
-        public void getting_specified_argument_in_resolver_overrides_default_value()
+        public async Task getting_specified_argument_in_resolver_overrides_default_value()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
@@ -374,7 +375,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
@@ -385,7 +386,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_access_object()
+        public async Task can_access_object()
         {
             var objectType = new ObjectGraphType<int>();
 
@@ -397,7 +398,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolver.Resolve(new ResolveFieldContext
+            await field.Resolver.ResolveAsync(new ResolveFieldContext
             {
                 Source = 12345
             });

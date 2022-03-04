@@ -16,9 +16,9 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             Name = "CancellationTestType";
 
-            Field<StringGraphType>("one", resolve: GetOneAsync);
-            Field<StringGraphType>("two", resolve: GetTwoAsync);
-            Field<StringGraphType>("three", resolve: GetThreeAsync);
+            FieldAsync<StringGraphType>("one", resolve: async context => await GetOneAsync(context));
+            FieldAsync<StringGraphType>("two", resolve: async context => await GetTwoAsync(context));
+            FieldAsync<StringGraphType>("three", resolve: async context => await GetThreeAsync(context));
         }
 
         public Task<string> GetOneAsync(IResolveFieldContext<object> context)

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace GraphQL.Resolvers
 {
@@ -13,8 +14,7 @@ namespace GraphQL.Resolvers
     /// </summary>
     public class NameFieldResolver : IFieldResolver
     {
-        private static readonly ConcurrentDictionary<(Type targetType, string name), Func<object, object>> _delegates
-            = new ConcurrentDictionary<(Type, string), Func<object, object>>();
+        private static readonly ConcurrentDictionary<(Type targetType, string name), Func<IResolveFieldContext, ValueTask<object?>>> _delegates = new();
 
         private NameFieldResolver() { }
 
@@ -24,18 +24,18 @@ namespace GraphQL.Resolvers
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
         /// <inheritdoc/>
-        public object? Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldDefinition?.Name);
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => Resolve(context, context.FieldDefinition.Name);
 
-        private static object? Resolve(object? source, string? name)
+        private static ValueTask<object?> Resolve(IResolveFieldContext context, string? name)
         {
-            if (source == null || name == null)
-                return null;
+            if (context.Source == null || name == null)
+                return default;
 
             // We use reflection to create a delegate to access the property/method
             // Then cache the delegate
             // This is over 10x faster that just using reflection to get the property/method value
-            var func = _delegates.GetOrAdd((source.GetType(), name), t => CreateDelegate(t.targetType, t.name));
-            return func(source);
+            var func = _delegates.GetOrAdd((context.Source.GetType(), name), t => CreateDelegate(t.targetType, t.name));
+            return func(context);
         }
 
         /// <summary>
@@ -59,15 +59,16 @@ namespace GraphQL.Resolvers
         /// <param name="target"> The type from which you want to get the value. </param>
         /// <param name="name"> Property/method name. </param>
         /// <returns> Compiled delegate to get the value. </returns>
-        private static Func<object, object> CreateDelegate(Type target, string name)
+        private static Func<IResolveFieldContext, ValueTask<object?>> CreateDelegate(Type target, string name)
         {
-            var parameter = Expression.Parameter(typeof(object), "x");
+            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+            var source = Expression.MakeMemberAccess(param, _sourcePropertyInfo);
+            var cast = Expression.Convert(source, target);
+            var body = CreateAccessorExpression(cast, name, target);
+            // supports return types of T, Task<T> and ValueTask<T>
+            return MemberResolver.BuildFieldResolverInternal(param, body);
 
-            var member = Expression.Convert(parameter, target);
-            var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(CreateAccessorExpression(), typeof(object)), parameter);
-            return lambda.Compile();
-
-            Expression CreateAccessorExpression()
+            static Expression CreateAccessorExpression(Expression member, string name, Type target)
             {
                 try
                 {
@@ -92,5 +93,7 @@ namespace GraphQL.Resolvers
                 }
             }
         }
+
+        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source));
     }
 }

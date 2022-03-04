@@ -88,11 +88,7 @@ namespace GraphQL.Execution
 
                 if (eventStreamField?.Subscriber != null)
                 {
-                    subscription = eventStreamField.Subscriber.Subscribe(resolveContext);
-                }
-                else if (eventStreamField?.AsyncSubscriber != null)
-                {
-                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
+                    subscription = await eventStreamField.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else
                 {

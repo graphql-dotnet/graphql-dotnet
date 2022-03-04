@@ -23,24 +23,6 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
-        [Fact]
-        public void can_create_custom_directive_with_tasks()
-        {
-            Builder.Types.Include<Query>();
-
-            AssertQuery(_ =>
-            {
-                _.Definitions = @"
-                    type Query {
-                        hello: String @upper
-                    }
-                ";
-                _.ConfigureBuildedSchema = schema => { schema.Directives.Register(new UpperDirective()); schema.RegisterVisitor<AsyncUppercaseDirectiveVisitor>(); };
-                _.Query = "{ hello }";
-                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD2!"" }";
-            });
-        }
-
         public class Query
         {
             public Task<string> Hello() => Task.FromResult("Hello World2!");

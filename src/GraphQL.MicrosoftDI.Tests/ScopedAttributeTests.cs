@@ -7,7 +7,7 @@ namespace GraphQL.MicrosoftDI.Tests
     public class ScopedAttributeTests
     {
         [Fact]
-        public async void ScopedMethodWorks()
+        public async Task ScopedMethodWorks()
         {
             Class1.DisposedCount = 0;
             var serviceCollection = new ServiceCollection();
@@ -23,19 +23,19 @@ namespace GraphQL.MicrosoftDI.Tests
             var unscopedFieldResolver = graphType.Fields.Find(nameof(TestClass.UnscopedField))!.Resolver!;
             var scopedFieldResolver = graphType.Fields.Find(nameof(TestClass.ScopedField))!.Resolver!;
             var scopedAsyncFieldResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncField))!.Resolver!;
-            unscopedFieldResolver.Resolve(context).ShouldBe("0 1");
-            unscopedFieldResolver.Resolve(context).ShouldBe("1 2");
-            unscopedFieldResolver.Resolve(context).ShouldBe("2 3");
+            (await unscopedFieldResolver.ResolveAsync(context)).ShouldBe("0 1");
+            (await unscopedFieldResolver.ResolveAsync(context)).ShouldBe("1 2");
+            (await unscopedFieldResolver.ResolveAsync(context)).ShouldBe("2 3");
             Class1.DisposedCount.ShouldBe(0);
-            (await (Task<object>)scopedFieldResolver.Resolve(context)).ShouldBe("0 1");
+            (await scopedFieldResolver.ResolveAsync(context)).ShouldBe("0 1");
             Class1.DisposedCount.ShouldBe(1);
-            (await (Task<object>)scopedFieldResolver.Resolve(context)).ShouldBe("0 1");
+            (await scopedFieldResolver.ResolveAsync(context)).ShouldBe("0 1");
             Class1.DisposedCount.ShouldBe(2);
-            (await (Task<object>)scopedAsyncFieldResolver.Resolve(context)).ShouldBe("0 1");
+            (await scopedAsyncFieldResolver.ResolveAsync(context)).ShouldBe("0 1");
             Class1.DisposedCount.ShouldBe(3);
-            (await (Task<object>)scopedAsyncFieldResolver.Resolve(context)).ShouldBe("0 1");
+            (await scopedAsyncFieldResolver.ResolveAsync(context)).ShouldBe("0 1");
             Class1.DisposedCount.ShouldBe(4);
-            unscopedFieldResolver.Resolve(context).ShouldBe("3 4");
+            (await unscopedFieldResolver.ResolveAsync(context)).ShouldBe("3 4");
             rootServiceProvider.Dispose();
             Class1.DisposedCount.ShouldBe(5);
         }
@@ -54,8 +54,8 @@ namespace GraphQL.MicrosoftDI.Tests
                 Source = new TestClass(),
                 RequestServices = rootServiceProvider,
             };
-            var unscopedSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!).AsyncSubscriber!;
-            var scopedAsyncSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!).AsyncSubscriber!;
+            var unscopedSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!).Subscriber!;
+            var scopedAsyncSubscriptionResolver = ((EventStreamFieldType)graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!).Subscriber!;
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("1 2"));
             (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("2 3"));

@@ -8,9 +8,9 @@ namespace GraphQL.Resolvers
     /// A precompiled event stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
-    public class EventStreamMethodResolver : MemberResolver, IAsyncEventStreamResolver
+    public class EventStreamMethodResolver : MemberResolver, IEventStreamResolver
     {
-        private Func<IResolveFieldContext, Task<IObservable<object?>>> _eventStreamResolver = null!;
+        private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _eventStreamResolver = null!;
 
         /// <summary>
         /// Initializes an instance for the specified method, using the specified instance expression to access the instance of the method,
@@ -26,22 +26,30 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        protected override Func<IResolveFieldContext, object?> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        protected override Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
             _eventStreamResolver = BuildEventStreamResolver(resolveFieldContextParameter, bodyExpression);
-            return context => context.Source;
+            return context => new ValueTask<object?>(context.Source);
         }
 
         /// <summary>
         /// Creates an appropriate event stream resolver function based on the return type of the expression body.
         /// </summary>
-        protected virtual Func<IResolveFieldContext, Task<IObservable<object?>>> BuildEventStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildEventStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
             Expression? taskBodyExpression = null;
 
-            if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
+            if (bodyExpression.Type == typeof(ValueTask<IObservable<object?>>))
             {
                 taskBodyExpression = bodyExpression;
+            }
+            else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
+            {
+                var valueTaskType = typeof(ValueTask<IObservable<object?>>);
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) });
+                taskBodyExpression = Expression.New(
+                    constructor,
+                    bodyExpression);
             }
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
             {
@@ -55,12 +63,28 @@ namespace GraphQL.Resolvers
                     }
                 }
             }
+            else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(ValueTask<>))
+            {
+                var type = bodyExpression.Type.GetGenericArguments()[0];
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
+                {
+                    var innerType = type.GetGenericArguments()[0];
+                    if (!innerType.IsValueType)
+                    {
+                        taskBodyExpression = Expression.Call(_castFromValueTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression);
+                    }
+                }
+            }
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
             {
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
                 if (!innerType.IsValueType)
                 {
-                    taskBodyExpression = Expression.Call(_castFromObservableMethodInfo.MakeGenericMethod(innerType), bodyExpression);
+                    var valueTaskType = typeof(ValueTask<IObservable<object?>>);
+                    var constructor = valueTaskType.GetConstructor(new Type[] { typeof(IObservable<object?>) });
+                    taskBodyExpression = Expression.New(
+                        constructor,
+                        bodyExpression);
                 }
             }
 
@@ -69,19 +93,19 @@ namespace GraphQL.Resolvers
                 throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type.");
             }
 
-            var lambda = Expression.Lambda<Func<IResolveFieldContext, Task<IObservable<object?>>>>(taskBodyExpression, resolveFieldContextParameter);
+            var lambda = Expression.Lambda<Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>(taskBodyExpression, resolveFieldContextParameter);
             return lambda.Compile();
         }
 
-        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
-        private static async Task<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
+        private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
+        private static async ValueTask<IObservable<object?>> CastFromValueTaskAsync<T>(ValueTask<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 
-        private static readonly MethodInfo _castFromObservableMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromObservable), BindingFlags.Static | BindingFlags.NonPublic);
-        private static Task<IObservable<object?>> CastFromObservable<T>(IObservable<T> observable) where T : class
-            => Task.FromResult<IObservable<object?>>(observable);
+        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
+        private static async ValueTask<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
+            => await task.ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public Task<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _eventStreamResolver(context);
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveEventStreamContext context) => _eventStreamResolver(context);
     }
 }

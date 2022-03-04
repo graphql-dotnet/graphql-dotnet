@@ -44,7 +44,7 @@ namespace GraphQL.Types
         /// An example of an instance expression would be as follows:
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public static IAsyncEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
+        public static IEventStreamResolver BuildEventStreamResolver(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType, LambdaExpression instanceExpression)
         {
             var arguments = BuildFieldResolver_BuildMethodArguments(methodInfo, sourceType, fieldType);
             return new EventStreamMethodResolver(methodInfo, instanceExpression, arguments);

@@ -25,39 +25,11 @@ namespace GraphQL.Tests.Utilities.Visitors
             if (applied != null)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
-                field.Resolver = new FuncFieldResolver<object>(context =>
-                {
-                    object result = inner.Resolve(context);
-
-                    return result switch
-                    {
-                        string str => str?.ToUpperInvariant(),
-                        Task<string> task => Task.FromResult(task.GetAwaiter().GetResult()?.ToUpperInvariant()),
-                        _ => result
-                    };
-                });
-            }
-        }
-    }
-
-    /// <summary>
-    /// Visitor for unit tests. Wraps field resolver and returns UPPERCASED result if it is string.
-    /// </summary>
-    public class AsyncUppercaseDirectiveVisitor : BaseSchemaNodeVisitor
-    {
-        public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
-        {
-            var applied = field.FindAppliedDirective("upper");
-            if (applied != null)
-            {
-                var inner = field.Resolver ?? NameFieldResolver.Instance;
-                field.Resolver = new AsyncFieldResolver<object>(async context =>
+                field.Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     object result = await inner.ResolveAsync(context);
 
-                    return result is string str
-                        ? str.ToUpperInvariant()
-                        : result;
+                    return result is string str ? str.ToUpperInvariant() : result;
                 });
             }
         }

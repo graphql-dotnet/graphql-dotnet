@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "messageAddedAsync",
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeAsync)
+                Subscriber = new AsyncEventStreamResolver<Message>(SubscribeAsync)
             });
 
             AddField(new EventStreamFieldType
@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Subscription
                 ),
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
+                Subscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
             });
 
             AddField(new EventStreamFieldType

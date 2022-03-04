@@ -30,22 +30,22 @@ namespace GraphQL.Tests.Instrumentation
         }
 
         [Fact]
-        public void default_resolves_named_field()
+        public async Task default_resolves_named_field()
         {
             _builder.Use(next => next);
-            _builder.BuildResolve().Invoke(_context).Result.ShouldBe("Quinn");
+            (await _builder.BuildResolve().Invoke(_context)).ShouldBe("Quinn");
         }
 
         [Fact]
-        public void middleware_can_override()
+        public async Task middleware_can_override()
         {
-            _builder.Use(next => context => Task.FromResult<object>("One"));
+            _builder.Use(next => context => new ValueTask<object>("One"));
 
-            _builder.BuildResolve().Invoke(_context).Result.ShouldBe("One");
+            (await _builder.BuildResolve().Invoke(_context)).ShouldBe("One");
         }
 
         [Fact]
-        public void multiple_middleware_runs_in_correct_order()
+        public async Task multiple_middleware_runs_in_correct_order()
         {
             // verify that the middleware runs in the same order as it did in 3.x
 
@@ -66,12 +66,12 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
             result.ShouldBe("One Two Quinn");
         }
 
         [Fact]
-        public void middleware_can_combine()
+        public async Task middleware_can_combine()
         {
             _builder.Use(next =>
             {
@@ -82,12 +82,12 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
             result.ShouldBe("One Quinn");
         }
 
         [Fact]
-        public void middleware_can_compose()
+        public async Task middleware_can_compose()
         {
             _builder.Use(next =>
             {
@@ -100,7 +100,7 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -109,11 +109,11 @@ namespace GraphQL.Tests.Instrumentation
         }
 
         [Fact]
-        public void can_use_class()
+        public async Task can_use_class()
         {
             _builder.Use(new SimpleMiddleware());
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -122,24 +122,24 @@ namespace GraphQL.Tests.Instrumentation
         }
 
         [Fact]
-        public void can_report_errors()
+        public async Task can_report_errors()
         {
             _builder.Use(next =>
             {
                 return context =>
                 {
                     context.Errors.Add(new ExecutionError("Custom error"));
-                    return Task.FromResult((object)null);
+                    return default;
                 };
             });
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
             result.ShouldBeNull();
             _context.Errors.ShouldContain(x => x.Message == "Custom error");
         }
 
         [Fact]
-        public void can_report_errors_with_data()
+        public async Task can_report_errors_with_data()
         {
             var additionalData = new Dictionary<string, string[]>
             {
@@ -151,11 +151,11 @@ namespace GraphQL.Tests.Instrumentation
                 return context =>
                 {
                     context.Errors.Add(new ExecutionError("Custom error", additionalData));
-                    return Task.FromResult((object)null);
+                    return default;
                 };
             });
 
-            var result = _builder.BuildResolve().Invoke(_context).Result;
+            var result = await _builder.BuildResolve().Invoke(_context);
 
             result.ShouldBeNull();
             _context.Errors.ShouldContain(x => x.Message == "Custom error");
@@ -175,7 +175,7 @@ namespace GraphQL.Tests.Instrumentation
 
         public class SimpleMiddleware : IFieldMiddleware
         {
-            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+            public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 using (context.Metrics.Subject("class", "from class"))
                 {

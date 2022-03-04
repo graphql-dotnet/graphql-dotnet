@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Pass_Through_Object_Source()
+        public async Task Pass_Through_Object_Source()
         {
             IResolveFieldContext<object> rfc1 = null;
             var ffr1 = new FuncFieldResolver<object, string>(context =>
@@ -34,13 +34,13 @@ namespace GraphQL.Tests.Execution
                 rfc1 = context;
                 return "ok";
             });
-            ffr1.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldBeSameAs(_context);
         }
 
         [Fact]
-        public void Shares_Complete_Typed()
+        public async Task Shares_Complete_Typed()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -54,8 +54,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return "ok";
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -64,7 +64,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Shares_Complete_Untyped()
+        public async Task Shares_Complete_Untyped()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -78,8 +78,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return "ok";
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -88,7 +88,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Does_Not_Share_Failed_Typed()
+        public async Task Does_Not_Share_Failed_Typed()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -104,10 +104,10 @@ namespace GraphQL.Tests.Execution
             });
             try
             {
-                ffr1.Resolve(_context);
+                await ffr1.ResolveAsync(_context);
             }
             catch { }
-            ffr2.Resolve(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Does_Not_Share_Failed_Untyped()
+        public async Task Does_Not_Share_Failed_Untyped()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -132,10 +132,10 @@ namespace GraphQL.Tests.Execution
             });
             try
             {
-                ffr1.Resolve(_context);
+                await ffr1.ResolveAsync(_context);
             }
             catch { }
-            ffr2.Resolve(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -144,213 +144,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Shares_Complete_Tasks_Typed()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult("ok");
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldBe(rfc2);
-        }
-
-        [Fact]
-        public void Shares_Complete_Tasks_Untyped()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult("ok");
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Incomplete_Tasks_Typed()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<string>>(async context =>
-            {
-                rfc1 = context;
-                await Task.Delay(100);
-                return "ok";
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<string>>(async context =>
-            {
-                rfc2 = context;
-                await Task.Delay(100);
-                return "ok";
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Incomplete_Tasks_Untyped()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            Func<IResolveFieldContext<int?>, Task<string>> fn1 = async context =>
-            {
-                rfc1 = context;
-                await Task.Delay(100);
-                return "ok";
-            };
-            var ffr1 = new FuncFieldResolver<int?, object>(context => fn1(context));
-            Func<IResolveFieldContext<int?>, Task<string>> fn2 = async context =>
-            {
-                rfc2 = context;
-                await Task.Delay(100);
-                return "ok";
-            };
-            var ffr2 = new FuncFieldResolver<int?, object>(context => fn2(context));
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Failed_Tasks_Typed_1()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc1 = context;
-                return Task.FromException<string>(new Exception());
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Failed_Tasks_Typed_2()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc1 = context;
-                throw new Exception();
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<string>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            try
-            {
-                ffr1.Resolve(_context);
-            }
-            catch { }
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Failed_Tasks_Untyped_1()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                return Task.FromException<string>(new Exception());
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Failed_Tasks_Untyped_2()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                throw new Exception();
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult("ok");
-            });
-            try
-            {
-                ffr1.Resolve(_context);
-            }
-            catch { }
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Dataloader_Typed()
+        public async Task Does_Not_Share_Dataloader_Typed()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -364,8 +158,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return _okDataLoader;
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -374,7 +168,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Does_Not_Share_Dataloader_Untyped()
+        public async Task Does_Not_Share_Dataloader_Untyped()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -388,8 +182,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return _okDataLoader;
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -398,103 +192,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Does_Not_Share_Dataloader_Tasks_Typed()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<IDataLoaderResult>>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult<IDataLoaderResult>(_okDataLoader);
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<IDataLoaderResult>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult<IDataLoaderResult>(_okDataLoader);
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Dataloader_Tasks_Untyped()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult<IDataLoaderResult>(_okDataLoader);
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult<IDataLoaderResult>(_okDataLoader);
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Dataloader_Tasks_Typed_Derived()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<OkDataLoader>>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult(_okDataLoader);
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<OkDataLoader>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult(_okDataLoader);
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Dataloader_Tasks_Untyped_Derived()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult(_okDataLoader);
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult(_okDataLoader);
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Enumerable_Typed()
+        public async Task Does_Not_Share_Enumerable_Typed()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -508,8 +206,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return new[] { 1, 2 };
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
@@ -518,7 +216,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void Does_Not_Share_Enumerable_Untyped()
+        public async Task Does_Not_Share_Enumerable_Untyped()
         {
             IResolveFieldContext<int?> rfc1 = null;
             IResolveFieldContext<int?> rfc2 = null;
@@ -532,56 +230,8 @@ namespace GraphQL.Tests.Execution
                 rfc2 = context;
                 return new[] { 1, 2 };
             });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Enumerable_Tasks_Typed()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, Task<IEnumerable<int>>>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
-            });
-            var ffr2 = new FuncFieldResolver<int?, Task<IEnumerable<int>>>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
-            rfc1.ShouldNotBeNull();
-            rfc1.ShouldNotBeSameAs(_context);
-            rfc2.ShouldNotBeNull();
-            rfc2.ShouldNotBeSameAs(_context);
-            rfc1.ShouldNotBe(rfc2);
-        }
-
-        [Fact]
-        public void Does_Not_Share_Enumerable_Tasks_Untyped()
-        {
-            IResolveFieldContext<int?> rfc1 = null;
-            IResolveFieldContext<int?> rfc2 = null;
-            var ffr1 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc1 = context;
-                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
-            });
-            var ffr2 = new FuncFieldResolver<int?, object>(context =>
-            {
-                rfc2 = context;
-                return Task.FromResult<IEnumerable<int>>(new[] { 1, 2 });
-            });
-            ffr1.Resolve(_context);
-            ffr2.Resolve(_context);
+            await ffr1.ResolveAsync(_context);
+            await ffr2.ResolveAsync(_context);
             rfc1.ShouldNotBeNull();
             rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();

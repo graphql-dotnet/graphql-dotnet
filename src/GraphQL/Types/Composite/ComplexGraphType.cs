@@ -372,7 +372,7 @@ namespace GraphQL.Types
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
-                AsyncSubscriber = subscribeAsync != null
+                Subscriber = subscribeAsync != null
                     ? new AsyncEventStreamResolver<object>(subscribeAsync)
                     : null
             });

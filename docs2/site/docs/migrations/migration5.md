@@ -477,6 +477,20 @@ class DroidType
 
 Similar changes may be necessary when using `FieldDelegate` to assign a field resolver.
 
+### 14. ValueTask support
+
+The execution pipeline has been changed to use `ValueTask` throughout. To support this change, the following
+interfaces have been slightly changed to have methods with `ValueTask` signatures:
+
+- `IFieldResolver`
+- `IEventStreamResolver` (`IAsyncEventStreamResolver` has been removed)
+- `IFieldMiddleware`
+
+This will result in a substantial speed increase for schemas that use field middleware.
+
+In addition, `ValueTask<T>` return types are supported for fields built on CLR methods via the schema builder,
+fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -802,3 +816,80 @@ You may use the following classes and methods as replacements:
   or `Task<IObservable<T>>`. It also provides a basic `IFieldResolver` implementation for subscription fields.
 - The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
 - The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
+
+### 33. ValueTask execution pipeline support changes
+
+The following interfaces have been modified to support a `ValueTask` pipeline:
+
+- `IFieldResolver`
+- `IEventStreamResolver`
+- `IFieldMiddleware` and `FieldMiddlewareDelegate`
+
+The following interfaces have been removed:
+
+- `IAsyncEventStreamResolver`
+
+All classes which implemented the above interfaces have been modified as necessary:
+
+- `AsyncEventStreamResolver`
+- `AsyncFieldResolver`
+- `EventStreamResolver`
+- `ExpressionFieldResolver`
+- `FuncFieldResolver`
+- `NameFieldResolver`
+- `InstrumentFieldsMiddleware`
+
+These properties have been removed:
+
+- `EventStreamFieldType.AsyncSubscriber`
+- `FieldConfig.AsyncSubscriber`
+
+Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
+
+In addition, it is required that any asynchronous fields must use an appropriate asynchronous field builder method or
+asynchronous field resolver, and inferred methods (built by the schema builder, `FieldDelegate`, or `AutoRegisteringObjectGraphType`)
+must be strongly typed.
+
+```csharp
+// works in v4, not in v5 (throws in runtime)
+Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
+
+// works in v4 or v5
+FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
+
+
+// works in v4, not in v5
+AddField(new FieldType
+{
+    Name = "hero",
+    Resolver = new FuncFieldResolver<Task<Droid>>(context => data.GetDroidByIdAsync("3")),
+});
+
+// works in v4 or v5
+AddField(new FieldType
+{
+    Name = "hero",
+    Resolver = new AsyncFieldResolver<Droid>(context => data.GetDroidByIdAsync("3")),
+});
+
+
+// works in v4, not in v5
+Func<IResolveFieldContext, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
+FieldDelegate<DroidType>(
+    "droid",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+    ),
+    resolve: func
+);
+
+// works in v4 or v5
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+FieldDelegate<DroidType>(
+    "droid",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+    ),
+    resolve: func
+);
+```

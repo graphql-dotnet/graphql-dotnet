@@ -12,9 +12,11 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<T?> Subscribe(IResolveEventStreamContext context) => _subscriber(context);
+        public ValueTask<IObservable<T?>> SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<T?>>(_subscriber(context));
 
-        IObservable<object?> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object?>)Subscribe(context);
+        ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<object?>>((IObservable<object?>)_subscriber(context));
     }
 
     public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
@@ -27,8 +29,10 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<TReturnType?> Subscribe(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
+        public ValueTask<IObservable<TReturnType?>> SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<TReturnType?>>(_subscriber(context.As<TSourceType>()));
 
-        IObservable<object?> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object?>)Subscribe(context);
+        ValueTask<IObservable<object?>> IEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
+            => new ValueTask<IObservable<object?>>((IObservable<object?>)_subscriber(context.As<TSourceType>()));
     }
 }

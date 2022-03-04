@@ -10,7 +10,7 @@ namespace GraphQL.Resolvers
     /// </summary>
     public class MemberResolver : IFieldResolver
     {
-        private readonly Func<IResolveFieldContext, object?> _resolver;
+        private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
         /// <summary>
         /// Initializes an instance for the specified field, using the specified instance expression to access the instance of the field.
@@ -112,21 +112,78 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Creates an appropriate resolver function based on the return type of the expression body.
         /// </summary>
-        protected virtual Func<IResolveFieldContext, object?> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        protected virtual Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+            => BuildFieldResolverInternal(resolveFieldContextParameter, bodyExpression);
+
+        /// <inheritdoc cref="BuildFieldResolver(ParameterExpression, Expression)"/>
+        internal static Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolverInternal(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
-            // convert the result to type object
-            var convertExpr = Expression.Convert(bodyExpression, typeof(object));
+            Expression? valueTaskExpr = null;
+
+            if (bodyExpression.Type == typeof(ValueTask<object?>))
+            {
+                valueTaskExpr = bodyExpression;
+            }
+            else if (bodyExpression.Type == typeof(Task<object?>))
+            {
+                // e.g. valueTask = new ValueTask<object>(body);
+                var valueTaskType = typeof(ValueTask<object?>);
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<object?>) });
+                valueTaskExpr = Expression.New(constructor, bodyExpression);
+            }
+            else if (bodyExpression.Type.IsGenericType)
+            {
+                var genericType = bodyExpression.Type.GetGenericTypeDefinition();
+                if (genericType == typeof(ValueTask<>))
+                {
+                    // e.g. valueTask = MarshalValueTask(body);
+                    var underlyingType = bodyExpression.Type.GetGenericArguments()[0];
+                    var method = _marshalValueTaskAsyncMethod.MakeGenericMethod(underlyingType);
+                    valueTaskExpr = Expression.Call(
+                        method,
+                        bodyExpression);
+                }
+                else if (genericType == typeof(Task<>))
+                {
+                    // e.g. valueTask = MarshalTask(body);
+                    var underlyingType = bodyExpression.Type.GetGenericArguments()[0];
+                    var method = _marshalTaskAsyncMethod.MakeGenericMethod(underlyingType);
+                    valueTaskExpr = Expression.Call(
+                        method,
+                        bodyExpression);
+                }
+            }
+
+            if (valueTaskExpr == null)
+            {
+                // convert the result to type object
+                // e.g. var convert = (object)body;
+                Expression convertExpr = bodyExpression.Type == typeof(object)
+                    ? bodyExpression
+                    : Expression.Convert(bodyExpression, typeof(object));
+
+                // e.g. valueTask = new ValueTask<object>(convert);
+                var valueTaskType = typeof(ValueTask<object?>);
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(object) });
+                valueTaskExpr = Expression.New(constructor, convertExpr);
+            }
 
             // create the lambda
-            var lambdaExpr = Expression.Lambda<Func<IResolveFieldContext, object>>(
-                convertExpr,
+            var lambdaExpr = Expression.Lambda<Func<IResolveFieldContext, ValueTask<object?>>>(
+                valueTaskExpr,
                 resolveFieldContextParameter);
 
             // compile the lambda expression
             return lambdaExpr.Compile();
         }
 
+        private static readonly MethodInfo _marshalTaskAsyncMethod = typeof(MemberResolver).GetMethod(nameof(MarshalTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static async ValueTask<object?> MarshalTaskAsync<T>(Task<T> task) => await task.ConfigureAwait(false);
+
+        private static readonly MethodInfo _marshalValueTaskAsyncMethod = typeof(MemberResolver).GetMethod(nameof(MarshalValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static async ValueTask<object?> MarshalValueTaskAsync<T>(ValueTask<T> task) => await task.ConfigureAwait(false);
+
         /// <inheritdoc/>
-        public virtual object? Resolve(IResolveFieldContext context) => _resolver(context);
+        public virtual ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
     }
 }
