@@ -21,6 +21,9 @@ namespace GraphQL.Tests
         [InlineData("FullInfoWithContext", "Anyone 20")]
         [InlineData("FromService", "hello")]
         [InlineData("AmbiguousExample", "", true)]
+        [InlineData("ShadowedName", "Anyone")]
+        [InlineData("BaseName", "Base")]
+        [InlineData("BaseMethod", "Base2")]
         public async Task resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)
         {
             var person = new Person
@@ -50,26 +53,16 @@ namespace GraphQL.Tests
                 (await result()).ShouldBe(expected);
         }
 
-        [Fact]
-        public async Task resolve_should_work_with_person2()
+        public class PersonBase
         {
-            var person = new Person2
-            {
-                Age = 20,
-                Name = "Anyone"
-            };
+            public string ShadowedName { get; } = "n/a";
 
-            var ret = await NameFieldResolver.Instance.ResolveAsync(new ResolveFieldContext
-            {
-                Source = person,
-                FieldDefinition = new GraphQL.Types.FieldType { Name = "name" },
-                FieldAst = new GraphQLField { Name = new GraphQLName("name") }
-            });
+            public string BaseName { get; } = "Base";
 
-            ret.ShouldBe("Anyone");
+            public string BaseMethod() => "Base2";
         }
 
-        public class Person
+        public class Person : PersonBase
         {
             public int Age { get; set; }
 
@@ -86,11 +79,8 @@ namespace GraphQL.Tests
             public string AmbiguousExample() => "";
 
             public string AmbiguousExample(string ret) => ret;
-        }
 
-        public class Person2 : Person
-        {
-            public new string Name { get; set; }
+            public new string ShadowedName => Name;
         }
 
         public class Class1
