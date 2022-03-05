@@ -909,3 +909,36 @@ The `AsyncSubscriber` property has been removed as described above.
 ### 35. `IEventStreamResolver<T>` interface removed
 
 For custom resolver implementations, please implement `IEventStreamResolver` instead.
+
+### 36. Asynchronous field resolver classes have been removed
+
+These classes have been removed:
+
+- `ScopedAsyncFieldResolver`
+- `AsyncFieldResolver`
+- `AsyncEventStreamResolver`
+
+Please use the new `ValueTask`-based constructors on `ScopedFieldResolver`, `FuncFieldResolver` and `EventStreamResolver` instead.
+
+```csharp
+// v4
+var resolver = new AsyncFieldResolver<string>(async context => await GetSomeString());
+
+// v5
+var resolver = new FuncFieldResolver<string>(async context => await GetSomeString());
+
+
+// v4
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new AsyncFieldResolver(func);
+
+// v5 option 1
+Func<IResolveFieldContext, ValueTask<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(func);
+
+// v5 option 2
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(context => new ValueTask<string>(func(context)));
+```
+
+Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolvers.

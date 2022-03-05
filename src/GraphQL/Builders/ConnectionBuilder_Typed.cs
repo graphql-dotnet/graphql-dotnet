@@ -259,11 +259,11 @@ namespace GraphQL.Builders
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
                 var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
                 CheckForErrors(connectionContext);
-                return resolver(connectionContext);
+                return new ValueTask<TReturnType?>(resolver(connectionContext));
             });
         }
 

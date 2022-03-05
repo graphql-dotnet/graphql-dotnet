@@ -14,9 +14,9 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
         /// </summary>
-        public ScopedFieldResolver(Func<IResolveFieldContext, TReturnType> resolver) : base(GetScopedResolver(resolver)) { }
+        public ScopedFieldResolver(Func<IResolveFieldContext, TReturnType?> resolver) : base(GetScopedResolver(resolver)) { }
 
-        private static Func<IResolveFieldContext, TReturnType> GetScopedResolver(Func<IResolveFieldContext, TReturnType> resolver)
+        private static Func<IResolveFieldContext, TReturnType?> GetScopedResolver(Func<IResolveFieldContext, TReturnType?> resolver)
         {
             return context =>
             {
@@ -24,14 +24,24 @@ namespace GraphQL.MicrosoftDI
                 return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
             };
         }
+
+        /// <inheritdoc cref="ScopedFieldResolver{TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        public ScopedFieldResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
+
+        private static Func<IResolveFieldContext, ValueTask<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
+        {
+            return async (context) =>
+            {
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return await resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
+            };
+        }
     }
 
     /// <inheritdoc cref="ScopedFieldResolver{TReturnType}"/>
     public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<TReturnType>
     {
-        /// <summary>
-        /// Initializes a new instance that creates a service scope and runs the specified delegate when resolving a field.
-        /// </summary>
+        /// <inheritdoc cref="ScopedFieldResolver{TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
         public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver) : base(GetScopedResolver(resolver)) { }
 
         private static Func<IResolveFieldContext, TReturnType?> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
@@ -40,6 +50,18 @@ namespace GraphQL.MicrosoftDI
             {
                 using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
                 return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
+            };
+        }
+
+        /// <inheritdoc cref="ScopedFieldResolver{TSourceType, TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext{TSourceType}, TReturnType})" />
+        public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
+
+        private static Func<IResolveFieldContext, ValueTask<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver)
+        {
+            return async (context) =>
+            {
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return await resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }
     }

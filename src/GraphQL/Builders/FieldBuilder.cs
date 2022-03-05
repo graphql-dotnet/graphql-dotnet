@@ -134,7 +134,7 @@ namespace GraphQL.Builders
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolve)
-            => Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
+            => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context))));
 
         /// <summary>
         /// Sets the return type of the field.
@@ -213,7 +213,7 @@ namespace GraphQL.Builders
 
         public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> subscribeAsync)
         {
-            FieldType.Subscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
+            FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(subscribeAsync(context)));
             return this;
         }
 
