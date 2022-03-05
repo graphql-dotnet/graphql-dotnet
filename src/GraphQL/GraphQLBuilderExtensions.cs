@@ -219,6 +219,42 @@ namespace GraphQL
         }
         #endregion
 
+        #region - AddAutoSchema / WithMutation / WithSubscription -
+        public static IGraphQLBuilderOrConfigureAutoSchema AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder)
+        {
+            builder.AddSchema<Schema>(ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IGraphTypeMapping, AutoRegisteringGraphTypeMapping>(ServiceLifetime.Singleton);
+            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>());
+            return new GraphQLBuilderOrConfigureAutoSchema(builder);
+        }
+
+        public static IGraphQLBuilderOrConfigureAutoSchema WithMutation<TMutationClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
+        {
+            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
+            return builder;
+        }
+
+        public static IGraphQLBuilderOrConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
+        {
+            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            return builder;
+        }
+
+        public interface IGraphQLBuilderOrConfigureAutoSchema : IGraphQLBuilder
+        {
+        }
+
+        private class GraphQLBuilderOrConfigureAutoSchema : IGraphQLBuilderOrConfigureAutoSchema
+        {
+            public GraphQLBuilderOrConfigureAutoSchema(IGraphQLBuilder baseBuilder)
+            {
+                Services = baseBuilder.Services;
+            }
+
+            public IServiceRegister Services { get; }
+        }
+        #endregion
+
         #region - AddDocumentExecuter -
         /// <summary>
         /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
@@ -519,6 +555,14 @@ namespace GraphQL
                 }
             });
 
+            return builder;
+        }
+        #endregion
+
+        #region - AddAutoClrMappings -
+        public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
+        {
+            builder.Services.Register<IGraphTypeMapping>(_ => new AutoRegisteringGraphTypeMapping(mapInputTypes, mapOutputTypes), ServiceLifetime.Singleton);
             return builder;
         }
         #endregion

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
 using GraphQL.Conversion;
@@ -19,7 +20,7 @@ namespace GraphQL.Types
     /// </summary>
     public class SchemaTypes : IEnumerable<IGraphType>
     {
-        internal static readonly Dictionary<Type, Type> BuiltInScalarMappings = new Dictionary<Type, Type>
+        public static ReadOnlyDictionary<Type, Type> BuiltInScalarMappings { get; } = new(new Dictionary<Type, Type>
         {
             [typeof(int)] = typeof(IntGraphType),
             [typeof(long)] = typeof(LongGraphType),
@@ -44,7 +45,7 @@ namespace GraphQL.Types
             [typeof(byte)] = typeof(ByteGraphType),
             [typeof(sbyte)] = typeof(SByteGraphType),
             [typeof(Uri)] = typeof(UriGraphType),
-        };
+        });
 
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
@@ -88,6 +89,7 @@ namespace GraphQL.Types
 
         private TypeCollectionContext _context;
         private INameConverter _nameConverter;
+        private IEnumerable<IGraphTypeMapping>? _graphTypeMappings;
 
         /// <summary>
         /// Initializes a new instance with no types registered.
@@ -103,11 +105,22 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public SchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+            : this(schema, serviceProvider, (IEnumerable<IGraphTypeMapping>?)serviceProvider.GetService(typeof(IEnumerable<IGraphTypeMapping>)))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance for the specified schema, and with the specified type resolver.
+        /// </summary>
+        /// <param name="schema">A schema for which this instance is created.</param>
+        /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+        /// <param name="graphTypeMappings">A service used to map CLR types to graph types.</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMapping>? graphTypeMappings)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            Initialize(schema, serviceProvider);
+            Initialize(schema, serviceProvider, graphTypeMappings);
         }
 
         private bool _initialized = false;
@@ -116,7 +129,8 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-        protected void Initialize(ISchema schema, IServiceProvider serviceProvider)
+        /// <param name="graphTypeMappings">A service used to map CLR types to graph types.</param>
+        protected void Initialize(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMapping>? graphTypeMappings)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
@@ -126,6 +140,7 @@ namespace GraphQL.Types
                 throw new InvalidOperationException("SchemaTypes has already been initialized.");
             _initialized = true;
 
+            _graphTypeMappings = graphTypeMappings;
             var types = GetSchemaTypes(schema, serviceProvider);
             var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
             var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
@@ -678,6 +693,17 @@ Make sure that your ServiceProvider is configured correctly.");
                         if (isInputType && mapping.GraphType.IsInputType() || !isInputType && mapping.GraphType.IsOutputType())
                             return mapping.GraphType;
                     }
+                }
+            }
+
+            // then an available IGraphTypeMapping instance
+            if (_graphTypeMappings != null)
+            {
+                foreach (var mapping in _graphTypeMappings)
+                {
+                    var type = mapping.GetGraphTypeFromClrType(clrType, isInputType);
+                    if (type != null)
+                        return type;
                 }
             }
 
