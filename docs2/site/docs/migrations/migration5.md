@@ -945,4 +945,4 @@ Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeSt
 var resolver = new FuncFieldResolver(async context => await func(context));
 ```
 
-Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolvers.
+Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolver delegates.
