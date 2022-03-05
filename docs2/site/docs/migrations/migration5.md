@@ -494,6 +494,12 @@ fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields bui
 When manually instantiating a field or subscription resolver, you may use a delegate that return a `ValueTask` by
 using new constructors available on the `FuncFieldResolver` or `EventStreamResolver` classes.
 
+### 15. `NameFieldResolver` enhanced method support
+
+When adding a field by name only, such as `Field<StringGraphType>("Name");`, and the field matches a method
+rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
+as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -946,3 +952,12 @@ var resolver = new FuncFieldResolver(async context => await func(context));
 ```
 
 Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolver delegates.
+
+### 37. `NameFieldResolver` implementation supports methods with arguments; may cause `AmbigiousMatchException`
+
+The `NameFieldResolver`, used when adding a field by name (e.g. `Field<StringGraphType>("Name");`),
+now supports methods with arguments. During resolver execution, it first looks for a matching property
+with the specified name, and if none is found, looks for a method with the matching name. Since it
+now supports methods with arguments as well as methods without arguments, an `AmbigiousMatchException`
+can occur if the name refers to a public method with multiple overloads. Either specify a field
+resolver explicitly, or reduce the number of public methods with the same name to one.
