@@ -916,7 +916,44 @@ The `AsyncSubscriber` property has been removed as described above.
 
 For custom resolver implementations, please implement `IEventStreamResolver` instead.
 
-### 36. `NameFieldResolver` implementation supports methods with arguments; may cause `AmbigiousMatchException`
+### 36. Asynchronous field resolver classes have been removed
+
+These classes have been removed:
+
+- `ScopedAsyncFieldResolver`
+- `AsyncFieldResolver`
+- `AsyncEventStreamResolver`
+
+Please use the new `ValueTask`-based constructors on `ScopedFieldResolver`, `FuncFieldResolver` and `EventStreamResolver` instead.
+
+```csharp
+// v4
+var resolver = new AsyncFieldResolver<string>(async context => await GetSomeString());
+
+// v5
+var resolver = new FuncFieldResolver<string>(async context => await GetSomeString());
+
+
+// v4
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new AsyncFieldResolver(func);
+
+// v5 option 1
+Func<IResolveFieldContext, ValueTask<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(func);
+
+// v5 option 2
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(context => new ValueTask<string>(func(context)));
+
+// v5 option 3
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(async context => await func(context));
+```
+
+Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolver delegates.
+
+### 37. `NameFieldResolver` implementation supports methods with arguments; may cause `AmbigiousMatchException`
 
 The `NameFieldResolver`, used when adding a field by name (e.g. `Field<StringGraphType>("Name");`),
 now supports methods with arguments. During resolver execution, it first looks for a matching property

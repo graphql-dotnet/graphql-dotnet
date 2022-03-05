@@ -5,10 +5,10 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public async Task TReturn_only()
         {
-            var resolver = new ScopedAsyncFieldResolver<string>(context =>
+            var resolver = new ScopedFieldResolver<string>(context =>
             {
                 context.RequestServices.ShouldBe(_scopedServiceProvider);
-                return Task.FromResult("success");
+                return new ValueTask<string>("success");
             });
             (await resolver.ResolveAsync(_scopedContext)).ShouldBe("success");
             VerifyScoped();
@@ -17,11 +17,11 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public async Task TSource_and_TReturn()
         {
-            var resolver = new ScopedAsyncFieldResolver<string, int>(context =>
+            var resolver = new ScopedFieldResolver<string, int>(context =>
             {
                 context.Source.ShouldBe("test");
                 context.RequestServices.ShouldBe(_scopedServiceProvider);
-                return Task.FromResult(2);
+                return new ValueTask<int>(2);
             });
             _scopedContext.Source = "test";
             (await resolver.ResolveAsync(_scopedContext)).ShouldBe(2);
@@ -31,14 +31,14 @@ namespace GraphQL.MicrosoftDI.Tests
         [Fact]
         public void RequiresRequestServices_TReturn_only()
         {
-            var resolver = new ScopedAsyncFieldResolver<int>(context => Task.FromResult(5));
+            var resolver = new ScopedFieldResolver<int>(context => new ValueTask<int>(5));
             Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()));
         }
 
         [Fact]
         public void RequiresRequestServices_TSource_and_TReturn()
         {
-            var resolver = new ScopedAsyncFieldResolver<string, int>(context => Task.FromResult(5));
+            var resolver = new ScopedFieldResolver<string, int>(context => new ValueTask<int>(5));
             Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()));
         }
     }

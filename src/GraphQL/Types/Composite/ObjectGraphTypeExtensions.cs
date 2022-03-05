@@ -59,7 +59,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 ResolvedType = type,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<object>(resolve)
+                    ? new FuncFieldResolver<object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             };
             obj.AddField(field);
