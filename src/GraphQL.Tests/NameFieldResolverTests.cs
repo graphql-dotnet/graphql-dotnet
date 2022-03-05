@@ -1,5 +1,7 @@
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQLParser.AST;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests
 {
@@ -14,8 +16,15 @@ namespace GraphQL.Tests
         [InlineData("fullInfo", "Anyone 20")]
         [InlineData(null, null)]
         [InlineData("unknown", "", true)]
-        [InlineData("FullInfoWithParam", "", true)]
-        public void resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)
+        [InlineData("FullInfoWithParam", "test Anyone 20")]
+        [InlineData("FULLINFOWITHPARAM", "test Anyone 20")]
+        [InlineData("FullInfoWithContext", "Anyone 20")]
+        [InlineData("FromService", "hello")]
+        [InlineData("AmbiguousExample", "", true)]
+        [InlineData("ShadowedName", "Anyone")]
+        [InlineData("BaseName", "Base")]
+        [InlineData("BaseMethod", "Base2")]
+        public async Task resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)
         {
             var person = new Person
             {
@@ -23,21 +32,37 @@ namespace GraphQL.Tests
                 Name = "Anyone"
             };
 
-            Func<object> result = () => NameFieldResolver.Instance.ResolveAsync(
+            var services = new ServiceCollection();
+            services.AddSingleton(new Class1());
+            Func<ValueTask<object>> result = () => NameFieldResolver.Instance.ResolveAsync(
                 new ResolveFieldContext
                 {
                     Source = person,
                     FieldDefinition = new GraphQL.Types.FieldType { Name = name },
-                    FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) }
-                }).GetAwaiter().GetResult();
+                    FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) },
+                    Arguments = new Dictionary<string, ArgumentValue>()
+                    {
+                        { "prefix", new ArgumentValue("test ", ArgumentSource.Literal) }
+                    },
+                    RequestServices = services.BuildServiceProvider(),
+                });
 
             if (throws)
-                Should.Throw<InvalidOperationException>(() => result());
+                await Should.ThrowAsync<InvalidOperationException>(async () => await result());
             else
-                result().ShouldBe(expected);
+                (await result()).ShouldBe(expected);
         }
 
-        public class Person
+        public class PersonBase
+        {
+            public string ShadowedName { get; } = "n/a";
+
+            public string BaseName { get; } = "Base";
+
+            public string BaseMethod() => "Base2";
+        }
+
+        public class Person : PersonBase
         {
             public int Age { get; set; }
 
@@ -46,6 +71,21 @@ namespace GraphQL.Tests
             public string FullInfo() => Name + " " + Age;
 
             public string FullInfoWithParam(string prefix) => prefix + FullInfo();
+
+            public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source).FullInfo();
+
+            public string FromService([FromServices] Class1 obj) => obj.Value;
+
+            public string AmbiguousExample() => "";
+
+            public string AmbiguousExample(string ret) => ret;
+
+            public new string ShadowedName => Name;
+        }
+
+        public class Class1
+        {
+            public string Value { get; } = "hello";
         }
     }
 }

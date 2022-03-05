@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "messageAddedAsync",
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new AsyncEventStreamResolver<Message>(SubscribeAsync)
+                Subscriber = new EventStreamResolver<Message>(SubscribeAsync)
             });
 
             AddField(new FieldType
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Subscription
                 ),
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
+                Subscriber = new EventStreamResolver<Message>(SubscribeByIdAsync)
             });
 
             AddField(new FieldType
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private async Task<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
+        private async ValueTask<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -107,9 +107,9 @@ namespace GraphQL.Tests.Subscription
             return _chat.Messages();
         }
 
-        private Task<IObservable<Message>> SubscribeAsync(IResolveFieldContext context)
+        private async ValueTask<IObservable<Message>> SubscribeAsync(IResolveFieldContext context)
         {
-            return _chat.MessagesAsync();
+            return await _chat.MessagesAsync();
         }
     }
 

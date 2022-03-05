@@ -259,7 +259,7 @@ namespace GraphQL.Types
                 Type = type,
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
+                    ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             });
         }
@@ -290,7 +290,7 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
+                    ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             });
         }
@@ -322,7 +322,7 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, TReturnType>(resolve)
+                    ? new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context)))
                     : null
             });
         }
@@ -372,7 +372,7 @@ namespace GraphQL.Types
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
                 Subscriber = subscribeAsync != null
-                    ? new AsyncEventStreamResolver<object>(subscribeAsync)
+                    ? new EventStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
                     : null
             });
         }
