@@ -41,6 +41,7 @@ namespace GraphQL.Tests.Types.Collections
             mock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
             mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
             mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(IEnumerable<IGraphTypeMapping>)), Times.Once);
             mock.VerifyNoOtherCalls();
         }
 
