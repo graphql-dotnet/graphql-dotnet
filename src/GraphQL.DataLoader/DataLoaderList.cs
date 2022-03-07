@@ -5,7 +5,7 @@ namespace GraphQL.DataLoader
         private class DataLoaderList : Dictionary<TKey, DataLoaderPair<TKey, T>>, IDataLoader
         {
             protected readonly DataLoaderBase<TKey, T> _dataLoader;
-            private Task _loadingTask;
+            private Task? _loadingTask;
 
             public DataLoaderList(DataLoaderBase<TKey, T> delayLoader) : base(delayLoader.EqualityComparer)
             {

@@ -190,7 +190,7 @@ namespace GraphQL.SystemTextJson
         /// <summary>
         /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// </summary>
-        private T ReadNode<T>(JsonElement jsonElement)
+        private T? ReadNode<T>(JsonElement jsonElement)
 #if NET6_0_OR_GREATER
             => JsonSerializer.Deserialize<T>(jsonElement, SerializerOptions);
 #else

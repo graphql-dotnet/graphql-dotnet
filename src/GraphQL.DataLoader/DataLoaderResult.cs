@@ -35,6 +35,6 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public Task<T> GetResultAsync(CancellationToken cancellationToken = default) => _result;
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
+        async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

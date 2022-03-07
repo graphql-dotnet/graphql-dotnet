@@ -55,7 +55,7 @@ namespace GraphQL.Types
         public EnumValuesBase Values { get; }
 
         /// <summary>
-        /// Returns an empty instance of <see cref="EnumValues"/>.
+        /// Returns a new instance of <see cref="EnumValues"/>.
         /// </summary>
         protected virtual EnumValuesBase CreateValues() => new EnumValues();
 
