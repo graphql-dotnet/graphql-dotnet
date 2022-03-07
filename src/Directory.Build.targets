@@ -9,7 +9,7 @@
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS8602;CS8604</WarningsNotAsErrors>
+    <WarningsNotAsErrors>CS8604</WarningsNotAsErrors>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
