@@ -1,7 +1,7 @@
 namespace GraphQL.Resolvers
 {
     /// <summary>
-    /// When resolving an event stream, this implementation calls a predefined delegate and returns the result.
+    /// When resolving a subscription field, this implementation calls a predefined delegate and returns the result.
     /// </summary>
     public class EventStreamResolver<TReturnType> : IEventStreamResolver
     {

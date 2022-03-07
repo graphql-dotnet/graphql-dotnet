@@ -6,7 +6,7 @@ using GraphQLParser.AST;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Executes a subscription
+    /// Executes a subscription.
     /// </summary>
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {

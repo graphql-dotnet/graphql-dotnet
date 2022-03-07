@@ -42,7 +42,7 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter jWriter, object? value, JsonSerializer jSerializer)
         {
-            if (IsWholeValue(value!, out string? result))
+            if (IsWholeValue(value, out string? result))
             {
                 jWriter.WriteRawValue(result);
             }
@@ -52,7 +52,7 @@ namespace GraphQL.NewtonsoftJson
             }
         }
 
-        private static bool IsWholeValue(object value, out string? result)
+        private static bool IsWholeValue(object? value, out string? result)
         {
             if (value is decimal dm)
             {

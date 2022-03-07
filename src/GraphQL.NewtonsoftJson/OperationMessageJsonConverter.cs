@@ -25,7 +25,13 @@ namespace GraphQL.NewtonsoftJson
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            var request = (OperationMessage)value!;
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            var request = (OperationMessage)value;
             writer.WriteStartObject();
             if (request.Type != null)
             {
