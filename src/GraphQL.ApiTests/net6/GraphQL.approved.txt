@@ -1602,7 +1602,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringGraphTypeMapping() { }
         public AutoRegisteringGraphTypeMapping(bool mapInputTypes, bool mapOutputTypes) { }
-        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType) { }
+        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
     {
@@ -1903,7 +1903,7 @@ namespace GraphQL.Types
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface IGraphTypeMapping
     {
-        System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType);
+        System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType);
     }
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
@@ -2239,9 +2239,7 @@ namespace GraphQL.Types
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "ClrType",
-                "GraphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings) { }
+        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMapping>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMapping>? graphTypeMappings) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
@@ -2357,6 +2355,14 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
+    }
+}
+namespace GraphQL.Types.Collections
+{
+    public class ManualGraphTypeMapping : GraphQL.Types.IGraphTypeMapping
+    {
+        public ManualGraphTypeMapping(System.Type clrType, System.Type graphType) { }
+        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType) { }
     }
 }
 namespace GraphQL.Types.Relay

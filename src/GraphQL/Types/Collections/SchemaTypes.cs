@@ -6,6 +6,7 @@ using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Resolvers;
+using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQLParser;
@@ -140,10 +141,13 @@ namespace GraphQL.Types
                 throw new InvalidOperationException("SchemaTypes has already been initialized.");
             _initialized = true;
 
-            _graphTypeMappings = graphTypeMappings;
             var types = GetSchemaTypes(schema, serviceProvider);
-            var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
-            var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
+            if (schema.TypeMappings != null)
+            {
+                // this code could be moved into Schema
+                var additionalMappings = schema.TypeMappings.Select(x => new ManualGraphTypeMapping(x.clrType, x.graphType));
+                graphTypeMappings = graphTypeMappings != null ? graphTypeMappings.Concat(additionalMappings).ToList() : additionalMappings.ToList();
+            }
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
             _typeDictionary = new Dictionary<Type, IGraphType>();
@@ -156,7 +160,7 @@ namespace GraphQL.Types
                    SetGraphType(name, type);
                    ctx.AddType(name, type, null!);
                },
-               typeMappings);
+               graphTypeMappings);
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
@@ -185,7 +189,7 @@ namespace GraphQL.Types
                         AddType(graphType, context);
                     }
                 },
-                typeMappings);
+                graphTypeMappings);
 
             foreach (var type in types)
             {
@@ -631,7 +635,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private object RebuildType(Type type, bool input, List<(Type, Type)> typeMappings)
+        private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMapping>? typeMappings)
         {
             if (!type.IsGenericType)
                 return type;
@@ -658,7 +662,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private object GetGraphType(Type clrType, bool input, List<(Type clr, Type graph)> typeMappings)
+        private object GetGraphType(Type clrType, bool input, IEnumerable<IGraphTypeMapping>? typeMappings)
         {
             var ret = GetGraphTypeFromClrType(clrType, input, typeMappings);
 
@@ -681,31 +685,21 @@ Make sure that your ServiceProvider is configured correctly.");
         /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
         /// and should already have been wrapped around the type reference.
         /// </remarks>
-        protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, List<(Type ClrType, Type GraphType)> typeMappings)
+        protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMapping>? typeMappings)
         {
+            Type? mappedType = null;
+
             // check custom mappings first
             if (typeMappings != null)
             {
                 foreach (var mapping in typeMappings)
                 {
-                    if (mapping.ClrType == clrType)
-                    {
-                        if (isInputType && mapping.GraphType.IsInputType() || !isInputType && mapping.GraphType.IsOutputType())
-                            return mapping.GraphType;
-                    }
+                    mappedType = mapping.GetGraphTypeFromClrType(clrType, isInputType, mappedType);
                 }
             }
 
-            // then an available IGraphTypeMapping instance
-            if (_graphTypeMappings != null)
-            {
-                foreach (var mapping in _graphTypeMappings)
-                {
-                    var type = mapping.GetGraphTypeFromClrType(clrType, isInputType);
-                    if (type != null)
-                        return type;
-                }
-            }
+            if (mappedType != null)
+                return mappedType;
 
             // then built-in mappings
             if (BuiltInScalarMappings.TryGetValue(clrType, out var graphType))

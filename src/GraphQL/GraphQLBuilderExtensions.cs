@@ -4,6 +4,7 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
+using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQL.Validation;
@@ -223,20 +224,20 @@ namespace GraphQL
         public static IGraphQLBuilderOrConfigureAutoSchema AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder)
         {
             builder.AddSchema<Schema>(ServiceLifetime.Singleton);
-            builder.Services.TryRegister<IGraphTypeMapping, AutoRegisteringGraphTypeMapping>(ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IGraphTypeMapping, AutoRegisteringGraphTypeMapping>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
             builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>());
             return new GraphQLBuilderOrConfigureAutoSchema(builder);
         }
 
         public static IGraphQLBuilderOrConfigureAutoSchema WithMutation<TMutationClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
         {
-            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
+            builder.ConfigureSchema((schema, provider) => schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
             return builder;
         }
 
         public static IGraphQLBuilderOrConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
         {
-            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            builder.ConfigureSchema((schema, provider) => schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
             return builder;
         }
 
@@ -547,13 +548,10 @@ namespace GraphQL
             // retreive all of the type mappings ahead-of-time, in case of a scoped or transient schema,
             // as reflection is relatively slow
             var typeMappings = assembly.GetClrTypeMappings();
-            builder.ConfigureSchema((schema, serviceProvider) =>
+            foreach (var typeMapping in typeMappings)
             {
-                foreach (var typeMapping in typeMappings)
-                {
-                    schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
-                }
-            });
+                builder.Services.Register(new ManualGraphTypeMapping(typeMapping.ClrType, typeMapping.GraphType));
+            }
 
             return builder;
         }

@@ -27,8 +27,11 @@ public class AutoRegisteringGraphTypeMapping : IGraphTypeMapping
     }
 
     /// <inheritdoc/>
-    public Type? GetGraphTypeFromClrType(Type clrType, bool isInputType)
+    public Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, Type? preferredType)
     {
+        if (preferredType != null)
+            return preferredType;
+
         if (isInputType && !_mapInputTypes ||
             !isInputType && !_mapOutputTypes ||
             clrType.IsEnum ||
