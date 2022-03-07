@@ -182,11 +182,11 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
             using var stringReader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
             using var jsonReader = new JsonTextReader(stringReader);
-            return new ValueTask<T>(Serializer.Deserialize<T>(jsonReader)!);
+            return new ValueTask<T?>(Serializer.Deserialize<T>(jsonReader)!);
         }
 
         /// <summary>

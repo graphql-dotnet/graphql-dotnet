@@ -60,7 +60,7 @@ namespace GraphQL.NewtonsoftJson
         protected Newtonsoft.Json.JsonSerializer Serializer { get; }
         public T? Deserialize<T>(string? json) { }
         public T? Read<T>(System.IO.TextReader json) { }
-        public System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
         public T? ReadNode<T>(object? value) { }
         public string Serialize<T>(T? value) { }
         public void Write<T>(System.IO.TextWriter textWriter, T value) { }

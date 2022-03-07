@@ -162,9 +162,11 @@ namespace GraphQL.SystemTextJson
         public Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)
             => JsonSerializer.SerializeAsync(stream, value, SerializerOptions, cancellationToken);
 
+#pragma warning disable CS8619 // Nullability of reference types doesn't match target type
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
             => JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
+#pragma warning restore CS8619 // Nullability of reference types doesn't match target type
 
         /// <inheritdoc/>
         public string Serialize<T>(T? value)
