@@ -364,7 +364,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Adds a subscription field to this graph type.
+        /// Adds a subscription field with the specified properties to this graph type.
         /// </summary>
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field</typeparam>
         /// <param name="name">The name of the field.</param>
