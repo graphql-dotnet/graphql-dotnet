@@ -54,6 +54,9 @@ namespace GraphQL.Types
         /// </summary>
         public EnumValuesBase Values { get; }
 
+        /// <summary>
+        /// Returns an empty instance of <see cref="EnumValues"/>.
+        /// </summary>
         protected virtual EnumValuesBase CreateValues() => new EnumValues();
 
         /// <inheritdoc/>
@@ -170,6 +173,9 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="EnumValues{TEnum}"/>.
+        /// </summary>
         protected override EnumValuesBase CreateValues() => new EnumValues<TEnum>();
 
         /// <inheritdoc/>

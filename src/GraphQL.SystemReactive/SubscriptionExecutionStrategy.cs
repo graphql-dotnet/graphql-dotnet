@@ -5,6 +5,9 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Executes a subscription
+    /// </summary>
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {
         /// <summary>
@@ -12,6 +15,12 @@ namespace GraphQL.Execution
         /// </summary>
         public static new SubscriptionExecutionStrategy Instance { get; } = new SubscriptionExecutionStrategy();
 
+        /// <summary>
+        /// Executes a GraphQL subscription request and returns the result. The result consists
+        /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
+        /// No serializable <see cref="ExecutionResult"/> is directly returned.
+        /// </summary>
+        /// <inheritdoc/>
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context);
@@ -43,6 +52,10 @@ namespace GraphQL.Execution
             return streams;
         }
 
+        /// <summary>
+        /// Asynchronously returns a stream of <see cref="ExecutionResult"/> responses for the
+        /// specified <see cref="ExecutionNode"/>.
+        /// </summary>
         protected virtual async Task<IObservable<ExecutionResult>?> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();

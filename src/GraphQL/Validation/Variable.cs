@@ -5,6 +5,9 @@ namespace GraphQL.Validation
     /// </summary>
     public class Variable
     {
+        /// <summary>
+        /// Initializes a new instance with the specified name.
+        /// </summary>
         public Variable(string name)
         {
             Name = name;

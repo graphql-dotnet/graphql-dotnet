@@ -2,6 +2,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities.Federation
 {
+    /// <summary>
+    /// A schema builder for GraphQL federation
+    /// </summary>
     public class FederatedSchema
     {
         /// <summary>

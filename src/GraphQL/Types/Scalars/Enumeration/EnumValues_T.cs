@@ -49,6 +49,7 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc/>
         public override IEnumerator<EnumValueDefinition> GetEnumerator() => DictionaryByName.Values.GetEnumerator();
     }
 }

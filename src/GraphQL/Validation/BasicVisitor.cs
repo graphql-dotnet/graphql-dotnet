@@ -43,15 +43,23 @@ namespace GraphQL.Validation
             }
         }
 
+        /// <inheritdoc cref="IASTVisitorContext"/>
         public readonly struct State : IASTVisitorContext
         {
+            /// <summary>
+            /// Initializes a new instance with the specified validation context.
+            /// </summary>
             public State(ValidationContext context)
             {
                 Context = context;
             }
 
+            /// <summary>
+            /// Returns the validation context.
+            /// </summary>
             public ValidationContext Context { get; }
 
+            /// <inheritdoc/>
             public CancellationToken CancellationToken => Context.CancellationToken;
         }
     }

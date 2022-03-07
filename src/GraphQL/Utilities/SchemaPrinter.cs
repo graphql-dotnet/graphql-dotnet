@@ -1,3 +1,5 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;

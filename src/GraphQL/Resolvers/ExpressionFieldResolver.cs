@@ -28,7 +28,7 @@ namespace GraphQL.Resolvers
             _resolver = MemberResolver.BuildFieldResolverInternal(param, body);
         }
 
-        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source));
+        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
 
         /// <inheritdoc/>
         ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)

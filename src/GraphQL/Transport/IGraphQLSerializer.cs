@@ -27,6 +27,6 @@ namespace GraphQL
         /// implementation) to the specified object type.
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        T ReadNode<T>(object? value);
+        T? ReadNode<T>(object? value);
     }
 }

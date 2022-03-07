@@ -117,7 +117,7 @@ namespace GraphQL.SystemTextJson
             ConfigureOptions(errorInfoProvider);
         }
 
-        private void ConfigureOptions(IErrorInfoProvider errorInfoProvider)
+        private void ConfigureOptions(IErrorInfoProvider? errorInfoProvider)
         {
             if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
@@ -159,7 +159,7 @@ namespace GraphQL.SystemTextJson
             => new JsonSerializerOptions { WriteIndented = indent };
 
         /// <inheritdoc/>
-        public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+        public Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)
             => JsonSerializer.SerializeAsync(stream, value, SerializerOptions, cancellationToken);
 
         /// <inheritdoc/>
@@ -167,11 +167,11 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
 
         /// <inheritdoc/>
-        public string Serialize<T>(T value)
+        public string Serialize<T>(T? value)
             => JsonSerializer.Serialize(value, SerializerOptions);
 
         /// <inheritdoc/>
-        public T Deserialize<T>(string json)
+        public T? Deserialize<T>(string? json)
             => json == null ? default : JsonSerializer.Deserialize<T>(json, SerializerOptions);
 
         /*******
@@ -202,7 +202,7 @@ namespace GraphQL.SystemTextJson
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JsonElement"/>.
         /// </summary>
-        public T ReadNode<T>(object value)
+        public T? ReadNode<T>(object? value)
             => value == null ? default : ReadNode<T>((JsonElement)value);
     }
 }

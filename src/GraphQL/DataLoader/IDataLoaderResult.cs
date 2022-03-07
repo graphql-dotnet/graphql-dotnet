@@ -10,7 +10,7 @@ namespace GraphQL.DataLoader
         /// Asynchronously executes the loader if it has not yet been executed; then returns the result
         /// </summary>
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        new Task<T?> GetResultAsync(CancellationToken cancellationToken = default);
+        new Task<T> GetResultAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>

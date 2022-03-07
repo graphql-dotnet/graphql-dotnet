@@ -217,7 +217,7 @@ namespace GraphQL.Types
                 // for instance, if the delegate represents obj.MyMethod,
                 // then the lambda would be: _ => obj
                 var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-                var body = Expression.Constant(resolve.Target, resolve.Method.DeclaringType);
+                var body = Expression.Constant(resolve.Target, resolve.Method.DeclaringType!);
                 var lambda = Expression.Lambda(body, param);
                 resolver = AutoRegisteringHelper.BuildFieldResolver(resolve.Method, null, null, lambda);
             }
@@ -327,6 +327,17 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a subscription field to this graph type.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of this field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
+        /// <param name="subscribe">An even stream resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribe<TGraphType>(
             string name,
             string? description = null,
@@ -352,6 +363,17 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a subscription field to this graph type.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of this field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
+        /// <param name="subscribeAsync">An even stream resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
             string? description = null,

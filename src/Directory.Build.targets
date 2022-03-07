@@ -6,4 +6,15 @@
     <Exclude>[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*</Exclude>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591;CS1574;CS8765;CS8601;CS8620;CS8600;CS8625;CS8767</WarningsAsErrors>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
 </Project>
