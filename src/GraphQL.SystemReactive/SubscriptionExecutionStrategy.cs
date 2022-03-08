@@ -20,7 +20,6 @@ namespace GraphQL.Execution
         /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
         /// No serializable <see cref="ExecutionResult"/> is directly returned.
         /// </summary>
-        /// <inheritdoc/>
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context);
