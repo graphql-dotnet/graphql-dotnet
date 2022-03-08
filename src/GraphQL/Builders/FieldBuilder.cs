@@ -205,12 +205,18 @@ namespace GraphQL.Builders
             return this;
         }
 
+        /// <summary>
+        /// Sets an event resolver for the field.
+        /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> subscribe)
         {
             FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
             return this;
         }
 
+        /// <summary>
+        /// Sets an event resolver for the field.
+        /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> subscribeAsync)
         {
             FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(subscribeAsync(context)));

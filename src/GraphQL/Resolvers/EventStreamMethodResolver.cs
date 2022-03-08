@@ -45,7 +45,7 @@ namespace GraphQL.Resolvers
             else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
                 var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) });
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
                 taskBodyExpression = Expression.New(
                     constructor,
                     bodyExpression);
@@ -80,7 +80,7 @@ namespace GraphQL.Resolvers
                 if (!innerType.IsValueType)
                 {
                     var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                    var constructor = valueTaskType.GetConstructor(new Type[] { typeof(IObservable<object?>) });
+                    var constructor = valueTaskType.GetConstructor(new Type[] { typeof(IObservable<object?>) })!;
                     taskBodyExpression = Expression.New(
                         constructor,
                         bodyExpression);
@@ -96,11 +96,11 @@ namespace GraphQL.Resolvers
             return lambda.Compile();
         }
 
-        private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromValueTaskAsync<T>(ValueTask<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 
-        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 

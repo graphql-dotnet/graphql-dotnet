@@ -12,6 +12,9 @@ namespace GraphQL
         private Type? _mappedToInput;
         private Type? _mappedToOutput;
 
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
         public GraphQLMetadataAttribute()
         {
         }
@@ -40,8 +43,14 @@ namespace GraphQL
         /// </summary>
         public string? DeprecationReason { get; set; }
 
+        /// <summary>
+        /// Indicates if the marked method represents a field resolver or a subscription event stream resolver.
+        /// </summary>
         public ResolverType ResolverType { get; set; }
 
+        /// <summary>
+        /// Indicates the CLR type that this graph type represents.
+        /// </summary>
         public Type? IsTypeOf { get; set; }
 
         /// <summary>
@@ -142,9 +151,18 @@ namespace GraphQL
         }
     }
 
+    /// <summary>
+    /// Indicates if the specified method is a field resolver or event stream resolver.
+    /// </summary>
     public enum ResolverType
     {
+        /// <summary>
+        /// Indicates the specified method is a field resolver
+        /// </summary>
         Resolver,
+        /// <summary>
+        /// Indicates the specified method is an event stream resolver
+        /// </summary>
         Subscriber
     }
 }

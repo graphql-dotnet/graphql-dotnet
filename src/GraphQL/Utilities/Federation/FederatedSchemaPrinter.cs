@@ -1,3 +1,5 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -107,7 +109,7 @@ namespace GraphQL.Utilities.Federation
                     FederatedDirectives = PrintFederatedDirectivesFromAst(x)
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
+            return fields == null ? "" : string.Join(Environment.NewLine, fields.Select(
                 f => "{3}  {0}{1}: {2}{4}{5}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation, f.FederatedDirectives)));
         }
 

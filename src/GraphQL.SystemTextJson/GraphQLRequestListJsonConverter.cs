@@ -39,7 +39,7 @@ namespace GraphQL.SystemTextJson
         {
             if (reader.TokenType == JsonTokenType.StartObject)
             {
-                var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options);
+                var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options)!;
                 return typeToConvert == typeof(List<GraphQLRequest>)
                     ? new List<GraphQLRequest>(1) { request }
                     : new GraphQLRequest[] { request };
@@ -60,7 +60,8 @@ namespace GraphQL.SystemTextJson
                 }
 
                 var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options);
-                list.Add(request);
+                if (request != null)
+                    list.Add(request);
             }
 
             //unexpected end of data

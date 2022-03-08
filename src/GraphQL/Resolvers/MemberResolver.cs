@@ -128,7 +128,7 @@ namespace GraphQL.Resolvers
             {
                 // e.g. valueTask = new ValueTask<object>(body);
                 var valueTaskType = typeof(ValueTask<object?>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<object?>) });
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<object?>) })!;
                 valueTaskExpr = Expression.New(constructor, bodyExpression);
             }
             else if (bodyExpression.Type.IsGenericType)
@@ -164,7 +164,7 @@ namespace GraphQL.Resolvers
 
                 // e.g. valueTask = new ValueTask<object>(convert);
                 var valueTaskType = typeof(ValueTask<object?>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(object) });
+                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(object) })!;
                 valueTaskExpr = Expression.New(constructor, convertExpr);
             }
 

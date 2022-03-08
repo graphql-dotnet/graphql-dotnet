@@ -11,10 +11,10 @@ namespace GraphQL.NewtonsoftJson
     public class InputsJsonConverter : JsonConverter
     {
         /// <inheritdoc/>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
             => ReadDictionary(reader)?.ToInputs();
 
-        internal static Dictionary<string, object> ReadDictionary(JsonReader reader)
+        internal static Dictionary<string, object?>? ReadDictionary(JsonReader reader)
         {
             if (reader.TokenType == JsonToken.Null)
                 return null;
@@ -22,7 +22,7 @@ namespace GraphQL.NewtonsoftJson
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException();
 
-            var result = new Dictionary<string, object>();
+            var result = new Dictionary<string, object?>();
 
             while (reader.Read())
             {
@@ -32,7 +32,7 @@ namespace GraphQL.NewtonsoftJson
                 if (reader.TokenType != JsonToken.PropertyName)
                     throw new JsonException();
 
-                string key = (string)reader.Value;
+                string key = (string)reader.Value!;
 
                 // move to property value
                 if (!reader.Read())
@@ -44,7 +44,7 @@ namespace GraphQL.NewtonsoftJson
             return result;
         }
 
-        private static object ReadValue(JsonReader reader)
+        private static object? ReadValue(JsonReader reader)
             => reader.TokenType switch
             {
                 JsonToken.StartArray => ReadArray(reader),
@@ -60,12 +60,12 @@ namespace GraphQL.NewtonsoftJson
                 _ => throw new InvalidOperationException($"Unexpected token type: {reader.TokenType}")
             };
 
-        private static List<object> ReadArray(JsonReader reader)
+        private static List<object?> ReadArray(JsonReader reader)
         {
             if (reader.TokenType != JsonToken.StartArray)
                 throw new JsonException();
 
-            var result = new List<object>();
+            var result = new List<object?>();
 
             while (reader.Read())
             {
@@ -78,7 +78,7 @@ namespace GraphQL.NewtonsoftJson
             return result;
         }
 
-        private static object ReadNumber(JsonReader reader)
+        private static object? ReadNumber(JsonReader reader)
         {
             var value = reader.Value;
             if (value is long l && l >= int.MinValue && l <= int.MaxValue)
@@ -89,7 +89,7 @@ namespace GraphQL.NewtonsoftJson
         /// <summary>
         /// This JSON converter does not support writing.
         /// </summary>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             => throw new NotImplementedException();
 
         /// <inheritdoc/>

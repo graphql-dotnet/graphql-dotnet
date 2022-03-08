@@ -32,15 +32,15 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanWrite => false;
 
         /// <inheritdoc/>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             => throw new NotSupportedException();
 
         /// <inheritdoc/>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                var request = serializer.Deserialize<GraphQLRequest>(reader);
+                var request = serializer.Deserialize<GraphQLRequest>(reader)!;
                 return objectType == typeof(List<GraphQLRequest>)
                     ? new List<GraphQLRequest>(1) { request }
                     : new GraphQLRequest[] { request };
@@ -61,7 +61,8 @@ namespace GraphQL.NewtonsoftJson
                 }
 
                 var request = serializer.Deserialize<GraphQLRequest>(reader);
-                list.Add(request);
+                if (request != null)
+                    list.Add(request);
             }
 
             //unexpected end of data

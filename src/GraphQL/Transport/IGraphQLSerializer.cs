@@ -20,13 +20,13 @@ namespace GraphQL
         /// Asynchronously deserializes the specified stream to the specified object type.
         /// Typically used to parse <see cref="GraphQLRequest"/> instances from JSON.
         /// </summary>
-        ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default);
+        ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deserializes the specified JSON element (element type depends on the serializer
         /// implementation) to the specified object type.
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        T ReadNode<T>(object? value);
+        T? ReadNode<T>(object? value);
     }
 }

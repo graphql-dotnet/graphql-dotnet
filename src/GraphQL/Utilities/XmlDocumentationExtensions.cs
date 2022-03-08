@@ -38,7 +38,7 @@ namespace GraphQL.Utilities
             char prefixCode;
             string memberName = member is Type t
                 ? t.FullName! // member is a Type
-                : member.DeclaringType.FullName + "." + member.Name;  // member belongs to a Type
+                : member.DeclaringType!.FullName + "." + member.Name;  // member belongs to a Type
             memberName = memberName.Replace('+', '.');
 
             switch (member.MemberType)
@@ -134,7 +134,7 @@ namespace GraphQL.Utilities
         /// <param name="xml">XML documentation.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
         public static string? GetXmlDocumentation(this MemberInfo member, XDocument? xml) => xml?.XPathEvaluate(
-            $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString().Trim().NullIfEmpty();
+            $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString()!.Trim().NullIfEmpty();
 
         /// <summary>
         /// Returns the XML documentation (returns/param tag) for the specified parameter.
@@ -160,8 +160,8 @@ namespace GraphQL.Utilities
         public static string? GetXmlDocumentation(this ParameterInfo parameter, XDocument? xml) =>
             parameter.IsRetval || string.IsNullOrEmpty(parameter.Name)
                 ? xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString().Trim().NullIfEmpty()
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString()!.Trim().NullIfEmpty()
                 : xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString().Trim().NullIfEmpty();
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString()!.Trim().NullIfEmpty();
     }
 }

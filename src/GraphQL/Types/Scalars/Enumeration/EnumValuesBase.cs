@@ -34,6 +34,7 @@ namespace GraphQL.Types
         /// </summary>
         public abstract EnumValueDefinition? FindByValue(object? value);
 
+        /// <inheritdoc/>
         public abstract IEnumerator<EnumValueDefinition> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

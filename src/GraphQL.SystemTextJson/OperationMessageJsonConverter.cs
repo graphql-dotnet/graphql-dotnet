@@ -51,7 +51,7 @@ namespace GraphQL.SystemTextJson
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new JsonException();
 
-                string key = reader.GetString();
+                string key = reader.GetString()!;
 
                 //unexpected end of data
                 if (!reader.Read())

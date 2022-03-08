@@ -6,17 +6,24 @@ using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
+    /// <summary>
+    /// An <see cref="IContractResolver"/> for GraphQL.NET.
+    /// </summary>
     public class GraphQLContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
         private readonly IErrorInfoProvider _errorInfoProvider;
 
+        /// <summary>
+        /// Initializes an instance with the specified <see cref="IErrorInfoProvider"/>.
+        /// </summary>
         public GraphQLContractResolver(IErrorInfoProvider errorInfoProvider)
         {
             _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
 
-        protected override JsonConverter ResolveContractConverter(Type objectType)
+        /// <inheritdoc/>
+        protected override JsonConverter? ResolveContractConverter(Type objectType)
         {
             if (typeof(ExecutionResult).IsAssignableFrom(objectType))
                 return new ExecutionResultJsonConverter(_errorInfoProvider, NamingStrategy);
@@ -36,6 +43,7 @@ namespace GraphQL.NewtonsoftJson
             return base.ResolveContractConverter(objectType);
         }
 
+        /// <inheritdoc/>
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);

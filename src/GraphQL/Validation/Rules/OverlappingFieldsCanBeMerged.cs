@@ -611,7 +611,7 @@ namespace GraphQL.Validation.Rules
             if (arguments1 == null && arguments2 != null)
                 return false;
 
-            if (arguments1.Count != arguments2.Count)
+            if (arguments1!.Count != arguments2!.Count)
             {
                 return false;
             }

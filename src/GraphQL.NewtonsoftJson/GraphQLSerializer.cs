@@ -116,7 +116,7 @@ namespace GraphQL.NewtonsoftJson
             Serializer = jsonSerializer;
         }
 
-        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider errorInfoProvider)
+        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider? errorInfoProvider)
         {
             return new JsonSerializerSettings
             {
@@ -125,14 +125,14 @@ namespace GraphQL.NewtonsoftJson
             };
         }
 
-        private static JsonSerializer BuildSerializer(bool indent, Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
+        private static JsonSerializer BuildSerializer(bool indent, Action<JsonSerializerSettings>? configureSerializerSettings, IErrorInfoProvider? errorInfoProvider)
         {
             var serializerSettings = GetDefaultSerializerSettings(indent, errorInfoProvider);
             configureSerializerSettings?.Invoke(serializerSettings);
             return BuildSerializer(serializerSettings, errorInfoProvider);
         }
 
-        private static JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
+        private static JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings, IErrorInfoProvider? errorInfoProvider)
         {
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
@@ -145,7 +145,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+        public async Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -174,7 +174,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public string Serialize<T>(T value)
+        public string Serialize<T>(T? value)
         {
             using var stringWriter = new StringWriter();
             Write(stringWriter, value);
@@ -182,17 +182,17 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
             using var stringReader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
             using var jsonReader = new JsonTextReader(stringReader);
-            return new ValueTask<T>(Serializer.Deserialize<T>(jsonReader));
+            return new ValueTask<T?>(Serializer.Deserialize<T>(jsonReader)!);
         }
 
         /// <summary>
         /// Deserializes from the specified <see cref="TextReader"/> to the specified object type.
         /// </summary>
-        public T Read<T>(TextReader json)
+        public T? Read<T>(TextReader json)
         {
             using var jsonReader = new JsonTextReader(json)
             {
@@ -202,14 +202,14 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public T Deserialize<T>(string json)
+        public T? Deserialize<T>(string? json)
             => json == null ? default : Read<T>(new StringReader(json));
 
         /// <summary>
         /// Converts the <see cref="JObject"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// A <paramref name="jObject"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        private T ReadNode<T>(JObject jObject)
+        private T? ReadNode<T>(JObject? jObject)
             => jObject == null ? default : jObject.ToObject<T>(Serializer);
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace GraphQL.NewtonsoftJson
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JObject"/>.
         /// </summary>
-        public T ReadNode<T>(object value)
-            => ReadNode<T>((JObject)value);
+        public T? ReadNode<T>(object? value)
+            => ReadNode<T>((JObject?)value);
     }
 }
