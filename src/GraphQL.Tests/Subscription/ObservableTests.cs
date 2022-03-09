@@ -223,7 +223,7 @@ public class ObservableTests : IDisposable
                     return;
             }
 
-            if (await _received.WaitAsync(10000))
+            if (await _received.WaitAsync(30000).ConfigureAwait(false))
                 return;
 
             lock (_stringBuilder)
