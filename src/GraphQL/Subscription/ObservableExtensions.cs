@@ -135,6 +135,7 @@ internal static class ObservableExtensions
                 QueueData? queueData;
                 lock (_queue)
                 {
+                    // should always successfully peek from the queue here
                     queueData = _queue.Count > 0 ? _queue.Peek() : null;
                 }
                 while (queueData != null)

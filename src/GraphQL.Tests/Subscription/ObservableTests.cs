@@ -182,6 +182,18 @@ public class ObservableTests : IDisposable
     }
 
     [Fact]
+    public void CanCallDisposeTwice()
+    {
+        var observable = Source
+            .SelectCatchAsync(
+                (data, token) => Task.FromResult(data),
+                (error, token) => error is ApplicationException ? throw error : Task.FromResult(error.GetType().Name));
+        var disposer = observable.Subscribe(Observer);
+        disposer.Dispose();
+        disposer.Dispose();
+    }
+
+    [Fact]
     public void NullArgumentsThrow()
     {
         var observableSuccess = Source.SelectCatchAsync<string, string>((_, _) => null!, (_, _) => null!);
