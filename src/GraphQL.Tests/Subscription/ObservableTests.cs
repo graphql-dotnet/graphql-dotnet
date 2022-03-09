@@ -175,6 +175,7 @@ public class ObservableTests : IDisposable
         Source.Error(new ApplicationException());
         Source.Next("b");
         Source.Error(new InvalidTimeZoneException());
+        Source.Next("c");
         Source.Completed();
         await Task.Delay(200); // just in case, but should execute synchronously anyway
         Observer.Current.ShouldBe("Next 'test'. ");
