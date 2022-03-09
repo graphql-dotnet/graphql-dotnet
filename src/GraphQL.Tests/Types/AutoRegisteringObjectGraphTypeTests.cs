@@ -512,6 +512,7 @@ namespace GraphQL.Tests.Types
 
         private struct NullSourceStructFailureTest
         {
+            public NullSourceStructFailureTest() { }
             public bool Example1 { get; set; } = true;
             public string Example2() => "test";
             public int Example3 = 3;
@@ -709,6 +710,7 @@ namespace GraphQL.Tests.Types
         [Name("Test")]
         public struct TestStructModel
         {
+            public TestStructModel() { }
             [Id]
             public int Id { get; set; } = 1;
             public static string Name = "Example";
