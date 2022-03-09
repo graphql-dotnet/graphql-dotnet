@@ -20,7 +20,7 @@ namespace GraphQL.SystemReactive
         /// singleton, and registers an <see cref="ExecutionStrategyRegistration"/> for the <see cref="OperationType.Subscription"/>
         /// operation type to use the <see cref="SubscriptionExecutionStrategy"/>.
         /// </summary>
-        public static IGraphQLBuilder AddSubscriptionExecutionStrategy(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddSystemReactiveExecutionStrategy(this IGraphQLBuilder builder)
             => builder.AddExecutionStrategy<SubscriptionExecutionStrategy>(OperationType.Subscription);
     }
 }

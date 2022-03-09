@@ -1,9 +1,11 @@
 using System.Reactive.Linq;
+using GraphQL.Execution;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
-namespace GraphQL.Execution
+namespace GraphQL.SystemReactive
 {
     /// <summary>
     /// Executes a subscription.

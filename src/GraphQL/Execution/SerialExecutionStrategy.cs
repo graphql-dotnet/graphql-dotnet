@@ -2,7 +2,7 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ExecutionNode)"/>
     public class SerialExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
@@ -19,7 +19,7 @@ namespace GraphQL.Execution
         /// Executes document nodes serially. Nodes that return a <see cref="IDataLoaderResult"/> will
         /// execute once all other pending nodes have been completed.
         /// </summary>
-        protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
+        public override async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
             // Use a stack to track all nodes in the tree that need to be executed
             var nodes = System.Threading.Interlocked.Exchange(ref _reusableNodes, null) ?? new Stack<ExecutionNode>();

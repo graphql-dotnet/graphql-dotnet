@@ -989,6 +989,7 @@ namespace GraphQL.Execution
     public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
     {
         public ExecutionContext() { }
+        public ExecutionContext(GraphQL.Execution.ExecutionContext context) { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
@@ -1049,7 +1050,7 @@ namespace GraphQL.Execution
         protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, GraphQLParser.ROM fragmentName, GraphQL.Types.IGraphType type) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
+        public abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode);
         protected GraphQL.Types.FieldType? GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IComplexGraphType parentType, GraphQLParser.AST.GraphQLField field) { }
         protected virtual GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Execution.ExecutionContext context) { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
@@ -1128,6 +1129,7 @@ namespace GraphQL.Execution
     public interface IExecutionStrategy
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context);
+        System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode);
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "field",
                 "fieldType"})]
@@ -1175,8 +1177,7 @@ namespace GraphQL.Execution
     {
         public ParallelExecutionStrategy() { }
         public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
-        protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
-        protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
+        public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
@@ -1187,12 +1188,25 @@ namespace GraphQL.Execution
     {
         public SerialExecutionStrategy() { }
         public static GraphQL.Execution.SerialExecutionStrategy Instance { get; }
-        protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
+        public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
     public class SubscriptionArrayExecutionNode : GraphQL.Execution.ArrayExecutionNode
     {
         public SubscriptionArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
         public override object Source { get; }
+    }
+    public class SubscriptionExecutionStrategy : GraphQL.Execution.ExecutionStrategy
+    {
+        public SubscriptionExecutionStrategy() { }
+        protected SubscriptionExecutionStrategy(GraphQL.Execution.IExecutionStrategy baseExecutionStrategy) { }
+        public static GraphQL.Execution.SubscriptionExecutionStrategy Instance { get; }
+        protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
+        public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionError> HandleExceptionAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception, string defaultMessage) { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ProcessDataAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, object? value) { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ProcessErrorAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception) { }
+        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>?> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }
     public class SubscriptionObjectExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {

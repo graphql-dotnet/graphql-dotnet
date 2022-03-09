@@ -1,14 +1,3 @@
-namespace GraphQL.Execution
-{
-    public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
-    {
-        public SubscriptionExecutionStrategy() { }
-        public static GraphQL.Execution.SubscriptionExecutionStrategy Instance { get; }
-        protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
-        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
-        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>?> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-    }
-}
 namespace GraphQL
 {
     [System.Obsolete("Please use the AddSubscriptionExecutionStrategy() builder method.")]
@@ -29,5 +18,13 @@ namespace GraphQL.SystemReactive
         [System.Obsolete("Please use AddSubscriptionExecutionStrategy()")]
         public static GraphQL.DI.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder) { }
+    }
+    public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
+    {
+        public SubscriptionExecutionStrategy() { }
+        public static GraphQL.SystemReactive.SubscriptionExecutionStrategy Instance { get; }
+        protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
+        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>?> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }
 }
