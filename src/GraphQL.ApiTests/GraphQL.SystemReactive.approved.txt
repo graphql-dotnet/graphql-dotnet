@@ -17,7 +17,7 @@ namespace GraphQL.SystemReactive
     {
         [System.Obsolete("Please use AddSubscriptionExecutionStrategy()")]
         public static GraphQL.DI.IGraphQLBuilder AddSubscriptionDocumentExecuter(this GraphQL.DI.IGraphQLBuilder builder) { }
-        public static GraphQL.DI.IGraphQLBuilder AddSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemReactiveExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
     public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
     {
