@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Subscription
 
         protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
-            var executer = new SubscriptionDocumentExecuter();
+            var executer = new DocumentExecuter();
             var services = new ServiceCollection();
             services.AddSingleton<IChat>(Chat);
             var provider = services.BuildServiceProvider();
