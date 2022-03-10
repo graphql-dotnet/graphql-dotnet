@@ -511,9 +511,10 @@ The new implementation supports some new features and bug fixes:
 1. Serial execution of data events' field resolvers is supported by passing an instance of
    `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
 
-2. Errors and output extensions are returned along with data events
+2. Errors and output extensions are returned along with data events.
 
-3. Memory leaks have been eliminated in the case of errors, output extensions, or metrics being enabled
+3. Memory leaks have been eliminated in the case of errors, output extensions, metrics being enabled,
+   or the use of the context's array pool.
 
 4. The unhandled exception handler properly handles all error situations that it was designed to.
 
