@@ -4,7 +4,7 @@ using GraphQL.Subscription;
 
 namespace GraphQL.Tests.Subscription;
 
-public class ObservableTests : IDisposable
+public class ObservableExtensionsTests : IDisposable
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver Observer { get; } = new();

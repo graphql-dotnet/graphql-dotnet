@@ -233,7 +233,6 @@ public class SubscriptionExecutionStrategyTests
         using var cts = new CancellationTokenSource();
         var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
         result.ShouldBeSuccessful();
-        result.Perf.ShouldBeNull();
         Source.Next("hello");
         Source.Next("testing");
         cts.Cancel();
@@ -250,7 +249,6 @@ public class SubscriptionExecutionStrategyTests
         using var cts = new CancellationTokenSource();
         var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
         result.ShouldBeSuccessful();
-        result.Perf.ShouldBeNull();
         Source.Next("hello");
         Source.Next("testing");
         Disposer!.Dispose();
