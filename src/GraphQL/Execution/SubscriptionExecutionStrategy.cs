@@ -122,6 +122,17 @@ namespace GraphQL.Execution
                             return await ProcessErrorAsync(context, node, exception);
                         });
             }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (ExecutionError error)
+            {
+                error.Path = node.ResponsePath;
+                error.AddLocation(node.Field, context.Document);
+                context.Errors.Add(error);
+                return null;
+            }
             catch (Exception exception)
             {
                 var error = await HandleExceptionInternalAsync(context, node, exception,

@@ -75,6 +75,15 @@ public class SubscriptionExecutionStrategyTests
     }
 
     [Fact]
+    public async Task InitialExecutionError()
+    {
+        var result = await ExecuteAsync("subscription { testWithExecutionError }");
+        result.Executed.ShouldBeTrue();
+        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""testWithExecutionError""]}],""data"":null}");
+        result.Streams.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Widget()
     {
         var result = await ExecuteAsync("subscription { testComplex { id name } }");
@@ -361,6 +370,17 @@ public class SubscriptionExecutionStrategyTests
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}]}");
     }
 
+    [Fact]
+    public async Task CancellationDuringSubscriptionShouldThrow()
+    {
+        var cts = new CancellationTokenSource();
+        await Should.ThrowAsync<OperationCanceledException>(async () => await ExecuteAsync("subscription { testWithCancellation }", o =>
+        {
+            o.CancellationToken = cts.Token;
+            o.UserContext["cts"] = cts;
+        }));
+    }
+
     #region - Schema -
     private class Query
     {
@@ -377,8 +397,17 @@ public class SubscriptionExecutionStrategyTests
             return source;
         }
 
+        public static IObservable<string> TestWithCancellation(IResolveFieldContext context)
+        {
+            ((CancellationTokenSource)context.UserContext["cts"]!).Cancel();
+            context.CancellationToken.ThrowIfCancellationRequested();
+            throw new Exception("Should not occur");
+        }
+
         public static IObservable<string> TestWithInitialError(bool custom)
             => throw (custom ? new InvalidOperationException("InitialException") : new ApplicationException("InitialException"));
+
+        public static IObservable<string> TestWithExecutionError() => throw new ExecutionError("Test error");
 
         public static IObservable<MyWidget> TestComplex([FromServices] IObservable<string> source)
             => new ObservableSelect<string, MyWidget>(source, value => new MyWidget { Name = value });
