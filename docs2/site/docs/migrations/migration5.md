@@ -508,7 +508,7 @@ document executer will support subscriptions without overriding `SelectExecution
 
 The new implementation supports some new features and bug fixes:
 
-1. Serial execution of data events' field resolverss is supported by passing an instance of
+1. Serial execution of data events' field resolvers is supported by passing an instance of
    `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
 
 2. Errors and output extensions are returned along with data events
