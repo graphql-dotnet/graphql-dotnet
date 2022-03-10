@@ -22,7 +22,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes a new instance with the specified execution strategy for child nodes.
         /// </summary>
-        protected SubscriptionExecutionStrategy(IExecutionStrategy baseExecutionStrategy)
+        public SubscriptionExecutionStrategy(IExecutionStrategy baseExecutionStrategy)
         {
             _baseExecutionStrategy = baseExecutionStrategy ?? throw new ArgumentNullException(nameof(baseExecutionStrategy));
         }

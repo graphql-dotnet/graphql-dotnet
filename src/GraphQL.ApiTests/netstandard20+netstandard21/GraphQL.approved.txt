@@ -1198,7 +1198,7 @@ namespace GraphQL.Execution
     public class SubscriptionExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public SubscriptionExecutionStrategy() { }
-        protected SubscriptionExecutionStrategy(GraphQL.Execution.IExecutionStrategy baseExecutionStrategy) { }
+        public SubscriptionExecutionStrategy(GraphQL.Execution.IExecutionStrategy baseExecutionStrategy) { }
         public static GraphQL.Execution.SubscriptionExecutionStrategy Instance { get; }
         protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }

@@ -201,7 +201,7 @@ public class SubscriptionExecutionStrategyTests
     [Fact]
     public async Task DocumentListeners_and_UserContext_works()
     {
-        var listener = new SampleListener { TestClass = this };
+        var listener = new SampleListener(_ => Counter += 1, _ => Counter += 10);
         Counter.ShouldBe(0);
         var result = await ExecuteAsync("subscription { testComplex { name getCounter } }", o =>
         {
@@ -265,6 +265,100 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""validateServiceProvider"": true } } }");
+    }
+
+    [Fact]
+    public void SubscriptionExecutionStrategy_NullConstructorThrow()
+    {
+        Should.Throw<ArgumentNullException>(() => new SubscriptionExecutionStrategy(null!));
+    }
+
+    [Fact]
+    public async Task CancelWithinErrorHandler_Eats()
+    {
+        using var cts = new CancellationTokenSource();
+        var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
+        {
+            o.CancellationToken = cts.Token;
+            o.UnhandledExceptionDelegate = async (context) =>
+            {
+                cts.Cancel();
+                cts.Token.ThrowIfCancellationRequested();
+            };
+        });
+        result.ShouldBeSuccessful();
+        Source.Next("custom");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Event stream error for field \u0027testComplex\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""OPERATION_CANCELED"",""codes"":[""OPERATION_CANCELED""]}}]}");
+    }
+
+    [Fact]
+    public async Task CancelWithinDocumentExecuter_Returns_DoesNotHandle()
+    {
+        var throwNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                context =>
+                {
+                    if (throwNow)
+                    {
+                        Disposer!.Dispose();
+                        context.CancellationToken.ThrowIfCancellationRequested();
+                        throw new NotSupportedException("Should not happen");
+                    }
+                },
+                _ => { }));
+            o.UnhandledExceptionDelegate = context => throw new NotSupportedException("Should not happen");
+        });
+        result.ShouldBeSuccessful();
+        throwNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveNoMoreResults();
+    }
+
+    [Fact]
+    public async Task ThrowExceptionWithinDocumentExecuter_Returns()
+    {
+        var throwNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                context =>
+                {
+                    if (throwNow)
+                    {
+                        throw new InvalidOperationException("Test exception");
+                    }
+                },
+                _ => { }));
+        });
+        result.ShouldBeSuccessful();
+        throwNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}]}");
+    }
+
+    [Fact]
+    public async Task ThrowErrorWithinDocumentExecuter_Returns()
+    {
+        var throwNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                context =>
+                {
+                    if (throwNow)
+                    {
+                        throw new ExecutionError("Test error");
+                    }
+                },
+                _ => { }));
+            o.UnhandledExceptionDelegate = async context => context.Exception = new ExecutionError("Should not happen");
+        });
+        result.ShouldBeSuccessful();
+        throwNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}]}");
     }
 
     #region - Schema -
@@ -346,11 +440,18 @@ public class SubscriptionExecutionStrategyTests
     #region - Test helper methods and classes -
     public class SampleListener : DocumentExecutionListenerBase
     {
-        public SubscriptionExecutionStrategyTests TestClass = null!;
+        private readonly Action<IExecutionContext> _beforeFunc;
+        private readonly Action<IExecutionContext> _afterFunc;
 
-        public override async Task BeforeExecutionAsync(IExecutionContext context) => TestClass.Counter += 1;
+        public SampleListener(Action<IExecutionContext> beforeFunc, Action<IExecutionContext> afterFunc)
+        {
+            _beforeFunc = beforeFunc;
+            _afterFunc = afterFunc;
+        }
 
-        public override async Task AfterExecutionAsync(IExecutionContext context) => TestClass.Counter += 10;
+        public override async Task BeforeExecutionAsync(IExecutionContext context) => _beforeFunc(context);
+
+        public override async Task AfterExecutionAsync(IExecutionContext context) => _afterFunc(context);
     }
 
     public class SampleObserver : IObserver<ExecutionResult>
