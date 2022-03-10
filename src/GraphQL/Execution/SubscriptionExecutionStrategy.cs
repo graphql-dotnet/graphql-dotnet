@@ -97,8 +97,6 @@ namespace GraphQL.Execution
                     .SelectCatchAsync(
                         async (value, token) =>
                         {
-                            using var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, token);
-
                             // duplicate context to prevent multiple event streams from sharing the same context,
                             // clear errors/metrics/extensions, and free array pool leased arrays
                             using var childContext = new ExecutionContext(context)
@@ -106,21 +104,19 @@ namespace GraphQL.Execution
                                 Errors = new ExecutionErrors(),
                                 OutputExtensions = new Dictionary<string, object?>(),
                                 Metrics = Instrumentation.Metrics.None,
-                                CancellationToken = tokenSource.Token,
+                                CancellationToken = token,
                             };
 
                             return await ProcessDataAsync(childContext, node, value).ConfigureAwait(false);
                         },
                         async (exception, token) =>
                         {
-                            using var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, token);
-
                             using var childContext = new ExecutionContext(context)
                             {
                                 Errors = new ExecutionErrors(),
                                 OutputExtensions = new Dictionary<string, object?>(),
                                 Metrics = Instrumentation.Metrics.None,
-                                CancellationToken = tokenSource.Token,
+                                CancellationToken = token,
                             };
 
                             return await ProcessErrorAsync(context, node, exception);

@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+#nullable enable
 
 namespace GraphQL.Tests.Subscription;
 

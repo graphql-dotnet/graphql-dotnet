@@ -14,12 +14,14 @@ public class SubscriptionExecutionStrategyTests
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
+    private IDisposable? Disposer { get; set; }
 
     [Fact]
     public async Task Basic()
     {
         var result = await ExecuteAsync("subscription { test }");
         result.ShouldBeSuccessful();
+        Disposer.ShouldNotBeNull();
         result.Perf.ShouldBeNull();
         Source.Next("hello");
         Source.Next("testing");
@@ -217,6 +219,56 @@ public class SubscriptionExecutionStrategyTests
         Observer.ShouldHaveNoMoreResults();
     }
 
+    [Fact]
+    public async Task RootCancellationThrowsOnInitialExecution()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        await Should.ThrowAsync<OperationCanceledException>(async () => await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token));
+    }
+
+    [Fact]
+    public async Task RootCancellationDoesNotAffectSubscriptions()
+    {
+        using var cts = new CancellationTokenSource();
+        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
+        result.ShouldBeSuccessful();
+        result.Perf.ShouldBeNull();
+        Source.Next("hello");
+        Source.Next("testing");
+        cts.Cancel();
+        Source.Next("success");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""success"" } }");
+        Observer.ShouldHaveNoMoreResults();
+    }
+
+    [Fact]
+    public async Task NoEventsAfterSourceDisconnected()
+    {
+        using var cts = new CancellationTokenSource();
+        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
+        result.ShouldBeSuccessful();
+        result.Perf.ShouldBeNull();
+        Source.Next("hello");
+        Source.Next("testing");
+        Disposer!.Dispose();
+        Source.Next("should not happen");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
+        Observer.ShouldHaveNoMoreResults();
+    }
+
+    [Fact]
+    public async Task CheckServiceProvider()
+    {
+        var result = await ExecuteAsync("subscription { testComplex { validateServiceProvider } }", o => o.UserContext["provider"] = o.RequestServices);
+        result.ShouldBeSuccessful();
+        Source.Next("hello");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""validateServiceProvider"": true } } }");
+    }
+
     #region - Schema -
     private class Query
     {
@@ -284,6 +336,12 @@ public class SubscriptionExecutionStrategyTests
             var testClass = (SubscriptionExecutionStrategyTests)userContext["testClass"]!;
             return testClass.Counter;
         }
+
+        public bool ValidateServiceProvider(IResolveFieldContext context)
+        {
+            var provider = (IServiceProvider)context.UserContext["provider"]!;
+            return object.ReferenceEquals(context.RequestServices, provider);
+        }
     }
     #endregion
 
@@ -345,7 +403,7 @@ public class SubscriptionExecutionStrategyTests
         if (subscriptionResult.Streams?.Count == 1)
         {
             Observer = new SampleObserver();
-            subscriptionResult.Streams.Single().Value.Subscribe(Observer);
+            Disposer = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
         }
         else if (subscriptionResult.Streams?.Count > 1)
         {
