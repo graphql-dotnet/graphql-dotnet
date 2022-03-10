@@ -991,3 +991,15 @@ with the specified name, and if none is found, looks for a method with the match
 now supports methods with arguments as well as methods without arguments, an `AmbigiousMatchException`
 can occur if the name refers to a public method with multiple overloads. Either specify a field
 resolver explicitly, or reduce the number of public methods with the same name to one.
+
+### 38. Subscription document executer removed
+
+Subscription support is provided by the `DocumentExecuter` implementation without the need to
+use `SubscriptionDocumentExecuter` or override `DocumentExecuter.SelectExecutionStrategy`. You may
+also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` method.
+
+### 39. Subscription nuget package removed
+
+Subscription support has been moved into the main project. If you have a need to reference
+`SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
+will need to remove references to the `GraphQL.SystemReactive` nuget package.
