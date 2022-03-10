@@ -500,6 +500,35 @@ When adding a field by name only, such as `Field<StringGraphType>("Name");`, and
 rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
 as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
 
+### 16. Subscription support improved
+
+Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
+the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter`, and the default
+document executer will support subscriptions without overriding `SelectExecutionStrategy`.
+
+The new implementation supports some new features and bug fixes:
+
+1. Serial execution of data events' field resolverss is supported by passing an instance of
+   `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
+
+2. Errors and output extensions are returned along with data events
+
+3. Memory leaks have been eliminated in the case of errors, output extensions, or metrics being enabled
+
+4. The unhandled exception handler properly handles all error situations that it was designed to.
+
+5. The `System.Reactive` nuget reference is not necessary for GraphQL. You may still choose to use
+   `System.Reactive` nuget package in your library if you wish.
+
+6. Derived implementations allow for a scoped DI provider during execution of data events. It will
+   be necessary to override `ProcessDataAsync` and change the `RequestServices` property to a scoped
+   instance before calling `base.ProcessDataAsync`.
+
+There are a number of other minor issues fixed; see these links for more details:
+
+- https://github.com/graphql-dotnet/graphql-dotnet/issues/3002
+- https://github.com/graphql-dotnet/graphql-dotnet/pull/3004
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
