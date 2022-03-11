@@ -102,7 +102,7 @@ namespace GraphQL
                 return result!;
 
             if (type.IsAbstract)
-                throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values.");
+                throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary.");
 
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
