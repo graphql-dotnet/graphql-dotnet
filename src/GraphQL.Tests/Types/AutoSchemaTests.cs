@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using GraphQL.MicrosoftDI;
-using GraphQL.Types;
 using GraphQL.SystemTextJson;
+using GraphQL.Types;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types;
 
