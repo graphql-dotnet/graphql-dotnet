@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using GraphQL.Conversion;
-using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -60,15 +59,5 @@ namespace GraphQL
         /// By default disabled.
         /// </summary>
         public static bool UseDeclaringTypeNames { get; set; } = false;
-
-        /// <summary>
-        /// Enables or disables usage of abstract types as generic parameters
-        /// for <see cref="InputObjectGraphType{TSourceType}"/>. The use of
-        /// abstract types as generic parameters will most likely lead to
-        /// runtime errors if you didn't add conversion in <see cref="ValueConverter"/>.
-        /// <br/>
-        /// By default enabled.
-        /// </summary>
-        public static bool EnableAbstractGenericParametersForInputObjectGraphType { get; set; } = true;
     }
 }
