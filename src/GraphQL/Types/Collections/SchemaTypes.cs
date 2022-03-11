@@ -22,7 +22,7 @@ namespace GraphQL.Types
     public class SchemaTypes : IEnumerable<IGraphType>
     {
         /// <summary>
-        /// Returns a dictionary of default CLR type to graph type mappings.
+        /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
         /// </summary>
         public static ReadOnlyDictionary<Type, Type> BuiltInScalarMappings { get; } = new(new Dictionary<Type, Type>
         {
