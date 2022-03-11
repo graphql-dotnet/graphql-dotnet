@@ -11,7 +11,7 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -23,7 +23,7 @@ namespace GraphQL
             where T : class
             => (T)ToObject(source, typeof(T));
 
-        private static readonly List<object> _emptyValues = new List<object>();
+        private static readonly List<object> _emptyValues = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -97,9 +97,12 @@ namespace GraphQL
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            // force sourceType to be IDictionary<string, object>
+            // if conversion from IDictionary<string, object> to desired type is registered then use it
             if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
                 return result!;
+
+            if (type.IsAbstract)
+                throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.");
 
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
