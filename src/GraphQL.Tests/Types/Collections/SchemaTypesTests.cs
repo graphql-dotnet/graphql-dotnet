@@ -41,6 +41,7 @@ namespace GraphQL.Tests.Types.Collections
             mock.Verify(x => x.GetService(typeof(HumanType)), Times.Once);
             mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
             mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
+            mock.Verify(x => x.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)), Times.Once);
             mock.VerifyNoOtherCalls();
         }
 
@@ -60,8 +61,8 @@ namespace GraphQL.Tests.Types.Collections
                     Query = new ObjectGraphType()
                 };
                 schema.Query.AddField(new FieldType { Name = "field1", Type = typeof(IntGraphType) });
-                Initialize(schema, serviceProvider);
-                Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider));
+                Initialize(schema, serviceProvider, null);
+                Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider, null));
             }
         }
     }

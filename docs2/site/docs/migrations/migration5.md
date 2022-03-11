@@ -500,7 +500,51 @@ When adding a field by name only, such as `Field<StringGraphType>("Name");`, and
 rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
 as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
 
-### 16. Subscription support improved
+### 16. Schemas can be entirely constructed from CLR types
+
+A new builder method `AddAutoSchema` has been added to allow building a schema entirely from CLR types
+using the new features within the auto-registering graph types to build the schema. Below is a sample:
+
+```csharp
+// sample configuration of DI
+var services = new ServiceCollection();
+services.AddGraphQL(b => b
+    .AddAutoSchema<Query>(s => s.WithMutation<Mutation>())
+    .AddSystemTextJson());
+var provider = services.BuildServiceProvider();
+
+
+// sample execution from DI
+var result = await provider.GetRequiredService<IDocumentExecuter>().ExecuteAsync(o =>
+{
+    o.RequestServices = provider;
+    o.Schema = provider.GetRequiredService<ISchema>();
+    o.Query = "{hero}";
+});
+var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
+// resultString returns the following JSON: {"data":{"hero":"Luke Skywalker"}}
+
+
+// sample schema
+public class Query
+{
+    public static string Hero => "Luke Skywalker";
+    public static IEnumerable<Droid> Droids => new Droid[] { new Droid("R2D2"), new Droid("C3PO") };
+}
+
+public class Mutation
+{
+    public static string Hero(string name) => name;
+}
+
+public record Droid(string Name);
+```
+
+Subscriptions are supported; interface or union graph types are not currently supported. You may
+mix the documented "graphtype-first" approach with the CLR types to implement anything not supported
+by the auto-registering graph types.
+
+### 17. Subscription support improved
 
 Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
 the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter`, and the default
@@ -992,13 +1036,21 @@ now supports methods with arguments as well as methods without arguments, an `Am
 can occur if the name refers to a public method with multiple overloads. Either specify a field
 resolver explicitly, or reduce the number of public methods with the same name to one.
 
-### 38. Subscription document executer removed
+### 38. `SchemaTypes` updated to support DI-injected mapping providers
+
+- `Initialize` method signature changed to include DI-injected mappings.
+
+- `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
+  Rather than a list of CLR to graph type tuples provided to the method, now a list of
+  `IGraphTypeMappingProvider` instances is provided.
+
+### 39. Subscription document executer removed
 
 Subscription support is provided by the `DocumentExecuter` implementation without the need to
 use `SubscriptionDocumentExecuter` or override `DocumentExecuter.SelectExecutionStrategy`. You may
 also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` method.
 
-### 39. Subscription nuget package removed
+### 40. Subscription nuget package removed
 
 Subscription support has been moved into the main project. If you have a need to reference
 `SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
