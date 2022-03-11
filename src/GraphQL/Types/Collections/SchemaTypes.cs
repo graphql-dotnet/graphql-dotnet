@@ -114,7 +114,8 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Initializes a new instance for the specified schema, and with the specified type resolver.
+        /// Initializes a new instance for the specified schema, with the specified type resolver,
+        /// with the specified set of <see cref="IGraphTypeMappingResolver"/> instances.
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
