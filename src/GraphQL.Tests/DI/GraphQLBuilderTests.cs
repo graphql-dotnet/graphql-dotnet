@@ -754,9 +754,9 @@ namespace GraphQL.Tests.DI
             var typeMappings = System.Reflection.Assembly.GetExecutingAssembly().GetClrTypeMappings();
             typeMappings.Count.ShouldBeGreaterThan(0); //ensure we are testing SOMETHING
 
-            var registeredResolvers = new List<ManualGraphTypeMappingResolver>();
-            _builderMock.Setup(b => b.Register(typeof(IGraphTypeMappingResolver), It.IsAny<ManualGraphTypeMappingResolver>(), false))
-                .Returns<Type, ManualGraphTypeMappingResolver, bool>((_, resolver, _) =>
+            var registeredResolvers = new List<ManualGraphTypeMappingProvider>();
+            _builderMock.Setup(b => b.Register(typeof(IGraphTypeMappingProvider), It.IsAny<ManualGraphTypeMappingProvider>(), false))
+                .Returns<Type, ManualGraphTypeMappingProvider, bool>((_, resolver, _) =>
                 {
                     registeredResolvers.Add(resolver);
                     return _builder;

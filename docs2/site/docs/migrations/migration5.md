@@ -1012,4 +1012,4 @@ resolver explicitly, or reduce the number of public methods with the same name t
 
 - `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
   Rather than a list of CLR to graph type tuples provided to the method, now a list of
-  `IGraphTypeMappingResolver` instances is provided.
+  `IGraphTypeMappingProvider` instances is provided.

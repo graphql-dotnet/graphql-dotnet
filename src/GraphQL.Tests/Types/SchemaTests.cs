@@ -247,7 +247,7 @@ namespace GraphQL.Tests.Types
         {
         }
 
-        protected override Type GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingResolver> typeMappings)
+        protected override Type GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider> typeMappings)
         {
             var ret = base.GetGraphTypeFromClrType(clrType, isInputType, typeMappings);
 
