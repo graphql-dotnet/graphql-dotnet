@@ -73,6 +73,8 @@ A list of the available extension methods is below:
 
 | Method    | Description / Notes | Library |
 |-----------|---------------------|---------|
+| `AddAutoClrMappings`    | Configures unmapped CLR types to use auto-registering graph types | |
+| `AddAutoSchema`         | Registers a schema based on CLR types | |
 | `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
 | `AddComplexityAnalyzer` | Enables the complexity analyzer and configures its options | |
 | `AddDataLoader`         | Registers classes necessary for data loader support | GraphQL.DataLoader |
@@ -83,6 +85,7 @@ A list of the available extension methods is below:
 | `AddExecutionStrategy`  | Registers an `ExecutionStrategyRegistration` for the selected execution strategy and operation type | |
 | `AddExecutionStrategySelector` | Registers the specified execution strategy selector | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
+| `AddGraphTypeMappingResolver` | Registers a graph type mapping resolver for unmapped CLR types | |
 | `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `AddMetrics`            | Registers and enables metrics depending on the supplied arguments | |
 | `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |

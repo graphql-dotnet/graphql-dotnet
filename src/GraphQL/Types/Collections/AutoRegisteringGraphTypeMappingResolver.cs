@@ -4,7 +4,7 @@ namespace GraphQL.Types;
 /// Maps unmapped complex types to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
 /// and <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>.
 /// </summary>
-public class AutoRegisteringGraphTypeMapping : IGraphTypeMapping
+public class AutoRegisteringGraphTypeMappingResolver : IGraphTypeMappingResolver
 {
     private readonly bool _mapInputTypes;
     private readonly bool _mapOutputTypes;
@@ -12,7 +12,7 @@ public class AutoRegisteringGraphTypeMapping : IGraphTypeMapping
     /// <summary>
     /// Creates an instance that maps both input and output types.
     /// </summary>
-    public AutoRegisteringGraphTypeMapping()
+    public AutoRegisteringGraphTypeMappingResolver()
         : this(true, true)
     {
     }
@@ -20,7 +20,7 @@ public class AutoRegisteringGraphTypeMapping : IGraphTypeMapping
     /// <summary>
     /// Creates an instance that maps input and/or output types, as specified.
     /// </summary>
-    public AutoRegisteringGraphTypeMapping(bool mapInputTypes, bool mapOutputTypes)
+    public AutoRegisteringGraphTypeMappingResolver(bool mapInputTypes, bool mapOutputTypes)
     {
         _mapInputTypes = mapInputTypes;
         _mapOutputTypes = mapOutputTypes;

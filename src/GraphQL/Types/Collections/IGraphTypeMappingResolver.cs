@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Provides a mapping from CLR types to graph types.
 /// </summary>
-public interface IGraphTypeMapping
+public interface IGraphTypeMappingResolver
 {
     /// <summary>
     /// Returns a graph type for a given CLR type, or <see langword="null"/> if no mapping is available.

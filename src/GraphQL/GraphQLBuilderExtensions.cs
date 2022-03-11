@@ -220,39 +220,97 @@ namespace GraphQL
         }
         #endregion
 
+        #region - AddGraphTypeMappingResolver -
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingResolver"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingResolver"/>.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingResolver"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this IGraphQLBuilder builder)
+            where TGraphTypeMappingResolver : class, IGraphTypeMappingResolver
+        {
+            builder.Services.Register<IGraphTypeMappingResolver, TGraphTypeMappingResolver>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingResolver"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingResolver"/> using the specified factory delegate.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingResolver"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this IGraphQLBuilder builder, Func<IServiceProvider, TGraphTypeMappingResolver> factory)
+            where TGraphTypeMappingResolver : class, IGraphTypeMappingResolver
+        {
+            builder.Services.Register<IGraphTypeMappingResolver>(factory, ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingResolver"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingResolver"/> using the specified instance.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingResolver"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this IGraphQLBuilder builder, TGraphTypeMappingResolver instance)
+            where TGraphTypeMappingResolver : class, IGraphTypeMappingResolver
+        {
+            builder.Services.Register<IGraphTypeMappingResolver>(instance);
+            return builder;
+        }
+        #endregion
+
         #region - AddAutoSchema / WithMutation / WithSubscription -
-        public static IGraphQLBuilderOrConfigureAutoSchema AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder)
+        /// <summary>
+        /// Registers an instance of the <see cref="Schema"/> class within the dependency injection framework as a singleton.
+        /// <see cref="ISchema"/> is also registered if it is not already registered within the dependency injection framework.
+        /// <see cref="Schema.Query"/> is set to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> with
+        /// <typeparamref name="TQueryClrType"/> as TSourceType.
+        /// <br/><br/>
+        /// Additionally, this method calls <see cref="AddAutoClrMappings(IGraphQLBuilder, bool, bool)">AddAutoClrMappings</see>
+        /// so that unmapped CLR input or output types are mapped to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>
+        /// and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> respectively.
+        /// <br/><br/>
+        /// To register a mutation or subscription CLR type within the schema, use the <paramref name="configure"/> delegate and
+        /// call <see cref="WithMutation{TMutationClrType}(IConfigureAutoSchema)">WithMutation</see> or
+        /// <see cref="WithSubscription{TSubscriptionClrType}(IConfigureAutoSchema)">WithSubscription</see>, respsectively.
+        /// <br/><br/>
+        /// This allows for a schema that is entirely configured with CLR types.
+        /// </summary>
+        public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
-            builder.AddSchema<Schema>(ServiceLifetime.Singleton);
-            builder.Services.TryRegister<IGraphTypeMapping, AutoRegisteringGraphTypeMapping>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            builder.AddSchema(provider => new Schema(provider, true), ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IGraphTypeMappingResolver, AutoRegisteringGraphTypeMappingResolver>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
             builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>());
-            return new GraphQLBuilderOrConfigureAutoSchema(builder);
-        }
-
-        public static IGraphQLBuilderOrConfigureAutoSchema WithMutation<TMutationClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
-        {
-            builder.ConfigureSchema((schema, provider) => schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
+            configure?.Invoke(new ConfigureAutoSchema(builder));
             return builder;
         }
 
-        public static IGraphQLBuilderOrConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IGraphQLBuilderOrConfigureAutoSchema builder)
+        /// <summary>
+        /// Configures <see cref="Schema.Mutation"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// with <typeparamref name="TMutationClrType"/> as TSourceType.
+        /// </summary>
+        public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
         {
-            builder.ConfigureSchema((schema, provider) => schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            builder.Builder.ConfigureSchema((schema, provider) => schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
             return builder;
         }
 
-        public interface IGraphQLBuilderOrConfigureAutoSchema : IGraphQLBuilder
+        /// <summary>
+        /// Configures <see cref="Schema.Subscription"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// with <typeparamref name="TSubscriptionClrType"/> as TSourceType.
+        /// </summary>
+        public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
-        }
-
-        private class GraphQLBuilderOrConfigureAutoSchema : IGraphQLBuilderOrConfigureAutoSchema
-        {
-            public GraphQLBuilderOrConfigureAutoSchema(IGraphQLBuilder baseBuilder)
-            {
-                Services = baseBuilder.Services;
-            }
-
-            public IServiceRegister Services { get; }
+            builder.Builder.ConfigureSchema((schema, provider) => schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            return builder;
         }
         #endregion
 
@@ -550,7 +608,7 @@ namespace GraphQL
             var typeMappings = assembly.GetClrTypeMappings();
             foreach (var typeMapping in typeMappings)
             {
-                builder.Services.Register(new ManualGraphTypeMapping(typeMapping.ClrType, typeMapping.GraphType));
+                builder.AddGraphTypeMappingResolver(new ManualGraphTypeMappingResolver(typeMapping.ClrType, typeMapping.GraphType));
             }
 
             return builder;
@@ -558,9 +616,15 @@ namespace GraphQL
         #endregion
 
         #region - AddAutoClrMappings -
+        /// <summary>
+        /// Registers an instance of <see cref="AutoRegisteringGraphTypeMappingResolver"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingResolver"/> and configures it to map input
+        /// and/or output types to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> or
+        /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> graph types.
+        /// </summary>
         public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
         {
-            builder.Services.Register<IGraphTypeMapping>(_ => new AutoRegisteringGraphTypeMapping(mapInputTypes, mapOutputTypes), ServiceLifetime.Singleton);
+            builder.AddGraphTypeMappingResolver(new AutoRegisteringGraphTypeMappingResolver(mapInputTypes, mapOutputTypes));
             return builder;
         }
         #endregion

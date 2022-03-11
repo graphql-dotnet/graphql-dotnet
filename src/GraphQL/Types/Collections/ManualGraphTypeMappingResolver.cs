@@ -1,13 +1,13 @@
 namespace GraphQL.Types.Collections;
 
-public class ManualGraphTypeMapping : IGraphTypeMapping
+internal class ManualGraphTypeMappingResolver : IGraphTypeMappingResolver
 {
     private readonly Type _clrType;
     private readonly Type _graphType;
     private readonly bool _isInputType;
     private readonly bool _isOutputType;
 
-    public ManualGraphTypeMapping(Type clrType, Type graphType)
+    public ManualGraphTypeMappingResolver(Type clrType, Type graphType)
     {
         _clrType = clrType ?? throw new ArgumentNullException(nameof(clrType));
         _graphType = graphType ?? throw new ArgumentNullException(nameof(graphType));

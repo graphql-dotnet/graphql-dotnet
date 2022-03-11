@@ -203,7 +203,7 @@ namespace GraphQL
     public static class GraphQLBuilderExtensions
     {
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
-        public static GraphQL.GraphQLBuilderExtensions.IGraphQLBuilderOrConfigureAutoSchema AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
@@ -258,6 +258,12 @@ namespace GraphQL
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TGraphTypeMappingResolver :  class, GraphQL.Types.IGraphTypeMappingResolver { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TGraphTypeMappingResolver> factory)
+            where TGraphTypeMappingResolver :  class, GraphQL.Types.IGraphTypeMappingResolver { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingResolver<TGraphTypeMappingResolver>(this GraphQL.DI.IGraphQLBuilder builder, TGraphTypeMappingResolver instance)
+            where TGraphTypeMappingResolver :  class, GraphQL.Types.IGraphTypeMappingResolver { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
@@ -316,9 +322,8 @@ namespace GraphQL
         public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TImplementation> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
             where TService :  class
             where TImplementation :  class, TService { }
-        public static GraphQL.GraphQLBuilderExtensions.IGraphQLBuilderOrConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.GraphQLBuilderExtensions.IGraphQLBuilderOrConfigureAutoSchema builder) { }
-        public static GraphQL.GraphQLBuilderExtensions.IGraphQLBuilderOrConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.GraphQLBuilderExtensions.IGraphQLBuilderOrConfigureAutoSchema builder) { }
-        public interface IGraphQLBuilderOrConfigureAutoSchema : GraphQL.DI.IGraphQLBuilder { }
+        public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+        public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
     public static class GraphQLExtensions
     {
@@ -362,6 +367,10 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public interface IConfigureAutoSchema
+    {
+        GraphQL.DI.IGraphQLBuilder Builder { get; }
     }
     public interface IDocumentExecuter
     {
@@ -1599,10 +1608,10 @@ namespace GraphQL.Types
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
     }
-    public class AutoRegisteringGraphTypeMapping : GraphQL.Types.IGraphTypeMapping
+    public class AutoRegisteringGraphTypeMappingResolver : GraphQL.Types.IGraphTypeMappingResolver
     {
-        public AutoRegisteringGraphTypeMapping() { }
-        public AutoRegisteringGraphTypeMapping(bool mapInputTypes, bool mapOutputTypes) { }
+        public AutoRegisteringGraphTypeMappingResolver() { }
+        public AutoRegisteringGraphTypeMappingResolver(bool mapInputTypes, bool mapOutputTypes) { }
         public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
@@ -1902,7 +1911,7 @@ namespace GraphQL.Types
         string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
-    public interface IGraphTypeMapping
+    public interface IGraphTypeMappingResolver
     {
         System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType);
     }
@@ -2228,7 +2237,7 @@ namespace GraphQL.Types
     {
         protected SchemaTypes() { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
-        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMapping>? graphTypeMappings) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingResolver>? graphTypeMappings) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
@@ -2240,8 +2249,8 @@ namespace GraphQL.Types
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMapping>? typeMappings) { }
-        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMapping>? graphTypeMappings) { }
+        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingResolver>? typeMappings) { }
+        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingResolver>? graphTypeMappings) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2356,14 +2365,6 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
-    }
-}
-namespace GraphQL.Types.Collections
-{
-    public class ManualGraphTypeMapping : GraphQL.Types.IGraphTypeMapping
-    {
-        public ManualGraphTypeMapping(System.Type clrType, System.Type graphType) { }
-        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType) { }
     }
 }
 namespace GraphQL.Types.Relay

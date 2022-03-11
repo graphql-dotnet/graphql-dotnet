@@ -6,6 +6,7 @@ using GraphQL.NewtonsoftJson;
 using GraphQL.SystemReactive;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
@@ -732,42 +733,45 @@ namespace GraphQL.Tests.DI
         [Fact]
         public void AddClrTypeMappings()
         {
-            var mockSchema = AddClrTypeMappings_Setup();
+            var validation = AddClrTypeMappings_Setup();
             _builder.AddClrTypeMappings();
             Verify();
-            mockSchema.Verify();
-            mockSchema.VerifyNoOtherCalls();
+            validation();
         }
 
         [Fact]
         public void AddClrTypeMappings_Assembly()
         {
-            var mockSchema = AddClrTypeMappings_Setup();
+            var validation = AddClrTypeMappings_Setup();
             _builder.AddClrTypeMappings(System.Reflection.Assembly.GetExecutingAssembly());
             Verify();
-            mockSchema.Verify();
-            mockSchema.VerifyNoOtherCalls();
+            validation();
         }
 
-        private Mock<ISchema> AddClrTypeMappings_Setup()
+        private Action AddClrTypeMappings_Setup()
         {
             //note: this does not test the functionality of AssemblyExtensions.GetClrTypeMappings
             var typeMappings = System.Reflection.Assembly.GetExecutingAssembly().GetClrTypeMappings();
             typeMappings.Count.ShouldBeGreaterThan(0); //ensure we are testing SOMETHING
-            var mockSchema = new Mock<ISchema>(MockBehavior.Strict);
-            foreach (var typeMapping in typeMappings)
-            {
-                mockSchema.Setup(s => s.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType)).Verifiable();
-            }
 
-            _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>(), false))
-                .Returns<Type, IConfigureSchema, bool>((_, action, _) =>
+            var registeredResolvers = new List<ManualGraphTypeMappingResolver>();
+            _builderMock.Setup(b => b.Register(typeof(IGraphTypeMappingResolver), It.IsAny<ManualGraphTypeMappingResolver>(), false))
+                .Returns<Type, ManualGraphTypeMappingResolver, bool>((_, resolver, _) =>
                 {
-                    action.Configure(mockSchema.Object, null);
+                    registeredResolvers.Add(resolver);
                     return _builder;
-                }).Verifiable();
+                })
+                .Verifiable();
 
-            return mockSchema;
+            return () =>
+            {
+                foreach (var mapping in typeMappings)
+                {
+                    registeredResolvers
+                        .Any(r => r.GetGraphTypeFromClrType(mapping.ClrType, mapping.GraphType.IsInputType(), null) == mapping.GraphType)
+                        .ShouldBeTrue($"The type mapping for '{mapping.ClrType.Name}' was not matched to '{mapping.GraphType.Name}'.");
+                }
+            };
         }
 
         [Fact]

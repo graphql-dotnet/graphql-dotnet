@@ -13,7 +13,7 @@ namespace GraphQL.Types
         /// <param name="resolver">A delegate which returns an instance of a graph type from its .NET type.</param>
         /// <param name="addType">A delegate which adds a graph type instance to the list of named graph types for the schema.</param>
         /// <param name="typeMappings">CLR-GraphType type mappings.</param>
-        internal TypeCollectionContext(Func<Type, IGraphType> resolver, Action<string, IGraphType, TypeCollectionContext> addType, IEnumerable<IGraphTypeMapping>? typeMappings)
+        internal TypeCollectionContext(Func<Type, IGraphType> resolver, Action<string, IGraphType, TypeCollectionContext> addType, IEnumerable<IGraphTypeMappingResolver>? typeMappings)
         {
             ResolveType = resolver;
             AddType = addType;
@@ -30,7 +30,7 @@ namespace GraphQL.Types
         /// </summary>
         internal Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
 
-        internal IEnumerable<IGraphTypeMapping>? TypeMappings { get; private set; }
+        internal IEnumerable<IGraphTypeMappingResolver>? TypeMappings { get; private set; }
 
         internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
