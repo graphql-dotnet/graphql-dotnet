@@ -118,7 +118,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-        /// <param name="graphTypeMappings">A service used to map CLR types to graph types.</param>
+        /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingResolver"/> instances used to map CLR types to graph types.</param>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingResolver>? graphTypeMappings)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
