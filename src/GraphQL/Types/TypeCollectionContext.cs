@@ -17,7 +17,7 @@ namespace GraphQL.Types
         {
             ResolveType = resolver;
             AddType = addType;
-            TypeMappings = typeMappings;
+            ClrToGraphTypeMappings = typeMappings;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace GraphQL.Types
         /// </summary>
         internal Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
 
-        internal IEnumerable<IGraphTypeMappingResolver>? TypeMappings { get; private set; }
+        internal IEnumerable<IGraphTypeMappingResolver>? ClrToGraphTypeMappings { get; private set; }
 
         internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }

@@ -507,7 +507,7 @@ namespace GraphQL.Types
                 if (field.Type == null)
                     throw new InvalidOperationException($"Both ResolvedType and Type properties on field '{parentType?.Name}.{field.Name}' are null.");
 
-                object typeOrError = RebuildType(field.Type, parentType is IInputObjectGraphType, context.TypeMappings);
+                object typeOrError = RebuildType(field.Type, parentType is IInputObjectGraphType, context.ClrToGraphTypeMappings);
                 if (typeOrError is string error)
                     throw new InvalidOperationException($"The GraphQL type for field '{parentType?.Name}.{field.Name}' could not be derived implicitly. " + error);
                 field.Type = (Type)typeOrError;
@@ -535,7 +535,7 @@ namespace GraphQL.Types
                         if (arg.Type == null)
                             throw new InvalidOperationException($"Both ResolvedType and Type properties on argument '{parentType?.Name}.{field.Name}.{arg.Name}' are null.");
 
-                        object typeOrError = RebuildType(arg.Type, true, context.TypeMappings);
+                        object typeOrError = RebuildType(arg.Type, true, context.ClrToGraphTypeMappings);
                         if (typeOrError is string error)
                             throw new InvalidOperationException($"The GraphQL type for argument '{parentType?.Name}.{field.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
@@ -562,7 +562,7 @@ namespace GraphQL.Types
                         if (arg.Type == null)
                             throw new InvalidOperationException($"Both ResolvedType and Type properties on argument '{directive.Name}.{arg.Name}' are null.");
 
-                        object typeOrError = RebuildType(arg.Type, true, context.TypeMappings);
+                        object typeOrError = RebuildType(arg.Type, true, context.ClrToGraphTypeMappings);
                         if (typeOrError is string error)
                             throw new InvalidOperationException($"The GraphQL type for argument '{directive.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
