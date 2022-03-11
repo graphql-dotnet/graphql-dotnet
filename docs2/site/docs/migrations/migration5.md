@@ -1005,3 +1005,11 @@ with the specified name, and if none is found, looks for a method with the match
 now supports methods with arguments as well as methods without arguments, an `AmbigiousMatchException`
 can occur if the name refers to a public method with multiple overloads. Either specify a field
 resolver explicitly, or reduce the number of public methods with the same name to one.
+
+### 38. `SchemaTypes` updated to support DI-injected mapping resolvers
+
+1. `Initialize` method signature changed to include DI-injected mappings.
+
+2. `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
+   Rather than a list of CLR to graph type tuples provided to the method, now a list of
+   `IGraphTypeMappingResolver` instances is provided.
