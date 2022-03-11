@@ -526,18 +526,18 @@ var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Seriali
 
 
 // sample schema
-private class Query
+public class Query
 {
     public static string Hero => "Luke Skywalker";
     public static IEnumerable<Droid> Droids => new Droid[] { new Droid("R2D2"), new Droid("C3PO") };
 }
 
-private class Mutation
+public class Mutation
 {
     public static string Hero(string name) => name;
 }
 
-private record Droid(string Name);
+public record Droid(string Name);
 ```
 
 Subscriptions are supported; interface or union graph types are not currently supported. You may
