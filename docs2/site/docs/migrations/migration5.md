@@ -1008,8 +1008,8 @@ resolver explicitly, or reduce the number of public methods with the same name t
 
 ### 38. `SchemaTypes` updated to support DI-injected mapping resolvers
 
-1. `Initialize` method signature changed to include DI-injected mappings.
+- `Initialize` method signature changed to include DI-injected mappings.
 
-2. `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
-   Rather than a list of CLR to graph type tuples provided to the method, now a list of
-   `IGraphTypeMappingResolver` instances is provided.
+- `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
+  Rather than a list of CLR to graph type tuples provided to the method, now a list of
+  `IGraphTypeMappingResolver` instances is provided.
