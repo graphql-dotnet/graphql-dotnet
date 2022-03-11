@@ -170,6 +170,7 @@ namespace GraphQL
     public static class GlobalSwitches
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
+        public static bool EnableAbstractGenericParametersForInputObjectGraphType { get; set; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }

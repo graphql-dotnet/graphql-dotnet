@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using GraphQL.Conversion;
+using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -11,24 +12,28 @@ namespace GraphQL
     {
         /// <summary>
         /// Enables or disables setting default values for 'defaultValue' from <see cref="DefaultValueAttribute"/>.
+        /// <br/>
         /// By default enabled.
         /// </summary>
         public static bool EnableReadDefaultValueFromAttributes { get; set; } = true;
 
         /// <summary>
         /// Enables or disables setting default values for 'deprecationReason' from <see cref="ObsoleteAttribute"/>.
+        /// <br/>
         /// By default enabled.
         /// </summary>
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; } = true;
 
         /// <summary>
         /// Enables or disables setting default values for 'description' from <see cref="DescriptionAttribute"/>.
+        /// <br/>
         /// By default enabled.
         /// </summary>
         public static bool EnableReadDescriptionFromAttributes { get; set; } = true;
 
         /// <summary>
         /// Enables or disables setting default values for 'description' from XML documentation.
+        /// <br/>
         /// By default disabled.
         /// </summary>
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; } = false;
@@ -51,7 +56,19 @@ namespace GraphQL
         /// <summary>
         /// Specifies whether to use the names of parent (declaring) types in case of nested graph types
         /// when calculating default graph type name.
+        /// <br/>
+        /// By default disabled.
         /// </summary>
         public static bool UseDeclaringTypeNames { get; set; } = false;
+
+        /// <summary>
+        /// Enables or disables usage of abstract types as generic parameters
+        /// for <see cref="InputObjectGraphType{TSourceType}"/>. The use of
+        /// abstract types as generic parameters will most likely lead to
+        /// runtime errors if you didn't add conversion in <see cref="ValueConverter"/>.
+        /// <br/>
+        /// By default enabled.
+        /// </summary>
+        public static bool EnableAbstractGenericParametersForInputObjectGraphType { get; set; } = true;
     }
 }

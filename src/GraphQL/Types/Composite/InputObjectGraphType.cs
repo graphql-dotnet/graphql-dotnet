@@ -39,6 +39,15 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
         /// <summary>
+        /// Creates an instance of <see cref="InputObjectGraphType{TSourceType}"/>.
+        /// </summary>
+        public InputObjectGraphType()
+        {
+            if (typeof(TSourceType).IsAbstract && !GlobalSwitches.EnableAbstractGenericParametersForInputObjectGraphType)
+                throw new InvalidOperationException($"[{nameof(GlobalSwitches.EnableAbstractGenericParametersForInputObjectGraphType)} switch is off] Abstract type '{typeof(TSourceType)}' can not be used as generic parameter.");
+        }
+
+        /// <summary>
         /// Converts a supplied dictionary of keys and values to an object.
         /// The default implementation uses <see cref="ObjectExtensions.ToObject"/> to convert the
         /// supplied field values into an object of type <typeparamref name="TSourceType"/>.
