@@ -501,15 +501,8 @@ public class SubscriptionExecutionStrategyTests
     private async Task<SubscriptionExecutionResult> ExecuteAsync(Action<ExecutionOptions> configureOptions)
     {
         var services = new ServiceCollection();
-        // todo: cleanup after PR #2999
         services.AddGraphQL(b => b
-            .AddSchema<MySchema>()
-            .ConfigureSchema((schema, provider) =>
-            {
-                schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<Query>>();
-                schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<Subscription>>();
-            })
-            .AddExecutionStrategy<SubscriptionExecutionStrategy>(GraphQLParser.AST.OperationType.Subscription));
+            .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
         var provider = services.BuildServiceProvider();
         var executer = provider.GetService<IDocumentExecuter>();
@@ -570,30 +563,6 @@ public class SubscriptionExecutionStrategyTests
             public void OnCompleted() => _target.OnCompleted();
             public void OnError(Exception error) => _target.OnError(error);
             public void OnNext(TIn value) => _target.OnNext(_transform(value));
-        }
-    }
-
-    // todo: remove after PR #2999
-    private class MySchema : Schema
-    {
-        public MySchema(IServiceProvider provider) : base(provider)
-        {
-        }
-
-        protected override SchemaTypes CreateSchemaTypes() => new MySchemaTypes(this, this);
-    }
-
-    // todo: remove after PR #2999
-    private class MySchemaTypes : SchemaTypes
-    {
-        public MySchemaTypes(ISchema schema, IServiceProvider provider) : base(schema, provider)
-        {
-        }
-
-        protected override Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, List<(Type ClrType, Type GraphType)> typeMappings)
-        {
-            var type = base.GetGraphTypeFromClrType(clrType, isInputType, typeMappings);
-            return type != null || isInputType ? type : typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(clrType);
         }
     }
     #endregion
