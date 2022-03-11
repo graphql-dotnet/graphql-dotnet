@@ -41,7 +41,7 @@ namespace GraphQL.DataLoader
             public Task<T[]> GetResultAsync(CancellationToken cancellationToken = default)
                 => Task.WhenAll(_dataLoaderResults.Select(x => x.GetResultAsync(cancellationToken)));
 
-            async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+            async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
                 => await GetResultAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -108,6 +108,7 @@ namespace GraphQL.DataLoader
             });
         }
 
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
             => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
@@ -133,5 +134,6 @@ namespace GraphQL.DataLoader
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>> resolve)
             => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(context => new ValueTask<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve(context))));
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
     }
 }

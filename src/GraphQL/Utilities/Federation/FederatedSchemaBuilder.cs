@@ -1,3 +1,5 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -156,7 +158,7 @@ namespace GraphQL.Utilities.Federation
             {
                 if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
                 {
-                    return new GraphQLTypeReference(typeName.ToString());
+                    return new GraphQLTypeReference(typeName!.ToString());
                 }
 
                 // TODO: Provide another way to give graph type name, such as an attribute

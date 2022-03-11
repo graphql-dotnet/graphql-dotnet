@@ -369,13 +369,13 @@ namespace GraphQL
     }
     public interface IGraphQLSerializer
     {
-        System.Threading.Tasks.ValueTask<T> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);
-        T ReadNode<T>(object? value);
+        System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);
+        T? ReadNode<T>(object? value);
         System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T? value, System.Threading.CancellationToken cancellationToken = default);
     }
     public interface IGraphQLTextSerializer : GraphQL.IGraphQLSerializer
     {
-        T Deserialize<T>(string? value);
+        T? Deserialize<T>(string? value);
         string Serialize<T>(T? value);
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
@@ -449,6 +449,7 @@ namespace GraphQL
         public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object?> dictionary) { }
     }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
+        where TKey :  notnull
     {
         public LightweightCache() { }
         public LightweightCache(System.Collections.Generic.IDictionary<TKey, TValue> dictionary) { }
@@ -910,7 +911,7 @@ namespace GraphQL.DataLoader
     }
     public interface IDataLoaderResult<T> : GraphQL.DataLoader.IDataLoaderResult
     {
-        System.Threading.Tasks.Task<T?> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
+        System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
     }
 }
 namespace GraphQL.Execution

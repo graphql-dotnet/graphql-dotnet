@@ -6,7 +6,7 @@ namespace GraphQL.MicrosoftDI
     /// <summary>
     /// When resolving a field, this implementation calls
     /// <see cref="IResolveFieldContext.RequestServices"/>.<see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)">CreateScope</see>
-    /// to create a dependency injection scope. Then it calls the specified <see cref="IAsyncEventStreamResolver"/>, passing the scoped service provider
+    /// to create a dependency injection scope. Then it calls the specified <see cref="IEventStreamResolver"/>, passing the scoped service provider
     /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
     /// </summary>
     internal class DynamicScopedEventStreamResolver : IEventStreamResolver

@@ -117,7 +117,7 @@ namespace GraphQL.SystemTextJson
             ConfigureOptions(errorInfoProvider);
         }
 
-        private void ConfigureOptions(IErrorInfoProvider errorInfoProvider)
+        private void ConfigureOptions(IErrorInfoProvider? errorInfoProvider)
         {
             if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
@@ -159,19 +159,21 @@ namespace GraphQL.SystemTextJson
             => new JsonSerializerOptions { WriteIndented = indent };
 
         /// <inheritdoc/>
-        public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+        public Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)
             => JsonSerializer.SerializeAsync(stream, value, SerializerOptions, cancellationToken);
 
+#pragma warning disable CS8619 // Nullability of reference types doesn't match target type
         /// <inheritdoc/>
-        public ValueTask<T> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
             => JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
+#pragma warning restore CS8619 // Nullability of reference types doesn't match target type
 
         /// <inheritdoc/>
-        public string Serialize<T>(T value)
+        public string Serialize<T>(T? value)
             => JsonSerializer.Serialize(value, SerializerOptions);
 
         /// <inheritdoc/>
-        public T Deserialize<T>(string json)
+        public T? Deserialize<T>(string? json)
             => json == null ? default : JsonSerializer.Deserialize<T>(json, SerializerOptions);
 
         /*******
@@ -190,7 +192,7 @@ namespace GraphQL.SystemTextJson
         /// <summary>
         /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
         /// </summary>
-        private T ReadNode<T>(JsonElement jsonElement)
+        private T? ReadNode<T>(JsonElement jsonElement)
 #if NET6_0_OR_GREATER
             => JsonSerializer.Deserialize<T>(jsonElement, SerializerOptions);
 #else
@@ -202,7 +204,7 @@ namespace GraphQL.SystemTextJson
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// Throws a <see cref="InvalidCastException"/> if <paramref name="value"/> is not a <see cref="JsonElement"/>.
         /// </summary>
-        public T ReadNode<T>(object value)
+        public T? ReadNode<T>(object? value)
             => value == null ? default : ReadNode<T>((JsonElement)value);
     }
 }

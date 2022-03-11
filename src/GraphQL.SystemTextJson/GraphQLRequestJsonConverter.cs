@@ -73,7 +73,7 @@ namespace GraphQL.SystemTextJson
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new JsonException();
 
-                string key = reader.GetString();
+                string key = reader.GetString()!;
 
                 //unexpected end of data
                 if (!reader.Read())
@@ -82,10 +82,10 @@ namespace GraphQL.SystemTextJson
                 switch (key)
                 {
                     case QUERY_KEY:
-                        request.Query = reader.GetString();
+                        request.Query = reader.GetString()!;
                         break;
                     case OPERATION_NAME_KEY:
-                        request.OperationName = reader.GetString();
+                        request.OperationName = reader.GetString()!;
                         break;
                     case VARIABLES_KEY:
                         request.Variables = JsonSerializer.Deserialize<Inputs>(ref reader, options);

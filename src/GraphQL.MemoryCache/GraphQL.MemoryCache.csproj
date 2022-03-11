@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>GraphQL memory cache implementation on top of Microsoft.Extensions.Caching.Memory</Description>
     <PackageTags>GraphQL;memory</PackageTags>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

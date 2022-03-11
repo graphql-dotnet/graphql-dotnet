@@ -55,7 +55,7 @@ namespace GraphQL.Instrumentation
                     new ApolloTrace.ResolverTrace
                     {
                         FieldName = fieldStat.MetaField<string>("fieldName"),
-                        Path = fieldStat.MetaField<IEnumerable<object>>("path").ToList(),
+                        Path = fieldStat.MetaField<IEnumerable<object>>("path")!.ToList(),
                         ParentType = fieldStat.MetaField<string>("typeName"),
                         ReturnType = fieldStat.MetaField<string>("returnTypeName"),
                         StartOffset = ApolloTrace.ConvertTime(fieldStat.Start),

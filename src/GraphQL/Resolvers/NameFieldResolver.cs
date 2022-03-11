@@ -86,6 +86,6 @@ namespace GraphQL.Resolvers
             return AutoRegisteringHelper.BuildFieldResolver(member, target, null, instanceLambda);
         }
 
-        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source));
+        private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
     }
 }

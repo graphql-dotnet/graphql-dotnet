@@ -17,9 +17,10 @@ namespace GraphQL.NewtonsoftJson
             return _inner.Rent(minimumLength);
         }
 
-        public void Return(char[] array)
+        public void Return(char[]? array)
         {
-            _inner.Return(array);
+            if (array != null)
+                _inner.Return(array);
         }
     }
 }

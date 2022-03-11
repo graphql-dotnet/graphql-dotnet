@@ -29,7 +29,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Initializes a new instance with the specified parameters.
-        /// If the parameter type is <see cref="IResolveFieldContext"/>, <see cref="IResolveEventStreamContext"/> or <see cref="CancellationToken"/>,
+        /// If the parameter type is <see cref="IResolveFieldContext"/> or <see cref="CancellationToken"/>,
         /// an expression is generated for the parameter and set within <see cref="Expression"/>; otherwise
         /// <see cref="Expression"/> is set to <see langword="null"/>.
         /// </summary>

@@ -8,9 +8,8 @@ namespace GraphQL.Resolvers
     /// </para><para>
     /// The <see cref="FieldType.Resolver"/> property defines the field resolver to be used for the field.
     /// </para><para>
-    /// Typically an instance of <see cref="FuncFieldResolver{TSourceType, TReturnType}">FuncFieldResolver</see> or
-    /// <see cref="AsyncFieldResolver{TSourceType, TReturnType}">AsyncFieldResolver</see> is created when code needs
-    /// to execute within the field resolver - typically by calling
+    /// Typically an instance of <see cref="FuncFieldResolver{TSourceType, TReturnType}">FuncFieldResolver</see>
+    /// is created when code needs to execute within the field resolver - typically by calling
     /// <see cref="Builders.FieldBuilder{TSourceType, TReturnType}">FieldBuilder</see>.<see cref="Builders.FieldBuilder{TSourceType, TReturnType}.Resolve(System.Func{IResolveFieldContext{TSourceType}, TReturnType})">Resolve</see>
     /// or <see cref="Builders.FieldBuilder{TSourceType, TReturnType}">FieldBuilder</see>.<see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveAsync(System.Func{IResolveFieldContext{TSourceType}, System.Threading.Tasks.Task{TReturnType}})">ResolveAsync</see>.
     /// </para><para>

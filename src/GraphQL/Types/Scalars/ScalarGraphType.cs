@@ -57,6 +57,10 @@ namespace GraphQL.Types
             _ => ThrowLiteralConversionError(value)
         };
 
+        /// <summary>
+        /// Parses a <see cref="double"/> according to the GraphQL specification,
+        /// throwing a conversion error if the value is outside the range of a <see cref="double"/>.
+        /// </summary>
         protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
             where TValueNode : GraphQLValue, IHasValueNode
         {

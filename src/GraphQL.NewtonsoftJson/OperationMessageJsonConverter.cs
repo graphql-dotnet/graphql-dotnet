@@ -23,8 +23,14 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanWrite => true;
 
         /// <inheritdoc/>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
             var request = (OperationMessage)value;
             writer.WriteStartObject();
             if (request.Type != null)
@@ -46,7 +52,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException();
@@ -61,7 +67,7 @@ namespace GraphQL.NewtonsoftJson
                 if (reader.TokenType != JsonToken.PropertyName)
                     throw new JsonException();
 
-                string key = (string)reader.Value;
+                string key = (string)reader.Value!;
 
                 switch (key)
                 {

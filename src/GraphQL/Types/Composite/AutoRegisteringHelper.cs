@@ -4,6 +4,10 @@ using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Helper methods for auto-registering graph types, <see cref="ComplexGraphType{TSourceType}.FieldDelegate{TGraphType}(string, string?, QueryArguments?, Delegate?, string?)">FieldDelegate</see>,
+    /// schema builder method builders, and <see cref="NameFieldResolver"/>.
+    /// </summary>
     public static class AutoRegisteringHelper
     {
         /// <summary>
@@ -88,7 +92,7 @@ namespace GraphQL.Types
                 .Invoke(null, new object[] { serviceProvider })!;
         }
 
-        private static readonly MethodInfo _buildSourceExpressionForSchemaBuilderInternalMethodInfo = typeof(AutoRegisteringHelper).GetMethod(nameof(BuildSourceExpressionForSchemaBuilderInternal), BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo _buildSourceExpressionForSchemaBuilderInternalMethodInfo = typeof(AutoRegisteringHelper).GetMethod(nameof(BuildSourceExpressionForSchemaBuilderInternal), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static Expression<Func<IResolveFieldContext, T>> BuildSourceExpressionForSchemaBuilderInternal<T>(IServiceProvider serviceProvider)
             => context => BuildSourceExpressionForSchemaBuilderInternal_GetSource<T>(context, serviceProvider);
         private static T BuildSourceExpressionForSchemaBuilderInternal_GetSource<T>(IResolveFieldContext context, IServiceProvider serviceProvider)

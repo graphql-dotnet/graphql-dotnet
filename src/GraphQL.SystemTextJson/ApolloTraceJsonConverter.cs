@@ -27,6 +27,6 @@ namespace GraphQL.SystemTextJson
 
         /// <inheritdoc/>
         public override ApolloTrace Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => JsonSerializer.Deserialize<ApolloTrace>(ref reader);
+            => JsonSerializer.Deserialize<ApolloTrace>(ref reader)!;
     }
 }
