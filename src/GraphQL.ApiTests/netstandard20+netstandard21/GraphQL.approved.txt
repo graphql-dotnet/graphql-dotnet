@@ -202,6 +202,8 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
+        public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
+        public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
@@ -256,6 +258,12 @@ namespace GraphQL
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
         public static GraphQL.DI.IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this GraphQL.DI.IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
             where TExecutionStrategySelector :  class, GraphQL.Execution.IExecutionStrategySelector { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TGraphTypeMappingProvider> factory)
+            where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
+        public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, TGraphTypeMappingProvider instance)
+            where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
@@ -314,6 +322,8 @@ namespace GraphQL
         public static GraphQL.DI.IServiceRegister TryRegister<TService, TImplementation>(this GraphQL.DI.IServiceRegister services, System.Func<System.IServiceProvider, TImplementation> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0)
             where TService :  class
             where TImplementation :  class, TService { }
+        public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+        public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
     public static class GraphQLExtensions
     {
@@ -357,6 +367,10 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public interface IConfigureAutoSchema
+    {
+        GraphQL.DI.IGraphQLBuilder Builder { get; }
     }
     public interface IDocumentExecuter
     {
@@ -1594,6 +1608,12 @@ namespace GraphQL.Types
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
     }
+    public class AutoRegisteringGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
+    {
+        public AutoRegisteringGraphTypeMappingProvider() { }
+        public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes) { }
+        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
+    }
     public static class AutoRegisteringHelper
     {
         public static GraphQL.Resolvers.IEventStreamResolver BuildEventStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
@@ -1884,6 +1904,10 @@ namespace GraphQL.Types
         string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IGraphTypeMappingProvider
+    {
+        System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType);
+    }
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
         object? DefaultValue { get; }
@@ -2206,20 +2230,20 @@ namespace GraphQL.Types
     {
         protected SchemaTypes() { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
         protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
-        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "ClrType",
-                "GraphType"})] System.Collections.Generic.List<System.ValueTuple<System.Type, System.Type>> typeMappings) { }
-        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
+        protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
+        protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {

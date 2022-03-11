@@ -500,6 +500,50 @@ When adding a field by name only, such as `Field<StringGraphType>("Name");`, and
 rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
 as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
 
+### 16. Schemas can be entirely constructed from CLR types
+
+A new builder method `AddAutoSchema` has been added to allow building a schema entirely from CLR types
+using the new features within the auto-registering graph types to build the schema. Below is a sample:
+
+```csharp
+// sample configuration of DI
+var services = new ServiceCollection();
+services.AddGraphQL(b => b
+    .AddAutoSchema<Query>(s => s.WithMutation<Mutation>())
+    .AddSystemTextJson());
+var provider = services.BuildServiceProvider();
+
+
+// sample execution from DI
+var result = await provider.GetRequiredService<IDocumentExecuter>().ExecuteAsync(o =>
+{
+    o.RequestServices = provider;
+    o.Schema = provider.GetRequiredService<ISchema>();
+    o.Query = "{hero}";
+});
+var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
+// resultString returns the following JSON: {"data":{"hero":"Luke Skywalker"}}
+
+
+// sample schema
+public class Query
+{
+    public static string Hero => "Luke Skywalker";
+    public static IEnumerable<Droid> Droids => new Droid[] { new Droid("R2D2"), new Droid("C3PO") };
+}
+
+public class Mutation
+{
+    public static string Hero(string name) => name;
+}
+
+public record Droid(string Name);
+```
+
+Subscriptions are supported; interface or union graph types are not currently supported. You may
+mix the documented "graphtype-first" approach with the CLR types to implement anything not supported
+by the auto-registering graph types.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -961,3 +1005,11 @@ with the specified name, and if none is found, looks for a method with the match
 now supports methods with arguments as well as methods without arguments, an `AmbigiousMatchException`
 can occur if the name refers to a public method with multiple overloads. Either specify a field
 resolver explicitly, or reduce the number of public methods with the same name to one.
+
+### 38. `SchemaTypes` updated to support DI-injected mapping providers
+
+- `Initialize` method signature changed to include DI-injected mappings.
+
+- `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
+  Rather than a list of CLR to graph type tuples provided to the method, now a list of
+  `IGraphTypeMappingProvider` instances is provided.
