@@ -500,7 +500,7 @@ When adding a field by name only, such as `Field<StringGraphType>("Name");`, and
 rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
 as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
 
-### 16. Schemas can be entire constructed from CLR types
+### 16. Schemas can be entirely constructed from CLR types
 
 A new builder method `AddAutoSchema` has been added to allow building a schema entirely from CLR types
 using the new features within the auto-registering graph types to build the schema. Below is a sample:
@@ -541,7 +541,7 @@ private record Droid(string Name);
 ```
 
 Subscriptions are supported; interface or union graph types are not currently supported. You may
-mix the documented graphtype-first approach with the CLR types to implement anything not supported
+mix the documented "graphtype-first" approach with the CLR types to implement anything not supported
 by the auto-registering graph types.
 
 ## Breaking Changes
