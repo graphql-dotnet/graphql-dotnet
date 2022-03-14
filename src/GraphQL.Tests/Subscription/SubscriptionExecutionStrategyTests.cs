@@ -392,17 +392,19 @@ public class SubscriptionExecutionStrategyTests
     [Fact]
     public async Task MultipleSubscriptionsShouldThrow()
     {
-        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }");
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false);
         result.ShouldNotBeSuccessful();
         result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}]}");
     }
 
     [Fact]
-    public async Task MultipleSubscriptionsShouldThrow_NoValidation()
+    public async Task MultipleSubscriptions_NoValidation()
     {
-        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { });
-        result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}],""data"":null}");
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { }, false);
+        result.ShouldBeOfType<SubscriptionExecutionResult>().Streams.ShouldNotBeNull().Count.ShouldBe(2);
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldBeNull();
+        result.Executed.ShouldBeTrue();
     }
 
     #region - Schema -
@@ -517,14 +519,16 @@ public class SubscriptionExecutionStrategyTests
         public void OnNext(ExecutionResult value) => Events.Enqueue(value);
     }
 
-    private Task<ExecutionResult> ExecuteAsync(string query, Action<ExecutionOptions>? configureOptions = null)
-        => ExecuteAsync(o =>
-        {
-            o.Query = query;
-            configureOptions?.Invoke(o);
-        });
+    private Task<ExecutionResult> ExecuteAsync(string query, Action<ExecutionOptions>? configureOptions = null, bool validateResponse = true)
+        => ExecuteAsync(
+            o =>
+            {
+                o.Query = query;
+                configureOptions?.Invoke(o);
+            },
+            validateResponse);
 
-    private async Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configureOptions)
+    private async Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configureOptions, bool validateResponse = true)
     {
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
@@ -546,8 +550,9 @@ public class SubscriptionExecutionStrategyTests
         };
         configureOptions(options);
         var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
-        if (result is SubscriptionExecutionResult subscriptionResult)
+        if (validateResponse)
         {
+            var subscriptionResult = result.ShouldBeOfType<SubscriptionExecutionResult>();
             if (subscriptionResult.Streams?.Count == 1)
             {
                 Observer = new SampleObserver();

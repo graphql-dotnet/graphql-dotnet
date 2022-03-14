@@ -42,13 +42,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            if (rootNode.SubFields?.Length != 1)
-            {
-                // should not occur if validation has occurred
-                throw new Validation.Errors.SingleRootFieldSubscriptionsError(context);
-            }
-            var node = rootNode.SubFields[0];
-            var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields!).ConfigureAwait(false);
 
             // if execution is successful, errors and extensions are not returned per the graphql-ws protocol
             // if execution is unsuccessful, the DocumentExecuter will add context errors to the result
@@ -56,8 +50,23 @@ namespace GraphQL.Execution
             return new SubscriptionExecutionResult(context)
             {
                 Executed = true,
-                Streams = stream != null ? new Dictionary<string, IObservable<ExecutionResult>>() { { node.Name!, stream } } : null,
+                Streams = streams,
             };
+        }
+
+        private async Task<IDictionary<string, IObservable<ExecutionResult>>?> ExecuteSubscriptionNodesAsync(ExecutionContext context, ExecutionNode[] nodes)
+        {
+            var streams = new Dictionary<string, IObservable<ExecutionResult>>();
+
+            foreach (var node in nodes)
+            {
+                var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+                if (stream == null)
+                    return null;
+                streams[node.Name!] = stream;
+            }
+
+            return streams;
         }
 
         /// <summary>
@@ -76,8 +85,7 @@ namespace GraphQL.Execution
             {
                 if (node.FieldDefinition?.Subscriber == null)
                 {
-                    // will be caught by error handling within DocumentExecuter
-                    // should be caught by schema validation
+                    // this is normally caught by schema validation
                     throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
@@ -85,7 +93,6 @@ namespace GraphQL.Execution
 
                 if (subscription == null)
                 {
-                    // will be caught by error handling within DocumentExecuter
                     throw new InvalidOperationException($"No event stream returned for field '{node.Field.Name}'.");
                 }
             }

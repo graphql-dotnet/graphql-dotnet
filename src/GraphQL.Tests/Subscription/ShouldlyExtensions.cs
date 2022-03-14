@@ -57,6 +57,7 @@ public static class ShouldlyExtensions
             result.Data.ShouldNotBeNull();
         }
         result.Errors.ShouldBeNull();
+        result.Executed.ShouldBeTrue();
         return result;
     }
 }
