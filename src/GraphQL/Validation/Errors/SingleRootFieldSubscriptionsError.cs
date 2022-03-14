@@ -1,4 +1,5 @@
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,6 +14,14 @@ namespace GraphQL.Validation.Errors
         /// </summary>
         public SingleRootFieldSubscriptionsError(ValidationContext context, GraphQLOperationDefinition operation, params ASTNode[] nodes)
             : base(context.Document.Source, NUMBER, InvalidNumberOfRootFieldMessage(operation.Name), nodes)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
+        public SingleRootFieldSubscriptionsError(ExecutionContext context)
+            : base(context.Document.Source, NUMBER, InvalidNumberOfRootFieldMessage(context.Operation.Name), context.Operation.SelectionSet.Selections.Skip(1).ToArray())
         {
         }
 

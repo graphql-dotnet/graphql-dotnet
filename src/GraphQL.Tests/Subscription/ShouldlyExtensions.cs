@@ -18,15 +18,6 @@ public static class ShouldlyExtensions
         actualJson.ShouldBe(expectedJson, customMessage);
     }
 
-    public static void ShouldBeSuccessful(this SubscriptionExecutionResult actual)
-    {
-        actual.ShouldNotBeNull();
-        actual.Data.ShouldBeNull();
-        actual.Errors.ShouldBeNull();
-        actual.Streams.ShouldNotBeNull();
-        actual.Streams.Count.ShouldBe(1);
-    }
-
     public static ExecutionResult ShouldHaveResult(this SubscriptionExecutionStrategyTests.SampleObserver? observer)
     {
         observer.ShouldNotBeNull();
@@ -42,9 +33,29 @@ public static class ShouldlyExtensions
         observer.Events.TryDequeue(out var result).ShouldBeFalse("Observable sequence should not have additional results but did");
     }
 
+    public static ExecutionResult ShouldNotBeSuccessful(this ExecutionResult result)
+    {
+        if (result is SubscriptionExecutionResult subscriptionExecutionResult)
+        {
+            subscriptionExecutionResult.Streams.ShouldBeNull();
+        }
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldNotBeNull();
+        result.Errors.Count.ShouldBeGreaterThan(0);
+        return result;
+    }
+
     public static ExecutionResult ShouldBeSuccessful(this ExecutionResult result)
     {
-        result.Data.ShouldNotBeNull();
+        if (result is SubscriptionExecutionResult subscriptionExecutionResult)
+        {
+            subscriptionExecutionResult.Streams.ShouldNotBeNull().Count.ShouldBe(1);
+            subscriptionExecutionResult.Data.ShouldBeNull();
+        }
+        else
+        {
+            result.Data.ShouldNotBeNull();
+        }
         result.Errors.ShouldBeNull();
         return result;
     }

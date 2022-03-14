@@ -42,32 +42,22 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields!).ConfigureAwait(false);
+            if (rootNode.SubFields?.Length != 1)
+            {
+                // should not occur if validation has occurred
+                throw new Validation.Errors.SingleRootFieldSubscriptionsError(context);
+            }
+            var node = rootNode.SubFields[0];
+            var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
 
-            ExecutionResult result = new SubscriptionExecutionResult(context)
+            // if execution is successful, errors and extensions are not returned per the graphql-ws protocol
+            // if execution is unsuccessful, the DocumentExecuter will add context errors to the result
+
+            return new SubscriptionExecutionResult(context)
             {
                 Executed = true,
-                Streams = streams,
+                Streams = stream != null ? new Dictionary<string, IObservable<ExecutionResult>>() { { node.Name!, stream } } : null,
             };
-
-            // note: do not add the errors from the context to the result here; it is done within the document executer
-
-            return result;
-        }
-
-        private async Task<IDictionary<string, IObservable<ExecutionResult>>> ExecuteSubscriptionNodesAsync(ExecutionContext context, ExecutionNode[] nodes)
-        {
-            var streams = new Dictionary<string, IObservable<ExecutionResult>>();
-
-            foreach (var node in nodes)
-            {
-                var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
-
-                if (stream != null)
-                    streams[node.Name!] = stream;
-            }
-
-            return streams;
         }
 
         /// <summary>
@@ -78,49 +68,26 @@ namespace GraphQL.Execution
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
+            var resolveContext = new ReadonlyResolveFieldContext(node, context);
+
+            IObservable<object?> subscription;
+
             try
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
-
-                IObservable<object?> subscription;
-
-                if (node.FieldDefinition?.Subscriber != null)
+                if (node.FieldDefinition?.Subscriber == null)
                 {
-                    subscription = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
-                }
-                else
-                {
+                    // will be caught by error handling within DocumentExecuter
+                    // should be caught by schema validation
                     throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
-                return subscription
-                    .SelectCatchAsync(
-                        async (value, token) =>
-                        {
-                            // duplicate context to prevent multiple event streams from sharing the same context,
-                            // clear errors/metrics/extensions, and free array pool leased arrays
-                            using var childContext = new ExecutionContext(context)
-                            {
-                                Errors = new ExecutionErrors(),
-                                OutputExtensions = new Dictionary<string, object?>(),
-                                Metrics = Instrumentation.Metrics.None,
-                                CancellationToken = token,
-                            };
+                subscription = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
 
-                            return await ProcessDataAsync(childContext, node, value).ConfigureAwait(false);
-                        },
-                        async (exception, token) =>
-                        {
-                            using var childContext = new ExecutionContext(context)
-                            {
-                                Errors = new ExecutionErrors(),
-                                OutputExtensions = new Dictionary<string, object?>(),
-                                Metrics = Instrumentation.Metrics.None,
-                                CancellationToken = token,
-                            };
-
-                            return await ProcessErrorAsync(context, node, exception);
-                        });
+                if (subscription == null)
+                {
+                    // will be caught by error handling within DocumentExecuter
+                    throw new InvalidOperationException($"No event stream returned for field '{node.Field.Name}'.");
+                }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
             {
@@ -135,11 +102,40 @@ namespace GraphQL.Execution
             }
             catch (Exception exception)
             {
-                var error = await HandleExceptionInternalAsync(context, node, exception,
-                    $"Could not subscribe to field '{node.Field.Name}'.").ConfigureAwait(false);
-                context.Errors.Add(error);
+                context.Errors.Add(await HandleExceptionInternalAsync(context, node, exception,
+                    $"Could not subscribe to field '{node.Field.Name}'.").ConfigureAwait(false));
                 return null;
             }
+
+            // cannot throw an exception here
+            return subscription
+                .SelectCatchAsync(
+                    async (value, token) =>
+                    {
+                        // duplicate context to prevent multiple event streams from sharing the same context,
+                        // clear errors/metrics/extensions, and free array pool leased arrays
+                        using var childContext = new ExecutionContext(context)
+                        {
+                            Errors = new ExecutionErrors(),
+                            OutputExtensions = new Dictionary<string, object?>(),
+                            Metrics = Instrumentation.Metrics.None,
+                            CancellationToken = token,
+                        };
+
+                        return await ProcessDataAsync(childContext, node, value).ConfigureAwait(false);
+                    },
+                    async (exception, token) =>
+                    {
+                        using var childContext = new ExecutionContext(context)
+                        {
+                            Errors = new ExecutionErrors(),
+                            OutputExtensions = new Dictionary<string, object?>(),
+                            Metrics = Instrumentation.Metrics.None,
+                            CancellationToken = token,
+                        };
+
+                        return await ProcessErrorAsync(context, node, exception);
+                    });
         }
 
         /// <summary>

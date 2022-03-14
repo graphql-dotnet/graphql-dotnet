@@ -60,27 +60,27 @@ public class SubscriptionExecutionStrategyTests
     public async Task InitialError()
     {
         var result = await ExecuteAsync("subscription { testWithInitialError(custom: false) }");
+        result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Could not subscribe to field \u0027testWithInitialError\u0027."",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""APPLICATION"",""codes"":[""APPLICATION""]} }],""data"":null}");
-        result.Streams.ShouldBeEmpty();
     }
 
     [Fact]
     public async Task InitialCustomError()
     {
         var result = await ExecuteAsync("subscription { testWithInitialError(custom: true) }");
+        result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Handled custom exception: InitialException"",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]} }],""data"":null}");
-        result.Streams.ShouldBeEmpty();
     }
 
     [Fact]
     public async Task InitialExecutionError()
     {
         var result = await ExecuteAsync("subscription { testWithExecutionError }");
+        result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""testWithExecutionError""]}],""data"":null}");
-        result.Streams.ShouldBeEmpty();
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class SubscriptionExecutionStrategyTests
     public async Task NotSubscriptionField()
     {
         var result = await ExecuteAsync("subscription { notSubscriptionField }");
-        result.Streams?.ShouldBeEmpty();
+        result.ShouldNotBeSuccessful();
         result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Subscriber not set for field \u0027notSubscriptionField\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""notSubscriptionField""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
     }
 
@@ -491,14 +491,14 @@ public class SubscriptionExecutionStrategyTests
         public void OnNext(ExecutionResult value) => Events.Enqueue(value);
     }
 
-    private Task<SubscriptionExecutionResult> ExecuteAsync(string query, Action<ExecutionOptions>? configureOptions = null)
+    private Task<ExecutionResult> ExecuteAsync(string query, Action<ExecutionOptions>? configureOptions = null)
         => ExecuteAsync(o =>
         {
             o.Query = query;
             configureOptions?.Invoke(o);
         });
 
-    private async Task<SubscriptionExecutionResult> ExecuteAsync(Action<ExecutionOptions> configureOptions)
+    private async Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configureOptions)
     {
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
@@ -520,17 +520,19 @@ public class SubscriptionExecutionStrategyTests
         };
         configureOptions(options);
         var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
-        var subscriptionResult = result.ShouldBeOfType<SubscriptionExecutionResult>();
-        if (subscriptionResult.Streams?.Count == 1)
+        if (result is SubscriptionExecutionResult subscriptionResult)
         {
-            Observer = new SampleObserver();
-            Disposer = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
+            if (subscriptionResult.Streams?.Count == 1)
+            {
+                Observer = new SampleObserver();
+                Disposer = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
+            }
+            else if (subscriptionResult.Streams?.Count > 1)
+            {
+                throw new Exception("More than one stream was returned");
+            }
         }
-        else if (subscriptionResult.Streams?.Count > 1)
-        {
-            throw new Exception("More than one stream was returned");
-        }
-        return subscriptionResult;
+        return result;
     }
 
     private class ObservableSelect<TIn, TOut> : IObservable<TOut>
