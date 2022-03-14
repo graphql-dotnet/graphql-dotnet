@@ -381,6 +381,30 @@ public class SubscriptionExecutionStrategyTests
         }));
     }
 
+    [Fact]
+    public async Task SubscriptionMethodNullShouldThrow()
+    {
+        var result = await ExecuteAsync("subscription { testObservableNull }");
+        result.ShouldNotBeSuccessful();
+        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testObservableNull""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
+    }
+
+    [Fact]
+    public async Task MultipleSubscriptionsShouldThrow()
+    {
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }");
+        result.ShouldNotBeSuccessful();
+        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}]}");
+    }
+
+    [Fact]
+    public async Task MultipleSubscriptionsShouldThrow_NoValidation()
+    {
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { });
+        result.ShouldNotBeSuccessful();
+        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}],""data"":null}");
+    }
+
     #region - Schema -
     private class Query
     {
@@ -417,6 +441,8 @@ public class SubscriptionExecutionStrategyTests
 
         public static IObservable<MyWidget?> TestNullHandlingNullable([FromServices] IObservable<string> source)
             => new ObservableSelect<string, MyWidget?>(source, value => value == null ? null : new MyWidget { Name = value });
+
+        public static IObservable<string> TestObservableNull() => null!;
 
         public static string NotSubscriptionField() => "testing";
     }
