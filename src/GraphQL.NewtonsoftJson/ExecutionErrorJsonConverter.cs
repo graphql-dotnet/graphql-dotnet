@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
-    /// Converts an instance of <see cref="ExecutionResult"/> to JSON. Doesn't support read from JSON.
+    /// Converts an instance of <see cref="ExecutionError"/> to JSON. Doesn't support read from JSON.
     /// </summary>
     public class ExecutionErrorJsonConverter : JsonConverter
     {

@@ -2,7 +2,7 @@ namespace GraphQL.Tests.Serialization
 {
     /// <summary>
     /// Tests for <see cref="IGraphQLTextSerializer"/> implementations and the custom converters
-    /// that are used in the process of serializing an <see cref="ExecutionResult"/> to JSON.
+    /// that are used in the process of serializing an <see cref="ExecutionError"/> to JSON.
     /// </summary>
     public class ExecutionErrorTests
     {
