@@ -10,9 +10,9 @@ public class GraphQLSerializerTests
     {
         var options = new JsonSerializerOptions();
         var serializer = new GraphQLSerializer(options);
-        options.Converters.Count.ShouldBe(7);
+        options.Converters.Count.ShouldBe(8);
         _ = serializer.Serialize<object>(new { name = "Tom", age = 42 });
         new GraphQLSerializer(options);
-        options.Converters.Count.ShouldBe(7);
+        options.Converters.Count.ShouldBe(8);
     }
 }

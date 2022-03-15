@@ -116,6 +116,25 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Writes_Correct_Execution_Result_With_Null_Data_Errors_And_Extensions_When_Executed(IGraphQLTextSerializer serializer)
+        {
+            var executionResult = new ExecutionResult
+            {
+                Data = null,
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
+                Executed = true
+            };
+
+            var expected = @"{ ""data"": null }";
+
+            var actual = serializer.Serialize(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
         public void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions_When_Not_Executed(IGraphQLTextSerializer writer)
         {
             var executionResult = new ExecutionResult
@@ -129,29 +148,6 @@ namespace GraphQL.Tests.Serialization
             var expected = @"{ }";
 
             var actual = writer.Serialize(executionResult);
-
-            actual.ShouldBeCrossPlatJson(expected);
-        }
-
-        [Theory]
-        [ClassData(typeof(GraphQLSerializersTestData))]
-        public void Writes_Path_Property_Correctly(IGraphQLTextSerializer serializer)
-        {
-            var executionResult = new ExecutionResult
-            {
-                Data = null,
-                Errors = new ExecutionErrors(),
-                Extensions = null,
-            };
-            var executionError = new ExecutionError("Error testing index")
-            {
-                Path = new object[] { "parent", 23, "child" }
-            };
-            executionResult.Errors.Add(executionError);
-
-            var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
-
-            var actual = serializer.Serialize(executionResult);
 
             actual.ShouldBeCrossPlatJson(expected);
         }

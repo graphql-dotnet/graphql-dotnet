@@ -13,7 +13,8 @@ namespace GraphQL.Tests.Bugs
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-            options.Converters.Add(new ExecutionResultJsonConverter(new TestErrorInfoProvider()));
+            options.Converters.Add(new ExecutionResultJsonConverter());
+            options.Converters.Add(new ExecutionErrorJsonConverter(new TestErrorInfoProvider()));
 
             var executionResult = new ExecutionResult();
             executionResult.AddError(new ExecutionError("An error occurred."));
