@@ -9,16 +9,6 @@ namespace GraphQL.SystemTextJson
     /// </summary>
     public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
     {
-        private readonly IErrorInfoProvider _errorInfoProvider;
-
-        /// <summary>
-        /// Creates an instance of <see cref="ExecutionResultJsonConverter"/> with the specified <see cref="IErrorInfoProvider"/>.
-        /// </summary>
-        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
-        {
-            _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
-        }
-
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, ExecutionResult value, JsonSerializerOptions options)
         {
@@ -26,7 +16,7 @@ namespace GraphQL.SystemTextJson
 
             // Important: Be careful with passing the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
-            WriteErrors(writer, value.Errors, _errorInfoProvider, options);
+            WriteErrors(writer, value.Errors, options);
             WriteData(writer, value, options);
             WriteExtensions(writer, value, options);
 
@@ -102,7 +92,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
+        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object? propertyValue, JsonSerializerOptions options)
         {
             if (options.PropertyNamingPolicy != null)
                 propertyName = options.PropertyNamingPolicy.ConvertName(propertyName);
@@ -110,7 +100,7 @@ namespace GraphQL.SystemTextJson
             WriteValue(writer, propertyValue, options);
         }
 
-        private static void WriteValue(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        private static void WriteValue(Utf8JsonWriter writer, object? value, JsonSerializerOptions options)
         {
             switch (value)
             {
@@ -227,7 +217,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, IErrorInfoProvider errorInfoProvider, JsonSerializerOptions options)
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors? errors, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -236,50 +226,7 @@ namespace GraphQL.SystemTextJson
 
             writer.WritePropertyName("errors");
 
-            writer.WriteStartArray();
-
-            foreach (var error in errors)
-            {
-                var info = errorInfoProvider.GetInfo(error);
-
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("message");
-
-                JsonSerializer.Serialize(writer, info.Message, options);
-
-                if (error.Locations != null)
-                {
-                    writer.WritePropertyName("locations");
-                    writer.WriteStartArray();
-                    foreach (var location in error.Locations)
-                    {
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("line");
-                        JsonSerializer.Serialize(writer, location.Line, options);
-                        writer.WritePropertyName("column");
-                        JsonSerializer.Serialize(writer, location.Column, options);
-                        writer.WriteEndObject();
-                    }
-                    writer.WriteEndArray();
-                }
-
-                if (error.Path != null && error.Path.Any())
-                {
-                    writer.WritePropertyName("path");
-                    JsonSerializer.Serialize(writer, error.Path, options);
-                }
-
-                if (info.Extensions?.Count > 0)
-                {
-                    writer.WritePropertyName("extensions");
-                    JsonSerializer.Serialize(writer, info.Extensions, options);
-                }
-
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndArray();
+            JsonSerializer.Serialize(writer, errors, options);
         }
 
         private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
