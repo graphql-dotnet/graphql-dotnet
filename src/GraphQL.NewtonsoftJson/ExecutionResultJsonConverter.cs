@@ -119,14 +119,7 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WritePropertyName("errors");
 
-            writer.WriteStartArray();
-
-            foreach (var error in errors)
-            {
-                serializer.Serialize(writer, error);
-            }
-
-            writer.WriteEndArray();
+            serializer.Serialize(writer, errors);
         }
 
         private void WriteExtensions(JsonWriter writer, ExecutionResult result, JsonSerializer serializer)
