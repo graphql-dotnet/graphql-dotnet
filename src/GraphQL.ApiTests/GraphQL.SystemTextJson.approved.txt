@@ -6,9 +6,16 @@ namespace GraphQL.SystemTextJson
         public override GraphQL.Instrumentation.ApolloTrace Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Instrumentation.ApolloTrace value, System.Text.Json.JsonSerializerOptions options) { }
     }
+    public class ExecutionErrorJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionError>
+    {
+        public ExecutionErrorJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public override bool CanConvert(System.Type typeToConvert) { }
+        public override GraphQL.ExecutionError Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionError error, System.Text.Json.JsonSerializerOptions options) { }
+    }
     public class ExecutionResultJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionResult>
     {
-        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public ExecutionResultJsonConverter() { }
         public override bool CanConvert(System.Type typeToConvert) { }
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }

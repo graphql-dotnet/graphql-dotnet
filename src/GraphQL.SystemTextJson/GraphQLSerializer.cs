@@ -121,7 +121,12 @@ namespace GraphQL.SystemTextJson
         {
             if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
-                SerializerOptions.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
+                SerializerOptions.Converters.Add(new ExecutionResultJsonConverter());
+            }
+
+            if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ExecutionError))))
+            {
+                SerializerOptions.Converters.Add(new ExecutionErrorJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
             }
 
             if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))

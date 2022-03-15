@@ -544,7 +544,14 @@ Subscriptions are supported; interface or union graph types are not currently su
 mix the documented "graphtype-first" approach with the CLR types to implement anything not supported
 by the auto-registering graph types.
 
-### 17. Subscription support improved
+### 17. `IGraphQLSerializer` implementations support serialization of `ExecutionError` instances.
+
+Previously, only when serializing an `ExecutionResult` instance would `ExecutionError` instances
+be properly serialized. Now you may serialize a `ExecutionError` instance directly and it will
+be handled by the specified `IErrorInfoProvider` and serialized correctly. This can be useful
+when implementing the newer `graphql-transport-ws` WebSockets protocol.
+
+### 18. Subscription support improved
 
 Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
 the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter`, and the default
@@ -1044,13 +1051,21 @@ resolver explicitly, or reduce the number of public methods with the same name t
   Rather than a list of CLR to graph type tuples provided to the method, now a list of
   `IGraphTypeMappingProvider` instances is provided.
 
-### 39. Subscription document executer removed
+### 39. `ExecutionResultJsonConverter` does not handle `ExecutionError`.
+
+If you directly create an instance of `ExecutionResultJsonConverter` and adding it to a set of
+serializer options, you will now need to also add `ExecutionErrorJsonConverter` also. The
+`IErrorInfoProvider` instance previously passed to the `ExecutionResultJsonConverter` will
+need to be passed to the `ExecutionErrorJsonConverter` instead. Typically no changes are
+necessary to user code for this API change.
+
+### 40. Subscription document executer removed
 
 Subscription support is provided by the `DocumentExecuter` implementation without the need to
 use `SubscriptionDocumentExecuter` or override `DocumentExecuter.SelectExecutionStrategy`. You may
 also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` method.
 
-### 40. Subscription nuget package removed
+### 41. Subscription nuget package removed
 
 Subscription support has been moved into the main project. If you have a need to reference
 `SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
