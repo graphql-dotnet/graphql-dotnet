@@ -19,8 +19,10 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Clones an existing instance, excluding <see cref="Errors"/>, <see cref="Metrics"/>, <see cref="OutputExtensions"/>,
-        /// array pool reservations and internal reusable references.
+        /// Clones reusable state information from an existing instance; not any properties that
+        /// hold result information. Specificially, <see cref="Errors"/>, <see cref="Metrics"/>,
+        /// <see cref="OutputExtensions"/>, array pool reservations and internal reusable references
+        /// are not cloned.
         /// </summary>
         public ExecutionContext(ExecutionContext context)
         {

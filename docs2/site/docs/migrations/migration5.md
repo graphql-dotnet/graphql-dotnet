@@ -402,7 +402,7 @@ public class MyExecutionStrategySelector : IExecutionStrategySelector
         {
             OperationType.Query => ParallelExecutionStrategy.Instance,
             OperationType.Mutation => SerialExecutionStrategy.Instance,
-            OperationType.Subscription => throw new NotSupportedException(),
+            OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
             _ => throw new InvalidOperationException()
         };
     }
@@ -860,36 +860,15 @@ Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`.
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
 but sets the default date parsing behavior set to 'none'.
 
-### 29. `SubscriptionDocumentExecuter` and `.AddSubscriptionDocumentExecuter()` have been deprecated.
-
-While these can continue to be used for the lifetime of v5, it is now suggested to use the
-`.AddSubscriptionExecutionStrategy()` builder method instead:
-
-```csharp
-// v4
-services.AddGraphQL()
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionDocumentExecuter();
-
-// v5
-services.AddGraphQL(builder => builder
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionExecutionStrategy());
-```
-
-For more details on the new approach to execution strategy selection, please review the new feature above titled:
-
-> The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
-
-### 30. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+### 29. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
 See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
 
-### 31. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+### 30. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
 See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
 
-### 32. Code removed to support prior implementation of FieldDelegate and schema builder
+### 31. Code removed to support prior implementation of FieldDelegate and schema builder
 
 The following classes and methods have been removed:
 
@@ -907,7 +886,7 @@ You may use the following classes and methods as replacements:
 - The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
 - The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
 
-### 33. ValueTask execution pipeline support changes
+### 32. ValueTask execution pipeline support changes
 
 The following interfaces have been modified to support a `ValueTask` pipeline:
 
@@ -984,7 +963,7 @@ FieldDelegate<DroidType>(
 );
 ```
 
-### 34. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
+### 33. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
 
 Please use the `IResolveFieldContext` interface and the `ResolveFieldContext` class instead. No other changes are required.
 

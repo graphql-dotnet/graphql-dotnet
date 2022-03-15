@@ -101,7 +101,12 @@ For more information see [DataLoader](https://graphql-dotnet.github.io/docs/guid
 
 > *Note: Prior to version 4, the contents of this package was part of the main GraphQL.NET package.*
 
-#### 5. Advanced Dependency Injection
+#### 5. Subscriptions
+
+`DocumentExecuter` can handle subscriptions as well as queries and mutations.
+For more information see [Subscriptions](https://graphql-dotnet.github.io/docs/getting-started/subscriptions).
+
+#### 6. Advanced Dependency Injection
 
 Also we provide some extra classes for advanced dependency injection usage on top of
 `Microsoft.Extensions.DependencyInjection.Abstractions` package.
