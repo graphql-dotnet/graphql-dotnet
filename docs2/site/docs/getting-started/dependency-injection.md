@@ -93,7 +93,6 @@ A list of the available extension methods is below:
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
-| `AddSubscriptionExecutionStrategy` | Registers an `ExecutionStrategyRegistration` for subscription support | GraphQL.SystemReactive | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
