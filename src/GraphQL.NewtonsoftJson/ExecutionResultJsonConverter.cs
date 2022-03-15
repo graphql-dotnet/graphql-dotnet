@@ -15,7 +15,6 @@ namespace GraphQL.NewtonsoftJson
         /// Initializes a new instance.
         /// </summary>
         public ExecutionResultJsonConverter()
-            : this(null)
         {
         }
 
