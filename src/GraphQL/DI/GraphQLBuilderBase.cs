@@ -43,6 +43,7 @@ namespace GraphQL.DI
 
             // configure service implementations to use the configured default services when not overridden by a user
             Services.TryRegister<IDocumentExecuter, DocumentExecuter>(ServiceLifetime.Singleton);
+            Services.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
             Services.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);

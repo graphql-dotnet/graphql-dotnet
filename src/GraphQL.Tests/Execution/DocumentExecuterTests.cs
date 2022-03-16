@@ -1,9 +1,12 @@
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
+using GraphQL.MicrosoftDI;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Execution
 {
@@ -48,6 +51,77 @@ namespace GraphQL.Tests.Execution
             });
             ret.Errors.ShouldBeNull();
             mutationStrategy.Executed.ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TypedInterfaceMapping()
+        {
+            var services = new ServiceCollection();
+            services.AddGraphQL(b => b
+                .AddSchema<Schema1>()
+                .AddSchema<Schema2>()
+                .AddSystemTextJson());
+            services.AddSingleton(typeof(MyExecuter<>));
+            var provider = services.BuildServiceProvider();
+
+            // verify executing with Schema1 works with custom class
+            var executer1 = provider.GetRequiredService<MyExecuter<Schema1>>();
+            var result1 = await executer1.ExecuteAsync("{hero}");
+            result1.ShouldBe("{\"data\":{\"hero\":\"hello\"}}");
+
+            // verify executing with Schema2 works with IDocumentExecuter<>
+            var executer2 = provider.GetRequiredService<IDocumentExecuter<Schema2>>();
+            var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider });
+            var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+            serializer.Serialize(result2).ShouldBe("{\"data\":{\"hero\":\"hello2\"}}");
+
+            // verify that you cannot specify Schema with this implementation
+            await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
+        }
+
+        private class MyExecuter<TSchema> where TSchema : ISchema
+        {
+            private readonly IDocumentExecuter<TSchema> _executer;
+            private readonly IGraphQLTextSerializer _serializer;
+            private readonly IServiceScopeFactory _scopeFactory;
+
+            public MyExecuter(IDocumentExecuter<TSchema> executer, IGraphQLTextSerializer serializer, IServiceScopeFactory scopeFactory)
+            {
+                _executer = executer;
+                _serializer = serializer;
+                _scopeFactory = scopeFactory;
+            }
+
+            public async Task<string> ExecuteAsync(string query)
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var result = await _executer.ExecuteAsync(new ExecutionOptions
+                {
+                    Query = query,
+                    RequestServices = scope.ServiceProvider,
+                });
+                return _serializer.Serialize(result);
+            }
+        }
+
+        private class Schema1 : Schema
+        {
+            public Schema1(IServiceProvider provider) : base(provider)
+            {
+                var graph = new ObjectGraphType { Name = "Query" };
+                graph.Field<StringGraphType>("hero", resolve: context => "hello");
+                Query = graph;
+            }
+        }
+
+        private class Schema2 : Schema
+        {
+            public Schema2(IServiceProvider provider) : base(provider)
+            {
+                var graph = new ObjectGraphType { Name = "Query" };
+                graph.Field<StringGraphType>("hero", resolve: context => "hello2");
+                Query = graph;
+            }
         }
 
         private class SampleGraph

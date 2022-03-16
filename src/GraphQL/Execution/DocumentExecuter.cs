@@ -2,6 +2,8 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser;
@@ -325,5 +327,26 @@ namespace GraphQL
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
             => _executionStrategySelector.Select(context);
+    }
+
+    internal class DocumentExecuter<TSchema> : IDocumentExecuter<TSchema>
+        where TSchema : ISchema
+    {
+        private readonly IDocumentExecuter _documentExecuter;
+        public DocumentExecuter(IDocumentExecuter documentExecuter)
+        {
+            _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        {
+            if (options.Schema != null)
+                throw new InvalidOperationException("Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
+
+            var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+            var schema = requestServices.GetRequiredService<TSchema>();
+            options.Schema = schema;
+            return _documentExecuter.ExecuteAsync(options);
+        }
     }
 }
