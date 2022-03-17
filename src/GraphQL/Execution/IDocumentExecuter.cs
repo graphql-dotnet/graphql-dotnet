@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -21,6 +22,15 @@ namespace GraphQL
         /// </summary>
         /// <param name="options">The options of the execution</param>
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
+    }
+
+    /// <summary>
+    /// Process an entire GraphQL request against a specific schema, given an input GraphQL request string.
+    /// This is intended to be called by user code to process a query.
+    /// </summary>
+    public interface IDocumentExecuter<TSchema> : IDocumentExecuter
+        where TSchema : ISchema
+    {
     }
 
     /// <summary>

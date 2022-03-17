@@ -334,6 +334,8 @@ namespace GraphQL
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
     }
+    public interface IDocumentExecuter<TSchema> : GraphQL.IDocumentExecuter
+        where TSchema : GraphQL.Types.ISchema { }
     public interface IDocumentWriter
     {
         System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default);

@@ -6,6 +6,8 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
@@ -321,6 +323,27 @@ namespace GraphQL
                 OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
                 _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
             };
+        }
+    }
+
+    internal class DocumentExecuter<TSchema> : IDocumentExecuter<TSchema>
+        where TSchema : ISchema
+    {
+        private readonly IDocumentExecuter _documentExecuter;
+        public DocumentExecuter(IDocumentExecuter documentExecuter)
+        {
+            _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        {
+            if (options.Schema != null)
+                throw new InvalidOperationException("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
+
+            var requestServices = options.RequestServices ?? throw new InvalidOperationException("No service provider specified. Please set the value of the ExecutionOptions.RequestServices to a valid service provider. Typically, this would be a scoped service provider from your dependency injection framework.");
+            var schema = requestServices.GetRequiredService<TSchema>();
+            options.Schema = schema;
+            return _documentExecuter.ExecuteAsync(options);
         }
     }
 }
