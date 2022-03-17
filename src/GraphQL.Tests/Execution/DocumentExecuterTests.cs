@@ -76,7 +76,8 @@ namespace GraphQL.Tests.Execution
             serializer.Serialize(result2).ShouldBe("{\"data\":{\"hero\":\"hello2\"}}");
 
             // verify that you cannot specify Schema with this implementation
-            await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
+            var err = await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
+            err.Message.ShouldBe("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
         }
 
         private class StringExecuter<TSchema> where TSchema : ISchema
