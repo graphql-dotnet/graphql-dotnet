@@ -376,6 +376,8 @@ namespace GraphQL
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
     }
+    public interface IDocumentExecuter<TSchema> : GraphQL.IDocumentExecuter
+        where TSchema : GraphQL.Types.ISchema { }
     public interface IGraphQLSerializer
     {
         System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);

@@ -551,6 +551,25 @@ be properly serialized. Now you may serialize a `ExecutionError` instance direct
 be handled by the specified `IErrorInfoProvider` and serialized correctly. This can be useful
 when implementing the newer `graphql-transport-ws` WebSockets protocol.
 
+### 18. `IDocumentExecuter<>` interface added to better support multiple schema registrations.
+
+To better support user classes based on a specific schema, the `IDocumentExecuter<>` interface
+and default implementation has been added which allows for executing a request without specifying
+the schema in the `ExecutionOptions`. The execution will pull the schema from dependency injection
+at run-time, supporting both singleton and scoped schemas. `RequestServices` is required to be
+provided.
+
+```csharp
+// sample that executes a request against MySchema
+var executer = serviceProvider.GetRequiredService<IDocumentExecuter<MySchema>>();
+var options = new ExecutionOptions
+{
+    Query = "{hero}",
+    RequestServices = serviceProvider,
+};
+var result = await executer.ExecuteAsync(options);
+```
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
