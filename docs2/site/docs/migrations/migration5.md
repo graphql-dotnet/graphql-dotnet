@@ -556,7 +556,8 @@ when implementing the newer `graphql-transport-ws` WebSockets protocol.
 To better support user classes based on a specific schema, the `IDocumentExecuter<>` interface
 and default implementation has been added which allows for executing a request without specifying
 the schema in the `ExecutionOptions`. The execution will pull the schema from dependency injection
-at run-time, supporting both singleton and scoped schemas.
+at run-time, supporting both singleton and scoped schemas. `RequestServices` is required to be
+provided.
 
 ```csharp
 // sample that executes a request against MySchema

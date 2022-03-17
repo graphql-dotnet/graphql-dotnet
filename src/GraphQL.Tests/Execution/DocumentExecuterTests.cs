@@ -61,15 +61,15 @@ namespace GraphQL.Tests.Execution
                 .AddSchema<Schema1>()
                 .AddSchema<Schema2>()
                 .AddSystemTextJson());
-            services.AddSingleton(typeof(MyExecuter<>));
+            services.AddSingleton(typeof(StringExecuter<>));
             var provider = services.BuildServiceProvider();
 
             // verify executing with Schema1 works with custom class
-            var executer1 = provider.GetRequiredService<MyExecuter<Schema1>>();
+            var executer1 = provider.GetRequiredService<StringExecuter<Schema1>>();
             var result1 = await executer1.ExecuteAsync("{hero}");
             result1.ShouldBe("{\"data\":{\"hero\":\"hello\"}}");
 
-            // verify executing with Schema2 works with IDocumentExecuter<>
+            // verify executing with Schema2 works with IDocumentExecuter<> directly
             var executer2 = provider.GetRequiredService<IDocumentExecuter<Schema2>>();
             var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider });
             var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
@@ -79,13 +79,13 @@ namespace GraphQL.Tests.Execution
             await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
         }
 
-        private class MyExecuter<TSchema> where TSchema : ISchema
+        private class StringExecuter<TSchema> where TSchema : ISchema
         {
             private readonly IDocumentExecuter<TSchema> _executer;
             private readonly IGraphQLTextSerializer _serializer;
             private readonly IServiceScopeFactory _scopeFactory;
 
-            public MyExecuter(IDocumentExecuter<TSchema> executer, IGraphQLTextSerializer serializer, IServiceScopeFactory scopeFactory)
+            public StringExecuter(IDocumentExecuter<TSchema> executer, IGraphQLTextSerializer serializer, IServiceScopeFactory scopeFactory)
             {
                 _executer = executer;
                 _serializer = serializer;
