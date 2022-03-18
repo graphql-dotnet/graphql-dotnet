@@ -1,5 +1,6 @@
 #nullable enable
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning disable IDE0053 // Use expression body for lambda expressions
 
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
@@ -282,21 +283,15 @@ public class SubscriptionExecutionStrategyTests
     }
 
     [Fact]
-    public async Task CancelWithinErrorHandler_Eats()
+    public async Task CancelWithinErrorHandler_Rethrows()
     {
-        using var cts = new CancellationTokenSource();
         var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
         {
-            o.CancellationToken = cts.Token;
-            o.UnhandledExceptionDelegate = async (context) =>
-            {
-                cts.Cancel();
-                cts.Token.ThrowIfCancellationRequested();
-            };
+            o.UnhandledExceptionDelegate = async (context) => throw new InvalidOperationException();
         });
         result.ShouldBeSuccessful();
         Source.Next("custom");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Event stream error for field \u0027testComplex\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""OPERATION_CANCELED"",""codes"":[""OPERATION_CANCELED""]}}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Unhandled error of type InvalidOperationException""}]}");
     }
 
     [Fact]

@@ -141,7 +141,7 @@ namespace GraphQL.Execution
                             CancellationToken = token,
                         };
 
-                        return await ProcessErrorAsync(context, node, exception);
+                        return await ProcessErrorAsync(context, node, exception).ConfigureAwait(false);
                     });
         }
 
@@ -224,13 +224,8 @@ namespace GraphQL.Execution
         /// Encapsulates an error within an <see cref="ExecutionResult"/> for errors generated
         /// by the event stream via <see cref="IObserver{T}.OnError(Exception)"/>.
         /// </summary>
-        protected virtual async Task<ExecutionResult> ProcessErrorAsync(ExecutionContext context, ExecutionNode node, Exception exception)
-        {
-            var result = new ExecutionResult(context);
-            result.AddError(await HandleExceptionInternalAsync(context, node, exception, $"Event stream error for field '{node.Field.Name}'.").ConfigureAwait(false));
-            result.AddErrors(context.Errors);
-            return result;
-        }
+        protected virtual Task<ExecutionError> ProcessErrorAsync(ExecutionContext context, ExecutionNode node, Exception exception)
+            => HandleExceptionInternalAsync(context, node, exception, $"Event stream error for field '{node.Field.Name}'.");
 
         /// <summary>
         /// Generates an <see cref="ExecutionError"/> for the specified <see cref="Exception"/>

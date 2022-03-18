@@ -1,15 +1,14 @@
 #nullable enable
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 using GraphQL.Subscription;
 
 namespace GraphQL.Tests.Subscription;
 
-public class ObservableExtensionsTests : IDisposable
+public class ObservableExtensionsTests
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver Observer { get; } = new();
-
-    public void Dispose() => Observer.Dispose();
 
     [Fact]
     public async Task DataInOrder()
@@ -22,14 +21,18 @@ public class ObservableExtensionsTests : IDisposable
                     await Task.Delay(s);
                     return data;
                 },
-                (error, token) => Task.FromResult(error.Message));
+                async (error, token) =>
+                {
+                    error.Message.ShouldBe("abc");
+                    return new ApplicationException();
+                });
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Next("0");
         Source.Error(new Exception("abc"));
         Source.Next("300");
         Source.Completed();
-        await Observer.WaitForAsync("Next '200'. Next '0'. Next 'abc'. Next '300'. Completed. ");
+        await Observer.WaitForAsync("Next '200'. Next '0'. Error 'ApplicationException'. Next '300'. Completed. ");
     }
 
     [Fact]
@@ -43,11 +46,11 @@ public class ObservableExtensionsTests : IDisposable
                     await Task.Delay(s);
                     return data;
                 },
-                (error, token) => Task.FromResult(error.GetType().Name));
+                (error, token) => throw new NotSupportedException());
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Next("aa");
-        await Observer.WaitForAsync("Next '200'. Next 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
     }
 
     [Fact]
@@ -61,11 +64,11 @@ public class ObservableExtensionsTests : IDisposable
                     Thread.Sleep(s);
                     return Task.FromResult(data);
                 },
-                (error, token) => Task.FromResult(error.GetType().Name));
+                (error, token) => throw new NotSupportedException());
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Next("aa");
-        await Observer.WaitForAsync("Next '200'. Next 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
     }
 
     [Fact]
@@ -79,10 +82,14 @@ public class ObservableExtensionsTests : IDisposable
                     await Task.Delay(s);
                     return data;
                 },
-                (error, token) => Task.FromException<string>(error));
+                async (error, token) =>
+                {
+                    await Task.Delay(200);
+                    return new FormatException();
+                });
         observable.Subscribe(Observer);
         Source.Next("200");
-        Source.Next("aa");
+        Source.Error(new ApplicationException());
         await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
     }
 
@@ -97,10 +104,10 @@ public class ObservableExtensionsTests : IDisposable
                     await Task.Delay(s);
                     return data;
                 },
-                (error, token) => throw error);
+                (error, token) => throw new FormatException());
         observable.Subscribe(Observer);
         Source.Next("200");
-        Source.Next("aa");
+        Source.Error(new ApplicationException());
         await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
     }
 
@@ -150,14 +157,14 @@ public class ObservableExtensionsTests : IDisposable
         var observable = Source
             .SelectCatchAsync(
                 (data, token) => Task.FromResult(data),
-                (error, token) => error is ApplicationException ? throw error : Task.FromResult(error.GetType().Name));
+                (error, token) => error is ApplicationException ? throw error : Task.FromResult<Exception>(new DivideByZeroException()));
         observable.Subscribe(Observer);
         Source.Next("a");
         Source.Error(new ApplicationException());
         Source.Next("b");
         Source.Error(new InvalidTimeZoneException());
         Source.Completed();
-        Observer.Current.ShouldBe("Next 'a'. Error 'ApplicationException'. Next 'b'. Next 'InvalidTimeZoneException'. Completed. ");
+        Observer.Current.ShouldBe("Next 'a'. Error 'ApplicationException'. Next 'b'. Error 'DivideByZeroException'. Completed. ");
     }
 
     [Fact]
@@ -166,7 +173,7 @@ public class ObservableExtensionsTests : IDisposable
         var observable = Source
             .SelectCatchAsync(
                 (data, token) => Task.FromResult(data),
-                (error, token) => error is ApplicationException ? throw error : Task.FromResult(error.GetType().Name));
+                (error, token) => error is ApplicationException ? throw error : Task.FromResult<Exception>(new DivideByZeroException()));
         var disposer = observable.Subscribe(Observer);
         Source.Next("test");
         Observer.Current.ShouldBe("Next 'test'. ");
@@ -182,12 +189,46 @@ public class ObservableExtensionsTests : IDisposable
     }
 
     [Fact]
+    public async Task CanceledSubscriptionsDontTransform()
+    {
+        bool transformed = false;
+        bool disposed = false;
+        var observable = Source
+            .SelectCatchAsync(
+                async (data, token) =>
+                {
+                    transformed = disposed;
+                    return data;
+                },
+                async (error, token) =>
+                {
+                    transformed = disposed;
+                    return error;
+                });
+        var disposer = observable.Subscribe(Observer);
+        Source.Next("test");
+        Source.Error(new DivideByZeroException());
+        Observer.Current.ShouldBe("Next 'test'. Error 'DivideByZeroException'. ");
+        disposer.Dispose();
+        disposed = true;
+        Source.Next("a");
+        Source.Error(new ApplicationException());
+        Source.Next("b");
+        Source.Error(new InvalidTimeZoneException());
+        Source.Next("c");
+        Source.Completed();
+        await Task.Delay(200); // just in case, but should execute synchronously anyway
+        Observer.Current.ShouldBe("Next 'test'. Error 'DivideByZeroException'. ");
+        transformed.ShouldBeFalse();
+    }
+
+    [Fact]
     public void CanCallDisposeTwice()
     {
         var observable = Source
             .SelectCatchAsync(
-                (data, token) => Task.FromResult(data),
-                (error, token) => error is ApplicationException ? throw error : Task.FromResult(error.GetType().Name));
+                async (data, token) => data,
+                async (error, token) => error);
         var disposer = observable.Subscribe(Observer);
         disposer.Dispose();
         disposer.Dispose();
@@ -211,11 +252,11 @@ public class ObservableExtensionsTests : IDisposable
         });
     }
 
-    private class SampleObserver : IObserver<string>, IDisposable
+    private class SampleObserver : IObserver<string>
     {
         private readonly System.Text.StringBuilder _stringBuilder = new();
         private string? _expected;
-        private readonly SemaphoreSlim _received = new(0, 1);
+        private readonly TaskCompletionSource<bool> _received = new();
 
         public string Current
         {
@@ -235,8 +276,7 @@ public class ObservableExtensionsTests : IDisposable
                     return;
             }
 
-            if (await _received.WaitAsync(30000).ConfigureAwait(false))
-                return;
+            var completedTask = await Task.WhenAny(_received.Task, Task.Delay(30000)).ConfigureAwait(false);
 
             lock (_stringBuilder)
             {
@@ -250,7 +290,7 @@ public class ObservableExtensionsTests : IDisposable
             {
                 _stringBuilder.Append($"Next '{value}'. ");
                 if (_stringBuilder.ToString() == _expected)
-                    _received.Release();
+                    _received.TrySetResult(true);
             }
         }
 
@@ -260,7 +300,7 @@ public class ObservableExtensionsTests : IDisposable
             {
                 _stringBuilder.Append($"Error '{exception.GetType().Name}'. ");
                 if (_stringBuilder.ToString() == _expected)
-                    _received.Release();
+                    _received.TrySetResult(true);
             }
         }
 
@@ -270,13 +310,8 @@ public class ObservableExtensionsTests : IDisposable
             {
                 _stringBuilder.Append($"Completed. ");
                 if (_stringBuilder.ToString() == _expected)
-                    _received.Release();
+                    _received.TrySetResult(true);
             }
-        }
-
-        public void Dispose()
-        {
-            _received.Dispose();
         }
     }
 }
