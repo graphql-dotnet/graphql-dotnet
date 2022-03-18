@@ -18,7 +18,7 @@ public static class ShouldlyExtensions
         actualJson.ShouldBe(expectedJson, customMessage);
     }
 
-    public static ExecutionResult ShouldHaveResult(this SubscriptionExecutionStrategyTests.SampleObserver? observer)
+    public static ExecutionResult ShouldHaveResult(this SampleObserver? observer)
     {
         observer.ShouldNotBeNull();
         observer.Events.ShouldNotBeNull();
@@ -26,7 +26,7 @@ public static class ShouldlyExtensions
         return result;
     }
 
-    public static void ShouldHaveNoMoreResults(this SubscriptionExecutionStrategyTests.SampleObserver? observer)
+    public static void ShouldHaveNoMoreResults(this SampleObserver? observer)
     {
         observer.ShouldNotBeNull();
         observer.Events.ShouldNotBeNull();

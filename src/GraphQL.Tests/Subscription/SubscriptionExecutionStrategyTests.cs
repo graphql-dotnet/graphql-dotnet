@@ -1,7 +1,6 @@
 #nullable enable
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-using System.Collections.Concurrent;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.Subscription;
@@ -510,14 +509,6 @@ public class SubscriptionExecutionStrategyTests
         public override async Task BeforeExecutionAsync(IExecutionContext context) => _beforeFunc(context);
 
         public override async Task AfterExecutionAsync(IExecutionContext context) => _afterFunc(context);
-    }
-
-    public class SampleObserver : IObserver<ExecutionResult>
-    {
-        public ConcurrentQueue<ExecutionResult> Events { get; } = new();
-        public void OnCompleted() => throw new NotImplementedException("OnCompleted should not occur");
-        public void OnError(Exception error) => throw new NotImplementedException("OnError should not occur");
-        public void OnNext(ExecutionResult value) => Events.Enqueue(value);
     }
 
     private Task<ExecutionResult> ExecuteAsync(string query, Action<ExecutionOptions>? configureOptions = null, bool validateResponse = true)
