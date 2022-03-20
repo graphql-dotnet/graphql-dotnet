@@ -192,15 +192,17 @@ internal static class ObservableExtensions
             /// </summary>
             public void Dispose()
             {
+                var cts = Interlocked.Exchange(ref _cancellationTokenSource, null);
+                if (cts == null)
+                    return;
                 // cancel pending operations and prevent pending operations
                 // from returning data after the observable has been detatched
-                _cancellationTokenSource?.Cancel();
+                cts.Cancel();
                 // dispose the cancellation token source
-                _cancellationTokenSource?.Dispose();
+                cts.Dispose();
                 // detach the observable sequence
                 _disposeAction?.Invoke();
                 // release references to the degree possible
-                _cancellationTokenSource = null;
                 _disposeAction = null;
             }
 
