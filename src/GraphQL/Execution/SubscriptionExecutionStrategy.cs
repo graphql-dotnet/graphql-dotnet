@@ -120,7 +120,7 @@ namespace GraphQL.Execution
                     async (value, token) =>
                     {
                         // duplicate context to prevent multiple event streams from sharing the same context,
-                        // clear errors/metrics/extensions, and free array pool leased arrays
+                        // and clear errors/metrics/extensions. Free array pool leased arrays after execution.
                         using var childContext = new ExecutionContext(context)
                         {
                             Errors = new ExecutionErrors(),
