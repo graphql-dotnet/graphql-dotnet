@@ -158,6 +158,11 @@ namespace GraphQL.Execution
 
             try
             {
+                // "clone" the node and set the source
+                // overwrite the 'node' variable here so it is picked up by exception handling code below
+                // and will contain the source from this data event
+                node = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
+
                 if (context.Listeners != null)
                 {
                     foreach (var listener in context.Listeners)
@@ -173,10 +178,8 @@ namespace GraphQL.Execution
                     return result;
                 }
 
-                var executionNode = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
-
                 // Execute the whole execution tree and return the result
-                await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
+                await ExecuteNodeTreeAsync(context, node).ConfigureAwait(false);
 
                 try
                 {
@@ -192,17 +195,17 @@ namespace GraphQL.Execution
                 finally
                 {
                     // Set the execution node's value to null if necessary
-                    var dataIsNull = executionNode.PropagateNull();
+                    var dataIsNull = node.PropagateNull();
 
                     // Return the result
                     result.Executed = true;
-                    if (!dataIsNull || executionNode.FieldDefinition.ResolvedType is not NonNullGraphType)
+                    if (!dataIsNull || node.FieldDefinition.ResolvedType is not NonNullGraphType)
                     {
                         result.Data = new RootExecutionNode(null!, null)
                         {
                             SubFields = new ExecutionNode[]
                             {
-                            executionNode,
+                                node,
                             }
                         };
                     }
