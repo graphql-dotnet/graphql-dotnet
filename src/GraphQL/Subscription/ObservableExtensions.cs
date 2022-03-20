@@ -211,7 +211,7 @@ internal static class ObservableExtensions
                 _cancellationTokenSource?.Cancel();
                 // dispose the cancellation token source
                 _cancellationTokenSource?.Dispose();
-                // detatch the observable sequence
+                // detach the observable sequence
                 _disposeAction?.Invoke();
                 // release references to the degree possible
                 _cancellationTokenSource = null;
