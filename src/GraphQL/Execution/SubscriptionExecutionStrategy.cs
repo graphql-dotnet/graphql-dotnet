@@ -158,8 +158,6 @@ namespace GraphQL.Execution
 
             try
             {
-                var executionNode = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
-
                 if (context.Listeners != null)
                 {
                     foreach (var listener in context.Listeners)
@@ -168,6 +166,8 @@ namespace GraphQL.Execution
                             .ConfigureAwait(false);
                     }
                 }
+
+                var executionNode = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
 
                 // Execute the whole execution tree and return the result
                 await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
