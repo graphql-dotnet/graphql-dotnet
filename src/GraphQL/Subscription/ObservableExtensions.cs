@@ -179,8 +179,8 @@ internal static class ObservableExtensions
             }
 
             /// <summary>
-            /// Wait for the transform to complete and push the data (or error) back to the observer.
-            /// If the observer has been disposed, then data and errors are ignored.
+            /// Wait for the transform to complete and push the error back to the observer.
+            /// If the observer has been disposed, then errors are ignored.
             /// </summary>
             private async Task ProcessErrorAsync(Task<Exception> errorTask)
             {
