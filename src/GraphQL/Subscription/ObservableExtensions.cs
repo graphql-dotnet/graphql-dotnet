@@ -101,7 +101,7 @@ internal static class ObservableExtensions
             }
 
             /// <summary>
-            /// Returns data from the queue in order (or raises errors or completed notifications);
+            /// Processes data from the queue in order (or raises errors or completed notifications);
             /// executes until the queue is empty.
             /// </summary>
             private async Task ProcessAllEventsInQueueAsync()
