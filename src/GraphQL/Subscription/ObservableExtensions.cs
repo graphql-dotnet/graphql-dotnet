@@ -56,7 +56,7 @@ internal static class ObservableExtensions
             private CancellationTokenSource? _cancellationTokenSource = new();
             private readonly CancellationToken _token;
             //create a queue so that events will be sent in order
-            private readonly Queue<QueueData> _queue = new();
+            private readonly Queue<QueueEvent> _queue = new();
             private readonly IObserver<TOut> _observer;
             private readonly Func<TIn, CancellationToken, Task<TOut>> _transformNext;
             private readonly Func<Exception, CancellationToken, Task<Exception>> _transformError;
@@ -73,18 +73,18 @@ internal static class ObservableExtensions
                 _transformNext = async (data, token) => await transformNext(data, token).ConfigureAwait(false);
             }
 
-            public void OnNext(TIn value) => QueueEvent(QueueType.Data, _transformNext(value, _token), null);
+            public void OnNext(TIn value) => Queue(QueueType.Data, _transformNext(value, _token), null);
 
-            public void OnError(Exception error) => QueueEvent(QueueType.Error, null, _transformError(error, _token));
+            public void OnError(Exception error) => Queue(QueueType.Error, null, _transformError(error, _token));
 
-            public void OnCompleted() => QueueEvent(QueueType.Completion, null, null);
+            public void OnCompleted() => Queue(QueueType.Completion, null, null);
 
             /// <summary>
             /// Queues the specified event and if necessary starts watching for an event to complete.
             /// </summary>
-            private void QueueEvent(QueueType queueType, Task<TOut>? task, Task<Exception>? error)
+            private void Queue(QueueType queueType, Task<TOut>? task, Task<Exception>? error)
             {
-                var queueData = new QueueData { Type = queueType, Data = task, Error = error };
+                var queueData = new QueueEvent { Type = queueType, Data = task, Error = error };
                 bool attach = false;
                 lock (_queue)
                 {
@@ -95,23 +95,8 @@ internal static class ObservableExtensions
                 // start watching for an event to complete, if this is the first in the queue
                 if (attach)
                 {
-                    // for data events, start sending the data once the transformation task completes
-                    // but for error/completion events, send the event now
-                    if (task != null)
-                    {
-                        // start returning data once the first task has completed (or now if already completed)
-                        if (task.IsCompleted)
-                        {
-                            _ = ReturnDataAsync();
-                        }
-                        else
-                        {
-                            _ = task.ContinueWith(_ => ReturnDataAsync());
-                        }
-                    }
-                    else
-                        // start returning data now
-                        _ = ReturnDataAsync();
+                    // start sending data events (will await on the task queued if needed)
+                    _ = ReturnDataAsync();
                 }
             }
 
@@ -122,24 +107,25 @@ internal static class ObservableExtensions
             private async Task ReturnDataAsync()
             {
                 // grab the event at the start of the queue, but don't remove it from the queue
-                QueueData? queueData;
+                QueueEvent queueEvent;
+                bool moreEvents;
                 lock (_queue)
                 {
                     // should always successfully peek from the queue here
-                    queueData = _queue.Count > 0 ? _queue.Peek() : null;
+                    moreEvents = _queue.TryPeek(out queueEvent);
                 }
-                while (queueData != null)
+                while (moreEvents)
                 {
                     // process the event
-                    if (queueData.Type == QueueType.Data)
+                    if (queueEvent.Type == QueueType.Data)
                     {
-                        await ProcessDataAsync(queueData.Data!).ConfigureAwait(false);
+                        await ProcessDataAsync(queueEvent.Data!).ConfigureAwait(false);
                     }
-                    else if (queueData.Type == QueueType.Error)
+                    else if (queueEvent.Type == QueueType.Error)
                     {
-                        await ProcessErrorAsync(queueData.Error!).ConfigureAwait(false);
+                        await ProcessErrorAsync(queueEvent.Error!).ConfigureAwait(false);
                     }
-                    else if (queueData.Type == QueueType.Completion)
+                    else if (queueEvent.Type == QueueType.Completion)
                     {
                         if (!_token.IsCancellationRequested)
                             _observer.OnCompleted();
@@ -148,7 +134,7 @@ internal static class ObservableExtensions
                     lock (_queue)
                     {
                         _ = _queue.Dequeue();
-                        queueData = _queue.Count > 0 ? _queue.Peek() : null;
+                        moreEvents = _queue.TryPeek(out queueEvent);
                     }
                     // if the queue is empty, immedately quit the loop, as any new
                     // events queued will start ReturnDataAsync
@@ -219,25 +205,12 @@ internal static class ObservableExtensions
             }
 
             /// <summary>
-            /// Represents an event.
+            /// Represents a single event in the queue.
             /// </summary>
-            private class QueueData
-            {
-                /// <summary>
-                /// Gets or sets the type of the event.
-                /// </summary>
-                public QueueType Type { get; set; }
-
-                /// <summary>
-                /// Gets or sets the <see cref="Task{TResult}"/> for a data event.
-                /// </summary>
-                public Task<TOut>? Data { get; set; }
-
-                /// <summary>
-                /// Gets or sets the <see cref="Task{TResult}"/> containing an <see cref="Exception"/> for an error event.
-                /// </summary>
-                public Task<Exception>? Error { get; set; }
-            }
+            /// <param name="Type">The type of the event.</param>
+            /// <param name="Data">For data events, the <see cref="Task{TResult}"/> containing a <typeparamref name="TOut"/>.</param>
+            /// <param name="Error">For error events, the <see cref="Task{TResult}"/> containing an <see cref="Exception"/>.</param>
+            private readonly record struct QueueEvent(QueueType Type, Task<TOut>? Data, Task<Exception>? Error);
 
             /// <summary>
             /// The type of the event.
@@ -250,4 +223,17 @@ internal static class ObservableExtensions
             }
         }
     }
+
+#if NETSTANDARD2_0
+    internal static bool TryPeek<T>(this Queue<T> queue, out T? value)
+    {
+        if (queue.Count > 0)
+        {
+            value = queue.Peek();
+            return true;
+        }
+        value = default;
+        return false;
+    }
+#endif
 }
