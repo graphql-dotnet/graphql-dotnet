@@ -127,8 +127,7 @@ internal static class ObservableExtensions
                     }
                     else if (queueEvent.Type == QueueType.Completion)
                     {
-                        if (!_token.IsCancellationRequested)
-                            _observer.OnCompleted();
+                        ProcessCompletion();
                     }
                     // once the event has been passed along, dequeue it
                     lock (_queue)
@@ -185,6 +184,16 @@ internal static class ObservableExtensions
                 }
                 if (!_token.IsCancellationRequested)
                     _observer.OnError(errorOut);
+            }
+
+            /// <summary>
+            /// Push a completion notice back to the observer.
+            /// If the observer has been disposed, ignore.
+            /// </summary>
+            private void ProcessCompletion()
+            {
+                if (!_token.IsCancellationRequested)
+                    _observer.OnCompleted();
             }
 
             /// <summary>
