@@ -96,7 +96,7 @@ internal static class ObservableExtensions
                 if (attach)
                 {
                     // start sending data events (will await on the task queued if needed)
-                    _ = ReturnDataAsync();
+                    _ = ProcessAllEventsInQueueAsync();
                 }
             }
 
@@ -104,7 +104,7 @@ internal static class ObservableExtensions
             /// Returns data from the queue in order (or raises errors or completed notifications);
             /// executes until the queue is empty.
             /// </summary>
-            private async Task ReturnDataAsync()
+            private async Task ProcessAllEventsInQueueAsync()
             {
                 // grab the event at the start of the queue, but don't remove it from the queue
                 QueueEvent queueEvent;
