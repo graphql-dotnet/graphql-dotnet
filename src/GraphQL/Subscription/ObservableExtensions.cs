@@ -1,5 +1,7 @@
 namespace GraphQL.Subscription;
 
+// This file only serves to eliminate the dependency on System.Reactive
+
 internal static class ObservableExtensions
 {
     /// <summary>
