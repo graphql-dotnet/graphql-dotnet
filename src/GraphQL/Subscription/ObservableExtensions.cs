@@ -9,7 +9,7 @@ internal static class ObservableExtensions
     /// whether they are data, error or completion notifications.
     /// </para>
     /// <para>
-    /// Ensures that after an <see cref="IObserver{T}"/> stream has been disposed,
+    /// Ensures that after a subscription has been disposed,
     /// no more events will be raised (data, error or completion), and signals
     /// pending asynchronous transformations that a cancellation has been requested.
     /// </para>
