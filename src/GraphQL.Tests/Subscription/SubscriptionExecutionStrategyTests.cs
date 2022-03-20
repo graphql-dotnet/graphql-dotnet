@@ -320,7 +320,7 @@ public class SubscriptionExecutionStrategyTests
     }
 
     [Fact]
-    public async Task ThrowExceptionWithinDocumentExecuter_Returns()
+    public async Task ThrowExceptionWithinListener_Before_Returns()
     {
         var throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
@@ -342,7 +342,7 @@ public class SubscriptionExecutionStrategyTests
     }
 
     [Fact]
-    public async Task ThrowErrorWithinDocumentExecuter_Returns()
+    public async Task ThrowErrorWithinListener_Before_Returns()
     {
         var throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
@@ -362,6 +362,95 @@ public class SubscriptionExecutionStrategyTests
         throwNow = true;
         Source.Next("test");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}]}");
+    }
+
+    [Fact]
+    public async Task ThrowExceptionWithinListener_After_ReturnsWithData()
+    {
+        var throwNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                _ => { },
+                context =>
+                {
+                    if (throwNow)
+                    {
+                        throw new InvalidOperationException("Test exception");
+                    }
+                }));
+        });
+        result.ShouldBeSuccessful();
+        throwNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":{""test"":""test""}}");
+    }
+
+    [Fact]
+    public async Task ThrowErrorWithinListener_After_ReturnsWithData()
+    {
+        var throwNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                _ => { },
+                context =>
+                {
+                    if (throwNow)
+                    {
+                        throw new ExecutionError("Test error");
+                    }
+                }));
+            o.UnhandledExceptionDelegate = async context => context.Exception = new ExecutionError("Should not happen");
+        });
+        result.ShouldBeSuccessful();
+        throwNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}],""data"":{""test"":""test""}}");
+    }
+
+    [Fact]
+    public async Task ErrorWithinListener_Before_ReturnsBeforeExecuting()
+    {
+        var errorNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                context =>
+                {
+                    if (errorNow)
+                    {
+                        context.Errors.Add(new ExecutionError("Test error"));
+                    }
+                },
+                _ => { }));
+        });
+        result.ShouldBeSuccessful();
+        errorNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}]}");
+    }
+
+    [Fact]
+    public async Task ErrorWithinListener_After_ReturnsAsExecuted()
+    {
+        var errorNow = false;
+        var result = await ExecuteAsync("subscription { test }", o =>
+        {
+            o.Listeners.Add(new SampleListener(
+                _ => { },
+                context =>
+                {
+                    if (errorNow)
+                    {
+                        context.Errors.Add(new ExecutionError("Test error"));
+                    }
+                }));
+        });
+        result.ShouldBeSuccessful();
+        errorNow = true;
+        Source.Next("test");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}],""data"":{""test"":""test""}}");
     }
 
     [Fact]

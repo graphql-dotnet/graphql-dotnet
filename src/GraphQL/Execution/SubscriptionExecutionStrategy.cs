@@ -167,34 +167,45 @@ namespace GraphQL.Execution
                     }
                 }
 
+                if (context.Errors.Count > 0)
+                {
+                    result.AddErrors(context.Errors);
+                    return result;
+                }
+
                 var executionNode = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
 
                 // Execute the whole execution tree and return the result
                 await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
-                if (context.Listeners != null)
+                try
                 {
-                    foreach (var listener in context.Listeners)
+                    if (context.Listeners != null)
                     {
-                        await listener.AfterExecutionAsync(context)
-                            .ConfigureAwait(false);
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.AfterExecutionAsync(context)
+                                .ConfigureAwait(false);
+                        }
                     }
                 }
-
-                // Set the execution node's value to null if necessary
-                var dataIsNull = executionNode.PropagateNull();
-
-                // Return the result
-                result.Executed = true;
-                if (!dataIsNull || executionNode.FieldDefinition.ResolvedType is not NonNullGraphType)
+                finally
                 {
-                    result.Data = new RootExecutionNode(null!, null)
+                    // Set the execution node's value to null if necessary
+                    var dataIsNull = executionNode.PropagateNull();
+
+                    // Return the result
+                    result.Executed = true;
+                    if (!dataIsNull || executionNode.FieldDefinition.ResolvedType is not NonNullGraphType)
                     {
-                        SubFields = new ExecutionNode[]
+                        result.Data = new RootExecutionNode(null!, null)
                         {
+                            SubFields = new ExecutionNode[]
+                            {
                             executionNode,
-                        }
-                    };
+                            }
+                        };
+                    }
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
