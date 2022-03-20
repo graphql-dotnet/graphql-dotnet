@@ -196,7 +196,7 @@ internal static class ObservableExtensions
                 if (cts == null)
                     return;
                 // cancel pending operations and prevent pending operations
-                // from returning data after the observable has been detatched
+                // from returning data after the observable has been detached
                 cts.Cancel();
                 // dispose the cancellation token source
                 cts.Dispose();

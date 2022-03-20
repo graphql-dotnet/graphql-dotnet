@@ -85,7 +85,7 @@ namespace GraphQL.Execution
             {
                 if (node.FieldDefinition?.Subscriber == null)
                 {
-                    // this is normally caught by schema validation
+                    // todo: this should be caught by schema validation
                     throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
