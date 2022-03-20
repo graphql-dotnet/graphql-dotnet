@@ -21,6 +21,8 @@ internal class SampleObservable<T> : IObservable<T>
 
     public void Error(Exception exception)
     {
+        if (exception == null)
+            throw new ArgumentNullException(nameof(exception));
         IObserver<T>[] observers;
         lock (_observers)
         {
@@ -47,19 +49,21 @@ internal class SampleObservable<T> : IObservable<T>
 
     public IDisposable Subscribe(IObserver<T> observer)
     {
+        if (observer == null)
+            throw new ArgumentNullException(nameof(observer));
         lock (_observers)
         {
             _observers.Add(observer);
         }
-        return new Disposer(this, observer);
+        return new Unsubscriber(this, observer);
     }
 
-    private class Disposer : IDisposable
+    private class Unsubscriber : IDisposable
     {
         private SampleObservable<T>? _source;
         private IObserver<T>? _observer;
 
-        public Disposer(SampleObservable<T> source, IObserver<T> observer)
+        public Unsubscriber(SampleObservable<T> source, IObserver<T> observer)
         {
             _source = source;
             _observer = observer;
