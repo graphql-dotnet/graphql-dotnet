@@ -15,4 +15,15 @@ public class GraphQLSerializerTests
         new GraphQLSerializer(options);
         options.Converters.Count.ShouldBe(8);
     }
+
+#if NET5_0_OR_GREATER
+    [Fact]
+    public void DoesNotModifyOptions1()
+    {
+        var options = new JsonSerializerOptions();
+        _ = JsonSerializer.Serialize("hello", options);
+        var serializer = new GraphQLSerializer(options);
+        _ = serializer.Serialize("hello");
+    }
+#endif
 }

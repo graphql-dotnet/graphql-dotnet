@@ -78,9 +78,14 @@ namespace GraphQL.SystemTextJson
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions)
         {
-            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
-
+#if NET5_0_OR_GREATER
+            // clone serializerOptions
+            SerializerOptions = new(serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions)));
+#else
             // TODO: fix this: it modifies serializerOptions
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+#endif
+
             ConfigureOptions(null);
         }
 
@@ -91,9 +96,14 @@ namespace GraphQL.SystemTextJson
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
-            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
-
+#if NET5_0_OR_GREATER
+            // clone serializerOptions
+            SerializerOptions = new(serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions)));
+#else
             // TODO: fix this: it modifies serializerOptions
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+#endif
+
             ConfigureOptions(errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)));
         }
 
