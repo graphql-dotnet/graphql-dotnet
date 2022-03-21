@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Serialization.SystemTextJson;
@@ -22,8 +23,21 @@ public class GraphQLSerializerTests
     {
         var options = new JsonSerializerOptions();
         _ = JsonSerializer.Serialize("hello", options);
+        options.Converters.Any(x => x.CanConvert(typeof(Inputs))).ShouldBeFalse();
         var serializer = new GraphQLSerializer(options);
         _ = serializer.Serialize("hello");
+        options.Converters.Any(x => x.CanConvert(typeof(Inputs))).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void DoesNotModifyOptions2()
+    {
+        var options = new JsonSerializerOptions();
+        _ = JsonSerializer.Serialize("hello", options);
+        options.Converters.Any(x => x.CanConvert(typeof(Inputs))).ShouldBeFalse();
+        var serializer = new GraphQLSerializer(options, new ErrorInfoProvider());
+        _ = serializer.Serialize("hello");
+        options.Converters.Any(x => x.CanConvert(typeof(Inputs))).ShouldBeFalse();
     }
 #endif
 }
