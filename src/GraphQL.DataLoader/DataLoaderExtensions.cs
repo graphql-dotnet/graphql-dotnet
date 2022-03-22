@@ -128,7 +128,7 @@ namespace GraphQL.DataLoader
         /// <returns>A pending data loader operation that can return a value once the data loaders and the chained delegate finish.</returns>
         public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, CancellationToken, Task<TResult>> chainedDelegate)
         {
-            return new SimpleDataLoader<TResult>(async (cancellationToken) =>
+            return new SimpleDataLoader<TResult>(async cancellationToken =>
             {
                 List<T> list;
                 if (parents is ICollection collection)
