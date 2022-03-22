@@ -86,6 +86,9 @@ namespace GraphQL.DataLoader.Tests.Types
                         users.GetUsersByIdAsync);
 
                     var ids = ctx.GetArgument<IEnumerable<int>>("ids");
+                    // note: does not work properly without ToList, because LoadAsync would not have
+                    // been called, so the ids would not have been queued for execution prior to the
+                    // first call to GetResultAsync
                     var ret = ids.Select(id => loader.LoadAsync(id)).ToList();
                     var ret2 = ret.Then(values => values.Where(x => x != null));
                     return ret2;
