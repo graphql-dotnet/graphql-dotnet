@@ -146,7 +146,7 @@ namespace GraphQL.DataLoader
         /// <inheritdoc cref="Then{T, TResult}(IEnumerable{IDataLoaderResult{T}}, Func{IEnumerable{T}, CancellationToken, Task{TResult}})"/>
         public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, Task<TResult>> chainedDelegate)
         {
-            return new SimpleDataLoader<TResult>(async (cancellationToken) =>
+            return new SimpleDataLoader<TResult>(async cancellationToken =>
             {
                 List<T> list;
                 if (parents is ICollection collection)
