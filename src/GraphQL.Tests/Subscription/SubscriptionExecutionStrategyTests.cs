@@ -159,7 +159,7 @@ public class SubscriptionExecutionStrategyTests
         Source.Error(new InvalidOperationException("SourceError"));
         Source.Next("success");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Event stream error for field \u0027testComplex\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""APPLICATION"",""codes"":[""APPLICATION""]}}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Response stream error for field \u0027testComplex\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""APPLICATION"",""codes"":[""APPLICATION""]}}]}");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""testing"" } } }");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: SourceError"",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}]}");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""success"" } } }");
