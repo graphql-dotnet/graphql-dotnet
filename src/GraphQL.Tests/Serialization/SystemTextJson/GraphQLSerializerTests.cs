@@ -1,5 +1,4 @@
 using System.Text.Json;
-using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Serialization.SystemTextJson;
