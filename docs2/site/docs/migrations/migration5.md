@@ -592,7 +592,7 @@ The new implementation of `SubscriptionExecutionStrategy` supports some new feat
    `System.Reactive` nuget package in your library if you wish.
 
 6. Derived implementations allow for a scoped DI provider during execution of data events. It will
-   be necessary to override `ProcessDataAsync` and change the `RequestServices` property to a scoped
+   be necessary to override `ProcessDataAsync` and change the `ExecutionContext.RequestServices` property to a scoped
    instance before calling `base.ProcessDataAsync`.
 
 There are a number of other minor issues fixed; see these links for more details:
