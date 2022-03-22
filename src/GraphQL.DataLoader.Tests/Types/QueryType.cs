@@ -76,6 +76,21 @@ namespace GraphQL.DataLoader.Tests.Types
                     return ret;
                 });
 
+            Field<NonNullGraphType<ListGraphType<UserType>>, IDataLoaderResult<IEnumerable<User>>>()
+                .Name("SpecifiedUsersWithThen")
+                .Description("Get Users by ID skipping null matches")
+                .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
+                .Resolve(ctx =>
+                {
+                    var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUserById",
+                        users.GetUsersByIdAsync);
+
+                    var ids = ctx.GetArgument<IEnumerable<int>>("ids");
+                    var ret = ids.Select(id => loader.LoadAsync(id)).ToList();
+                    var ret2 = ret.Then(values => values.Where(x => x != null));
+                    return ret2;
+                });
+
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>()
                 .Name("ExerciseListsOfLists")
                 .Argument<ListGraphType<ListGraphType<IntGraphType>>>("values")
