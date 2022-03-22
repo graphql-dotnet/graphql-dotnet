@@ -576,7 +576,7 @@ Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget
 the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter` (removed), and the default
 document executer will support subscriptions without overriding `SelectExecutionStrategy`.
 
-The new implementation supports some new features and bug fixes:
+The new implementation of `SubscriptionExecutionStrategy` supports some new features and bug fixes:
 
 1. Serial execution of data events' field resolvers is supported by passing an instance of
    `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
