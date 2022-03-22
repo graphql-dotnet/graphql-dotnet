@@ -573,7 +573,7 @@ var result = await executer.ExecuteAsync(options);
 ### 19. Subscription support improved
 
 Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
-the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter`, and the default
+the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter` (removed), and the default
 document executer will support subscriptions without overriding `SelectExecutionStrategy`.
 
 The new implementation supports some new features and bug fixes:
