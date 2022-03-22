@@ -74,6 +74,9 @@ namespace GraphQL.DataLoader
         public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
         public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, TResult> chainedDelegate) { }
         public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this System.Collections.Generic.IEnumerable<GraphQL.DataLoader.IDataLoaderResult<T>> parents, System.Func<System.Collections.Generic.IEnumerable<T>, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this System.Collections.Generic.IEnumerable<GraphQL.DataLoader.IDataLoaderResult<T>> parents, System.Func<System.Collections.Generic.IEnumerable<T>, TResult> chainedDelegate) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<T, TResult>(this System.Collections.Generic.IEnumerable<GraphQL.DataLoader.IDataLoaderResult<T>> parents, System.Func<System.Collections.Generic.IEnumerable<T>, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
     }
     public sealed class DataLoaderPair<TKey, T> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>
     {
