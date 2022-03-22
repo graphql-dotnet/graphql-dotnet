@@ -239,7 +239,7 @@ namespace GraphQL.Execution
         /// by the event stream via <see cref="IObserver{T}.OnError(Exception)"/>.
         /// </summary>
         protected virtual Task<ExecutionError> ProcessErrorAsync(ExecutionContext context, ExecutionNode node, Exception exception)
-            => HandleExceptionInternalAsync(context, node, exception, $"Event stream error for field '{node.Field.Name}'.");
+            => HandleExceptionInternalAsync(context, node, exception, $"Response stream error for field '{node.Field.Name}'.");
 
         /// <summary>
         /// Generates an <see cref="ExecutionError"/> for the specified <see cref="Exception"/>
