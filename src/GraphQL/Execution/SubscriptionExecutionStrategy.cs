@@ -167,7 +167,7 @@ namespace GraphQL.Execution
                 // and will contain the source from this data event
                 node = BuildSubscriptionExecutionNode(node.Parent!, node.GraphType!, node.Field, node.FieldDefinition, node.IndexInParentNode, value!);
 
-                if (context.Listeners != null)
+                if (context.Listeners?.Count > 0)
                 {
                     foreach (var listener in context.Listeners)
                     {
