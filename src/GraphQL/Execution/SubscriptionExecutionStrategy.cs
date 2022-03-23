@@ -15,7 +15,7 @@ namespace GraphQL.Execution
         /// Initializes a new instance with a parallel execution strategy for child nodes.
         /// </summary>
         public SubscriptionExecutionStrategy()
-            : this(new ParallelExecutionStrategy())
+            : this(new ParallelExecutionStrategy()) // new instance of shared variables within ParallelExecutionStrategy; do not use ParallelExecutionStrategy.Instance
         {
         }
 
