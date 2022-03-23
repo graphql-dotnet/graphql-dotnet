@@ -150,7 +150,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Processes data from the event source via <see cref="IObserver{T}.OnNext(T)"/> and
+        /// Processes data from the source stream via <see cref="IObserver{T}.OnNext(T)"/> and
         /// returns an <see cref="ExecutionResult"/>.
         /// <br/><br/>
         /// Override this method to mutate <see cref="ExecutionContext"/> as necessary, such
