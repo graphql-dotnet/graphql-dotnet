@@ -36,6 +36,14 @@ namespace GraphQL.Execution
         /// Executes a GraphQL subscription request and returns the result. The result consists
         /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
         /// No serializable <see cref="ExecutionResult"/> is directly returned.
+        /// <br/><br/>
+        /// Keep in mind that if a scoped context is passed into <see cref="ExecutionContext.RequestServices"/>,
+        /// and if it is disposed after the initial execution, node executions of subsequent data events will contain
+        /// the disposed <see cref="ExecutionContext.RequestServices"/> instance and hence be unusable.
+        /// <br/><br/>
+        /// If scoped services are needed, it is recommended to override
+        /// <see cref="ProcessDataAsync(ExecutionContext, ExecutionNode, object?)"/>
+        /// with an implementation that creates a service scope during execution of the data events.
         /// </summary>
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
