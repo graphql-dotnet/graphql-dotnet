@@ -137,7 +137,7 @@ internal static class ObservableExtensions
                         _ = _queue.Dequeue();
                         moreEvents = _queue.TryPeek(out queueEvent);
                     }
-                    // if the queue is empty, immedately quit the loop, as any new
+                    // if the queue is empty, immediately quit the loop, as any new
                     // events queued will start ProcessAllEventsInQueueAsync
                 }
             }
