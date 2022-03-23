@@ -47,9 +47,9 @@ internal static class ObservableExtensions
         /// </summary>
         public IDisposable Subscribe(IObserver<TOut> observer)
         {
-            IDisposable? disposable = null;
-            var newObserver = new Observer(observer, _transformNext, _transformError, () => disposable?.Dispose());
-            disposable = _source.Subscribe(newObserver);
+            IDisposable? subscription = null;
+            var newObserver = new Observer(observer, _transformNext, _transformError, () => subscription?.Dispose());
+            subscription = _source.Subscribe(newObserver);
             return newObserver;
         }
 
