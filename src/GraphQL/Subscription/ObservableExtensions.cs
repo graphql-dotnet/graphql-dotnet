@@ -206,7 +206,7 @@ internal static class ObservableExtensions
             }
 
             /// <summary>
-            /// Disposes of the underlying observable sequence
+            /// Disposes of the underlying observable subscription
             /// </summary>
             public void Dispose()
             {
