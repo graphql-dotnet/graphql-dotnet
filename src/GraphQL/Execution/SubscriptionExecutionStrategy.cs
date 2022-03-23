@@ -230,7 +230,7 @@ namespace GraphQL.Execution
             catch (Exception exception)
             {
                 result.AddError(await HandleExceptionInternalAsync(context, node, exception,
-                    $"Could not process event data for field '{node.Field.Name}'.").ConfigureAwait(false));
+                    $"Could not process source stream event data for field '{node.Field.Name}'.").ConfigureAwait(false));
             }
 
             result.AddErrors(context.Errors);
