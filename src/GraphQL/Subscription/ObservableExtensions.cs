@@ -75,9 +75,19 @@ internal static class ObservableExtensions
                 _transformNext = async (data, token) => await transformNext(data, token).ConfigureAwait(false);
             }
 
-            public void OnNext(TIn value) => Queue(QueueType.Data, _transformNext(value, _token), default);
+            public void OnNext(TIn value)
+            {
+                if (_token.IsCancellationRequested)
+                    return;
+                Queue(QueueType.Data, _transformNext(value, _token), default);
+            }
 
-            public void OnError(Exception error) => Queue(QueueType.Error, default, _transformError(error, _token));
+            public void OnError(Exception error)
+            {
+                if (_token.IsCancellationRequested)
+                    return;
+                Queue(QueueType.Error, default, _transformError(error, _token));
+            }
 
             public void OnCompleted() => Queue(QueueType.Completion, default, default);
 
