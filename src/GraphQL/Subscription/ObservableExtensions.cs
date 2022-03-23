@@ -136,6 +136,11 @@ internal static class ObservableExtensions
                     // once the event has been passed along, dequeue it
                     lock (_queue)
                     {
+                        if (_token.IsCancellationRequested)
+                        {
+                            _queue.Clear();
+                            return;
+                        }
                         _ = _queue.Dequeue();
                         moreEvents = _queue.TryPeek(out queueEvent);
                     }
