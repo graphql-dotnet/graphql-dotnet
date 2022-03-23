@@ -187,7 +187,7 @@ namespace GraphQL.Execution
 
                 try
                 {
-                    if (context.Listeners != null)
+                    if (context.Listeners?.Count > 0)
                     {
                         foreach (var listener in context.Listeners)
                         {
