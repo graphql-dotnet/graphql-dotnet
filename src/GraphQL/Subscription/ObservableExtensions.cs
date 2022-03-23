@@ -138,7 +138,7 @@ internal static class ObservableExtensions
                         moreEvents = _queue.TryPeek(out queueEvent);
                     }
                     // if the queue is empty, immedately quit the loop, as any new
-                    // events queued will start ReturnDataAsync
+                    // events queued will start ProcessAllEventsInQueueAsync
                 }
             }
 
