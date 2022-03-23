@@ -129,28 +129,24 @@ namespace GraphQL.Execution
                     {
                         // duplicate context to prevent multiple event streams from sharing the same context,
                         // and clear errors/metrics/extensions. Free array pool leased arrays after execution.
-                        using var childContext = new ExecutionContext(context)
-                        {
-                            Errors = new ExecutionErrors(),
-                            OutputExtensions = new Dictionary<string, object?>(),
-                            Metrics = Instrumentation.Metrics.None,
-                            CancellationToken = token,
-                        };
+                        using var childContext = CloneExecutionContext(context, token);
 
                         return await ProcessDataAsync(childContext, node, value).ConfigureAwait(false);
                     },
                     async (exception, token) =>
                     {
-                        using var childContext = new ExecutionContext(context)
-                        {
-                            Errors = new ExecutionErrors(),
-                            OutputExtensions = new Dictionary<string, object?>(),
-                            Metrics = Instrumentation.Metrics.None,
-                            CancellationToken = token,
-                        };
+                        using var childContext = CloneExecutionContext(context, token);
 
                         return await ProcessErrorAsync(context, node, exception).ConfigureAwait(false);
                     });
+
+            static ExecutionContext CloneExecutionContext(ExecutionContext context, CancellationToken token) => new(context)
+            {
+                Errors = new ExecutionErrors(),
+                OutputExtensions = new Dictionary<string, object?>(),
+                Metrics = Instrumentation.Metrics.None,
+                CancellationToken = token,
+            };
         }
 
         /// <summary>
