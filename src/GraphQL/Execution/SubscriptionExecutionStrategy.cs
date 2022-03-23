@@ -156,7 +156,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// Override this method to mutate <see cref="ExecutionContext"/> as necessary, such
     /// as changing the <see cref="ExecutionContext.RequestServices"/> property to a scoped instance.
     /// </summary>
-    protected virtual async Task<ExecutionResult> ProcessDataAsync(ExecutionContext context, ExecutionNode node, object? value)
+    protected virtual async ValueTask<ExecutionResult> ProcessDataAsync(ExecutionContext context, ExecutionNode node, object? value)
     {
         var result = new ExecutionResult(context);
 

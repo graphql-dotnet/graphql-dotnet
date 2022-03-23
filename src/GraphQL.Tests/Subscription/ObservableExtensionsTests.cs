@@ -62,7 +62,7 @@ public class ObservableExtensionsTests
                 {
                     var s = int.Parse(data);
                     Thread.Sleep(s);
-                    return Task.FromResult(data);
+                    return new ValueTask<string>(data);
                 },
                 (error, token) => throw new NotSupportedException());
         observable.Subscribe(Observer);
@@ -156,8 +156,8 @@ public class ObservableExtensionsTests
         // nothing gets scheduled on the task scheduler
         var observable = Source
             .SelectCatchAsync(
-                (data, token) => Task.FromResult(data),
-                (error, token) => error is ApplicationException ? throw error : Task.FromResult<Exception>(new DivideByZeroException()));
+                (data, token) => new ValueTask<string>(data),
+                (error, token) => error is ApplicationException ? throw error : new ValueTask<Exception>(new DivideByZeroException()));
         observable.Subscribe(Observer);
         Source.Next("a");
         Source.Error(new ApplicationException());
@@ -172,8 +172,8 @@ public class ObservableExtensionsTests
     {
         var observable = Source
             .SelectCatchAsync(
-                (data, token) => Task.FromResult(data),
-                (error, token) => error is ApplicationException ? throw error : Task.FromResult<Exception>(new DivideByZeroException()));
+                (data, token) => new ValueTask<string>(data),
+                (error, token) => error is ApplicationException ? throw error : new ValueTask<Exception>(new DivideByZeroException()));
         var disposer = observable.Subscribe(Observer);
         Source.Next("test");
         Observer.Current.ShouldBe("Next 'test'. ");
@@ -237,18 +237,18 @@ public class ObservableExtensionsTests
     [Fact]
     public void NullArgumentsThrow()
     {
-        var observableSuccess = Source.SelectCatchAsync<string, string>((_, _) => null!, (_, _) => null!);
+        var observableSuccess = Source.SelectCatchAsync<string, string>((_, _) => default, (_, _) => default);
         Should.Throw<ArgumentNullException>(() =>
         {
-            var observableFail = Source.SelectCatchAsync<string, string>(null!, (_, _) => null!);
+            var observableFail = Source.SelectCatchAsync<string, string>(null!, (_, _) => default);
         });
         Should.Throw<ArgumentNullException>(() =>
         {
-            var observableFail = Source.SelectCatchAsync<string, string>((_, _) => null!, null!);
+            var observableFail = Source.SelectCatchAsync<string, string>((_, _) => default, default!);
         });
         Should.Throw<ArgumentNullException>(() =>
         {
-            var observableFail = ((IObservable<string>)null!).SelectCatchAsync<string, string>((_, _) => null!, (_, _) => null!);
+            var observableFail = ((IObservable<string>)null!).SelectCatchAsync<string, string>((_, _) => default, (_, _) => default);
         });
     }
 
