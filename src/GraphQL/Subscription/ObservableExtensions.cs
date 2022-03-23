@@ -131,18 +131,22 @@ internal static class ObservableExtensions
                 while (moreEvents)
                 {
                     // process the event
-                    if (queueEvent.Type == QueueType.Data)
+                    try
                     {
-                        await ProcessDataAsync(queueEvent.Data).ConfigureAwait(false);
+                        if (queueEvent.Type == QueueType.Data)
+                        {
+                            await ProcessDataAsync(queueEvent.Data).ConfigureAwait(false);
+                        }
+                        else if (queueEvent.Type == QueueType.Error)
+                        {
+                            await ProcessErrorAsync(queueEvent.Error).ConfigureAwait(false);
+                        }
+                        else if (queueEvent.Type == QueueType.Completion)
+                        {
+                            ProcessCompletion();
+                        }
                     }
-                    else if (queueEvent.Type == QueueType.Error)
-                    {
-                        await ProcessErrorAsync(queueEvent.Error).ConfigureAwait(false);
-                    }
-                    else if (queueEvent.Type == QueueType.Completion)
-                    {
-                        ProcessCompletion();
-                    }
+                    catch { }
                     // once the event has been passed along, dequeue it
                     lock (_queue)
                     {
