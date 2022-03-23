@@ -86,6 +86,8 @@ internal static class ObservableExtensions
             /// </summary>
             private void Queue(QueueType queueType, ValueTask<TOut> task, ValueTask<Exception> error)
             {
+                if (_token.IsCancellationRequested)
+                    return; // note: the task to be queued is never awaited in this case
                 var queueData = new QueueEvent { Type = queueType, Data = task, Error = error };
                 bool attach = false;
                 lock (_queue)
