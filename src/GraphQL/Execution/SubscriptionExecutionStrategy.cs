@@ -35,7 +35,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Executes a GraphQL subscription request and returns the result. The result consists
         /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
-        /// No serializable <see cref="ExecutionResult"/> is directly returned.
+        /// No serializable <see cref="ExecutionResult"/> is directly returned unless an error has occurred. This relates more to the protocol in use (defined in the transport layer) than the response here.
         /// <br/><br/>
         /// Keep in mind that if a scoped context is passed into <see cref="ExecutionContext.RequestServices"/>,
         /// and if it is disposed after the initial execution, node executions of subsequent data events will contain
