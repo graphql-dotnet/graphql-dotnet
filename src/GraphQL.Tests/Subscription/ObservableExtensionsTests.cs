@@ -174,10 +174,10 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 (data, token) => new ValueTask<string>(data),
                 (error, token) => error is ApplicationException ? throw error : new ValueTask<Exception>(new DivideByZeroException()));
-        var disposer = observable.Subscribe(Observer);
+        var subscription = observable.Subscribe(Observer);
         Source.Next("test");
         Observer.Current.ShouldBe("Next 'test'. ");
-        disposer.Dispose();
+        subscription.Dispose();
         Source.Next("a");
         Source.Error(new ApplicationException());
         Source.Next("b");
