@@ -14,14 +14,14 @@ public class SubscriptionExecutionStrategyTests
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
-    private IDisposable? Disposer { get; set; }
+    private IDisposable? SubscriptionObj { get; set; }
 
     [Fact]
     public async Task Basic()
     {
         var result = await ExecuteAsync("subscription { test }");
         result.ShouldBeSuccessful();
-        Disposer.ShouldNotBeNull();
+        SubscriptionObj.ShouldNotBeNull();
         result.Perf.ShouldBeNull();
         Source.Next("hello");
         Source.Next("testing");
@@ -260,7 +260,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
-        Disposer!.Dispose();
+        SubscriptionObj!.Dispose();
         Source.Next("should not happen");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
         Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
@@ -305,7 +305,7 @@ public class SubscriptionExecutionStrategyTests
                 {
                     if (throwNow)
                     {
-                        Disposer!.Dispose();
+                        SubscriptionObj!.Dispose();
                         context.CancellationToken.ThrowIfCancellationRequested();
                         throw new NotSupportedException("Should not happen");
                     }
@@ -632,7 +632,7 @@ public class SubscriptionExecutionStrategyTests
             if (subscriptionResult.Streams?.Count == 1)
             {
                 Observer = new SampleObserver();
-                Disposer = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
+                SubscriptionObj = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
             }
             else if (subscriptionResult.Streams?.Count > 1)
             {
