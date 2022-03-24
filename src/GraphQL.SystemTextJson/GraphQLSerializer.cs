@@ -74,26 +74,56 @@ namespace GraphQL.SystemTextJson
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings
         /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
+        /// <br/><br/>
+        /// Note that <see cref="JsonSerializerOptions"/> is designed in such a way to reuse created objects.
+        /// This leads to a massive speedup in subsequent calls to the serializer. The downside is you can't
+        /// change properties on the options object after you've passed it in a
+        /// <see cref="JsonSerializer.Serialize(object, Type, JsonSerializerOptions)">Serialize()</see> or
+        /// <see cref="JsonSerializer.Deserialize(string, Type, JsonSerializerOptions)">Deserialize()</see> call.
+        /// You'll get the exception: <i><see cref="InvalidOperationException"/>: Serializer options cannot be changed
+        /// once serialization or deserialization has occurred</i>. To get around this problem we create a copy of
+        /// options on NET5 platform and above. Passed options object remains unchanged and any changes you
+        /// make are unobserved.
         /// </summary>
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions)
         {
-            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
-
+#if NET5_0_OR_GREATER
+            // clone serializerOptions
+            SerializerOptions = new(serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions)));
+#else
             // TODO: fix this: it modifies serializerOptions
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+#endif
+
             ConfigureOptions(null);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with the specified settings.
+        /// <br/><br/>
+        /// Note that <see cref="JsonSerializerOptions"/> is designed in such a way to reuse created objects.
+        /// This leads to a massive speedup in subsequent calls to the serializer. The downside is you can't
+        /// change properties on the options object after you've passed it in a
+        /// <see cref="JsonSerializer.Serialize(object, Type, JsonSerializerOptions)">Serialize()</see> or
+        /// <see cref="JsonSerializer.Deserialize(string, Type, JsonSerializerOptions)">Deserialize()</see> call.
+        /// You'll get the exception: <i><see cref="InvalidOperationException"/>: Serializer options cannot be changed
+        /// once serialization or deserialization has occurred</i>. To get around this problem we create a copy of
+        /// options on NET5 platform and above. Passed options object remains unchanged and any changes you
+        /// make are unobserved.
         /// </summary>
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public GraphQLSerializer(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
-            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
-
+#if NET5_0_OR_GREATER
+            // clone serializerOptions
+            SerializerOptions = new(serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions)));
+#else
             // TODO: fix this: it modifies serializerOptions
+            SerializerOptions = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+#endif
+
             ConfigureOptions(errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)));
         }
 
