@@ -146,7 +146,12 @@ internal static class ObservableExtensions
                             ProcessCompletion();
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                        // if an error is unhandled, execution of this method will terminate, and
+                        // no further events in the queue will be processed, and Queue will not
+                        // start another ProcessAllEventsInQueueAsync because the queue is not empty
+                    }
                     // once the event has been passed along, dequeue it
                     lock (_queue)
                     {
