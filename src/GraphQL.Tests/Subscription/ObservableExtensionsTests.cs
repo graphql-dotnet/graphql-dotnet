@@ -205,11 +205,11 @@ public class ObservableExtensionsTests
                     transformed = disposed;
                     return error;
                 });
-        var disposer = observable.Subscribe(Observer);
+        var subscription = observable.Subscribe(Observer);
         Source.Next("test");
         Source.Error(new DivideByZeroException());
         Observer.Current.ShouldBe("Next 'test'. Error 'DivideByZeroException'. ");
-        disposer.Dispose();
+        subscription.Dispose();
         disposed = true;
         Source.Next("a");
         Source.Error(new ApplicationException());
