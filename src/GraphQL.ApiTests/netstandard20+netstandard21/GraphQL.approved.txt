@@ -1220,7 +1220,7 @@ namespace GraphQL.Execution
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionError> HandleExceptionAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception, string defaultMessage) { }
-        protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ProcessDataAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, object? value) { }
+        protected virtual System.Threading.Tasks.ValueTask<GraphQL.ExecutionResult> ProcessDataAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, object? value) { }
         protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionError> ProcessErrorAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception) { }
         protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>?> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }

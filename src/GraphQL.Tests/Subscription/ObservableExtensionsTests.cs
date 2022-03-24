@@ -229,9 +229,9 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) => data,
                 async (error, token) => error);
-        var disposer = observable.Subscribe(Observer);
-        disposer.Dispose();
-        disposer.Dispose();
+        var subscription = observable.Subscribe(Observer);
+        subscription.Dispose();
+        subscription.Dispose();
     }
 
     [Fact]
