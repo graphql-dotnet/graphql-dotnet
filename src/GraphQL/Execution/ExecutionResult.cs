@@ -20,8 +20,16 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
+        /// Should be set to <see langword="null"/> for subscription results.
         /// </summary>
         public object? Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets a dictionary of returned subscription fields along with their
+        /// event streams as <see cref="IObservable{T}"/> implementations.
+        /// Should be set to <see langword="null"/> for query or mutation results.
+        /// </summary>
+        public IDictionary<string, IObservable<ExecutionResult>>? Streams { get; set; }
 
         /// <summary>
         /// Returns a set of errors that occurred during any stage of processing (parsing, validating, executing, etc.). This property is serialized as part of the GraphQL json response.
