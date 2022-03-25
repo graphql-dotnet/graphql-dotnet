@@ -69,6 +69,7 @@ namespace GraphQL.MicrosoftDI
     public static class GraphQLBuilderExtensions
     {
         public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder, bool serialExecution = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
     }
@@ -147,6 +148,14 @@ namespace GraphQL.MicrosoftDI
     {
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.ValueTask<TReturnType?>> resolver) { }
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolver) { }
+    }
+    public class ScopedSubscriptionExecutionStrategy : GraphQL.Execution.SubscriptionExecutionStrategy
+    {
+        public ScopedSubscriptionExecutionStrategy(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory) { }
+        public ScopedSubscriptionExecutionStrategy(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory, GraphQL.Execution.IExecutionStrategy executionStrategy) { }
+        protected override GraphQL.Execution.ExecutionContext CloneExecutionContext(GraphQL.Execution.ExecutionContext context, System.Threading.CancellationToken token) { }
+        protected override System.Threading.Tasks.ValueTask<GraphQL.ExecutionResult> ProcessDataAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, object? value) { }
+        protected override System.Threading.Tasks.Task<GraphQL.ExecutionError> ProcessErrorAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception) { }
     }
     public class SelfActivatingServiceProvider : System.IServiceProvider
     {

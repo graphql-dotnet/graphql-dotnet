@@ -35,15 +35,15 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// <summary>
     /// Executes a GraphQL subscription request and returns the result. The result consists
     /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
-    /// No serializable <see cref="ExecutionResult"/> is directly returned unless an error has occurred. This relates more to the protocol in use (defined in the transport layer) than the response here.
+    /// No serializable <see cref="ExecutionResult"/> is directly returned unless an error has occurred. This relates
+    /// more to the protocol in use (defined in the transport layer) than the response here.
     /// <br/><br/>
     /// Keep in mind that if a scoped context is passed into <see cref="ExecutionContext.RequestServices"/>,
     /// and if it is disposed after the initial execution, node executions of subsequent data events will contain
     /// the disposed <see cref="ExecutionContext.RequestServices"/> instance and hence be unusable.
     /// <br/><br/>
-    /// If scoped services are needed, it is recommended to override
-    /// <see cref="ProcessDataAsync(ExecutionContext, ExecutionNode, object?)"/>
-    /// with an implementation that creates a service scope during execution of the data events.
+    /// If scoped services are needed, it is recommended to utilize the ScopedSubscriptionExecutionStrategy
+    /// class from the GraphQL.MicrosoftDI package, which will create a service scope during execution of data events.
     /// </summary>
     public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
     {
@@ -122,6 +122,9 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
             return null;
         }
 
+        // preserve required information from the context
+        var preservedContext = CloneExecutionContext(context, default);
+
         // cannot throw an exception here
         return source
             .SelectCatchAsync(
@@ -129,25 +132,31 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
                 {
                     // duplicate context to prevent multiple event streams from sharing the same context,
                     // and clear errors/metrics/extensions. Free array pool leased arrays after execution.
-                    using var childContext = CloneExecutionContext(context, token);
+                    using var childContext = CloneExecutionContext(preservedContext, token);
 
                     return await ProcessDataAsync(childContext, node, value).ConfigureAwait(false);
                 },
                 async (exception, token) =>
                 {
-                    using var childContext = CloneExecutionContext(context, token);
+                    using var childContext = CloneExecutionContext(preservedContext, token);
 
-                    return await ProcessErrorAsync(context, node, exception).ConfigureAwait(false);
+                    return await ProcessErrorAsync(childContext, node, exception).ConfigureAwait(false);
                 });
-
-        static ExecutionContext CloneExecutionContext(ExecutionContext context, CancellationToken token) => new(context)
-        {
-            Errors = new ExecutionErrors(),
-            OutputExtensions = new Dictionary<string, object?>(),
-            Metrics = Instrumentation.Metrics.None,
-            CancellationToken = token,
-        };
     }
+
+    /// <summary>
+    /// Clones an execution context without stateful information -- errors, metrics, and output extensions.
+    /// Sets the cancellation token on the clonsed context to the specified value.
+    /// <br/><br/>
+    /// Override to clear a stored service provider from being preserved within a cloned execution context.
+    /// </summary>
+    protected virtual ExecutionContext CloneExecutionContext(ExecutionContext context, CancellationToken token) => new(context)
+    {
+        Errors = new ExecutionErrors(),
+        OutputExtensions = new Dictionary<string, object?>(),
+        Metrics = Instrumentation.Metrics.None,
+        CancellationToken = token,
+    };
 
     /// <summary>
     /// Processes data from the source stream via <see cref="IObserver{T}.OnNext(T)"/> and
