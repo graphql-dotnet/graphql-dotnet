@@ -610,7 +610,7 @@ public class SubscriptionExecutionStrategyTests
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
-        var provider = services.BuildServiceProvider();
+        var provider = services.BuildServiceProvider(); // not disposed intentionally
         var executer = provider.GetService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
