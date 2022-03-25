@@ -3,7 +3,6 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.NewtonsoftJson;
-using GraphQL.SystemReactive;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
@@ -1470,15 +1469,6 @@ namespace GraphQL.Tests.DI
             var options = MockSetupConfigure2<JsonSerializerSettings>();
             _builder.AddNewtonsoftJson(options);
             Verify();
-        }
-        #endregion
-
-        #region - GraphQL.SystemReactive: AddSubscriptionDocumentExecuter -
-        [Fact]
-        public void AddSubscriptionDocumentExecuter()
-        {
-            MockSetupRegister<IDocumentExecuter, SubscriptionDocumentExecuter>();
-            _builder.AddSubscriptionDocumentExecuter();
         }
         #endregion
 

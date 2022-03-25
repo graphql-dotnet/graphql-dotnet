@@ -11,6 +11,37 @@ namespace GraphQL.Execution
     public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public ExecutionContext()
+        {
+        }
+
+        /// <summary>
+        /// Clones reusable state information from an existing instance; not any properties that
+        /// hold result information. Specifically, <see cref="Errors"/>, <see cref="Metrics"/>,
+        /// <see cref="OutputExtensions"/>, array pool reservations and internal reusable references
+        /// are not cloned.
+        /// </summary>
+        public ExecutionContext(ExecutionContext context)
+        {
+            ExecutionStrategy = context.ExecutionStrategy;
+            Document = context.Document;
+            Schema = context.Schema;
+            RootValue = context.RootValue;
+            UserContext = context.UserContext;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+            Listeners = context.Listeners;
+            ThrowOnUnhandledException = context.ThrowOnUnhandledException;
+            UnhandledExceptionDelegate = context.UnhandledExceptionDelegate;
+            MaxParallelExecutionCount = context.MaxParallelExecutionCount;
+            InputExtensions = context.InputExtensions;
+            RequestServices = context.RequestServices;
+        }
+
         /// <inheritdoc/>
         public IExecutionStrategy ExecutionStrategy { get; set; }
 

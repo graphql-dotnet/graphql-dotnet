@@ -402,7 +402,7 @@ public class MyExecutionStrategySelector : IExecutionStrategySelector
         {
             OperationType.Query => ParallelExecutionStrategy.Instance,
             OperationType.Mutation => SerialExecutionStrategy.Instance,
-            OperationType.Subscription => throw new NotSupportedException(),
+            OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
             _ => throw new InvalidOperationException()
         };
     }
@@ -569,6 +569,36 @@ var options = new ExecutionOptions
 };
 var result = await executer.ExecuteAsync(options);
 ```
+
+### 19. Subscription support improved
+
+Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
+the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter` (removed), and the default
+document executer will support subscriptions without overriding `SelectExecutionStrategy`.
+
+The new implementation of `SubscriptionExecutionStrategy` supports some new features and bug fixes:
+
+1. Serial execution of data events' field resolvers is supported by passing an instance of
+   `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
+
+2. Errors and output extensions are returned along with data events.
+
+3. Memory leaks have been eliminated in the case of errors, output extensions, metrics being enabled,
+   or the use of the context's array pool.
+
+4. The unhandled exception handler properly handles all error situations that it was designed to.
+
+5. The `System.Reactive` nuget reference is not necessary for GraphQL. You may still choose to use
+   `System.Reactive` nuget package in your library if you wish.
+
+6. Derived implementations allow for a scoped DI provider during execution of data events. It will
+   be necessary to override `ProcessDataAsync` and change the `ExecutionContext.RequestServices` property to a scoped
+   instance before calling `base.ProcessDataAsync`.
+
+There are a number of other minor issues fixed; see these links for more details:
+
+- https://github.com/graphql-dotnet/graphql-dotnet/issues/3002
+- https://github.com/graphql-dotnet/graphql-dotnet/pull/3004
 
 ## Breaking Changes
 
@@ -849,36 +879,15 @@ Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`.
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
 but sets the default date parsing behavior set to 'none'.
 
-### 29. `SubscriptionDocumentExecuter` and `.AddSubscriptionDocumentExecuter()` have been deprecated.
-
-While these can continue to be used for the lifetime of v5, it is now suggested to use the
-`.AddSubscriptionExecutionStrategy()` builder method instead:
-
-```csharp
-// v4
-services.AddGraphQL()
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionDocumentExecuter();
-
-// v5
-services.AddGraphQL(builder => builder
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionExecutionStrategy());
-```
-
-For more details on the new approach to execution strategy selection, please review the new feature above titled:
-
-> The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
-
-### 30. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+### 29. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
 See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
 
-### 31. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+### 30. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
 See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
 
-### 32. Code removed to support prior implementation of FieldDelegate and schema builder
+### 31. Code removed to support prior implementation of FieldDelegate and schema builder
 
 The following classes and methods have been removed:
 
@@ -896,7 +905,7 @@ You may use the following classes and methods as replacements:
 - The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
 - The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
 
-### 33. ValueTask execution pipeline support changes
+### 32. ValueTask execution pipeline support changes
 
 The following interfaces have been modified to support a `ValueTask` pipeline:
 
@@ -973,7 +982,7 @@ FieldDelegate<DroidType>(
 );
 ```
 
-### 34. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
+### 33. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
 
 Please use the `IResolveFieldContext` interface and the `ResolveFieldContext` class instead. No other changes are required.
 
@@ -1047,3 +1056,15 @@ serializer options, you will now need to also add `ExecutionErrorJsonConverter` 
 `IErrorInfoProvider` instance previously passed to the `ExecutionResultJsonConverter` will
 need to be passed to the `ExecutionErrorJsonConverter` instead. Typically no changes are
 necessary to user code for this API change.
+
+### 40. Subscription document executer removed
+
+Subscription support is provided by the `DocumentExecuter` implementation without the need to
+use `SubscriptionDocumentExecuter` or override `DocumentExecuter.SelectExecutionStrategy`. You may
+also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` method.
+
+### 41. Subscription nuget package removed
+
+Subscription support has been moved into the main project. If you have a need to reference
+`SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
+will need to remove references to the `GraphQL.SystemReactive` nuget package.

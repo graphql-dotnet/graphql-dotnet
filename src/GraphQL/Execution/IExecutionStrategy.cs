@@ -16,6 +16,12 @@ namespace GraphQL.Execution
         Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
 
         /// <summary>
+        /// Executes an execution node and all of its child nodes. This is typically only executed upon
+        /// the root execution node.
+        /// </summary>
+        Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
+
+        /// <summary>
         /// Returns the children fields for a specified node.
         /// </summary>
         Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);

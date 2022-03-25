@@ -34,7 +34,6 @@ Provides the following packages:
 | GraphQL.NewtonsoftJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![Nuget](https://img.shields.io/nuget/v/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) |
 | GraphQL.MemoryCache    | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.MemoryCache)](https://www.nuget.org/packages/GraphQL.MemoryCache)       | [![Nuget](https://img.shields.io/nuget/v/GraphQL.MemoryCache)](https://www.nuget.org/packages/GraphQL.MemoryCache)       |
 | GraphQL.DataLoader     | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.DataLoader)](https://www.nuget.org/packages/GraphQL.DataLoader)         | [![Nuget](https://img.shields.io/nuget/v/GraphQL.DataLoader)](https://www.nuget.org/packages/GraphQL.DataLoader)         |
-| GraphQL.SystemReactive | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemReactive)](https://www.nuget.org/packages/GraphQL.SystemReactive) | [![Nuget](https://img.shields.io/nuget/v/GraphQL.SystemReactive)](https://www.nuget.org/packages/GraphQL.SystemReactive) |
 | GraphQL.MicrosoftDI    | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.MicrosoftDI)](https://www.nuget.org/packages/GraphQL.MicrosoftDI)       | [![Nuget](https://img.shields.io/nuget/v/GraphQL.MicrosoftDI)](https://www.nuget.org/packages/GraphQL.MicrosoftDI)       |
 
 You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
@@ -104,15 +103,7 @@ For more information see [DataLoader](https://graphql-dotnet.github.io/docs/guid
 
 #### 5. Subscriptions
 
-For handling subscriptions you'll need an instance of `DocumentExecuter` that supports this
-GraphQL operation type. `DocumentExecuter` class from the main GraphQL.NET package supports
-only queries and mutations. We provide `SubscriptionDocumentExecuter` implementation on top
-of `System.Reactive` packages.
-
-```
-> dotnet add package GraphQL.SystemReactive
-```
-
+`DocumentExecuter` can handle subscriptions as well as queries and mutations.
 For more information see [Subscriptions](https://graphql-dotnet.github.io/docs/getting-started/subscriptions).
 
 #### 6. Advanced Dependency Injection

@@ -2,6 +2,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQLParser;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -74,6 +75,19 @@ namespace GraphQL
             Document = result.Document;
             Perf = result.Perf;
             Extensions = result.Extensions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the <see cref="Query"/>, <see cref="Document"/>,
+        /// <see cref="Operation"/> and <see cref="Extensions"/> properties set from the
+        /// specified <see cref="ExecutionContext"/>.
+        /// </summary>
+        internal ExecutionResult(ExecutionContext context)
+        {
+            Query = context.Document.Source;
+            Document = context.Document;
+            Operation = context.Operation;
+            Extensions = context.OutputExtensions;
         }
 
         /// <summary>

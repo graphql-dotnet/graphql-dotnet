@@ -1,3 +1,5 @@
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
+
 namespace GraphQL.Subscription
 {
     /// <inheritdoc/>
@@ -9,12 +11,18 @@ namespace GraphQL.Subscription
         /// </summary>
         public IDictionary<string, IObservable<ExecutionResult>>? Streams { get; set; }
 
-        /// <inheritdoc cref="ExecutionResult()"/>
+        /// <inheritdoc/>
         public SubscriptionExecutionResult()
         {
         }
 
-        /// <inheritdoc cref="ExecutionResult(ExecutionResult)"/>
+        /// <inheritdoc/>
+        internal SubscriptionExecutionResult(ExecutionContext context)
+            : base(context)
+        {
+        }
+
+        /// <inheritdoc/>
         public SubscriptionExecutionResult(ExecutionResult result)
             : base(result)
         {

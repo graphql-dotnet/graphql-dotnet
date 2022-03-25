@@ -15,7 +15,7 @@ namespace GraphQL.Execution
     {
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
-        /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>.
+        /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ExecutionNode)"/>.
         /// Once complete, the values are collected into an object that is ready to be serialized and returned
         /// within an <see cref="ExecutionResult"/>.
         /// </summary>
@@ -29,22 +29,15 @@ namespace GraphQL.Execution
             // After the entire node tree has been executed, get the values
             object? data = rootNode.PropagateNull() ? null : rootNode;
 
-            return new ExecutionResult
+            return new ExecutionResult(context)
             {
                 Executed = true,
                 Data = data,
-                Query = context.Document.Source,
-                Document = context.Document,
-                Operation = context.Operation,
-                Extensions = context.OutputExtensions
             };
         }
 
-        /// <summary>
-        /// Executes an execution node and all of its child nodes. This is typically only executed upon
-        /// the root execution node.
-        /// </summary>
-        protected abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode);
+        /// <inheritdoc/>
+        public abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
 
         /// <summary>
         /// Returns the root graph type for the execution -- for a specified schema and operation type.
