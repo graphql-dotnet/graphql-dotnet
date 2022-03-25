@@ -189,6 +189,28 @@ public class ObservableExtensionsTests
     }
 
     [Fact]
+    public async Task CanceledSubscriptionsDontSendPendingData()
+    {
+        var observable = Source
+            .SelectCatchAsync(
+                async (data, token) =>
+                {
+                    var s = int.Parse(data);
+                    await Task.Delay(s);
+                    return data;
+                },
+                (error, token) => new ValueTask<Exception>(error));
+        var subscription = observable.Subscribe(Observer);
+        Source.Next("200"); // if the value is 0, it completes synchronously, and the test would fail
+        Source.Next("200"); // another asynchronous event
+        Source.Error(new ExecutionError("test")); // a completed synchronous transformation, but in the queue after one with a delay
+        subscription.Dispose();
+        Observer.Current.ShouldBe("");
+        await Task.Delay(1000);
+        Observer.Current.ShouldBe("");
+    }
+
+    [Fact]
     public async Task CanceledSubscriptionsDontTransform()
     {
         bool transformed = false;
