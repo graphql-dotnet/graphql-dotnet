@@ -149,6 +149,7 @@ public class SubscriptionExecutionStrategyTests
     [Fact]
     public async Task Widget_SourceError()
     {
+        // during handling of the `Source.Error` events below,
         // in this case the graphql execution has not started, so executed should be false
         // and "data" should not exist in the map of error events
         var result = await ExecuteAsync("subscription { testComplex { id name } }");
