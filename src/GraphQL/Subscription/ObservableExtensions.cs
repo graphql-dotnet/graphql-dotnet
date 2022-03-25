@@ -106,7 +106,7 @@ internal static class ObservableExtensions
                     attach = _queue.Count == 1;
                 }
 
-                // start watching for an event to complete, if this is the first in the queue
+                // start processing events, if this is the first event in the queue
                 if (attach)
                 {
                     // start sending data events (will await on the task queued if needed)
