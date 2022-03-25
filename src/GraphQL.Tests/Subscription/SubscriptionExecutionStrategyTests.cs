@@ -289,7 +289,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
         {
-            o.UnhandledExceptionDelegate = async (context) => throw new InvalidOperationException();
+            o.UnhandledExceptionDelegate = async context => throw new InvalidOperationException();
         });
         result.ShouldBeSuccessful();
         Source.Next("custom");
