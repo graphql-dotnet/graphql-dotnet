@@ -1,19 +1,18 @@
 using System.Reactive.Linq;
-using GraphQL.Subscription;
 
 namespace GraphQL.Tests.Subscription
 {
     public class SubscriptionTests
     {
-        protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
+        protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
             var executer = new DocumentExecuter();
 
             var result = await executer.ExecuteAsync(options);
 
-            result.ShouldBeOfType<SubscriptionExecutionResult>();
+            result.Data.ShouldBeNull();
 
-            return (SubscriptionExecutionResult)result;
+            return result;
         }
 
         [Fact]
