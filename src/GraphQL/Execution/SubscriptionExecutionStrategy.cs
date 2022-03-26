@@ -1,4 +1,3 @@
-using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQLParser.AST;
 

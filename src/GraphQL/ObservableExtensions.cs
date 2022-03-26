@@ -1,4 +1,4 @@
-namespace GraphQL.Subscription;
+namespace GraphQL;
 
 // This file only serves to eliminate the dependency on System.Reactive package.
 
