@@ -49,6 +49,7 @@ public class ScopedSubscriptionExecutionStrategy : SubscriptionExecutionStrategy
         newContext.RequestServices = null;
         return newContext;
     }
+
     /// <summary>
     /// Processes data from the source stream via <see cref="IObserver{T}.OnNext(T)"/> and
     /// returns an <see cref="ExecutionResult"/>.
