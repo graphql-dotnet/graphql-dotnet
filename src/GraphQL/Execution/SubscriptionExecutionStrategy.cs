@@ -1,4 +1,3 @@
-using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -34,9 +33,9 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
     /// <summary>
     /// Executes a GraphQL subscription request and returns the result. The result consists
-    /// of one or more streams of GraphQL responses, returned within <see cref="SubscriptionExecutionResult.Streams"/>.
-    /// No serializable <see cref="ExecutionResult"/> is directly returned unless an error has occurred. This relates
-    /// more to the protocol in use (defined in the transport layer) than the response here.
+    /// of one or more streams of GraphQL responses, returned within <see cref="ExecutionResult.Streams"/>.
+    /// No serializable <see cref="ExecutionResult"/> is directly returned unless an error has occurred.
+    /// This relates more to the protocol in use (defined in the transport layer) than the response here.
     /// <br/><br/>
     /// Keep in mind that if a scoped context is passed into <see cref="ExecutionContext.RequestServices"/>,
     /// and if it is disposed after the initial execution, node executions of subsequent data events will contain
@@ -55,7 +54,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
         // if execution is successful, errors and extensions are not returned per the graphql-ws protocol
         // if execution is unsuccessful, the DocumentExecuter will add context errors to the result
 
-        return new SubscriptionExecutionResult(context)
+        return new ExecutionResult(context)
         {
             Executed = true,
             Streams = streams,

@@ -130,6 +130,7 @@ namespace GraphQL
         public GraphQLParser.AST.GraphQLOperationDefinition? Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[]? Perf { get; set; }
         public GraphQLParser.ROM Query { get; set; }
+        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>>? Streams { get; set; }
         public GraphQL.ExecutionResult AddError(GraphQL.ExecutionError error) { }
         public GraphQL.ExecutionResult AddErrors(GraphQL.ExecutionErrors errors) { }
     }
@@ -1555,15 +1556,6 @@ namespace GraphQL.Resolvers
     {
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
-    }
-}
-namespace GraphQL.Subscription
-{
-    public class SubscriptionExecutionResult : GraphQL.ExecutionResult
-    {
-        public SubscriptionExecutionResult() { }
-        public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
-        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>>? Streams { get; set; }
     }
 }
 namespace GraphQL.Transport

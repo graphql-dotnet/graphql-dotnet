@@ -4,7 +4,6 @@
 
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
-using GraphQL.Subscription;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -478,7 +477,6 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false);
         result.ShouldNotBeSuccessful();
-        result.ShouldNotBeOfType<SubscriptionExecutionResult>();
         result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}]}");
     }
 
@@ -486,7 +484,7 @@ public class SubscriptionExecutionStrategyTests
     public async Task MultipleSubscriptions_NoValidation()
     {
         var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { }, false);
-        result.ShouldBeOfType<SubscriptionExecutionResult>().Streams.ShouldNotBeNull().Count.ShouldBe(2);
+        result.Streams.ShouldNotBeNull().Count.ShouldBe(2);
         result.Data.ShouldBeNull();
         result.Errors.ShouldBeNull();
         result.Executed.ShouldBeTrue();
@@ -629,13 +627,12 @@ public class SubscriptionExecutionStrategyTests
         var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
         if (validateResponse)
         {
-            var subscriptionResult = result.ShouldBeOfType<SubscriptionExecutionResult>();
-            if (subscriptionResult.Streams?.Count == 1)
+            if (result.Streams?.Count == 1)
             {
                 Observer = new SampleObserver();
-                SubscriptionObj = subscriptionResult.Streams.Single().Value.Subscribe(Observer);
+                SubscriptionObj = result.Streams.Single().Value.Subscribe(Observer);
             }
-            else if (subscriptionResult.Streams?.Count > 1)
+            else if (result.Streams?.Count > 1)
             {
                 throw new Exception("More than one stream was returned");
             }

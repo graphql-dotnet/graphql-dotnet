@@ -1,5 +1,4 @@
 using System.Reactive.Linq;
-using GraphQL.Subscription;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription
@@ -8,7 +7,7 @@ namespace GraphQL.Tests.Subscription
     {
         private readonly Chat Chat = new Chat();
 
-        protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
+        protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
             var executer = new DocumentExecuter();
             var services = new ServiceCollection();
@@ -20,9 +19,9 @@ namespace GraphQL.Tests.Subscription
 
             var result = await executer.ExecuteAsync(options);
 
-            result.ShouldBeOfType<SubscriptionExecutionResult>();
+            result.Data.ShouldBeNull();
 
-            return (SubscriptionExecutionResult)result;
+            return result;
         }
 
         [Fact]
