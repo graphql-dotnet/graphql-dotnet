@@ -43,7 +43,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// the disposed <see cref="ExecutionContext.RequestServices"/> instance and hence be unusable.
     /// <br/><br/>
     /// If scoped services are needed, it is recommended to utilize the ScopedSubscriptionExecutionStrategy
-    /// class from the GraphQL.MicrosoftDI package, which will create a service scope during execution of data events.
+    /// class from the GraphQL.MicrosoftDI package, which will create a service scope during processing of data events.
     /// </summary>
     public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
     {
