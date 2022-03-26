@@ -1,6 +1,5 @@
 #nullable enable
 
-using GraphQL.Subscription;
 using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Subscription;
@@ -35,11 +34,11 @@ public static class ShouldlyExtensions
 
     public static ExecutionResult ShouldNotBeSuccessful(this ExecutionResult result)
     {
-        if (result is SubscriptionExecutionResult subscriptionExecutionResult)
+        if (result.Operation?.Operation == GraphQLParser.AST.OperationType.Subscription)
         {
-            subscriptionExecutionResult.Streams.ShouldBeNull();
+            result.Data.ShouldBeNull();
         }
-        result.Data.ShouldBeNull();
+        result.Streams.ShouldBeNull();
         result.Errors.ShouldNotBeNull();
         result.Errors.Count.ShouldBeGreaterThan(0);
         return result;
@@ -47,10 +46,10 @@ public static class ShouldlyExtensions
 
     public static ExecutionResult ShouldBeSuccessful(this ExecutionResult result)
     {
-        if (result is SubscriptionExecutionResult subscriptionExecutionResult)
+        if (result.Operation?.Operation == GraphQLParser.AST.OperationType.Subscription)
         {
-            subscriptionExecutionResult.Streams.ShouldNotBeNull().Count.ShouldBe(1);
-            subscriptionExecutionResult.Data.ShouldBeNull();
+            result.Streams.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Data.ShouldBeNull();
         }
         else
         {

@@ -1068,3 +1068,8 @@ also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` 
 Subscription support has been moved into the main project. If you have a need to reference
 `SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
 will need to remove references to the `GraphQL.SystemReactive` nuget package.
+
+### 42. `SubscriptionExecutionResult` class removed
+
+The `SubscriptionExecutionResult.Streams` property has been moved to the `ExecutionResult` class.
+Please use the `ExecutionResult` class rather than the `SubscriptionExecutionResult` class.

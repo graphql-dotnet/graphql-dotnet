@@ -2,7 +2,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
-using GraphQL.Subscription;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -10,11 +9,11 @@ namespace GraphQL.DataLoader.Tests
 {
     public class DataLoaderSubscriptionTest : QueryTestBase
     {
-        protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(string query)
+        protected async Task<ExecutionResult> ExecuteSubscribeAsync(string query)
         {
             var result = await ExecuteQueryAsync<DataLoaderTestSchema>(query);
-            result.ShouldBeOfType<SubscriptionExecutionResult>();
-            return (SubscriptionExecutionResult)result;
+            result.Data.ShouldBeNull();
+            return result;
         }
 
         [Fact]
