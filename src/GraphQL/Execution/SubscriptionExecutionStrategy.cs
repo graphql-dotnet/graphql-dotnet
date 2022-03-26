@@ -146,7 +146,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
     /// <summary>
     /// Clones an execution context without stateful information -- errors, metrics, and output extensions.
-    /// Sets the cancellation token on the clonsed context to the specified value.
+    /// Sets the cancellation token on the cloned context to the specified value.
     /// <br/><br/>
     /// Override to clear a stored service provider from being preserved within a cloned execution context.
     /// </summary>
