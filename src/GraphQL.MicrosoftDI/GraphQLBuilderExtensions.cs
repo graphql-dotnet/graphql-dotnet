@@ -1,4 +1,5 @@
 using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
@@ -63,6 +64,27 @@ namespace GraphQL.MicrosoftDI
                 return schema;
             }, serviceLifetime);
 
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a <see cref="ScopedSubscriptionExecutionStrategy"/> for use with subscription operations,
+        /// which will create a dedicated service scope during execution of data events after (but not including)
+        /// the initial subscription request execution. Be sure to also execute the initial subscription request via
+        /// the <see cref="IDocumentExecuter"/> with a dedicated service scope for proper execution with the common
+        /// WebSockets protocols, as multiple subscriptions may execute concurrently over a single HTTP context.
+        /// </summary>
+        public static IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this IGraphQLBuilder builder, bool serialExecution = true)
+        {
+            builder.AddExecutionStrategy(
+                provider =>
+                {
+                    var serviceScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+                    // create a new instance of the underlying execution strategy so reusable fields are not shared
+                    IExecutionStrategy underlyingExecutionStrategy = serialExecution ? new SerialExecutionStrategy() : new ParallelExecutionStrategy();
+                    return new ScopedSubscriptionExecutionStrategy(serviceScopeFactory, underlyingExecutionStrategy);
+                },
+                GraphQLParser.AST.OperationType.Subscription);
             return builder;
         }
     }

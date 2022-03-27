@@ -1218,6 +1218,7 @@ namespace GraphQL.Execution
         public SubscriptionExecutionStrategy(GraphQL.Execution.IExecutionStrategy baseExecutionStrategy) { }
         public static GraphQL.Execution.SubscriptionExecutionStrategy Instance { get; }
         protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        protected virtual GraphQL.Execution.ExecutionContext CloneExecutionContext(GraphQL.Execution.ExecutionContext context, System.Threading.CancellationToken token) { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionError> HandleExceptionAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception, string defaultMessage) { }
