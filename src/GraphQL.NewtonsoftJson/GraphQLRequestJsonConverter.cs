@@ -67,8 +67,11 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <inheritdoc/>
-        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+
             if (reader.TokenType != JsonToken.StartObject)
                 throw new JsonException();
 
