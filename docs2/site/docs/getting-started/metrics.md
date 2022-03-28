@@ -23,6 +23,19 @@ ExecutionResult result = executor.ExecuteAsync(_ =>
 result.EnrichWithApolloTracing(start);
 ```
 
+Alternatively, you can use the `ApolloTracingDocumentExecuter` to append the tracing results
+to the execution; this is ideal when wiring up GraphQL via dependency injection.
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<StarWarsSchema>()
+    .AddMetrics(true)
+    .AddDocumentExecuter<ApolloTracingDocumentExecuter>()
+    .AddSystemTextJson());
+```
+
+Here is a sample of the results:
+
 ```json
 {
   "data": {
