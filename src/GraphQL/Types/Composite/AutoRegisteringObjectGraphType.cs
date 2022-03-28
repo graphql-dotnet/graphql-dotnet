@@ -126,7 +126,7 @@ namespace GraphQL.Types
                 var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
                 if (IsObservable(methodInfo.ReturnType))
                 {
-                    var resolver = new EventStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
+                    var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
                     fieldType.Subscriber = resolver;
                 }

@@ -358,7 +358,7 @@ namespace GraphQL.Types
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
                 Subscriber = subscribe != null
-                    ? new EventStreamResolver<object>(subscribe)
+                    ? new SourceStreamResolver<object>(subscribe)
                     : null
             });
         }
@@ -394,7 +394,7 @@ namespace GraphQL.Types
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
                 Subscriber = subscribeAsync != null
-                    ? new EventStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
+                    ? new SourceStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
                     : null
             });
         }

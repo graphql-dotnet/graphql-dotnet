@@ -67,7 +67,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         foreach (var node in nodes)
         {
-            var stream = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
+            var stream = await ResolveResponseStreamAsync(context, node).ConfigureAwait(false);
             if (stream == null)
                 return null;
             streams[node.Name!] = stream;
@@ -80,7 +80,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// Asynchronously returns a stream of <see cref="ExecutionResult"/> responses for the
     /// specified <see cref="ExecutionNode"/>.
     /// </summary>
-    protected virtual async Task<IObservable<ExecutionResult>?> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
+    protected virtual async Task<IObservable<ExecutionResult>?> ResolveResponseStreamAsync(ExecutionContext context, ExecutionNode node)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 

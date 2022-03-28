@@ -344,7 +344,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         a.Modify(config);
                 }
 
-                config.Subscriber = AutoRegisteringHelper.BuildEventStreamResolver(
+                config.Subscriber = AutoRegisteringHelper.BuildSourceStreamResolver(
                     config.SubscriberAccessor.MethodInfo,
                     null, // unknown source type
                     null, // unknown FieldType

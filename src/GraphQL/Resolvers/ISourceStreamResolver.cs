@@ -6,9 +6,9 @@ namespace GraphQL.Resolvers
     /// which will resolve child fields using the event data as the source. Then the resolved graph is
     /// returned to the client, and the process repeats for further event notifications. 
     /// </summary>
-    public interface IEventStreamResolver
+    public interface ISourceStreamResolver
     {
-        /// <inheritdoc cref="IEventStreamResolver"/>
+        /// <inheritdoc cref="ISourceStreamResolver"/>
         ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context);
     }
 }

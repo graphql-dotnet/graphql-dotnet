@@ -483,7 +483,7 @@ The execution pipeline has been changed to use `ValueTask` throughout. To suppor
 interfaces have been slightly changed to have methods with `ValueTask` signatures:
 
 - `IFieldResolver`
-- `IEventStreamResolver` (`IAsyncEventStreamResolver` has been removed)
+- `IEventStreamResolver` (renamed to `ISourceStreamResolver`) (`IAsyncEventStreamResolver` has been removed)
 - `IFieldMiddleware`
 
 This will result in a substantial speed increase for schemas that use field middleware.
@@ -492,7 +492,7 @@ In addition, `ValueTask<T>` return types are supported for fields built on CLR m
 fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
 
 When manually instantiating a field or subscription resolver, you may use a delegate that return a `ValueTask` by
-using new constructors available on the `FuncFieldResolver` or `EventStreamResolver` classes.
+using new constructors available on the `FuncFieldResolver` or `SourceStreamResolver` classes.
 
 ### 15. `NameFieldResolver` enhanced method support
 
@@ -900,8 +900,9 @@ You may use the following classes and methods as replacements:
 
 - The `MemberResolver` class is an `IFieldResolver` implementation for a property, method or field. Expressions are passed
   to the constructor for the instance (and if applicable, method arguments), which is immediately compiled.
-- The `EventStreamMethodResolver` class is an `IEventStreamResolver` implementation for a method that returns an `IObservable<T>`
-  or `Task<IObservable<T>>`. It also provides a basic `IFieldResolver` implementation for subscription fields.
+- The `SourceStreamMethodResolver` class is an `ISourceStreamResolver` (previously `IEventStreamResolver`) implementation
+  for a method that returns an `IObservable<T>` or `Task<IObservable<T>>`. It also provides a basic `IFieldResolver`
+  implementation for subscription fields.
 - The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
 - The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
 
@@ -910,7 +911,7 @@ You may use the following classes and methods as replacements:
 The following interfaces have been modified to support a `ValueTask` pipeline:
 
 - `IFieldResolver`
-- `IEventStreamResolver`
+- `ISourceStreamResolver` (previously `IEventStreamResolver`)
 - `IFieldMiddleware` and `FieldMiddlewareDelegate`
 
 The following interfaces have been removed:
@@ -919,13 +920,13 @@ The following interfaces have been removed:
 
 All classes which implemented the above interfaces have been modified as necessary:
 
-- `AsyncEventStreamResolver`
+- `AsyncSourceStreamResolver` (previously `AsyncEventStreamResolver`)
 - `AsyncFieldResolver`
-- `EventStreamResolver`
 - `ExpressionFieldResolver`
 - `FuncFieldResolver`
-- `NameFieldResolver`
 - `InstrumentFieldsMiddleware`
+- `NameFieldResolver`
+- `SourceStreamResolver` (previously `EventStreamResolver`)
 
 These properties have been removed:
 
@@ -993,7 +994,7 @@ The `AsyncSubscriber` property has been removed as described above.
 
 ### 35. `IEventStreamResolver<T>` interface removed
 
-For custom resolver implementations, please implement `IEventStreamResolver` instead.
+For custom resolver implementations, please implement `ISourceStreamResolver` (previously `IEventStreamResolver`) interface instead.
 
 ### 36. Asynchronous field resolver classes have been removed
 
@@ -1003,7 +1004,8 @@ These classes have been removed:
 - `AsyncFieldResolver`
 - `AsyncEventStreamResolver`
 
-Please use the new `ValueTask`-based constructors on `ScopedFieldResolver`, `FuncFieldResolver` and `EventStreamResolver` instead.
+Please use the new `ValueTask`-based constructors on `ScopedFieldResolver`, `FuncFieldResolver` and `SourceStreamResolver`
+(previously `EventStreamResolver`) instead.
 
 ```csharp
 // v4
@@ -1073,3 +1075,8 @@ will need to remove references to the `GraphQL.SystemReactive` nuget package.
 
 The `SubscriptionExecutionResult.Streams` property has been moved to the `ExecutionResult` class.
 Please use the `ExecutionResult` class rather than the `SubscriptionExecutionResult` class.
+
+### 43. `IEventStreamResolver` and `EventStreamResolver` renamed
+
+- `IEventStreamResolver` is now `ISourceStreamResolver`
+- `EventStreamResolver` is now `SourceStreamResolver`

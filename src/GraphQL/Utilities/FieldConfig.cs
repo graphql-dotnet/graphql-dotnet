@@ -50,7 +50,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Gets or sets the event stream resolver.
         /// </summary>
-        public IEventStreamResolver? Subscriber { get; set; }
+        public ISourceStreamResolver? Subscriber { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IAccessor"/> representing the class member

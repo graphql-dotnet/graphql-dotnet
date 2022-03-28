@@ -28,7 +28,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "messageAdded",
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new EventStreamResolver<Message>(Subscribe)
+                Subscriber = new SourceStreamResolver<Message>(Subscribe)
             });
 
             AddField(new FieldType
@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Subscription
                 ),
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new EventStreamResolver<Message>(SubscribeById)
+                Subscriber = new SourceStreamResolver<Message>(SubscribeById)
             });
 
             AddField(new FieldType
@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "messageAddedAsync",
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new EventStreamResolver<Message>(SubscribeAsync)
+                Subscriber = new SourceStreamResolver<Message>(SubscribeAsync)
             });
 
             AddField(new FieldType
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Subscription
                 ),
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-                Subscriber = new EventStreamResolver<Message>(SubscribeByIdAsync)
+                Subscriber = new SourceStreamResolver<Message>(SubscribeByIdAsync)
             });
 
             AddField(new FieldType
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "messageGetAll",
                 Type = typeof(ListGraphType<MessageType>),
                 Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
-                Subscriber = new EventStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
+                Subscriber = new SourceStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
             });
 
             AddField(new FieldType
@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Subscription
                 Name = "newMessageContent",
                 Type = typeof(StringGraphType),
                 Resolver = new FuncFieldResolver<string>(context => context.Source as string),
-                Subscriber = new EventStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
+                Subscriber = new SourceStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
             });
         }
 
