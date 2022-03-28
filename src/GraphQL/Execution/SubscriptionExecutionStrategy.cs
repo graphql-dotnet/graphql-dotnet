@@ -86,7 +86,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         var resolveContext = new ReadonlyResolveFieldContext(node, context);
 
-        IObservable<object?> source;
+        IObservable<object?> sourceStream;
 
         try
         {
@@ -96,9 +96,9 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
                 throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
             }
 
-            source = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
+            sourceStream = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
 
-            if (source == null)
+            if (sourceStream == null)
             {
                 throw new InvalidOperationException($"No event stream returned for field '{node.Field.Name}'.");
             }
@@ -125,7 +125,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
         var preservedContext = CloneExecutionContext(context, default);
 
         // cannot throw an exception here
-        return source
+        return sourceStream
             .SelectCatchAsync(
                 async (value, token) =>
                 {
