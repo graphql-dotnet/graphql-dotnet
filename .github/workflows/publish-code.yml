@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check github.ref starts with 'refs/tags/'
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         run: |
@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
@@ -47,7 +47,7 @@ jobs:
           path: docs2/public/**
           if-no-files-found: error
       - name: Setup .NET Core 6.0 SDK
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.102'
           source-url: https://api.nuget.org/v3/index.json
