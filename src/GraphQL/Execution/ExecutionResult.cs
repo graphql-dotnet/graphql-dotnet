@@ -26,7 +26,7 @@ namespace GraphQL
 
         /// <summary>
         /// Gets or sets a dictionary of returned subscription fields along with their
-        /// event streams as <see cref="IObservable{T}"/> implementations.
+        /// response streams as <see cref="IObservable{T}"/> implementations.
         /// Should be set to <see langword="null"/> for query or mutation results.
         /// According to the GraphQL specification this dictionary should have exactly one item.
         /// </summary>

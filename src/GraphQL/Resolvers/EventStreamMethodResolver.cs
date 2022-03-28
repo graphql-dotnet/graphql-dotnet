@@ -4,12 +4,12 @@ using System.Reflection;
 namespace GraphQL.Resolvers
 {
     /// <summary>
-    /// A precompiled event stream resolver for a specific <see cref="MethodInfo"/>.
+    /// A precompiled source stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
     public class EventStreamMethodResolver : MemberResolver, IEventStreamResolver
     {
-        private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _eventStreamResolver = null!;
+        private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _sourceStreamResolver = null!;
 
         /// <summary>
         /// Initializes an instance for the specified method, using the specified instance expression to access the instance of the method,
@@ -27,7 +27,7 @@ namespace GraphQL.Resolvers
         /// <inheritdoc/>
         protected override Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
-            _eventStreamResolver = BuildEventStreamResolver(resolveFieldContextParameter, bodyExpression);
+            _sourceStreamResolver = BuildEventStreamResolver(resolveFieldContextParameter, bodyExpression);
             return context => new ValueTask<object?>(context.Source);
         }
 
@@ -105,6 +105,6 @@ namespace GraphQL.Resolvers
             => await task.ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _eventStreamResolver(context);
+        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _sourceStreamResolver(context);
     }
 }
