@@ -10,7 +10,7 @@ namespace GraphQL.SystemTextJson
     /// <br/><br/>
     /// To determine if a single request is a batch request or not, deserialize to the type
     /// <see cref="IList{T}">IList</see>&lt;<see cref="GraphQLRequest"/>&gt; and examine the type
-    /// of the returned object to see if it <see cref="GraphQLRequest"/>[].
+    /// of the returned object to see if it is <see cref="GraphQLRequest"/>[].
     /// If the returned object is an array, then it is not a batch request.
     /// </summary>
     public class GraphQLRequestListJsonConverter : JsonConverter<IEnumerable<GraphQLRequest>>
