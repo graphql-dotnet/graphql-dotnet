@@ -485,6 +485,7 @@ interfaces have been slightly changed to have methods with `ValueTask` signature
 - `IFieldResolver`
 - `IEventStreamResolver` (`IAsyncEventStreamResolver` has been removed)
 - `IFieldMiddleware`
+- `IValidationRule`
 
 This will result in a substantial speed increase for schemas that use field middleware.
 
