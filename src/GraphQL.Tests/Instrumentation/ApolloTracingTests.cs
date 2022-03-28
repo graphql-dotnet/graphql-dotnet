@@ -103,7 +103,7 @@ query {
                 .AddMetrics(true)
                 .AddDocumentExecuter<ApolloTracingDocumentExecuter>()
                 .AddSystemTextJson());
-            var provider = serviceCollection.BuildServiceProvider();
+            using var provider = serviceCollection.BuildServiceProvider();
             var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
             var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
             var result = await executer.ExecuteAsync(new ExecutionOptions
