@@ -173,6 +173,37 @@ namespace GraphQL.Tests.Serialization
 
         [Theory]
         [ClassData(typeof(GraphQLSerializersTestData))]
+        public void Reads_Null_GraphQLRequest_In_List(IGraphQLTextSerializer serializer)
+        {
+            var actual = serializer.Deserialize<GraphQLRequest[]>("[null]");
+            actual.Length.ShouldBe(1);
+            actual.First().ShouldBeNull();
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void BatchRequestAsIListIsNotArrayForListOfSingle(IGraphQLTextSerializer serializer)
+        {
+            // verifies that when deserializing to IList<GraphQLRequest>, and when a single item is in the list, the result is not a GraphQLRequest[]
+            // note: the server counts on this behavior to determine whether or not a request is a batch request
+            var actual = serializer.Deserialize<IList<GraphQLRequest>>("[{}]");
+            actual.ShouldNotBeOfType<GraphQLRequest[]>();
+            actual.Count.ShouldBe(1);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
+        public void BatchRequestAsIListIsArrayForSingle(IGraphQLTextSerializer serializer)
+        {
+            // verifies that when deserializing to IList<GraphQLRequest>, and when it is not a batch request, the result is a GraphQLRequest[1]
+            // note: the server counts on this behavior to determine whether or not a request is a batch request
+            var actual = serializer.Deserialize<IList<GraphQLRequest>>("{}");
+            actual.ShouldBeOfType<GraphQLRequest[]>();
+            actual.Count.ShouldBe(1);
+        }
+
+        [Theory]
+        [ClassData(typeof(GraphQLSerializersTestData))]
         public void Reads_GraphQLRequest_List_NotCaseSensitive(IGraphQLTextSerializer serializer)
         {
             var test = @"{""VARIABLES"":{""date"":""2015-12-22T10:10:10+03:00""},""query"":""test""}";

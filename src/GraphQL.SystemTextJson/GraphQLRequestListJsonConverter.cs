@@ -7,6 +7,11 @@ namespace GraphQL.SystemTextJson
     /// <summary>
     /// A custom JsonConverter for reading or writing a list of <see cref="GraphQLRequest"/> objects.
     /// Will deserialize a single request into a list containing one request.
+    /// <br/><br/>
+    /// To determine if a single request is a batch request or not, deserialize to the type
+    /// <see cref="IList{T}">IList</see>&lt;<see cref="GraphQLRequest"/>&gt; and examine the type
+    /// of the returned object to see if it <see cref="GraphQLRequest"/>[].
+    /// If the returned object is an array, then it is not a batch request.
     /// </summary>
     public class GraphQLRequestListJsonConverter : JsonConverter<IEnumerable<GraphQLRequest>>
     {
@@ -40,6 +45,7 @@ namespace GraphQL.SystemTextJson
             if (reader.TokenType == JsonTokenType.StartObject)
             {
                 var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options)!;
+                // do not change behavior here; see class notes
                 return typeToConvert == typeof(List<GraphQLRequest>)
                     ? new List<GraphQLRequest>(1) { request }
                     : new GraphQLRequest[] { request };
@@ -59,9 +65,8 @@ namespace GraphQL.SystemTextJson
                         : list;
                 }
 
-                var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options);
-                if (request != null)
-                    list.Add(request);
+                var request = JsonSerializer.Deserialize<GraphQLRequest>(ref reader, options)!;
+                list.Add(request);
             }
 
             //unexpected end of data
