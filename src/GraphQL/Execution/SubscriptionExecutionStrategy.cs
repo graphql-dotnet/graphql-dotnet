@@ -90,13 +90,13 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         try
         {
-            if (node.FieldDefinition?.Subscriber == null)
+            if (node.FieldDefinition?.StreamResolver == null)
             {
                 // todo: this should be caught by schema validation
-                throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
+                throw new InvalidOperationException($"Stream resolver not set for field '{node.Field.Name}'.");
             }
 
-            sourceStream = await node.FieldDefinition.Subscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
+            sourceStream = await node.FieldDefinition.StreamResolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
             if (sourceStream == null)
             {
@@ -117,7 +117,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
         catch (Exception exception)
         {
             context.Errors.Add(await HandleExceptionInternalAsync(context, node, exception,
-                $"Could not subscribe to field '{node.Field.Name}'.").ConfigureAwait(false));
+                $"Could not resolve source stream for field '{node.Field.Name}'.").ConfigureAwait(false));
             return null;
         }
 

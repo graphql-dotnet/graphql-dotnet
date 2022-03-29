@@ -624,7 +624,7 @@ namespace GraphQL
     public enum ResolverType
     {
         Resolver = 0,
-        Subscriber = 1,
+        StreamResolver = 1,
     }
     public static class SchemaExtensions
     {
@@ -1528,7 +1528,7 @@ namespace GraphQL.Resolvers
     }
     public interface ISourceStreamResolver
     {
-        System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context);
+        System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveAsync(GraphQL.IResolveFieldContext context);
     }
     public class MemberResolver : GraphQL.Resolvers.IFieldResolver
     {
@@ -1548,19 +1548,19 @@ namespace GraphQL.Resolvers
         public SourceStreamMethodResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
         protected override System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<object?>>> BuildSourceStreamResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
-        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context) { }
+        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveStreamAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class SourceStreamResolver<TReturnType> : GraphQL.Resolvers.ISourceStreamResolver
     {
         public SourceStreamResolver(System.Func<GraphQL.IResolveFieldContext, System.IObservable<TReturnType?>> sourceStreamResolver) { }
         public SourceStreamResolver(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
-        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context) { }
+        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class SourceStreamResolver<TSourceType, TReturnType> : GraphQL.Resolvers.ISourceStreamResolver
     {
         public SourceStreamResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
         public SourceStreamResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.ValueTask<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
-        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> SubscribeAsync(GraphQL.IResolveFieldContext context) { }
+        public System.Threading.Tasks.ValueTask<System.IObservable<object?>> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
 }
 namespace GraphQL.Transport
@@ -1863,7 +1863,7 @@ namespace GraphQL.Types
         public string Name { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
-        public GraphQL.Resolvers.ISourceStreamResolver? Subscriber { get; set; }
+        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
@@ -2490,8 +2490,8 @@ namespace GraphQL.Utilities
         public string Name { get; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Reflection.IAccessor? ResolverAccessor { get; set; }
-        public GraphQL.Resolvers.ISourceStreamResolver? Subscriber { get; set; }
-        public GraphQL.Reflection.IAccessor? SubscriberAccessor { get; set; }
+        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
+        public GraphQL.Reflection.IAccessor? StreamResolverAccessor { get; set; }
         public GraphQL.Utilities.ArgumentConfig ArgumentFor(string argumentName) { }
     }
     public interface ISchemaNodeVisitor

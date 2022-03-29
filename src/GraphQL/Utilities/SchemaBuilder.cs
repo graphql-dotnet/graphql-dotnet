@@ -327,9 +327,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         private void InitializeSubscriptionField(FieldConfig config, Type? parentType)
         {
             config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
-            config.SubscriberAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Subscriber);
+            config.StreamResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.StreamResolver);
 
-            if (config.ResolverAccessor != null && config.SubscriberAccessor != null)
+            if (config.ResolverAccessor != null && config.StreamResolverAccessor != null)
             {
                 config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
                     config.ResolverAccessor.MethodInfo,
@@ -344,8 +344,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         a.Modify(config);
                 }
 
-                config.Subscriber = AutoRegisteringHelper.BuildSourceStreamResolver(
-                    config.SubscriberAccessor.MethodInfo,
+                config.StreamResolver = AutoRegisteringHelper.BuildSourceStreamResolver(
+                    config.StreamResolverAccessor.MethodInfo,
                     null, // unknown source type
                     null, // unknown FieldType
                     AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
@@ -404,7 +404,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
-                Subscriber = fieldConfig.Subscriber,
+                StreamResolver = fieldConfig.StreamResolver,
             };
 
             fieldConfig.CopyMetadataTo(field);

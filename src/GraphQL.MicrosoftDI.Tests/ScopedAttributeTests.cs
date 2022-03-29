@@ -53,17 +53,17 @@ namespace GraphQL.MicrosoftDI.Tests
                 Source = new TestClass(),
                 RequestServices = rootServiceProvider,
             };
-            var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.Subscriber!;
-            var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.Subscriber!;
-            (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
-            (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("1 2"));
-            (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("2 3"));
+            var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.StreamResolver!;
+            var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.StreamResolver!;
+            (await unscopedSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("0 1"));
+            (await unscopedSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("1 2"));
+            (await unscopedSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("2 3"));
             Class1.DisposedCount.ShouldBe(0);
-            (await scopedAsyncSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
+            (await scopedAsyncSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("0 1"));
             Class1.DisposedCount.ShouldBe(1);
-            (await scopedAsyncSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("0 1"));
+            (await scopedAsyncSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("0 1"));
             Class1.DisposedCount.ShouldBe(2);
-            (await unscopedSubscriptionResolver.SubscribeAsync(context)).Subscribe(new SampleObserver("3 4"));
+            (await unscopedSubscriptionResolver.ResolveAsync(context)).Subscribe(new SampleObserver("3 4"));
             rootServiceProvider.Dispose();
             Class1.DisposedCount.ShouldBe(3);
         }

@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Subscription
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Conventions")]
     public class Subscription
     {
-        [GraphQLMetadata(Name = "messageAdded", ResolverType = ResolverType.Subscriber)]
+        [GraphQLMetadata(Name = "messageAdded", ResolverType = ResolverType.StreamResolver)]
         public IObservable<Message> SubscribeMessageAdded(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.Messages();
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Subscription
             return context.Source as Message;
         }
 
-        [GraphQLMetadata(Name = "messageGetAll", ResolverType = ResolverType.Subscriber)]
+        [GraphQLMetadata(Name = "messageGetAll", ResolverType = ResolverType.StreamResolver)]
         public IObservable<List<Message>> SubscribeMessageGetAll(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Subscription
             return context.Source as List<Message>;
         }
 
-        [GraphQLMetadata(Name = "messageAddedByUser", ResolverType = ResolverType.Subscriber)]
+        [GraphQLMetadata(Name = "messageAddedByUser", ResolverType = ResolverType.StreamResolver)]
         public IObservable<Message> SubscribeMessageAddedByUser(IResolveFieldContext context, string id)
         {
             var messages = SubscriptionSchemaWithReflection.Chat.Messages();
@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Subscription
             return context.Source as Message;
         }
 
-        [GraphQLMetadata(Name = "messageAddedAsync", ResolverType = ResolverType.Subscriber)]
+        [GraphQLMetadata(Name = "messageAddedAsync", ResolverType = ResolverType.StreamResolver)]
         public Task<IObservable<Message>> SubscribeMessageAddedAsync(IResolveFieldContext context)
         {
             return SubscriptionSchemaWithReflection.Chat.MessagesAsync();
@@ -90,7 +90,7 @@ namespace GraphQL.Tests.Subscription
             return context.Source as Message;
         }
 
-        [GraphQLMetadata(Name = "messageAddedByUserAsync", ResolverType = ResolverType.Subscriber)]
+        [GraphQLMetadata(Name = "messageAddedByUserAsync", ResolverType = ResolverType.StreamResolver)]
         public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(IResolveFieldContext context, string id)
         {
             var messages = await SubscriptionSchemaWithReflection.Chat.MessagesAsync();

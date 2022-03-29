@@ -85,7 +85,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
         /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
-        /// and <see cref="FieldType.Subscriber"/>.
+        /// and <see cref="FieldType.StreamResolver"/>.
         /// <br/><br/>
         /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
         /// member from <see cref="IResolveFieldContext.Source"/>.
@@ -101,7 +101,7 @@ namespace GraphQL.Types
                 var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
-                fieldType.Subscriber = null;
+                fieldType.StreamResolver = null;
             }
             else if (memberInfo is MethodInfo methodInfo)
             {
@@ -128,13 +128,13 @@ namespace GraphQL.Types
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
-                    fieldType.Subscriber = resolver;
+                    fieldType.StreamResolver = resolver;
                 }
                 else
                 {
                     var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
-                    fieldType.Subscriber = null;
+                    fieldType.StreamResolver = null;
                 }
                 fieldType.Arguments = queryArguments;
             }
@@ -143,7 +143,7 @@ namespace GraphQL.Types
                 var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Arguments = null;
                 fieldType.Resolver = resolver;
-                fieldType.Subscriber = null;
+                fieldType.StreamResolver = null;
             }
             else if (memberInfo == null)
             {

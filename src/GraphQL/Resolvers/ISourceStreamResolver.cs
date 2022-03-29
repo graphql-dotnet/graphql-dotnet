@@ -9,6 +9,6 @@ namespace GraphQL.Resolvers
     public interface ISourceStreamResolver
     {
         /// <inheritdoc cref="ISourceStreamResolver"/>
-        ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context);
+        ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context);
     }
 }

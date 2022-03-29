@@ -50,7 +50,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Gets or sets the event stream resolver.
         /// </summary>
-        public ISourceStreamResolver? Subscriber { get; set; }
+        public ISourceStreamResolver? StreamResolver { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IAccessor"/> representing the class member
@@ -62,7 +62,7 @@ namespace GraphQL.Utilities
         /// Gets or sets the <see cref="IAccessor"/> representing the class member
         /// to be executed for the subscription field's event stream resolver.
         /// </summary>
-        public IAccessor? SubscriberAccessor { get; set; }
+        public IAccessor? StreamResolverAccessor { get; set; }
 
         /// <summary>
         /// Gets configuration for specific field argument by argument name.
