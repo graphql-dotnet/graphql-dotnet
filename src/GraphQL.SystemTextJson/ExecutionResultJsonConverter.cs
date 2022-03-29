@@ -56,7 +56,7 @@ namespace GraphQL.SystemTextJson
                     writer.WriteStartObject();
                     foreach (var childNode in objectExecutionNode.SubFields)
                     {
-                        var propertyName = childNode.Name;
+                        var propertyName = childNode.Name!;
                         if (options.PropertyNamingPolicy != null)
                             propertyName = options.PropertyNamingPolicy.ConvertName(propertyName);
                         writer.WritePropertyName(propertyName);

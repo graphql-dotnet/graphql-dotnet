@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Diagnostics;
 using GraphQL;
 using GraphQL.Instrumentation;

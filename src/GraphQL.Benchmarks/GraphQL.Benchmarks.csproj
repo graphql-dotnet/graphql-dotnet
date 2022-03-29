@@ -4,7 +4,6 @@
     <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
     <OutputType>exe</OutputType>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

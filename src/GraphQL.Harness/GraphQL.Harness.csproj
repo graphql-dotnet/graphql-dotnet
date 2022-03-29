@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
-    <NoWarn>$(NoWarn);1591</NoWarn>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
