@@ -61,12 +61,12 @@ namespace GraphQL.SystemTextJson
                 _ => throw new InvalidOperationException($"Unexpected token type: {reader.TokenType}")
             };
 
-        private static List<object> ReadArray(ref Utf8JsonReader reader)
+        private static List<object?> ReadArray(ref Utf8JsonReader reader)
         {
             if (reader.TokenType != JsonTokenType.StartArray)
                 throw new JsonException();
 
-            var result = new List<object>();
+            var result = new List<object?>();
 
             while (reader.Read())
             {
