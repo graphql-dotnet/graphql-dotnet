@@ -485,6 +485,7 @@ interfaces have been slightly changed to have methods with `ValueTask` signature
 - `IFieldResolver`
 - `IEventStreamResolver` (`IAsyncEventStreamResolver` has been removed)
 - `IFieldMiddleware`
+- `IValidationRule`
 
 This will result in a substantial speed increase for schemas that use field middleware.
 
@@ -912,6 +913,7 @@ The following interfaces have been modified to support a `ValueTask` pipeline:
 - `IFieldResolver`
 - `IEventStreamResolver`
 - `IFieldMiddleware` and `FieldMiddlewareDelegate`
+- `IValidationRule`
 
 The following interfaces have been removed:
 
@@ -926,6 +928,7 @@ All classes which implemented the above interfaces have been modified as necessa
 - `FuncFieldResolver`
 - `NameFieldResolver`
 - `InstrumentFieldsMiddleware`
+- All built-in validation rules
 
 These properties have been removed:
 
@@ -1073,3 +1076,21 @@ will need to remove references to the `GraphQL.SystemReactive` nuget package.
 
 The `SubscriptionExecutionResult.Streams` property has been moved to the `ExecutionResult` class.
 Please use the `ExecutionResult` class rather than the `SubscriptionExecutionResult` class.
+
+### 43. `DateTimeOffsetGraphType` does not adjust to UTC
+
+Previously any ISO-8601 date/time values were converted to UTC before being returned in
+a `DateTimeOffset` value from the `DateTimeOffsetGraphType`. This results in a loss of
+information that was provided to the GraphQL request. In v5, the time offset is preserved.
+
+Although typically `DateTimeOffset` values are not assumed to be in any specific time zone,
+if your code does so, you may need to make changes to your code or implement a custom scalar
+to replace the default scalar.
+
+You may be affected by this change if you use certain versions of Npgsql.
+See https://www.npgsql.org/doc/types/datetime.html
+
+### 44. `OverlappingFieldsCanBeMerged` validation rule enabled by default
+
+Previously this rule, part of the GraphQL specification, was not enabled by default; in
+GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRules` list.
