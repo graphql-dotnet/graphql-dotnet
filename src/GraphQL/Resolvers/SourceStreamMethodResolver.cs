@@ -7,7 +7,7 @@ namespace GraphQL.Resolvers
     /// A precompiled source stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
-    public class EventStreamMethodResolver : MemberResolver, IEventStreamResolver
+    public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     {
         private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _sourceStreamResolver = null!;
 
@@ -19,7 +19,7 @@ namespace GraphQL.Resolvers
         /// An example of an instance expression would be as follows:
         /// <code>context =&gt; (TSourceType)context.Source</code>
         /// </summary>
-        public EventStreamMethodResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
+        public SourceStreamMethodResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
             : base(methodInfo, instanceExpression, methodArgumentExpressions)
         {
         }
@@ -27,14 +27,14 @@ namespace GraphQL.Resolvers
         /// <inheritdoc/>
         protected override Func<IResolveFieldContext, ValueTask<object?>> BuildFieldResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
-            _sourceStreamResolver = BuildEventStreamResolver(resolveFieldContextParameter, bodyExpression);
+            _sourceStreamResolver = BuildSourceStreamResolver(resolveFieldContextParameter, bodyExpression);
             return context => new ValueTask<object?>(context.Source);
         }
 
         /// <summary>
         /// Creates an appropriate event stream resolver function based on the return type of the expression body.
         /// </summary>
-        protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildEventStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
+        protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildSourceStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
             Expression? taskBodyExpression = null;
 
@@ -96,11 +96,11 @@ namespace GraphQL.Resolvers
             return lambda.Compile();
         }
 
-        private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromValueTaskAsync<T>(ValueTask<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 
-        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(EventStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 

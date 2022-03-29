@@ -36,7 +36,7 @@ public class ChatSubscriptions : ObjectGraphType
       Name = "messageAdded",
       Type = typeof(MessageType),
       Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-      Subscriber = new EventStreamResolver<Message>(Subscribe)
+      Subscriber = new SourceStreamResolver<Message>(Subscribe)
     });
   }
 
@@ -45,7 +45,7 @@ public class ChatSubscriptions : ObjectGraphType
     return context.Source as Message;
   }
 
-  private IObservable<Message> Subscribe(IResolveEventStreamContext context)
+  private IObservable<Message> Subscribe(IResolveFieldContext context)
   {
     return _chat.Messages();
   }

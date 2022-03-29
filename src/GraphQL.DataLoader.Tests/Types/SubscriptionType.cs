@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests.Types
                 Name = "orderAdded",
                 Type = typeof(OrderType),
                 Resolver = new FuncFieldResolver<Order>(ResolveMessage),
-                Subscriber = new EventStreamResolver<Order>(Subscribe)
+                Subscriber = new SourceStreamResolver<Order>(Subscribe)
             });
         }
 

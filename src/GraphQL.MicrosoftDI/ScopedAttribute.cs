@@ -22,7 +22,7 @@ namespace GraphQL
 
             if (fieldType.Subscriber != null)
             {
-                fieldType.Subscriber = new DynamicScopedEventStreamResolver(fieldType.Subscriber);
+                fieldType.Subscriber = new DynamicScopedSourceStreamResolver(fieldType.Subscriber);
             }
         }
     }
