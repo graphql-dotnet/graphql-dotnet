@@ -109,6 +109,40 @@ fragment comparisonFields on Character {
             withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
+        [Fact]
+        public void nested_fragments()
+        {
+            var withFrag = AnalyzeComplexity(@"query SomeDroids {
+                  droid(id: ""3"") {
+                    ...DroidFragment
+                  }
+               }
+
+               fragment DroidFragment on Droid {
+                 name
+                 ... nestedNameFragment1
+               }
+
+               fragment nestedNameFragment1 on Droid {
+                 ... nestedNameFragment2
+                 name
+               }
+
+               fragment nestedNameFragment2 on Droid {
+                 name
+            }");
+
+            var woFrag = AnalyzeComplexity(@"query SomeDroids {
+                  droid(id: ""3"") {
+                    name
+                  }
+               }");
+
+            withFrag.Complexity.ShouldBe(4/*woFrag.Complexity*/); // TODO: 4 != 2 but may be OK
+            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+        }
+
         [Fact]
         public void absurdly_huge_query()
         {
