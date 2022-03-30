@@ -57,7 +57,8 @@ namespace GraphQL.Validation.Complexity
             };
             var visitor = new ComplexityVisitor();
 
-            foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>())
+            // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
+            foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>().OrderBy(x => x, new NestedFragmentsComparer(doc)))
                 visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
 
             context.FragmentMapAlreadyBuilt = true;

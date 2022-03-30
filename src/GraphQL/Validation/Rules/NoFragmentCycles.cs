@@ -27,11 +27,11 @@ namespace GraphQL.Validation.Rules
             var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new();
             if (!visitedFrags.Contains(node.FragmentName.Name))
             {
-                detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
+                DetectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
             }
         });
 
-        private static void detectCycleRecursive(
+        private static void DetectCycleRecursive(
             GraphQLFragmentDefinition fragment,
             Stack<GraphQLFragmentSpread> spreadPath,
             HashSet<ROM> visitedFrags,
@@ -61,7 +61,7 @@ namespace GraphQL.Validation.Rules
                         var spreadFragment = context.Document.FindFragmentDefinition(spreadName);
                         if (spreadFragment != null)
                         {
-                            detectCycleRecursive(
+                            DetectCycleRecursive(
                                 spreadFragment,
                                 spreadPath,
                                 visitedFrags,
