@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests.Types
                 Name = "orderAdded",
                 Type = typeof(OrderType),
                 Resolver = new FuncFieldResolver<Order>(ResolveMessage),
-                StreamResolver = new SourceStreamResolver<Order>(StreamResolver)
+                StreamResolver = new SourceStreamResolver<Order>(ResolveStream)
             });
         }
 
@@ -28,7 +28,7 @@ namespace GraphQL.DataLoader.Tests.Types
             return context.Source as Order;
         }
 
-        private IObservable<Order> StreamResolver(IResolveFieldContext context)
+        private IObservable<Order> ResolveStream(IResolveFieldContext context)
         {
             return ordersStore.GetOrderObservable();
         }
