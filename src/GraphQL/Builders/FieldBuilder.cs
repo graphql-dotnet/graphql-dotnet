@@ -206,20 +206,20 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets an event resolver for the field.
+        /// Sets a source stream resolver for the field.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStream(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
         {
-            FieldType.Subscriber = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
+            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
             return this;
         }
 
         /// <summary>
-        /// Sets an event resolver for the field.
+        /// Sets a source stream resolver for the field.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
         {
-            FieldType.Subscriber = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
+            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
             return this;
         }
 

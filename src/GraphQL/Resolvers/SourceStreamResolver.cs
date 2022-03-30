@@ -34,7 +34,7 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context)
+        public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
             => _sourceStreamResolver(context);
     }
 
@@ -68,7 +68,7 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context)
+        public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
             => _sourceStreamResolver(context);
     }
 }

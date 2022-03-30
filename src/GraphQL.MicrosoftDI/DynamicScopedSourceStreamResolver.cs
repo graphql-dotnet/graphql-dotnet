@@ -21,11 +21,11 @@ namespace GraphQL.MicrosoftDI
             _resolverFunc = async context =>
             {
                 using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
-                return await resolver.SubscribeAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
+                return await resolver.ResolveAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }
 
         /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _resolverFunc(context);
+        public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context) => _resolverFunc(context);
     }
 }

@@ -104,7 +104,9 @@ namespace GraphQL.Resolvers
         private static async ValueTask<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 
-        /// <inheritdoc/>
-        public ValueTask<IObservable<object?>> SubscribeAsync(IResolveFieldContext context) => _sourceStreamResolver(context);
+        /// <inheritdoc cref="ISourceStreamResolver.ResolveAsync(IResolveFieldContext)" />
+        public ValueTask<IObservable<object?>> ResolveStreamAsync(IResolveFieldContext context) => _sourceStreamResolver(context);
+
+        ValueTask<IObservable<object?>> ISourceStreamResolver.ResolveAsync(IResolveFieldContext context) => ResolveStreamAsync(context);
     }
 }

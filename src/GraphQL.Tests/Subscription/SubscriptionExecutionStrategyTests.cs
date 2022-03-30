@@ -61,7 +61,7 @@ public class SubscriptionExecutionStrategyTests
         var result = await ExecuteAsync("subscription { testWithInitialError(custom: false) }");
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
-        result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Could not subscribe to field \u0027testWithInitialError\u0027."",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""APPLICATION"",""codes"":[""APPLICATION""]} }],""data"":null}");
+        result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Could not resolve source stream for field \u0027testWithInitialError\u0027."",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""APPLICATION"",""codes"":[""APPLICATION""]} }],""data"":null}");
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { notSubscriptionField }");
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Subscriber not set for field \u0027notSubscriptionField\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""notSubscriptionField""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
+        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""notSubscriptionField""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
     }
 
     public int Counter = 0;

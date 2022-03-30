@@ -335,7 +335,7 @@ namespace GraphQL.Types
         /// <param name="description">The description of this field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
-        /// <param name="subscribe">An even stream resolver delegate.</param>
+        /// <param name="subscribe">A source stream resolver delegate.</param>
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribe<TGraphType>(
@@ -357,7 +357,7 @@ namespace GraphQL.Types
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
-                Subscriber = subscribe != null
+                StreamResolver = subscribe != null
                     ? new SourceStreamResolver<object>(subscribe)
                     : null
             });
@@ -371,7 +371,7 @@ namespace GraphQL.Types
         /// <param name="description">The description of this field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
-        /// <param name="subscribeAsync">An even stream resolver delegate.</param>
+        /// <param name="subscribeAsync">A source stream resolver delegate.</param>
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribeAsync<TGraphType>(
@@ -393,7 +393,7 @@ namespace GraphQL.Types
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
-                Subscriber = subscribeAsync != null
+                StreamResolver = subscribeAsync != null
                     ? new SourceStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
                     : null
             });

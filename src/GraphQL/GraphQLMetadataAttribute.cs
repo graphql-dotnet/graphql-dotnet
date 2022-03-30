@@ -161,8 +161,8 @@ namespace GraphQL
         /// </summary>
         Resolver,
         /// <summary>
-        /// Indicates the specified method is an event stream resolver
+        /// Indicates the specified method is an source stream resolver
         /// </summary>
-        Subscriber
+        StreamResolver
     }
 }
