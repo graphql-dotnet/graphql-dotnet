@@ -1101,3 +1101,6 @@ GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRu
 
 - `IEventStreamResolver` is now `ISourceStreamResolver`
 - `EventStreamResolver` is now `SourceStreamResolver`
+- `IAsyncEventStreamResolver` and `AsyncEventStreamResolver` have been removed
+- `IEventStreamResolver.Subscriber` is now `ISourceStreamResolver.ResolveAsync`
+- Field builder `Subscribe` and `SubscribeAsync` methods are now `ResolveStream` and `ResolveStreamAsync`
