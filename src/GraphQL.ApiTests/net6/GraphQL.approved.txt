@@ -2827,6 +2827,7 @@ namespace GraphQL.Validation
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
+        public System.IServiceProvider? RequestServices { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
@@ -2844,12 +2845,12 @@ namespace GraphQL.Validation
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
     {
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
-        public string Number { get; set; }
+        public string? Number { get; set; }
     }
     public readonly struct ValidationOptions
     {
@@ -2858,6 +2859,7 @@ namespace GraphQL.Validation
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
+        public System.IServiceProvider? RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
