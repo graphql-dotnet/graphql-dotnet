@@ -1,6 +1,7 @@
 #nullable enable
 
 using GraphQL.MicrosoftDI;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,8 @@ public class RequestServicesTests
         services.AddScoped<Class1>();
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>()
-            .AddValidationRule<MyValidationRule>());
+            .AddValidationRule<MyValidationRule>()
+            .AddSystemTextJson());
         using var provider = services.BuildServiceProvider();
 
         // test class1 with root service provider
@@ -42,6 +44,11 @@ public class RequestServicesTests
 
         // verify that class1.GetNum returned "1" because it is a scoped instance
         result.Errors.ShouldHaveSingleItem().Message.ShouldBe("Num is 1");
+
+        // serialize to json to be sure no issues with a validation error without a number
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var resultString = serializer.Serialize(result);
+        resultString.ShouldBe(@"{""errors"":[{""message"":""Num is 1"",""extensions"":{""code"":""VALIDATION_ERROR"",""codes"":[""VALIDATION_ERROR""]}}]}");
     }
 
     private class MyValidationRule : IValidationRule
