@@ -65,6 +65,7 @@ Specific support is provided for serializing and deserializing to the following 
 | Class                   | Notes |
 |-------------------------|-------|
 | `ExecutionResult`       | Only serialization is supported |
+| `ExecutionError`        | Only serialization is supported |
 | `GraphQLRequest`        | |
 | `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
 | `OperationMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
