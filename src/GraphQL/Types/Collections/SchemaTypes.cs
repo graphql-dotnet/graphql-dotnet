@@ -51,10 +51,10 @@ namespace GraphQL.Types
             [typeof(Uri)] = typeof(UriGraphType),
         });
 
-        // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
+        // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
 
-        // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
+        // Standard scalars https://spec.graphql.org/October2021/#sec-Scalars
         private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
         {
             new StringGraphType(),
@@ -230,7 +230,7 @@ namespace GraphQL.Types
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+            //    throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
 
             if (schema.Query != null)
                 yield return schema.Query;

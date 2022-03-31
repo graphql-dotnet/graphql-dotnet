@@ -262,7 +262,7 @@ var json = await schema.ExecuteAsync(_ =>
 
 ### Grammar / AST
 
-- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](https://graphql.github.io/graphql-spec/June2018/).
+- Grammar and AST for the GraphQL language should be compatible with the [October 2021 specification](https://spec.graphql.org/October2021/).
 
 ### Operation Execution
 
@@ -315,7 +315,7 @@ var json = await schema.ExecuteAsync(_ =>
 
 ### Schema Introspection
 
-GraphQL.NET supports introspection schema from [June2018 spec](http://spec.graphql.org/June2018/#sec-Schema-Introspection)
+GraphQL.NET supports introspection schema from [October 2021 spec](https://spec.graphql.org/October2021/#sec-Schema-Introspection)
 with some additional experimental introspection [extensions](https://graphql-dotnet.github.io/docs/getting-started/directives#directives-and-introspection).
 
 ## Publishing NuGet packages
@@ -334,8 +334,8 @@ This project exists thanks to all the people who contribute.
 PRs are welcome! Looking for something to work on? The list of [open issues](https://github.com/graphql-dotnet/graphql-dotnet/issues)
 is a great place to start. You can help the project simply respond to some of the [asked questions](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aissue+is%3Aopen+label%3Aquestion).
 
-The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 4.x.x.
-If you have a PR with some breaking changes, then please target it to the `develop` branch.
+The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 5.x.x.
+If you have a PR with some breaking changes, then please target it to the `develop` branch that tracks changes for v6.0.0.
 
 ## Backers
 

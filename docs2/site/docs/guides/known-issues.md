@@ -321,7 +321,7 @@ execution strategy. Please read the section on this in the
 > see https://go.microsoft.com/fwlink/?linkid=2097913.
 
 This problem is due to the fact that the default execution strategy for a query operation
-is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/June2018/#sec-Normal-and-Serial-Execution),
+is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/October2021/#sec-Normal-and-Serial-Execution),
 combined with the fact that you are using a shared instance of the Entity Framework
 `DbContext`.
 
