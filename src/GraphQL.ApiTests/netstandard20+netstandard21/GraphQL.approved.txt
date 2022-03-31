@@ -2831,10 +2831,12 @@ namespace GraphQL.Validation
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
     {
-        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
+        public ValidationError(string message) { }
+        public ValidationError(string message, System.Exception? innerException) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
         public string? Number { get; set; }
     }

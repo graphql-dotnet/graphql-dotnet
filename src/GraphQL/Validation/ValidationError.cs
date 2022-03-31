@@ -12,8 +12,26 @@ namespace GraphQL.Validation
     {
         private readonly List<ASTNode> _nodes = new();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message.
+        /// </summary>
+        public ValidationError(string message) : base(message)
+        {
+            Code = GetValidationErrorCode(GetType());
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message. Sets the
+        /// <see cref="ExecutionError.Code">Code</see> property based on the inner exception.
+        /// Loads any exception data from the inner exception into this instance.
+        /// </summary>
+        public ValidationError(string message, Exception? innerException) : base(message, innerException)
+        {
+            Code = GetValidationErrorCode(GetType());
+        }
+
         /// <inheritdoc cref="ValidationError(ROM, string, string, ASTNode[])"/>
-        public ValidationError(ROM originalQuery, string? number, string message, ASTNode node)
+        public ValidationError(ROM originalQuery, string number, string message, ASTNode node)
             : this(originalQuery, number, message, (Exception?)null, node)
         {
         }
@@ -22,7 +40,7 @@ namespace GraphQL.Validation
         /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
         /// Sets locations based on the original query and specified AST nodes that this error applies to.
         /// </summary>
-        public ValidationError(ROM originalQuery, string? number, string message, params ASTNode[] nodes)
+        public ValidationError(ROM originalQuery, string number, string message, params ASTNode[] nodes)
             : this(originalQuery, number, message, null, nodes)
         {
         }
@@ -30,7 +48,7 @@ namespace GraphQL.Validation
         /// <inheritdoc cref="ValidationError(ROM, string, string, Exception, ASTNode[])"/>
         public ValidationError(
             ROM originalQuery,
-            string? number,
+            string number,
             string message,
             Exception? innerException,
             ASTNode node)
@@ -53,7 +71,7 @@ namespace GraphQL.Validation
         /// </summary>
         public ValidationError(
             ROM originalQuery,
-            string? number,
+            string number,
             string message,
             Exception? innerException,
             params ASTNode[]? nodes)
