@@ -66,6 +66,9 @@ namespace GraphQL.Validation
         /// <inheritdoc cref="ExecutionOptions.Extensions"/>
         public Inputs Extensions { get; set; } = null!;
 
+        /// <inheritdoc cref="ExecutionOptions.RequestServices"/>
+        public IServiceProvider? RequestServices { get; set; }
+
         /// <summary>
         /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
         /// defaults to <see cref="CancellationToken.None"/>
