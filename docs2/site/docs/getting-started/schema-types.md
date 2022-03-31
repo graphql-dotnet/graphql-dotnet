@@ -5,7 +5,7 @@
 A GraphQL object type has a name and fields, but at some point those fields have to resolve
 to some concrete data. That's where the scalar types come in: they represent the leaves of the query.
 
-These are the scalars provided by the [GraphQL Specification](https://graphql.github.io/graphql-spec/June2018/#sec-Scalars).
+These are the scalars provided by the [GraphQL Specification](https://spec.graphql.org/October2021/#sec-Scalars).
 
 | GraphQL | GraphQL.NET        | .NET                    |
 |----------|---------------------|-------------------------|

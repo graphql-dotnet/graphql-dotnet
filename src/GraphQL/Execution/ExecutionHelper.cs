@@ -133,7 +133,7 @@ namespace GraphQL.Execution
 
                 foreach (var field in inputObjectGraphType.Fields.List)
                 {
-                    // https://spec.graphql.org/June2018/#sec-Input-Objects
+                    // https://spec.graphql.org/October2021/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
