@@ -25,6 +25,7 @@ namespace GraphQL.Validation
             NonUserContext = null;
             Variables = null!;
             Extensions = null!;
+            RequestServices = null!;
         }
 
         /// <summary>
