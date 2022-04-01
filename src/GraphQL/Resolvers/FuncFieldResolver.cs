@@ -27,14 +27,9 @@ namespace GraphQL.Resolvers
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
 
-            if (resolver is Func<IResolveFieldContext, ValueTask<object?>> resolverObject)
-            {
-                _resolver = resolverObject;
-            }
-            else
-            {
-                _resolver = async context => await resolver(context).ConfigureAwait(false);
-            }
+            _resolver = resolver is Func<IResolveFieldContext, ValueTask<object?>> resolverObject
+                ? resolverObject
+                : async context => await resolver(context).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -66,14 +61,9 @@ namespace GraphQL.Resolvers
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
 
-            if (resolver is Func<IResolveFieldContext<TSourceType>, ValueTask<object?>> resolverObject)
-            {
-                _resolver = context => resolverObject(context.As<TSourceType>());
-            }
-            else
-            {
-                _resolver = async context => await resolver(context.As<TSourceType>()).ConfigureAwait(false);
-            }
+            _resolver = resolver is Func<IResolveFieldContext<TSourceType>, ValueTask<object?>> resolverObject
+                ? context => resolverObject(context.As<TSourceType>())
+                : async context => await resolver(context.As<TSourceType>()).ConfigureAwait(false);
         }
 
         private Func<IResolveFieldContext, ValueTask<object?>> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)

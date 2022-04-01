@@ -504,7 +504,7 @@ namespace GraphQL
         /// </summary>
         internal static string Print(this ASTNode node)
         {
-            var writer = new StringWriter();
+            using var writer = new StringWriter();
             _sdlPrinter.PrintAsync(node, writer).GetAwaiter().GetResult(); // actually is sync
             return writer.ToString()!;
         }

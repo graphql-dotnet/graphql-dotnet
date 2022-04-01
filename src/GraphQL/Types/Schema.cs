@@ -54,14 +54,11 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (runConfigurations)
+            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
             {
-                if (services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
+                foreach (var configuration in configurations)
                 {
-                    foreach (var configuration in configurations)
-                    {
-                        configuration.Configure(this, services);
-                    }
+                    configuration.Configure(this, services);
                 }
             }
         }

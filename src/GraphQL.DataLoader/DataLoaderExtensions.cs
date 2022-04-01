@@ -125,11 +125,9 @@ namespace GraphQL.DataLoader
         {
             return new SimpleDataLoader<TResult>(async cancellationToken =>
             {
-                List<T> list;
-                if (parents is ICollection collection)
-                    list = new(collection.Count);
-                else
-                    list = new();
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
                 foreach (var parent in parents)
                 {
                     list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
@@ -143,11 +141,9 @@ namespace GraphQL.DataLoader
         {
             return new SimpleDataLoader<TResult>(async cancellationToken =>
             {
-                List<T> list;
-                if (parents is ICollection collection)
-                    list = new(collection.Count);
-                else
-                    list = new();
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
                 foreach (var parent in parents)
                 {
                     list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
@@ -161,11 +157,9 @@ namespace GraphQL.DataLoader
         {
             return new SimpleDataLoader<TResult>(async cancellationToken =>
             {
-                List<T> list;
-                if (parents is ICollection collection)
-                    list = new(collection.Count);
-                else
-                    list = new();
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
                 foreach (var parent in parents)
                 {
                     list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
