@@ -104,7 +104,7 @@ namespace GraphQL.Validation
         public IEnumerable<ASTNode> Nodes => _nodes;
 
         /// <summary>
-        /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification.
+        /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification if any.
         /// </summary>
         public string? Number { get; set; }
     }
