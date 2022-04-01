@@ -1105,3 +1105,7 @@ GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRu
 - `IAsyncEventStreamResolver` and `AsyncEventStreamResolver` have been removed
 - `IEventStreamResolver.Subscriber` is now `ISourceStreamResolver.ResolveAsync`
 - Field builder `Subscribe` and `SubscribeAsync` methods are now `ResolveStream` and `ResolveStreamAsync`
+
+### 46. `ValidationContext.GetRecursiveVariables` returns null instead of an empty list
+
+This was done for the purposes of the overall strategy for reducing memory consumption.
