@@ -38,7 +38,7 @@ namespace GraphQL
                    typeof(ScalarGraphType).IsAssignableFrom(namedType2);
         }
 
-        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
         /// <summary>
         /// Indicates if the type is an input graph type (scalar or input object).
         /// </summary>
@@ -62,7 +62,7 @@ namespace GraphQL
                    typeof(IInputObjectGraphType).IsAssignableFrom(type);
         }
 
-        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
         /// <summary>
         /// Indicates if the graph type is an input graph type (scalar or input object).
         /// </summary>
@@ -75,7 +75,7 @@ namespace GraphQL
                    typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
         }
 
-        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
         /// <summary>
         /// Indicates if the type is an output graph type (scalar, object, interface or union).
         /// </summary>
@@ -101,7 +101,7 @@ namespace GraphQL
                    typeof(UnionGraphType).IsAssignableFrom(type);
         }
 
-        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
         /// <summary>
         /// Indicates if the graph type is an output graph type (scalar, object, interface or union).
         /// </summary>

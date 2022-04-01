@@ -39,7 +39,7 @@ namespace GraphQL
 
         /// <summary>
         /// Gets or sets current validation delegate. By default this delegate validates all names according
-        /// to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
+        /// to the GraphQL <see href="https://spec.graphql.org/October2021/#sec-Names">specification</see>.
         /// <br/><br/>
         /// Setting this delegate allows you to use names not conforming to the specification, for example
         /// 'enum-member'. Only change it when absolutely necessary. This is typically only overridden

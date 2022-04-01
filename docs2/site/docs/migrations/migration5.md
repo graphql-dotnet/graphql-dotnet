@@ -23,7 +23,7 @@ access these extensions from validation rules via `ValidationContext.Extensions`
 ### 3. Improved GraphQL-Parser
 
 GraphQL.NET v5 uses GraphQL-Parser v8. This release brought numerous changes in the parser object model,
-which began to better fit the [latest version](http://spec.graphql.org/October2021/) of the published
+which began to better fit the [latest version](https://spec.graphql.org/October2021/) of the published
 official GraphQL specification. GraphQL-Parser v8 has a lot of backward incompatible changes, but you are
 unlikely to come across them if you do not use advanced features.
 
@@ -65,6 +65,7 @@ Specific support is provided for serializing and deserializing to the following 
 | Class                   | Notes |
 |-------------------------|-------|
 | `ExecutionResult`       | Only serialization is supported |
+| `ExecutionError`        | Only serialization is supported |
 | `GraphQLRequest`        | |
 | `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
 | `OperationMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |

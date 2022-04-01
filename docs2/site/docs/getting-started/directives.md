@@ -1,12 +1,13 @@
 # Directives
 
 A directive can be attached to almost every part of the schema - field, query, enum, fragment inclusion etc. and can affect execution
-of the query in any way the server desires. The core GraphQL [specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives)
-includes exactly three directives.
+of the query in any way the server desires. The core GraphQL [specification](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
+includes exactly four directives.
 
 * `@include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Only include this field in the result if the argument is true.
 * `@skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Skip this field if the argument is true.
 * `@deprecated(reason: String = "No longer supported") on FIELD_DEFINITION | ENUM_VALUE` Indicates deprecated portions of a GraphQL service’s schema, such as deprecated fields on a type or deprecated enum values.
+* `@specifiedBy(url: String!) on SCALAR` Provides a scalar specification URL for specifying the behavior of custom scalar types.
 
 ```graphql
 query HeroQuery($id: ID, $withFriends: Boolean!) {
@@ -22,15 +23,16 @@ query HeroQuery($id: ID, $withFriends: Boolean!) {
 # Executable Directives and Type System Directives
 
 There are two types of directives - those that are applied on incoming requests (so called client directives) and applied
-on the schema (so called server directives). This is determined by the specified [locations](http://spec.graphql.org/June2018/#sec-Type-System.Directives)
+on the schema (so called server directives). This is determined by the specified [locations](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
 when defining the directive. Also it is acceptable to define a directive that will be both client-side and server-side.
 
 Server-side examples:
-- [@deprecated](http://spec.graphql.org/June2018/#sec--deprecated)
+- [@deprecated](https://spec.graphql.org/October2021/#sec--deprecated)
+- [@specifiedBy](https://spec.graphql.org/October2021/#sec--specifiedBy)
 
 Client-side examples:
-- [@skip](http://spec.graphql.org/June2018/#sec--skip)
-- [@include](http://spec.graphql.org/June2018/#sec--include)
+- [@skip](https://spec.graphql.org/October2021/#sec--skip)
+- [@include](https://spec.graphql.org/October2021/#sec--include)
 
 # Repeatable Directives
 
@@ -490,7 +492,7 @@ public class MyDirective : DirectiveGraphType
 If you do not explicitly set this property (either to `true` or `false`) then by default your
 directive definition along with all applications of this directive to the schema elements will
 be present in the introspection response if and only if directive definition has all its locations
-of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
+of type [`ExecutableDirectiveLocation`](https://spec.graphql.org/October2021/#ExecutableDirectiveLocation)
 (so called client-side directive).
 
 # Directive vs Field Middleware 
