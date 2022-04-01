@@ -21,9 +21,8 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message. Sets the
-        /// <see cref="ExecutionError.Code">Code</see> property based on the inner exception.
-        /// Loads any exception data from the inner exception into this instance.
+        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
+        /// Sets additional codes based on the inner exception(s). Loads any exception data from the inner exception into this instance.
         /// </summary>
         public ValidationError(string message, Exception? innerException) : base(message, innerException)
         {
