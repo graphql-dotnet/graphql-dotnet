@@ -76,7 +76,7 @@ namespace GraphQL
     {
         public ExecutionError(string message) { }
         public ExecutionError(string message, System.Collections.IDictionary data) { }
-        public ExecutionError(string message, System.Exception? exception) { }
+        public ExecutionError(string message, System.Exception? innerException) { }
         public string? Code { get; set; }
         public System.Collections.Generic.List<GraphQLParser.Location>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }

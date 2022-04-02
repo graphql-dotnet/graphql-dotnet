@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Rules
     {
         private sealed class FieldVisitor : BaseVariableVisitor
         {
-            public static readonly FieldVisitor Instance = new FieldVisitor();
+            public static readonly FieldVisitor Instance = new();
 
             public override void VisitField(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
             {

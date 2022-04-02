@@ -124,7 +124,7 @@ namespace GraphQL.Execution
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                if (!(input is GraphQLObjectValue objectValue))
+                if (input is not GraphQLObjectValue objectValue)
                 {
                     throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                 }

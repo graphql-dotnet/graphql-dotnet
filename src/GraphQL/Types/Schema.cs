@@ -13,7 +13,7 @@ namespace GraphQL.Types
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
-        private readonly object _allTypesInitializationLock = new object();
+        private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
         private List<IGraphType>? _additionalInstances;

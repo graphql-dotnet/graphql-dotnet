@@ -24,7 +24,7 @@ namespace GraphQL.Utilities
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
-        private static readonly List<string> _builtInScalars = new List<string>
+        private static readonly List<string> _builtInScalars = new()
         {
             "String",
             "Boolean",
@@ -33,7 +33,7 @@ namespace GraphQL.Utilities
             "ID"
         };
 
-        private static readonly List<string> _builtInDirectives = new List<string>
+        private static readonly List<string> _builtInDirectives = new()
         {
             "skip",
             "include",
