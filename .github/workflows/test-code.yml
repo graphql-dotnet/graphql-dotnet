@@ -61,13 +61,13 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: |
-          dotnet test \
-          --no-build \
-          --collect "XPlat Code Coverage" \
-          --results-directory .coverage \
-          -- \
-          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover \
+        run: >
+          dotnet test
+          --no-build
+          --collect "XPlat Code Coverage"
+          --results-directory .coverage
+          --
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
