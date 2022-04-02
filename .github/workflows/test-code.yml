@@ -61,12 +61,19 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore --no-build -p:CollectCoverage=true
+        run: >
+          dotnet test
+          --no-build
+          --collect "XPlat Code Coverage"
+          --results-directory .coverage
+          --
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v2.1.0
         with:
-          files: .coverage/GraphQL.DataLoader.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net6.opencover.xml
+          files: 'src/.coverage/**/coverage.opencover.xml'
 
   buildcheck:
     needs:
