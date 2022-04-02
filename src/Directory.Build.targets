@@ -1,9 +1,5 @@
 <Project>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
-    <Exclude>[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*</Exclude>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Nullable>enable</Nullable>
@@ -18,4 +14,5 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
+
 </Project>
