@@ -52,6 +52,9 @@ namespace GraphQL.Validation
         /// </summary>
         public GraphQLOperationDefinition Operation { get; init; } = null!;
 
+        /// <inheritdoc cref="ExecutionOptions.RequestServices"/>
+        public IServiceProvider? RequestServices { get; init; } = null;
+
         /// <summary>
         /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
         /// defaults to <see cref="CancellationToken.None"/>

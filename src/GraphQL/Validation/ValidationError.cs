@@ -12,6 +12,23 @@ namespace GraphQL.Validation
     {
         private readonly List<ASTNode> _nodes = new();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message.
+        /// </summary>
+        public ValidationError(string message) : base(message)
+        {
+            Code = GetValidationErrorCode(GetType());
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
+        /// Sets additional codes based on the inner exception(s). Loads any exception data from the inner exception into this instance.
+        /// </summary>
+        public ValidationError(string message, Exception? innerException) : base(message, innerException)
+        {
+            Code = GetValidationErrorCode(GetType());
+        }
+
         /// <inheritdoc cref="ValidationError(ROM, string, string, ASTNode[])"/>
         public ValidationError(ROM originalQuery, string number, string message, ASTNode node)
             : this(originalQuery, number, message, (Exception?)null, node)
@@ -86,8 +103,8 @@ namespace GraphQL.Validation
         public IEnumerable<ASTNode> Nodes => _nodes;
 
         /// <summary>
-        /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification.
+        /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification if any.
         /// </summary>
-        public string Number { get; set; }
+        public string? Number { get; set; }
     }
 }
