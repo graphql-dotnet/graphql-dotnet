@@ -61,12 +61,15 @@ jobs:
         run: dotnet build --no-restore -c Debug
       - name: Test solution [Debug]
         working-directory: src
-        run: dotnet test --no-restore --no-build --collect "XPlat Code Coverage"
+        run: dotnet test --no-restore --no-build --collect "XPlat Code Coverage" --results-directory .coverage -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      - name: List
+        working-directory: src/.coverage
+        run: ls -R
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v2.1.0
         with:
-          files: "**/coverage.opencover.xml"
+          files: 'src/.coverage/**/coverage.opencover.xml'
 
   buildcheck:
     needs:
