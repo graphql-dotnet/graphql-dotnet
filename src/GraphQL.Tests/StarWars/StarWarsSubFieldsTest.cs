@@ -124,7 +124,6 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
         AssertQuerySuccess(query, expected);
     }
 
-
     [Fact]
     public void subfields_does_not_throw_for_primitive()
     {

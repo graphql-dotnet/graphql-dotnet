@@ -188,7 +188,6 @@ type User @key(fields: ""id"") {
             new User { Id = "2", Username = "Two" },
         };
 
-
         var accessor = new DataLoaderContextAccessor
         {
             Context = new DataLoaderContext()
@@ -207,15 +206,15 @@ type User @key(fields: ""id"") {
             return Task.FromResult(loader.LoadAsync(id));
         });
 
-        var query = @"
-                {
-                    _entities(representations: [{__typename: ""User"", id: ""1"" }, {__typename: ""User"", id: ""2"" }]) {
-                        ... on User {
-                            id
-                            username
-                        }
-                    }
-                }";
+        string query = @"
+        {
+            _entities(representations: [{__typename: ""User"", id: ""1"" }, {__typename: ""User"", id: ""2"" }]) {
+                ... on User {
+                    id
+                    username
+                }
+            }
+        }";
 
         var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""1"", ""username"": ""One"" }, { ""__typename"": ""User"", ""id"" : ""2"", ""username"": ""Two"" }] }";
 

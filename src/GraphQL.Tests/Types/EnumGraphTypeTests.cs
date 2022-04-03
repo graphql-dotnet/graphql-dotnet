@@ -29,7 +29,7 @@ public class EnumGraphTypeTests
         }
     }
 
-    private readonly EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
+    private readonly EnumerationGraphType<Colors> type = new();
 
     [Fact]
     public void adds_values_from_enum()
@@ -44,7 +44,6 @@ public class EnumGraphTypeTests
         type.Values.Count.ShouldBe(5);
         type.Values.First().Description.ShouldBeNull();
     }
-
 
     [Fact]
     public void adds_values_from_enum_with_description_attribute()

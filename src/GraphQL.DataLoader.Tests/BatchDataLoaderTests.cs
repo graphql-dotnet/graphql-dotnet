@@ -300,7 +300,6 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
         Exception ex = await Should.ThrowAsync<ArgumentException>(async () =>
         {
-
             // Now await tasks
             var user1 = await task1.GetResultAsync();
             var user2 = await task2.GetResultAsync();

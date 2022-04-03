@@ -116,8 +116,7 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
         });
     }
 
-
-    private void duplicateFrag(
+    private static void duplicateFrag(
       ValidationTestConfig _,
       string fragName,
       int line1,
