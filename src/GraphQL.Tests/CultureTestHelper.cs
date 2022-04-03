@@ -18,7 +18,6 @@ namespace GraphQL.Tests
         /// Executes the specified delegate with a variety of cultures.
         /// Be sure to mark the test class with <c>[Collection("StaticTests")]</c>
         /// </summary>
-        /// <param name="scope"></param>
         public static void UseCultures(Action scope)
         {
             foreach (var culture in Cultures)
