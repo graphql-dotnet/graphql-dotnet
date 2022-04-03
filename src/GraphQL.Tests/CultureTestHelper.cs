@@ -4,7 +4,7 @@ namespace GraphQL.Tests
 {
     public static class CultureTestHelper
     {
-        public static IEnumerable<CultureInfo> Cultures => new[]
+        private static IEnumerable<CultureInfo> Cultures => new[]
         {
             new CultureInfo("ru-RU"),
             new CultureInfo("fi-FI"),
@@ -14,6 +14,11 @@ namespace GraphQL.Tests
             new CultureInfo(CultureInfo.CurrentCulture.Name)
         };
 
+        /// <summary>
+        /// Executes the specified delegate with a variety of cultures.
+        /// Be sure to mark the test class with <c>[Collection("StaticTests")]</c>
+        /// to avoid the interference of static variables.
+        /// </summary>
         public static void UseCultures(Action scope)
         {
             foreach (var culture in Cultures)
@@ -22,7 +27,7 @@ namespace GraphQL.Tests
             }
         }
 
-        public static void UseCulture(CultureInfo culture, Action scope)
+        private static void UseCulture(CultureInfo culture, Action scope)
         {
             var before = CultureInfo.CurrentCulture;
             var beforeUi = CultureInfo.CurrentUICulture;

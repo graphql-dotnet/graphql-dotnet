@@ -3,6 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class DateTimeOffsetGraphTypeTests
     {
         private readonly DateTimeOffsetGraphType _type = new DateTimeOffsetGraphType();

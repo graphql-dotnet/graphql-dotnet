@@ -3,6 +3,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class DecimalGraphTypeTests
     {
         private readonly DecimalGraphType _type = new DecimalGraphType();

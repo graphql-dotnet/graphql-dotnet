@@ -3,6 +3,7 @@ using GraphQL.Validation.Rules;
 
 namespace GraphQL.Tests.Validation
 {
+    [Collection("StaticTests")]
     public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrectType, ValidationSchema>
     {
         [Fact]

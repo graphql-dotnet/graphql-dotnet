@@ -4,6 +4,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class FloatGraphTypeTests
     {
         private readonly FloatGraphType type = new FloatGraphType();

@@ -5,6 +5,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class DateOnlyGraphTypeTests
     {
         private readonly DateOnlyGraphType _type = new();

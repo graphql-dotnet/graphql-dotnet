@@ -5,6 +5,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class TimeSpanMillisecondsGraphTypeTests
     {
         public class TimeSpanMillisecondsGraphTypeTestsData : IEnumerable<object[]>
