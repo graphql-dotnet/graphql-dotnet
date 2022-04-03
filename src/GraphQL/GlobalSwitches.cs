@@ -4,6 +4,11 @@ using GraphQL.Utilities;
 
 namespace GraphQL
 {
+    // decorate any test classes which contain tests that modify these global switches with
+    //   [Collection("StaticTests")]
+    // these tests will run sequentially after all other tests are complete
+    // be sure to restore the global switch to its initial state with a finally block
+
     /// <summary>
     /// Global options for configuring GraphQL execution.
     /// </summary>

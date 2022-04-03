@@ -3,6 +3,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Tests.Bugs
 {
+    [Collection("StaticTests")]
     public class Bug2194
     {
         [Fact]

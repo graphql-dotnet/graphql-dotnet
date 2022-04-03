@@ -3,6 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class DateTimeGraphTypeTests
     {
         private readonly DateTimeGraphType _type = new DateTimeGraphType();

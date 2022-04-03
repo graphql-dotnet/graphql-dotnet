@@ -8,6 +8,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Tests.Types
 {
+    [Collection("StaticTests")]
     public class ComplexGraphTypeTests
     {
         internal class ComplexType<T> : ObjectGraphType<T>

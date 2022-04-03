@@ -2,6 +2,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs
 {
+    [Collection("StaticTests")]
     public class Bug_nested_type_names_dont_conflict :
         QueryTestBase<Bug_nested_type_names_dont_conflict.MutationSchema>
     {

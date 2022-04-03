@@ -1,5 +1,6 @@
 namespace GraphQL.Tests
 {
+    [Collection("StaticTests")]
     public class ObjectExtensionsTests
     {
         [Fact]

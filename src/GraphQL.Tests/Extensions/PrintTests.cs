@@ -3,6 +3,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Extensions
 {
+    [Collection("StaticTests")]
     public class PrintTests
     {
         [Fact]
