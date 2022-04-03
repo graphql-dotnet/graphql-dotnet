@@ -3,95 +3,95 @@ using GraphQL.DI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Tests.Execution.Performance
+namespace GraphQL.Tests.Execution.Performance;
+
+public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.ThreadPerformanceSchema>
 {
-    public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.ThreadPerformanceSchema>
+    public override void RegisterServices(IServiceRegister register)
     {
-        public override void RegisterServices(IServiceRegister register)
+        register.Transient<PerfQuery>();
+        register.Transient<PerfMutation>();
+        register.Singleton<ThreadPerformanceSchema>();
+    }
+
+    public class PerfQuery : ObjectGraphType<object>
+    {
+        public PerfQuery()
         {
-            register.Transient<PerfQuery>();
-            register.Transient<PerfMutation>();
-            register.Singleton<ThreadPerformanceSchema>();
+            Name = "Query";
+
+            FieldAsync<StringGraphType, string>("halfSecond", resolve: c => Get(500, "Half"));
+            FieldAsync<StringGraphType, string>("quarterSecond", resolve: c => Get(500, "Quarter"));
         }
 
-        public class PerfQuery : ObjectGraphType<object>
+        private async Task<string> Get(int milliseconds, string result)
         {
-            public PerfQuery()
-            {
-                Name = "Query";
+            await Task.Delay(milliseconds);
+            return result;
+        }
+    }
 
-                FieldAsync<StringGraphType, string>("halfSecond", resolve: c => Get(500, "Half"));
-                FieldAsync<StringGraphType, string>("quarterSecond", resolve: c => Get(500, "Quarter"));
-            }
+    public class PerfMutation : ObjectGraphType<object>
+    {
+        public static readonly List<string> Calls = new List<string>();
 
-            private async Task<string> Get(int milliseconds, string result)
-            {
-                await Task.Delay(milliseconds);
-                return result;
-            }
+        public PerfMutation()
+        {
+            Name = "Mutation";
+
+            FieldAsync<StringGraphType, string>("setFive", resolve: c => Set("5"));
+            FieldAsync<StringGraphType, string>("setOne", resolve: c => Set("1"));
         }
 
-        public class PerfMutation : ObjectGraphType<object>
+        private Task<string> Set(string result)
         {
-            public static readonly List<string> Calls = new List<string>();
-
-            public PerfMutation()
-            {
-                Name = "Mutation";
-
-                FieldAsync<StringGraphType, string>("setFive", resolve: c => Set("5"));
-                FieldAsync<StringGraphType, string>("setOne", resolve: c => Set("1"));
-            }
-
-            private Task<string> Set(string result)
-            {
-                Calls.Add(result);
-                var list = string.Join(",", Calls.ToList());
-                return Task.FromResult(list);
-            }
+            Calls.Add(result);
+            var list = string.Join(",", Calls.ToList());
+            return Task.FromResult(list);
         }
+    }
 
-        public class ThreadPerformanceSchema : Schema
+    public class ThreadPerformanceSchema : Schema
+    {
+        public ThreadPerformanceSchema(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            public ThreadPerformanceSchema(IServiceProvider serviceProvider)
-                : base(serviceProvider)
-            {
-                Query = serviceProvider.GetRequiredService<PerfQuery>();
-                Mutation = serviceProvider.GetRequiredService<PerfMutation>();
-            }
+            Query = serviceProvider.GetRequiredService<PerfQuery>();
+            Mutation = serviceProvider.GetRequiredService<PerfMutation>();
         }
+    }
 
-        [Fact(Skip = "May fail on a single processor machine.")]
-        // [Fact]
-        public void Executes_IsQuickerThanTotalTaskTime()
-        {
-            var query = @"
+    [Fact(Skip = "May fail on a single processor machine.")]
+    // [Fact]
+    public void Executes_IsQuickerThanTotalTaskTime()
+    {
+        var query = @"
                 query HeroNameAndFriendsQuery {
                   halfSecond,
                   quarterSecond
                 }
             ";
 
-            var smallListTimer = new Stopwatch();
-            smallListTimer.Start();
+        var smallListTimer = new Stopwatch();
+        smallListTimer.Start();
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
-            {
-                _.EnableMetrics = false;
-                _.Schema = Schema;
-                _.Query = query;
-            }).GetAwaiter().GetResult();
-
-            smallListTimer.Stop();
-
-            runResult2.Errors.ShouldBeNull();
-            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(900);
-        }
-
-        [Fact]
-        public async Task Mutations_RunSynchronously()
+        var runResult2 = Executer.ExecuteAsync(_ =>
         {
-            var query = @"
+            _.EnableMetrics = false;
+            _.Schema = Schema;
+            _.Query = query;
+        }).GetAwaiter().GetResult();
+
+        smallListTimer.Stop();
+
+        runResult2.Errors.ShouldBeNull();
+        smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(900);
+    }
+
+    [Fact]
+    public async Task Mutations_RunSynchronously()
+    {
+        var query = @"
                 mutation Multiple {
                   m1:setFive
                   m2:setFive
@@ -113,14 +113,13 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            var result = await Executer.ExecuteAsync(_ =>
-            {
-                _.Schema = Schema;
-                _.Query = query;
-            });
+        var result = await Executer.ExecuteAsync(_ =>
+        {
+            _.Schema = Schema;
+            _.Query = query;
+        });
 
-            result.Errors.ShouldBeNull();
-            ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
-        }
+        result.Errors.ShouldBeNull();
+        ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
     }
 }

@@ -1,10 +1,9 @@
-namespace GraphQL.MicrosoftDI.Tests
+namespace GraphQL.MicrosoftDI.Tests;
+
+internal static class TestExtensions
 {
-    internal static class TestExtensions
+    public static void ShouldBeTask(this ValueTask<object> value, object expected)
     {
-        public static void ShouldBeTask(this ValueTask<object> value, object expected)
-        {
-            value.AsTask().Result.ShouldBe(expected);
-        }
+        value.AsTask().Result.ShouldBe(expected);
     }
 }
