@@ -3,63 +3,63 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 
-namespace GraphQL.Tests.Execution
+namespace GraphQL.Tests.Execution;
+
+public class UnionInterfaceTests : QueryTestBase<UnionSchema>
 {
-    public class UnionInterfaceTests : QueryTestBase<UnionSchema>
+    private readonly Person _john;
+
+    public UnionInterfaceTests()
     {
-        private readonly Person _john;
-
-        public UnionInterfaceTests()
+        var garfield = new Cat
         {
-            var garfield = new Cat
-            {
-                Name = "Garfield",
-                Meows = false
-            };
+            Name = "Garfield",
+            Meows = false
+        };
 
-            var odie = new Dog
-            {
-                Name = "Odie",
-                Barks = true
-            };
-
-            var liz = new Person
-            {
-                Name = "Liz",
-                Pets = new List<IPet>(),
-                Friends = new List<INamed>()
-            };
-
-            _john = new Person
-            {
-                Name = "John",
-                Pets = new List<IPet>
-                {
-                    garfield,
-                    odie
-                },
-                Friends = new List<INamed>
-                {
-                    liz,
-                    odie
-                }
-            };
-        }
-
-        public override void RegisterServices(IServiceRegister register)
+        var odie = new Dog
         {
-            register.Transient<DogType>();
-            register.Transient<CatType>();
-            register.Transient<PetType>();
-            register.Transient<PersonType>();
-            register.Transient<NamedType>();
-            register.Singleton<UnionSchema>();
-        }
+            Name = "Odie",
+            Barks = true
+        };
 
-        [Fact]
-        public void can_introspect_on_union_and_intersection_types()
+        var liz = new Person
         {
-            var query = @"
+            Name = "Liz",
+            Pets = new List<IPet>(),
+            Friends = new List<INamed>()
+        };
+
+        _john = new Person
+        {
+            Name = "John",
+            Pets = new List<IPet>
+            {
+                garfield,
+                odie
+            },
+            Friends = new List<INamed>
+            {
+                liz,
+                odie
+            }
+        };
+    }
+
+    public override void RegisterServices(IServiceRegister register)
+    {
+        register.Transient<DogType>();
+        register.Transient<CatType>();
+        register.Transient<PetType>();
+        register.Transient<PersonType>();
+        register.Transient<NamedType>();
+        register.Singleton<UnionSchema>();
+    }
+
+    [Fact]
+    public void can_introspect_on_union_and_intersection_types()
+    {
+        var query = @"
             query AQuery {
                 Named: __type(name: ""Named"") {
                   kind
@@ -82,7 +82,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var expected = @"{
+        var expected = @"{
                 ""Named"": {
                   ""kind"": ""INTERFACE"",
                   ""name"": ""Named"",
@@ -112,15 +112,15 @@ namespace GraphQL.Tests.Execution
                 }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void executes_using_union_types()
-        {
-            // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
+    [Fact]
+    public void executes_using_union_types()
+    {
+        // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-            var query = @"
+        var query = @"
                 query AQuery {
                   __typename
                   name
@@ -133,7 +133,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
@@ -141,19 +141,19 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
-            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
-            result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
-            result.Errors[1].Message.ShouldBe("Error trying to resolve field 'pets'.");
-            result.Errors[1].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'meows' from type 'Dog'.");
-        }
+        var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
+        result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
+        result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
+        result.Errors[1].Message.ShouldBe("Error trying to resolve field 'pets'.");
+        result.Errors[1].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'meows' from type 'Dog'.");
+    }
 
-        [Fact]
-        public void executes_union_types_with_inline_fragments()
-        {
-            // This is the valid version of the query in the above test.
+    [Fact]
+    public void executes_union_types_with_inline_fragments()
+    {
+        // This is the valid version of the query in the above test.
 
-            var query = @"
+        var query = @"
                 query AQuery {
                   __typename
                   name
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
@@ -182,15 +182,15 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john);
-        }
+        AssertQuerySuccess(query, expected, root: _john);
+    }
 
-        [Fact]
-        public void executes_using_interface_types()
-        {
-            // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
+    [Fact]
+    public void executes_using_interface_types()
+    {
+        // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-            var query = @"
+        var query = @"
                 query AQuery {
                   __typename
                   name
@@ -203,7 +203,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
@@ -211,17 +211,17 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
-            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'friends'.");
-            result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Person'.");
-            result.Errors[1].Message.ShouldBe("Error trying to resolve field 'friends'.");
-            result.Errors[1].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'meows' from type 'Dog'.");
-        }
+        var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
+        result.Errors[0].Message.ShouldBe("Error trying to resolve field 'friends'.");
+        result.Errors[0].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Person'.");
+        result.Errors[1].Message.ShouldBe("Error trying to resolve field 'friends'.");
+        result.Errors[1].InnerException.Message.ShouldBe("Schema is not configured correctly to fetch field 'meows' from type 'Dog'.");
+    }
 
-        [Fact]
-        public void allows_fragment_conditions_to_be_abstract_types()
-        {
-            var query = @"
+    [Fact]
+    public void allows_fragment_conditions_to_be_abstract_types()
+    {
+        var query = @"
                 query AQuery {
                   __typename
                   name
@@ -251,7 +251,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                   ""__typename"": ""Person"",
                   ""name"": ""John"",
@@ -266,105 +266,104 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john);
-        }
+        AssertQuerySuccess(query, expected, root: _john);
     }
+}
 
-    public interface INamed
+public interface INamed
+{
+    string Name { get; set; }
+}
+
+public interface IPet : INamed
+{
+}
+
+public class Dog : IPet
+{
+    public string Name { get; set; }
+    public bool Barks { get; set; }
+}
+
+public class Cat : IPet
+{
+    public string Name { get; set; }
+    public bool Meows { get; set; }
+}
+
+public class Person : INamed
+{
+    public string Name { get; set; }
+    public List<IPet> Pets { get; set; }
+    public List<INamed> Friends { get; set; }
+}
+
+public class NamedType : InterfaceGraphType
+{
+    public NamedType()
     {
-        string Name { get; set; }
+        Name = "Named";
+
+        Field<StringGraphType>("name");
     }
+}
 
-    public interface IPet : INamed
+public class DogType : ObjectGraphType<Dog>
+{
+    public DogType()
     {
+        Name = "Dog";
+
+        Field<StringGraphType>("name");
+        Field<BooleanGraphType>("barks");
+
+        Interface<NamedType>();
     }
+}
 
-    public class Dog : IPet
+public class CatType : ObjectGraphType<Cat>
+{
+    public CatType()
     {
-        public string Name { get; set; }
-        public bool Barks { get; set; }
+        Name = "Cat";
+
+        Field<StringGraphType>("name");
+        Field<BooleanGraphType>("meows");
+
+        Interface<NamedType>();
     }
+}
 
-    public class Cat : IPet
+public class PetType : UnionGraphType
+{
+    public PetType()
     {
-        public string Name { get; set; }
-        public bool Meows { get; set; }
+        Name = "Pet";
+
+        Type<DogType>();
+        Type<CatType>();
     }
+}
 
-    public class Person : INamed
+public class PersonType : ObjectGraphType<Person>
+{
+    public PersonType()
     {
-        public string Name { get; set; }
-        public List<IPet> Pets { get; set; }
-        public List<INamed> Friends { get; set; }
+        Name = "Person";
+
+        Field<StringGraphType>("name");
+        Field<ListGraphType<PetType>>("pets");
+        Field<ListGraphType<NamedType>>("friends");
+
+        Interface<NamedType>();
     }
+}
 
-    public class NamedType : InterfaceGraphType
+public class UnionSchema : Schema
+{
+    public UnionSchema(IServiceProvider resolver)
+        : base(resolver)
     {
-        public NamedType()
-        {
-            Name = "Named";
-
-            Field<StringGraphType>("name");
-        }
-    }
-
-    public class DogType : ObjectGraphType<Dog>
-    {
-        public DogType()
-        {
-            Name = "Dog";
-
-            Field<StringGraphType>("name");
-            Field<BooleanGraphType>("barks");
-
-            Interface<NamedType>();
-        }
-    }
-
-    public class CatType : ObjectGraphType<Cat>
-    {
-        public CatType()
-        {
-            Name = "Cat";
-
-            Field<StringGraphType>("name");
-            Field<BooleanGraphType>("meows");
-
-            Interface<NamedType>();
-        }
-    }
-
-    public class PetType : UnionGraphType
-    {
-        public PetType()
-        {
-            Name = "Pet";
-
-            Type<DogType>();
-            Type<CatType>();
-        }
-    }
-
-    public class PersonType : ObjectGraphType<Person>
-    {
-        public PersonType()
-        {
-            Name = "Person";
-
-            Field<StringGraphType>("name");
-            Field<ListGraphType<PetType>>("pets");
-            Field<ListGraphType<NamedType>>("friends");
-
-            Interface<NamedType>();
-        }
-    }
-
-    public class UnionSchema : Schema
-    {
-        public UnionSchema(IServiceProvider resolver)
-            : base(resolver)
-        {
-            Query = resolver.GetRequiredService<PersonType>();
-        }
+        Query = resolver.GetRequiredService<PersonType>();
     }
 }

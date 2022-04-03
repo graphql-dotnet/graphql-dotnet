@@ -1,8 +1,8 @@
-namespace GraphQL.Benchmarks
+namespace GraphQL.Benchmarks;
+
+public static class Variables
 {
-    public static class Variables
-    {
-        public static readonly string VariablesVariable = @"
+    public static readonly string VariablesVariable = @"
 { ""in"":
   [
     {
@@ -29,5 +29,4 @@ namespace GraphQL.Benchmarks
   ]
 }
 ";
-    }
 }

@@ -1,12 +1,11 @@
 using GraphQL.Utilities.Federation;
 
-namespace GraphQL.Tests.Utilities
+namespace GraphQL.Tests.Utilities;
+
+public class FederatedSchemaBuilderTestBase : SchemaBuilderTestBase
 {
-    public class FederatedSchemaBuilderTestBase : SchemaBuilderTestBase
+    public FederatedSchemaBuilderTestBase()
     {
-        public FederatedSchemaBuilderTestBase()
-        {
-            Builder = new FederatedSchemaBuilder();
-        }
+        Builder = new FederatedSchemaBuilder();
     }
 }

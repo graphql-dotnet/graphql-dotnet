@@ -1,250 +1,249 @@
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GraphQL.Tests.Subscription
+namespace GraphQL.Tests.Subscription;
+
+public class SubscriptionWithAutoGraphTypeTests
 {
-    public class SubscriptionWithAutoGraphTypeTests
+    private readonly Chat Chat = new Chat();
+
+    protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
     {
-        private readonly Chat Chat = new Chat();
+        var executer = new DocumentExecuter();
+        var services = new ServiceCollection();
+        services.AddSingleton<IChat>(Chat);
+        var provider = services.BuildServiceProvider();
 
-        protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
+        options.Schema = new SubscriptionSchemaWithAutoGraphType();
+        options.RequestServices = provider;
+
+        var result = await executer.ExecuteAsync(options);
+
+        result.Data.ShouldBeNull();
+
+        return result;
+    }
+
+    [Fact]
+    public async Task SubscribeGetAll()
+    {
+        /* Given */
+        var addedMessage = new Message
         {
-            var executer = new DocumentExecuter();
-            var services = new ServiceCollection();
-            services.AddSingleton<IChat>(Chat);
-            var provider = services.BuildServiceProvider();
+            Content = "test",
+            From = new MessageFrom
+            {
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
 
-            options.Schema = new SubscriptionSchemaWithAutoGraphType();
-            options.RequestServices = provider;
-
-            var result = await executer.ExecuteAsync(options);
-
-            result.Data.ShouldBeNull();
-
-            return result;
-        }
-
-        [Fact]
-        public async Task SubscribeGetAll()
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
-            /* Given */
-            var addedMessage = new Message
-            {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+            Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
+        });
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
-            });
+        Chat.AddMessageGetAll(addedMessage);
 
-            Chat.AddMessageGetAll(addedMessage);
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
 
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
+        message.ShouldNotBeNull();
+        var data = message.Data.ToDict();
+        data.ShouldNotBeNull();
+        data["messageGetAll"].ShouldNotBeNull();
+    }
 
-            message.ShouldNotBeNull();
-            var data = message.Data.ToDict();
-            data.ShouldNotBeNull();
-            data["messageGetAll"].ShouldNotBeNull();
-        }
-
-        [Fact]
-        public async Task SubscribeToContent()
+    [Fact]
+    public async Task SubscribeToContent()
+    {
+        /* Given */
+        var addedMessage = new Message
         {
-            /* Given */
-            var addedMessage = new Message
+            Content = "test",
+            From = new MessageFrom
             {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription newMessageContent { newMessageContent }",
-            });
-
-            Chat.AddMessage(addedMessage);
-
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
-
-            message.ShouldNotBeNull();
-            var data = message.Data.ToDict();
-            data.ShouldNotBeNull();
-            data["newMessageContent"].ShouldNotBeNull();
-            data["newMessageContent"].ToString().ShouldBe("test");
-        }
-
-        [Fact]
-        public async Task Subscribe()
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
-            /* Given */
-            var addedMessage = new Message
-            {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+            Query = "subscription newMessageContent { newMessageContent }",
+        });
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-            });
+        Chat.AddMessage(addedMessage);
 
-            Chat.AddMessage(addedMessage);
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
 
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
+        message.ShouldNotBeNull();
+        var data = message.Data.ToDict();
+        data.ShouldNotBeNull();
+        data["newMessageContent"].ShouldNotBeNull();
+        data["newMessageContent"].ToString().ShouldBe("test");
+    }
 
-            message.ShouldNotBeNull();
-            message.ShouldBeOfType<ExecutionResult>();
-            message.Data.ShouldNotBeNull();
-            message.Data.ShouldNotBeAssignableTo<Task>();
-        }
-
-        [Fact]
-        public async Task SubscribeAsync()
+    [Fact]
+    public async Task Subscribe()
+    {
+        /* Given */
+        var addedMessage = new Message
         {
-            /* Given */
-            var addedMessage = new Message
+            Content = "test",
+            From = new MessageFrom
             {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
-            });
-
-            Chat.AddMessage(addedMessage);
-
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
-
-            message.ShouldNotBeNull();
-            message.ShouldBeOfType<ExecutionResult>();
-            message.Data.ShouldNotBeNull();
-            message.Data.ShouldNotBeAssignableTo<Task>();
-        }
-
-        [Fact]
-        public async Task SubscribeWithArgument()
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
-            /* Given */
-            var addedMessage = new Message
-            {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+            Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
+        });
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
-                Variables = new Inputs(new Dictionary<string, object>
-                {
-                    ["id"] = "1"
-                })
-            });
+        Chat.AddMessage(addedMessage);
 
-            Chat.AddMessage(addedMessage);
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
 
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
+        message.ShouldNotBeNull();
+        message.ShouldBeOfType<ExecutionResult>();
+        message.Data.ShouldNotBeNull();
+        message.Data.ShouldNotBeAssignableTo<Task>();
+    }
 
-            message.ShouldNotBeNull();
-            message.ShouldBeOfType<ExecutionResult>();
-            message.Data.ShouldNotBeNull();
-        }
-
-        [Fact]
-        public async Task SubscribeWithArgumentAsync()
+    [Fact]
+    public async Task SubscribeAsync()
+    {
+        /* Given */
+        var addedMessage = new Message
         {
-            /* Given */
-            var addedMessage = new Message
+            Content = "test",
+            From = new MessageFrom
             {
-                Content = "test",
-                From = new MessageFrom
-                {
-                    DisplayName = "test",
-                    Id = "1"
-                },
-                SentAt = DateTime.Now.Date
-            };
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
 
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
-            {
-                Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
-                Variables = new Inputs(new Dictionary<string, object>
-                {
-                    ["id"] = "1"
-                })
-            });
-
-            Chat.AddMessage(addedMessage);
-
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
-
-            message.ShouldNotBeNull();
-            message.ShouldBeOfType<ExecutionResult>();
-            message.Data.ShouldNotBeNull();
-        }
-
-        [Fact]
-        public async Task OnError()
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
-            /* When */
-            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
+        });
+
+        Chat.AddMessage(addedMessage);
+
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
+
+        message.ShouldNotBeNull();
+        message.ShouldBeOfType<ExecutionResult>();
+        message.Data.ShouldNotBeNull();
+        message.Data.ShouldNotBeAssignableTo<Task>();
+    }
+
+    [Fact]
+    public async Task SubscribeWithArgument()
+    {
+        /* Given */
+        var addedMessage = new Message
+        {
+            Content = "test",
+            From = new MessageFrom
             {
-                Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-            });
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
 
-            Chat.AddError(new Exception("test"));
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
+        {
+            Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
+            Variables = new Inputs(new Dictionary<string, object>
+            {
+                ["id"] = "1"
+            })
+        });
 
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
-            error.InnerException.Message.ShouldBe("test");
-            error.Path.ShouldBe(new[] { "messageAdded" });
-        }
+        Chat.AddMessage(addedMessage);
+
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
+
+        message.ShouldNotBeNull();
+        message.ShouldBeOfType<ExecutionResult>();
+        message.Data.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task SubscribeWithArgumentAsync()
+    {
+        /* Given */
+        var addedMessage = new Message
+        {
+            Content = "test",
+            From = new MessageFrom
+            {
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateTime.Now.Date
+        };
+
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
+        {
+            Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
+            Variables = new Inputs(new Dictionary<string, object>
+            {
+                ["id"] = "1"
+            })
+        });
+
+        Chat.AddMessage(addedMessage);
+
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
+
+        message.ShouldNotBeNull();
+        message.ShouldBeOfType<ExecutionResult>();
+        message.Data.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task OnError()
+    {
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
+        {
+            Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
+        });
+
+        Chat.AddError(new Exception("test"));
+
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
+        error.InnerException.Message.ShouldBe("test");
+        error.Path.ShouldBe(new[] { "messageAdded" });
     }
 }

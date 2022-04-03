@@ -1,29 +1,29 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 
-namespace GraphQL.Tests.Validation
+namespace GraphQL.Tests.Validation;
+
+public class NoUndefinedVariablesTests : ValidationTestBase<NoUndefinedVariables, ValidationSchema>
 {
-    public class NoUndefinedVariablesTests : ValidationTestBase<NoUndefinedVariables, ValidationSchema>
+    [Fact]
+    public void all_variables_defined()
     {
-        [Fact]
-        public void all_variables_defined()
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String, $c: String) {
                     field(a: $a, b: $b, c: $c)
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void all_variables_deeply_defined()
+    [Fact]
+    public void all_variables_deeply_defined()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String, $c: String) {
                     field(a: $a) {
                       field(b: $b) {
@@ -32,15 +32,15 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void all_variables_deeply_in_inline_fragments_defined()
+    [Fact]
+    public void all_variables_deeply_in_inline_fragments_defined()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String, $c: String) {
                     ... on Type {
                       field(a: $a) {
@@ -53,15 +53,15 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void all_variables_in_fragments_deeply_defined()
+    [Fact]
+    public void all_variables_in_fragments_deeply_defined()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String, $c: String) {
                     ...FragA
                   }
@@ -79,15 +79,15 @@ namespace GraphQL.Tests.Validation
                     field(c: $c)
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void variable_within_single_fragment_defined_in_multiple_operations()
+    [Fact]
+    public void variable_within_single_fragment_defined_in_multiple_operations()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String) {
                     ...FragA
                   }
@@ -98,15 +98,15 @@ namespace GraphQL.Tests.Validation
                     field(a: $a)
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void variable_within_fragments_defined_in_operations()
+    [Fact]
+    public void variable_within_fragments_defined_in_operations()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String) {
                     ...FragA
                   }
@@ -120,15 +120,15 @@ namespace GraphQL.Tests.Validation
                     field(b: $b)
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void variable_within_recursive_fragment_defined()
+    [Fact]
+    public void variable_within_recursive_fragment_defined()
+    {
+        ShouldPassRule(_ =>
         {
-            ShouldPassRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String) {
                     ...FragA
                   }
@@ -138,58 +138,58 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-            });
-        }
+        });
+    }
 
-        [Fact]
-        public void variable_not_defined()
+    [Fact]
+    public void variable_not_defined()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String, $c: String) {
                     field(a: $a, b: $b, c: $c, d: $d)
                   }
                 ";
-                undefVar(_, "d", 3, 51, "Foo", 2, 19);
-            });
-        }
+            undefVar(_, "d", 3, 51, "Foo", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void variable_not_defined_by_unnamed_query()
+    [Fact]
+    public void variable_not_defined_by_unnamed_query()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   {
                     field(a: $a)
                   }
                 ";
-                undefVar(_, "a", 3, 30, "", 2, 19);
-            });
-        }
+            undefVar(_, "a", 3, 30, "", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void multiple_variables_not_defined()
+    [Fact]
+    public void multiple_variables_not_defined()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($b: String) {
                     field(a: $a, b: $b, c: $c)
                   }
                 ";
-                undefVar(_, "a", 3, 30, "Foo", 2, 19);
-                undefVar(_, "c", 3, 44, "Foo", 2, 19);
-            });
-        }
+            undefVar(_, "a", 3, 30, "Foo", 2, 19);
+            undefVar(_, "c", 3, 44, "Foo", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void variable_in_fragment_not_defined_by_unnamed_query()
+    [Fact]
+    public void variable_in_fragment_not_defined_by_unnamed_query()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   {
                     ...FragA
                   }
@@ -197,16 +197,16 @@ namespace GraphQL.Tests.Validation
                     field(a: $a)
                   }
                 ";
-                undefVar(_, "a", 6, 30, "", 2, 19);
-            });
-        }
+            undefVar(_, "a", 6, 30, "", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void variable_in_fragment_not_defined_by_operation()
+    [Fact]
+    public void variable_in_fragment_not_defined_by_operation()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String, $b: String) {
                     ...FragA
                   }
@@ -224,16 +224,16 @@ namespace GraphQL.Tests.Validation
                     field(c: $c)
                   }
                 ";
-                undefVar(_, "c", 16, 30, "Foo", 2, 19);
-            });
-        }
+            undefVar(_, "c", 16, 30, "Foo", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void multiple_variables_in_fragments_not_defined()
+    [Fact]
+    public void multiple_variables_in_fragments_not_defined()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($b: String) {
                     ...FragA
                   }
@@ -251,17 +251,17 @@ namespace GraphQL.Tests.Validation
                     field(c: $c)
                   }
                 ";
-                undefVar(_, "a", 6, 30, "Foo", 2, 19);
-                undefVar(_, "c", 16, 30, "Foo", 2, 19);
-            });
-        }
+            undefVar(_, "a", 6, 30, "Foo", 2, 19);
+            undefVar(_, "c", 16, 30, "Foo", 2, 19);
+        });
+    }
 
-        [Fact]
-        public void single_variable_in_fragment_not_defined_by_multiple_operations()
+    [Fact]
+    public void single_variable_in_fragment_not_defined_by_multiple_operations()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($a: String) {
                     ...FragAB
                   }
@@ -272,17 +272,17 @@ namespace GraphQL.Tests.Validation
                     field(a: $a, b: $b)
                   }
                 ";
-                undefVar(_, "b", 9, 37, "Foo", 2, 19);
-                undefVar(_, "b", 9, 37, "Bar", 5, 19);
-            });
-        }
+            undefVar(_, "b", 9, 37, "Foo", 2, 19);
+            undefVar(_, "b", 9, 37, "Bar", 5, 19);
+        });
+    }
 
-        [Fact]
-        public void variables_in_fragment_not_defined_by_multiple_operations()
+    [Fact]
+    public void variables_in_fragment_not_defined_by_multiple_operations()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($b: String) {
                     ...FragAB
                   }
@@ -293,17 +293,17 @@ namespace GraphQL.Tests.Validation
                     field(a: $a, b: $b)
                   }
                 ";
-                undefVar(_, "a", 9, 30, "Foo", 2, 19);
-                undefVar(_, "b", 9, 37, "Bar", 5, 19);
-            });
-        }
+            undefVar(_, "a", 9, 30, "Foo", 2, 19);
+            undefVar(_, "b", 9, 37, "Bar", 5, 19);
+        });
+    }
 
-        [Fact]
-        public void variable_in_fragment_used_by_other_operation()
+    [Fact]
+    public void variable_in_fragment_used_by_other_operation()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($b: String) {
                     ...FragA
                   }
@@ -317,17 +317,17 @@ namespace GraphQL.Tests.Validation
                     field(b: $b)
                   }
                 ";
-                undefVar(_, "a", 9, 30, "Foo", 2, 19);
-                undefVar(_, "b", 12, 30, "Bar", 5, 19);
-            });
-        }
+            undefVar(_, "a", 9, 30, "Foo", 2, 19);
+            undefVar(_, "b", 12, 30, "Bar", 5, 19);
+        });
+    }
 
-        [Fact]
-        public void multiple_undefined_variables_produce_multiple_errors()
+    [Fact]
+    public void multiple_undefined_variables_produce_multiple_errors()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   query Foo($b: String) {
                     ...FragAB
                   }
@@ -343,30 +343,29 @@ namespace GraphQL.Tests.Validation
                     field2(c: $c)
                   }
                 ";
-                undefVar(_, "a", 9, 31, "Foo", 2, 19);
-                undefVar(_, "a", 11, 31, "Foo", 2, 19);
-                undefVar(_, "c", 14, 31, "Foo", 2, 19);
-                undefVar(_, "b", 9, 38, "Bar", 5, 19);
-                undefVar(_, "b", 11, 38, "Bar", 5, 19);
-                undefVar(_, "c", 14, 31, "Bar", 5, 19);
-            });
-        }
+            undefVar(_, "a", 9, 31, "Foo", 2, 19);
+            undefVar(_, "a", 11, 31, "Foo", 2, 19);
+            undefVar(_, "c", 14, 31, "Foo", 2, 19);
+            undefVar(_, "b", 9, 38, "Bar", 5, 19);
+            undefVar(_, "b", 11, 38, "Bar", 5, 19);
+            undefVar(_, "c", 14, 31, "Bar", 5, 19);
+        });
+    }
 
-        private void undefVar(
-            ValidationTestConfig _,
-            string varName,
-            int line1,
-            int column1,
-            string opName,
-            int line2,
-            int column2)
+    private void undefVar(
+        ValidationTestConfig _,
+        string varName,
+        int line1,
+        int column1,
+        string opName,
+        int line2,
+        int column2)
+    {
+        _.Error(err =>
         {
-            _.Error(err =>
-            {
-                err.Message = NoUndefinedVariablesError.UndefinedVarMessage(varName, opName);
-                err.Loc(line1, column1);
-                err.Loc(line2, column2);
-            });
-        }
+            err.Message = NoUndefinedVariablesError.UndefinedVarMessage(varName, opName);
+            err.Loc(line1, column1);
+            err.Loc(line2, column2);
+        });
     }
 }
