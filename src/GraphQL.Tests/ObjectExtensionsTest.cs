@@ -14,8 +14,7 @@ public class ObjectExtensionsTests
     {
         /* Given */
         double value = 123.123d;
-        Type floatType = typeof(double);
-
+        var floatType = typeof(double);
 
         /* When */
         var actual = ValueConverter.ConvertTo(value, floatType);
@@ -35,8 +34,7 @@ public class ObjectExtensionsTests
     {
         /* Given */
         decimal value = 123.123m;
-        Type floatType = typeof(decimal);
-
+        var floatType = typeof(decimal);
 
         /* When */
         var actual = ValueConverter.ConvertTo(value, floatType);
@@ -54,11 +52,9 @@ public class ObjectExtensionsTests
     [Fact]
     public void convert_single()
     {
-
         /* Given */
         float value = 123.123f;
-        Type floatType = typeof(float);
-
+        var floatType = typeof(float);
 
         /* When */
         var actual = ValueConverter.ConvertTo(value, floatType);
@@ -145,7 +141,6 @@ public class ObjectExtensionsTests
         actual.ShouldBe(doubles);
     }
 
-
     [Fact]
     public void convert_double_array_of_arrays_to_array_of_arrays()
     {
@@ -171,7 +166,6 @@ public class ObjectExtensionsTests
         // Assert
         actual.ShouldBe(doubles);
     }
-
 
     [Fact]
     public void convert_strings_array_to_array()
@@ -224,7 +218,6 @@ public class ObjectExtensionsTests
         // Assert
         actual.ShouldBe(strings);
     }
-
 
     [Fact]
     public void convert_string_array_of_arrays_to_array_of_arrays()

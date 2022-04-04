@@ -26,7 +26,6 @@ public class Bug2159 : QueryTestBase<Bug2159Schema>
     [Fact]
     public void Direct_Variable_Null() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", @"{ ""testValue"": null }", "{\"input\":null}".ToInputs());
 
-
     [Fact]
     public void Object_Literal_Default() => AssertQuerySuccess("{ testObject }", @"{ ""testObject"": ""defaultValue"" }");
 

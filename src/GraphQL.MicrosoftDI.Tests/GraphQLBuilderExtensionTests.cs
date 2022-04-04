@@ -8,7 +8,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddGraphQL()
     {
-        var executed = false;
+        bool executed = false;
         var services = new ServiceCollection();
         services.AddGraphQL(builder =>
         {
@@ -69,7 +69,7 @@ public class GraphQLBuilderExtensionTests
 
     private class Class2
     {
-        public static Class2 Instance = new Class2();
+        public static Class2 Instance = new();
 
         private Class2()
         {

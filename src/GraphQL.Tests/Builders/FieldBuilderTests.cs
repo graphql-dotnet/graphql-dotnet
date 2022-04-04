@@ -63,7 +63,7 @@ public class FieldBuilderTests
         fields[0].Type.ShouldBe(typeof(StringGraphType));
 
         var context = new ResolveFieldContext();
-        var result = await fields[0].Resolver.ResolveAsync(context);
+        object result = await fields[0].Resolver.ResolveAsync(context);
         result.GetType().ShouldBe(typeof(string));
         result.ShouldBe("SomeString");
     }
@@ -360,7 +360,6 @@ public class FieldBuilderTests
             FieldDefinition = field
         });
     }
-
 
     [Fact]
     public async Task getting_specified_argument_in_resolver_overrides_default_value()

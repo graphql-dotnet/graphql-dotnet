@@ -67,7 +67,6 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
         ShouldPassRule(query);
     }
 
-
     [Fact]
     public void Different_directives_with_different_aliases_should_pass()
     {

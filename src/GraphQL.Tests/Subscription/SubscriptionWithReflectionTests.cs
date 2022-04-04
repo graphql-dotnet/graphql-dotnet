@@ -4,12 +4,10 @@ namespace GraphQL.Tests.Subscription;
 
 public class SubscriptionWithReflectionTests
 {
-
     public SubscriptionWithReflectionTests()
     {
         SubscriptionSchemaWithReflection.Initialize(new Chat());
     }
-
 
     protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
     {
