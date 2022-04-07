@@ -23,7 +23,7 @@ public class ArgumentInformationTests
     {
         var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo))
         {
-            Expression = (Expression<Func<IResolveFieldContext, int>>)(context => 23)
+            Expression = (IResolveFieldContext context) => 23
         };
         info.Expression.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
     }
@@ -33,7 +33,7 @@ public class ArgumentInformationTests
     {
         var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo))
         {
-            Expression = (Expression<Func<IResolveFieldContext, object>>)(context => 23)
+            Expression = (IResolveFieldContext context) => 23
         };
         info.Expression.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
     }
@@ -42,7 +42,7 @@ public class ArgumentInformationTests
     public void Expression_Throws_For_Invalid_ObjectType()
     {
         var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-        var error = Should.Throw<ArgumentException>(() => info.Expression = (Expression<Func<IResolveFieldContext, object>>)(context => "hello"));
+        var error = Should.Throw<ArgumentException>(() => info.Expression = (IResolveFieldContext context) => "hello");
         error.Message.ShouldBe("Value must be a lambda expression delegate of type Func<IResolveFieldContext, Int32>.");
     }
 
@@ -50,7 +50,7 @@ public class ArgumentInformationTests
     public void Expression_Throws_For_Invalid_Type()
     {
         var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-        var error = Should.Throw<ArgumentException>(() => info.Expression = (Expression<Func<IResolveFieldContext, string>>)(context => "hello"));
+        var error = Should.Throw<ArgumentException>(() => info.Expression = (IResolveFieldContext context) => "hello");
         error.Message.ShouldBe("Value must be a lambda expression delegate of type Func<IResolveFieldContext, Int32>.");
     }
 
