@@ -18,6 +18,7 @@ public class AuthorizationTests
         field.AuthorizeWithRoles("Role1,Role2");
         field.AuthorizeWithRoles("Role3, Role2");
         field.AuthorizeWithRoles("Role1", "Role4");
+        field.AuthorizeWithRoles("");
 
         field.RequiresAuthorization().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
