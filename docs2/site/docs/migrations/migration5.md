@@ -608,7 +608,7 @@ This allows for specifying roles rather than just policies that can be used to v
 As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), it requires support by a third-party
 library to perform the validation.
 
-Similar to the ASP.Net Core `AuthorizeAttribute`, the new `AuthorizeWithRoles` method accepts
+Similar to the ASP.NET Core `AuthorizeAttribute`, the new `AuthorizeWithRoles` method accepts
 a comma-separated list of role names that would allow access to the graph or field.
 
 ```csharp
