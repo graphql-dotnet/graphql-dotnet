@@ -81,7 +81,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWithPolicy{TMetadataProvider}(TMetadataProvider, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : IProvideMetadata
             => AuthorizeWithPolicy(provider, policy);
@@ -111,7 +111,7 @@ namespace GraphQL
             foreach (var role in roles.Split(','))
             {
                 var role2 = role.Trim();
-                if (!list.Contains(role2))
+                if (role2 != "" && !list.Contains(role2))
                     list.Add(role2);
             }
 
@@ -167,7 +167,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWith{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string policy)
             => AuthorizeWithPolicy(builder, policy);
@@ -217,7 +217,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWithPolicy{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string policy)
             => AuthorizeWithPolicy(builder, policy);
