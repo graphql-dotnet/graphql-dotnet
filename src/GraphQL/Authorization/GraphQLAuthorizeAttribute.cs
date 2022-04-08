@@ -9,7 +9,7 @@ namespace GraphQL
     public class GraphQLAuthorizeAttribute : GraphQLAttribute
     {
         /// <summary>
-        /// Creates an instance with the specified policy and/or roles.
+        /// Creates an empty instance of <see cref="GraphQLAuthorizeAttribute"/> with no policy/roles specified.
         /// </summary>
         public GraphQLAuthorizeAttribute()
         {
