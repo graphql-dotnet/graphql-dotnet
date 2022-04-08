@@ -176,7 +176,7 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
 
         // each field resolver will build a new instance of DIObject
         protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
-            => (Expression<Func<IResolveFieldContext, DIObject>>)(context => MemberInstanceFunc(context));
+            => (IResolveFieldContext context) => MemberInstanceFunc(context);
 
         private DIObject MemberInstanceFunc(IResolveFieldContext context)
         {
