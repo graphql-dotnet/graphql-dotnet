@@ -26,6 +26,17 @@ public class AuthorizationTests
     }
 
     [Fact]
+    public void NoRolesNoop()
+    {
+        var field = new FieldType();
+        field.AuthorizeWithRoles();
+        field.AuthorizeWithRoles("");
+        field.AuthorizeWithRoles(" ");
+        field.AuthorizeWithRoles(",");
+        field.RequiresAuthorization().ShouldBeFalse();
+    }
+
+    [Fact]
     public void FieldBuilder()
     {
         var graph = new ObjectGraphType();
