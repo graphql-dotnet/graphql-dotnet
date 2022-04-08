@@ -26,7 +26,7 @@ namespace GraphQL
         /// <summary>
         /// The name of policy to apply.
         /// </summary>
-        public string? Policy { get; set; }
+        public string? Policy { get; init; }
 
         /// <summary>
         /// A comma-separated list of the roles to apply.
