@@ -142,7 +142,7 @@ namespace GraphQL
 
             foreach (var role in roles)
             {
-                if (!list.Contains(role))
+                if (role != "" && !list.Contains(role))
                     list.Add(role);
             }
 
