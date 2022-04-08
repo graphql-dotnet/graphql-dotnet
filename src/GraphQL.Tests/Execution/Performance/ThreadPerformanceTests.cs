@@ -26,7 +26,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
 
         private async Task<string> Get(int milliseconds, string result)
         {
-            await Task.Delay(milliseconds);
+            await Task.Delay(milliseconds).ConfigureAwait(false);
             return result;
         }
     }
@@ -117,7 +117,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
         {
             _.Schema = Schema;
             _.Query = query;
-        });
+        }).ConfigureAwait(false);
 
         result.Errors.ShouldBeNull();
         ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");

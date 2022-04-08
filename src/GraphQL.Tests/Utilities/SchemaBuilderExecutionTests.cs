@@ -436,7 +436,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ hello }";
             _.Root = root;
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -457,7 +457,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ source }";
             _.Root = new { Hello = "World" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""source"": true }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -474,7 +474,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }");
+        var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }").ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -491,7 +491,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
+        var result = await ExecuteAsync(schema, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }").ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -512,7 +512,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = @"{ userContext }";
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -533,7 +533,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = @"{ userContext }";
             _.UserContext = new ChildMyUserContext { Name = "Quinn" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -576,7 +576,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = @"{ userContextWithParam(id: ""abcd"") }";
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -598,7 +598,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Query = @"{ three }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""three"": true }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -620,7 +620,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Query = @"{ four(id: 123) }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        });
+        }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult(@"{ ""four"": true }");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -717,7 +717,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Types.Include<PetQueryType>();
         });
 
-        var result = await ExecuteAsync(schema, _ => _.Query = @"{ pet { ... on Dog { name } } }");
+        var result = await ExecuteAsync(schema, _ => _.Query = @"{ pet { ... on Dog { name } } }").ConfigureAwait(false);
 
         var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
         var expectedResult = CreateQueryResult(expected);

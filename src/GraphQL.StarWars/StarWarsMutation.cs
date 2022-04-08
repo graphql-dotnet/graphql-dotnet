@@ -3,6 +3,9 @@ using GraphQL.Types;
 
 namespace GraphQL.StarWars;
 
+/// <summary>
+/// Mutation for StarWars schema.
+/// </summary>
 /// <example>
 /// This is an example JSON request for a mutation
 /// {

@@ -200,7 +200,7 @@ public class ResolveFieldContextTests
                 _context.Errors.Add(new ExecutionError("test"));
         });
 
-        await Task.WhenAll(t1, t2);
+        await Task.WhenAll(t1, t2).ConfigureAwait(false);
 
         _context.Errors.Count.ShouldBe(10);
     }

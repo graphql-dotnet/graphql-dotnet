@@ -12,9 +12,9 @@ public class DefaultCacheTests
         var query = "test";
         var memoryCache = DefaultDocumentCache.Instance;
 
-        (await memoryCache.GetAsync(query)).ShouldBeNull();
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBeNull();
 
-        await memoryCache.SetAsync(query, doc);
-        (await memoryCache.GetAsync(query)).ShouldBeNull();
+        await memoryCache.SetAsync(query, doc).ConfigureAwait(false);
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBeNull();
     }
 }

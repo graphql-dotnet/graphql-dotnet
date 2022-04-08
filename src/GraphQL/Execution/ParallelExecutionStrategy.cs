@@ -46,7 +46,7 @@ namespace GraphQL.Execution
                             if (pendingNodeTask.IsCompleted)
                             {
                                 // Throw any caught exceptions
-                                await pendingNodeTask;
+                                await pendingNodeTask.ConfigureAwait(false);
 
                                 // Node completed synchronously, so no need to add it to the list of currently executing nodes
                                 // instead add any child nodes to the pendingNodes queue directly here

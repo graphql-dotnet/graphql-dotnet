@@ -61,7 +61,7 @@ public class ScopedSubscriptionExecutionStrategy : SubscriptionExecutionStrategy
     {
         using var scope = _serviceScopeFactory.CreateScope();
         context.RequestServices = scope.ServiceProvider;
-        return await base.ProcessDataAsync(context, node, value);
+        return await base.ProcessDataAsync(context, node, value).ConfigureAwait(false);
     }
 
     /// <summary>

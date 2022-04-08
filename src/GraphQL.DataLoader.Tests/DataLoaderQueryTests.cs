@@ -335,7 +335,7 @@ mutation {
             }
         }
     }
-}");
+}").ConfigureAwait(false);
 
         result.Errors.ShouldBeNull();
     }

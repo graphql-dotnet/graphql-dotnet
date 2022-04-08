@@ -18,7 +18,7 @@ public class DocumentExecuterExceptions : QueryTestBase<PR1735Schema>
             Query = query,
             Schema = Schema,
             ThrowOnUnhandledException = true,
-        });
+        }).ConfigureAwait(false);
         valid.ShouldNotBeNull();
         valid.Data.ShouldBeNull();
         valid.Errors.ShouldNotBeNull();
@@ -35,7 +35,7 @@ public class DocumentExecuterExceptions : QueryTestBase<PR1735Schema>
             Schema = Schema,
             Variables = "{\"arg\":500}".ToInputs(),
             ThrowOnUnhandledException = true,
-        });
+        }).ConfigureAwait(false);
         valid.ShouldNotBeNull();
         valid.Data.ShouldBeNull();
         valid.Errors.ShouldNotBeNull();

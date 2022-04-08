@@ -93,7 +93,7 @@ public class Subscription
     [GraphQLMetadata(Name = "messageAddedByUserAsync", ResolverType = ResolverType.StreamResolver)]
     public async Task<IObservable<Message>> SubscribeMessageAddedByUserAsync(IResolveFieldContext context, string id)
     {
-        var messages = await SubscriptionSchemaWithReflection.Chat.MessagesAsync();
+        var messages = await SubscriptionSchemaWithReflection.Chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
     }
 

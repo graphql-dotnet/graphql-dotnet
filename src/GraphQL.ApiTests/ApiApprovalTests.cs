@@ -6,7 +6,9 @@ using PublicApiGenerator;
 
 namespace GraphQL.ApiTests;
 
-/// <see href="https://github.com/JakeGinnivan/ApiApprover"/>
+/// <summary>
+/// See more info about API approval tests here <see href="https://github.com/JakeGinnivan/ApiApprover"/>.
+/// </summary>
 public class ApiApprovalTests
 {
     [Theory]

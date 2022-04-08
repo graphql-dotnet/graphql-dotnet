@@ -96,9 +96,9 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         // Dispatch loading
         await loader.DispatchAsync().ConfigureAwait(false);
 
-        var user1bOrders = await task1b;
-        var user2bOrders = await task2b;
-        var user3Orders = await task3;
+        var user1bOrders = await task1b.ConfigureAwait(false);
+        var user2bOrders = await task2b.ConfigureAwait(false);
+        var user3Orders = await task3.ConfigureAwait(false);
 
         user1bOrders.ShouldNotBeNull();
         user2bOrders.ShouldNotBeNull();

@@ -158,7 +158,7 @@ public class SchemaTests
             schema.AllTypes.Count.ShouldNotBe(0);
             return async context =>
             {
-                var res = await next(context);
+                var res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });

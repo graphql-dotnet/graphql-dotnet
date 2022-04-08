@@ -26,7 +26,7 @@ public class MultithreadedTests
             {
                 Query = "IntrospectionQuery".ReadGraphQLRequest(),
                 Schema = starWarsTest.Schema,
-            });
+            }).ConfigureAwait(false);
             result.Errors.ShouldBeNull();
         };
 
@@ -36,7 +36,7 @@ public class MultithreadedTests
         var builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
         starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
         starWarsTest.Schema.FieldMiddleware = middleware;
-        await testExecution();
+        await testExecution().ConfigureAwait(false);
         var correctCount = count;
 
         // test initializing the schema first, followed by 3 simultaneous executions
@@ -45,12 +45,12 @@ public class MultithreadedTests
         builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
         starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
         starWarsTest.Schema.FieldMiddleware = middleware;
-        await testExecution();
+        await testExecution().ConfigureAwait(false);
         count = 0;
         var t1 = Task.Run(testExecution);
         var t2 = Task.Run(testExecution);
         var t3 = Task.Run(testExecution);
-        await Task.WhenAll(t1, t2, t3);
+        await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
         count.ShouldBe(correctCount * 3, "Failed synchronized initialization");
 
         // test three simultaneous executions on an uninitialized schema
@@ -63,7 +63,7 @@ public class MultithreadedTests
         t1 = Task.Run(testExecution);
         t2 = Task.Run(testExecution);
         t3 = Task.Run(testExecution);
-        await Task.WhenAll(t1, t2, t3);
+        await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
         count.ShouldBe(correctCount * 3, "Failed multithreaded initialization");
     }
 }

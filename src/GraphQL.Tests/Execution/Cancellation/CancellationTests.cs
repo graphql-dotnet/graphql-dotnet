@@ -16,9 +16,9 @@ public class CancellationTestType : ObjectGraphType
     {
         Name = "CancellationTestType";
 
-        FieldAsync<StringGraphType>("one", resolve: async context => await GetOneAsync(context));
-        FieldAsync<StringGraphType>("two", resolve: async context => await GetTwoAsync(context));
-        FieldAsync<StringGraphType>("three", resolve: async context => await GetThreeAsync(context));
+        FieldAsync<StringGraphType>("one", resolve: async context => await GetOneAsync(context).ConfigureAwait(false));
+        FieldAsync<StringGraphType>("two", resolve: async context => await GetTwoAsync(context).ConfigureAwait(false));
+        FieldAsync<StringGraphType>("three", resolve: async context => await GetThreeAsync(context).ConfigureAwait(false));
     }
 
     public Task<string> GetOneAsync(IResolveFieldContext<object> context)
@@ -42,7 +42,7 @@ public class CancellationTestType : ObjectGraphType
     {
         await Task.Yield();
         ((CancellationTokenSource)context.RootValue).Cancel();
-        await Task.Delay(1000, context.CancellationToken);
+        await Task.Delay(1000, context.CancellationToken).ConfigureAwait(false);
         // should never execute
         return "three";
     }

@@ -291,7 +291,7 @@ public class AutoRegisteringObjectGraphTypeTests
         using var provider = serviceCollection.BuildServiceProvider();
         context.RequestServices = provider;
         fieldType.Resolver.ShouldNotBeNull();
-        (await fieldType.Resolver!.ResolveAsync(context)).ShouldBe(expected);
+        (await fieldType.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(expected);
     }
 
     [Fact]
@@ -355,7 +355,7 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             Source = obj,
             FieldDefinition = new FieldType { Name = fieldName },
-        });
+        }).ConfigureAwait(false);
         actual.ShouldBe(expected);
     }
 
@@ -367,9 +367,9 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             Source = new NoDefaultConstructorTest(true)
         };
-        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context)).ShouldBe(true);
-        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context)).ShouldBe("test");
-        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context)).ShouldBe(1);
+        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(true);
+        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("test");
+        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(1);
     }
 
     [Fact]
@@ -377,11 +377,11 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new TestFieldSupport<NullSourceFailureTest>();
         var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
     }
 
@@ -390,11 +390,11 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new TestFieldSupport<NullSourceStructFailureTest>();
         var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context)))
+        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
     }
 
@@ -403,9 +403,9 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new TestFieldSupport<NullSourceTest>();
         var context = new ResolveFieldContext();
-        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context)).ShouldBe(true);
-        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context)).ShouldBe("test");
-        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context)).ShouldBe(3);
+        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(true);
+        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("test");
+        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(3);
     }
 
     [Fact]
@@ -455,10 +455,10 @@ public class AutoRegisteringObjectGraphTypeTests
                 { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
             },
         };
-        (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
+        (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(1);
         graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
-        (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
-        (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
+        (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("Example");
+        (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("testExample1");
     }
 
     [Fact]
@@ -470,7 +470,7 @@ public class AutoRegisteringObjectGraphTypeTests
         (await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = new CustomHardcodedArgumentAttributeTestClass(),
-        })).ShouldBe("85");
+        }).ConfigureAwait(false)).ShouldBe("85");
     }
 
     private class CustomHardcodedArgumentAttributeTestClass

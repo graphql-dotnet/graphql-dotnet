@@ -91,6 +91,7 @@ namespace GraphQL.Utilities
 
             return _cachedXml.GetOrAdd(assemblyName, key =>
             {
+
                 try
                 {
                     if (File.Exists(pathToXmlFile))
@@ -103,10 +104,12 @@ namespace GraphQL.Utilities
                             doc = XDocument.Load(relativePath);
                     }
                 }
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
                 catch (Exception)
                 {
                     // No logging is needed
                 }
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
 
                 return doc;
             });

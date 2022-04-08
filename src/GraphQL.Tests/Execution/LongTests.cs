@@ -13,7 +13,7 @@ public class LongTests
         {
             _.Schema = new LongSchema();
             _.Query = "{ testField }";
-        });
+        }).ConfigureAwait(false);
 
         var json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();

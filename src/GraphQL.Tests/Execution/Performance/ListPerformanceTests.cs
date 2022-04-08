@@ -114,7 +114,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.UserContext = null;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        });
+        }).ConfigureAwait(false);
 
         smallListTimer.Stop();
 
@@ -149,7 +149,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.UserContext = null;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        });
+        }).ConfigureAwait(false);
 
         smallListTimer.Stop();
 
@@ -196,7 +196,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.UserContext = null;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        });
+        }).ConfigureAwait(false);
 
         smallListTimer.Stop();
 

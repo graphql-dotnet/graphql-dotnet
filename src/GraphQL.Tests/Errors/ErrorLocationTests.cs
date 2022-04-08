@@ -16,7 +16,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        });
+        }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();
@@ -36,7 +36,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        });
+        }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();
@@ -53,7 +53,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = @"{ testSub { one two } }";
-        });
+        }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();
@@ -67,7 +67,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = @"{ testSubList { one two } }";
-        });
+        }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();

@@ -10,6 +10,6 @@ public class SystemTestBase<T> where T : class
         using var system = AlbaHost.ForStartup<T>(b => b.ConfigureServices((_, services) => services.AddMvcCore()));
         // system.Environment.EnvironmentName = "Testing";
         systemConfigure?.Invoke(system);
-        return await system.Scenario(configuration);
+        return await system.Scenario(configuration).ConfigureAwait(false);
     }
 }

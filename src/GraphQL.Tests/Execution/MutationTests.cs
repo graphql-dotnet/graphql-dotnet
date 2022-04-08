@@ -154,7 +154,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<int>("newNumber");
-                return await root.PromiseToChangeTheNumberAsync(change);
+                return await root.PromiseToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -187,7 +187,7 @@ public class MutationChange : ObjectGraphType
             resolve: async context =>
             {
                 var change = context.GetArgument<int>("newNumber");
-                return await Root.PromiseAndFailToChangeTheNumberAsync(change);
+                return await Root.PromiseAndFailToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -219,7 +219,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<DateTime>("newDateTime");
-                return await root.PromiseToChangeTheDateTimeAsync(change);
+                return await root.PromiseToChangeTheDateTimeAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -250,7 +250,7 @@ public class MutationChange : ObjectGraphType
             resolve: async context =>
             {
                 var change = context.GetArgument<DateTime>("newDateTime");
-                return await Root.PromiseAndFailToChangeTheDateTimeAsync(change);
+                return await Root.PromiseAndFailToChangeTheDateTimeAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -362,7 +362,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
                   ""sixth"": null
                 }";
 
-        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
         var last = result.Errors.Last();
         last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
@@ -457,7 +457,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
                   ""sixth"": null
                 }";
 
-        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
         var last = result.Errors.Last();
         last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
