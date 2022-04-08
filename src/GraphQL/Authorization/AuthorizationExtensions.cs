@@ -65,7 +65,7 @@ namespace GraphQL
         /// </param>
         /// <param name="policy"> Authorization policy name. </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
-        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
+        public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : IProvideMetadata
         {
             if (policy == null)
@@ -79,6 +79,12 @@ namespace GraphQL
             provider.Metadata[POLICY_KEY] = list;
             return provider;
         }
+
+        /// <inheritdoc cref="AuthorizeWithPolicy{TMetadataProvider}(TMetadataProvider, string)"/>
+        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
+            where TMetadataProvider : IProvideMetadata
+            => AuthorizeWithPolicy(provider, policy);
 
         /// <summary>
         /// Adds authorization role(s) to the specified metadata provider. Roles should
@@ -114,6 +120,37 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Adds authorization role(s) to the specified metadata provider.  If the underlying field already
+        /// contains a role with the same name, then it will not be added twice.
+        /// </summary>
+        /// <typeparam name="TMetadataProvider"> The type of metadata provider. Generics are used here to
+        /// let compiler infer the returning type to allow methods chaining.
+        /// </typeparam>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
+        /// <param name="roles"> List of authorization role name(s). </param>
+        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
+        public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, params string[] roles)
+            where TMetadataProvider : IProvideMetadata
+        {
+            if (roles == null)
+                throw new ArgumentNullException(nameof(roles));
+
+            var list = GetRoles(provider) ?? new List<string>();
+
+            foreach (var role in roles)
+            {
+                if (!list.Contains(role))
+                    list.Add(role);
+            }
+
+            provider.Metadata[ROLE_KEY] = list;
+            return provider;
+        }
+
+        /// <summary>
         /// Adds authorization policy to the specified field builder. If the underlying field already contains
         /// a policy with the same name, then it will not be added twice.
         /// </summary>
@@ -122,22 +159,43 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="policy"> Authorization policy name. </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string policy)
         {
-            builder.FieldType.AuthorizeWith(policy);
+            builder.FieldType.AuthorizeWithPolicy(policy);
             return builder;
         }
+
+        /// <inheritdoc cref="AuthorizeWith{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, string)"/>
+        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder, string policy)
+            => AuthorizeWithPolicy(builder, policy);
 
         /// <summary>
         /// Adds authorization role(s) to the specified field builder. Roles should
         /// be comma-separated and role names will be trimmed. If the underlying field already
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
+        /// <param name="builder"></param>
         /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
         public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string roles)
+        {
+            builder.FieldType.AuthorizeWithRoles(roles);
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds authorization role(s) to the specified field builder. If the underlying field already
+        /// contains a role with the same name, then it will not be added twice.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="roles"> List of authorization role name(s). </param>
+        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
             return builder;
@@ -151,22 +209,43 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="policy"> Authorization policy name. </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
-        public static ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(
+        public static ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string policy)
         {
-            builder.FieldType.AuthorizeWith(policy);
+            builder.FieldType.AuthorizeWithPolicy(policy);
             return builder;
         }
+
+        /// <inheritdoc cref="AuthorizeWithPolicy{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
+        [Obsolete("Please use AuthorizeWithPolicy instead.")]
+        public static ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(
+            this ConnectionBuilder<TSourceType> builder, string policy)
+            => AuthorizeWithPolicy(builder, policy);
 
         /// <summary>
         /// Adds authorization role(s) to the specified connection builder. Roles should
         /// be comma-separated and role names will be trimmed. If the underlying field already
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
+        /// <param name="builder"></param>
         /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
         public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string roles)
+        {
+            builder.FieldType.AuthorizeWithRoles(roles);
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds authorization role(s) to the specified connection builder. If the underlying field already
+        /// contains a role with the same name, then it will not be added twice.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="roles"> List of authorization role name(s). </param>
+        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
+            this ConnectionBuilder<TSourceType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
             return builder;

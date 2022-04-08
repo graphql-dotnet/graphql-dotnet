@@ -13,12 +13,15 @@ public class AuthorizationTests
         field.RequiresAuthorization().ShouldBeTrue();
         field.AuthorizeWith("Policy2");
         field.AuthorizeWith("Policy2");
+        field.AuthorizeWithPolicy("Policy3");
+        field.AuthorizeWithPolicy("Policy3");
         field.AuthorizeWithRoles("Role1,Role2");
         field.AuthorizeWithRoles("Role3, Role2");
+        field.AuthorizeWithRoles("Role1", "Role4");
 
         field.RequiresAuthorization().ShouldBeTrue();
-        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2" });
-        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
+        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
+        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
 
     [Fact]
@@ -29,13 +32,16 @@ public class AuthorizationTests
             .AuthorizeWith("Policy1")
             .AuthorizeWith("Policy2")
             .AuthorizeWith("Policy2")
+            .AuthorizeWithPolicy("Policy3")
+            .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithRoles("Role1,Role2")
-            .AuthorizeWithRoles("Role3, Role2");
+            .AuthorizeWithRoles("Role3, Role2")
+            .AuthorizeWithRoles("Role1", "Role4");
 
         var field = graph.Fields.Find("Field");
         field.RequiresAuthorization().ShouldBeTrue();
-        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2" });
-        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
+        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
+        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
 
     [Fact]
@@ -47,13 +53,16 @@ public class AuthorizationTests
             .AuthorizeWith("Policy1")
             .AuthorizeWith("Policy2")
             .AuthorizeWith("Policy2")
+            .AuthorizeWithPolicy("Policy3")
+            .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithRoles("Role1,Role2")
-            .AuthorizeWithRoles("Role3, Role2");
+            .AuthorizeWithRoles("Role3, Role2")
+            .AuthorizeWithRoles("Role1", "Role4");
 
         var field = graph.Fields.Find("Field");
         field.RequiresAuthorization().ShouldBeTrue();
-        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2" });
-        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
+        field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
+        field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
 
     [Fact]

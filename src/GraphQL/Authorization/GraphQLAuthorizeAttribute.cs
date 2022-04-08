@@ -38,7 +38,7 @@ namespace GraphQL
         public override void Modify(TypeConfig type)
         {
             if (Policy != null)
-                type.AuthorizeWith(Policy);
+                type.AuthorizeWithPolicy(Policy);
 
             if (Roles != null)
                 type.AuthorizeWithRoles(Roles);
@@ -48,7 +48,7 @@ namespace GraphQL
         public override void Modify(FieldConfig field)
         {
             if (Policy != null)
-                field.AuthorizeWith(Policy);
+                field.AuthorizeWithPolicy(Policy);
 
             if (Roles != null)
                 field.AuthorizeWithRoles(Roles);
@@ -58,7 +58,7 @@ namespace GraphQL
         public override void Modify(IGraphType graphType)
         {
             if (Policy != null)
-                graphType.AuthorizeWith(Policy);
+                graphType.AuthorizeWithPolicy(Policy);
 
             if (Roles != null)
                 graphType.AuthorizeWithRoles(Roles);
@@ -68,7 +68,7 @@ namespace GraphQL
         public override void Modify(FieldType fieldType, bool isInputType)
         {
             if (Policy != null)
-                fieldType.AuthorizeWith(Policy);
+                fieldType.AuthorizeWithPolicy(Policy);
 
             if (Roles != null)
                 fieldType.AuthorizeWithRoles(Roles);
