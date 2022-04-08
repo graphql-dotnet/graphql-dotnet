@@ -621,6 +621,10 @@ You may also supply a list of strings as in the following example:
 graph.AuthorizeWithRoles("Administrators", "Managers");
 ```
 
+### 21. `RequestServices` added to `ValidationContext` in GraphQL 5.1.0
+
+This allows for validation rules to access scoped services if necessary.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
