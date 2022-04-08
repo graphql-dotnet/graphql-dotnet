@@ -20,7 +20,7 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
     {
         var mock = GetMockDataLoader();
         var keys = new[] { 1, 2 };
-        var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys).GetResultAsync();
+        var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys).GetResultAsync().ConfigureAwait(false);
 
         users.ShouldNotBeNull();
         users.Length.ShouldBe(keys.Length, "Should return array of same length as number of keys provided");
@@ -38,7 +38,7 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
     public async Task LoadAsync_MultipleKeysAsParams_CallsSingularMultipleTimes()
     {
         var mock = GetMockDataLoader();
-        var users = await DataLoaderExtensions.LoadAsync(mock.Object, 1, 2).GetResultAsync();
+        var users = await DataLoaderExtensions.LoadAsync(mock.Object, 1, 2).GetResultAsync().ConfigureAwait(false);
 
         users.ShouldNotBeNull();
         users.Length.ShouldBe(2, "Should return array of same length as number of keys provided");
@@ -79,17 +79,17 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
             var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await loader.DispatchAsync().ConfigureAwait(false);
             var task1 = result1.GetResultAsync();
             var task2 = result2.GetResultAsync();
 
             // Now await tasks
-            users1 = await task1;
+            users1 = await task1.ConfigureAwait(false);
             users1.ShouldNotBeNull();
             user1 = users1[0];
             user2 = users1[1];
 
-            users2 = await task2;
+            users2 = await task2.ConfigureAwait(false);
             users2.ShouldNotBeNull();
             user3 = users2[2];
         });
