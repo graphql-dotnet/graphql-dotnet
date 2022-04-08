@@ -3,11 +3,17 @@ namespace GraphQL
     public static class AuthorizationExtensions
     {
         public const string POLICY_KEY = "Authorization__Policies";
+        public const string ROLE_KEY = "Authorization__Roles";
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string roles) { }
+        public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, string roles)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string roles) { }
         public static System.Collections.Generic.List<string>? GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
+        public static System.Collections.Generic.List<string>? GetRoles(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
     }
     [System.Flags]
@@ -194,8 +200,10 @@ namespace GraphQL
     }
     public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
     {
+        public GraphQLAuthorizeAttribute() { }
         public GraphQLAuthorizeAttribute(string policy) { }
-        public string Policy { get; }
+        public string? Policy { get; set; }
+        public string? Roles { get; set; }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
