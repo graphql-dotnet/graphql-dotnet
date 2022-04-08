@@ -4,12 +4,12 @@ namespace GraphQL
     {
         public const string POLICY_KEY = "Authorization__Policies";
         public const string ROLE_KEY = "Authorization__Roles";
-        [System.Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
-        [System.Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        [System.Obsolete("Please use AuthorizeWithPolicy instead.")]
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
         public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
