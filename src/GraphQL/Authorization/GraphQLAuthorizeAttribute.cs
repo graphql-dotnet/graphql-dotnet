@@ -32,7 +32,7 @@ namespace GraphQL
         /// A comma-separated list of the roles to apply.
         /// Role names will be trimmed before adding.
         /// </summary>
-        public string? Roles { get; set; }
+        public string? Roles { get; init; }
 
         /// <inheritdoc />
         public override void Modify(TypeConfig type)
