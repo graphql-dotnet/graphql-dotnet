@@ -5,6 +5,8 @@ namespace GraphQL
 {
     /// <summary>
     /// Attribute to apply an authorization policy and/or roles to a graph or field.
+    /// This attribute mimics AuthorizeAttribute from ASP.NET Core so it is something
+    /// people are likely used to, if they do any web programming in C#.
     /// </summary>
     public class GraphQLAuthorizeAttribute : GraphQLAttribute
     {
