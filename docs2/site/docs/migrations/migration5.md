@@ -1118,4 +1118,4 @@ This was done for the purposes of the overall strategy for reducing memory consu
 
 ### 47. `AuthorizeWith` renamed to `AuthorizeWithPolicy`
 
-This change was made to clarify and differentiate between `AuthorizeWithRoles`
+This change was made to clarify and differentiate between `AuthorizeWithRoles`.
