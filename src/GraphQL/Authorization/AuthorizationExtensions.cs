@@ -163,8 +163,6 @@ namespace GraphQL
         /// be comma-separated and role names will be trimmed. If the underlying field already
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
-        /// <typeparam name="TSourceType"></typeparam>
-        /// <param name="builder"></param>
         /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
         public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
