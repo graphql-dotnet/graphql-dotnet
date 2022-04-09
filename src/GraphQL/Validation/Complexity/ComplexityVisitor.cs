@@ -68,7 +68,7 @@ namespace GraphQL.Validation.Complexity
                 }
             }
 
-            await base.VisitFieldAsync(field, context);
+            await base.VisitFieldAsync(field, context).ConfigureAwait(false);
 
             context.CurrentSubSelectionImpact = prevCurrentSubSelectionImpact;
             context.CurrentEndNodeImpact = prevCurrentEndNodeImpact;
@@ -81,7 +81,7 @@ namespace GraphQL.Validation.Complexity
             context.RecordFieldComplexity(fragmentSpread, context.CurrentSubSelectionImpact / context.AvgImpact * fragmentComplexity.Complexity);
             context.Result.TotalQueryDepth += fragmentComplexity.Depth;
 
-            await base.VisitFragmentSpreadAsync(fragmentSpread, context);
+            await base.VisitFragmentSpreadAsync(fragmentSpread, context).ConfigureAwait(false);
         }
     }
 }

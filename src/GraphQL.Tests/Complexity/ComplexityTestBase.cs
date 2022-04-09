@@ -23,7 +23,7 @@ public class ComplexityTestBase
             options.Schema = CreateSchema();
             options.Query = query;
             options.ComplexityConfiguration = complexityConfig;
-        });
+        }).ConfigureAwait(false);
 
     //ISSUE: manually created test instance with ServiceProvider
     private static StarWarsSchema CreateSchema()

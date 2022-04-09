@@ -91,7 +91,7 @@ public class ChatSubscriptions : ObjectGraphType
     {
         var id = context.GetArgument<string>("id");
 
-        var messages = await _chat.MessagesAsync();
+        var messages = await _chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
     }
 
@@ -109,7 +109,7 @@ public class ChatSubscriptions : ObjectGraphType
 
     private async ValueTask<IObservable<Message>> SubscribeAsync(IResolveFieldContext context)
     {
-        return await _chat.MessagesAsync();
+        return await _chat.MessagesAsync().ConfigureAwait(false);
     }
 }
 
@@ -253,7 +253,7 @@ public class Chat : IChat
     public async Task<IObservable<Message>> MessagesAsync()
     {
         //pretend we are doing something async here
-        await Task.Delay(100);
+        await Task.Delay(100).ConfigureAwait(false);
         return Messages();
     }
 

@@ -28,7 +28,7 @@ public class QueryType : ObjectGraphType
             .Returns<IEnumerable<User>>()
             .ResolveAsync(async ctx =>
             {
-                await System.Threading.Tasks.Task.Delay(20);
+                await System.Threading.Tasks.Task.Delay(20).ConfigureAwait(false);
 
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
                     users.GetAllUsersAsync);

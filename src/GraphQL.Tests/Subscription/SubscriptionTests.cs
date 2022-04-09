@@ -8,7 +8,7 @@ public class SubscriptionTests
     {
         var executer = new DocumentExecuter();
 
-        var result = await executer.ExecuteAsync(options);
+        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
 
         result.Data.ShouldBeNull();
 
@@ -38,7 +38,7 @@ public class SubscriptionTests
         {
             Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
             Schema = schema
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessageGetAll(addedMessage);
 
@@ -75,7 +75,7 @@ public class SubscriptionTests
         {
             Query = "subscription newMessageContent { newMessageContent }",
             Schema = schema
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessage(addedMessage);
 
@@ -112,7 +112,7 @@ public class SubscriptionTests
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
             Schema = schema
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessage(addedMessage);
 
@@ -148,7 +148,7 @@ public class SubscriptionTests
         {
             Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
             Schema = schema
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessage(addedMessage);
 
@@ -188,7 +188,7 @@ public class SubscriptionTests
             {
                 ["id"] = "1"
             })
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessage(addedMessage);
 
@@ -227,7 +227,7 @@ public class SubscriptionTests
             {
                 ["id"] = "1"
             })
-        });
+        }).ConfigureAwait(false);
 
         chat.AddMessage(addedMessage);
 
@@ -252,13 +252,13 @@ public class SubscriptionTests
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
             Schema = schema
-        });
+        }).ConfigureAwait(false);
 
         chat.AddError(new Exception("test"));
 
         /* Then */
         var stream = result.Streams.Values.FirstOrDefault();
-        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
+        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync()).ConfigureAwait(false);
         error.InnerException.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
     }

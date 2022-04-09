@@ -37,7 +37,7 @@ public class RequestServicesTests
         {
             Query = "{hero}",
             RequestServices = scope.ServiceProvider,
-        });
+        }).ConfigureAwait(false);
 
         // MyValidationRule should always add an error message
         result.Executed.ShouldBeFalse();

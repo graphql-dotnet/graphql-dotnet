@@ -725,7 +725,7 @@ public class SchemaBuilderTests
         fieldType.DeprecationReason.ShouldBe("Test4");
         fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
         var context = new ResolveFieldContext() { Source = new TestType() };
-        (await fieldType.Resolver.ResolveAsync(context)).ShouldBeOfType<string>().ShouldBe("value");
+        (await fieldType.Resolver.ResolveAsync(context).ConfigureAwait(false)).ShouldBeOfType<string>().ShouldBe("value");
     }
 
     [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]

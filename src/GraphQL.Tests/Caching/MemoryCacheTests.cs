@@ -12,10 +12,10 @@ public class MemoryCacheTests
         var query = "test";
         var memoryCache = new MemoryDocumentCache();
 
-        (await memoryCache.GetAsync(query)).ShouldBeNull();
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBeNull();
 
-        await memoryCache.SetAsync(query, doc);
-        (await memoryCache.GetAsync(query)).ShouldBe(doc);
+        await memoryCache.SetAsync(query, doc).ConfigureAwait(false);
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBe(doc);
     }
 
     [Fact]
@@ -25,10 +25,10 @@ public class MemoryCacheTests
         var query = "test";
         var memoryCache = new MemoryDocumentCache();
 
-        await memoryCache.SetAsync(query, doc);
+        await memoryCache.SetAsync(query, doc).ConfigureAwait(false);
 
-        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsync(query, null));
+        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsync(query, null).ConfigureAwait(false)).ConfigureAwait(false);
 
-        (await memoryCache.GetAsync(query)).ShouldBe(doc);
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBe(doc);
     }
 }

@@ -64,7 +64,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_output()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }");
+        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testOutput\": 124}}");
     }
 
@@ -72,7 +72,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parseliteral()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }");
+        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
     }
 
@@ -84,7 +84,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
         {
             _.Query = "query ($arg: Int!) { testInput(arg:$arg) }";
             _.Variables = "{\"arg\":123}".ToInputs();
-        });
+        }).ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
     }
 
@@ -92,7 +92,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_output_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }");
+        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testOutputString\": \"output-hello\"}}");
     }
 
@@ -100,7 +100,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parseliteral_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }");
+        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
     }
 
@@ -112,7 +112,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
         {
             _.Query = "query ($arg: String!) { testInputString(arg:$arg) }";
             _.Variables = "{\"arg\":\"hello\"}".ToInputs();
-        });
+        }).ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
     }
 

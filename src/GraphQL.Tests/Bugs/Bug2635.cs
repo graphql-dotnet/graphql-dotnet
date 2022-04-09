@@ -22,7 +22,7 @@ public class Bug2635 : QueryTestBase<Bug2635.MySchema>
                 Schema = new MySchema(),
                 Root = this,
                 CancellationToken = CancellationTokenSource.Token,
-            });
+            }).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -44,7 +44,7 @@ public class Bug2635 : QueryTestBase<Bug2635.MySchema>
         {
             FieldAsync<IntGraphType>("a", resolve: async context =>
             {
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
                 ((Bug2635)context.RootValue).Num = 1;
                 throw new Exception();
             });

@@ -163,10 +163,10 @@ public class ExecutionResultTests
         {
             Schema = schema,
             Query = "IntrospectionQuery".ReadGraphQLRequest()
-        });
+        }).ConfigureAwait(false);
         var syncResult = serializer.Serialize(result);
         var stream = new System.IO.MemoryStream();
-        await serializer.WriteAsync(stream, result);
+        await serializer.WriteAsync(stream, result).ConfigureAwait(false);
         var asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
         syncResult.ShouldBe(asyncResult);
     }

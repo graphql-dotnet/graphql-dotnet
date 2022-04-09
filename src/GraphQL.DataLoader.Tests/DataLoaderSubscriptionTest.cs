@@ -11,7 +11,7 @@ public class DataLoaderSubscriptionTest : QueryTestBase
 {
     protected async Task<ExecutionResult> ExecuteSubscribeAsync(string query)
     {
-        var result = await ExecuteQueryAsync<DataLoaderTestSchema>(query);
+        var result = await ExecuteQueryAsync<DataLoaderTestSchema>(query).ConfigureAwait(false);
         result.Data.ShouldBeNull();
         return result;
     }

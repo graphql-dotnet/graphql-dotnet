@@ -48,9 +48,9 @@ public class NameFieldResolverTests
             });
 
         if (throws)
-            await Should.ThrowAsync<InvalidOperationException>(async () => await result());
+            await Should.ThrowAsync<InvalidOperationException>(async () => await result().ConfigureAwait(false)).ConfigureAwait(false);
         else
-            (await result()).ShouldBe(expected);
+            (await result().ConfigureAwait(false)).ShouldBe(expected);
     }
 
     public class PersonBase

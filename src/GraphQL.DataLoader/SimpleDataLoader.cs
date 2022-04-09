@@ -35,7 +35,9 @@ namespace GraphQL.DataLoader
             if (_result != null)
                 return _result;
 
+#pragma warning disable RCS1059 // Avoid locking on publicly accessible instance.
             lock (this)
+#pragma warning restore RCS1059 // Avoid locking on publicly accessible instance.
             {
                 if (_result != null)
                     return _result;

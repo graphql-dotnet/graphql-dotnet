@@ -24,7 +24,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         await loader.DispatchAsync().ConfigureAwait(false);
 
-        var result1 = await delayResult.GetResultAsync();
+        var result1 = await delayResult.GetResultAsync().ConfigureAwait(false);
 
         result1.ShouldNotBeNull();
         result1.Count().ShouldBe(2);
@@ -54,7 +54,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
             .Returns(async (CancellationToken ct) =>
             {
-                await Task.Delay(60000, ct);
+                await Task.Delay(60000, ct).ConfigureAwait(false);
                 ct.ThrowIfCancellationRequested();
 
                 return users;
@@ -119,7 +119,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var task = result.GetResultAsync();
 
-        var ex = await Should.ThrowAsync<Exception>(task);
+        var ex = await Should.ThrowAsync<Exception>(task).ConfigureAwait(false);
 
         ex.Message.ShouldBe("Deferred");
     }

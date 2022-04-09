@@ -17,7 +17,7 @@ public class SubscriptionWithAutoGraphTypeTests
         options.Schema = new SubscriptionSchemaWithAutoGraphType();
         options.RequestServices = provider;
 
-        var result = await executer.ExecuteAsync(options);
+        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
 
         result.Data.ShouldBeNull();
 
@@ -43,7 +43,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessageGetAll(addedMessage);
 
@@ -76,7 +76,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription newMessageContent { newMessageContent }",
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessage(addedMessage);
 
@@ -110,7 +110,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessage(addedMessage);
 
@@ -143,7 +143,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessage(addedMessage);
 
@@ -180,7 +180,7 @@ public class SubscriptionWithAutoGraphTypeTests
             {
                 ["id"] = "1"
             })
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessage(addedMessage);
 
@@ -216,7 +216,7 @@ public class SubscriptionWithAutoGraphTypeTests
             {
                 ["id"] = "1"
             })
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddMessage(addedMessage);
 
@@ -236,13 +236,13 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
-        });
+        }).ConfigureAwait(false);
 
         Chat.AddError(new Exception("test"));
 
         /* Then */
         var stream = result.Streams.Values.FirstOrDefault();
-        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
+        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync()).ConfigureAwait(false);
         error.InnerException.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
     }

@@ -110,7 +110,7 @@ query {
         {
             Query = "{ hero { name } }",
             RequestServices = provider,
-        });
+        }).ConfigureAwait(false);
         var resultString = serializer.Serialize(result);
         resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
     }

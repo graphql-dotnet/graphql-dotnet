@@ -29,7 +29,7 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
         {
             Query = "{test}",
             Schema = Schema,
-        });
+        }).ConfigureAwait(false);
         valid.Data.ShouldNotBeNull();
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -37,16 +37,16 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             {
                 Query = null,
                 Schema = Schema,
-            });
-        });
+            }).ConfigureAwait(false);
+        }).ConfigureAwait(false);
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             await de.ExecuteAsync(new ExecutionOptions()
             {
                 Query = "{test}",
                 Schema = null,
-            });
-        });
+            }).ConfigureAwait(false);
+        }).ConfigureAwait(false);
     }
 
     [Fact]

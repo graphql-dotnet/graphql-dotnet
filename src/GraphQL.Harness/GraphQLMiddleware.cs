@@ -29,11 +29,11 @@ namespace Example
         {
             if (!IsGraphQLRequest(context))
             {
-                await next(context);
+                await next(context).ConfigureAwait(false);
                 return;
             }
 
-            await ExecuteAsync(context);
+            await ExecuteAsync(context).ConfigureAwait(false);
         }
 
         private bool IsGraphQLRequest(HttpContext context)
@@ -46,7 +46,7 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted);
+            var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false);
 
             var result = await _executer.ExecuteAsync(options =>
             {
@@ -58,14 +58,14 @@ namespace Example
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
                 options.CancellationToken = context.RequestAborted;
-            });
+            }).ConfigureAwait(false);
 
             if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
             }
 
-            await WriteResponseAsync(context, result, context.RequestAborted);
+            await WriteResponseAsync(context, result, context.RequestAborted).ConfigureAwait(false);
         }
 
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
@@ -73,7 +73,7 @@ namespace Example
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200; // OK
 
-            await _serializer.WriteAsync(context.Response.Body, result, cancellationToken);
+            await _serializer.WriteAsync(context.Response.Body, result, cancellationToken).ConfigureAwait(false);
         }
     }
 }

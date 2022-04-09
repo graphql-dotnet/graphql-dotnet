@@ -40,7 +40,7 @@ public class DocumentExecuterTests
             Schema = schema,
             Query = "{hero}",
             Root = new SampleGraph(),
-        });
+        }).ConfigureAwait(false);
         ret.Errors.ShouldBeNull();
         queryStrategy.Executed.ShouldBeTrue();
         ret = await executer.ExecuteAsync(new ExecutionOptions()
@@ -48,7 +48,7 @@ public class DocumentExecuterTests
             Schema = schema,
             Query = "mutation{hero}",
             Root = new SampleGraph(),
-        });
+        }).ConfigureAwait(false);
         ret.Errors.ShouldBeNull();
         mutationStrategy.Executed.ShouldBeTrue();
     }
@@ -66,17 +66,17 @@ public class DocumentExecuterTests
 
         // verify executing with Schema1 works with custom class
         var executer1 = provider.GetRequiredService<StringExecuter<Schema1>>();
-        var result1 = await executer1.ExecuteAsync("{hero}");
+        var result1 = await executer1.ExecuteAsync("{hero}").ConfigureAwait(false);
         result1.ShouldBe("{\"data\":{\"hero\":\"hello\"}}");
 
         // verify executing with Schema2 works with IDocumentExecuter<> directly
         var executer2 = provider.GetRequiredService<IDocumentExecuter<Schema2>>();
-        var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider });
+        var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider }).ConfigureAwait(false);
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         serializer.Serialize(result2).ShouldBe("{\"data\":{\"hero\":\"hello2\"}}");
 
         // verify that you cannot specify Schema with this implementation
-        var err = await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
+        var err = await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }).ConfigureAwait(false)).ConfigureAwait(false);
         err.Message.ShouldBe("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
     }
 
@@ -100,7 +100,7 @@ public class DocumentExecuterTests
             {
                 Query = query,
                 RequestServices = scope.ServiceProvider,
-            });
+            }).ConfigureAwait(false);
             return _serializer.Serialize(result);
         }
     }

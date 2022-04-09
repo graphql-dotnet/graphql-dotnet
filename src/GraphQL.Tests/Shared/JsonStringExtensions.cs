@@ -45,6 +45,6 @@ public static class JsonStringExtensions
     {
         var options = new ExecutionOptions { Schema = schema };
         configure(options);
-        return _serializer.Serialize(await _executer.ExecuteAsync(options));
+        return _serializer.Serialize(await _executer.ExecuteAsync(options).ConfigureAwait(false));
     }
 }

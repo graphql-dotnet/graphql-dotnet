@@ -36,7 +36,7 @@ namespace GraphQL.Validation
                 for (int i = 0; i < _visitors.Count; ++i)
                     _visitors[i].Enter(node, context.Context);
 
-                await base.VisitAsync(node, context);
+                await base.VisitAsync(node, context).ConfigureAwait(false);
 
                 for (int i = _visitors.Count - 1; i >= 0; --i)
                     _visitors[i].Leave(node, context.Context);

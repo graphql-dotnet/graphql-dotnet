@@ -159,7 +159,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             options.CancellationToken = cancellationToken;
             options.ValidationRules = rules;
             options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
-        });
+        }).ConfigureAwait(false);
 
         var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 

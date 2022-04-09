@@ -149,7 +149,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
+        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false) as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
@@ -201,7 +201,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as Connection<Child>;
 
         result.ShouldNotBeNull();
@@ -255,7 +255,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
         result.ShouldNotBeNull();
@@ -332,7 +332,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as ParentChildrenConnection;
 
         result.ShouldNotBeNull();
@@ -396,7 +396,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             .Name("connection")
             .PageSize(10)
             .Resolve(context => context.First);
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
+        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
     }
 
     [Fact]
@@ -407,7 +407,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             .Name("connection")
             .PageSize(10)
             .ResolveAsync(context => Task.FromResult<object>(context.First));
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
+        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
     }
 
     public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
