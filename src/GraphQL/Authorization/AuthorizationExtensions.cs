@@ -21,6 +21,12 @@ namespace GraphQL
         public const string ROLE_KEY = "Authorization__Roles";
 
         /// <summary>
+        /// Metadata key name for indicating that the user must be authorized to access the resource.
+        /// Value of this key is a boolean value.
+        /// </summary>
+        public const string AUTHORIZE_KEY = "Authorization__Required";
+
+        /// <summary>
         /// Gets a list of authorization policy names for the specified metadata provider if any.
         /// Otherwise returns <see langword="null"/>.
         /// </summary>
@@ -50,7 +56,22 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
-        public static bool RequiresAuthorization(this IProvideMetadata provider) => GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
+        public static bool RequiresAuthorization(this IProvideMetadata provider)
+            => GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0 || provider.GetMetadata(AUTHORIZE_KEY, false);
+
+        /// <summary>
+        /// Adds metadata to indicate that the resource requires that the user has successfully authenticated.
+        /// </summary>
+        /// <param name="provider">
+        /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
+        /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
+        /// </param>
+        public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : IProvideMetadata
+        {
+            provider.Metadata[AUTHORIZE_KEY] = true;
+            return provider;
+        }
 
         /// <summary>
         /// Adds authorization policy to the specified metadata provider. If the provider already contains
@@ -116,6 +137,7 @@ namespace GraphQL
             }
 
             provider.Metadata[ROLE_KEY] = list;
+            provider.Authorize();
             return provider;
         }
 
@@ -147,6 +169,7 @@ namespace GraphQL
             }
 
             provider.Metadata[ROLE_KEY] = list;
+            provider.Authorize();
             return provider;
         }
 

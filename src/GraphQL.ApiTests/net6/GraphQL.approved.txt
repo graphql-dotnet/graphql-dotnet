@@ -2,8 +2,11 @@ namespace GraphQL
 {
     public static class AuthorizationExtensions
     {
+        public const string AUTHORIZE_KEY = "Authorization__Required";
         public const string POLICY_KEY = "Authorization__Policies";
         public const string ROLE_KEY = "Authorization__Roles";
+        public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
         [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
@@ -215,7 +218,9 @@ namespace GraphQL
         public GraphQLAuthorizeAttribute(string policy) { }
         public string? Policy { get; set; }
         public string? Roles { get; set; }
+        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }

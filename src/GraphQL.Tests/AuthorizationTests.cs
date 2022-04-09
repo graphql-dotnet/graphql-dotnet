@@ -26,14 +26,22 @@ public class AuthorizationTests
     }
 
     [Fact]
-    public void NoRolesNoop()
+    public void NoRoles()
     {
         var field = new FieldType();
         field.AuthorizeWithRoles();
         field.AuthorizeWithRoles("");
         field.AuthorizeWithRoles(" ");
         field.AuthorizeWithRoles(",");
-        field.RequiresAuthorization().ShouldBeFalse();
+        field.RequiresAuthorization().ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Authorize()
+    {
+        var field = new FieldType();
+        field.Authorize();
+        field.RequiresAuthorization().ShouldBeTrue();
     }
 
     [Fact]
@@ -91,6 +99,9 @@ public class AuthorizationTests
         field.RequiresAuthorization().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
+
+        field = graph.Fields.Find("Value");
+        field.RequiresAuthorization().ShouldBeTrue();
     }
 
     [Fact]
@@ -101,6 +112,7 @@ public class AuthorizationTests
 type Class1 {
   id: String!
   name: String!
+  value: String!
 }",
             configure => configure.Types.Include<Class1>());
 
@@ -115,6 +127,9 @@ type Class1 {
         field.RequiresAuthorization().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
+
+        field = graph.Fields.Find("value");
+        field.RequiresAuthorization().ShouldBeTrue();
     }
 
     [GraphQLAuthorize("Policy1")]
@@ -133,5 +148,7 @@ type Class1 {
         [GraphQLAuthorize(Roles = "Role1,Role2")]
         [GraphQLAuthorize(Roles = "Role3, Role2")]
         public string Name { get; set; }
+        [GraphQLAuthorize]
+        public string Value { get; set; }
     }
 }
