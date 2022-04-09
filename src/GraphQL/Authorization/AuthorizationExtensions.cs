@@ -21,7 +21,7 @@ namespace GraphQL
         public const string ROLE_KEY = "Authorization__Roles";
 
         /// <summary>
-        /// Metadata key name for indicating that the user must be authorized to access the resource.
+        /// Metadata key name for indicating that the user must be authorized (strictly speaking, authenticated) to access the resource.
         /// Value of this key is a boolean value.
         /// </summary>
         public const string AUTHORIZE_KEY = "Authorization__Required";
