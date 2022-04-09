@@ -57,7 +57,7 @@ namespace GraphQL
         /// </param>
         /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
         public static bool RequiresAuthorization(this IProvideMetadata provider)
-            => GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0 || provider.GetMetadata(AUTHORIZE_KEY, false);
+            => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
 
         /// <summary>
         /// Adds metadata to indicate that the resource requires that the user has successfully authenticated.
@@ -98,6 +98,7 @@ namespace GraphQL
                 list.Add(policy);
 
             provider.Metadata[POLICY_KEY] = list;
+            provider.Authorize();
             return provider;
         }
 
