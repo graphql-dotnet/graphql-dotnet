@@ -605,7 +605,7 @@ There are a number of other minor issues fixed; see these links for more details
 ### 20. `Authorize` and `AuthorizeWithRoles` added in GraphQL 5.1.0
 
 This allows for specifying roles rather than just policies that can be used to validate a request.
-`Authorize` can be used to specify that authentication is required, without specifying any specific roles or policies.
+`Authorize` can be used to specify that only authentication is required, without specifying any specific roles or policies.
 As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), it requires support by a third-party
 library to perform the validation.
 
