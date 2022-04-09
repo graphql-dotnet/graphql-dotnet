@@ -40,6 +40,7 @@ public class AuthorizationTests
     public void Authorize()
     {
         var field = new FieldType();
+        field.RequiresAuthorization().ShouldBeFalse();
         field.Authorize();
         field.RequiresAuthorization().ShouldBeTrue();
     }
