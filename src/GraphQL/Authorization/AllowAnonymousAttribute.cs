@@ -10,11 +10,6 @@ namespace GraphQL
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
     public class AllowAnonymousAttribute : GraphQLAttribute
     {
-        /// <inheritdoc cref="AllowAnonymousAttribute"/>
-        public AllowAnonymousAttribute()
-        {
-        }
-
         /// <inheritdoc />
         public override void Modify(FieldConfig field)
         {
