@@ -162,9 +162,9 @@ If this type of functionality is necessary for your data types, you will need to
 field resolvers to perform the conversion, as a custom scalar cannot do this. This is a limitation
 of GraphQL.NET.
 
-### Should I use `GraphQLAuthorizeAttribute` or the `AuthorizeWith` method?
+### Should I use `AuthorizeAttribute` or the `AuthorizeWith` method?
 
-`GraphQLAuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
+`AuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
 with the code-first approach.
 
 See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)

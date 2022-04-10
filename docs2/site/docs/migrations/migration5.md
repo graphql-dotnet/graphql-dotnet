@@ -101,7 +101,7 @@ class Person
 
     public string Name { get; set; }
 
-    [GraphQLAuthorize("Administrators")]
+    [Authorize("Administrators")]
     public int Age { get; set; }
 
     [Description("Employee's job position")]
@@ -268,7 +268,7 @@ type instead.
 
 #### Graphs, fields and arguments recognize attributes to control initialization behavior
 
-Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
+Any attribute that derives from `GraphQLAttribute`, such as `AuthorizeAttribute`, can be set on a
 CLR class or one if its properties, fields, methods or method arguments and is configured for the graph,
 field type or query argument. New attributes have been updated or added for convenience as follows:
 
@@ -285,7 +285,7 @@ field type or query argument. New attributes have been updated or added for conv
 | `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
 | `[FromSource]`       | For method parameters, specifies that the argument value should be the context 'Source' |
 | `[FromUserContext]`  | For method parameters, specifies that the argument value should be the user context |
-| `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
+| `[Authorize]`        | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
 Note: `[Scoped]` is provided through the GraphQL.MicrosoftDI NuGet package.
@@ -1134,6 +1134,10 @@ GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRu
 
 This was done for the purposes of the overall strategy for reducing memory consumption.
 
-### 47. `AuthorizeWith` renamed to `AuthorizeWithPolicy`
+### 47. `AuthorizeWith` renamed to `AuthorizeWithPolicy` in 5.1.0
 
 This change was made to clarify and differentiate between `AuthorizeWithRoles`.
+
+### 48. `GraphQLAuthorizeAttribute` renamed to `AuthorizeAttribute` in 5.1.1
+
+This change was made to align with the rest of the attributes' names.

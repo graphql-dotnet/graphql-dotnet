@@ -30,6 +30,19 @@ namespace GraphQL
         public static System.Collections.Generic.List<string>? GetRoles(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
     }
+    public class AuthorizeAttribute : GraphQL.GraphQLAttribute
+    {
+        public AuthorizeAttribute() { }
+        public AuthorizeAttribute(string policy) { }
+        public string? Policy { get; set; }
+        public string? Roles { get; set; }
+        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     [System.Flags]
     public enum AutoRegisteringMode
     {
@@ -212,18 +225,10 @@ namespace GraphQL
         public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
-    public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
+    [System.Obsolete("Please use AuthorizeAttribute instead. This class will be removed in v6.")]
+    public class GraphQLAuthorizeAttribute : GraphQL.AuthorizeAttribute
     {
         public GraphQLAuthorizeAttribute() { }
-        public GraphQLAuthorizeAttribute(string policy) { }
-        public string? Policy { get; set; }
-        public string? Roles { get; set; }
-        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
-        public override void Modify(GraphQL.Types.IGraphType graphType) { }
-        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
-        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
-        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     public static class GraphQLBuilderExtensions
     {
