@@ -58,7 +58,7 @@ namespace GraphQL
         /// Returns a boolean indicating if anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
-        public static bool AllowsAnonymous(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
+        public static bool IsAnonymousAllowed(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
 
         /// <summary>
         /// Adds metadata to indicate that anonymous access should be allowed to a field of a graph type
@@ -79,8 +79,13 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
-        public static bool RequiresAuthorization(this IProvideMetadata provider)
+        public static bool IsAuthorizationRequired(this IProvideMetadata provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
+
+        /// <inheritdoc cref="IsAuthorizationRequired(IProvideMetadata)"/>
+        [Obsolete("Please use IsAuthorizationRequired. Will be removed in v6.")]
+        public static bool RequiresAuthorization(this IProvideMetadata provider)
+            => provider.IsAuthorizationRequired();
 
         /// <summary>
         /// Adds metadata to indicate that the resource requires that the user has successfully authenticated.
