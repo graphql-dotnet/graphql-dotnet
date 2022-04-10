@@ -606,7 +606,7 @@ There are a number of other minor issues fixed; see these links for more details
 
 `AuthorizeWithRoles` allows for specifying roles rather than just policies that can be used to validate a request.
 `Authorize` can be used to specify that only authentication is required, without specifying any specific roles or policies.
-`AllowAnonymous` indicates that anonymous access should be allowed to a field of a graph type requiring authorization,
+`AllowAnonymous` typically indicates that anonymous access should be allowed to a field of a graph type requiring authorization,
 providing that no other fields were selected. As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), these
 new methods require support by a third-party library to perform the validation.
 
