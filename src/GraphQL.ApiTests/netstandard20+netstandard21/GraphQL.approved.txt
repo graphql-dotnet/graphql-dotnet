@@ -1,10 +1,21 @@
 namespace GraphQL
 {
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class AllowAnonymousAttribute : GraphQL.GraphQLAttribute
+    {
+        public AllowAnonymousAttribute() { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     public static class AuthorizationExtensions
     {
+        public const string ANONYMOUS_KEY = "Authorization__AllowAnonymous";
         public const string AUTHORIZE_KEY = "Authorization__Required";
         public const string POLICY_KEY = "Authorization__Policies";
         public const string ROLE_KEY = "Authorization__Roles";
+        public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static bool AllowingAnonymous(this GraphQL.Types.IProvideMetadata provider) { }
         public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
