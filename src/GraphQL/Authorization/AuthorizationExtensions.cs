@@ -27,7 +27,7 @@ namespace GraphQL
         public const string AUTHORIZE_KEY = "Authorization__Required";
 
         /// <summary>
-        /// Metadata key name for indicating if anonymous access should be allowed to a field of a graph type
+        /// Metadata key name for typically indicating if anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
         public const string ANONYMOUS_KEY = "Authorization__AllowAnonymous";
@@ -55,13 +55,13 @@ namespace GraphQL
         public static List<string>? GetRoles(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(ROLE_KEY);
 
         /// <summary>
-        /// Returns a boolean indicating if anonymous access should be allowed to a field of a graph type
+        /// Returns a boolean typically indicating if anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
         public static bool IsAnonymousAllowed(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
 
         /// <summary>
-        /// Adds metadata to indicate that anonymous access should be allowed to a field of a graph type
+        /// Adds metadata to typically indicate that anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
         public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)

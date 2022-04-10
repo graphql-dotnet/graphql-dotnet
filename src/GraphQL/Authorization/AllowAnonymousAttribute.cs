@@ -4,7 +4,7 @@ using GraphQL.Utilities;
 namespace GraphQL;
 
 /// <summary>
-/// Attribute to indicate that anonymous access should be allowed to a field of a graph type
+/// Attribute to typically indicate that anonymous access should be allowed to a field of a graph type
 /// requiring authorization, providing that no other fields were selected.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
