@@ -58,7 +58,7 @@ namespace GraphQL
         /// Returns a boolean indicating if anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
-        public static bool AllowingAnonymous(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
+        public static bool AllowsAnonymous(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
 
         /// <summary>
         /// Adds metadata to indicate that anonymous access should be allowed to a field of a graph type
