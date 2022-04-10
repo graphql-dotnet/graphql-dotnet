@@ -133,23 +133,23 @@ type Class1 {
         field.RequiresAuthorization().ShouldBeTrue();
     }
 
-    [GraphQLAuthorize("Policy1")]
-    [GraphQLAuthorize("Policy2")]
-    [GraphQLAuthorize("Policy2")]
-    [GraphQLAuthorize(Policy = "Policy3")]
-    [GraphQLAuthorize(Roles = "Role1,Role2")]
-    [GraphQLAuthorize(Roles = "Role3, Role2")]
+    [Authorize("Policy1")]
+    [Authorize("Policy2")]
+    [Authorize("Policy2")]
+    [Authorize(Policy = "Policy3")]
+    [Authorize(Roles = "Role1,Role2")]
+    [Authorize(Roles = "Role3, Role2")]
     private class Class1
     {
         public string Id { get; set; }
-        [GraphQLAuthorize("Policy1")]
-        [GraphQLAuthorize("Policy2")]
-        [GraphQLAuthorize("Policy2")]
-        [GraphQLAuthorize(Policy = "Policy3")]
-        [GraphQLAuthorize(Roles = "Role1,Role2")]
-        [GraphQLAuthorize(Roles = "Role3, Role2")]
+        [Authorize("Policy1")]
+        [Authorize("Policy2")]
+        [Authorize("Policy2")]
+        [Authorize(Policy = "Policy3")]
+        [Authorize(Roles = "Role1,Role2")]
+        [Authorize(Roles = "Role3, Role2")]
         public string Name { get; set; }
-        [GraphQLAuthorize]
+        [Authorize]
         public string Value { get; set; }
     }
 }
