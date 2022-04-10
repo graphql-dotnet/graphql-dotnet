@@ -116,7 +116,7 @@ public class AuthorizationTests
         field.RequiresAuthorization().ShouldBeTrue();
         field.AllowingAnonymous().ShouldBeFalse();
 
-        field = graph.Fields.Find("Test");
+        field = graph.Fields.Find("Public");
         field.RequiresAuthorization().ShouldBeFalse();
         field.AllowingAnonymous().ShouldBeTrue();
     }
@@ -130,7 +130,7 @@ type Class1 {
   id: String!
   name: String!
   value: String!
-  test: String!
+  public: String!
 }",
             configure => configure.Types.Include<Class1>());
 
@@ -152,7 +152,7 @@ type Class1 {
         field.RequiresAuthorization().ShouldBeTrue();
         field.AllowingAnonymous().ShouldBeFalse();
 
-        field = graph.Fields.Find("test");
+        field = graph.Fields.Find("public");
         field.RequiresAuthorization().ShouldBeFalse();
         field.AllowingAnonymous().ShouldBeTrue();
     }
@@ -176,6 +176,6 @@ type Class1 {
         [GraphQLAuthorize]
         public string Value { get; set; }
         [AllowAnonymous]
-        public string Test { get; set; }
+        public string Public { get; set; }
     }
 }
