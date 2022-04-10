@@ -15,7 +15,7 @@ namespace GraphQL
         public const string ROLE_KEY = "Authorization__Roles";
         public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        public static bool AllowingAnonymous(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool AllowsAnonymous(this GraphQL.Types.IProvideMetadata provider) { }
         public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
