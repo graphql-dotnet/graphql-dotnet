@@ -602,12 +602,13 @@ There are a number of other minor issues fixed; see these links for more details
 - https://github.com/graphql-dotnet/graphql-dotnet/issues/3002
 - https://github.com/graphql-dotnet/graphql-dotnet/pull/3004
 
-### 20. `Authorize` and `AuthorizeWithRoles` extension methods added in GraphQL 5.1.0 and 5.1.1
+### 20. `Authorize`, `AuthorizeWithRoles` and `AllowAnonymous` extension methods added in GraphQL 5.1.0 and 5.1.1
 
-This allows for specifying roles rather than just policies that can be used to validate a request.
+`AuthorizeWithRoles` allows for specifying roles rather than just policies that can be used to validate a request.
 `Authorize` can be used to specify that only authentication is required, without specifying any specific roles or policies.
-As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), it requires support by a third-party
-library to perform the validation.
+`AllowAnonymous` typically indicates that anonymous access should be allowed to a field of a graph type requiring authorization,
+providing that no other fields were selected. As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), these
+new methods require support by a third-party library to perform the validation.
 
 Similar to the ASP.NET Core `AuthorizeAttribute`, the new `AuthorizeWithRoles` method accepts
 a comma-separated list of role names that would allow access to the graph or field.
@@ -621,6 +622,9 @@ You may also supply a list of strings as in the following example:
 ```csharp
 graph.AuthorizeWithRoles("Administrators", "Managers");
 ```
+
+For schema-first and "type-first" graphs, the `[GraphQLAuthorize]` has been updated to support roles and can now
+be used without any policy or role names, and an `[AllowAnonymous]` attribute has been added.
 
 ### 21. `RequestServices` added to `ValidationContext` in GraphQL 5.1.0
 

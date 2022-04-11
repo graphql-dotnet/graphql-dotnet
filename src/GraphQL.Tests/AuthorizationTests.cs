@@ -8,9 +8,9 @@ public class AuthorizationTests
     public void Field()
     {
         var field = new FieldType();
-        field.RequiresAuthorization().ShouldBeFalse();
+        field.IsAuthorizationRequired().ShouldBeFalse();
         field.AuthorizeWith("Policy1");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
         field.AuthorizeWith("Policy2");
         field.AuthorizeWith("Policy2");
         field.AuthorizeWithPolicy("Policy3");
@@ -20,7 +20,7 @@ public class AuthorizationTests
         field.AuthorizeWithRoles("Role1", "Role4");
         field.AuthorizeWithRoles("");
 
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
@@ -33,16 +33,25 @@ public class AuthorizationTests
         field.AuthorizeWithRoles("");
         field.AuthorizeWithRoles(" ");
         field.AuthorizeWithRoles(",");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
+    }
+
+    [Fact]
+    public void AllowAnonymous()
+    {
+        var field = new FieldType();
+        field.IsAnonymousAllowed().ShouldBeFalse();
+        field.AllowAnonymous();
+        field.IsAnonymousAllowed().ShouldBeTrue();
     }
 
     [Fact]
     public void Authorize()
     {
         var field = new FieldType();
-        field.RequiresAuthorization().ShouldBeFalse();
+        field.IsAuthorizationRequired().ShouldBeFalse();
         field.Authorize();
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
     }
 
     [Fact]
@@ -60,7 +69,7 @@ public class AuthorizationTests
             .AuthorizeWithRoles("Role1", "Role4");
 
         var field = graph.Fields.Find("Field");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
@@ -81,7 +90,7 @@ public class AuthorizationTests
             .AuthorizeWithRoles("Role1", "Role4");
 
         var field = graph.Fields.Find("Field");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
     }
@@ -90,19 +99,26 @@ public class AuthorizationTests
     public void AutoOutputGraphType()
     {
         var graph = new AutoRegisteringObjectGraphType<Class1>();
-        graph.RequiresAuthorization().ShouldBeTrue();
+        graph.IsAuthorizationRequired().ShouldBeTrue();
+        graph.IsAnonymousAllowed().ShouldBeFalse();
         graph.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         graph.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
 
-        graph.Fields.Find("Id").RequiresAuthorization().ShouldBeFalse();
+        graph.Fields.Find("Id").IsAuthorizationRequired().ShouldBeFalse();
 
         var field = graph.Fields.Find("Name");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
+        field.IsAnonymousAllowed().ShouldBeFalse();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
 
         field = graph.Fields.Find("Value");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
+        field.IsAnonymousAllowed().ShouldBeFalse();
+
+        field = graph.Fields.Find("Public");
+        field.IsAuthorizationRequired().ShouldBeFalse();
+        field.IsAnonymousAllowed().ShouldBeTrue();
     }
 
     [Fact]
@@ -114,23 +130,31 @@ type Class1 {
   id: String!
   name: String!
   value: String!
+  public: String!
 }",
             configure => configure.Types.Include<Class1>());
 
         var graph = (ObjectGraphType)schema.AllTypes["Class1"];
-        graph.RequiresAuthorization().ShouldBeTrue();
+        graph.IsAuthorizationRequired().ShouldBeTrue();
+        graph.IsAnonymousAllowed().ShouldBeFalse();
         graph.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         graph.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
 
-        graph.Fields.Find("id").RequiresAuthorization().ShouldBeFalse();
+        graph.Fields.Find("id").IsAuthorizationRequired().ShouldBeFalse();
 
         var field = graph.Fields.Find("name");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
+        field.IsAnonymousAllowed().ShouldBeFalse();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3" });
 
         field = graph.Fields.Find("value");
-        field.RequiresAuthorization().ShouldBeTrue();
+        field.IsAuthorizationRequired().ShouldBeTrue();
+        field.IsAnonymousAllowed().ShouldBeFalse();
+
+        field = graph.Fields.Find("public");
+        field.IsAuthorizationRequired().ShouldBeFalse();
+        field.IsAnonymousAllowed().ShouldBeTrue();
     }
 
     [Authorize("Policy1")]
@@ -151,5 +175,7 @@ type Class1 {
         public string Name { get; set; }
         [Authorize]
         public string Value { get; set; }
+        [AllowAnonymous]
+        public string Public { get; set; }
     }
 }

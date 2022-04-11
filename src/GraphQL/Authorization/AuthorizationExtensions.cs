@@ -27,6 +27,12 @@ namespace GraphQL
         public const string AUTHORIZE_KEY = "Authorization__Required";
 
         /// <summary>
+        /// Metadata key name for typically indicating if anonymous access should be allowed to a field of a graph type
+        /// requiring authorization, providing that no other fields were selected.
+        /// </summary>
+        public const string ANONYMOUS_KEY = "Authorization__AllowAnonymous";
+
+        /// <summary>
         /// Gets a list of authorization policy names for the specified metadata provider if any.
         /// Otherwise returns <see langword="null"/>.
         /// </summary>
@@ -49,6 +55,23 @@ namespace GraphQL
         public static List<string>? GetRoles(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(ROLE_KEY);
 
         /// <summary>
+        /// Returns a boolean typically indicating if anonymous access should be allowed to a field of a graph type
+        /// requiring authorization, providing that no other fields were selected.
+        /// </summary>
+        public static bool IsAnonymousAllowed(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
+
+        /// <summary>
+        /// Adds metadata to typically indicate that anonymous access should be allowed to a field of a graph type
+        /// requiring authorization, providing that no other fields were selected.
+        /// </summary>
+        public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : IProvideMetadata
+        {
+            provider.Metadata[ANONYMOUS_KEY] = true;
+            return provider;
+        }
+
+        /// <summary>
         /// Gets a boolean value that determines whether any authorization policy is applied to this metadata provider.
         /// </summary>
         /// <param name="provider">
@@ -56,8 +79,13 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
-        public static bool RequiresAuthorization(this IProvideMetadata provider)
+        public static bool IsAuthorizationRequired(this IProvideMetadata provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
+
+        /// <inheritdoc cref="IsAuthorizationRequired(IProvideMetadata)"/>
+        [Obsolete("Please use IsAuthorizationRequired. Will be removed in v6.")]
+        public static bool RequiresAuthorization(this IProvideMetadata provider)
+            => provider.IsAuthorizationRequired();
 
         /// <summary>
         /// Adds metadata to indicate that the resource requires that the user has successfully authenticated.
