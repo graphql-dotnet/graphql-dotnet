@@ -23,6 +23,7 @@ public class AuthorizationTests
         field.IsAuthorizationRequired().ShouldBeTrue();
         field.GetPolicies().ShouldBe(new string[] { "Policy1", "Policy2", "Policy3" });
         field.GetRoles().ShouldBe(new string[] { "Role1", "Role2", "Role3", "Role4" });
+        1.ShouldBe(1);
     }
 
     [Fact]

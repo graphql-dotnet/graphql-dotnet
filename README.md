@@ -344,6 +344,10 @@ Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
 
+## Additions
+
+There's always place for more.
+
 ## Sponsors
 
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/graphql-net#sponsor).
