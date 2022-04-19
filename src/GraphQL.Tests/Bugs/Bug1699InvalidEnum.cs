@@ -59,6 +59,9 @@ public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
     public void Input_EnumList_Variable() => AssertQuerySuccess("query($arg: [Bug1699Enum]) { inputList(arg: $arg) }", @"{ ""inputList"": ""Sleepy"" }", @"{""arg"":[""SLEEPY""]}".ToInputs());
 
     [Fact]
+    public void Input_CustomEnumList() => AssertQuerySuccess("query($arg: [Bug1699CustomEnum]) { inputListCustom(arg: $arg) }", @"{ ""inputListCustom"": ""ISDOPEY"" }", @"{""arg"":[""ISDOPEY""]}".ToInputs());
+
+    [Fact]
     public void Input_Enum_Valid() => AssertQuerySuccess("{ inputEnum(arg: SLEEPY) }", @"{ ""inputEnum"": ""SLEEPY"" }");
 
     [Fact]
@@ -197,6 +200,10 @@ public class Bug1699InvalidEnumQuery : ObjectGraphType
             "inputList",
             arguments: new QueryArguments(new QueryArgument<ListGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg" }),
             resolve: ctx => string.Join(",", ctx.GetArgument<List<Bug1699Enum>>("arg").Select(x => x.ToString())));
+        Field<StringGraphType>(
+            "inputListCustom",
+            arguments: new QueryArguments(new QueryArgument<ListGraphType<Bug1699CustomEnumGraphType>> { Name = "arg" }),
+            resolve: ctx => string.Join(",", ctx.GetArgument<List<object>>("arg").Select(x => x.ToString())));
     }
 }
 
@@ -214,5 +221,6 @@ public class Bug1699CustomEnumGraphType : EnumerationGraphType
         Add(new EnumValueDefinition("ISGRUMPY", Bug1699Enum.Grumpy));
         Add(new EnumValueDefinition("ISHAPPY", Bug1699Enum.Happy));
         Add(new EnumValueDefinition("ISSLEEPY", 2));
+        Add(name: "ISDOPEY", value: "ISDOPEY", description: "testing description");
     }
 }
