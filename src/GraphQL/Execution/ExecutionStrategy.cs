@@ -331,7 +331,6 @@ namespace GraphQL.Execution
                         {
                             count += GetFragmentSpreads(context, fragment.SelectionSet);
                         }
-
                     }
                     else if (selection is GraphQLInlineFragment inline)
                     {
