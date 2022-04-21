@@ -222,7 +222,7 @@ namespace GraphQL.Execution
             fields ??= new();
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
-            int countOfSpreads = GetFragmentSpreads(selectionSet);
+            int countOfSpreads = GetFragmentSpreads(context, selectionSet);
             ROM[]? visitedFragmentNames = null;
             if (countOfSpreads > 1)
                 visitedFragmentNames = ArrayPool<ROM>.Shared.Rent(countOfSpreads);
@@ -316,14 +316,27 @@ namespace GraphQL.Execution
                 };
             }
 
-            static int GetFragmentSpreads(GraphQLSelectionSet selectionSet)
+            static int GetFragmentSpreads(ExecutionContext context, GraphQLSelectionSet selectionSet)
             {
                 int count = 0;
 
                 foreach (var selection in selectionSet.Selections)
                 {
-                    if (selection is GraphQLFragmentSpread)
+                    if (selection is GraphQLFragmentSpread spread)
+                    {
                         ++count;
+
+                        var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
+                        if (fragment != null)
+                        {
+                            count += GetFragmentSpreads(context, fragment.SelectionSet);
+                        }
+
+                    }
+                    else if (selection is GraphQLInlineFragment inline)
+                    {
+                        count += GetFragmentSpreads(context, inline.SelectionSet);
+                    }
                 }
 
                 return count;
