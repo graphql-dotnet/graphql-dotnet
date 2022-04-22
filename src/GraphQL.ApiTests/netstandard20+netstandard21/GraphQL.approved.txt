@@ -414,6 +414,7 @@ namespace GraphQL
     public interface IConfigureAutoSchema
     {
         GraphQL.DI.IGraphQLBuilder Builder { get; }
+        System.Type SchemaType { get; }
     }
     public interface IDocumentExecuter
     {
@@ -1699,6 +1700,10 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+    }
+    public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
+    {
+        public AutoSchema(System.IServiceProvider serviceProvider) { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
     {

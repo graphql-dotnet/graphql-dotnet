@@ -1,4 +1,5 @@
 using GraphQL.DI;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -12,15 +13,23 @@ namespace GraphQL
         /// Returns a <see cref="IGraphQLBuilder"/> reference that can be used to configure the schema or service provider.
         /// </summary>
         IGraphQLBuilder Builder { get; }
+
+        /// <summary>
+        /// Returns the type of constructed schema, which can be used to type match prior to additional configurations.
+        /// </summary>
+        Type SchemaType { get; }
     }
 
-    internal class ConfigureAutoSchema : IConfigureAutoSchema
+    internal class ConfigureAutoSchema<TQueryClrType> : IConfigureAutoSchema
     {
         public ConfigureAutoSchema(IGraphQLBuilder baseBuilder)
         {
             Builder = baseBuilder;
+            SchemaType = typeof(AutoSchema<TQueryClrType>);
         }
 
         public IGraphQLBuilder Builder { get; }
+
+        public Type SchemaType { get; }
     }
 }
