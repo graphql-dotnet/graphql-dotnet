@@ -16,6 +16,7 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the type of constructed schema, which can be used to type match prior to additional configurations.
+        /// Usually it is always <see cref="AutoSchema{TQueryClrType}"/>.
         /// </summary>
         Type SchemaType { get; }
     }
