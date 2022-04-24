@@ -269,7 +269,7 @@ namespace GraphQL
 
         #region - AddAutoSchema / WithMutation / WithSubscription -
         /// <summary>
-        /// Registers an instance of the <see cref="Schema"/> class within the dependency injection framework as a singleton.
+        /// Registers an instance of the <see cref="AutoSchema{TQueryClrType}"/> class within the dependency injection framework as a singleton.
         /// <see cref="ISchema"/> is also registered if it is not already registered within the dependency injection framework.
         /// <see cref="Schema.Query"/> is set to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> with
         /// <typeparamref name="TQueryClrType"/> as TSourceType.
@@ -286,10 +286,9 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
-            builder.AddSchema(provider => new Schema(provider, true), ServiceLifetime.Singleton);
+            builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
             builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
-            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>());
-            configure?.Invoke(new ConfigureAutoSchema(builder));
+            configure?.Invoke(new ConfigureAutoSchema<TQueryClrType>(builder));
             return builder;
         }
 
@@ -299,7 +298,11 @@ namespace GraphQL
         /// </summary>
         public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
         {
-            builder.Builder.ConfigureSchema((schema, provider) => schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>();
+            });
             return builder;
         }
 
@@ -309,7 +312,11 @@ namespace GraphQL
         /// </summary>
         public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
-            builder.Builder.ConfigureSchema((schema, provider) => schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>();
+            });
             return builder;
         }
         #endregion
