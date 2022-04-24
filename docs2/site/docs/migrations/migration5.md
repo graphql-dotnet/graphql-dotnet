@@ -951,13 +951,11 @@ The following interfaces have been removed:
 
 All classes which implemented the above interfaces have been modified as necessary:
 
-- `AsyncSourceStreamResolver` (previously `AsyncEventStreamResolver`)
-- `AsyncFieldResolver`
 - `ExpressionFieldResolver`
-- `FuncFieldResolver`
+- `FuncFieldResolver` (`AsyncFieldResolver` was absorbed by it)
 - `InstrumentFieldsMiddleware`
 - `NameFieldResolver`
-- `SourceStreamResolver` (previously `EventStreamResolver`)
+- `SourceStreamResolver` (previously `EventStreamResolver` and `AsyncEventStreamResolver`)
 - All built-in validation rules
 
 These properties have been removed:
