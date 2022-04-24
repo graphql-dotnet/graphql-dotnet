@@ -770,7 +770,7 @@ The `ExecutionOptions.Variables` property does not require `Inputs.Empty`, but i
 tests based on the `.ToInputs()` extension method, you may want a direct replacement.
 Equivalent code to the previous functionality is as follows:
 
-```cs
+```csharp
 using GraphQL;
 using GraphQL.SystemTextJson;
 
