@@ -1,5 +1,6 @@
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Types;
@@ -132,9 +133,8 @@ namespace GraphQL
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-            else if (IsAnIEnumerable(type))
+            else if (TryGetEnumerableElementType(type, out var clrElementType))
             {
-                var clrElementType = GetEnumerableElementType(type);
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
@@ -231,44 +231,26 @@ namespace GraphQL
             return friendlyName;
         }
 
-        private static bool IsAnIEnumerable(Type type) =>
-            type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
-
         /// <summary>
         /// Returns the type of element for a one-dimensional container type.
-        /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
-        /// as a one-dimensional container type.
         /// </summary>
-        private static Type GetEnumerableElementType(this Type type)
+        private static bool TryGetEnumerableElementType(Type type, [NotNullWhen(true)] out Type? elementType)
         {
-            // prefer a known type, just in case multiple enumerable interfaces are supported
-            if (type.IsConstructedGenericType)
+            if (type == typeof(IEnumerable))
             {
-                var definition = type.GetGenericTypeDefinition();
-                if (_typedContainers.Contains(definition))
-                {
-                    return type.GenericTypeArguments[0];
-                }
+                elementType = typeof(object);
+                return true;
             }
 
-            // see if the type supports IEnumerable<T>
-            var supportedInterfaces = type.GetInterfaces();
-            foreach (var iface in supportedInterfaces)
+            if (!type.IsGenericType || !TypeInformation.EnumerableListTypes.Contains(type.GetGenericTypeDefinition()))
             {
-                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                {
-                    return iface.GenericTypeArguments[0];
-                }
+                elementType = null;
+                return false;
             }
 
-            // see if the type supports IEnumerable
-            if (typeof(IEnumerable).IsAssignableFrom(type))
-                return typeof(object);
-
-            throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
+            elementType = type.GetGenericArguments()[0];
+            return true;
         }
-
-        private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
 
         /// <summary>
         /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
