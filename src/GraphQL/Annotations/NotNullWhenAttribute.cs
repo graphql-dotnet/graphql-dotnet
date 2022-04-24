@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+#if NETSTANDARD2_0
 
 // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Diagnostics/CodeAnalysis/NullableAttributes.cs#L107
 namespace System.Diagnostics.CodeAnalysis;
