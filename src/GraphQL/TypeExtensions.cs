@@ -140,7 +140,7 @@ namespace GraphQL
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             else if (!GlobalSwitches.MapAllEnumerableTypes && TryGetEnumerableElementType(type, out var clrElementType))
             {
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
@@ -148,6 +148,7 @@ namespace GraphQL
             }
             else
             {
+#pragma warning disable CS0618 // Type or member is obsolete -- remove this block for v6
                 var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
                 if (attr != null)
                 {
@@ -195,7 +196,6 @@ namespace GraphQL
                     }
                 }
             }
-#pragma warning restore CS0618 // Type or member is obsolete
 
             if (!isNullable)
             {
