@@ -259,7 +259,7 @@ an input graph, you may also need to override `ParseDictionary` as well.
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
 
-```cs
+```csharp
 services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
 ```
 
@@ -879,7 +879,7 @@ public class AutoRegisteringObjectGraphTypeWithoutMethods<T> : AutoRegisteringOb
 
 Register this class within your DI engine like this:
 
-```cs
+```csharp
 services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
 ```
 
