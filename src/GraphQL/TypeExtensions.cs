@@ -133,14 +133,21 @@ namespace GraphQL
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-            else if (TryGetEnumerableElementType(type, out var clrElementType))
+#pragma warning disable CS0618 // Type or member is obsolete -- remove this block for v6
+            else if (GlobalSwitches.MapAllEnumerableTypes && IsAnIEnumerable(type))
+            {
+                var clrElementType = GetEnumerableElementType(type);
+                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            else if (!GlobalSwitches.MapAllEnumerableTypes && TryGetEnumerableElementType(type, out var clrElementType))
             {
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else
             {
-#pragma warning disable CS0618 // Type or member is obsolete
                 var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
                 if (attr != null)
                 {
@@ -188,6 +195,7 @@ namespace GraphQL
                     }
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             if (!isNullable)
             {
@@ -230,6 +238,48 @@ namespace GraphQL
 
             return friendlyName;
         }
+
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
+        private static bool IsAnIEnumerable(Type type) =>
+            type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
+
+        /// <summary>
+        /// Returns the type of element for a one-dimensional container type.
+        /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
+        /// as a one-dimensional container type.
+        /// </summary>
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
+        private static Type GetEnumerableElementType(this Type type)
+        {
+            // prefer a known type, just in case multiple enumerable interfaces are supported
+            if (type.IsConstructedGenericType)
+            {
+                var definition = type.GetGenericTypeDefinition();
+                if (_typedContainers.Contains(definition))
+                {
+                    return type.GenericTypeArguments[0];
+                }
+            }
+
+            // see if the type supports IEnumerable<T>
+            var supportedInterfaces = type.GetInterfaces();
+            foreach (var iface in supportedInterfaces)
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    return iface.GenericTypeArguments[0];
+                }
+            }
+
+            // see if the type supports IEnumerable
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+                return typeof(object);
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
+        }
+
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
+        private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
 
         /// <summary>
         /// Returns the type of element for a one-dimensional container type.

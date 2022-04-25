@@ -64,5 +64,16 @@ namespace GraphQL
         /// By default disabled.
         /// </summary>
         public static bool UseDeclaringTypeNames { get; set; } = false;
+
+        /// <summary>
+        /// Specifies whether to map all types that implement <see cref="IEnumerable{T}"/> to list
+        /// graph types within <see cref="TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
+        /// or only common collection types such as <see cref="IEnumerable{T}"/>, <see cref="IList{T}"/>,
+        /// <see cref="List{T}"/> and so on.
+        /// <br/><br/>
+        /// When set to <see langword="true"/>, dictionaries are also detected as lists of
+        /// <see cref="KeyValuePair{TKey, TValue}"/> which may be unintended.
+        /// </summary>
+        public static bool MapAllEnumerableTypes { get; set; } = true;
     }
 }
