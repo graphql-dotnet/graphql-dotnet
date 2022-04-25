@@ -148,7 +148,7 @@ namespace GraphQL
             }
             else
             {
-#pragma warning disable CS0618 // Type or member is obsolete -- remove this block for v6
+#pragma warning disable CS0618 // Type or member is obsolete
                 var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
                 if (attr != null)
                 {
