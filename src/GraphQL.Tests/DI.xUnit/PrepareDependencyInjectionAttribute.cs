@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using GraphQL.DI;
-using GraphQL.Execution;
 using GraphQL.Types;
 using Xunit.Sdk;
 
