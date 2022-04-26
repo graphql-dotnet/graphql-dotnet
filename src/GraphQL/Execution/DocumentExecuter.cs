@@ -147,7 +147,7 @@ namespace GraphQL
 
                 if (operation == null)
                 {
-                    throw new InvalidOperationException($"Query does not contain operation '{options.OperationName}'.");
+                    throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
                 }
 
                 IValidationResult validationResult;
