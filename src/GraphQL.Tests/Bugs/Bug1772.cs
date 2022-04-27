@@ -44,6 +44,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
         result.Errors.Count.ShouldBe(1);
         result.Errors[0].ShouldBeOfType<InvalidOperationError>();
         result.Errors[0].Message.ShouldBe("Query does not contain operation '" + operationName + "'.");
+        result.Errors[0].InnerException.ShouldBeNull();
     }
 }
 
