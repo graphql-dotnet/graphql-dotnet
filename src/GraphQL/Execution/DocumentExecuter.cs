@@ -143,12 +143,11 @@ namespace GraphQL
                 }
 
                 var operation = GetOperation(options.OperationName, document);
-                metrics.SetOperationName(operation?.Name);
-
                 if (operation == null)
                 {
-                    throw new InvalidOperationException($"Query does not contain operation '{options.OperationName}'.");
+                    throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
                 }
+                metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;
                 Variables variables;

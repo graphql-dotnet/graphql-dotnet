@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using GraphQL.DI;
-using GraphQL.Execution;
 using GraphQL.Types;
 using Xunit.Sdk;
 
@@ -65,7 +64,7 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
         {
             var method = _currentMethod.Value;
             return method == null || !_diAdapters.TryGetValue(method, out var stack) || stack == null || stack.Count == 0
-                ? throw new InvalidOperationError("Attempt to access IServiceProvider out of prepared DependencyInjection context.")
+                ? throw new InvalidOperationException("Attempt to access IServiceProvider out of prepared DependencyInjection context.")
                 : stack.Peek().ServiceProvider;
         }
     }
