@@ -1181,7 +1181,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IGraphQLBuilder AddPersistentQueries(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddPersistedQueries(this IGraphQLBuilder builder)
         {
             builder.Services.TryRegister<IPersistedQueriesExecutor, PersistedQueriesExecutor>(ServiceLifetime.Singleton);
 
