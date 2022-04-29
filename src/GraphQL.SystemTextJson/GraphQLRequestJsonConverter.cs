@@ -33,12 +33,25 @@ namespace GraphQL.SystemTextJson
         /// </summary>
         private const string EXTENSIONS_KEY = "extensions";
 
+        /// <summary>
+        /// Name for the hash parameter.
+        /// </summary>
+        private const string HASH_KEY = "hash";
+
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, GraphQLRequest value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName(QUERY_KEY);
-            writer.WriteStringValue(value.Query);
+            if (value.Query != null)
+            {
+                writer.WritePropertyName(QUERY_KEY);
+                writer.WriteStringValue(value.Query);
+            }
+            if (value.Hash != null)
+            {
+                writer.WritePropertyName(HASH_KEY);
+                writer.WriteStringValue(value.Hash);
+            }
             if (value.OperationName != null)
             {
                 writer.WritePropertyName(OPERATION_NAME_KEY);
@@ -83,6 +96,9 @@ namespace GraphQL.SystemTextJson
                 {
                     case QUERY_KEY:
                         request.Query = reader.GetString()!;
+                        break;
+                    case HASH_KEY:
+                        request.Hash = reader.GetString()!;
                         break;
                     case OPERATION_NAME_KEY:
                         request.OperationName = reader.GetString()!;

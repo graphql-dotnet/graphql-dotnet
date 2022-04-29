@@ -12,9 +12,9 @@ namespace GraphQL.Transport
         public string? OperationName { get; set; }
 
         /// <summary>
-        /// A Document containing GraphQL Operations and Fragments to execute (required).
+        /// A Document containing GraphQL Operations and Fragments to execute.
         /// </summary>
-        public string Query { get; set; } = null!;
+        public string? Query { get; set; }
 
         /// <summary>
         /// Values for any Variables defined by the Operation (optional).
@@ -25,5 +25,10 @@ namespace GraphQL.Transport
         /// This entry is reserved for implementors to extend the protocol however they see fit (optional).
         /// </summary>
         public Inputs? Extensions { get; set; }
+
+        /// <summary>
+        /// Hash will be used to find corresponding persisted query.
+        /// </summary>
+        public string? Hash { get; set; }
     }
 }

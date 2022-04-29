@@ -321,6 +321,7 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder AddPersistentQueries(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
@@ -880,11 +881,13 @@ namespace GraphQL.Caching
         public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
         public System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
         public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
+        public System.Threading.Tasks.ValueTask SetByHashAsync(string hash, string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
     public interface IDocumentCache
     {
         System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query);
         System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value);
+        System.Threading.Tasks.ValueTask SetByHashAsync(string hash, string query, GraphQLParser.AST.GraphQLDocument value);
     }
 }
 namespace GraphQL.Conversion
@@ -1534,6 +1537,19 @@ namespace GraphQL.Introspection
         public @__TypeKind() { }
     }
 }
+namespace GraphQL.PersistedQueries
+{
+    public interface IPersistedQueriesExecutor
+    {
+        System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteRequestAsync(GraphQL.Transport.GraphQLRequest gqlRequest, System.Collections.Generic.IDictionary<string, object?> userContext, GraphQL.IDocumentExecuter executer, System.IServiceProvider requestServices, System.Threading.CancellationToken token);
+    }
+    public class PersistedQueriesExecutor : GraphQL.PersistedQueries.IPersistedQueriesExecutor
+    {
+        public PersistedQueriesExecutor(GraphQL.Caching.IDocumentCache cache) { }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteRequestAsync(GraphQL.Transport.GraphQLRequest gqlRequest, System.Collections.Generic.IDictionary<string, object?> userContext, GraphQL.IDocumentExecuter executer, System.IServiceProvider requestServices, System.Threading.CancellationToken token) { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteRequestAsync(GraphQL.Transport.GraphQLRequest gqlRequest, GraphQLParser.AST.GraphQLDocument? graphQLDocument, System.Collections.Generic.IDictionary<string, object?> userContext, GraphQL.IDocumentExecuter executer, System.IServiceProvider requestServices, System.Threading.CancellationToken token) { }
+    }
+}
 namespace GraphQL.Reflection
 {
     public interface IAccessor
@@ -1613,8 +1629,9 @@ namespace GraphQL.Transport
     {
         public GraphQLRequest() { }
         public GraphQL.Inputs? Extensions { get; set; }
+        public string? Hash { get; set; }
         public string? OperationName { get; set; }
-        public string Query { get; set; }
+        public string? Query { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
     }
     public class OperationMessage

@@ -20,5 +20,13 @@ namespace GraphQL.Caching
         /// <param name="query">As the cache key.</param>
         /// <param name="value">The document object to cache.</param>
         ValueTask SetAsync(string query, GraphQLDocument value);
+
+        /// <summary>
+        /// Sets a document in the cache. Must be thread-safe.
+        /// </summary>
+        /// <param name="hash">As the cache key.</param>
+        /// <param name="query">Underlying query.</param>
+        /// <param name="value">The document object to cache.</param>
+        ValueTask SetByHashAsync(string hash, string query, GraphQLDocument value);
     }
 }
