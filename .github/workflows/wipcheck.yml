@@ -8,8 +8,13 @@ on:
       - synchronize   # when code is added
       - reopened      # when a closed PR is reopened
 
+permissions:
+  contents: read
+
 jobs:
   check-title:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
 
     steps:

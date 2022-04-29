@@ -21,6 +21,9 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -76,6 +79,8 @@ jobs:
           files: 'src/.coverage/**/coverage.opencover.xml'
 
   buildcheck:
+    permissions:
+      contents: none
     needs:
       - test
     runs-on: ubuntu-latest
