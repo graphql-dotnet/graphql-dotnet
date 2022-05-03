@@ -75,14 +75,14 @@ public class VariableBenchmark : IBenchmark
         var result = ExecuteQuery(_schema, Queries.VariablesVariable, _queryVariableDocument, _variableInputs);
     }
 
-    private ExecutionResult ExecuteQuery(ISchema schema, string query, GraphQLDocument document, Inputs inputs)
+    private ExecutionResult ExecuteQuery(ISchema schema, string query, GraphQLDocument document, Inputs variables)
     {
         return _executer.ExecuteAsync(_ =>
         {
             _.Schema = schema;
             _.Query = query;
             _.Document = document;
-            _.Variables = inputs;
+            _.Variables = variables;
             _.ValidationRules = EnableValidation ? null : Array.Empty<IValidationRule>();
             _.ThrowOnUnhandledException = true;
         }).GetAwaiter().GetResult();

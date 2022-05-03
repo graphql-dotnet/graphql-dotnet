@@ -27,7 +27,7 @@ public class ValidationTestBase<TRule, TSchema>
 
         config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-        var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Inputs);
+        var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Variables);
 
         result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
         result.Errors.Count.ShouldBe(
@@ -66,7 +66,7 @@ public class ValidationTestBase<TRule, TSchema>
         ShouldPassRule(config =>
         {
             config.Query = query;
-            config.Inputs = variables.ToInputs();
+            config.Variables = variables.ToInputs();
         });
     }
 
@@ -78,7 +78,7 @@ public class ValidationTestBase<TRule, TSchema>
 
         config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-        var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Inputs);
+        var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Variables);
         var message = "";
         if (result.Errors?.Any() == true)
         {
