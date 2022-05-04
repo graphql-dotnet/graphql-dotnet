@@ -290,6 +290,9 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
+        private IGraphType BuildGraphQLType(Type type, IGraphType resolvedType)
+            => BuildGraphQLType(type, _ => resolvedType);
+
         /// <summary>
         /// Returns a new instance of the specified graph type, using the specified resolver to
         /// instantiate a new instance if the required type cannot be found from the lookup table.
@@ -467,9 +470,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
-                    AddTypeIfNotRegistered(unionedType, context);
-
-                    var objType = FindGraphType(unionedType) as IObjectGraphType;
+                    var objType = AddTypeIfNotRegistered(unionedType, context) as IObjectGraphType;
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
@@ -513,8 +514,8 @@ namespace GraphQL.Types
                     throw new InvalidOperationException($"The GraphQL type for field '{parentType?.Name}.{field.Name}' could not be derived implicitly. " + error);
                 field.Type = (Type)typeOrError;
 
-                AddTypeIfNotRegistered(field.Type, context);
-                field.ResolvedType = BuildGraphQLType(field.Type, context.ResolveType);
+                var namedType = AddTypeIfNotRegistered(field.Type, context);
+                field.ResolvedType = BuildGraphQLType(field.Type, namedType);
             }
             else
             {
@@ -541,8 +542,8 @@ namespace GraphQL.Types
                             throw new InvalidOperationException($"The GraphQL type for argument '{parentType?.Name}.{field.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
 
-                        AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildGraphQLType(arg.Type, context.ResolveType);
+                        var namedType = AddTypeIfNotRegistered(arg.Type, context);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, namedType);
                     }
                     else
                     {
@@ -568,8 +569,8 @@ namespace GraphQL.Types
                             throw new InvalidOperationException($"The GraphQL type for argument '{directive.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
 
-                        AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildGraphQLType(arg.Type, context.ResolveType);
+                        var namedType = AddTypeIfNotRegistered(arg.Type, context);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, namedType);
                     }
                     else
                     {
@@ -601,7 +602,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
+        private IGraphType AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
             var namedType = type.GetNamedType();
             var foundType = FindGraphType(namedType);
@@ -609,21 +610,26 @@ Make sure that your ServiceProvider is configured correctly.");
             {
                 if (namedType == typeof(PageInfoType))
                 {
-                    AddType(new PageInfoType(), context);
+                    foundType = new PageInfoType();
+                    AddType(foundType, context);
                 }
                 else if (namedType.IsGenericType && (namedType.ImplementsGenericType(typeof(EdgeType<>)) || namedType.ImplementsGenericType(typeof(ConnectionType<,>))))
                 {
-                    AddType((IGraphType)Activator.CreateInstance(namedType)!, context);
+                    foundType = (IGraphType)Activator.CreateInstance(namedType)!;
+                    AddType(foundType, context);
                 }
                 else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
                 {
-                    AddType(builtInCustomScalar, _context);
+                    foundType = builtInCustomScalar;
+                    AddType(foundType, _context);
                 }
                 else
                 {
-                    AddTypeWithLoopCheck(context.ResolveType(namedType), context, namedType);
+                    foundType = context.ResolveType(namedType);
+                    AddTypeWithLoopCheck(foundType, context, namedType);
                 }
             }
+            return foundType;
         }
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
