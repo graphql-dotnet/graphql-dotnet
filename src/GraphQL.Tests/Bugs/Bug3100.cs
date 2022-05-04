@@ -7,8 +7,10 @@ namespace GraphQL.Tests.Bugs;
 
 public class Bug3100
 {
-    [Fact]
-    public async Task OverrideAutoGraphTypeWithinDI()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task OverrideAutoGraphTypeWithinDI(bool useMyAutoGraphType)
     {
         // set up service collection and default services
         var services = new ServiceCollection();
@@ -18,15 +20,33 @@ public class Bug3100
         services.AddTransient<Query1>();
 
         // this test works without the next line of code here
-        services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(MyAutoGraphType<>));
+        if (useMyAutoGraphType)
+            services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(MyAutoGraphType<>));
+
+        var provider = services.BuildServiceProvider();
+
+        // verify that the query field resolver type maps to a properly initialized instance
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var queryType = schema.AllTypes["Query1"].ShouldBeOfType<Query1>();
+        foreach (var field in queryType.Fields)
+        {
+            var resolvedType = field.ResolvedType.GetNamedType().ShouldBeAssignableTo<ObjectGraphType<Class2>>();
+            if (useMyAutoGraphType)
+                resolvedType.ShouldBeOfType<MyAutoGraphType<Class2>>();
+            else
+                resolvedType.ShouldBeOfType<AutoRegisteringObjectGraphType<Class2>>();
+            var class2Type = schema.AllTypes["Class2"].ShouldNotBeNull();
+            resolvedType.ShouldBe(class2Type);
+            resolvedType.Fields.Find("id").ShouldNotBeNull();
+        }
 
         // run the sample query
-        var provider = services.BuildServiceProvider();
         var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
         var serializer = new GraphQLSerializer();
         var result = await executer.ExecuteAsync(new ExecutionOptions
         {
-            Query = "{class2{id}}",
+            Query = "{ class2 { id } }",
             RequestServices = provider,
         }).ConfigureAwait(false);
         var actual = serializer.Serialize(result);
@@ -55,6 +75,10 @@ public class Bug3100
             Field(
                 type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>),
                 name: "Class2",
+                resolve: context => new Class2[] { new Class2() });
+            Field(
+                type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>),
+                name: "Class2b",
                 resolve: context => new Class2[] { new Class2() });
         }
     }
