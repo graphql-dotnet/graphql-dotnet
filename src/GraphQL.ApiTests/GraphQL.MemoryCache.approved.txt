@@ -14,7 +14,6 @@ namespace GraphQL.Caching
         public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
         public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
-        public virtual System.Threading.Tasks.ValueTask SetByHashAsync(string hash, string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {

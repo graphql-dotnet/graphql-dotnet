@@ -20,8 +20,5 @@ namespace GraphQL.Caching
 
         /// <inheritdoc/>
         public ValueTask SetAsync(string query, GraphQLDocument value) => default;
-
-        /// <inheritdoc/>
-        public ValueTask SetByHashAsync(string hash, string query, GraphQLDocument value) => default;
     }
 }

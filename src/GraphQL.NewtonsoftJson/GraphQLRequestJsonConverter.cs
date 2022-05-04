@@ -32,8 +32,6 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         private const string EXTENSIONS_KEY = "extensions";
 
-        private const string HASH_KEY = "hash";
-
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType) => objectType == typeof(GraphQLRequest);
 
@@ -48,16 +46,10 @@ namespace GraphQL.NewtonsoftJson
         {
             var request = (GraphQLRequest)value!;
             writer.WriteStartObject();
-
             if (request.Query != null)
             {
                 writer.WritePropertyName(QUERY_KEY);
                 writer.WriteValue(request.Query);
-            }
-            if (request.Hash != null)
-            {
-                writer.WritePropertyName(HASH_KEY);
-                writer.WriteValue(request.Hash);
             }
             if (request.OperationName != null)
             {
@@ -102,9 +94,6 @@ namespace GraphQL.NewtonsoftJson
                 {
                     case QUERY_KEY:
                         request.Query = reader.ReadAsString()!;
-                        break;
-                    case HASH_KEY:
-                        request.Hash = reader.ReadAsString()!;
                         break;
                     case OPERATION_NAME_KEY:
                         request.OperationName = reader.ReadAsString();

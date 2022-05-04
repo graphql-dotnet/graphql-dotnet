@@ -83,18 +83,5 @@ namespace GraphQL.Caching
 
             return default;
         }
-
-        /// <inheritdoc/>
-        public virtual ValueTask SetByHashAsync(string hash, string query, GraphQLDocument value)
-        {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            _memoryCache.Set(hash, value, GetMemoryCacheEntryOptions(query));
-
-            return default;
-        }
     }
 }

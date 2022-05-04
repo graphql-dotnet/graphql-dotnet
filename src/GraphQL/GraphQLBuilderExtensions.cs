@@ -3,7 +3,6 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.PersistedQueries;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
@@ -1175,17 +1174,5 @@ namespace GraphQL
             return builder;
         }
         #endregion
-
-        /// <summary>
-        /// .
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IGraphQLBuilder AddPersistedQueries(this IGraphQLBuilder builder)
-        {
-            builder.Services.TryRegister<IPersistedQueriesExecutor, PersistedQueriesExecutor>(ServiceLifetime.Singleton);
-
-            return builder;
-        }
     }
 }
