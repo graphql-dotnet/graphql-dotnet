@@ -1614,7 +1614,7 @@ namespace GraphQL.Transport
         public GraphQLRequest() { }
         public GraphQL.Inputs? Extensions { get; set; }
         public string? OperationName { get; set; }
-        public string Query { get; set; }
+        public string? Query { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
     }
     public class OperationMessage

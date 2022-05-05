@@ -37,8 +37,11 @@ namespace GraphQL.SystemTextJson
         public override void Write(Utf8JsonWriter writer, GraphQLRequest value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName(QUERY_KEY);
-            writer.WriteStringValue(value.Query);
+            if (value.Query != null)
+            {
+                writer.WritePropertyName(QUERY_KEY);
+                writer.WriteStringValue(value.Query);
+            }
             if (value.OperationName != null)
             {
                 writer.WritePropertyName(OPERATION_NAME_KEY);
