@@ -14,7 +14,7 @@ namespace GraphQL.Transport
         /// <summary>
         /// A Document containing GraphQL Operations and Fragments to execute.
         /// It can be null in case of automatic persisted queries (https://www.apollographql.com/docs/apollo-server/performance/apq/)
-        /// when a client sends only SHA-256 hash of the query given that corresponding key-value pair has been persisted on a server beforehand.
+        /// when a client sends only SHA-256 hash of the query in <see cref="Extensions"/> given that corresponding key-value pair has been saved on a server beforehand.
         /// </summary>
         public string? Query { get; set; }
 
