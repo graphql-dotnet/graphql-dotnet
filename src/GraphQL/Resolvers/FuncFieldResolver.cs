@@ -18,6 +18,10 @@ namespace GraphQL.Resolvers
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
 
+            var returnType = resolver.Method.ReturnType; // in case the delegate was cast so TReturnType is just object, pull the original return type
+            if (typeof(Task).IsAssignableFrom(returnType) || (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+                throw new InvalidOperationException("Please use the proper FuncFieldResolver constructor for asynchronous delegates, or call FieldAsync when adding your field to the graph.");
+
             _resolver = context => new ValueTask<object?>(resolver(context));
         }
 
@@ -68,6 +72,10 @@ namespace GraphQL.Resolvers
 
         private Func<IResolveFieldContext, ValueTask<object?>> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
+            var returnType = resolver.Method.ReturnType; // in case the delegate was cast so TReturnType is just object, pull the original return type
+            if (typeof(Task).IsAssignableFrom(returnType) || (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+                throw new InvalidOperationException("Please use the proper FuncFieldResolver constructor for asynchronous delegates, or call FieldAsync when adding your field to the graph.");
+
             // also see ExecutionStrategy.ExecuteNodeAsync as it relates to context re-use
 
             // when source type is object, just pass the context through, letting the execution strategy handle context re-use
@@ -78,14 +86,14 @@ namespace GraphQL.Resolvers
             }
 
             // for return types of IDataLoaderResult or IEnumerable
-            if (!CanReuseContextForType(typeof(TReturnType)))
+            if (!CanReuseContextForType(returnType))
             {
                 // Data loaders and IEnumerable results cannot use pooled contexts
                 return (context) => new ValueTask<object?>(resolver(context.As<TSourceType>()));
             }
 
             // for return types of object, examine the return type at runtime to determine if context re-use is applicable
-            if (typeof(TReturnType) == typeof(object))
+            if (returnType == typeof(object))
             {
                 // must determine type at runtime
                 return (context) =>
