@@ -86,10 +86,6 @@ namespace GraphQL
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
-            if (options.Schema == null)
-                throw new InvalidOperationException("Cannot execute request if no schema is specified");
-            if (options.Query == null && options.Document == null)
-                throw new InvalidOperationException("Cannot execute request if no query is specified");
 
             if (_configurations != null)
             {
@@ -99,6 +95,11 @@ namespace GraphQL
                     await configuration.ConfigureAsync(options).ConfigureAwait(false);
                 }
             }
+
+            if (options.Schema == null)
+                throw new InvalidOperationException("Cannot execute request if no schema is specified");
+            if (options.Query == null && options.Document == null)
+                throw new InvalidOperationException("Cannot execute request if no query is specified");
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
