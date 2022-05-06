@@ -12,7 +12,7 @@ public class ValidationTestConfig
 
     public string Query { get; set; }
 
-    public Inputs Inputs { get; set; } = Inputs.Empty;
+    public Inputs Variables { get; set; } = Inputs.Empty;
 
     public IList<IValidationRule> Rules => _rules;
 
