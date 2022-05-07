@@ -889,7 +889,7 @@ namespace GraphQL
         }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecutionOptions -
+        #region - ConfigureSchema and ConfigureExecutionOptions and ConfigureExecution -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.
         /// Assumes that the schema derives from <see cref="Schema"/>.
@@ -915,7 +915,9 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+#pragma warning restore CS0618 // Type or member is obsolete
             return builder;
         }
 
@@ -930,7 +932,21 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+#pragma warning restore CS0618 // Type or member is obsolete
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures an action that can modify or replace document execution behavior.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> action)
+        {
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
             return builder;
         }
         #endregion
@@ -1076,6 +1092,21 @@ namespace GraphQL
                 }
             });
             return builder;
+        }
+
+        /// <summary>
+        /// Configures the execution to add Apollo Tracing results to the returned <see cref="ExecutionResult"/> instance.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracingResults(this IGraphQLBuilder builder)
+        {
+            return builder.ConfigureExecution(async (next, options) =>
+            {
+                var start = DateTime.UtcNow;
+                var result = await next(options).ConfigureAwait(false);
+                if (options.EnableMetrics)
+                    result.EnrichWithApolloTracing(start);
+                return result;
+            });
         }
         #endregion
 

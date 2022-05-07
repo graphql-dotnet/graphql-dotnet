@@ -114,4 +114,26 @@ query {
         var resultString = serializer.Serialize(result);
         resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
     }
+
+    [Fact]
+    public async Task AddApolloTracingResults_Works()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<StarWarsData>();
+        serviceCollection.AddGraphQL(b => b
+            .AddSelfActivatingSchema<StarWarsSchema>()
+            .AddMetrics(true)
+            .AddApolloTracingResults()
+            .AddSystemTextJson());
+        using var provider = serviceCollection.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var result = await executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ hero { name } }",
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var resultString = serializer.Serialize(result);
+        resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
+    }
 }
