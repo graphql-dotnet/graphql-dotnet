@@ -104,7 +104,7 @@ namespace GraphQL
             _execution = BuildExecution(configurations);
         }
 
-        private Func<ExecutionOptions, Task<ExecutionResult>> BuildExecution(IEnumerable<IConfigureExecution> configurations)
+        private ExecutionDelegate BuildExecutionDelegate(IEnumerable<IConfigureExecution> configurations)
         {
             ExecutionDelegate execution = CoreExecuteAsync;
             var configurationArray = configurations.ToArray();
