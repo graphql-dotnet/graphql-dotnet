@@ -23,7 +23,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
-        private readonly Func<ExecutionOptions, Task<ExecutionResult>> _execution;
+        private readonly ExecutionDelegate _execution;
         private readonly IExecutionStrategySelector _executionStrategySelector;
 
         /// <summary>
