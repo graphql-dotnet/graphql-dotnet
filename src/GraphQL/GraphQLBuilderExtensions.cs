@@ -944,7 +944,7 @@ namespace GraphQL
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> action)
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
         {
             builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
             return builder;
