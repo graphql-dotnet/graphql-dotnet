@@ -27,6 +27,7 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
         : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
     {
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes a new instance.
@@ -42,7 +43,6 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
         : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configureExecutions, configureExecutionOptions)
     {
     }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <inheritdoc/>
     public override async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)

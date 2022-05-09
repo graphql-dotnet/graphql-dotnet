@@ -83,10 +83,12 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
-        [Obsolete("Added for DI compatibility only; this constructor will be removed in v6")]
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations, IEnumerable<IConfigureExecutionOptions> optionsConfigurations)
+#pragma warning disable CS0618 // Type or member is obsolete
             : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configurations.Append(new ConfigureExecutionOptionsMapper(optionsConfigurations)))
+#pragma warning restore CS0618 // Type or member is obsolete
         {
+            // TODO: remove in v6
         }
 
         /// <summary>
@@ -94,8 +96,9 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
+        internal DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
         {
+            // TODO: in v6 make this public
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));

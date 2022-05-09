@@ -4,8 +4,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
     /// Allows configuration of execution options immediately prior to executing a document.
     /// This configuration generally happens in <see cref="IDocumentExecuter.ExecuteAsync" /> implementations.
     /// </summary>
-    [Obsolete("Use IConfigureExecution; will be removed in v6")]
-    public interface IConfigureExecutionOptions
+    public interface IConfigureExecutionOptions // TODO: remove in v6
     {
         /// <summary>
         /// Configures execution options immediately prior to executing a document.
@@ -16,9 +15,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
         Task ConfigureAsync(ExecutionOptions executionOptions);
     }
 
-#pragma warning disable CS0618 // Type or member is obsolete
     internal sealed class ConfigureExecutionOptions : IConfigureExecutionOptions // implement IConfigureExecution for v6
-#pragma warning restore CS0618 // Type or member is obsolete
     {
         private readonly Func<ExecutionOptions, Task> _action;
 
