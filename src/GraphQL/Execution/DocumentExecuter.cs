@@ -112,7 +112,7 @@ namespace GraphQL
             {
                 var action = configurationArray[i];
                 var nextExecution = execution;
-                execution = async options => await action.ExecuteAsync(nextExecution, options).ConfigureAwait(false);
+                execution = async options => await action.ExecuteAsync(options, nextExecution).ConfigureAwait(false);
             }
             return execution;
         }
