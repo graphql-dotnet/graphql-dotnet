@@ -116,7 +116,7 @@ query {
     }
 
     [Fact]
-    public async Task AddApolloTracingResults_Works()
+    public async Task AddApolloTracing_Works()
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<StarWarsData>();
