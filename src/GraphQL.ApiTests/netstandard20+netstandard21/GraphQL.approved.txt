@@ -1351,6 +1351,7 @@ namespace GraphQL.Instrumentation
     }
     public class ApolloTracingDocumentExecuter : GraphQL.DocumentExecuter
     {
+        [System.Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
         public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
         public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configureExecutions, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions) { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }

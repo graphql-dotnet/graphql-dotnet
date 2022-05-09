@@ -16,7 +16,7 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
+    [Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
     public ApolloTracingDocumentExecuter(
         IDocumentBuilder documentBuilder,
         IDocumentValidator documentValidator,
@@ -27,7 +27,6 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
         : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
     {
     }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes a new instance.
