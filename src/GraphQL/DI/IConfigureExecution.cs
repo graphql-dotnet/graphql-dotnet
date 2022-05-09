@@ -24,7 +24,7 @@ namespace GraphQL.DI
     {
         private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
 
-        public ConfigureExecution(Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> action)
+        public ConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
         {
             _action = action;
         }
