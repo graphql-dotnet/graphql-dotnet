@@ -123,7 +123,7 @@ namespace GraphQL
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            return await _execution(options).ConfigureAwait(false);
+            return _execution(options);
         }
 
         private async Task<ExecutionResult> InternalExecuteAsync(ExecutionOptions options)
