@@ -915,9 +915,7 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
-#pragma warning restore CS0618 // Type or member is obsolete
             return builder;
         }
 
@@ -932,9 +930,7 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
-#pragma warning restore CS0618 // Type or member is obsolete
             return builder;
         }
 
