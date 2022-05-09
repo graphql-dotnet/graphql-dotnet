@@ -29,7 +29,7 @@ namespace GraphQL.DI
             _action = action;
         }
 
-        public Task<ExecutionResult> ExecuteAsync(Func<ExecutionOptions, Task<ExecutionResult>> next, ExecutionOptions executionOptions)
-            => _action(next, executionOptions);
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+            => _action(options, next);
     }
 }
