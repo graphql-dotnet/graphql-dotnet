@@ -96,7 +96,7 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
-        internal DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
+        private DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
         {
             // TODO: in v6 make this public
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
