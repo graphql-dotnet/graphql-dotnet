@@ -109,11 +109,9 @@ namespace GraphQL
         [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
             "moved in v6")]
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations) { }
         [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
             "moved in v6")]
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
-        [System.Obsolete("Added for DI compatibility only; this constructor will be removed in v6")]
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> optionsConfigurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
@@ -253,7 +251,6 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddApolloTracingResults(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
@@ -349,7 +346,7 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task<GraphQL.ExecutionResult>>, GraphQL.ExecutionOptions, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
@@ -927,6 +924,7 @@ namespace GraphQL.Conversion
 }
 namespace GraphQL.DI
 {
+    public delegate System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecutionDelegate(GraphQL.ExecutionOptions options);
     public abstract class GraphQLBuilderBase : GraphQL.DI.IGraphQLBuilder
     {
         protected GraphQLBuilderBase() { }
@@ -935,9 +933,8 @@ namespace GraphQL.DI
     }
     public interface IConfigureExecution
     {
-        System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> next, GraphQL.ExecutionOptions executionOptions);
+        System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next);
     }
-    [System.Obsolete("Use IConfigureExecution; will be removed in v6")]
     public interface IConfigureExecutionOptions
     {
         System.Threading.Tasks.Task ConfigureAsync(GraphQL.ExecutionOptions executionOptions);
@@ -1352,7 +1349,6 @@ namespace GraphQL.Instrumentation
             public string? ReturnType { get; set; }
         }
     }
-    [System.Obsolete("Use AddApolloTracingResults instead; will be removed in v6")]
     public class ApolloTracingDocumentExecuter : GraphQL.DocumentExecuter
     {
         public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
