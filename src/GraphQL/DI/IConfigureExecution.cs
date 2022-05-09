@@ -22,7 +22,7 @@ namespace GraphQL.DI
 
     internal class ConfigureExecution : IConfigureExecution
     {
-        private readonly Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> _action;
+        private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
 
         public ConfigureExecution(Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> action)
         {
