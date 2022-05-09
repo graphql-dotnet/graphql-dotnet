@@ -182,7 +182,17 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                     {
                         HasNextPage = true, HasPreviousPage = false, StartCursor = "01", EndCursor = "01",
                     },
-                    Edges = new List<Edge<Child>> {new Edge<Child> {Cursor = "01", Node = new Child {Field1 = "abcd",},},},
+                    Edges = new List<Edge<Child>>
+                    {
+                        new Edge<Child>
+                        {
+                            Cursor = "01",
+                            Node = new Child
+                            {
+                                Field1 = "abcd",
+                            },
+                        },
+                    },
                 });
 
         var field = type.Fields.Single();
