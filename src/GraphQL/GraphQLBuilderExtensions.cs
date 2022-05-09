@@ -1099,7 +1099,7 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddApolloTracingResults(this IGraphQLBuilder builder)
         {
-            return builder.ConfigureExecution(async (next, options) =>
+            return builder.ConfigureExecution(async (options, next) =>
             {
                 var start = DateTime.UtcNow;
                 var result = await next(options).ConfigureAwait(false);
