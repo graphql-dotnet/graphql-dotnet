@@ -12,8 +12,13 @@ namespace GraphQL.DI
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used to resolve other services from the dependency injection framework.
         /// </remarks>
-        Task<ExecutionResult> ExecuteAsync(Func<ExecutionOptions, Task<ExecutionResult>> next, ExecutionOptions executionOptions);
+        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next);
     }
+    
+    /// <summary>
+    /// A function that can process a GraphQL document.
+    /// </summary>
+    public delegate Task<ExecutionResult> ExecutionDelegate(ExecutionOptions options);
 
     internal class ConfigureExecution : IConfigureExecution
     {
