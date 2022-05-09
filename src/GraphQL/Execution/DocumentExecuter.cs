@@ -118,7 +118,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        public virtual Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));

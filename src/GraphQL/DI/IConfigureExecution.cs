@@ -14,7 +14,7 @@ namespace GraphQL.DI
         /// </remarks>
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next);
     }
-    
+
     /// <summary>
     /// A function that can process a GraphQL document.
     /// </summary>

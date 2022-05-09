@@ -44,14 +44,14 @@ namespace GraphQL.DI // TODO: think about namespaces!
     [Obsolete("Remove in v6")]
     internal sealed class ConfigureExecutionOptionsMapper : IConfigureExecution
     {
-        private readonly Func<Func<ExecutionOptions, Task<ExecutionResult>>, ExecutionOptions, Task<ExecutionResult>> _action;
+        private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
 
         public ConfigureExecutionOptionsMapper(IEnumerable<IConfigureExecutionOptions> configureExecutionOptions)
         {
             var configurations = configureExecutionOptions.ToArray();
             if (configurations.Length > 0)
             {
-                _action = async (next, options) =>
+                _action = async (options, next) =>
                 {
                     for (int i = 0; i < configurations.Length; i++)
                     {
@@ -62,11 +62,11 @@ namespace GraphQL.DI // TODO: think about namespaces!
             }
             else
             {
-                _action = (next, options) => next(options);
+                _action = (options, next) => next(options);
             }
         }
 
-        public Task<ExecutionResult> ExecuteAsync(Func<ExecutionOptions, Task<ExecutionResult>> next, ExecutionOptions executionOptions)
-            => _action(next, executionOptions);
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions executionOptions, ExecutionDelegate next)
+            => _action(executionOptions, next);
     }
 }
