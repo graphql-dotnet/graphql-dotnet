@@ -11,12 +11,12 @@ namespace GraphQL.Instrumentation;
 /// <see cref="ApolloTracingExtensions.EnrichWithApolloTracing(GraphQL.ExecutionResult, DateTime)"/>
 /// when complete, if <see cref="ExecutionOptions.EnableMetrics"/> is enabled.
 /// </summary>
-[Obsolete("Use AddApolloTracingResults instead; will be removed in v6")]
 public class ApolloTracingDocumentExecuter : DocumentExecuter
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     public ApolloTracingDocumentExecuter(
         IDocumentBuilder documentBuilder,
         IDocumentValidator documentValidator,
@@ -42,6 +42,7 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
         : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configureExecutions, configureExecutionOptions)
     {
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <inheritdoc/>
     public override async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)

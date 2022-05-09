@@ -1093,21 +1093,6 @@ namespace GraphQL
             });
             return builder;
         }
-
-        /// <summary>
-        /// Configures the execution to add Apollo Tracing results to the returned <see cref="ExecutionResult"/> instance.
-        /// </summary>
-        public static IGraphQLBuilder AddApolloTracingResults(this IGraphQLBuilder builder)
-        {
-            return builder.ConfigureExecution(async (options, next) =>
-            {
-                var start = DateTime.UtcNow;
-                var result = await next(options).ConfigureAwait(false);
-                if (options.EnableMetrics)
-                    result.EnrichWithApolloTracing(start);
-                return result;
-            });
-        }
         #endregion
 
         #region - AddExecutionStrategySelector -
