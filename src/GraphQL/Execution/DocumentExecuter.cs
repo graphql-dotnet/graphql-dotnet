@@ -101,7 +101,7 @@ namespace GraphQL
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
             _executionStrategySelector = executionStrategySelector ?? throw new ArgumentNullException(nameof(executionStrategySelector));
-            _execution = BuildExecution(configurations);
+            _execution = BuildExecutionDelegate(configurations);
         }
 
         private ExecutionDelegate BuildExecutionDelegate(IEnumerable<IConfigureExecution> configurations)
