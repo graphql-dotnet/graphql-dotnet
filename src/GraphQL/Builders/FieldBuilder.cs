@@ -35,9 +35,9 @@ namespace GraphQL.Builders
         public FieldType FieldType { get; }
 
         /// <summary>
-        /// Initializes a new instance for the specified <see cref="GraphQL.Types.FieldType"/>.
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
         /// </summary>
-        public FieldBuilder(FieldType fieldType)
+        protected FieldBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
