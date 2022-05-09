@@ -126,7 +126,7 @@ namespace GraphQL
             return _execution(options);
         }
 
-        private async Task<ExecutionResult> InternalExecuteAsync(ExecutionOptions options)
+        private async Task<ExecutionResult> CoreExecuteAsync(ExecutionOptions options)
         {
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
