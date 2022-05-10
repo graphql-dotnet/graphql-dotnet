@@ -63,7 +63,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
             }
         }
 
-        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions executionOptions, ExecutionDelegate next)
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
             => _action(executionOptions, next);
     }
 }
