@@ -79,7 +79,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
