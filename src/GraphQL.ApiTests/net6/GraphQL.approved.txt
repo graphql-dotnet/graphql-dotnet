@@ -761,6 +761,7 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType>
     {
+        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
@@ -797,6 +798,7 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
+        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
@@ -833,6 +835,7 @@ namespace GraphQL.Builders
     }
     public class FieldBuilder<TSourceType, TReturnType>
     {
+        protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }

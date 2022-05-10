@@ -426,9 +426,7 @@ namespace GraphQL.Types
             {
                 foreach (var objectInterface in obj.Interfaces.List)
                 {
-                    AddTypeIfNotRegistered(objectInterface, context);
-
-                    if (FindGraphType(objectInterface) is IInterfaceGraphType interfaceInstance)
+                    if (AddTypeIfNotRegistered(objectInterface, context) is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);
