@@ -10,7 +10,7 @@ namespace GraphQL.Instrumentation
         {
             return context.Metrics.Enabled
                 ? ResolveWhenMetricsEnabledAsync(context, next)
-                : default;
+                : next(context);
         }
 
         private async ValueTask<object?> ResolveWhenMetricsEnabledAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
