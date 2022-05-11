@@ -114,4 +114,42 @@ query {
         var resultString = serializer.Serialize(result);
         resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
     }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task AddApolloTracing_Works(bool enable, bool enableAfter)
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<StarWarsData>();
+        serviceCollection.AddGraphQL(b => b
+            .AddSelfActivatingSchema<StarWarsSchema>()
+            .AddApolloTracing(enable)
+            .ConfigureExecutionOptions(opts =>
+            {
+                opts.EnableMetrics.ShouldBe(enable);
+                if (enableAfter)
+                    opts.EnableMetrics = true;
+            })
+            .AddSystemTextJson());
+        using var provider = serviceCollection.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var result = await executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ hero { name } }",
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var resultString = serializer.Serialize(result);
+        if (enable || enableAfter)
+        {
+            resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
+        }
+        else
+        {
+            resultString.ShouldBe(@"{""data"":{""hero"":{""name"":""R2-D2""}}}");
+        }
+    }
 }

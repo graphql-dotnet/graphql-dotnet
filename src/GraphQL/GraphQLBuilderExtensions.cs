@@ -1038,22 +1038,7 @@ namespace GraphQL
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
         public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enable = true)
-        {
-            builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.ConfigureExecution(async (options, next) =>
-            {
-                if (enable)
-                    options.EnableMetrics = true;
-                DateTime start = DateTime.UtcNow;
-                var ret = await next(options).ConfigureAwait(false);
-                if (options.EnableMetrics)
-                {
-                    ret.EnrichWithApolloTracing(start);
-                }
-                return ret;
-            });
-            return builder;
-        }
+            => AddApolloTracing(builder, _ => enable);
 
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
