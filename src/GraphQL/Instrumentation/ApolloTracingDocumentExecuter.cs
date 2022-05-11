@@ -11,6 +11,7 @@ namespace GraphQL.Instrumentation;
 /// <see cref="ApolloTracingExtensions.EnrichWithApolloTracing(GraphQL.ExecutionResult, DateTime)"/>
 /// when complete, if <see cref="ExecutionOptions.EnableMetrics"/> is enabled.
 /// </summary>
+[Obsolete("Use AddApolloTracing instead of AddMetrics, which also appends Apollo Tracing data to the execution result. This class will be removed in v6.")]
 public class ApolloTracingDocumentExecuter : DocumentExecuter
 {
     /// <summary>
