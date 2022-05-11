@@ -23,7 +23,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
         private readonly IDocumentCache _documentCache;
-        private readonly IConfigureExecutionOptions[]? _configurations;
+        private readonly ExecutionDelegate _execution;
         private readonly IExecutionStrategySelector _executionStrategySelector;
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace GraphQL
         /// and <see cref="IDocumentCache"/> instances.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, null!)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, new DefaultExecutionStrategySelector(), Array.Empty<IConfigureExecution>())
         {
         }
 
@@ -61,8 +61,9 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
+        [Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be removed in v6")]
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configurations, new DefaultExecutionStrategySelector())
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, new DefaultExecutionStrategySelector(), new IConfigureExecution[] { new ConfigureExecutionOptionsMapper(configurations) })
         {
         }
 
@@ -71,31 +72,65 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
         /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
         /// </summary>
+        [Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be removed in v6")]
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations, IExecutionStrategySelector executionStrategySelector)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, new IConfigureExecution[] { new ConfigureExecutionOptionsMapper(configurations) })
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
+        /// </summary>
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations, IEnumerable<IConfigureExecutionOptions> optionsConfigurations)
+#pragma warning disable CS0618 // Type or member is obsolete
+            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configurations.Append(new ConfigureExecutionOptionsMapper(optionsConfigurations)))
+#pragma warning restore CS0618 // Type or member is obsolete
+        {
+            // TODO: remove in v6
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// <see cref="IDocumentCache"/> and a set of <see cref="IConfigureExecutionOptions"/> instances.
+        /// </summary>
+        private DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
+        {
+            // TODO: in v6 make this public
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
-            _configurations = configurations?.ToArray();
             _executionStrategySelector = executionStrategySelector ?? throw new ArgumentNullException(nameof(executionStrategySelector));
+            _execution = BuildExecutionDelegate(configurations);
+        }
+
+        private ExecutionDelegate BuildExecutionDelegate(IEnumerable<IConfigureExecution> configurations)
+        {
+            ExecutionDelegate execution = CoreExecuteAsync;
+            var configurationArray = configurations.ToArray();
+            for (var i = configurationArray.Length - 1; i >= 0; i--)
+            {
+                var action = configurationArray[i];
+                var nextExecution = execution;
+                execution = async options => await action.ExecuteAsync(options, nextExecution).ConfigureAwait(false);
+            }
+            return execution;
         }
 
         /// <inheritdoc/>
-        public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        public virtual Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            if (_configurations != null)
-            {
-                foreach (var configuration in _configurations)
-                {
-                    // allocation free when the configuration delegate is not asynchronous
-                    await configuration.ConfigureAsync(options).ConfigureAwait(false);
-                }
-            }
+            return _execution(options);
+        }
 
+        private async Task<ExecutionResult> CoreExecuteAsync(ExecutionOptions options)
+        {
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
             if (options.Query == null && options.Document == null)

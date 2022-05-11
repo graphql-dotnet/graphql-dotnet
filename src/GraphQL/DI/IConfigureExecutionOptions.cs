@@ -4,7 +4,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
     /// Allows configuration of execution options immediately prior to executing a document.
     /// This configuration generally happens in <see cref="IDocumentExecuter.ExecuteAsync" /> implementations.
     /// </summary>
-    public interface IConfigureExecutionOptions
+    public interface IConfigureExecutionOptions // TODO: remove in v6
     {
         /// <summary>
         /// Configures execution options immediately prior to executing a document.
@@ -15,7 +15,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
         Task ConfigureAsync(ExecutionOptions executionOptions);
     }
 
-    internal sealed class ConfigureExecutionOptions : IConfigureExecutionOptions
+    internal sealed class ConfigureExecutionOptions : IConfigureExecutionOptions // implement IConfigureExecution for v6
     {
         private readonly Func<ExecutionOptions, Task> _action;
 
@@ -33,5 +33,37 @@ namespace GraphQL.DI // TODO: think about namespaces!
         {
             return _action(executionOptions);
         }
+    }
+
+    /// <summary>
+    /// Maps old <see cref="IConfigureExecutionOptions"/> implementations to a <see cref="IConfigureExecution"/> implementation.
+    /// </summary>
+    [Obsolete("Remove in v6")]
+    internal sealed class ConfigureExecutionOptionsMapper : IConfigureExecution
+    {
+        private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
+
+        public ConfigureExecutionOptionsMapper(IEnumerable<IConfigureExecutionOptions> configureExecutionOptions)
+        {
+            var configurations = configureExecutionOptions.ToArray();
+            if (configurations.Length > 0)
+            {
+                _action = async (options, next) =>
+                {
+                    for (int i = 0; i < configurations.Length; i++)
+                    {
+                        await configurations[i].ConfigureAsync(options).ConfigureAwait(false);
+                    }
+                    return await next(options).ConfigureAwait(false);
+                };
+            }
+            else
+            {
+                _action = (options, next) => next(options);
+            }
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+            => _action(options, next);
     }
 }

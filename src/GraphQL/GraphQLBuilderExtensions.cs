@@ -889,7 +889,7 @@ namespace GraphQL
         }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecutionOptions -
+        #region - ConfigureSchema and ConfigureExecutionOptions and ConfigureExecution -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.
         /// Assumes that the schema derives from <see cref="Schema"/>.
@@ -931,6 +931,18 @@ namespace GraphQL
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures an action that can modify or replace document execution behavior.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
+        {
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
             return builder;
         }
         #endregion
