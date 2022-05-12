@@ -1,5 +1,6 @@
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching;
 
@@ -8,6 +9,17 @@ namespace GraphQL.Caching;
 /// </summary>
 public class MemoryDocumentCache : BaseMemoryCache<GraphQLDocument, MemoryDocumentCacheOptions>, IDocumentCache
 {
+    /// <inheritdoc cref="BaseMemoryCache{GraphQLDocument, MemoryDocumentCacheOptions}.BaseMemoryCache()"/>
+    public MemoryDocumentCache()
+    {
+    }
+
+    /// <inheritdoc cref="BaseMemoryCache{GraphQLDocument, MemoryDocumentCacheOptions}.BaseMemoryCache(IOptions{MemoryDocumentCacheOptions})"/>
+    public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
+        : base(options)
+    {
+    }
+
     /// <inheritdoc/>
     protected override MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, GraphQLDocument _)
     {

@@ -3,6 +3,7 @@ using GraphQL.MicrosoftDI;
 using GraphQL.Caching;
 using GraphQL.Types;
 using GraphQL.SystemTextJson;
+using Microsoft.Extensions.Options;
 
 namespace GraphQL.Tests.PersistedQueries;
 
@@ -13,6 +14,12 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     public AutomaticPersistedQueriesTests(AutomaticPersistedQueriesFixture fixture)
     {
         _fixture = fixture;
+    }
+
+    [Fact]
+    public void Action_Was_Applied_To_Options()
+    {
+        _fixture.Provider.GetRequiredService<IOptions<MemoryQueryCacheOptions>>().Value.SlidingExpiration.ShouldBe(TimeSpan.FromMinutes(1));
     }
 
     [Fact]
@@ -117,28 +124,28 @@ public class AutomaticPersistedQueriesFixture : IDisposable
         }
     }
 
-    private readonly ServiceProvider _provider;
     private readonly IDocumentExecuter<AutomaticPersistedQueriesTestSchema> _executer;
     private readonly IGraphQLTextSerializer _serializer;
+    public readonly ServiceProvider Provider;
 
     public AutomaticPersistedQueriesFixture()
     {
-        _provider = new ServiceCollection()
+        Provider = new ServiceCollection()
             .AddGraphQL(builder => builder
-                .AddAutomaticPersistedQueries()
+                .AddAutomaticPersistedQueries(options => options.SlidingExpiration = TimeSpan.FromMinutes(1))
                 .AddSchema<AutomaticPersistedQueriesTestSchema>()
                 .AddSystemTextJson()
             ).BuildServiceProvider();
 
-        _executer = _provider.GetRequiredService<IDocumentExecuter<AutomaticPersistedQueriesTestSchema>>();
-        _serializer = _provider.GetRequiredService<IGraphQLTextSerializer>();
+        _executer = Provider.GetRequiredService<IDocumentExecuter<AutomaticPersistedQueriesTestSchema>>();
+        _serializer = Provider.GetRequiredService<IGraphQLTextSerializer>();
     }
 
     public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure = null)
     {
         var options = new ExecutionOptions
         {
-            RequestServices = _provider
+            RequestServices = Provider
         };
         configure?.Invoke(options);
 
@@ -147,5 +154,5 @@ public class AutomaticPersistedQueriesFixture : IDisposable
 
     public string Serialize(ExecutionResult result) => _serializer.Serialize(result);
 
-    public void Dispose() => _provider.Dispose();
+    public void Dispose() => Provider.Dispose();
 }
