@@ -114,4 +114,53 @@ query {
         var resultString = serializer.Serialize(result);
         resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
     }
+
+    [Theory]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(true, true, false)]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
+    public async Task AddApolloTracing_Works(bool enable, bool enableBefore, bool enableAfter)
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<StarWarsData>();
+        serviceCollection.AddGraphQL(b => b
+            .AddSelfActivatingSchema<StarWarsSchema>()
+            .ConfigureExecution((opts, next) =>
+            {
+                opts.EnableMetrics.ShouldBeFalse();
+                if (enableBefore)
+                    opts.EnableMetrics = true;
+                return next(opts);
+            })
+            .AddApolloTracing(enable)
+            .ConfigureExecutionOptions(opts =>
+            {
+                opts.EnableMetrics.ShouldBe(enable || enableBefore);
+                if (enableAfter)
+                    opts.EnableMetrics = true;
+            })
+            .AddSystemTextJson());
+        using var provider = serviceCollection.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var result = await executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ hero { name } }",
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var resultString = serializer.Serialize(result);
+        if (enable || enableAfter || enableBefore)
+        {
+            resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
+        }
+        else
+        {
+            resultString.ShouldBe(@"{""data"":{""hero"":{""name"":""R2-D2""}}}");
+        }
+    }
 }

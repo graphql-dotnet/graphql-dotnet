@@ -1029,13 +1029,52 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddMetrics -
+        #region - AddApolloTracing / AddMetrics -
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// When <paramref name="enableMetrics"/> is <see langword="true"/>, configures execution to set
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => AddApolloTracing(builder, _ => enableMetrics);
+
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
+        {
+            if (enablePredicate == null)
+                throw new ArgumentNullException(nameof(enablePredicate));
+
+            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            builder.ConfigureExecution(async (options, next) =>
+            {
+                if (enablePredicate(options))
+                    options.EnableMetrics = true;
+                DateTime start = DateTime.UtcNow;
+                var ret = await next(options).ConfigureAwait(false);
+                if (options.EnableMetrics)
+                {
+                    ret.EnrichWithApolloTracing(start);
+                }
+                return ret;
+            });
+            return builder;
+        }
+
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema.
         /// When <paramref name="enable"/> is <see langword="true"/>, configures execution to set
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
@@ -1050,6 +1089,7 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
             if (enablePredicate == null)
@@ -1072,6 +1112,7 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
         {
             if (enablePredicate == null)

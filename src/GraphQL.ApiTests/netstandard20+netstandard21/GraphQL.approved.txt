@@ -251,6 +251,8 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
+        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
+        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
@@ -315,8 +317,14 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate) { }
         public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
@@ -1352,6 +1360,8 @@ namespace GraphQL.Instrumentation
             public string? ReturnType { get; set; }
         }
     }
+    [System.Obsolete("Use AddApolloTracing instead of AddMetrics, which also appends Apollo Tracing dat" +
+        "a to the execution result. This class will be removed in v6.")]
     public class ApolloTracingDocumentExecuter : GraphQL.DocumentExecuter
     {
         [System.Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
