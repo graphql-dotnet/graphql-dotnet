@@ -1034,11 +1034,11 @@ namespace GraphQL
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema, and configures responses to include Apollo
         /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
-        /// When <paramref name="enable"/> is <see langword="true"/>, configures execution to set
+        /// When <paramref name="enableMetrics"/> is <see langword="true"/>, configures execution to set
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
-        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enable = true)
-            => AddApolloTracing(builder, _ => enable);
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => AddApolloTracing(builder, _ => enableMetrics);
 
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
