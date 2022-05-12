@@ -10,12 +10,8 @@ namespace GraphQL.Caching
         where TOptions : BaseMemoryCacheOptions<TOptions>, new()
     {
         private readonly IMemoryCache _memoryCache;
+        private readonly BaseMemoryCacheOptions<TOptions> _options;
         private readonly bool _memoryCacheIsOwned;
-
-        /// <summary>
-        /// Cache options.
-        /// </summary>
-        protected readonly BaseMemoryCacheOptions<TOptions> Options;
 
         /// <summary>
         /// Initializes a new instance with the default options: 100,000 maximum total query size and no expiration time.
@@ -50,7 +46,7 @@ namespace GraphQL.Caching
         protected BaseMemoryCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<TOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            Options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+            _options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
             _memoryCacheIsOwned = disposeMemoryCache;
         }
 
@@ -60,7 +56,7 @@ namespace GraphQL.Caching
         /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
         /// </summary>
         protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key)
-            => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = key.Length };
+            => new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = key.Length };
 
         /// <inheritdoc/>
         public virtual void Dispose()
