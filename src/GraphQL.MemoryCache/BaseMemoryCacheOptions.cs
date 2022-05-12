@@ -4,14 +4,15 @@ using Microsoft.Extensions.Options;
 namespace GraphQL.Caching
 {
     /// <summary>
-    /// Provides configuration options for <see cref="MemoryDocumentCache"/>.
+    /// Provides basic configuration options for <see cref="BaseMemoryCache{TValue,TOptions}"/>.
     /// </summary>
-    public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDocumentCacheOptions>
+    public abstract class BaseMemoryCacheOptions<TDescendantOptions> : MemoryCacheOptions, IOptions<TDescendantOptions>
+        where TDescendantOptions : BaseMemoryCacheOptions<TDescendantOptions>, new()
     {
         /// <summary>
         /// Initializes a default instance with the size limit set to 100,000.
         /// </summary>
-        public MemoryDocumentCacheOptions()
+        public BaseMemoryCacheOptions()
         {
             SizeLimit = 100000;
         }
@@ -22,6 +23,6 @@ namespace GraphQL.Caching
         /// </summary>
         public TimeSpan? SlidingExpiration { get; set; }
 
-        MemoryDocumentCacheOptions IOptions<MemoryDocumentCacheOptions>.Value => this;
+        TDescendantOptions IOptions<TDescendantOptions>.Value => (this as TDescendantOptions)!;
     }
 }

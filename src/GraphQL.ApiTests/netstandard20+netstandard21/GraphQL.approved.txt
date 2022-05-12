@@ -884,17 +884,18 @@ namespace GraphQL.Builders
 }
 namespace GraphQL.Caching
 {
-    public sealed class DefaultDocumentCache : GraphQL.Caching.IDocumentCache
+    public sealed class DefaultDocumentCache : GraphQL.Caching.ICache<GraphQLParser.AST.GraphQLDocument>, GraphQL.Caching.IDocumentCache
     {
         public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
         public System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
         public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
-    public interface IDocumentCache
+    public interface ICache<TValue>
     {
-        System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query);
-        System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value);
+        System.Threading.Tasks.ValueTask<TValue?> GetAsync(string key);
+        System.Threading.Tasks.ValueTask SetAsync(string key, TValue value);
     }
+    public interface IDocumentCache : GraphQL.Caching.ICache<GraphQLParser.AST.GraphQLDocument> { }
 }
 namespace GraphQL.Conversion
 {
