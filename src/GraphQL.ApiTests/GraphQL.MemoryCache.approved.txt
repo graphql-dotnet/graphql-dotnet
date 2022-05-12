@@ -6,7 +6,11 @@ namespace GraphQL.Caching
         protected virtual string ComputeSHA256(string input) { }
         protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
         public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
-        protected virtual string? GetHash(GraphQL.Inputs? extensions) { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
+                "Hash",
+                "Version",
+                "Enabled"})]
+        protected virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
     }
     public abstract class BaseMemoryCacheOptions<TDescendantOptions> : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<TDescendantOptions>
         where TDescendantOptions : GraphQL.Caching.BaseMemoryCacheOptions<TDescendantOptions>, new ()
@@ -63,5 +67,10 @@ namespace GraphQL.Caching
     public class PersistedQueryNotFoundError : GraphQL.Validation.ValidationError
     {
         public PersistedQueryNotFoundError(string hash) { }
+    }
+    [System.Serializable]
+    public class PersistedQueryUnsupportedVersionError : GraphQL.Validation.ValidationError
+    {
+        public PersistedQueryUnsupportedVersionError(string? version) { }
     }
 }

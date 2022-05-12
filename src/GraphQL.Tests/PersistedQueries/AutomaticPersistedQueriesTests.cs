@@ -41,13 +41,34 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     }
 
     [Fact]
-    public async Task Not_Persisted_Query_Should_Return_Not_Found_Code()
+    public async Task Wrong_Version_Should_Be_Detected()
     {
         var extentions = new Inputs(new Dictionary<string, object>
         {
             ["persistedQuery"] = new Dictionary<string, object>
             {
-                ["sha256Hash"] = "1"
+                ["sha256Hash"] = "1",
+                ["version"] = "2"
+            }
+        });
+
+        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+
+        result.Errors.ShouldNotBeNull();
+        var error = result.Errors.Single();
+        error.Message.ShouldBe("Persisted queries with '2' version are not supported.");
+        error.Code.ShouldBe("PERSISTED_QUERY_UNSUPPORTED_VERSION");
+    }
+
+    [Fact]
+    public async Task Not_Saved_Query_Should_Return_Not_Found_Code()
+    {
+        var extentions = new Inputs(new Dictionary<string, object>
+        {
+            ["persistedQuery"] = new Dictionary<string, object>
+            {
+                ["sha256Hash"] = "1",
+                ["version"] = "1"
             }
         });
 
@@ -66,7 +87,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             ["persistedQuery"] = new Dictionary<string, object>
             {
-                ["sha256Hash"] = "badHash"
+                ["sha256Hash"] = "badHash",
+                ["version"] = "1"
             }
         });
         var result = await _fixture.ExecuteAsync(opt =>
@@ -88,7 +110,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             ["persistedQuery"] = new Dictionary<string, object>
             {
-                ["sha256Hash"] = "d7b0dfafc61a1f0618f4f346911d5aa87bef97b134f2943383223bdac4410134"
+                ["sha256Hash"] = "d7b0dfafc61a1f0618f4f346911d5aa87bef97b134f2943383223bdac4410134",
+                ["version"] = "1"
             }
         });
 

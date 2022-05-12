@@ -5,12 +5,13 @@ using GraphQL.DI;
 namespace GraphQL.Caching;
 
 /// <summary>
-/// Implementation of Automatic Persisted Queries.
+/// Implementation of Automatic Persisted Queries (APQ).
 /// https://www.apollographql.com/docs/react/api/link/persisted-queries/
 /// </summary>
 public class AutomaticPersistedQueriesExecution : IConfigureExecution
 {
     private readonly IQueryCache _cache;
+    private const string SUPPORTED_VERSION = "1";
 
     /// <summary>
     /// Initializes a new instance.
@@ -21,22 +22,34 @@ public class AutomaticPersistedQueriesExecution : IConfigureExecution
     }
 
     /// <summary>
-    /// Searching a hash in <see cref="ExecutionOptions.Extensions"/> based on a protocol:
+    /// Searching APQ fields in <see cref="ExecutionOptions.Extensions"/> based on a protocol:
     /// https://www.apollographql.com/docs/react/api/link/persisted-queries/#protocol
     /// </summary>
-    protected virtual string? GetHash(Inputs? extensions)
+    protected virtual (string? Hash, string? Version, bool Enabled) GetAPQProperties(Inputs? extensions)
     {
-        if (
-            (extensions?.TryGetValue("persistedQuery", out var persistedQueryObject) ?? false) &&
-            persistedQueryObject is Dictionary<string, object> persistedQuery &&
-            persistedQuery.TryGetValue("sha256Hash", out var sha256HashObject) &&
-            sha256HashObject is string sha256Hash &&
-            !string.IsNullOrWhiteSpace(sha256Hash))
+        string? hashResult = null;
+        string? versionResult = null;
+        bool enabled = false;
+
+        if (extensions?.TryGetValue("persistedQuery", out var persistedQueryObject) ?? false)
         {
-            return sha256Hash;
+            enabled = true;
+
+            if (persistedQueryObject is Dictionary<string, object> persistedQuery)
+            {
+                if (persistedQuery.TryGetValue("sha256Hash", out var sha256HashObject) && sha256HashObject is string sha256Hash && !string.IsNullOrWhiteSpace(sha256Hash))
+                {
+                    hashResult = sha256Hash;
+                }
+
+                if (persistedQuery.TryGetValue("version", out var versionObject) && versionObject is string version && !string.IsNullOrWhiteSpace(version))
+                {
+                    versionResult = version;
+                }
+            }
         }
 
-        return null;
+        return (hashResult, versionResult, enabled);
     }
 
     /// <summary>
@@ -63,21 +76,26 @@ public class AutomaticPersistedQueriesExecution : IConfigureExecution
     /// <inheritdoc/>
     public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        var hash = GetHash(options.Extensions);
+        var apq = GetAPQProperties(options.Extensions);
+
+        if (apq.Enabled && apq.Version != SUPPORTED_VERSION)
+        {
+            return CreateExecutionResult(new PersistedQueryUnsupportedVersionError(apq.Version));
+        }
 
         if (string.IsNullOrWhiteSpace(options.Query))
         {
-            if (string.IsNullOrWhiteSpace(hash))
+            if (string.IsNullOrWhiteSpace(apq.Hash))
             {
                 return CreateExecutionResult(new ExecutionError("GraphQL query is missing."));
             }
             else
             {
-                var queryFromCache = await _cache.GetAsync(hash!).ConfigureAwait(false);
+                var queryFromCache = await _cache.GetAsync(apq.Hash!).ConfigureAwait(false);
 
                 if (queryFromCache == null)
                 {
-                    return CreateExecutionResult(new PersistedQueryNotFoundError(hash!));
+                    return CreateExecutionResult(new PersistedQueryNotFoundError(apq.Hash!));
                 }
                 else
                 {
@@ -85,15 +103,15 @@ public class AutomaticPersistedQueriesExecution : IConfigureExecution
                 }
             }
         }
-        else if (!string.IsNullOrWhiteSpace(hash))
+        else if (!string.IsNullOrWhiteSpace(apq.Hash))
         {
-            if (hash!.Equals(ComputeSHA256(options.Query!), StringComparison.InvariantCultureIgnoreCase))
+            if (apq.Hash!.Equals(ComputeSHA256(options.Query!), StringComparison.InvariantCultureIgnoreCase))
             {
-                await _cache.SetAsync(hash!, options.Query!).ConfigureAwait(false);
+                await _cache.SetAsync(apq.Hash!, options.Query!).ConfigureAwait(false);
             }
             else
             {
-                return CreateExecutionResult(new PersistedQueryBadHashError(hash));
+                return CreateExecutionResult(new PersistedQueryBadHashError(apq.Hash));
             }
         }
 
