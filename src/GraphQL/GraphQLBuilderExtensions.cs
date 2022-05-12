@@ -1044,18 +1044,18 @@ namespace GraphQL
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema, and configures responses to include Apollo
         /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
-        /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
+        /// Configures execution to run <paramref name="enableMetricsPredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
-        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
         {
-            if (enablePredicate == null)
-                throw new ArgumentNullException(nameof(enablePredicate));
+            if (enableMetricsPredicate == null)
+                throw new ArgumentNullException(nameof(enableMetricsPredicate));
 
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             builder.ConfigureExecution(async (options, next) =>
             {
-                if (enablePredicate(options))
+                if (enableMetricsPredicate(options))
                     options.EnableMetrics = true;
                 DateTime start = DateTime.UtcNow;
                 var ret = await next(options).ConfigureAwait(false);
