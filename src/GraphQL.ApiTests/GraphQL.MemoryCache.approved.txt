@@ -17,7 +17,7 @@ namespace GraphQL.Caching
     public class BaseMemoryCache<TValue, TOptions> : GraphQL.Caching.ICache<TValue>, System.IDisposable
         where TOptions : GraphQL.Caching.BaseMemoryCacheOptions<TOptions>, new ()
     {
-        protected readonly GraphQL.Caching.BaseMemoryCacheOptions<TOptions> _options;
+        protected readonly GraphQL.Caching.BaseMemoryCacheOptions<TOptions> Options;
         public BaseMemoryCache() { }
         public BaseMemoryCache(Microsoft.Extensions.Options.IOptions<TOptions> options) { }
         protected BaseMemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<TOptions> options) { }

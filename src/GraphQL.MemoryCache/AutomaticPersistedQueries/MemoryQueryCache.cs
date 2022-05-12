@@ -21,7 +21,5 @@ public class MemoryQueryCache : BaseMemoryCache<string, MemoryQueryCacheOptions>
 
     /// <inheritdoc/>
     protected override MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string _, string value)
-    {
-        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = value.Length };
-    }
+        => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = value.Length };
 }

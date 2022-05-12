@@ -56,7 +56,7 @@ public class AutomaticPersistedQueriesExecution : IConfigureExecution
     }
 
     /// <summary>
-    /// Create <see cref="ExecutionResult"/> with specific error.
+    /// Create <see cref="ExecutionResult"/> with provided error.
     /// </summary>
     protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new ExecutionResult { Errors = new ExecutionErrors { error } };
 

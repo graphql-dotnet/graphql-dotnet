@@ -17,7 +17,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     }
 
     [Fact]
-    public void Action_Was_Applied_To_Options()
+    public void Configure_Action_Was_Applied_To_Options()
     {
         _fixture.Provider.GetRequiredService<IOptions<MemoryQueryCacheOptions>>().Value.SlidingExpiration.ShouldBe(TimeSpan.FromMinutes(1));
     }

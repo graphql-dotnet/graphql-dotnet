@@ -3,7 +3,7 @@ using GraphQL.Validation;
 namespace GraphQL.Caching;
 
 /// <summary>
-/// An error in case provided hash doesn't correspond to calculated hash.
+/// An error in case provided hash doesn't equal to calculated hash.
 /// </summary>
 [Serializable]
 public class PersistedQueryBadHashError : ValidationError

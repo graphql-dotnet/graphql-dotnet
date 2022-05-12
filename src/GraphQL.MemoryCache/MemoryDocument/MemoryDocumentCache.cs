@@ -22,7 +22,5 @@ public class MemoryDocumentCache : BaseMemoryCache<GraphQLDocument, MemoryDocume
 
     /// <inheritdoc/>
     protected override MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, GraphQLDocument _)
-    {
-        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = key.Length };
-    }
+        => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = key.Length };
 }
