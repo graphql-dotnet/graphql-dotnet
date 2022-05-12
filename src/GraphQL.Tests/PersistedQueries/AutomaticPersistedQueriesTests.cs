@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using GraphQL.MicrosoftDI;
 using GraphQL.Caching;
 using GraphQL.Types;
 using GraphQL.SystemTextJson;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Tests.PersistedQueries;
