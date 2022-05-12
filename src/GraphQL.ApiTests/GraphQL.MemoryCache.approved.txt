@@ -27,7 +27,7 @@ namespace GraphQL.Caching
         protected BaseMemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<TOptions> options) { }
         public virtual void Dispose() { }
         public virtual System.Threading.Tasks.ValueTask<TValue?> GetAsync(string key) { }
-        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, TValue value) { }
+        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key) { }
         public virtual System.Threading.Tasks.ValueTask SetAsync(string key, TValue value) { }
     }
     public static class GraphQLBuilderExtensions
@@ -42,7 +42,6 @@ namespace GraphQL.Caching
     {
         public MemoryDocumentCache() { }
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
-        protected override Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, GraphQLParser.AST.GraphQLDocument _) { }
     }
     public class MemoryDocumentCacheOptions : GraphQL.Caching.BaseMemoryCacheOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
@@ -52,7 +51,6 @@ namespace GraphQL.Caching
     {
         public MemoryQueryCache() { }
         public MemoryQueryCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryQueryCacheOptions> options) { }
-        protected override Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string _, string value) { }
     }
     public class MemoryQueryCacheOptions : GraphQL.Caching.BaseMemoryCacheOptions<GraphQL.Caching.MemoryQueryCacheOptions>
     {

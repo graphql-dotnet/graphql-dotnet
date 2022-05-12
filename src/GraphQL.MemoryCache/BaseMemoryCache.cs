@@ -41,12 +41,12 @@ namespace GraphQL.Caching
 
         /// <summary>
         /// Initializes a new instance with the specified memory cache and options.
-        /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string, TValue)"/>, the sliding expiration
+        /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string)"/>, the sliding expiration
         /// time specified within <paramref name="options"/> can be ignored.
         /// </summary>
         /// <param name="memoryCache">The memory cache instance to use.</param>
         /// <param name="disposeMemoryCache">Indicates if the memory cache is disposed when this instance is disposed.</param>
-        /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(string, TValue)"/>; optional.</param>
+        /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(string)"/>; optional.</param>
         protected BaseMemoryCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<TOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
@@ -59,8 +59,8 @@ namespace GraphQL.Caching
         /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
         /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
         /// </summary>
-        protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, TValue value)
-            => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration };
+        protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key)
+            => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = key.Length };
 
         /// <inheritdoc/>
         public virtual void Dispose()
@@ -88,7 +88,7 @@ namespace GraphQL.Caching
                 throw new ArgumentNullException(nameof(value));
             }
 
-            _memoryCache.Set(key, value, GetMemoryCacheEntryOptions(key, value));
+            _memoryCache.Set(key, value, GetMemoryCacheEntryOptions(key));
 
             return default;
         }

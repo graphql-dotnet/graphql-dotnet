@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching;
@@ -18,8 +17,4 @@ public class MemoryQueryCache : BaseMemoryCache<string, MemoryQueryCacheOptions>
         : base(options)
     {
     }
-
-    /// <inheritdoc/>
-    protected override MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string _, string value)
-        => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = value.Length };
 }

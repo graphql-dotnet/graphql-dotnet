@@ -1,5 +1,4 @@
 using GraphQLParser.AST;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching;
@@ -19,8 +18,4 @@ public class MemoryDocumentCache : BaseMemoryCache<GraphQLDocument, MemoryDocume
         : base(options)
     {
     }
-
-    /// <inheritdoc/>
-    protected override MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key, GraphQLDocument _)
-        => new MemoryCacheEntryOptions { SlidingExpiration = Options.SlidingExpiration, Size = key.Length };
 }
