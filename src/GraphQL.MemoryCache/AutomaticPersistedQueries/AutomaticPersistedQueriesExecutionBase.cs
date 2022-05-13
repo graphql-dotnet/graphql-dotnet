@@ -49,22 +49,27 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     }
 
     /// <summary>
-    /// Compute SHA256 hash.
+    /// Check equality of the provided hash and a hash computed from the query.
     /// </summary>
-    public virtual string ComputeSHA256(string input)
+    public virtual bool CheckHash(string hash, string query)
     {
-        var inputBytes = Encoding.UTF8.GetBytes(input);
+        var inputBytes = Encoding.UTF8.GetBytes(query);
         var shaShared = Interlocked.Exchange(ref _sha256, null) ?? SHA256.Create();
         var bytes = shaShared.ComputeHash(inputBytes);
         Interlocked.CompareExchange(ref _sha256, shaShared, null);
 
+#if NET5_0_OR_GREATER
+        var queryHash = Convert.ToHexString(bytes);
+#else
         var builder = new StringBuilder();
         foreach (var item in bytes)
         {
             builder.Append(item.ToString("x2"));
         }
+        var queryHash = builder.ToString();
+#endif
 
-        return builder.ToString();
+        return hash.Equals(queryHash, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -115,7 +120,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
         }
         else if (apq.Hash != null)
         {
-            if (apq.Hash.Equals(ComputeSHA256(options.Query), StringComparison.InvariantCultureIgnoreCase))
+            if (CheckHash(apq.Hash, options.Query))
             {
                 await SetQueryAsync(apq.Hash, options.Query).ConfigureAwait(false);
             }

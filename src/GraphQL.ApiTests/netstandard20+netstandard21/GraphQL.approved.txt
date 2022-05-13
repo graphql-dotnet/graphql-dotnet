@@ -1141,20 +1141,10 @@ namespace GraphQL.Execution
     }
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
-        protected ExecutionStrategyRegistration(GraphQL.Execution.ExecutionStrategyRegistration original) { }
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
         protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
-        public virtual GraphQL.Execution.ExecutionStrategyRegistration <Clone>$() { }
-        public void Deconstruct(out GraphQL.Execution.IExecutionStrategy Strategy, out GraphQLParser.AST.OperationType Operation) { }
-        public virtual bool Equals(GraphQL.Execution.ExecutionStrategyRegistration? other) { }
-        public override bool Equals(object? obj) { }
-        public override int GetHashCode() { }
-        protected virtual bool PrintMembers(System.Text.StringBuilder builder) { }
-        public override string ToString() { }
-        public static bool operator !=(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
-        public static bool operator ==(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
