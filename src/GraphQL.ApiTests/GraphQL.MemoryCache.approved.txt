@@ -10,8 +10,8 @@ namespace GraphQL.Caching
         public AutomaticPersistedQueriesExecution() { }
         public AutomaticPersistedQueriesExecution(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions> options) { }
         public void Dispose() { }
-        public override System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash) { }
-        public override System.Threading.Tasks.ValueTask SetQueryAsync(string hash, string query) { }
+        public override System.Threading.Tasks.Task<string?> GetQueryAsync(string hash) { }
+        public override System.Threading.Tasks.Task SetQueryAsync(string hash, string query) { }
     }
     public abstract class AutomaticPersistedQueriesExecutionBase : GraphQL.DI.IConfigureExecution
     {
@@ -25,8 +25,8 @@ namespace GraphQL.Caching
                 "Version",
                 "Enabled"})]
         public virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
-        public abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
-        public abstract System.Threading.Tasks.ValueTask SetQueryAsync(string hash, string query);
+        public abstract System.Threading.Tasks.Task<string?> GetQueryAsync(string hash);
+        public abstract System.Threading.Tasks.Task SetQueryAsync(string hash, string query);
     }
     public static class GraphQLBuilderExtensions
     {
@@ -50,17 +50,14 @@ namespace GraphQL.Caching
         public MemoryDocumentCacheOptions() { }
         public System.TimeSpan? SlidingExpiration { get; set; }
     }
-    [System.Serializable]
     public class PersistedQueryBadHashError : GraphQL.Execution.RequestError
     {
         public PersistedQueryBadHashError(string hash) { }
     }
-    [System.Serializable]
     public class PersistedQueryNotFoundError : GraphQL.Execution.RequestError
     {
         public PersistedQueryNotFoundError(string hash) { }
     }
-    [System.Serializable]
     public class PersistedQueryUnsupportedVersionError : GraphQL.Execution.RequestError
     {
         public PersistedQueryUnsupportedVersionError(string? version) { }

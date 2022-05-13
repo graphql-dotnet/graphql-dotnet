@@ -5,7 +5,6 @@ namespace GraphQL.Caching;
 /// <summary>
 /// An error in case provided hash doesn't equal to calculated hash.
 /// </summary>
-[Serializable]
 public class PersistedQueryBadHashError : RequestError
 {
     /// <summary>

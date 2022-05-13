@@ -5,7 +5,6 @@ namespace GraphQL.Caching;
 /// <summary>
 /// An error in case of unsupported version.
 /// </summary>
-[Serializable]
 public class PersistedQueryUnsupportedVersionError : RequestError
 {
     /// <summary>

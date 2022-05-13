@@ -5,7 +5,6 @@ namespace GraphQL.Caching;
 /// <summary>
 /// An error in case a query hasn't been found by hash.
 /// </summary>
-[Serializable]
 public class PersistedQueryNotFoundError : RequestError
 {
     /// <summary>

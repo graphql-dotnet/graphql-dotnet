@@ -15,8 +15,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// </summary>
     public const string SUPPORTED_VERSION = "1";
 
-    private readonly object _lockObject = new();
-    private readonly SHA256 _sha256 = SHA256.Create();
+    private SHA256? _sha256;
 
     /// <summary>
     /// Searching APQ fields in <see cref="ExecutionOptions.Extensions"/> based on a protocol:
@@ -54,11 +53,10 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// </summary>
     public virtual string ComputeSHA256(string input)
     {
-        byte[] bytes;
-        lock (_lockObject)
-        {
-            bytes = _sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-        }
+        var inputBytes = Encoding.UTF8.GetBytes(input);
+        var shaShared = Interlocked.Exchange(ref _sha256, null) ?? SHA256.Create();
+        var bytes = shaShared.ComputeHash(inputBytes);
+        Interlocked.CompareExchange(ref _sha256, shaShared, null);
 
         var builder = new StringBuilder();
         foreach (var item in bytes)
@@ -77,12 +75,12 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// <summary>
     /// Get query by hash. It is likely to be implemented via cache mechanism.
     /// </summary>
-    public abstract ValueTask<string?> GetQueryAsync(string hash);
+    public abstract Task<string?> GetQueryAsync(string hash);
 
     /// <summary>
     /// Set query by hash. It is likely to be implemented via cache mechanism.
     /// </summary>
-    public abstract ValueTask SetQueryAsync(string hash, string query);
+    public abstract Task SetQueryAsync(string hash, string query);
 
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)

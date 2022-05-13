@@ -27,14 +27,14 @@ public class AutomaticPersistedQueriesExecution : AutomaticPersistedQueriesExecu
     }
 
     /// <inheritdoc/>
-    public override ValueTask<string?> GetQueryAsync(string hash) => new(_cache.TryGetValue<string>(hash, out var value) ? value : null);
+    public override Task<string?> GetQueryAsync(string hash) => Task.FromResult(_cache.TryGetValue<string>(hash, out var value) ? value : null);
 
     /// <inheritdoc/>
-    public override ValueTask SetQueryAsync(string hash, string query)
+    public override Task SetQueryAsync(string hash, string query)
     {
         _cache.Set(hash, query, new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = query.Length });
 
-        return default;
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
