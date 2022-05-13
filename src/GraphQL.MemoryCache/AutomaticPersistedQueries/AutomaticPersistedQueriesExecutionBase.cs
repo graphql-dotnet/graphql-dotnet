@@ -61,7 +61,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
 #if NET5_0_OR_GREATER
         var queryHash = Convert.ToHexString(bytes);
 #else
-        var builder = new StringBuilder();
+        var builder = new StringBuilder(bytes.Length * 2);
         foreach (var item in bytes)
         {
             builder.Append(item.ToString("x2"));
