@@ -37,6 +37,8 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             Schema = Schema,
         }).ConfigureAwait(false);
         result.Errors.Single().ShouldBeOfType(typeof(QueryMissingError));
+        result.Errors.Single().Locations.ShouldBeNull();
+        result.Errors.Single().Path.ShouldBeNull();
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             await de.ExecuteAsync(new ExecutionOptions()
