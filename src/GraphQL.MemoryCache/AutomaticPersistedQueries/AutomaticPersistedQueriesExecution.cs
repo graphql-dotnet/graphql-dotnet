@@ -27,7 +27,7 @@ public class AutomaticPersistedQueriesExecution : AutomaticPersistedQueriesExecu
     }
 
     /// <inheritdoc/>
-    public override Task<string?> GetQueryAsync(string hash) => Task.FromResult(_cache.TryGetValue<string>(hash, out var value) ? value : null);
+    public override ValueTask<string?> GetQueryAsync(string hash) => new(_cache.TryGetValue<string>(hash, out var value) ? value : null);
 
     /// <inheritdoc/>
     public override Task SetQueryAsync(string hash, string query)

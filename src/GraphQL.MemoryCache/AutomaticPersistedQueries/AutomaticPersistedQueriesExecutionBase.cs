@@ -75,7 +75,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// <summary>
     /// Get query by hash. It is likely to be implemented via cache mechanism.
     /// </summary>
-    public abstract Task<string?> GetQueryAsync(string hash);
+    public abstract ValueTask<string?> GetQueryAsync(string hash);
 
     /// <summary>
     /// Set query by hash. It is likely to be implemented via cache mechanism.
