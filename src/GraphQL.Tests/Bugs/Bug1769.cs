@@ -31,12 +31,14 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             Schema = Schema,
         }).ConfigureAwait(false);
         valid.Data.ShouldNotBeNull();
-        var result = await de.ExecuteAsync(new ExecutionOptions()
+        await Assert.ThrowsAsync<QueryMissingError>(async () =>
         {
-            Query = null,
-            Schema = Schema,
+            await de.ExecuteAsync(new ExecutionOptions()
+            {
+                Query = null,
+                Schema = Schema,
+            }).ConfigureAwait(false);
         }).ConfigureAwait(false);
-        result.Errors.Single().ShouldBeOfType(typeof(QueryMissingError));
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             await de.ExecuteAsync(new ExecutionOptions()

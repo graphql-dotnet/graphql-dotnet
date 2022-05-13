@@ -1,4 +1,5 @@
 using GraphQL.Caching;
+using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -40,12 +41,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     }
 
     [Fact]
-    public async Task Without_Query_And_Hash_Should_Return_Error()
-    {
-        var result = await _fixture.ExecuteAsync().ConfigureAwait(false);
-
-        AssertError(result, "QUERY_MISSING", "GraphQL query is missing.");
-    }
+    public Task Without_Query_And_Hash_Should_Throw_Error()
+        => Assert.ThrowsAsync<QueryMissingError>(async () => await _fixture.ExecuteAsync().ConfigureAwait(false));
 
     [Fact]
     public async Task Wrong_Version_Should_Be_Detected()
