@@ -884,18 +884,17 @@ namespace GraphQL.Builders
 }
 namespace GraphQL.Caching
 {
-    public sealed class DefaultDocumentCache : GraphQL.Caching.ICache<GraphQLParser.AST.GraphQLDocument>, GraphQL.Caching.IDocumentCache
+    public sealed class DefaultDocumentCache : GraphQL.Caching.IDocumentCache
     {
         public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
         public System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
         public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
-    public interface ICache<TValue>
+    public interface IDocumentCache
     {
-        System.Threading.Tasks.ValueTask<TValue?> GetAsync(string key);
-        System.Threading.Tasks.ValueTask SetAsync(string key, TValue value);
+        System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query);
+        System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value);
     }
-    public interface IDocumentCache : GraphQL.Caching.ICache<GraphQLParser.AST.GraphQLDocument> { }
 }
 namespace GraphQL.Conversion
 {
@@ -1254,6 +1253,15 @@ namespace GraphQL.Execution
         public ParallelExecutionStrategy() { }
         public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
+    }
+    public class QueryMissingError : GraphQL.Execution.RequestError
+    {
+        public QueryMissingError() { }
+    }
+    public class RequestError : GraphQL.ExecutionError
+    {
+        public RequestError(string message) { }
+        public RequestError(string message, System.Exception? innerException) { }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {

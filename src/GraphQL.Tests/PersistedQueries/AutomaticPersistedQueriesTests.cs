@@ -19,7 +19,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [Fact]
     public void Configure_Action_Was_Applied_To_Options()
     {
-        _fixture.Provider.GetRequiredService<IOptions<MemoryQueryCacheOptions>>().Value.SlidingExpiration.ShouldBe(TimeSpan.FromMinutes(1));
+        _fixture.Provider.GetRequiredService<IOptions<AutomaticPersistedQueriesCacheOptions>>().Value.SlidingExpiration.ShouldBe(TimeSpan.FromMinutes(1));
     }
 
     [Fact]
@@ -31,13 +31,20 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
     }
 
+    private void AssertError(ExecutionResult result, string code, string message)
+    {
+        result.Errors.ShouldNotBeNull();
+        var error = result.Errors.Single();
+        error.Code.ShouldBe(code);
+        error.Message.ShouldBe(message);
+    }
+
     [Fact]
     public async Task Without_Query_And_Hash_Should_Return_Error()
     {
         var result = await _fixture.ExecuteAsync().ConfigureAwait(false);
 
-        result.Errors.ShouldNotBeNull();
-        result.Errors.Single().Message.ShouldBe("GraphQL query is missing.");
+        AssertError(result, "QUERY_MISSING", "GraphQL query is missing.");
     }
 
     [Fact]
@@ -54,10 +61,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
 
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
-        result.Errors.ShouldNotBeNull();
-        var error = result.Errors.Single();
-        error.Message.ShouldBe("Persisted queries with '2' version are not supported.");
-        error.Code.ShouldBe("PERSISTED_QUERY_UNSUPPORTED_VERSION");
+        AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "Automatic persisted queries protocol of version '2' is not supported.");
     }
 
     [Fact]
@@ -74,10 +78,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
 
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
-        result.Errors.ShouldNotBeNull();
-        var error = result.Errors.Single();
-        error.Message.ShouldBe("Persisted query with '1' hash was not found.");
-        error.Code.ShouldBe("PERSISTED_QUERY_NOT_FOUND");
+        AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "Persisted query with '1' hash was not found.");
     }
 
     [Fact]
@@ -97,10 +98,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
             opt.Extensions = extentions;
         }).ConfigureAwait(false);
 
-        result.Errors.ShouldNotBeNull();
-        var error = result.Errors.Single();
-        error.Message.ShouldBe("The 'badHash' hash doesn't correspond to a query.");
-        error.Code.ShouldBe("PERSISTED_QUERY_BAD_HASH");
+        AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The 'badHash' hash doesn't correspond to a query.");
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-using GraphQL.Validation;
+using GraphQL.Execution;
 
 namespace GraphQL.Caching;
 
@@ -6,13 +6,13 @@ namespace GraphQL.Caching;
 /// An error in case of unsupported version.
 /// </summary>
 [Serializable]
-public class PersistedQueryUnsupportedVersionError : ValidationError
+public class PersistedQueryUnsupportedVersionError : RequestError
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     public PersistedQueryUnsupportedVersionError(string? version)
-        : base($"Persisted queries with '{version}' version are not supported.")
+        : base($"Automatic persisted queries protocol of version '{version}' is not supported.")
     {
     }
 }

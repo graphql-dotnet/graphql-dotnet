@@ -1,72 +1,67 @@
 namespace GraphQL.Caching
 {
-    public class AutomaticPersistedQueriesExecution : GraphQL.DI.IConfigureExecution
+    public class AutomaticPersistedQueriesCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>
     {
-        public AutomaticPersistedQueriesExecution(GraphQL.Caching.IQueryCache cache) { }
-        protected virtual string ComputeSHA256(string input) { }
-        protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
-        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        public AutomaticPersistedQueriesCacheOptions() { }
+        public System.TimeSpan? SlidingExpiration { get; set; }
+    }
+    public class AutomaticPersistedQueriesExecution : GraphQL.Caching.AutomaticPersistedQueriesExecutionBase, System.IDisposable
+    {
+        public AutomaticPersistedQueriesExecution() { }
+        public AutomaticPersistedQueriesExecution(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions> options) { }
+        public void Dispose() { }
+        public override System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash) { }
+        public override System.Threading.Tasks.ValueTask SetQueryAsync(string hash, string query) { }
+    }
+    public abstract class AutomaticPersistedQueriesExecutionBase : GraphQL.DI.IConfigureExecution
+    {
+        public const string SUPPORTED_VERSION = "1";
+        protected AutomaticPersistedQueriesExecutionBase() { }
+        public virtual string ComputeSHA256(string input) { }
+        public virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
                 "Hash",
                 "Version",
                 "Enabled"})]
-        protected virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
-    }
-    public abstract class BaseMemoryCacheOptions<TDescendantOptions> : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<TDescendantOptions>
-        where TDescendantOptions : GraphQL.Caching.BaseMemoryCacheOptions<TDescendantOptions>, new ()
-    {
-        public BaseMemoryCacheOptions() { }
-        public System.TimeSpan? SlidingExpiration { get; set; }
-    }
-    public class BaseMemoryCache<TValue, TOptions> : GraphQL.Caching.ICache<TValue>, System.IDisposable
-        where TOptions : GraphQL.Caching.BaseMemoryCacheOptions<TOptions>, new ()
-    {
-        public BaseMemoryCache() { }
-        public BaseMemoryCache(Microsoft.Extensions.Options.IOptions<TOptions> options) { }
-        protected BaseMemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<TOptions> options) { }
-        public virtual void Dispose() { }
-        public virtual System.Threading.Tasks.ValueTask<TValue?> GetAsync(string key) { }
-        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key) { }
-        public virtual System.Threading.Tasks.ValueTask SetAsync(string key, TValue value) { }
+        public virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
+        public abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
+        public abstract System.Threading.Tasks.ValueTask SetQueryAsync(string hash, string query);
     }
     public static class GraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryQueryCacheOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryQueryCacheOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
     }
-    public interface IQueryCache : GraphQL.Caching.ICache<string> { }
-    public class MemoryDocumentCache : GraphQL.Caching.BaseMemoryCache<GraphQLParser.AST.GraphQLDocument, GraphQL.Caching.MemoryDocumentCacheOptions>, GraphQL.Caching.ICache<GraphQLParser.AST.GraphQLDocument>, GraphQL.Caching.IDocumentCache
+    public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
     {
         public MemoryDocumentCache() { }
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
+        protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
+        public virtual void Dispose() { }
+        public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
+        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
+        public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
     }
-    public class MemoryDocumentCacheOptions : GraphQL.Caching.BaseMemoryCacheOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
+    public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
         public MemoryDocumentCacheOptions() { }
-    }
-    public class MemoryQueryCache : GraphQL.Caching.BaseMemoryCache<string, GraphQL.Caching.MemoryQueryCacheOptions>, GraphQL.Caching.ICache<string>, GraphQL.Caching.IQueryCache
-    {
-        public MemoryQueryCache() { }
-        public MemoryQueryCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryQueryCacheOptions> options) { }
-    }
-    public class MemoryQueryCacheOptions : GraphQL.Caching.BaseMemoryCacheOptions<GraphQL.Caching.MemoryQueryCacheOptions>
-    {
-        public MemoryQueryCacheOptions() { }
+        public System.TimeSpan? SlidingExpiration { get; set; }
     }
     [System.Serializable]
-    public class PersistedQueryBadHashError : GraphQL.Validation.ValidationError
+    public class PersistedQueryBadHashError : GraphQL.Execution.RequestError
     {
         public PersistedQueryBadHashError(string hash) { }
     }
     [System.Serializable]
-    public class PersistedQueryNotFoundError : GraphQL.Validation.ValidationError
+    public class PersistedQueryNotFoundError : GraphQL.Execution.RequestError
     {
         public PersistedQueryNotFoundError(string hash) { }
     }
     [System.Serializable]
-    public class PersistedQueryUnsupportedVersionError : GraphQL.Validation.ValidationError
+    public class PersistedQueryUnsupportedVersionError : GraphQL.Execution.RequestError
     {
         public PersistedQueryUnsupportedVersionError(string? version) { }
     }

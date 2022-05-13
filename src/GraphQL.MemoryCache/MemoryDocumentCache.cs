@@ -1,24 +1,24 @@
+using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching
 {
     /// <summary>
-    /// A basic implementation of an in memory cache, limited by a configured amount of memory.
+    /// A basic implementation of a document cache, limited by a configured amount of memory.
     /// </summary>
-    public class BaseMemoryCache<TValue, TOptions> : ICache<TValue>, IDisposable
-        where TOptions : BaseMemoryCacheOptions<TOptions>, new()
+    public class MemoryDocumentCache : IDocumentCache, IDisposable
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly BaseMemoryCacheOptions<TOptions> _options;
+        private readonly MemoryDocumentCacheOptions _options;
         private readonly bool _memoryCacheIsOwned;
 
         /// <summary>
         /// Initializes a new instance with the default options: 100,000 maximum total query size and no expiration time.
         /// Anticipate memory use of approximately 1MB.
         /// </summary>
-        public BaseMemoryCache()
-            : this(new TOptions())
+        public MemoryDocumentCache()
+            : this(new MemoryDocumentCacheOptions())
         {
         }
 
@@ -26,8 +26,8 @@ namespace GraphQL.Caching
         /// Initializes a new instance with the specified options. Set the <see cref="MemoryCacheOptions.SizeLimit"/>
         /// value to the maximum total query size to be cached. Anticipate about 10x maximum memory use above that value.
         /// </summary>
-        /// <param name="options">A value containing the <typeparamref name="TOptions"/> to use.</param>
-        public BaseMemoryCache(IOptions<TOptions> options)
+        /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
+        public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
             : this(
                 new MemoryCache(options),
                 true,
@@ -43,7 +43,7 @@ namespace GraphQL.Caching
         /// <param name="memoryCache">The memory cache instance to use.</param>
         /// <param name="disposeMemoryCache">Indicates if the memory cache is disposed when this instance is disposed.</param>
         /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(string)"/>; optional.</param>
-        protected BaseMemoryCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<TOptions> options)
+        protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
@@ -55,8 +55,10 @@ namespace GraphQL.Caching
         /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
         /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
         /// </summary>
-        protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string key)
-            => new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = key.Length };
+        protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query)
+        {
+            return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = query.Length };
+        }
 
         /// <inheritdoc/>
         public virtual void Dispose()
@@ -66,25 +68,18 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public virtual ValueTask<TValue?> GetAsync(string key)
-        {
-            if (_memoryCache.TryGetValue<TValue>(key, out var value))
-            {
-                return new ValueTask<TValue?>(value);
-            }
-
-            return default;
-        }
+        public virtual ValueTask<GraphQLDocument?> GetAsync(string query) =>
+            new(_memoryCache.TryGetValue<GraphQLDocument>(query, out var value) ? value : null);
 
         /// <inheritdoc/>
-        public virtual ValueTask SetAsync(string key, TValue value)
+        public virtual ValueTask SetAsync(string query, GraphQLDocument value)
         {
             if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
-            _memoryCache.Set(key, value, GetMemoryCacheEntryOptions(key));
+            _memoryCache.Set(query, value, GetMemoryCacheEntryOptions(query));
 
             return default;
         }

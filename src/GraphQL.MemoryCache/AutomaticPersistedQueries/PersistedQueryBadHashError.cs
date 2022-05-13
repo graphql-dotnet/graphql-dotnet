@@ -1,4 +1,4 @@
-using GraphQL.Validation;
+using GraphQL.Execution;
 
 namespace GraphQL.Caching;
 
@@ -6,7 +6,7 @@ namespace GraphQL.Caching;
 /// An error in case provided hash doesn't equal to calculated hash.
 /// </summary>
 [Serializable]
-public class PersistedQueryBadHashError : ValidationError
+public class PersistedQueryBadHashError : RequestError
 {
     /// <summary>
     /// Initializes a new instance.

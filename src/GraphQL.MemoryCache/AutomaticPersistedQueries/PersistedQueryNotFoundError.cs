@@ -1,4 +1,4 @@
-using GraphQL.Validation;
+using GraphQL.Execution;
 
 namespace GraphQL.Caching;
 
@@ -6,7 +6,7 @@ namespace GraphQL.Caching;
 /// An error in case a query hasn't been found by hash.
 /// </summary>
 [Serializable]
-public class PersistedQueryNotFoundError : ValidationError
+public class PersistedQueryNotFoundError : RequestError
 {
     /// <summary>
     /// Initializes a new instance.
