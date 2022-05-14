@@ -27,10 +27,10 @@ public class AutomaticPersistedQueriesExecution : AutomaticPersistedQueriesExecu
     }
 
     /// <inheritdoc/>
-    public override ValueTask<string?> GetQueryAsync(string hash) => new(_cache.TryGetValue<string>(hash, out var value) ? value : null);
+    protected override ValueTask<string?> GetQueryAsync(string hash) => new(_cache.TryGetValue<string>(hash, out var value) ? value : null);
 
     /// <inheritdoc/>
-    public override Task SetQueryAsync(string hash, string query)
+    protected override Task SetQueryAsync(string hash, string query)
     {
         _cache.Set(hash, query, new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = query.Length });
 

@@ -21,7 +21,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// Searching APQ fields in <see cref="ExecutionOptions.Extensions"/> based on a protocol:
     /// https://www.apollographql.com/docs/react/api/link/persisted-queries/#protocol
     /// </summary>
-    public virtual (string? Hash, string? Version, bool Enabled) GetAPQProperties(Inputs? extensions)
+    protected virtual (string? Hash, string? Version, bool Enabled) GetAPQProperties(Inputs? extensions)
     {
         string? hashResult = null;
         string? versionResult = null;
@@ -51,7 +51,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// <summary>
     /// Check equality of the provided hash and a hash computed from the query.
     /// </summary>
-    public virtual bool CheckHash(string hash, string query)
+    protected virtual bool CheckHash(string hash, string query)
     {
         var inputBytes = Encoding.UTF8.GetBytes(query);
         var shaShared = Interlocked.Exchange(ref _sha256, null) ?? SHA256.Create();
@@ -75,17 +75,17 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// <summary>
     /// Create <see cref="ExecutionResult"/> with provided error.
     /// </summary>
-    public virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new ExecutionResult { Errors = new ExecutionErrors { error } };
+    protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new ExecutionResult { Errors = new ExecutionErrors { error } };
 
     /// <summary>
     /// Get query by hash. It is likely to be implemented via cache mechanism.
     /// </summary>
-    public abstract ValueTask<string?> GetQueryAsync(string hash);
+    protected abstract ValueTask<string?> GetQueryAsync(string hash);
 
     /// <summary>
     /// Set query by hash. It is likely to be implemented via cache mechanism.
     /// </summary>
-    public abstract Task SetQueryAsync(string hash, string query);
+    protected abstract Task SetQueryAsync(string hash, string query);
 
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)

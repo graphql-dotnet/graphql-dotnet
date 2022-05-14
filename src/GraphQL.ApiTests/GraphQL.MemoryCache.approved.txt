@@ -10,23 +10,23 @@ namespace GraphQL.Caching
         public AutomaticPersistedQueriesExecution() { }
         public AutomaticPersistedQueriesExecution(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions> options) { }
         public void Dispose() { }
-        public override System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash) { }
-        public override System.Threading.Tasks.Task SetQueryAsync(string hash, string query) { }
+        protected override System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash) { }
+        protected override System.Threading.Tasks.Task SetQueryAsync(string hash, string query) { }
     }
     public abstract class AutomaticPersistedQueriesExecutionBase : GraphQL.DI.IConfigureExecution
     {
         public const string SUPPORTED_VERSION = "1";
         protected AutomaticPersistedQueriesExecutionBase() { }
-        public virtual bool CheckHash(string hash, string query) { }
-        public virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
+        protected virtual bool CheckHash(string hash, string query) { }
+        protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
                 "Hash",
                 "Version",
                 "Enabled"})]
-        public virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
-        public abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
-        public abstract System.Threading.Tasks.Task SetQueryAsync(string hash, string query);
+        protected virtual System.ValueTuple<string?, string?, bool> GetAPQProperties(GraphQL.Inputs? extensions) { }
+        protected abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
+        protected abstract System.Threading.Tasks.Task SetQueryAsync(string hash, string query);
     }
     public static class GraphQLBuilderExtensions
     {
