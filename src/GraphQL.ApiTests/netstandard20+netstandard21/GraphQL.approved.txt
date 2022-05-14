@@ -1262,6 +1262,15 @@ namespace GraphQL.Execution
         public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
+    public class QueryMissingError : GraphQL.Execution.RequestError
+    {
+        public QueryMissingError() { }
+    }
+    public class RequestError : GraphQL.ExecutionError
+    {
+        public RequestError(string message) { }
+        public RequestError(string message, System.Exception? innerException) { }
+    }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
         public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType, GraphQLParser.AST.GraphQLSelectionSet? selectionSet) { }
