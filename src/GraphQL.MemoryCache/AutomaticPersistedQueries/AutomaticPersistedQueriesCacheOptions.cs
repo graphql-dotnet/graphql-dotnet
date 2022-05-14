@@ -9,7 +9,7 @@ namespace GraphQL.Caching;
 public class AutomaticPersistedQueriesCacheOptions : MemoryCacheOptions, IOptions<AutomaticPersistedQueriesCacheOptions>
 {
     /// <summary>
-    /// Initializes a default instance with the size limit set to 100,000.
+    /// Initializes a default instance with the size limit (sum of all requests lengths in symbols) set to 100,000.
     /// </summary>
     public AutomaticPersistedQueriesCacheOptions()
     {
