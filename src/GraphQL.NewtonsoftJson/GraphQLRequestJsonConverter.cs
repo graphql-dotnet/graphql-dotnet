@@ -46,8 +46,11 @@ namespace GraphQL.NewtonsoftJson
         {
             var request = (GraphQLRequest)value!;
             writer.WriteStartObject();
-            writer.WritePropertyName(QUERY_KEY);
-            writer.WriteValue(request.Query);
+            if (request.Query != null)
+            {
+                writer.WritePropertyName(QUERY_KEY);
+                writer.WriteValue(request.Query);
+            }
             if (request.OperationName != null)
             {
                 writer.WritePropertyName(OPERATION_NAME_KEY);

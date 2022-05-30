@@ -269,7 +269,7 @@ namespace GraphQL
 
         #region - AddAutoSchema / WithMutation / WithSubscription -
         /// <summary>
-        /// Registers an instance of the <see cref="Schema"/> class within the dependency injection framework as a singleton.
+        /// Registers an instance of the <see cref="AutoSchema{TQueryClrType}"/> class within the dependency injection framework as a singleton.
         /// <see cref="ISchema"/> is also registered if it is not already registered within the dependency injection framework.
         /// <see cref="Schema.Query"/> is set to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> with
         /// <typeparamref name="TQueryClrType"/> as TSourceType.
@@ -286,10 +286,9 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
-            builder.AddSchema(provider => new Schema(provider, true), ServiceLifetime.Singleton);
+            builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
             builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
-            builder.ConfigureSchema((schema, provider) => schema.Query = provider.GetRequiredService<AutoRegisteringObjectGraphType<TQueryClrType>>());
-            configure?.Invoke(new ConfigureAutoSchema(builder));
+            configure?.Invoke(new ConfigureAutoSchema<TQueryClrType>(builder));
             return builder;
         }
 
@@ -299,7 +298,11 @@ namespace GraphQL
         /// </summary>
         public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
         {
-            builder.Builder.ConfigureSchema((schema, provider) => schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>());
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>();
+            });
             return builder;
         }
 
@@ -309,7 +312,11 @@ namespace GraphQL
         /// </summary>
         public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
-            builder.Builder.ConfigureSchema((schema, provider) => schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>());
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>();
+            });
             return builder;
         }
         #endregion
@@ -882,7 +889,7 @@ namespace GraphQL
         }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecutionOptions -
+        #region - ConfigureSchema and ConfigureExecutionOptions and ConfigureExecution -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.
         /// Assumes that the schema derives from <see cref="Schema"/>.
@@ -924,6 +931,18 @@ namespace GraphQL
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
             builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures an action that can modify or replace document execution behavior.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
+        {
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
             return builder;
         }
         #endregion
@@ -1010,13 +1029,52 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddMetrics -
+        #region - AddApolloTracing / AddMetrics -
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// When <paramref name="enableMetrics"/> is <see langword="true"/>, configures execution to set
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => AddApolloTracing(builder, _ => enableMetrics);
+
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// Configures execution to run <paramref name="enableMetricsPredicate"/> and when <see langword="true"/>, sets
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
+        {
+            if (enableMetricsPredicate == null)
+                throw new ArgumentNullException(nameof(enableMetricsPredicate));
+
+            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            builder.ConfigureExecution(async (options, next) =>
+            {
+                if (enableMetricsPredicate(options))
+                    options.EnableMetrics = true;
+                DateTime start = DateTime.UtcNow;
+                var ret = await next(options).ConfigureAwait(false);
+                if (options.EnableMetrics)
+                {
+                    ret.EnrichWithApolloTracing(start);
+                }
+                return ret;
+            });
+            return builder;
+        }
+
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema.
         /// When <paramref name="enable"/> is <see langword="true"/>, configures execution to set
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
@@ -1031,6 +1089,7 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
             if (enablePredicate == null)
@@ -1053,6 +1112,7 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
         {
             if (enablePredicate == null)

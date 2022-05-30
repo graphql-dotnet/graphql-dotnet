@@ -45,7 +45,6 @@ namespace GraphQL.Introspection
                     return types.Constrained(index);
                 });
 
-
             Field<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",

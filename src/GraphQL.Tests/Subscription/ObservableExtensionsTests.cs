@@ -16,7 +16,7 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 async (error, token) =>
@@ -30,7 +30,7 @@ public class ObservableExtensionsTests
         Source.Error(new Exception("abc"));
         Source.Next("300");
         Source.Completed();
-        await Observer.WaitForAsync("Next '200'. Next '0'. Error 'ApplicationException'. Next '300'. Completed. ");
+        await Observer.WaitForAsync("Next '200'. Next '0'. Error 'ApplicationException'. Next '300'. Completed. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -41,14 +41,14 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 (error, token) => throw new NotSupportedException());
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Next("aa");
-        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class ObservableExtensionsTests
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Next("aa");
-        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -77,18 +77,18 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 async (error, token) =>
                 {
-                    await Task.Delay(200);
+                    await Task.Delay(200).ConfigureAwait(false);
                     return new FormatException();
                 });
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Error(new ApplicationException());
-        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -99,14 +99,14 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 (error, token) => throw new FormatException());
         observable.Subscribe(Observer);
         Source.Next("200");
         Source.Error(new ApplicationException());
-        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ");
+        await Observer.WaitForAsync("Next '200'. Error 'FormatException'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 (error, token) => throw error);
@@ -125,7 +125,7 @@ public class ObservableExtensionsTests
         Source.Completed();
         Source.Next("0");
         Source.Next("200");
-        await Observer.WaitForAsync("Completed. Next '0'. Next '200'. ");
+        await Observer.WaitForAsync("Completed. Next '0'. Next '200'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -136,15 +136,15 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 (error, token) => throw error);
         observable.Subscribe(Observer);
         Source.Next("10");
-        await Task.Delay(500);
+        await Task.Delay(500).ConfigureAwait(false);
         Source.Next("20");
-        await Observer.WaitForAsync("Next '10'. Next '20'. ");
+        await Observer.WaitForAsync("Next '10'. Next '20'. ").ConfigureAwait(false);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class ObservableExtensionsTests
         Source.Error(new InvalidTimeZoneException());
         Source.Next("c");
         Source.Completed();
-        await Task.Delay(200); // just in case, but should execute synchronously anyway
+        await Task.Delay(200).ConfigureAwait(false); // just in case, but should execute synchronously anyway
         Observer.Current.ShouldBe("Next 'test'. ");
     }
 
@@ -194,7 +194,7 @@ public class ObservableExtensionsTests
                 async (data, token) =>
                 {
                     var s = int.Parse(data);
-                    await Task.Delay(s);
+                    await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
                 (error, token) => new ValueTask<Exception>(error));
@@ -204,7 +204,7 @@ public class ObservableExtensionsTests
         Source.Error(new ExecutionError("test")); // a completed synchronous transformation, but in the queue after one with a delay
         subscription.Dispose();
         Observer.Current.ShouldBe("");
-        await Task.Delay(1000);
+        await Task.Delay(1000).ConfigureAwait(false);
         Observer.Current.ShouldBe("");
     }
 
@@ -237,7 +237,7 @@ public class ObservableExtensionsTests
         Source.Error(new InvalidTimeZoneException());
         Source.Next("c");
         Source.Completed();
-        await Task.Delay(200); // just in case, but should execute synchronously anyway
+        await Task.Delay(200).ConfigureAwait(false); // just in case, but should execute synchronously anyway
         Observer.Current.ShouldBe("Next 'test'. Error 'DivideByZeroException'. ");
         transformed.ShouldBeFalse();
     }

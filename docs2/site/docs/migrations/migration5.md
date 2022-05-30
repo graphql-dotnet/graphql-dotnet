@@ -23,7 +23,7 @@ access these extensions from validation rules via `ValidationContext.Extensions`
 ### 3. Improved GraphQL-Parser
 
 GraphQL.NET v5 uses GraphQL-Parser v8. This release brought numerous changes in the parser object model,
-which began to better fit the [latest version](http://spec.graphql.org/October2021/) of the published
+which began to better fit the [latest version](https://spec.graphql.org/October2021/) of the published
 official GraphQL specification. GraphQL-Parser v8 has a lot of backward incompatible changes, but you are
 unlikely to come across them if you do not use advanced features.
 
@@ -65,6 +65,7 @@ Specific support is provided for serializing and deserializing to the following 
 | Class                   | Notes |
 |-------------------------|-------|
 | `ExecutionResult`       | Only serialization is supported |
+| `ExecutionError`        | Only serialization is supported |
 | `GraphQLRequest`        | |
 | `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
 | `OperationMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
@@ -100,7 +101,7 @@ class Person
 
     public string Name { get; set; }
 
-    [GraphQLAuthorize("Administrators")]
+    [Authorize("Administrators")]
     public int Age { get; set; }
 
     [Description("Employee's job position")]
@@ -258,7 +259,7 @@ an input graph, you may also need to override `ParseDictionary` as well.
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
 
-```cs
+```csharp
 services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
 ```
 
@@ -267,7 +268,7 @@ type instead.
 
 #### Graphs, fields and arguments recognize attributes to control initialization behavior
 
-Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
+Any attribute that derives from `GraphQLAttribute`, such as `AuthorizeAttribute`, can be set on a
 CLR class or one if its properties, fields, methods or method arguments and is configured for the graph,
 field type or query argument. New attributes have been updated or added for convenience as follows:
 
@@ -284,7 +285,7 @@ field type or query argument. New attributes have been updated or added for conv
 | `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
 | `[FromSource]`       | For method parameters, specifies that the argument value should be the context 'Source' |
 | `[FromUserContext]`  | For method parameters, specifies that the argument value should be the user context |
-| `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
+| `[Authorize]`        | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
 Note: `[Scoped]` is provided through the GraphQL.MicrosoftDI NuGet package.
@@ -601,6 +602,34 @@ There are a number of other minor issues fixed; see these links for more details
 - https://github.com/graphql-dotnet/graphql-dotnet/issues/3002
 - https://github.com/graphql-dotnet/graphql-dotnet/pull/3004
 
+### 20. `Authorize`, `AuthorizeWithRoles` and `AllowAnonymous` extension methods added in GraphQL 5.1.0 and 5.1.1
+
+`AuthorizeWithRoles` allows for specifying roles rather than just policies that can be used to validate a request.
+`Authorize` can be used to specify that only authentication is required, without specifying any specific roles or policies.
+`AllowAnonymous` typically indicates that anonymous access should be allowed to a field of a graph type requiring authorization,
+providing that no other fields were selected. As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), these
+new methods require support by a third-party library to perform the validation.
+
+Similar to the ASP.NET Core `AuthorizeAttribute`, the new `AuthorizeWithRoles` method accepts
+a comma-separated list of role names that would allow access to the graph or field.
+
+```csharp
+graph.AuthorizeWithRoles("Administrators,Managers");
+```
+
+You may also supply a list of strings as in the following example:
+
+```csharp
+graph.AuthorizeWithRoles("Administrators", "Managers");
+```
+
+For schema-first and "type-first" graphs, the `[GraphQLAuthorize]` has been updated to support roles and can now
+be used without any policy or role names, and an `[AllowAnonymous]` attribute has been added.
+
+### 21. `RequestServices` added to `ValidationContext` in GraphQL 5.1.0
+
+This allows for validation rules to access scoped services if necessary.
+
 ## Breaking Changes
 
 ### 1. UnhandledExceptionDelegate
@@ -741,7 +770,7 @@ The `ExecutionOptions.Variables` property does not require `Inputs.Empty`, but i
 tests based on the `.ToInputs()` extension method, you may want a direct replacement.
 Equivalent code to the previous functionality is as follows:
 
-```cs
+```csharp
 using GraphQL;
 using GraphQL.SystemTextJson;
 
@@ -749,16 +778,16 @@ public static class StringExtensions
 {
     private static readonly GraphQLSerializer _serializer = new();
 
-    public static Inputs ToInputs(string json)
+    public static Inputs ToInputs(this string json)
         => json == null ? Inputs.Empty : _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
 
-    public static Inputs ToInputs(System.Text.Json.JsonElement element)
+    public static Inputs ToInputs(this System.Text.Json.JsonElement element)
         => _serializer.ReadNode<Inputs>(element) ?? Inputs.Empty;
 
-    public static T FromJson<T>(string json)
+    public static T? FromJson<T>(this string json)
         => _serializer.Deserialize<T>(json);
 
-    public static System.Threading.Tasks.ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default)
+    public static System.Threading.Tasks.ValueTask<T?> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default)
         => _serializer.ReadAsync<T>(stream, cancellationToken);
 }
 ```
@@ -850,7 +879,7 @@ public class AutoRegisteringObjectGraphTypeWithoutMethods<T> : AutoRegisteringOb
 
 Register this class within your DI engine like this:
 
-```cs
+```csharp
 services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
 ```
 
@@ -922,13 +951,11 @@ The following interfaces have been removed:
 
 All classes which implemented the above interfaces have been modified as necessary:
 
-- `AsyncSourceStreamResolver` (previously `AsyncEventStreamResolver`)
-- `AsyncFieldResolver`
 - `ExpressionFieldResolver`
-- `FuncFieldResolver`
+- `FuncFieldResolver` (`AsyncFieldResolver` was absorbed by it)
 - `InstrumentFieldsMiddleware`
 - `NameFieldResolver`
-- `SourceStreamResolver` (previously `EventStreamResolver`)
+- `SourceStreamResolver` (previously `EventStreamResolver` and `AsyncEventStreamResolver`)
 - All built-in validation rules
 
 These properties have been removed:
@@ -1104,3 +1131,15 @@ GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRu
 - `IAsyncEventStreamResolver` and `AsyncEventStreamResolver` have been removed
 - `IEventStreamResolver.Subscriber` is now `ISourceStreamResolver.ResolveAsync`
 - Field builder `Subscribe` and `SubscribeAsync` methods are now `ResolveStream` and `ResolveStreamAsync`
+
+### 46. `ValidationContext.GetRecursiveVariables` returns null instead of an empty list
+
+This was done for the purposes of the overall strategy for reducing memory consumption.
+
+### 47. `AuthorizeWith` renamed to `AuthorizeWithPolicy` in 5.1.0
+
+This change was made to clarify and differentiate between `AuthorizeWithRoles`.
+
+### 48. `GraphQLAuthorizeAttribute` renamed to `AuthorizeAttribute` in 5.1.1
+
+This change was made to align with the rest of the attributes' names.

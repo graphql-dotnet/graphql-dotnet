@@ -15,8 +15,7 @@ namespace GraphQL
     /// </summary>
     public static class ValueConverter
     {
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
-            = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
 
         /// <summary>
         /// Register built-in conversions. This list is expected to grow over time.

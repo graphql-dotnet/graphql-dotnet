@@ -1,35 +1,35 @@
-namespace GraphQL.Tests.Complexity
+namespace GraphQL.Tests.Complexity;
+
+public class ComplexityTestsWithLimits : ComplexityTestBase
 {
-    public class ComplexityTestsWithLimits : ComplexityTestBase
+    [Fact]
+    public void simple_query_avec_limit()
     {
-        [Fact]
-        public void simple_query_avec_limit()
-        {
-            var res = AnalyzeComplexity(@"
+        var res = AnalyzeComplexity(@"
 query {
   A(first: 10) {
     B
   }
 }");
-            res.TotalQueryDepth.ShouldBe(1);
-            res.Complexity.ShouldBe(20);
-        }
+        res.TotalQueryDepth.ShouldBe(1);
+        res.Complexity.ShouldBe(20);
+    }
 
-        [Fact]
-        public void argument_ignored_when_no_subselection()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void argument_ignored_when_no_subselection()
+    {
+        var res = AnalyzeComplexity(@"
 query {
   A(first: 10)
 }");
-            res.TotalQueryDepth.ShouldBe(0);
-            res.Complexity.ShouldBe(1);
-        }
+        res.TotalQueryDepth.ShouldBe(0);
+        res.Complexity.ShouldBe(1);
+    }
 
-        [Fact]
-        public void two_depth_query_A_limited()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void two_depth_query_A_limited()
+    {
+        var res = AnalyzeComplexity(@"
 query {
   A(id: ""iyIGiygiyg"") {
     B {
@@ -37,14 +37,14 @@ query {
     }
   }
 }");
-            res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(5);
-        }
+        res.TotalQueryDepth.ShouldBe(2);
+        res.Complexity.ShouldBe(5);
+    }
 
-        [Fact]
-        public void two_depth_query_B_limited()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void two_depth_query_B_limited()
+    {
+        var res = AnalyzeComplexity(@"
 query {
   F
   A {
@@ -55,14 +55,14 @@ query {
     }
   }
 }");
-            res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(23);
-        }
+        res.TotalQueryDepth.ShouldBe(2);
+        res.Complexity.ShouldBe(23);
+    }
 
-        [Fact]
-        public void last_value_ignored_when_first_exits()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void last_value_ignored_when_first_exits()
+    {
+        var res = AnalyzeComplexity(@"
 query {
   F
   A {
@@ -73,14 +73,14 @@ query {
     }
   }
 }");
-            res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(23);
-        }
+        res.TotalQueryDepth.ShouldBe(2);
+        res.Complexity.ShouldBe(23);
+    }
 
-        [Fact]
-        public void first_and_last_value_ignored_when_id_exists()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void first_and_last_value_ignored_when_id_exists()
+    {
+        var res = AnalyzeComplexity(@"
 query {
   F
   A {
@@ -90,14 +90,14 @@ query {
     }
   }
 }");
-            res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(9);
-        }
+        res.TotalQueryDepth.ShouldBe(2);
+        res.Complexity.ShouldBe(9);
+    }
 
-        [Fact]
-        public void fragments_with_limits_handled()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void fragments_with_limits_handled()
+    {
+        var res = AnalyzeComplexity(@"
 {
   F
   A {
@@ -112,14 +112,14 @@ fragment X on Y {
     E
   }
 }");
-            res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(23);
-        }
+        res.TotalQueryDepth.ShouldBe(2);
+        res.Complexity.ShouldBe(23);
+    }
 
-        [Fact]
-        public void issue344()
-        {
-            var res = AnalyzeComplexity(@"
+    [Fact]
+    public void issue344()
+    {
+        var res = AnalyzeComplexity(@"
 query myQuery($id: Int) {
   data(id: $id) {
     a1
@@ -162,8 +162,7 @@ fragment Y on SecondGraphType {
     c2
   }
 }");
-            res.TotalQueryDepth.ShouldBe(12);
-            res.Complexity.ShouldBe(60);
-        }
+        res.TotalQueryDepth.ShouldBe(12);
+        res.Complexity.ShouldBe(60);
     }
 }

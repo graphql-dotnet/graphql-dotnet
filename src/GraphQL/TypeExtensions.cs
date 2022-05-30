@@ -1,5 +1,6 @@
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Types;
@@ -132,9 +133,16 @@ namespace GraphQL
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-            else if (IsAnIEnumerable(type))
+#pragma warning disable CS0618 // Type or member is obsolete -- remove this block for v6
+            else if (GlobalSwitches.MapAllEnumerableTypes && IsAnIEnumerable(type))
             {
                 var clrElementType = GetEnumerableElementType(type);
+                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            else if (!GlobalSwitches.MapAllEnumerableTypes && TryGetEnumerableElementType(type, out var clrElementType))
+            {
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
@@ -231,6 +239,7 @@ namespace GraphQL
             return friendlyName;
         }
 
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
@@ -239,6 +248,7 @@ namespace GraphQL
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
         /// as a one-dimensional container type.
         /// </summary>
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
         private static Type GetEnumerableElementType(this Type type)
         {
             // prefer a known type, just in case multiple enumerable interfaces are supported
@@ -268,7 +278,29 @@ namespace GraphQL
             throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
         }
 
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
         private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
+
+        /// <summary>
+        /// Returns the type of element for a one-dimensional container type.
+        /// </summary>
+        private static bool TryGetEnumerableElementType(Type type, [NotNullWhen(true)] out Type? elementType)
+        {
+            if (type == typeof(IEnumerable))
+            {
+                elementType = typeof(object);
+                return true;
+            }
+
+            if (!type.IsGenericType || !TypeInformation.EnumerableListTypes.Contains(type.GetGenericTypeDefinition()))
+            {
+                elementType = null;
+                return false;
+            }
+
+            elementType = type.GetGenericArguments()[0];
+            return true;
+        }
 
         /// <summary>
         /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>

@@ -12,9 +12,11 @@ namespace GraphQL.Transport
         public string? OperationName { get; set; }
 
         /// <summary>
-        /// A Document containing GraphQL Operations and Fragments to execute (required).
+        /// A Document containing GraphQL Operations and Fragments to execute.
+        /// It can be null in case of automatic persisted queries (https://www.apollographql.com/docs/apollo-server/performance/apq/)
+        /// when a client sends only SHA-256 hash of the query in <see cref="Extensions"/> given that corresponding key-value pair has been saved on a server beforehand.
         /// </summary>
-        public string Query { get; set; } = null!;
+        public string? Query { get; set; }
 
         /// <summary>
         /// Values for any Variables defined by the Operation (optional).

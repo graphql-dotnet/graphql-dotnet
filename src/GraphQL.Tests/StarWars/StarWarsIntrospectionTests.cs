@@ -1,21 +1,21 @@
-namespace GraphQL.Tests.StarWars
+namespace GraphQL.Tests.StarWars;
+
+public class StarWarsIntrospectionTests : StarWarsTestBase
 {
-    public class StarWarsIntrospectionTests : StarWarsTestBase
+    [Fact]
+    public void provides_typename()
     {
-        [Fact]
-        public void provides_typename()
-        {
-            var query = "{ hero { __typename name } }";
+        var query = "{ hero { __typename name } }";
 
-            var expected = @"{ ""hero"": { ""__typename"": ""Droid"", ""name"": ""R2-D2"" } }";
+        var expected = @"{ ""hero"": { ""__typename"": ""Droid"", ""name"": ""R2-D2"" } }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_schema_for_an_object_kind()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_schema_for_an_object_kind()
+    {
+        var query = @"
                 query IntrospectionDroidKindQuery {
                   __type(name: ""Droid"") {
                     name,
@@ -24,20 +24,20 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""__type"": {
                 ""name"": ""Droid"",
                 ""kind"": ""OBJECT""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_schema_for_an_interface_kind()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_schema_for_an_interface_kind()
+    {
+        var query = @"
             query IntrospectionCharacterKindQuery {
               __type(name: ""Character"") {
                 name
@@ -46,20 +46,20 @@ namespace GraphQL.Tests.StarWars
             }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""__type"": {
                 ""name"": ""Character"",
                 ""kind"": ""INTERFACE""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_schema_for_possibleTypes_of_an_interface()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_schema_for_possibleTypes_of_an_interface()
+    {
+        var query = @"
             query IntrospectionCharacterKindQuery {
               __type(name: ""Character"") {
                 name
@@ -72,7 +72,7 @@ namespace GraphQL.Tests.StarWars
             }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""__type"": {
                 ""name"": ""Character"",
                 ""kind"": ""INTERFACE"",
@@ -83,13 +83,13 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_the_schema_for_object_fields()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_the_schema_for_object_fields()
+    {
+        var query = @"
             query IntrospectionDroidFieldsQuery {
               __type(name: ""Droid"") {
                 name
@@ -104,7 +104,7 @@ namespace GraphQL.Tests.StarWars
             }
             ";
 
-            var expected = @"{
+        var expected = @"{
                 ""__type"": {
                   ""name"": ""Droid"",
                   ""fields"": [
@@ -154,13 +154,13 @@ namespace GraphQL.Tests.StarWars
                 }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_the_schema_for_documentation()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_the_schema_for_documentation()
+    {
+        var query = @"
             query IntrospectionDroidDescriptionQuery {
               __type(name: ""Droid"") {
                 name
@@ -168,20 +168,20 @@ namespace GraphQL.Tests.StarWars
               }
             }
             ";
-            var expected = @"{
+        var expected = @"{
               ""__type"": {
                 ""name"": ""Droid"",
                 ""description"": ""A mechanical creature in the Star Wars universe.""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void allows_querying_the_schema()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_the_schema()
+    {
+        var query = @"
             query SchemaIntrospectionQuery {
               __schema {
                 types { name, kind }
@@ -197,7 +197,7 @@ namespace GraphQL.Tests.StarWars
               }
             }
             ";
-            var expected = @"{
+        var expected = @"{
                 ""__schema"": {
                     ""types"": [
                     {
@@ -318,14 +318,14 @@ namespace GraphQL.Tests.StarWars
                 }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        // https://github.com/graphql-dotnet/graphql-dotnet/issues/2233
-        [Fact]
-        public void allow_querying_input_object_type_fields()
-        {
-            var query = @"{
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2233
+    [Fact]
+    public void allow_querying_input_object_type_fields()
+    {
+        var query = @"{
   __type(name: ""HumanInput"") {
     fields { name }
     inputFields { name }
@@ -333,13 +333,13 @@ namespace GraphQL.Tests.StarWars
 }
             ";
 
-            AssertQuerySuccess(query, "HumanInputIntrospectionResult".ReadJsonResult());
-        }
+        AssertQuerySuccess(query, "HumanInputIntrospectionResult".ReadJsonResult());
+    }
 
-        [Fact]
-        public void allows_querying_field_args()
-        {
-            var query = @"
+    [Fact]
+    public void allows_querying_field_args()
+    {
+        var query = @"
             query SchemaIntrospectionQuery {
               __schema {
                 queryType {
@@ -363,7 +363,7 @@ namespace GraphQL.Tests.StarWars
               }
             }
             ";
-            var expected = @"{
+        var expected = @"{
               ""__schema"": {
                 ""queryType"": {
                   ""fields"": [
@@ -412,7 +412,6 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
     }
 }

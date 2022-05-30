@@ -2,210 +2,210 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
 
-namespace GraphQL.Tests.Utilities
+namespace GraphQL.Tests.Utilities;
+
+public class SchemaPrinterTests
 {
-    public class SchemaPrinterTests
+    private string printSingleFieldSchema<T>(
+        IEnumerable<QueryArgument> arguments = null)
+        where T : GraphType
     {
-        private string printSingleFieldSchema<T>(
-            IEnumerable<QueryArgument> arguments = null)
-            where T : GraphType
+        var args = arguments != null ? new QueryArguments(arguments) : null;
+
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<T>(
+            "singleField",
+            arguments: args);
+
+        var schema = new Schema
         {
-            var args = arguments != null ? new QueryArguments(arguments) : null;
+            Query = root
+        };
 
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<T>(
-                "singleField",
-                arguments: args);
+        var result = print(schema);
 
-            var schema = new Schema
-            {
-                Query = root
-            };
+        // ensure schema isn't disposed before test finishes
+        schema.Query.Name.ShouldNotBeNull();
 
-            var result = print(schema);
+        return result;
+    }
 
-            // ensure schema isn't disposed before test finishes
-            schema.Query.Name.ShouldNotBeNull();
+    private static string print(ISchema schema)
+    {
+        return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true, PrintDescriptionsAsComments = true });
+    }
 
-            return result;
+    private static string print(ISchema schema, SchemaPrinterOptions options)
+    {
+        var printer = new SchemaPrinter(schema, options);
+        return Environment.NewLine + printer.Print();
+    }
+
+    private void AssertEqual(string result, string expectedName, string expected, bool excludeScalars = false)
+    {
+        AssertEqual(
+            result,
+            new Dictionary<string, string> { { expectedName, expected } },
+            excludeScalars);
+    }
+
+    private void AssertEqual(string result, Dictionary<string, string> expected, bool excludeScalars = false)
+    {
+        string exp;
+        if (excludeScalars)
+        {
+            exp = string.Join($"{Environment.NewLine}{Environment.NewLine}", expected
+                .OrderBy(x => x.Key)
+                .Select(x => x.Value));
+        }
+        else
+        {
+            var orderedScalars = expected
+                .OrderBy(x => x.Key, StringComparer.Ordinal)
+                .Select(x => x.Value);
+            exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
         }
 
-        private static string print(ISchema schema)
-        {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeDeprecationReasons = true, PrintDescriptionsAsComments = true });
-        }
+        result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
+    }
 
-        private static string print(ISchema schema, SchemaPrinterOptions options)
-        {
-            var printer = new SchemaPrinter(schema, options);
-            return Environment.NewLine + printer.Print();
-        }
+    private class TestSchemaTypes : SchemaTypes
+    {
+    }
 
-        private void AssertEqual(string result, string expectedName, string expected, bool excludeScalars = false)
-        {
-            AssertEqual(
-                result,
-                new Dictionary<string, string> { { expectedName, expected } },
-                excludeScalars);
-        }
+    [Fact]
+    public void prints_directive()
+    {
+        var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+        var skip = new SkipDirective();
+        var arg = skip.Arguments.First();
+        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
-        private void AssertEqual(string result, Dictionary<string, string> expected, bool excludeScalars = false)
-        {
-            string exp;
-            if (excludeScalars)
-            {
-                exp = string.Join($"{Environment.NewLine}{Environment.NewLine}", expected
-                    .OrderBy(x => x.Key)
-                    .Select(x => x.Value));
-            }
-            else
-            {
-                var orderedScalars = expected
-                    .OrderBy(x => x.Key, StringComparer.Ordinal)
-                    .Select(x => x.Value);
-                exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
-            }
-
-            result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
-        }
-
-        private class TestSchemaTypes : SchemaTypes
-        {
-        }
-
-        [Fact]
-        public void prints_directive()
-        {
-            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
-            var skip = new SkipDirective();
-            var arg = skip.Arguments.First();
-            arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
-
-            var result = printer.PrintDirective(skip);
-            const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
+        var result = printer.PrintDirective(skip);
+        const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
 directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(result, "directive", expected, excludeScalars: true);
-        }
+        AssertEqual(result, "directive", expected, excludeScalars: true);
+    }
 
-        [Fact]
-        public void prints_directive_2()
-        {
-            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
-            var skip = new SkipDirective();
-            var arg = skip.Arguments.First();
-            arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
+    [Fact]
+    public void prints_directive_2()
+    {
+        var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
+        var skip = new SkipDirective();
+        var arg = skip.Arguments.First();
+        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
-            var result = printer.PrintDirective(skip);
-            const string expected = @"""""""
+        var result = printer.PrintDirective(skip);
+        const string expected = @"""""""
 Directs the executor to skip this field or fragment when the 'if' argument is true.
 """"""
 directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(result, "directive", expected, excludeScalars: true);
-        }
+        AssertEqual(result, "directive", expected, excludeScalars: true);
+    }
 
-        [Fact]
-        public void prints_directive_without_arguments()
-        {
-            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query);
-            string result = new SchemaPrinter(null).PrintDirective(d);
-            result.ShouldBe("directive @my on FIELD | QUERY");
-        }
+    [Fact]
+    public void prints_directive_without_arguments()
+    {
+        var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query);
+        string result = new SchemaPrinter(null).PrintDirective(d);
+        result.ShouldBe("directive @my on FIELD | QUERY");
+    }
 
-        [Fact]
-        public void prints_repeatable_directive_without_arguments()
-        {
-            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
-            string result = new SchemaPrinter(null).PrintDirective(d);
-            result.ShouldBe("directive @my repeatable on FIELD | QUERY");
-        }
+    [Fact]
+    public void prints_repeatable_directive_without_arguments()
+    {
+        var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
+        string result = new SchemaPrinter(null).PrintDirective(d);
+        result.ShouldBe("directive @my repeatable on FIELD | QUERY");
+    }
 
-        [Fact]
-        public void prints_repeatable_directive_with_arguments()
+    [Fact]
+    public void prints_repeatable_directive_with_arguments()
+    {
+        var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query)
         {
-            var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query)
-            {
-                Repeatable = true,
-                Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
-            };
-            string result = new SchemaPrinter(null).PrintDirective(d);
-            result.ShouldBe(@"directive @my(
+            Repeatable = true,
+            Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
+        };
+        string result = new SchemaPrinter(null).PrintDirective(d);
+        result.ShouldBe(@"directive @my(
   max: Int
 ) repeatable on FIELD | QUERY");
-        }
+    }
 
-        [Fact]
-        public void prints_string_field()
-        {
-            var result = printSingleFieldSchema<StringGraphType>();
-            const string expected =
+    [Fact]
+    public void prints_string_field()
+    {
+        var result = printSingleFieldSchema<StringGraphType>();
+        const string expected =
 @"type Query {
   singleField: String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_list_field()
-        {
-            var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
-            const string expected =
+    [Fact]
+    public void prints_string_list_field()
+    {
+        var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
+        const string expected =
 @"type Query {
   singleField: [String]
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_non_null_string_field()
-        {
-            var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
-            const string expected =
+    [Fact]
+    public void prints_non_null_string_field()
+    {
+        var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
+        const string expected =
 @"type Query {
   singleField: String!
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_non_null_list_of_string_field()
-        {
-            var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
-            const string expected =
+    [Fact]
+    public void prints_non_null_list_of_string_field()
+    {
+        var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
+        const string expected =
 @"type Query {
   singleField: [String]!
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_non_null_list_of_non_null_string_field()
-        {
-            var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
-            const string expected =
+    [Fact]
+    public void prints_non_null_list_of_non_null_string_field()
+    {
+        var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
+        const string expected =
 @"type Query {
   singleField: [String!]!
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_object_field()
+    [Fact]
+    public void prints_object_field()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<FooType>("foo");
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<FooType>("foo");
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "Foo",
+                "Foo",
 @"# This is a Foo object type
 type Foo {
   # This is of type String
@@ -213,35 +213,35 @@ type Foo {
   # This is of type Integer
   int: Int @deprecated(reason: ""This field is now deprecated"")
 }"
-                },
-                {
-                    "Query",
+            },
+            {
+                "Query",
 @"type Query {
   foo: Foo
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_object_field_with_field_descriptions()
+    [Fact]
+    public void prints_object_field_with_field_descriptions()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<FooType>("foo");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<FooType>("foo");
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = true,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
+        var expected = new Dictionary<string, string>
+        {
             {
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
-            };
-
-            var expected = new Dictionary<string, string>
-            {
-                {
-                    "Foo",
+                "Foo",
 @"# This is a Foo object type
 type Foo {
   # This is of type String
@@ -249,35 +249,35 @@ type Foo {
   # This is of type Integer
   int: Int
 }"
-                },
-                {
-                    "Query",
+            },
+            {
+                "Query",
 @"type Query {
   foo: Foo
 }"
-                },
-            };
-            AssertEqual(print(schema, options), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema, options), expected);
+    }
 
-        [Fact]
-        public void prints_object_field_with_field_descriptions_2()
+    [Fact]
+    public void prints_object_field_with_field_descriptions_2()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<FooType>("foo");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<FooType>("foo");
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = false,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
+        var expected = new Dictionary<string, string>
+        {
             {
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
-            };
-
-            var expected = new Dictionary<string, string>
-            {
-                {
-                    "Foo",
+                "Foo",
 @"""""""
 This is a Foo object type
 """"""
@@ -291,36 +291,36 @@ type Foo {
   """"""
   int: Int
 }"
-                },
-                {
-                    "Query",
+            },
+            {
+                "Query",
 @"type Query {
   foo: Foo
 }"
-                },
-            };
-            AssertEqual(print(schema, options), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema, options), expected);
+    }
 
-        [Fact]
-        public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
+    [Fact]
+    public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<FooType>("foo");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<FooType>("foo");
+            IncludeDescriptions = true,
+            IncludeDeprecationReasons = true,
+            PrintDescriptionsAsComments = true,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
+        var expected = new Dictionary<string, string>
+        {
             {
-                IncludeDescriptions = true,
-                IncludeDeprecationReasons = true,
-                PrintDescriptionsAsComments = true,
-            };
-
-            var expected = new Dictionary<string, string>
-            {
-                {
-                    "Foo",
+                "Foo",
 @"# This is a Foo object type
 type Foo {
   # This is of type String
@@ -328,37 +328,37 @@ type Foo {
   # This is of type Integer
   int: Int
 }".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
-                },
-                {
-                    "Query",
+            },
+            {
+                "Query",
 @"type Query {
   foo: Foo
 }"
-                },
-            };
-            var result = print(schema, options);
-            AssertEqual(result, expected);
-        }
+            },
+        };
+        var result = print(schema, options);
+        AssertEqual(result, expected);
+    }
 
-        [Fact]
-        public void prints_object_field_with_field_descriptions_and_deprecation_reasons_2()
+    [Fact]
+    public void prints_object_field_with_field_descriptions_and_deprecation_reasons_2()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<FooType>("foo");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<FooType>("foo");
+            IncludeDescriptions = true,
+            IncludeDeprecationReasons = true,
+            PrintDescriptionsAsComments = false,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
+        var expected = new Dictionary<string, string>
+        {
             {
-                IncludeDescriptions = true,
-                IncludeDeprecationReasons = true,
-                PrintDescriptionsAsComments = false,
-            };
-
-            var expected = new Dictionary<string, string>
-            {
-                {
-                    "Foo",
+                "Foo",
 @"""""""
 This is a Foo object type
 """"""
@@ -372,146 +372,146 @@ type Foo {
   """"""
   int: Int
 }".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
-                },
-                {
-                    "Query",
+            },
+            {
+                "Query",
 @"type Query {
   foo: Foo
 }"
-                },
-            };
-            var result = print(schema, options);
-            AssertEqual(result, expected);
-        }
+            },
+        };
+        var result = print(schema, options);
+        AssertEqual(result, expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_int_arg()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne" }
-                });
+    [Fact]
+    public void prints_string_field_with_int_arg()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne" }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_int_arg_with_default()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
-                });
+    [Fact]
+    public void prints_string_field_with_int_arg_with_default()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int = 2): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_non_null_int_arg()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new[]
-                {
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
-                });
+    [Fact]
+    public void prints_string_field_with_non_null_int_arg()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new[]
+            {
+                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int!): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_multiple_args()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new QueryArgument[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne" },
-                    new QueryArgument<StringGraphType> { Name = "argTwo" }
-                });
+    [Fact]
+    public void prints_string_field_with_multiple_args()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new QueryArgument[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne" },
+                new QueryArgument<StringGraphType> { Name = "argTwo" }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int, argTwo: String): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_multiple_args_first_has_default()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new QueryArgument[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
-                    new QueryArgument<StringGraphType> { Name = "argTwo" },
-                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
-                });
+    [Fact]
+    public void prints_string_field_with_multiple_args_first_has_default()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new QueryArgument[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
+                new QueryArgument<StringGraphType> { Name = "argTwo" },
+                new QueryArgument<BooleanGraphType> { Name = "argThree" }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_multiple_args_second_has_default()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new QueryArgument[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne" },
-                    new QueryArgument<StringGraphType> { Name = "argTwo", DefaultValue = "foo" },
-                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
-                });
+    [Fact]
+    public void prints_string_field_with_multiple_args_second_has_default()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new QueryArgument[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne" },
+                new QueryArgument<StringGraphType> { Name = "argTwo", DefaultValue = "foo" },
+                new QueryArgument<BooleanGraphType> { Name = "argThree" }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int, argTwo: String = ""foo"", argThree: Boolean): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_string_field_with_multiple_args_third_has_default()
-        {
-            var result = printSingleFieldSchema<StringGraphType>(
-                new QueryArgument[]
-                {
-                    new QueryArgument<IntGraphType> { Name = "argOne" },
-                    new QueryArgument<StringGraphType> { Name = "argTwo" },
-                    new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
-                });
+    [Fact]
+    public void prints_string_field_with_multiple_args_third_has_default()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new QueryArgument[]
+            {
+                new QueryArgument<IntGraphType> { Name = "argOne" },
+                new QueryArgument<StringGraphType> { Name = "argTwo" },
+                new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
+            });
 
-            const string expected =
+        const string expected =
 @"type Query {
   singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
 }";
-            AssertEqual(result, "Query", expected);
-        }
+        AssertEqual(result, "Query", expected);
+    }
 
-        [Fact]
-        public void prints_interface()
-        {
-            var root = new ObjectGraphType { Name = "Root" };
-            root.Field<BarType>("bar");
+    [Fact]
+    public void prints_interface()
+    {
+        var root = new ObjectGraphType { Name = "Root" };
+        root.Field<BarType>("bar");
 
-            var schema = new Schema { Query = root };
+        var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), "", @"
+        AssertEqual(print(schema), "", @"
 schema {
   query: Root
 }
@@ -531,19 +531,19 @@ type Root {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces()
-        {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+    [Fact]
+    public void prints_multiple_interfaces()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
 
-            var schema = new Schema { Query = root };
+        var schema = new Schema { Query = root };
 
-            var result = print(schema);
+        var result = print(schema);
 
-            AssertEqual(result, "", @"
+        AssertEqual(result, "", @"
 interface Baaz {
   # This is of type Integer
   int: Int
@@ -566,24 +566,24 @@ type Query {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces_with_old_implements_syntax()
+    [Fact]
+    public void prints_multiple_interfaces_with_old_implements_syntax()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+            OldImplementsSyntax = true,
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = true,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
-            {
-                OldImplementsSyntax = true,
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
-            };
-
-            AssertEqual(print(schema, options), "", @"
+        AssertEqual(print(schema, options), "", @"
 interface Baaz {
   # This is of type Integer
   int: Int
@@ -606,24 +606,24 @@ type Query {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces_with_old_implements_syntax_2()
+    [Fact]
+    public void prints_multiple_interfaces_with_old_implements_syntax_2()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+            OldImplementsSyntax = true,
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = false,
+        };
 
-            var schema = new Schema { Query = root };
-
-            var options = new SchemaPrinterOptions
-            {
-                OldImplementsSyntax = true,
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
-            };
-
-            AssertEqual(print(schema, options), "", @"
+        AssertEqual(print(schema, options), "", @"
 interface Baaz {
   """"""
   This is of type Integer
@@ -656,25 +656,25 @@ type Query {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces_with_field_descriptions()
+    [Fact]
+    public void prints_multiple_interfaces_with_field_descriptions()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = true,
+        };
 
-            var schema = new Schema { Query = root };
+        var result = print(schema, options);
 
-            var options = new SchemaPrinterOptions
-            {
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = true,
-            };
-
-            var result = print(schema, options);
-
-            AssertEqual(result, "", @"
+        AssertEqual(result, "", @"
 interface Baaz {
   # This is of type Integer
   int: Int
@@ -697,25 +697,25 @@ type Query {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces_with_field_descriptions_2()
+    [Fact]
+    public void prints_multiple_interfaces_with_field_descriptions_2()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
+
+        var schema = new Schema { Query = root };
+
+        var options = new SchemaPrinterOptions
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+            IncludeDescriptions = true,
+            PrintDescriptionsAsComments = false,
+        };
 
-            var schema = new Schema { Query = root };
+        var result = print(schema, options);
 
-            var options = new SchemaPrinterOptions
-            {
-                IncludeDescriptions = true,
-                PrintDescriptionsAsComments = false,
-            };
-
-            var result = print(schema, options);
-
-            AssertEqual(result, "", @"
+        AssertEqual(result, "", @"
 interface Baaz {
   """"""
   This is of type Integer
@@ -748,18 +748,18 @@ type Query {
   bar: Bar
 }
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_unions()
-        {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<SingleUnion>("single");
-            root.Field<MultipleUnion>("multiple");
+    [Fact]
+    public void prints_unions()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<SingleUnion>("single");
+        root.Field<MultipleUnion>("multiple");
 
-            var schema = new Schema { Query = root };
+        var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), "", @"
+        AssertEqual(print(schema), "", @"
 type Bar implements IFoo {
   # This is of type String
   str: String
@@ -788,103 +788,103 @@ type Query {
 
 union SingleUnion = Foo
 ", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_input_type()
+    [Fact]
+    public void prints_input_type()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<NonNullGraphType<StringGraphType>>(
+            "str",
+            arguments: new QueryArguments(new QueryArgument<InputType> { Name = "argOne" }));
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<NonNullGraphType<StringGraphType>>(
-                "str",
-                arguments: new QueryArguments(new QueryArgument<InputType> { Name = "argOne" }));
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "InputType",
+                "InputType",
 @"input InputType {
   int: Int
 }"
-                },
-                                {
-                    "Query",
+            },
+                            {
+                "Query",
 @"type Query {
   str(argOne: InputType): String!
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_input_type_with_default()
+    [Fact]
+    public void prints_input_type_with_default()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<NonNullGraphType<StringGraphType>>(
+            "str",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<SomeInputType>> { Name = "argOne", DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true } },
+                new QueryArgument<ListGraphType<SomeInputType>> { Name = "argTwo", DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } } })
+            );
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<NonNullGraphType<StringGraphType>>(
-                "str",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<SomeInputType>> { Name = "argOne", DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true } },
-                    new QueryArgument<ListGraphType<SomeInputType>> { Name = "argTwo", DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } } })
-                );
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "SomeInput",
+                "SomeInput",
 @"input SomeInput {
   age: Int!
   name: String!
   isDeveloper: Boolean!
 }"
-                },
-                                {
-                    "Query",
+            },
+                            {
+                "Query",
 @"type Query {
   str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_input_type_with_default_null_value()
+    [Fact]
+    public void prints_input_type_with_default_null_value()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<NonNullGraphType<StringGraphType>>(
+            "str",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
+            );
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<NonNullGraphType<StringGraphType>>(
-                "str",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
-                );
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "SomeInput2",
+                "SomeInput2",
 @"input SomeInput2 {
   names: [String]
 }"
-                },
-                                {
-                    "Query",
+            },
+                            {
+                "Query",
 @"type Query {
   str(argOne: SomeInput2! = { names: null }): String!
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_input_type_with_default_as_dictionary()
-        {
-            var schema = Schema.For(@"
+    [Fact]
+    public void prints_input_type_with_default_as_dictionary()
+    {
+        var schema = Schema.For(@"
 input SomeInput {
   age: Int!
   name: String!
@@ -898,31 +898,31 @@ type Query {
 }
 ");
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
-                    "SomeInput",
+                "SomeInput",
 @"input SomeInput {
   age: Int!
   name: String!
   isDeveloper: Boolean!
   unused: Boolean
 }"
-                },
-                                {
-                    "Query",
+            },
+                            {
+                "Query",
 @"type Query {
   str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_input_type_with_default_as_dictionary_null_values()
-        {
-            var schema = Schema.For(@"
+    [Fact]
+    public void prints_input_type_with_default_as_dictionary_null_values()
+    {
+        var schema = Schema.For(@"
 input SomeInput {
   age: Int = 2
 }
@@ -932,72 +932,72 @@ type Query {
 }
 ");
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
-                    "SomeInput",
+                "SomeInput",
 @"input SomeInput {
   age: Int = 2
 }"
-                },
-                                {
-                    "Query",
+            },
+                            {
+                "Query",
 @"type Query {
   str(arg: SomeInput = { age: null }): String!
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_custom_scalar()
+    [Fact]
+    public void prints_custom_scalar()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<OddType>("odd");
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<OddType>("odd");
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
+            { "Odd", @"scalar Odd" },
             {
-                { "Odd", @"scalar Odd" },
-                {
-                    "Query",
+                "Query",
 @"type Query {
   odd: Odd
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_builtin_scalars()
+    [Fact]
+    public void prints_builtin_scalars()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BigIntGraphType>("bigint");
+        root.Field<ByteGraphType>("byte");
+        root.Field<DateGraphType>("date");
+        root.Field<DateTimeGraphType>("datetime");
+        root.Field<DateTimeOffsetGraphType>("datetimeoffset");
+        root.Field<DecimalGraphType>("decimal");
+        root.Field<GuidGraphType>("guid");
+        root.Field<LongGraphType>("long");
+        root.Field<TimeSpanMillisecondsGraphType>("milliseconds");
+        root.Field<SByteGraphType>("sbyte");
+        root.Field<TimeSpanSecondsGraphType>("seconds");
+        root.Field<ShortGraphType>("short");
+        root.Field<UIntGraphType>("uint");
+        root.Field<ULongGraphType>("ulong");
+        root.Field<UShortGraphType>("ushort");
+        root.Field<UriGraphType>("uri");
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BigIntGraphType>("bigint");
-            root.Field<ByteGraphType>("byte");
-            root.Field<DateGraphType>("date");
-            root.Field<DateTimeGraphType>("datetime");
-            root.Field<DateTimeOffsetGraphType>("datetimeoffset");
-            root.Field<DecimalGraphType>("decimal");
-            root.Field<GuidGraphType>("guid");
-            root.Field<LongGraphType>("long");
-            root.Field<TimeSpanMillisecondsGraphType>("milliseconds");
-            root.Field<SByteGraphType>("sbyte");
-            root.Field<TimeSpanSecondsGraphType>("seconds");
-            root.Field<ShortGraphType>("short");
-            root.Field<UIntGraphType>("uint");
-            root.Field<ULongGraphType>("ulong");
-            root.Field<UShortGraphType>("ushort");
-            root.Field<UriGraphType>("uri");
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "Query",
+                "Query",
 @"scalar BigInt
 
 scalar Byte
@@ -1060,29 +1060,29 @@ scalar ULong
 scalar UShort
 
 scalar Uri"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_enum()
+    [Fact]
+    public void prints_enum()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<RgbEnum>("rgb");
+
+        var schema = new Schema { Query = root };
+
+        var expected = new Dictionary<string, string>
         {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<RgbEnum>("rgb");
-
-            var schema = new Schema { Query = root };
-
-            var expected = new Dictionary<string, string>
             {
-                {
-                    "Query",
+                "Query",
 @"type Query {
   rgb: RGB
 }"
-                },
-                {
-                    "RGB",
+            },
+            {
+                "RGB",
 @"enum RGB {
   # Red!
   RED @deprecated(reason: ""Use green!"")
@@ -1091,39 +1091,39 @@ scalar Uri"
   # Blue!
   BLUE
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_enum_default_args()
+    [Fact]
+    public void prints_enum_default_args()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+
+        var f = new FieldType
         {
-            var root = new ObjectGraphType { Name = "Query" };
-
-            var f = new FieldType
+            Name = "bestColor",
+            Arguments = new QueryArguments(new QueryArgument<RgbEnum>
             {
-                Name = "bestColor",
-                Arguments = new QueryArguments(new QueryArgument<RgbEnum>
-                {
-                    Name = "color",
-                    DefaultValue = 0 // 0 = red --- must be internal representation of enumeration value or validation will fail
-                }),
-                Type = typeof(RgbEnum)
-            };
-            root.AddField(f);
-            var schema = new Schema { Query = root };
-            schema.RegisterType<RgbEnum>();
-            var expected = new Dictionary<string, string>
+                Name = "color",
+                DefaultValue = 0 // 0 = red --- must be internal representation of enumeration value or validation will fail
+            }),
+            Type = typeof(RgbEnum)
+        };
+        root.AddField(f);
+        var schema = new Schema { Query = root };
+        schema.RegisterType<RgbEnum>();
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
-                    "Query",
+                "Query",
 @"type Query {
   bestColor(color: RGB = RED): RGB
 }"
-                },
-                {
-                    "RGB",
+            },
+            {
+                "RGB",
 @"enum RGB {
   # Red!
   RED @deprecated(reason: ""Use green!"")
@@ -1132,26 +1132,26 @@ scalar Uri"
   # Blue!
   BLUE
 }"
-                },
-            };
-            AssertEqual(print(schema), expected);
-        }
+            },
+        };
+        AssertEqual(print(schema), expected);
+    }
 
-        [Fact]
-        public void prints_introspection_schema_with_descriptions_as_comments()
+    [Fact]
+    public void prints_introspection_schema_with_descriptions_as_comments()
+    {
+        var schema = new Schema
         {
-            var schema = new Schema
+            Query = new ObjectGraphType
             {
-                Query = new ObjectGraphType
-                {
-                    Name = "Root"
-                }
-            };
-            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
-            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
-            var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+                Name = "Root"
+            }
+        };
+        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
-            const string expected = @"
+        const string expected = @"
 schema {
   query: Root
 }
@@ -1320,23 +1320,23 @@ enum __TypeKind {
 }
 ";
 
-            AssertEqual(result, "", expected, excludeScalars: true);
-        }
-        [Fact]
-        public void prints_introspection_schema_with_descriptions()
+        AssertEqual(result, "", expected, excludeScalars: true);
+    }
+    [Fact]
+    public void prints_introspection_schema_with_descriptions()
+    {
+        var schema = new Schema
         {
-            var schema = new Schema
+            Query = new ObjectGraphType
             {
-                Query = new ObjectGraphType
-                {
-                    Name = "Root"
-                }
-            };
-            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
-            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
-            var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+                Name = "Root"
+            }
+        };
+        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
+        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
-            const string expected = @"
+        const string expected = @"
 schema {
   query: Root
 }
@@ -1577,25 +1577,25 @@ enum __TypeKind {
 }
 ";
 
-            AssertEqual(result, "", expected, excludeScalars: true);
-        }
+        AssertEqual(result, "", expected, excludeScalars: true);
+    }
 
-        [Fact]
-        public void prints_introspection_schema_with_experimental_features_enabled()
+    [Fact]
+    public void prints_introspection_schema_with_experimental_features_enabled()
+    {
+        var schema = new Schema
         {
-            var schema = new Schema
+            Query = new ObjectGraphType
             {
-                Query = new ObjectGraphType
-                {
-                    Name = "Root"
-                }
+                Name = "Root"
             }
-            .EnableExperimentalIntrospectionFeatures();
-            schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
-            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
-            var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+        }
+        .EnableExperimentalIntrospectionFeatures();
+        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
+        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
-            const string expected = @"
+        const string expected = @"
 schema {
   query: Root
 }
@@ -1793,21 +1793,21 @@ enum __TypeKind {
 }
 ";
 
-            AssertEqual(result, "", expected, excludeScalars: true);
-        }
+        AssertEqual(result, "", expected, excludeScalars: true);
+    }
 
-        [Fact]
-        public void prints_descriptions_correctly()
-        {
-            var printer = new SchemaPrinter(new Schema());
-            printer.PrintDescription("This is a test").ShouldBeCrossPlat("\"\"\"\nThis is a test\n\"\"\"\n");
-            printer.PrintDescription("Th\\is \"is\" a \"\"\"test\n\tline2\n line3\u0003").ShouldBeCrossPlat("\"\"\"\nTh\\is \"is\" a \\\"\"\"test\n\tline2\n line3\n\"\"\"\n");
-        }
+    [Fact]
+    public void prints_descriptions_correctly()
+    {
+        var printer = new SchemaPrinter(new Schema());
+        printer.PrintDescription("This is a test").ShouldBeCrossPlat("\"\"\"\nThis is a test\n\"\"\"\n");
+        printer.PrintDescription("Th\\is \"is\" a \"\"\"test\n\tline2\n line3\u0003").ShouldBeCrossPlat("\"\"\"\nTh\\is \"is\" a \\\"\"\"test\n\tline2\n line3\n\"\"\"\n");
+    }
 
-        [Fact]
-        public void sorts_schema_correctly()
-        {
-            var schema = Schema.For(@"
+    [Fact]
+    public void sorts_schema_correctly()
+    {
+        var schema = Schema.For(@"
 # test sorting type names
 type Zebra {
   # test sorting field names on object types
@@ -1853,9 +1853,9 @@ enum Beta {
   VALUE_2
 }
 ");
-            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
-            var actual = printer.Print();
-            var expected = @"directive @test1(
+        var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
+        var actual = printer.Print();
+        var expected = @"directive @test1(
   arg2: Boolean!
   arg1: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
@@ -1891,163 +1891,162 @@ type Zebra {
   field3: String
 }
 ";
-            actual.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
+        actual.ShouldBe(expected, StringCompareShould.IgnoreLineEndings);
+    }
+
+    public class FooType : ObjectGraphType
+    {
+        public FooType()
+        {
+            Name = "Foo";
+            Description = "This is a Foo object type";
+            Field<StringGraphType>(
+                name: "str",
+                description: "This is of type String");
+            Field<IntGraphType>(
+                name: "int",
+                description: "This is of type Integer",
+                deprecationReason: "This field is now deprecated");
+        }
+    }
+
+    public class FooInterfaceType : InterfaceGraphType
+    {
+        public FooInterfaceType()
+        {
+            Name = "IFoo";
+            Description = "This is a Foo interface type";
+            ResolveType = obj => null;
+            Field<StringGraphType>(
+                name: "str",
+                description: "This is of type String");
+        }
+    }
+
+    public class BaazInterfaceType : InterfaceGraphType
+    {
+        public BaazInterfaceType()
+        {
+            Name = "Baaz";
+            ResolveType = obj => null;
+            Field<IntGraphType>(
+                name: "int",
+                description: "This is of type Integer");
+        }
+    }
+
+    public class BarType : ObjectGraphType
+    {
+        public BarType()
+        {
+            Name = "Bar";
+            Field<StringGraphType>(
+                name: "str",
+                description: "This is of type String");
+            Interface<FooInterfaceType>();
+        }
+    }
+
+    public class BarMultipleType : ObjectGraphType
+    {
+        public BarMultipleType()
+        {
+            Name = "Bar";
+            Field<StringGraphType>(
+                name: "str",
+                description: "This is of type String");
+            Field<IntGraphType>(
+              name: "int",
+              description: "This is of type Integer");
+            Interface<FooInterfaceType>();
+            Interface<BaazInterfaceType>();
+        }
+    }
+
+    public class SingleUnion : UnionGraphType
+    {
+        public SingleUnion()
+        {
+            Name = "SingleUnion";
+            ResolveType = obj => null;
+            Type<FooType>();
+        }
+    }
+
+    public class MultipleUnion : UnionGraphType
+    {
+        public MultipleUnion()
+        {
+            Name = "MultipleUnion";
+            ResolveType = obj => null;
+            Type<FooType>();
+            Type<BarType>();
+        }
+    }
+
+    public class InputType : InputObjectGraphType
+    {
+        public InputType()
+        {
+            Name = "InputType";
+            Field<IntGraphType>("int");
+        }
+    }
+
+    public class SomeInputType : InputObjectGraphType<SomeInput>
+    {
+        public SomeInputType()
+        {
+            Name = "SomeInput";
+            Field(x => x.Age);
+            Field(x => x.Name);
+            Field(x => x.IsDeveloper);
+        }
+    }
+
+    public class SomeInput
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+
+        public bool IsDeveloper { get; set; }
+    }
+
+    public class SomeInputType2 : InputObjectGraphType<SomeInput2>
+    {
+        public SomeInputType2()
+        {
+            Name = "SomeInput2";
+            Field(x => x.Names, true);
+        }
+    }
+
+    public class SomeInput2
+    {
+        public IList<string> Names { get; set; }
+    }
+
+    public class OddType : ScalarGraphType
+    {
+        public OddType()
+        {
+            Name = "Odd";
         }
 
-        public class FooType : ObjectGraphType
+        public override object ParseValue(object value) => null;
+
+        public override object ParseLiteral(GraphQLValue value) => null;
+    }
+
+    public class RgbEnum : EnumerationGraphType
+    {
+        public RgbEnum()
         {
-            public FooType()
-            {
-                Name = "Foo";
-                Description = "This is a Foo object type";
-                Field<StringGraphType>(
-                    name: "str",
-                    description: "This is of type String");
-                Field<IntGraphType>(
-                    name: "int",
-                    description: "This is of type Integer",
-                    deprecationReason: "This field is now deprecated");
-            }
-        }
-
-        public class FooInterfaceType : InterfaceGraphType
-        {
-            public FooInterfaceType()
-            {
-                Name = "IFoo";
-                Description = "This is a Foo interface type";
-                ResolveType = obj => null;
-                Field<StringGraphType>(
-                    name: "str",
-                    description: "This is of type String");
-            }
-        }
-
-        public class BaazInterfaceType : InterfaceGraphType
-        {
-            public BaazInterfaceType()
-            {
-                Name = "Baaz";
-                ResolveType = obj => null;
-                Field<IntGraphType>(
-                    name: "int",
-                    description: "This is of type Integer");
-            }
-        }
-
-        public class BarType : ObjectGraphType
-        {
-            public BarType()
-            {
-                Name = "Bar";
-                Field<StringGraphType>(
-                    name: "str",
-                    description: "This is of type String");
-                Interface<FooInterfaceType>();
-            }
-        }
-
-        public class BarMultipleType : ObjectGraphType
-        {
-            public BarMultipleType()
-            {
-                Name = "Bar";
-                Field<StringGraphType>(
-                    name: "str",
-                    description: "This is of type String");
-                Field<IntGraphType>(
-                  name: "int",
-                  description: "This is of type Integer");
-                Interface<FooInterfaceType>();
-                Interface<BaazInterfaceType>();
-            }
-        }
-
-        public class SingleUnion : UnionGraphType
-        {
-            public SingleUnion()
-            {
-                Name = "SingleUnion";
-                ResolveType = obj => null;
-                Type<FooType>();
-            }
-        }
-
-        public class MultipleUnion : UnionGraphType
-        {
-            public MultipleUnion()
-            {
-                Name = "MultipleUnion";
-                ResolveType = obj => null;
-                Type<FooType>();
-                Type<BarType>();
-            }
-        }
-
-        public class InputType : InputObjectGraphType
-        {
-            public InputType()
-            {
-                Name = "InputType";
-                Field<IntGraphType>("int");
-            }
-        }
-
-        public class SomeInputType : InputObjectGraphType<SomeInput>
-        {
-            public SomeInputType()
-            {
-                Name = "SomeInput";
-                Field(x => x.Age);
-                Field(x => x.Name);
-                Field(x => x.IsDeveloper);
-            }
-        }
-
-        public class SomeInput
-        {
-            public string Name { get; set; }
-
-            public int Age { get; set; }
-
-            public bool IsDeveloper { get; set; }
-        }
-
-        public class SomeInputType2 : InputObjectGraphType<SomeInput2>
-        {
-            public SomeInputType2()
-            {
-                Name = "SomeInput2";
-                Field(x => x.Names, true);
-            }
-        }
-
-        public class SomeInput2
-        {
-            public IList<string> Names { get; set; }
-        }
-
-        public class OddType : ScalarGraphType
-        {
-            public OddType()
-            {
-                Name = "Odd";
-            }
-
-            public override object ParseValue(object value) => null;
-
-            public override object ParseLiteral(GraphQLValue value) => null;
-        }
-
-        public class RgbEnum : EnumerationGraphType
-        {
-            public RgbEnum()
-            {
-                Name = "RGB";
-                Add("RED", 0, "Red!", "Use green!");
-                Add("GREEN", 1, "Green!");
-                Add("BLUE", 2, "Blue!");
-            }
+            Name = "RGB";
+            Add("RED", 0, "Red!", "Use green!");
+            Add("GREEN", 1, "Green!");
+            Add("BLUE", 2, "Blue!");
         }
     }
 }

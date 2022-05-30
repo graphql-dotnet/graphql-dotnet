@@ -191,7 +191,7 @@ namespace GraphQL.SystemTextJson
         }
 
         private static JsonSerializerOptions GetDefaultSerializerOptions(bool indent)
-            => new JsonSerializerOptions { WriteIndented = indent };
+            => new() { WriteIndented = indent };
 
         /// <inheritdoc/>
         public Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)

@@ -63,6 +63,7 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.RequestServices = options.RequestServices;
             context.CancellationToken = options.CancellationToken;
 
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
@@ -112,7 +113,7 @@ namespace GraphQL.Validation
                                 visitors.Add(visitor);
                         }
                     }
-                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context));
+                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
                 }
 
                 // can report errors even without rules enabled

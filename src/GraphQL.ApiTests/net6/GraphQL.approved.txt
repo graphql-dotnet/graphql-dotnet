@@ -1,14 +1,60 @@
 namespace GraphQL
 {
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class AllowAnonymousAttribute : GraphQL.GraphQLAttribute
+    {
+        public AllowAnonymousAttribute() { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     public static class AuthorizationExtensions
     {
+        public const string ANONYMOUS_KEY = "Authorization__AllowAnonymous";
+        public const string AUTHORIZE_KEY = "Authorization__Required";
         public const string POLICY_KEY = "Authorization__Policies";
+        public const string ROLE_KEY = "Authorization__Roles";
+        public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
+        public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string roles) { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, params string[] roles) { }
+        public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, string roles)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, params string[] roles)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string roles) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, params string[] roles) { }
         public static System.Collections.Generic.List<string>? GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
+        public static System.Collections.Generic.List<string>? GetRoles(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool IsAnonymousAllowed(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool IsAuthorizationRequired(this GraphQL.Types.IProvideMetadata provider) { }
+        [System.Obsolete("Please use IsAuthorizationRequired. Will be removed in v6.")]
         public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
+    }
+    public class AuthorizeAttribute : GraphQL.GraphQLAttribute
+    {
+        public AuthorizeAttribute() { }
+        public AuthorizeAttribute(string policy) { }
+        public string? Policy { get; set; }
+        public string? Roles { get; set; }
+        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     [System.Flags]
     public enum AutoRegisteringMode
@@ -60,8 +106,13 @@ namespace GraphQL
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
+        [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
+            "moved in v6")]
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
+        [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
+            "moved in v6")]
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> optionsConfigurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
@@ -76,7 +127,7 @@ namespace GraphQL
     {
         public ExecutionError(string message) { }
         public ExecutionError(string message, System.Collections.IDictionary data) { }
-        public ExecutionError(string message, System.Exception? exception) { }
+        public ExecutionError(string message, System.Exception? innerException) { }
         public string? Code { get; set; }
         public System.Collections.Generic.List<GraphQLParser.Location>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
@@ -175,6 +226,7 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        public static bool MapAllEnumerableTypes { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
@@ -192,17 +244,15 @@ namespace GraphQL
         public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
-    public class GraphQLAuthorizeAttribute : GraphQL.GraphQLAttribute
+    [System.Obsolete("Please use AuthorizeAttribute instead. This class will be removed in v6.")]
+    public class GraphQLAuthorizeAttribute : GraphQL.AuthorizeAttribute
     {
-        public GraphQLAuthorizeAttribute(string policy) { }
-        public string Policy { get; }
-        public override void Modify(GraphQL.Types.IGraphType graphType) { }
-        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
-        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+        public GraphQLAuthorizeAttribute() { }
     }
     public static class GraphQLBuilderExtensions
     {
+        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
+        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enableMetricsPredicate) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
@@ -267,8 +317,14 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate) { }
+        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
+            "tion result. This method will be removed in v6.")]
         public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate) { }
         public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
@@ -298,6 +354,7 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
@@ -372,6 +429,7 @@ namespace GraphQL
     public interface IConfigureAutoSchema
     {
         GraphQL.DI.IGraphQLBuilder Builder { get; }
+        System.Type SchemaType { get; }
     }
     public interface IDocumentExecuter
     {
@@ -711,6 +769,7 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType>
     {
+        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
@@ -747,6 +806,7 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
+        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
@@ -783,6 +843,7 @@ namespace GraphQL.Builders
     }
     public class FieldBuilder<TSourceType, TReturnType>
     {
+        protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
@@ -874,11 +935,16 @@ namespace GraphQL.Conversion
 }
 namespace GraphQL.DI
 {
+    public delegate System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecutionDelegate(GraphQL.ExecutionOptions options);
     public abstract class GraphQLBuilderBase : GraphQL.DI.IGraphQLBuilder
     {
         protected GraphQLBuilderBase() { }
         public abstract GraphQL.DI.IServiceRegister Services { get; }
         protected virtual void RegisterDefaultServices() { }
+    }
+    public interface IConfigureExecution
+    {
+        System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next);
     }
     public interface IConfigureExecutionOptions
     {
@@ -1083,20 +1149,10 @@ namespace GraphQL.Execution
     }
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
-        protected ExecutionStrategyRegistration(GraphQL.Execution.ExecutionStrategyRegistration original) { }
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
         protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
-        public virtual GraphQL.Execution.ExecutionStrategyRegistration <Clone>$() { }
-        public void Deconstruct(out GraphQL.Execution.IExecutionStrategy Strategy, out GraphQLParser.AST.OperationType Operation) { }
-        public virtual bool Equals(GraphQL.Execution.ExecutionStrategyRegistration? other) { }
-        public override bool Equals(object? obj) { }
-        public override int GetHashCode() { }
-        protected virtual bool PrintMembers(System.Text.StringBuilder builder) { }
-        public override string ToString() { }
-        public static bool operator !=(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
-        public static bool operator ==(GraphQL.Execution.ExecutionStrategyRegistration? left, GraphQL.Execution.ExecutionStrategyRegistration? right) { }
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
@@ -1196,6 +1252,15 @@ namespace GraphQL.Execution
         public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
+    public class QueryMissingError : GraphQL.Execution.RequestError
+    {
+        public QueryMissingError() { }
+    }
+    public class RequestError : GraphQL.ExecutionError
+    {
+        public RequestError(string message) { }
+        public RequestError(string message, System.Exception? innerException) { }
+    }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
         public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType, GraphQLParser.AST.GraphQLSelectionSet? selectionSet) { }
@@ -1294,9 +1359,13 @@ namespace GraphQL.Instrumentation
             public string? ReturnType { get; set; }
         }
     }
+    [System.Obsolete("Use AddApolloTracing instead of AddMetrics, which also appends Apollo Tracing dat" +
+        "a to the execution result. This class will be removed in v6.")]
     public class ApolloTracingDocumentExecuter : GraphQL.DocumentExecuter
     {
+        [System.Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
         public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
+        public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configureExecutions, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions) { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
     }
     public static class ApolloTracingExtensions
@@ -1570,7 +1639,7 @@ namespace GraphQL.Transport
         public GraphQLRequest() { }
         public GraphQL.Inputs? Extensions { get; set; }
         public string? OperationName { get; set; }
-        public string Query { get; set; }
+        public string? Query { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
     }
     public class OperationMessage
@@ -1657,6 +1726,10 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+    }
+    public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
+    {
+        public AutoSchema(System.IServiceProvider serviceProvider) { }
     }
     public class BigIntGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2827,6 +2900,7 @@ namespace GraphQL.Validation
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
+        public System.IServiceProvider? RequestServices { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
@@ -2844,12 +2918,14 @@ namespace GraphQL.Validation
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
     {
+        public ValidationError(string message) { }
+        public ValidationError(string message, System.Exception? innerException) { }
         public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
         public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
         public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
         public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
-        public string Number { get; set; }
+        public string? Number { get; set; }
     }
     public readonly struct ValidationOptions
     {
@@ -2858,6 +2934,7 @@ namespace GraphQL.Validation
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
+        public System.IServiceProvider? RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }

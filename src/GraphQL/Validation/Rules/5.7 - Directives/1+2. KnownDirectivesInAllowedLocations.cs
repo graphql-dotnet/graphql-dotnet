@@ -38,7 +38,7 @@ namespace GraphQL.Validation.Rules
             }
         });
 
-        // From http://spec.graphql.org/October2021/#sec-Document:
+        // From https://spec.graphql.org/October2021/#sec-Document:
         // Documents are only executable by a GraphQL service if they are ExecutableDocument and contain at least
         // one OperationDefinition. A Document which contains TypeSystemDefinitionOrExtension must not be executed;
         // GraphQL execution services which receive a Document containing these should return a descriptive error.
@@ -55,7 +55,7 @@ namespace GraphQL.Validation.Rules
 
             return appliedTo switch
             {
-                // http://spec.graphql.org/October2021/#ExecutableDirectiveLocation
+                // https://spec.graphql.org/October2021/#ExecutableDirectiveLocation
                 GraphQLOperationDefinition op => op.Operation switch
                 {
                     OperationType.Query => DirectiveLocation.Query,
@@ -69,7 +69,7 @@ namespace GraphQL.Validation.Rules
                 GraphQLInlineFragment _ => DirectiveLocation.InlineFragment,
                 GraphQLVariableDefinition _ => DirectiveLocation.VariableDefinition,
 
-                // http://spec.graphql.org/October2021/#TypeSystemDirectiveLocation
+                // https://spec.graphql.org/October2021/#TypeSystemDirectiveLocation
                 GraphQLSchemaDefinition _ => DirectiveLocation.Schema,
                 GraphQLScalarTypeDefinition _ => DirectiveLocation.Scalar,
                 GraphQLObjectTypeDefinition _ => DirectiveLocation.Object,

@@ -20,11 +20,11 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Enables printing schema as SDL (Schema Definition Language) document.
     /// <br/>
-    /// See <see href="http://spec.graphql.org/June2018/#sec-Type-System"/> for more information.
+    /// See <see href="https://spec.graphql.org/October2021/#sec-Type-System"/> for more information.
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
-        private static readonly List<string> _builtInScalars = new List<string>
+        private static readonly List<string> _builtInScalars = new()
         {
             "String",
             "Boolean",
@@ -33,7 +33,7 @@ namespace GraphQL.Utilities
             "ID"
         };
 
-        private static readonly List<string> _builtInDirectives = new List<string>
+        private static readonly List<string> _builtInDirectives = new()
         {
             "skip",
             "include",

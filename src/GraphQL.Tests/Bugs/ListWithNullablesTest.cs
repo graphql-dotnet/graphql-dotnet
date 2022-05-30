@@ -1,58 +1,57 @@
 using GraphQL.Types;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class ListWithNullablesTest : QueryTestBase<ListWithNullablesSchema>
 {
-    public class ListWithNullablesTest : QueryTestBase<ListWithNullablesSchema>
+    [Fact]
+    public void Can_Accept_Null_List_From_Literal()
     {
-        [Fact]
-        public void Can_Accept_Null_List_From_Literal()
-        {
-            var query = @"
+        var query = @"
                 query _ {
                   list {
                     value
                   }
                 }";
-            var expected = @"
+        var expected = @"
                 {
                     ""list"": [{ ""value"": ""one""}, null, { ""value"": ""three"" }]
                 }";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
     }
+}
 
-    public class ListWithNullablesSchema : Schema
+public class ListWithNullablesSchema : Schema
+{
+    public ListWithNullablesSchema()
     {
-        public ListWithNullablesSchema()
-        {
-            Query = new ListWithNullablesQuery();
-        }
+        Query = new ListWithNullablesQuery();
     }
+}
 
-    public class ListWithNullablesQuery : ObjectGraphType
+public class ListWithNullablesQuery : ObjectGraphType
+{
+    public ListWithNullablesQuery()
     {
-        public ListWithNullablesQuery()
-        {
-            Name = "Query";
+        Name = "Query";
 
-            Field<ListGraphType<ListEntityGraphType>>(
-                "list",
-                resolve: context => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
-        }
+        Field<ListGraphType<ListEntityGraphType>>(
+            "list",
+            resolve: context => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
     }
+}
 
-    public class ListEntity
+public class ListEntity
+{
+    public string Value { get; set; }
+}
+
+public class ListEntityGraphType : ObjectGraphType<ListEntity>
+{
+    public ListEntityGraphType()
     {
-        public string Value { get; set; }
-    }
+        Name = "Entity";
 
-    public class ListEntityGraphType : ObjectGraphType<ListEntity>
-    {
-        public ListEntityGraphType()
-        {
-            Name = "Entity";
-
-            Field(x => x.Value);
-        }
+        Field(x => x.Value);
     }
 }

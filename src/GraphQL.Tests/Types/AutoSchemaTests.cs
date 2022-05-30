@@ -26,7 +26,7 @@ public class AutoSchemaTests
             o.RequestServices = provider;
             o.Schema = provider.GetRequiredService<ISchema>();
             o.Query = query;
-        });
+        }).ConfigureAwait(false);
         var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
         resultString.ShouldBe(expectedResult);
     }

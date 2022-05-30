@@ -35,7 +35,7 @@ public class SubscriptionSchemaWithAutoGraphType : Schema
         public static Task<IObservable<Message>> MessageAddedAsync([FromServices] IChat chat) => chat.MessagesAsync();
         public static IObservable<Message> MessageAddedByUser([FromServices] IChat chat, string id) => chat.Messages().Where(message => message.From.Id == id);
         [Name("MessageAddedByUserAsync")]
-        public static async Task<IObservable<Message>> MessageAddedByUserAsync([FromServices] IChat chat, string id) => (await chat.MessagesAsync()).Where(message => message.From.Id == id);
+        public static async Task<IObservable<Message>> MessageAddedByUserAsync([FromServices] IChat chat, string id) => (await chat.MessagesAsync().ConfigureAwait(false)).Where(message => message.From.Id == id);
         public static IObservable<List<Message>> MessageGetAll([FromServices] IChat chat) => chat.MessagesGetAll();
         public static IObservable<string> NewMessageContent([FromServices] IChat chat) => chat.Messages().Select(message => message.Content);
     }

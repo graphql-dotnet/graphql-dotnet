@@ -1,11 +1,11 @@
-namespace GraphQL.Tests.Complexity
+namespace GraphQL.Tests.Complexity;
+
+public class ComplexityTests : ComplexityTestBase
 {
-    public class ComplexityTests : ComplexityTestBase
+    [Fact]
+    public void inline_fragments_test()
     {
-        [Fact]
-        public void inline_fragments_test()
-        {
-            var withFrag = AnalyzeComplexity(@"
+        var withFrag = AnalyzeComplexity(@"
 query withInlineFragment {
   profiles(handles: [""dnetguru""]) {
     handle
@@ -16,7 +16,7 @@ query withInlineFragment {
     }
   }
 }");
-            var woFrag = AnalyzeComplexity(@"
+        var woFrag = AnalyzeComplexity(@"
 query withoutFragments {
   profiles(handles: [""dnetguru""]) {
     handle
@@ -26,14 +26,14 @@ query withoutFragments {
   }
 }");
 
-            withFrag.Complexity.ShouldBe(woFrag.Complexity);
-            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-        }
+        withFrag.Complexity.ShouldBe(woFrag.Complexity);
+        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+    }
 
-        [Fact]
-        public void fragments_test()
-        {
-            var withFrag = AnalyzeComplexity(@"
+    [Fact]
+    public void fragments_test()
+    {
+        var withFrag = AnalyzeComplexity(@"
 {
   leftComparison: hero(episode: EMPIRE) {
     ...comparisonFields
@@ -50,7 +50,7 @@ fragment comparisonFields on Character {
     name
   }
 }");
-            var woFrag = AnalyzeComplexity(@"
+        var woFrag = AnalyzeComplexity(@"
 {
   leftComparison: hero(episode: EMPIRE) {
     name
@@ -68,14 +68,14 @@ fragment comparisonFields on Character {
   }
 }");
 
-            withFrag.Complexity.ShouldBe(woFrag.Complexity);
-            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-        }
+        withFrag.Complexity.ShouldBe(woFrag.Complexity);
+        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+    }
 
-        [Fact]
-        public void fragment_test_nested()
-        {
-            var withFrag = AnalyzeComplexity(@"
+    [Fact]
+    public void fragment_test_nested()
+    {
+        var withFrag = AnalyzeComplexity(@"
 			{
 			  A {
 			    W {
@@ -92,7 +92,7 @@ fragment comparisonFields on Character {
 			  }
 			}");
 
-            var woFrag = AnalyzeComplexity(@"
+        var woFrag = AnalyzeComplexity(@"
 			{
 			  A {
 			    W {
@@ -105,15 +105,15 @@ fragment comparisonFields on Character {
 			  }
 		    }");
 
-            withFrag.Complexity.ShouldBe(woFrag.Complexity);
-            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-        }
+        withFrag.Complexity.ShouldBe(woFrag.Complexity);
+        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+    }
 
-        // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
-        [Fact]
-        public void nested_fragments()
-        {
-            var withFrag = AnalyzeComplexity(@"query SomeDroids {
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
+    [Fact]
+    public void nested_fragments()
+    {
+        var withFrag = AnalyzeComplexity(@"query SomeDroids {
                   droid(id: ""3"") {
                     ...DroidFragment
                   }
@@ -133,28 +133,27 @@ fragment comparisonFields on Character {
                  name
             }");
 
-            var woFrag = AnalyzeComplexity(@"query SomeDroids {
+        var woFrag = AnalyzeComplexity(@"query SomeDroids {
                   droid(id: ""3"") {
                     name
                   }
                }");
 
-            withFrag.Complexity.ShouldBe(4/*woFrag.Complexity*/); // TODO: 4 != 2 but may be OK
-            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-        }
+        withFrag.Complexity.ShouldBe(4/*woFrag.Complexity*/); // TODO: 4 != 2 but may be OK
+        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+    }
 
-        [Fact]
-        public void absurdly_huge_query()
+    [Fact]
+    public void absurdly_huge_query()
+    {
+        try
         {
-            try
-            {
-                AnalyzeComplexity(
-                    @"{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
-            }
-            catch (InvalidOperationException ex)
-            {
-                ex.Message.ShouldBe("Query is too complex to validate.");
-            }
+            AnalyzeComplexity(
+                @"{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            ex.Message.ShouldBe("Query is too complex to validate.");
         }
     }
 }

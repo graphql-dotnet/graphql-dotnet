@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3.0.0
+        uses: actions/setup-node@v3.2.0
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
@@ -41,7 +41,7 @@ jobs:
         working-directory: docs2
         run: yarn gatsby build
       - name: Upload documentation as workflow artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Documentation
           path: docs2/public/**
@@ -49,7 +49,7 @@ jobs:
       - name: Setup .NET Core 6.0 SDK
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '6.0.102'
+          dotnet-version: '6.0.x'
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
@@ -63,7 +63,7 @@ jobs:
         working-directory: src
         run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o out
       - name: Upload Nuget packages as workflow artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Nuget packages
           path: |

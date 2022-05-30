@@ -1,44 +1,44 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 
-namespace GraphQL.Tests.Validation
+namespace GraphQL.Tests.Validation;
+
+public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOperation, ValidationSchema>
 {
-    public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOperation, ValidationSchema>
+    [Fact]
+    public void no_operations()
     {
-        [Fact]
-        public void no_operations()
-        {
-            ShouldPassRule(@"
+        ShouldPassRule(@"
                 fragment fragA on Type {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void one_anon_operation()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void one_anon_operation()
+    {
+        ShouldPassRule(@"
                 {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void one_named_operation()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void one_named_operation()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void multiple_operations()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void multiple_operations()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   field
                 }
@@ -47,12 +47,12 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void one_anon_with_fragment()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void one_anon_with_fragment()
+    {
+        ShouldPassRule(@"
                 {
                   ...Foo
                 }
@@ -61,12 +61,12 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void multiple_anon_operations()
-        {
-            var query = @"
+    [Fact]
+    public void multiple_anon_operations()
+    {
+        var query = @"
                 {
                   fieldA
                 }
@@ -76,18 +76,18 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
-                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 6, 17);
-            });
-        }
-
-        [Fact]
-        public void anon_operation_with_mutation()
+        ShouldFailRule(_ =>
         {
-            var query = @"
+            _.Query = query;
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 6, 17);
+        });
+    }
+
+    [Fact]
+    public void anon_operation_with_mutation()
+    {
+        var query = @"
                 {
                   fieldA
                 }
@@ -97,17 +97,17 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
-            });
-        }
-
-        [Fact]
-        public void anon_operation_with_subscription()
+        ShouldFailRule(_ =>
         {
-            var query = @"
+            _.Query = query;
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+        });
+    }
+
+    [Fact]
+    public void anon_operation_with_subscription()
+    {
+        var query = @"
                 {
                   fieldA
                 }
@@ -117,11 +117,10 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
-            });
-        }
+        ShouldFailRule(_ =>
+        {
+            _.Query = query;
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+        });
     }
 }

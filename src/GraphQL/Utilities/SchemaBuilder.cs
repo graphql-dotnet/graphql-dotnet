@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        protected readonly Dictionary<string, IGraphType> _types = new();
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         private GraphQLSchemaDefinition? _schemaDef;
 

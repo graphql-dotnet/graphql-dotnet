@@ -1,8 +1,8 @@
-namespace GraphQL.Benchmarks
+namespace GraphQL.Benchmarks;
+
+public static class Queries
 {
-    public static class Queries
-    {
-        public static readonly string Introspection = @"
+    public static readonly string Introspection = @"
   query IntrospectionQuery {
     __schema {
       description
@@ -97,9 +97,9 @@ namespace GraphQL.Benchmarks
   }
 ";
 
-        public static readonly string Hero = "{ hero { id name } }";
+    public static readonly string Hero = "{ hero { id name } }";
 
-        public static readonly string Fragments = @"
+    public static readonly string Fragments = @"
 query deep {
   human(id: ""abcd"") {
     friends {
@@ -148,7 +148,7 @@ fragment HumanData on Human {
 }
 ";
 
-        public static readonly string VariablesLiteral = @"
+    public static readonly string VariablesLiteral = @"
 {
   test(inputs: [
     {
@@ -176,7 +176,7 @@ fragment HumanData on Human {
 }
 ";
 
-        public static readonly string VariablesDefaultVariable = @"
+    public static readonly string VariablesDefaultVariable = @"
 query ($in: [MyInputObject] =
   [
     {
@@ -206,11 +206,10 @@ query ($in: [MyInputObject] =
 }
 ";
 
-        public static readonly string VariablesVariable = @"
+    public static readonly string VariablesVariable = @"
 query ($in: [MyInputObject])
 {
   test(inputs: $in)
 }
 ";
-    }
 }

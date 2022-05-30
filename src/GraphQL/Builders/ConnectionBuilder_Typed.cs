@@ -24,7 +24,10 @@ namespace GraphQL.Builders
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        internal ConnectionBuilder(FieldType fieldType)
+        /// <summary>
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+        /// </summary>
+        protected internal ConnectionBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }

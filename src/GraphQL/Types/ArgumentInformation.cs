@@ -38,13 +38,11 @@ namespace GraphQL.Types
         {
             if (parameterInfo.ParameterType == typeof(IResolveFieldContext))
             {
-                Expression<Func<IResolveFieldContext, IResolveFieldContext>> expr = x => x;
-                Expression = expr;
+                Expression = (IResolveFieldContext x) => x;
             }
             else if (parameterInfo.ParameterType == typeof(CancellationToken))
             {
-                Expression<Func<IResolveFieldContext, CancellationToken>> expr = x => x.CancellationToken;
-                Expression = expr;
+                Expression = (IResolveFieldContext x) => x.CancellationToken;
             }
         }
 
@@ -131,7 +129,7 @@ namespace GraphQL.Types
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
                 throw new ArgumentException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.", nameof(argumentDelegate));
 
-            Expression = (Expression<Func<IResolveFieldContext, TParameterType?>>)(context => argumentDelegate(context));
+            Expression = (IResolveFieldContext context) => argumentDelegate(context);
         }
 
         /// <summary>

@@ -11,11 +11,13 @@ namespace GraphQL.Instrumentation;
 /// <see cref="ApolloTracingExtensions.EnrichWithApolloTracing(GraphQL.ExecutionResult, DateTime)"/>
 /// when complete, if <see cref="ExecutionOptions.EnableMetrics"/> is enabled.
 /// </summary>
+[Obsolete("Use AddApolloTracing instead of AddMetrics, which also appends Apollo Tracing data to the execution result. This class will be removed in v6.")]
 public class ApolloTracingDocumentExecuter : DocumentExecuter
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
+    [Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
     public ApolloTracingDocumentExecuter(
         IDocumentBuilder documentBuilder,
         IDocumentValidator documentValidator,
@@ -24,6 +26,21 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
         IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
         IExecutionStrategySelector executionStrategySelector)
         : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    public ApolloTracingDocumentExecuter(
+        IDocumentBuilder documentBuilder,
+        IDocumentValidator documentValidator,
+        IComplexityAnalyzer complexityAnalyzer,
+        IDocumentCache documentCache,
+        IExecutionStrategySelector executionStrategySelector,
+        IEnumerable<IConfigureExecution> configureExecutions,
+        IEnumerable<IConfigureExecutionOptions> configureExecutionOptions)
+        : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configureExecutions, configureExecutionOptions)
     {
     }
 

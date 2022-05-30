@@ -28,7 +28,7 @@ public class ScopedExecutionStrategyTests
         {
             Query = "subscription { widgets { value } }",
             RequestServices = provider,
-        });
+        }).ConfigureAwait(false);
         var stream = result.Streams.ShouldNotBeNull().ShouldHaveSingleItem().Value;
         var results = new List<string>();
         stream.Subscribe(x =>

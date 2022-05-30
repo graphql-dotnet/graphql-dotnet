@@ -68,13 +68,10 @@ namespace GraphQL.Execution
                 var child = SubFields[i];
                 bool valueIsNull = child.PropagateNull();
 
-                if (valueIsNull)
+                if (valueIsNull && child.FieldDefinition!.ResolvedType is NonNullGraphType)
                 {
-                    if (child.FieldDefinition!.ResolvedType is NonNullGraphType)
-                    {
-                        SubFields = null;
-                        return true;
-                    }
+                    SubFields = null;
+                    return true;
                 }
             }
 

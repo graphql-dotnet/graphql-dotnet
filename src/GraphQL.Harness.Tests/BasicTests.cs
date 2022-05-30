@@ -1,23 +1,22 @@
 using System.Net;
 using GraphQL.Transport;
 
-namespace GraphQL.Harness.Tests
+namespace GraphQL.Harness.Tests;
+
+public class BasicTests : SystemTestBase<Startup>
 {
-    public class BasicTests : SystemTestBase<Startup>
+    [Fact]
+    public async Task hero()
     {
-        [Fact]
-        public async Task hero()
+        await run(scenario =>
         {
-            await run(scenario =>
+            var input = new GraphQLRequest
             {
-                var input = new GraphQLRequest
-                {
-                    Query = @"{ hero { name} }"
-                };
-                scenario.Post.Json(input).ToUrl("/graphql");
-                scenario.StatusCodeShouldBe(HttpStatusCode.OK);
-                scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
-            });
-        }
+                Query = @"{ hero { name} }"
+            };
+            scenario.Post.Json(input).ToUrl("/graphql");
+            scenario.StatusCodeShouldBe(HttpStatusCode.OK);
+            scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
+        }).ConfigureAwait(false);
     }
 }

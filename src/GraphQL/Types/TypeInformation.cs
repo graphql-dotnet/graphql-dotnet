@@ -322,7 +322,7 @@ namespace GraphQL.Types
             return type;
         }
 
-        private static readonly Type[] _listTypes = new Type[] {
+        internal static readonly Type[] EnumerableListTypes = new Type[] {
             typeof(IEnumerable<>),
             typeof(IList<>),
             typeof(List<>),
@@ -339,6 +339,6 @@ namespace GraphQL.Types
         /// types which may also be able to be cast to <see cref="IEnumerable{T}"/>.
         /// </summary>
         private bool IsRecognizedListType(Type type)
-            => Array.IndexOf(_listTypes, type.GetGenericTypeDefinition()) >= 0;
+            => Array.IndexOf(EnumerableListTypes, type.GetGenericTypeDefinition()) >= 0;
     }
 }

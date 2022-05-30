@@ -2,55 +2,54 @@ using GraphQL.DI;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class BugWithCustomScalarsInDirective : QueryTestBase<BugWithCustomScalarsInDirectiveSchema>
 {
-    public class BugWithCustomScalarsInDirective : QueryTestBase<BugWithCustomScalarsInDirectiveSchema>
+    public override void RegisterServices(IServiceRegister register)
     {
-        public override void RegisterServices(IServiceRegister register)
-        {
-            register.Transient<BugWithCustomScalarsInDirectiveSchema>();
-            register.Transient<BugWithCustomScalarsInDirectiveQuery>();
-        }
-
-        [Fact]
-        public void schema_should_be_initialized()
-        {
-            Schema.Initialize();
-        }
+        register.Transient<BugWithCustomScalarsInDirectiveSchema>();
+        register.Transient<BugWithCustomScalarsInDirectiveQuery>();
     }
 
-    public class BugWithCustomScalarsInDirectiveSchema : Schema
+    [Fact]
+    public void schema_should_be_initialized()
     {
-        public BugWithCustomScalarsInDirectiveSchema(IServiceProvider provider, BugWithCustomScalarsInDirectiveQuery query)
-            : base(provider)
-        {
-            Query = query;
-            Directives.Register(new LinkDirective(), new SomeDirective());
-        }
+        Schema.Initialize();
     }
+}
 
-    public class BugWithCustomScalarsInDirectiveQuery : ObjectGraphType
+public class BugWithCustomScalarsInDirectiveSchema : Schema
+{
+    public BugWithCustomScalarsInDirectiveSchema(IServiceProvider provider, BugWithCustomScalarsInDirectiveQuery query)
+        : base(provider)
     {
-        public BugWithCustomScalarsInDirectiveQuery()
-        {
-            Name = "Query";
-            Field<StringGraphType>("str", resolve: _ => "aaa");
-        }
+        Query = query;
+        Directives.Register(new LinkDirective(), new SomeDirective());
     }
+}
 
-    public class LinkDirective : Directive
+public class BugWithCustomScalarsInDirectiveQuery : ObjectGraphType
+{
+    public BugWithCustomScalarsInDirectiveQuery()
     {
-        public LinkDirective() : base("link", DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface)
-        {
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<UriGraphType>> { Name = "url" });
-        }
+        Name = "Query";
+        Field<StringGraphType>("str", resolve: _ => "aaa");
     }
+}
 
-    public class SomeDirective : Directive
+public class LinkDirective : Directive
+{
+    public LinkDirective() : base("link", DirectiveLocation.FieldDefinition, DirectiveLocation.Object, DirectiveLocation.Interface)
     {
-        public SomeDirective() : base("some", DirectiveLocation.Scalar)
-        {
-            Arguments = new QueryArguments(new QueryArgument<GuidGraphType> { Name = "one" }, new QueryArgument<BigIntGraphType> { Name = "two" }, new QueryArgument<TimeSpanSecondsGraphType> { Name = "three" });
-        }
+        Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<UriGraphType>> { Name = "url" });
+    }
+}
+
+public class SomeDirective : Directive
+{
+    public SomeDirective() : base("some", DirectiveLocation.Scalar)
+    {
+        Arguments = new QueryArguments(new QueryArgument<GuidGraphType> { Name = "one" }, new QueryArgument<BigIntGraphType> { Name = "two" }, new QueryArgument<TimeSpanSecondsGraphType> { Name = "three" });
     }
 }

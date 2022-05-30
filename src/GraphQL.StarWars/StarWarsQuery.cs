@@ -9,13 +9,13 @@ public class StarWarsQuery : ObjectGraphType<object>
     {
         Name = "Query";
 
-        FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
+        FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
         FieldAsync<HumanType>(
             "human",
             arguments: new QueryArguments(
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
             ),
-            resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"))
+            resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false)
         );
 
         Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);

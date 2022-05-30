@@ -1,7 +1,6 @@
-namespace GraphQL.Tests.Execution
+namespace GraphQL.Tests.Execution;
+
+public class InputConversionSystemTextJsonTests : InputConversionTestsBase
 {
-    public class InputConversionSystemTextJsonTests : InputConversionTestsBase
-    {
-        protected override Inputs VariablesToInputs(string variables) => variables.ToInputs();
-    }
+    protected override Inputs VariablesToInputs(string variables) => variables.ToInputs();
 }

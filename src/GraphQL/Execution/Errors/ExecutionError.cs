@@ -6,7 +6,8 @@ using GraphQLParser.AST;
 namespace GraphQL
 {
     /// <summary>
-    /// Represents an error generated while processing a document and intended to be returned within an <see cref="ExecutionResult"/>.
+    /// Represents an error generated while processing a document and
+    /// intended to be returned within an <see cref="ExecutionResult"/>.
     /// </summary>
     [Serializable]
     public class ExecutionError : Exception
@@ -20,7 +21,8 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message and exception data.
+        /// Initializes a new instance of the <see cref="ExecutionError"/>
+        /// class with a specified error message and exception data.
         /// </summary>
         public ExecutionError(string message, IDictionary data)
             : base(message)
@@ -29,24 +31,25 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message. Sets the
-        /// <see cref="Code"/> property based on the inner exception. Loads any exception data
-        /// from the inner exception into this instance.
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified
+        /// error message and inner exception. Sets the <see cref="Code"/> property based on the
+        /// inner exception. Loads any exception data from the inner exception into this instance.
         /// </summary>
-        public ExecutionError(string message, Exception? exception)
-            : base(message, exception)
+        public ExecutionError(string message, Exception? innerException)
+            : base(message, innerException)
         {
-            SetCode(exception);
-            SetData(exception);
+            SetCode(innerException);
+            SetData(innerException);
         }
 
         /// <summary>
-        /// Returns a list of locations within the document that this error applies to.
+        /// Returns a list of locations (if any) within the document that this error applies to.
         /// </summary>
         public List<Location>? Locations { get; private set; }
 
         /// <summary>
-        /// Gets or sets a code for this error.
+        /// Gets or sets a code for this error. Code is typically used to write the 'code'
+        /// property to the execution result 'extensions' property.
         /// </summary>
         public string? Code { get; set; }
 

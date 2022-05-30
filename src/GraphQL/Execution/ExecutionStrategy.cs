@@ -210,7 +210,7 @@ namespace GraphQL.Execution
         /// otherwise the field name). This ensures all fields with the same response key included via referenced
         /// fragments are executed at the same time.
         /// <br/><br/>
-        /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
+        /// <see href="https://spec.graphql.org/October2021/#sec-Field-Collection"/> and <see href="https://spec.graphql.org/October2021/#CollectFields()"/>
         /// </summary>
         /// <param name="context">The execution context.</param>
         /// <param name="specificType">The graph type to compare the selection set against. May be <see langword="null"/> for root execution node.</param>
@@ -222,7 +222,7 @@ namespace GraphQL.Execution
             fields ??= new();
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
-            int countOfSpreads = GetFragmentSpreads(selectionSet);
+            int countOfSpreads = GetFragmentSpreads(context, selectionSet);
             ROM[]? visitedFragmentNames = null;
             if (countOfSpreads > 1)
                 visitedFragmentNames = ArrayPool<ROM>.Shared.Rent(countOfSpreads);
@@ -316,14 +316,26 @@ namespace GraphQL.Execution
                 };
             }
 
-            static int GetFragmentSpreads(GraphQLSelectionSet selectionSet)
+            static int GetFragmentSpreads(ExecutionContext context, GraphQLSelectionSet selectionSet)
             {
                 int count = 0;
 
                 foreach (var selection in selectionSet.Selections)
                 {
-                    if (selection is GraphQLFragmentSpread)
+                    if (selection is GraphQLFragmentSpread spread)
+                    {
                         ++count;
+
+                        var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
+                        if (fragment != null)
+                        {
+                            count += GetFragmentSpreads(context, fragment.SelectionSet);
+                        }
+                    }
+                    else if (selection is GraphQLInlineFragment inline)
+                    {
+                        count += GetFragmentSpreads(context, inline.SelectionSet);
+                    }
                 }
 
                 return count;
@@ -334,7 +346,7 @@ namespace GraphQL.Execution
         /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
         /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
         /// <br/><br/>
-        /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
+        /// <see href="https://spec.graphql.org/October2021/#DoesFragmentTypeApply()"/>
         /// </summary>
         protected bool DoesFragmentConditionMatch(ExecutionContext context, ROM fragmentName, IGraphType type /* should be named type*/)
         {
