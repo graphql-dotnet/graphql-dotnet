@@ -13,5 +13,5 @@ memory usage is reduced by freeing unnecessary references after obtaining the re
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
 
-This property was not used internally and is not normally exposed accessible from user code.
+This property was not used internally and should not be necessary by user code or custom implementations.
 Removal was necessary as the value is released after the result is set.
