@@ -87,11 +87,7 @@ namespace GraphQL.DataLoader
         {
             var loader = _loader;
             if (loader != null)
-            {
-                // it does not matter if there are simultaneous calls to DispatchAsync as DataLoaderList
-                // protects against double calls to DispatchAsync
                 await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
-            }
             return Result;
         }
     }
