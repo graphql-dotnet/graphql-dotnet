@@ -85,6 +85,7 @@ namespace GraphQL.DataLoader
 
         async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
         {
+            // same code as above; prevents an additional allocation
             var loader = _loader;
             if (loader != null)
                 await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
