@@ -35,7 +35,19 @@ namespace GraphQL.DataLoader
         /// <summary>
         /// Returns the result if it has been set, or throws an exception if not
         /// </summary>
-        public T Result => IsResultSet ? _result : throw new InvalidOperationException("Result has not been set");
+        public T Result
+        {
+            get
+            {
+                if (IsResultSet)
+                {
+                    Interlocked.MemoryBarrier(); // ensure that _loader is read before _result is read
+                    return _result;
+                }
+                else
+                    throw new InvalidOperationException("Result has not been set");
+            }
+        }
 
         /// <summary>
         /// Returns a boolean that indicates if the result has been set
@@ -62,13 +74,11 @@ namespace GraphQL.DataLoader
         public async Task<T> GetResultAsync(CancellationToken cancellationToken = default)
         {
             var loader = _loader;
-            Interlocked.MemoryBarrier(); // ensure that _loader is read before _result is read
             if (loader != null)
             {
                 // it does not matter if there are simultaneous calls to DispatchAsync as DataLoaderList
                 // protects against double calls to DispatchAsync
                 await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
-                _loader = null;
             }
             return Result;
         }
@@ -76,13 +86,11 @@ namespace GraphQL.DataLoader
         async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
         {
             var loader = _loader;
-            Interlocked.MemoryBarrier(); // ensure that _loader is read before _result is read
             if (loader != null)
             {
                 // it does not matter if there are simultaneous calls to DispatchAsync as DataLoaderList
                 // protects against double calls to DispatchAsync
                 await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
-                _loader = null;
             }
             return Result;
         }
