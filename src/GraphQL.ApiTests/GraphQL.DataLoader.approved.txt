@@ -81,7 +81,6 @@ namespace GraphQL.DataLoader
         public DataLoaderPair(GraphQL.DataLoader.IDataLoader loader, TKey key) { }
         public bool IsResultSet { get; }
         public TKey Key { get; }
-        public GraphQL.DataLoader.IDataLoader Loader { get; }
         public T Result { get; }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public void SetResult(T value) { }
