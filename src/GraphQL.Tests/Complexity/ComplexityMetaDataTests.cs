@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
-using GraphQL.MicrosoftDI;
-using GraphQL.Validation.Complexity;
 using GraphQL.Execution;
+using GraphQL.MicrosoftDI;
 using GraphQL.Types;
+using GraphQL.Validation.Complexity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
 

@@ -61,13 +61,14 @@ namespace GraphQL.Validation.Complexity
             var prevCurrentEndNodeImpact = context.CurrentEndNodeImpact;
 
             var fieldImpact = _visitor?.GetFieldDef()?.GetMetadata<double?>("impact") ?? context.AvgImpact;
-            context.CurrentSubSelectionImpact ??= (fieldImpact == 0 ? context.AvgImpact : fieldImpact);
+            var zeroImpact = fieldImpact < 0.001;
+            context.CurrentSubSelectionImpact ??= (zeroImpact ? context.AvgImpact : fieldImpact);
 
             if (context.FragmentMapAlreadyBuilt)
             {
                 if (field.SelectionSet == null) // leaf field
                 {
-                    context.RecordFieldComplexity(field, fieldImpact == 0 ? 0 : context.CurrentEndNodeImpact);
+                    context.RecordFieldComplexity(field, zeroImpact ? 0 : context.CurrentEndNodeImpact);
                 }
                 else
                 {
@@ -78,15 +79,15 @@ namespace GraphQL.Validation.Complexity
                         ? context.CurrentSubSelectionImpact.Value
                         : impactFromArgs.Value / context.AvgImpact * context.CurrentSubSelectionImpact.Value;
 
-                    context.RecordFieldComplexity(field, fieldImpact == 0 ? 0 : context.CurrentEndNodeImpact);
-                    context.CurrentSubSelectionImpact *= impactFromArgs ?? (fieldImpact == 0 ? context.AvgImpact : fieldImpact);
+                    context.RecordFieldComplexity(field, zeroImpact ? 0 : context.CurrentEndNodeImpact);
+                    context.CurrentSubSelectionImpact *= impactFromArgs ?? (zeroImpact ? context.AvgImpact : fieldImpact);
                 }
             }
             else
             {
                 if (field.SelectionSet == null) // leaf field
                 {
-                    context.CurrentFragmentComplexity.Complexity += fieldImpact == 0 ? 0 : context.CurrentEndNodeImpact;
+                    context.CurrentFragmentComplexity.Complexity += zeroImpact ? 0 : context.CurrentEndNodeImpact;
                 }
                 else
                 {
@@ -97,8 +98,8 @@ namespace GraphQL.Validation.Complexity
                         ? context.CurrentSubSelectionImpact.Value
                         : impactFromArgs.Value / context.AvgImpact * context.CurrentSubSelectionImpact.Value;
 
-                    context.CurrentFragmentComplexity.Complexity += fieldImpact == 0 ? 0 : context.CurrentEndNodeImpact;
-                    context.CurrentSubSelectionImpact *= impactFromArgs ?? (fieldImpact == 0 ? context.AvgImpact : fieldImpact);
+                    context.CurrentFragmentComplexity.Complexity += zeroImpact ? 0 : context.CurrentEndNodeImpact;
+                    context.CurrentSubSelectionImpact *= impactFromArgs ?? (zeroImpact ? context.AvgImpact : fieldImpact);
                 }
             }
 
