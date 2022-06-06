@@ -60,7 +60,7 @@ namespace GraphQL.Validation.Complexity
             var prevCurrentSubSelectionImpact = context.CurrentSubSelectionImpact;
             var prevCurrentEndNodeImpact = context.CurrentEndNodeImpact;
 
-            var fieldImpact = _visitor?.GetFieldDef()?.GetMetadata<double?>("impact") ?? context.AvgImpact;
+            var fieldImpact = _visitor?.GetFieldDef()?.GetImpact() ?? context.AvgImpact;
             var zeroImpact = fieldImpact < 0.001;
             context.CurrentSubSelectionImpact ??= (zeroImpact ? context.AvgImpact : fieldImpact);
 

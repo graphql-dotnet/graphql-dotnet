@@ -93,7 +93,7 @@ public class ComplexityMetaDataFixture : IDisposable
         public ComplexityQuery()
         {
             Field<Hero>("hero", resolve: _ => 0)
-                .WithMetadata("impact", 2d);
+                .WithImpact(2);
         }
     }
 
@@ -102,12 +102,12 @@ public class ComplexityMetaDataFixture : IDisposable
         public Hero()
         {
             Field<IntGraphType>("id", resolve: context => context.Source)
-                .WithMetadata("impact", 0d);
+                .WithImpact(0);
 
             Field<StringGraphType>("name", resolve: context => $"Tom_{context.Source}");
 
             Field<ListGraphType<Hero>>("friends", resolve: context => new List<int> { 0, 1, 2 }.Where(x => x != context.Source).ToList())
-                .WithMetadata("impact", 3d);
+                .WithImpact(3);
         }
     }
 
