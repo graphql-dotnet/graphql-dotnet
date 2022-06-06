@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using GraphQL.MicrosoftDI;
-using GraphQL.StarWars;
 using GraphQL.Validation.Complexity;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -17,9 +16,9 @@ public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
     }
 
     [Fact]
-    public void MetaData_ShouldBe_Used()
+    public async Task MetaData_ShouldBe_Used()
     {
-        var result = _fixture.Analyze(@"
+        var result = await _fixture.AnalyzeAsync(@"
 query {
     hero { #2
         id #0
@@ -36,15 +35,16 @@ query {
         }
     }
 }
-");
+").ConfigureAwait(false);
+
         result.Complexity.ShouldBe(60);
         result.TotalQueryDepth.ShouldBe(4);
     }
 
     [Fact]
-    public void MetaData_With_Fragments_ShouldBe_Used()
+    public async Task MetaData_With_Fragments_ShouldBe_Used()
     {
-        var result = _fixture.Analyze(@"
+        var result = await _fixture.AnalyzeAsync(@"
 query {
     hero { #2
         id #0
@@ -71,7 +71,8 @@ fragment friendsIdName on Hero {
         name #3
     }
 }
-");
+").ConfigureAwait(false);
+
         result.Complexity.ShouldBe(136);
         result.TotalQueryDepth.ShouldBe(5);
     }
@@ -87,21 +88,25 @@ public class ComplexityMetaDataFixture : IDisposable
         }
     }
 
-    public class ComplexityQuery : ObjectGraphType<object>
+    public class ComplexityQuery : ObjectGraphType
     {
         public ComplexityQuery()
         {
-            Field<Hero>("hero").WithMetadata("complexity", 2d);
+            Field<Hero>("hero", resolve: _ => 0).WithMetadata("complexity", 2d);
         }
     }
 
-    public class Hero : ObjectGraphType<object>
+    public class Hero : ObjectGraphType<int>
     {
         public Hero()
         {
-            Field<IdGraphType>("id").WithMetadata("complexity", 0d);
-            Field<StringGraphType>("name");
-            Field<ListGraphType<Hero>>("friends").WithMetadata("complexity", 3d);
+            Field<IntGraphType>("id", resolve: context => context.Source)
+                .WithMetadata("complexity", 0d);
+
+            Field<StringGraphType>("name", resolve: context => $"Tom_{context.Source}");
+
+            Field<ListGraphType<Hero>>("friends", resolve: context => new List<int> { 0, 1, 2 }.Where(x => x != context.Source).ToList())
+                .WithMetadata("complexity", 3d);
         }
     }
 
@@ -110,13 +115,13 @@ public class ComplexityMetaDataFixture : IDisposable
     private readonly IDocumentBuilder _documentBuilder;
     private readonly ComplexityConfiguration _config;
     private readonly ISchema _schema;
+    private readonly IDocumentExecuter _executer;
 
     public ComplexityMetaDataFixture()
     {
         _provider = new ServiceCollection()
-            .AddSingleton<StarWarsData>()
             .AddGraphQL(builder => builder
-                .AddSchema<ComplexitySchema>().AddGraphTypes()
+                .AddSchema<ComplexitySchema>()
                 .AddComplexityAnalyzer()
             ).BuildServiceProvider();
 
@@ -124,9 +129,20 @@ public class ComplexityMetaDataFixture : IDisposable
         _config = new();
         _schema = _provider.GetRequiredService<ISchema>();
         _analyzer = (ComplexityAnalyzer)_provider.GetRequiredService<IComplexityAnalyzer>();
+        _executer = _provider.GetRequiredService<IDocumentExecuter<ComplexitySchema>>();
     }
 
-    public ComplexityResult Analyze(string query) => _analyzer.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
+    public async Task<ComplexityResult> AnalyzeAsync(string query)
+    {
+        var result = await _executer.ExecuteAsync(o =>
+        {
+            o.Query = query;
+            o.RequestServices = _provider;
+        }).ConfigureAwait(false);
+        result.Errors.ShouldBeNull();
+
+        return _analyzer.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
+    }
 
     public void Dispose() => _provider.Dispose();
 }
