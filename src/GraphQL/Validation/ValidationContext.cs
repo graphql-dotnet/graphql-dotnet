@@ -213,7 +213,7 @@ namespace GraphQL.Validation
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
                     var parsedValue = ParseValueObject(inputObjectGraphType, variableDef, variableName, value, visitor);
-                    visitor?.VisitObject(this, variableDef, variableName, inputObjectGraphType, value, parsedValue);
+                    visitor?.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue);
                     return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
@@ -226,13 +226,13 @@ namespace GraphQL.Validation
                 else if (type is ListGraphType listGraphType)
                 {
                     var parsedValue = ParseValueList(listGraphType, variableDef, variableName, value, visitor);
-                    visitor?.VisitList(this, variableDef, variableName, listGraphType, value, parsedValue);
+                    visitor?.VisitListAsync(this, variableDef, variableName, listGraphType, value, parsedValue);
                     return parsedValue;
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
                     var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
-                    visitor?.VisitScalar(this, variableDef, variableName, scalarGraphType, value, parsedValue);
+                    visitor?.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue);
                     return parsedValue;
                 }
                 else
@@ -327,7 +327,7 @@ namespace GraphQL.Validation
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
                         object? parsedFieldValue = ParseValue(field.ResolvedType!, variableDef, childFieldVariableName, fieldValue, visitor);
-                        visitor?.VisitField(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
+                        visitor?.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
                         newDictionary[field.Name] = parsedFieldValue;
                     }
                     else if (field.DefaultValue != null)
