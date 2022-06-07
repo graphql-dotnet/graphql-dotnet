@@ -2815,8 +2815,8 @@ namespace GraphQL.Validation
     }
     public interface INodeVisitor
     {
-        void Enter(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
-        void Leave(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
+        System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
+        System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
     }
     public interface IValidationResult
     {
@@ -2867,7 +2867,7 @@ namespace GraphQL.Validation
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
-        public void Enter(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQLParser.AST.ASTNode? GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument? GetArgument() { }
         public GraphQL.Types.Directive? GetDirective() { }
@@ -2875,7 +2875,7 @@ namespace GraphQL.Validation
         public GraphQL.Types.IGraphType? GetInputType(int index = 0) { }
         public GraphQL.Types.IGraphType? GetLastType(int index = 0) { }
         public GraphQL.Types.IGraphType? GetParentType(int index = 0) { }
-        public void Leave(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {

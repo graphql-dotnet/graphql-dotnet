@@ -83,11 +83,11 @@ namespace GraphQL.Validation
                 if (node == null)
                     return;
 
-                context.Info.Enter(node, context.ValidationContext);
+                await context.Info.EnterAsync(node, context.ValidationContext).ConfigureAwait(false);
 
                 await base.VisitAsync(node, context).ConfigureAwait(false);
 
-                context.Info.Leave(node, context.ValidationContext);
+                await context.Info.LeaveAsync(node, context.ValidationContext).ConfigureAwait(false);
             }
 
             protected override ValueTask VisitVariableAsync(GraphQLVariable variable, GetVariablesVisitorContext context)

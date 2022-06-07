@@ -26,11 +26,13 @@ namespace GraphQL.Validation.Complexity
         {
             if (node != null)
             {
-                _visitor?.Enter(node, null!);
+                if (_visitor != null)
+                    await _visitor.EnterAsync(node, null!).ConfigureAwait(false);
 
                 await base.VisitAsync(node, context).ConfigureAwait(false);
 
-                _visitor?.Leave(node, null!);
+                if (_visitor != null)
+                    await _visitor.LeaveAsync(node, null!).ConfigureAwait(false);
             }
         }
 
