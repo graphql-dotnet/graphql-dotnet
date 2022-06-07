@@ -2961,8 +2961,8 @@ namespace GraphQL.Validation.Complexity
 {
     public static class ComplexityAnalayzerMetadataExtensions
     {
-        public static double? GetImpact(this GraphQL.Types.IProvideMetadata? provider) { }
-        public static TMetadataProvider WithImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
+        public static double? GetComplexityImpact(this GraphQL.Types.IProvideMetadata provider) { }
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
     public class ComplexityAnalyzer : GraphQL.Validation.Complexity.IComplexityAnalyzer

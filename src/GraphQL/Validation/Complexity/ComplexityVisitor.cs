@@ -24,20 +24,13 @@ namespace GraphQL.Validation.Complexity
 
         public override async ValueTask VisitAsync(ASTNode? node, AnalysisContext context)
         {
-            if (_visitor != null)
+            if (node != null)
             {
-                if (node != null)
-                {
-                    _visitor.Enter(node, null!);
+                _visitor?.Enter(node, null!);
 
-                    await base.VisitAsync(node, context).ConfigureAwait(false);
-
-                    _visitor.Leave(node, null!);
-                }
-            }
-            else
-            {
                 await base.VisitAsync(node, context).ConfigureAwait(false);
+
+                _visitor?.Leave(node, null!);
             }
         }
 
@@ -60,8 +53,8 @@ namespace GraphQL.Validation.Complexity
             var prevCurrentSubSelectionImpact = context.CurrentSubSelectionImpact;
             var prevCurrentEndNodeImpact = context.CurrentEndNodeImpact;
 
-            var fieldImpact = _visitor?.GetFieldDef()?.GetImpact() ?? context.AvgImpact;
-            var zeroImpact = fieldImpact < 0.001;
+            var fieldImpact = _visitor?.GetFieldDef()?.GetComplexityImpact() ?? context.AvgImpact;
+            var zeroImpact = fieldImpact == 0;
             context.CurrentSubSelectionImpact ??= (zeroImpact ? context.AvgImpact : fieldImpact);
 
             if (context.FragmentMapAlreadyBuilt)
