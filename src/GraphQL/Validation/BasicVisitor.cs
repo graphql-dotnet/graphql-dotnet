@@ -43,6 +43,15 @@ namespace GraphQL.Validation
             }
         }
 
+        /// <summary>
+        /// Executes <see cref="INodeVisitor.CompleteAsync(ValidationContext)"/> for each <see cref="INodeVisitor"/>.
+        /// </summary>
+        public async ValueTask CompleteAsync(State context)
+        {
+            for (int i = 0; i < _visitors.Count; ++i)
+                await _visitors[i].CompleteAsync(context.Context).ConfigureAwait(false);
+        }
+
         /// <inheritdoc cref="IASTVisitorContext"/>
         public readonly struct State : IASTVisitorContext
         {

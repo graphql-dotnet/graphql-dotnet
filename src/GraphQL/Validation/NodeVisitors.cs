@@ -29,5 +29,11 @@ namespace GraphQL.Validation
             foreach (var n in _nodeVisitors)
                 await n.LeaveAsync(node, context).ConfigureAwait(false);
         }
+
+        async ValueTask INodeVisitor.CompleteAsync(ValidationContext context)
+        {
+            foreach (var n in _nodeVisitors)
+                await n.CompleteAsync(context).ConfigureAwait(false);
+        }
     }
 }

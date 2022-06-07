@@ -238,6 +238,10 @@ namespace GraphQL.Validation
             return default;
         }
 
+        /// <inheritdoc/>
+        public ValueTask CompleteAsync(ValidationContext context)
+            => default;
+
         private static FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)
         {
             var name = field.Name;

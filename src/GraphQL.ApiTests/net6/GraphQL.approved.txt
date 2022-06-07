@@ -2803,6 +2803,7 @@ namespace GraphQL.Validation
     {
         public BasicVisitor(params GraphQL.Validation.INodeVisitor[] visitors) { }
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
+        public System.Threading.Tasks.ValueTask CompleteAsync(GraphQL.Validation.BasicVisitor.State context) { }
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Validation.BasicVisitor.State context) { }
         public readonly struct State : GraphQLParser.Visitors.IASTVisitorContext
         {
@@ -2829,6 +2830,7 @@ namespace GraphQL.Validation
     }
     public interface INodeVisitor
     {
+        System.Threading.Tasks.ValueTask CompleteAsync(GraphQL.Validation.ValidationContext context);
         System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
         System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context);
     }
@@ -2881,6 +2883,7 @@ namespace GraphQL.Validation
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
+        public System.Threading.Tasks.ValueTask CompleteAsync(GraphQL.Validation.ValidationContext context) { }
         public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQLParser.AST.ASTNode? GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument? GetArgument() { }

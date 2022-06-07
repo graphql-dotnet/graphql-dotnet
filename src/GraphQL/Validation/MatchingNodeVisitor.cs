@@ -43,6 +43,9 @@ namespace GraphQL.Validation
             }
             return default;
         }
+
+        ValueTask INodeVisitor.CompleteAsync(GraphQL.Validation.ValidationContext context)
+            => default;
     }
 
     /// <summary>
@@ -89,5 +92,8 @@ namespace GraphQL.Validation
             }
             return default;
         }
+
+        ValueTask INodeVisitor.CompleteAsync(GraphQL.Validation.ValidationContext context)
+            => default;
     }
 }
