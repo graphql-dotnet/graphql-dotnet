@@ -9,9 +9,11 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 Especially noteworthy when a data loader is configured with caching enabled and a singleton lifetime,
 memory usage is reduced by freeing unnecessary references after obtaining the results.
 
-### 2. Async support for validation rules
+### 2. Async support for validation rules, and new `CompleteAsync` method
 
 Particularly useful for authentication checks, now validation rules are asynchronous.
+The `CompleteAsync` method executes when all nodes have been walked, easing implementations
+which need to execute code after all operations and fragments have been walked.
 
 ## Breaking Changes
 
@@ -20,7 +22,7 @@ Particularly useful for authentication checks, now validation rules are asynchro
 This property was not used internally and should not be necessary by user code or custom implementations.
 Removal was necessary as the value is released after the result is set.
 
-### 2. `INodeVisitor` and `IVariableVisitor` members' signatures are asynchronous and end in `Async`.
+### 2. `INodeVisitor` and `IVariableVisitor` members' signatures are asynchronous and end in `Async`; `INodeVisitor.CompleteAsync` was added.
 
 Note that `MatchingNodeVisitor` has not changed, so many validation rules will not require
 any source code changes.
