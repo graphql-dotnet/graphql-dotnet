@@ -212,8 +212,9 @@ namespace GraphQL.Validation
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    var parsedValue = ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor);
-                    visitor?.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue);
+                    var parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    if (visitor != null)
+                        await visitor.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
@@ -221,18 +222,20 @@ namespace GraphQL.Validation
                     if (value == null)
                         throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.");
 
-                    return ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor);
+                    return await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
                     var parsedValue = await ParseValueListAsync(listGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
-                    visitor?.VisitListAsync(this, variableDef, variableName, listGraphType, value, parsedValue);
+                    if (visitor != null)
+                        await visitor.VisitListAsync(this, variableDef, variableName, listGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
                     var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
-                    visitor?.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue);
+                    if (visitor != null)
+                        await visitor.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else
