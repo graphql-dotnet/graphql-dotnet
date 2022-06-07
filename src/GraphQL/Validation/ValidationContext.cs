@@ -330,7 +330,8 @@ namespace GraphQL.Validation
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
                         object? parsedFieldValue = await ParseValueAsync(field.ResolvedType!, variableDef, childFieldVariableName, fieldValue, visitor).ConfigureAwait(false);
-                        visitor?.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
+                        if (visitor != null)
+                            await visitor.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue).ConfigureAwait(false);
                         newDictionary[field.Name] = parsedFieldValue;
                     }
                     else if (field.DefaultValue != null)
