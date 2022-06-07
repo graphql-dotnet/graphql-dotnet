@@ -2959,11 +2959,17 @@ namespace GraphQL.Validation
 }
 namespace GraphQL.Validation.Complexity
 {
+    public static class ComplexityAnalayzerMetadataExtensions
+    {
+        public static double? GetComplexityImpact(this GraphQL.Types.IProvideMetadata provider) { }
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+    }
     public class ComplexityAnalyzer : GraphQL.Validation.Complexity.IComplexityAnalyzer
     {
         public ComplexityAnalyzer() { }
         protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
-        public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters) { }
+        public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Types.ISchema? schema = null) { }
     }
     public class ComplexityConfiguration
     {
@@ -2982,7 +2988,7 @@ namespace GraphQL.Validation.Complexity
     }
     public interface IComplexityAnalyzer
     {
-        void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration parameters);
+        void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration parameters, GraphQL.Types.ISchema? schema = null);
     }
 }
 namespace GraphQL.Validation.Errors
