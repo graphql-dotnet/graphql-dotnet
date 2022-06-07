@@ -207,7 +207,7 @@ namespace GraphQL
                 if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
                 {
                     using (metrics.Subject("document", "Analyzing complexity"))
-                        _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
+                        _complexityAnalyzer.Validate(document, options.ComplexityConfiguration, options.Schema);
                 }
 
                 if (saveInCache && validationResult.IsValid)
