@@ -895,6 +895,9 @@ Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationG
 In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
 and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
 
+See https://github.com/graphql-dotnet/graphql-dotnet/issues/3105 for code to revert to the
+old behavior.
+
 ### 27. `EnumerationGraphType.AddValue` changes
 
 `description` argument from `EnumerationGraphType.AddValue` method was marked as optional
