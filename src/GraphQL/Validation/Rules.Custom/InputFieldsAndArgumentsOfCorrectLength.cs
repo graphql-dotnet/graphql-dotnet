@@ -19,11 +19,11 @@ namespace GraphQL.Validation.Rules
         {
             public static readonly FieldVisitor Instance = new();
 
-            public override ValueTask VisitFieldAsync(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
+            public override void VisitField(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
             {
                 var lengthDirective = field.FindAppliedDirective("length");
                 if (lengthDirective == null)
-                    return default;
+                    return;
 
                 var min = lengthDirective.FindArgument("min")?.Value;
                 var max = lengthDirective.FindArgument("max")?.Value;
@@ -38,8 +38,6 @@ namespace GraphQL.Validation.Rules
                     if (min != null && str.Length < (int)min || max != null && str.Length > (int)max)
                         context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, variable, variableName, str.Length, (int?)min, (int?)max));
                 }
-
-                return default;
             }
         }
 

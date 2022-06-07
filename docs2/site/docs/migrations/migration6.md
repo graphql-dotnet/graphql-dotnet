@@ -20,7 +20,7 @@ Particularly useful for authentication checks, now validation rules are asynchro
 This property was not used internally and should not be necessary by user code or custom implementations.
 Removal was necessary as the value is released after the result is set.
 
-### 2. `INodeVisitor` and `IVariableVisitor` members' signatures are asynchronous and end in `Async`.
+### 2. `INodeVisitor` members' signatures are asynchronous and end in `Async`.
 
 Note that `MatchingNodeVisitor` has not changed, so many validation rules will not require
 any source code changes.
