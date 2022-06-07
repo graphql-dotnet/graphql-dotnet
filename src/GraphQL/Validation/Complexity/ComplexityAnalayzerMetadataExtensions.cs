@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Complexity;
 /// </summary>
 public static class ComplexityAnalayzerMetadataExtensions
 {
-    private const string COMPLEXITY_IMPACT = "complexityImpact";
+    private const string COMPLEXITY_IMPACT = "__COMPLEXITY_IMPACT__";
 
     /// <summary>
     /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
