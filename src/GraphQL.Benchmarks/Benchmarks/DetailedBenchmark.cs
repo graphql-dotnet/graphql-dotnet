@@ -223,7 +223,7 @@ public class DetailedBenchmark : IBenchmark
                 Schema = Schema,
                 Variables = Inputs ?? Inputs.Empty,
                 Operation = Operation,
-            }.GetVariableValues();
+            }.GetVariableValuesAsync().Result;
         }
 
         private static readonly DocumentValidator _documentValidator = new DocumentValidator();
