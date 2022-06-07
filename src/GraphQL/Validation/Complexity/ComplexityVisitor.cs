@@ -22,6 +22,11 @@ namespace GraphQL.Validation.Complexity
             _visitor = new TypeInfo(schema);
         }
 
+        public ComplexityVisitor(TypeInfo visitor)
+        {
+            _visitor = visitor;
+        }
+
         public override async ValueTask VisitAsync(ASTNode? node, AnalysisContext context)
         {
             if (node != null)
