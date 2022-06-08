@@ -19,11 +19,11 @@ namespace GraphQL.Validation.Complexity
             Analyzed(document, complexityParameters, complexityResult);
 
             if (complexityResult.Complexity > complexityParameters.MaxComplexity)
-                throw new InvalidOperationException(
+                throw new ComplexityError(
                     $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key}");
 
             if (complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
-                throw new InvalidOperationException(
+                throw new ComplexityError(
                     $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
         }
 
