@@ -2,7 +2,6 @@ using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 
 namespace GraphQL.Instrumentation;
 
@@ -21,11 +20,10 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
     public ApolloTracingDocumentExecuter(
         IDocumentBuilder documentBuilder,
         IDocumentValidator documentValidator,
-        IComplexityAnalyzer complexityAnalyzer,
         IDocumentCache documentCache,
         IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
         IExecutionStrategySelector executionStrategySelector)
-        : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
+        : base(documentBuilder, documentValidator, documentCache, configureExecutionOptions, executionStrategySelector)
     {
     }
 
@@ -35,12 +33,11 @@ public class ApolloTracingDocumentExecuter : DocumentExecuter
     public ApolloTracingDocumentExecuter(
         IDocumentBuilder documentBuilder,
         IDocumentValidator documentValidator,
-        IComplexityAnalyzer complexityAnalyzer,
         IDocumentCache documentCache,
         IExecutionStrategySelector executionStrategySelector,
         IEnumerable<IConfigureExecution> configureExecutions,
         IEnumerable<IConfigureExecutionOptions> configureExecutionOptions)
-        : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, executionStrategySelector, configureExecutions, configureExecutionOptions)
+        : base(documentBuilder, documentValidator, documentCache, executionStrategySelector, configureExecutions, configureExecutionOptions)
     {
     }
 

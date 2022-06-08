@@ -6,7 +6,7 @@ namespace GraphQL.Validation.Complexity;
 public class ComplexityValidationRule : IValidationRule
 {
     private readonly ComplexityConfiguration _complexityConfiguration;
-    private readonly IComplexityAnalyzer _complexityAnalyzer = new ComplexityAnalyzer();
+    private readonly ComplexityAnalyzer _complexityAnalyzer = new();
 
     /// <inheritdoc cref="ComplexityValidationRule"/>
     public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration)

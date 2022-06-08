@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Complexity
     /// <summary>
     /// The default complexity analyzer.
     /// </summary>
-    public class ComplexityAnalyzer : IComplexityAnalyzer
+    public class ComplexityAnalyzer
     {
         /// <inheritdoc/>
         public void Validate(GraphQLDocument document, ComplexityConfiguration complexityParameters, ISchema? schema = null)

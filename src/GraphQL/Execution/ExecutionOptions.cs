@@ -46,9 +46,6 @@ namespace GraphQL
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext { get; set; } = new Dictionary<string, object?>();
 
-        /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
-        public ComplexityConfiguration? ComplexityConfiguration { get; set; }
-
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
