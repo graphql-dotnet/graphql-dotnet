@@ -50,6 +50,11 @@ namespace GraphQL.Execution
             {
                 case OperationType.Query:
                     type = context.Schema.Query;
+                    // note that per the GraphQL specification, a query root type is required; but currently
+                    // the schema validation check is disabled to allow for test schemas
+                    // that only contain a mutation or subscription root type.
+                    if (type == null)
+                        throw new InvalidOperationError("Schema is not configured for queries").AddLocation(context.Operation, context.Document);
                     break;
 
                 case OperationType.Mutation:
