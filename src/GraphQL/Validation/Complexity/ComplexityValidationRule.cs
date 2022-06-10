@@ -6,12 +6,23 @@ namespace GraphQL.Validation.Complexity;
 public class ComplexityValidationRule : IValidationRule
 {
     private readonly ComplexityConfiguration _complexityConfiguration;
-    private readonly ComplexityAnalyzer _complexityAnalyzer = new();
+    private readonly IComplexityAnalyzer _complexityAnalyzer;
 
-    /// <inheritdoc cref="ComplexityValidationRule"/>
+    /// <summary>
+    /// Initializes an instance with the specified complexity configuration.
+    /// </summary>
     public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration)
+        : this(complexityConfiguration, new ComplexityAnalyzer())
+    {
+    }
+
+    /// <summary>
+    /// Initializes an instance with the specified complexity configuration and complexity analyzer.
+    /// </summary>
+    public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration, IComplexityAnalyzer complexityAnalyzer)
     {
         _complexityConfiguration = complexityConfiguration;
+        _complexityAnalyzer = complexityAnalyzer;
     }
 
     /// <inheritdoc/>
