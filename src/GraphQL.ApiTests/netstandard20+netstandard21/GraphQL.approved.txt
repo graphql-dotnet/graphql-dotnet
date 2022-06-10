@@ -258,6 +258,16 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
+            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentCache> documentCacheFactory)
