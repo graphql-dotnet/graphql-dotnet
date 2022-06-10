@@ -332,62 +332,97 @@ public class GraphQLBuilderExtensionTests
     #endregion
 
     #region - AddComplexityAnalyzer -
-    [Fact]
-    public void AddComplexityAnalyzer()
+    [Theory]
+    [InlineData(false, false, false, false, false)]
+    [InlineData(false, false, false, true, false)]
+    [InlineData(false, false, false, false, true)]
+    [InlineData(true, false, false, false, false)]
+    [InlineData(true, false, false, true, false)]
+    [InlineData(true, false, false, false, true)]
+    [InlineData(true, true, false, false, false)]
+    [InlineData(true, true, false, true, false)]
+    [InlineData(true, true, false, false, true)]
+    [InlineData(true, false, true, false, false)]
+    [InlineData(true, false, true, true, false)]
+    [InlineData(true, false, true, false, true)]
+    public void AddComplexityAnalyzer(bool typed, bool withFactory, bool withInstance, bool withAction, bool withAction2)
     {
-        var instance = new ComplexityValidationRule(new ComplexityConfiguration());
+        var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
         MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
         MockSetupRegister<IValidationRule, ComplexityValidationRule>();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(instance).Verifiable();
+        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-        MockSetupConfigureNull<ComplexityConfiguration>();
-        _builder.AddComplexityAnalyzer();
+        Func<IServiceProvider, IComplexityAnalyzer> factory = null;
+        MyComplexityAnalyzer instance = null;
+        if (typed)
+        {
+            if (withFactory)
+            {
+                factory = MockSetupRegister<IComplexityAnalyzer>();
+            }
+            else if (withInstance)
+            {
+                instance = new MyComplexityAnalyzer();
+                MockSetupRegister<IComplexityAnalyzer>(instance);
+            }
+            else
+            {
+                MockSetupRegister<IComplexityAnalyzer, MyComplexityAnalyzer>();
+            }
+        }
+        if (withAction)
+        {
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            if (typed)
+            {
+                if (withFactory)
+                    _builder.AddComplexityAnalyzer(factory, action);
+                else if (withInstance)
+                    _builder.AddComplexityAnalyzer(instance, action);
+                else
+                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
+            }
+            else
+            {
+                _builder.AddComplexityAnalyzer(action);
+            }
+        }
+        else
+        {
+            var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
+            if (!withAction2)
+                MockSetupConfigureNull<ComplexityConfiguration>();
+            if (typed)
+            {
+                if (withFactory)
+                    _builder.AddComplexityAnalyzer(factory, action);
+                else if (withInstance)
+                    _builder.AddComplexityAnalyzer(instance, action);
+                else
+                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
+            }
+            else
+            {
+                _builder.AddComplexityAnalyzer(action);
+            }
+        }
         var opts = getOpts();
         opts.ValidationRules.ShouldNotBeNull();
-        opts.ValidationRules.ShouldContain(instance);
+        opts.ValidationRules.ShouldContain(ruleInstance);
         opts.CachedDocumentValidationRules?.ShouldBeEmpty();
         mockServiceProvider.Verify();
         Verify();
     }
 
     [Fact]
-    public void AddComplexityAnalyzer_WithAction()
+    public void AddComplexityAnalyzer_Null()
     {
-        var instance = new ComplexityValidationRule(new ComplexityConfiguration());
-        MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
-        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(instance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-        var action = MockSetupConfigure1<ComplexityConfiguration>();
-        _builder.AddComplexityAnalyzer(action);
-        var opts = getOpts();
-        opts.ValidationRules.ShouldNotBeNull();
-        opts.ValidationRules.ShouldContain(instance);
-        opts.CachedDocumentValidationRules?.ShouldBeEmpty();
-        mockServiceProvider.Verify();
-        Verify();
+        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
     }
 
-    [Fact]
-    public void AddComplexityAnalyzer_WithAction2()
-    {
-        var instance = new ComplexityValidationRule(new ComplexityConfiguration());
-        MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
-        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(instance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-        var action = MockSetupConfigure2<ComplexityConfiguration>();
-        _builder.AddComplexityAnalyzer(action);
-        var opts = getOpts();
-        opts.ValidationRules.ShouldNotBeNull();
-        opts.ValidationRules.ShouldContain(instance);
-        opts.CachedDocumentValidationRules?.ShouldBeEmpty();
-        mockServiceProvider.Verify();
-        Verify();
-    }
+    private class MyComplexityAnalyzer : ComplexityAnalyzer { }
     #endregion
 
     #region - AddErrorInfoProvider -
