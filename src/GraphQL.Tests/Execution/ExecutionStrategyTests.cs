@@ -19,7 +19,7 @@ public class ExecutionStrategyTests
             Schema = schema,
         }).ConfigureAwait(false);
         result.Data.ShouldBeNull();
-        //todo: the document should fail validation and Executed should return false
+        //TODO: the document should fail validation and Executed should return false
         //see: https://github.com/graphql/graphql-spec/pull/955
         result.Executed.ShouldBeTrue();
         result.Errors.ShouldHaveSingleItem().Message.ShouldBe(expectedErrorMessage);
