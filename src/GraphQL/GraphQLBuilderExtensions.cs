@@ -433,6 +433,16 @@ namespace GraphQL
             builder.Services.Configure(action);
             return builder;
         }
+
+        /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
+        public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
+            where TAnalyzer : class, IComplexityAnalyzer
+        {
+            builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
+            return builder;
+        }
         #endregion
 
         #region - AddErrorInfoProvider
