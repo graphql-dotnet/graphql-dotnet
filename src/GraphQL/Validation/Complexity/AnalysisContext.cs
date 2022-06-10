@@ -3,7 +3,7 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity
 {
-    internal class AnalysisContext : IASTVisitorContext
+    internal sealed class AnalysisContext : IASTVisitorContext
     {
         public double AvgImpact { get; set; }
 

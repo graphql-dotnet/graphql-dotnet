@@ -26,7 +26,6 @@ public class DocumentExecuterTests
         var executer = new DocumentExecuter(
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
-            new ComplexityAnalyzer(),
             DefaultDocumentCache.Instance,
             new IConfigureExecutionOptions[] { },
             selector);

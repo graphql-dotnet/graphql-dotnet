@@ -22,7 +22,7 @@ public class ComplexityTestBase
         {
             options.Schema = CreateSchema();
             options.Query = query;
-            options.ComplexityConfiguration = complexityConfig;
+            options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
         }).ConfigureAwait(false);
 
     //ISSUE: manually created test instance with ServiceProvider

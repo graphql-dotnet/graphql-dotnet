@@ -129,7 +129,7 @@ public class ComplexityMetaDataFixture : IDisposable
         _documentBuilder = _provider.GetRequiredService<IDocumentBuilder>();
         _config = new();
         _schema = _provider.GetRequiredService<ISchema>();
-        _analyzer = (ComplexityAnalyzer)_provider.GetRequiredService<IComplexityAnalyzer>();
+        _analyzer = new();
         _executer = _provider.GetRequiredService<IDocumentExecuter<ComplexitySchema>>();
     }
 
