@@ -313,6 +313,22 @@
           ]
         },
         {
+          "name": "Query",
+          "appliedDirectives": [],
+          "fields": [
+            {
+              "name": "dummy",
+              "appliedDirectives": [],
+              "args": []
+            }
+          ]
+        },
+        {
+          "name": "Int",
+          "appliedDirectives": [],
+          "fields": null
+        },
+        {
           "name": "RootMutation",
           "appliedDirectives": [
             {
