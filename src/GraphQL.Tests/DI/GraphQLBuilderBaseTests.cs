@@ -4,7 +4,6 @@ using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using Moq;
 
 namespace GraphQL.Tests.DI;

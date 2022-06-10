@@ -1,7 +1,6 @@
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using GraphQLParser.AST;
 
 namespace GraphQL
