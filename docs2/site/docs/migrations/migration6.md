@@ -24,3 +24,26 @@ Removal was necessary as the value is released after the result is set.
 
 Note that `MatchingNodeVisitor` has not changed, so many validation rules will not require
 any source code changes.
+
+### 3. `ExecutionOptions.ComplexityConfiguration` has been removed
+
+Complexity analysis is now a validation rule and has been removed from execution options.
+There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` methods as shown below:
+
+```cs
+// GraphQL 5.x or 6.x
+builder.AddComplexityAnalyzer(complexityConfig => {
+    //set complexityConfig here
+});
+```
+
+However, when manually setting `options.ComplexityConfiguration`, you will need to instead add the
+`ComplexityValidationRule` validation rule to the validation rules.
+
+```cs
+// GraphQL 5.x
+options.ComplexityConfiguration = complexityConfig;
+
+// GraphQL 6.x
+options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
+```
