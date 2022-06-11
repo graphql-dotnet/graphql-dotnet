@@ -47,3 +47,61 @@ options.ComplexityConfiguration = complexityConfig;
 // GraphQL 6.x
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
 ```
+
+### 4. `IComplexityAnalyzer` has been removed from `DocumentExecuter` constructors
+
+When not using the complexity analyzer, or when using the default complexity analyzer, simply
+remove the argument from calls to the constructor and no additional changes are required.
+
+```cs
+/// GraphQL 5.x
+public MyCustomDocumentExecuter(
+    IDocumentBuilder documentBuilder,
+    IDocumentValidator documentValidator,
+    IComplexityAnalyzer complexityAnalyzer,
+    IDocumentCache documentCache,
+    IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
+    IExecutionStrategySelector executionStrategySelector)
+    : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
+{
+}
+
+/// GraphQL 6.x
+public MyCustomDocumentExecuter(
+    IDocumentBuilder documentBuilder,
+    IDocumentValidator documentValidator,
+    IDocumentCache documentCache,
+    IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
+    IExecutionStrategySelector executionStrategySelector)
+    : base(documentBuilder, documentValidator, documentCache, configureExecutionOptions, executionStrategySelector)
+{
+}
+```
+
+When using a custom complexity analyzer implementation added through the `IGraphQLBuilder.AddComplexityAnalyzer`
+methods, no change is required.
+
+```cs
+/// GraphQL 5.x or 6.x
+builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(complexityConfig => {
+    // set configuration here
+});
+```
+
+When using a custom complexity analyzer implementation configured through DI, and need to
+add the `ComplexityValidationRule` validation rule to the validation rules, pass the implementation
+from DI through to `ComplexityValidationRule`.
+
+```cs
+// GraphQL 5.x
+options.ComplexityConfiguration = complexityConfig;
+
+// GraphQL 6.x
+options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
+    new ComplexityValidationRule(
+        complexityConfig,
+        options.RequestServices.GetRequiredService<IComplexityAnalyzer>()
+    ));
+```
+
+Using the `IGraphQLBuilder` interface to configure GraphQL is the recommended approach.
