@@ -33,7 +33,7 @@ There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` method
 ```cs
 // GraphQL 5.x or 6.x
 builder.AddComplexityAnalyzer(complexityConfig => {
-    //set complexityConfig here
+    // set configuration here
 });
 ```
 
