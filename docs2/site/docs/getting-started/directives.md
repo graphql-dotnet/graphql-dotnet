@@ -40,7 +40,7 @@ In GraphQL language a directive may be defined as repeatable by including the `r
 Repeatable directives are often useful when the same directive should be used with different arguments
 at a single location, especially in cases where additional information needs to be provided to a type
 or schema extension via a directive. GraphQL.NET v4 supports repeatable directives. To make your directive
-repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`.
+repeatable in GraphQL.NET set `Directive.Repeatable` property to `true`.
 
 # Basic steps when adding a directive
 
@@ -50,10 +50,10 @@ repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`
 
 # Defining your custom directive
 
-To define your custom directive create a directive class inherited from `DirectiveGraphType`.
+To define your custom directive create a directive class inherited from `Directive`.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
@@ -97,7 +97,7 @@ will be checked.
 The following is an example of using the server-side `@length` directive.
 
 ```csharp
-public class LengthDirective : DirectiveGraphType
+public class LengthDirective : Directive
 {
     // The meaning of this property will be explained below in the 'Directives and introspection' paragraph. 
     public override bool? Introspectable => true;
@@ -180,7 +180,7 @@ provided by the applied directive. This class should implement `ISchemaNodeVisit
 Let's imagine an `@upper` directive.
 
 ```csharp
-public class UpperDirective : DirectiveGraphType
+public class UpperDirective : Directive
 {
     public UpperDirective()
         : base("upper", DirectiveLocation.FieldDefinition)
@@ -252,7 +252,7 @@ schema visitors. In this case, the directive is usually set to provide additiona
 means of introspection. For example, consider such server-side `@author` directive:
 
 ```csharp
-public class AuthorDirective : DirectiveGraphType
+public class AuthorDirective : Directive
 {
     public AuthorDirective()
         : base("author", DirectiveLocation.FieldDefinition)
@@ -472,7 +472,7 @@ To make your defined directive and all its applications to the schema elements a
 introspection, override the `Introspectable` property of your directive.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)

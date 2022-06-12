@@ -152,10 +152,13 @@ public class SchemaIntrospectionTests
     [ClassData(typeof(GraphQLSerializersTestData))]
     public async Task validate_non_null_schema(IGraphQLTextSerializer serializer)
     {
+        var query = new ObjectGraphType { Name = "Query" };
+        query.Field<IntGraphType>("dummy");
+        var schema = new TestSchema() { Query = query };
         var documentExecuter = new DocumentExecuter();
         var executionResult = await documentExecuter.ExecuteAsync(_ =>
         {
-            _.Schema = new TestSchema();
+            _.Schema = schema;
             _.Query = InputObjectBugQuery;
         }).ConfigureAwait(false);
 
