@@ -4,7 +4,6 @@ using GraphQL.Execution;
 using GraphQL.Tests.DI;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
 
 namespace GraphQL.Tests;
@@ -21,7 +20,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 {
     public QueryTestBase()
     {
-        Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+        Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
     }
 
 #pragma warning disable xUnit1013 // public method should be marked as test

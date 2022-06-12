@@ -1,7 +1,6 @@
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using GraphQLParser;
 
 namespace GraphQL.Tests.Bugs;
@@ -59,9 +58,9 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
     public void DocumentExecuter_cannot_have_null_constructor_parameters()
     {
         _ = new DocumentExecuter();
-        _ = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null, new DocumentValidator(), new ComplexityAnalyzer()));
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null, new ComplexityAnalyzer()));
+        _ = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator());
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null, new DocumentValidator()));
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null));
         Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null));
     }
 }

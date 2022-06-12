@@ -53,7 +53,88 @@ Removal was necessary as the value is released after the result is set.
 Note that `MatchingNodeVisitor` has not changed, so many validation rules will not require
 any source code changes.
 
-### 3. Obsolete members have been removed
+### 3. `ExecutionOptions.ComplexityConfiguration` has been removed
+
+Complexity analysis is now a validation rule and has been removed from execution options.
+There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` methods as shown below:
+
+```csharp
+// GraphQL 5.x or 6.x
+builder.AddComplexityAnalyzer(complexityConfig => {
+    // set configuration here
+});
+```
+
+However, when manually setting `options.ComplexityConfiguration`, you will need to instead add the
+`ComplexityValidationRule` validation rule to the validation rules.
+
+```csharp
+// GraphQL 5.x
+options.ComplexityConfiguration = complexityConfig;
+
+// GraphQL 6.x
+options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
+```
+
+### 4. `IComplexityAnalyzer` has been removed from `DocumentExecuter` constructors
+
+When not using the complexity analyzer, or when using the default complexity analyzer, simply
+remove the argument from calls to the constructor and no additional changes are required.
+
+```csharp
+/// GraphQL 5.x
+public MyCustomDocumentExecuter(
+    IDocumentBuilder documentBuilder,
+    IDocumentValidator documentValidator,
+    IComplexityAnalyzer complexityAnalyzer,
+    IDocumentCache documentCache,
+    IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
+    IExecutionStrategySelector executionStrategySelector)
+    : base(documentBuilder, documentValidator, complexityAnalyzer, documentCache, configureExecutionOptions, executionStrategySelector)
+{
+}
+
+/// GraphQL 6.x
+public MyCustomDocumentExecuter(
+    IDocumentBuilder documentBuilder,
+    IDocumentValidator documentValidator,
+    IDocumentCache documentCache,
+    IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
+    IExecutionStrategySelector executionStrategySelector)
+    : base(documentBuilder, documentValidator, documentCache, configureExecutionOptions, executionStrategySelector)
+{
+}
+```
+
+When using a custom complexity analyzer implementation added through the `IGraphQLBuilder.AddComplexityAnalyzer`
+methods, no change is required.
+
+```csharp
+/// GraphQL 5.x or 6.x
+builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(complexityConfig => {
+    // set configuration here
+});
+```
+
+When using a custom complexity analyzer implementation configured through DI, and need to
+add the `ComplexityValidationRule` validation rule to the validation rules, pass the implementation
+from DI through to `ComplexityValidationRule`.
+
+```csharp
+// GraphQL 5.x
+options.ComplexityConfiguration = complexityConfig;
+
+// GraphQL 6.x
+options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
+    new ComplexityValidationRule(
+        complexityConfig,
+        options.RequestServices.GetRequiredService<IComplexityAnalyzer>()
+    ));
+```
+
+Using the `IGraphQLBuilder` interface to configure the GraphQL.NET execution engine is the recommended approach.
+
+### 5. Obsolete members have been removed
 
 | Member | Replaced by |
 |--------|-------------|
@@ -72,7 +153,7 @@ Please consider the operation of the new `AddApolloTracing` method (see 'New Fea
 when replacing `AddMetrics` with `AddApolloTracing`. Remember that `AddApolloTracing` includes
 functionality previously within `ApolloTracingDocumentExecuter` and/or `EnrichWithApolloTracing`.
 
-### 3. `GlobalSwitches.MapAllEnumerableTypes` has been removed; only specific types are detected as lists.
+### 6. `GlobalSwitches.MapAllEnumerableTypes` has been removed; only specific types are detected as lists.
 
 When auto detecting graph types from CLR types (usually within `AutoRegisteringObjectGraphType` or the
 expression syntax of `Field(x => x.Member)`), previously any type except `string` that implemented

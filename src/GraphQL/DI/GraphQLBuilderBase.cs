@@ -3,7 +3,6 @@ using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 
 namespace GraphQL.DI
 {
@@ -46,7 +45,6 @@ namespace GraphQL.DI
             Services.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
-            Services.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
             Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);

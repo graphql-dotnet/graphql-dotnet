@@ -64,7 +64,6 @@ The `AddGraphQL()` method will register default implementations of the following
 * `IDocumentExecuter`
 * `IDocumentBuilder`
 * `IDocumentValidator`
-* `IComplexityAnalyzer` - which is not used unless configured within `ExecutionOptions`
 * `IErrorInfoProvider`
 * `IDocumentCache` - an implemenation which does not cache documents
 * `IExecutionStrategySelector` - which does not support subscriptions by default

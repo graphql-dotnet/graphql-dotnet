@@ -5,7 +5,6 @@ using GraphQL.MicrosoftDI;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Execution;
@@ -26,7 +25,6 @@ public class DocumentExecuterTests
         var executer = new DocumentExecuter(
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
-            new ComplexityAnalyzer(),
             DefaultDocumentCache.Instance,
             selector,
             new IConfigureExecution[] { });
