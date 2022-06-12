@@ -13,13 +13,13 @@ memory usage is reduced by freeing unnecessary references after obtaining the re
 
 Particularly useful for authentication checks, now validation rules are asynchronous.
 
-### 3. Add `AddApolloTracing` builder method (added in 5.2.0)
+### 3. Add `AddApolloTracing` builder method (added in 5.3.0)
 
 This method adds the `InstrumentFieldsMiddleware` to the schema, and conditionally enables metrics
 during execution via `ExecutionOptions.EnableMetrics`. It also appends the Apollo Tracing results
 to the execution result if metrics is enabled during execution.
 
-### 4. Add `ConfigureExecution` builder method (added in 5.2.0)
+### 4. Add `ConfigureExecution` builder method (added in 5.3.0)
 
 `ConfigureExecution` allows a delegate to both alter the execution options and the execution result.
 For example, to add total execution time to the results, you could write:
