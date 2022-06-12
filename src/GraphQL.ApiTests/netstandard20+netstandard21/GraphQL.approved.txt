@@ -17,13 +17,6 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
-        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
-            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
-        [System.Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
         public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
@@ -40,8 +33,6 @@ namespace GraphQL
         public static System.Collections.Generic.List<string>? GetRoles(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool IsAnonymousAllowed(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool IsAuthorizationRequired(this GraphQL.Types.IProvideMetadata provider) { }
-        [System.Obsolete("Please use IsAuthorizationRequired. Will be removed in v6.")]
-        public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
     }
     public class AuthorizeAttribute : GraphQL.GraphQLAttribute
     {
@@ -106,13 +97,7 @@ namespace GraphQL
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache) { }
-        [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
-            "moved in v6")]
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations) { }
-        [System.Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be re" +
-            "moved in v6")]
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configurations, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> optionsConfigurations) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
@@ -225,7 +210,6 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
-        public static bool MapAllEnumerableTypes { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
@@ -242,11 +226,6 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
         public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
-    }
-    [System.Obsolete("Please use AuthorizeAttribute instead. This class will be removed in v6.")]
-    public class GraphQLAuthorizeAttribute : GraphQL.AuthorizeAttribute
-    {
-        public GraphQLAuthorizeAttribute() { }
     }
     public static class GraphQLBuilderExtensions
     {
@@ -316,15 +295,6 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
-            "tion result. This method will be removed in v6.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, bool enable = true) { }
-        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
-            "tion result. This method will be removed in v6.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate) { }
-        [System.Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execu" +
-            "tion result. This method will be removed in v6.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMetrics(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enablePredicate, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate) { }
         public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
@@ -945,10 +915,6 @@ namespace GraphQL.DI
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next);
     }
-    public interface IConfigureExecutionOptions
-    {
-        System.Threading.Tasks.Task ConfigureAsync(GraphQL.ExecutionOptions executionOptions);
-    }
     public interface IConfigureSchema
     {
         void Configure(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider);
@@ -1357,15 +1323,6 @@ namespace GraphQL.Instrumentation
             public System.Collections.Generic.List<object>? Path { get; set; }
             public string? ReturnType { get; set; }
         }
-    }
-    [System.Obsolete("Use AddApolloTracing instead of AddMetrics, which also appends Apollo Tracing dat" +
-        "a to the execution result. This class will be removed in v6.")]
-    public class ApolloTracingDocumentExecuter : GraphQL.DocumentExecuter
-    {
-        [System.Obsolete("Use constructor that accepts IConfigureExecution also; will be removed in v6")]
-        public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector) { }
-        public ApolloTracingDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Caching.IDocumentCache documentCache, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configureExecutions, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecutionOptions> configureExecutionOptions) { }
-        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
     }
     public static class ApolloTracingExtensions
     {

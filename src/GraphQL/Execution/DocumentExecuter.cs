@@ -52,48 +52,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/>, <see cref="IDocumentCache"/> and a set of
-        /// <see cref="IConfigureExecutionOptions"/> instances.
-        /// </summary>
-        [Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be removed in v6")]
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations)
-            : this(documentBuilder, documentValidator, documentCache, new DefaultExecutionStrategySelector(), new IConfigureExecution[] { new ConfigureExecutionOptionsMapper(configurations) })
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
         /// <see cref="IDocumentValidator"/>, <see cref="IDocumentCache"/> and a set of
-        /// <see cref="IConfigureExecutionOptions"/> instances.
+        /// <see cref="IConfigureExecution"/> instances.
         /// </summary>
-        [Obsolete("Use the constructor that accepts IConfigureExecution; this constructor will be removed in v6")]
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IEnumerable<IConfigureExecutionOptions> configurations, IExecutionStrategySelector executionStrategySelector)
-            : this(documentBuilder, documentValidator, documentCache, executionStrategySelector, new IConfigureExecution[] { new ConfigureExecutionOptionsMapper(configurations) })
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/>, <see cref="IDocumentCache"/> and a set of
-        /// <see cref="IConfigureExecutionOptions"/> instances.
-        /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations, IEnumerable<IConfigureExecutionOptions> optionsConfigurations)
-#pragma warning disable CS0618 // Type or member is obsolete
-            : this(documentBuilder, documentValidator, documentCache, executionStrategySelector, configurations.Append(new ConfigureExecutionOptionsMapper(optionsConfigurations)))
-#pragma warning restore CS0618 // Type or member is obsolete
-        {
-            // TODO: remove in v6
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/>, <see cref="IDocumentCache"/> and a set of
-        /// <see cref="IConfigureExecutionOptions"/> instances.
-        /// </summary>
-        private DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
-        {
-            // TODO: in v6 make this public
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));

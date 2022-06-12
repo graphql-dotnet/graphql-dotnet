@@ -82,11 +82,6 @@ namespace GraphQL
         public static bool IsAuthorizationRequired(this IProvideMetadata provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
 
-        /// <inheritdoc cref="IsAuthorizationRequired(IProvideMetadata)"/>
-        [Obsolete("Please use IsAuthorizationRequired. Will be removed in v6.")]
-        public static bool RequiresAuthorization(this IProvideMetadata provider)
-            => provider.IsAuthorizationRequired();
-
         /// <summary>
         /// Adds metadata to indicate that the resource requires that the user has successfully authenticated.
         /// </summary>
@@ -129,12 +124,6 @@ namespace GraphQL
             provider.Authorize();
             return provider;
         }
-
-        /// <inheritdoc cref="AuthorizeWithPolicy{TMetadataProvider}(TMetadataProvider, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
-            where TMetadataProvider : IProvideMetadata
-            => AuthorizeWithPolicy(provider, policy);
 
         /// <summary>
         /// Adds authorization role(s) to the specified metadata provider. Roles should
@@ -218,12 +207,6 @@ namespace GraphQL
             return builder;
         }
 
-        /// <inheritdoc cref="AuthorizeWith{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder, string policy)
-            => AuthorizeWithPolicy(builder, policy);
-
         /// <summary>
         /// Adds authorization role(s) to the specified field builder. Roles should
         /// be comma-separated and role names will be trimmed. If the underlying field already
@@ -267,12 +250,6 @@ namespace GraphQL
             builder.FieldType.AuthorizeWithPolicy(policy);
             return builder;
         }
-
-        /// <inheritdoc cref="AuthorizeWithPolicy{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
-        [Obsolete("Please use AuthorizeWithPolicy instead. Will be removed in v6.")]
-        public static ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(
-            this ConnectionBuilder<TSourceType> builder, string policy)
-            => AuthorizeWithPolicy(builder, policy);
 
         /// <summary>
         /// Adds authorization role(s) to the specified connection builder. Roles should
