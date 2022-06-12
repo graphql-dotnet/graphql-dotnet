@@ -24,7 +24,7 @@ to the execution result if metrics is enabled during execution.
 `ConfigureExecution` allows a delegate to both alter the execution options and the execution result.
 For example, to add total execution time to the results, you could write:
 
-```cs
+```csharp
 services.AddGraphQL(b => b
     // other builder methods here
     .ConfigureExecution(async (options, next) => {
@@ -158,7 +158,7 @@ functionality previously within `ApolloTracingDocumentExecuter` and/or `EnrichWi
 When auto detecting graph types from CLR types (usually within `AutoRegisteringObjectGraphType` or the
 expression syntax of `Field(x => x.Member)`), previously any type except `string` that implemented
 `IEnumerable` was considered a list type. This would includes types such as dictionary types, making
-it impossible to register a CLR type that dervies from a dictionary for automatic mapping.
+it impossible to register a CLR type that derives from a dictionary for automatic mapping.
 
 Now only the following types or generic types are considered list types:
 
