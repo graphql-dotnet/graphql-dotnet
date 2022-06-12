@@ -1,4 +1,7 @@
-namespace GraphQL.Validation.Complexity;
+using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Errors.Custom;
+
+namespace GraphQL.Validation.Rules.Custom;
 
 /// <summary>
 /// Analyzes a document to determine if its complexity exceeds a threshold.

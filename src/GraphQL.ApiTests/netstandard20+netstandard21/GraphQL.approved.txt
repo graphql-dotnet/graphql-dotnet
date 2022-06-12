@@ -2978,22 +2978,12 @@ namespace GraphQL.Validation.Complexity
         public int? MaxDepth { get; set; }
         public int MaxRecursionCount { get; set; }
     }
-    public class ComplexityError : GraphQL.Validation.ValidationError
-    {
-        public ComplexityError(string message) { }
-    }
     public class ComplexityResult
     {
         public ComplexityResult() { }
         public double Complexity { get; set; }
         public System.Collections.Generic.Dictionary<GraphQLParser.AST.ASTNode, double> ComplexityMap { get; }
         public int TotalQueryDepth { get; set; }
-    }
-    public class ComplexityValidationRule : GraphQL.Validation.IValidationRule
-    {
-        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
-        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public interface IComplexityAnalyzer
     {
@@ -3147,6 +3137,13 @@ namespace GraphQL.Validation.Errors
     public class VariablesInAllowedPositionError : GraphQL.Validation.ValidationError
     {
         public VariablesInAllowedPositionError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLVariableDefinition varDef, GraphQL.Types.IGraphType varType, GraphQL.Validation.VariableUsage usage) { }
+    }
+}
+namespace GraphQL.Validation.Errors.Custom
+{
+    public class ComplexityError : GraphQL.Validation.ValidationError
+    {
+        public ComplexityError(string message) { }
     }
 }
 namespace GraphQL.Validation.Rules
@@ -3331,6 +3328,15 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.VariablesInAllowedPosition Instance;
         public VariablesInAllowedPosition() { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+    }
+}
+namespace GraphQL.Validation.Rules.Custom
+{
+    public class ComplexityValidationRule : GraphQL.Validation.IValidationRule
+    {
+        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
+        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
 }

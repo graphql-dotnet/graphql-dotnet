@@ -2,6 +2,7 @@ using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.Tests.StarWars;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;

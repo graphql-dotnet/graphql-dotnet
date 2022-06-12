@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using GraphQL.Types;
+using GraphQL.Validation.Errors.Custom;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity

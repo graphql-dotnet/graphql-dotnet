@@ -9,6 +9,7 @@ using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 using Moq;
 

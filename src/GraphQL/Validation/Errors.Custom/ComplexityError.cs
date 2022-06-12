@@ -1,4 +1,4 @@
-namespace GraphQL.Validation.Complexity;
+namespace GraphQL.Validation.Errors.Custom;
 
 /// <summary>
 /// Represents a complexity error.

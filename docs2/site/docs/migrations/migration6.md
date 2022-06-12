@@ -30,7 +30,7 @@ any source code changes.
 Complexity analysis is now a validation rule and has been removed from execution options.
 There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` methods as shown below:
 
-```cs
+```csharp
 // GraphQL 5.x or 6.x
 builder.AddComplexityAnalyzer(complexityConfig => {
     // set configuration here
@@ -40,7 +40,7 @@ builder.AddComplexityAnalyzer(complexityConfig => {
 However, when manually setting `options.ComplexityConfiguration`, you will need to instead add the
 `ComplexityValidationRule` validation rule to the validation rules.
 
-```cs
+```csharp
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
@@ -53,7 +53,7 @@ options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
 When not using the complexity analyzer, or when using the default complexity analyzer, simply
 remove the argument from calls to the constructor and no additional changes are required.
 
-```cs
+```csharp
 /// GraphQL 5.x
 public MyCustomDocumentExecuter(
     IDocumentBuilder documentBuilder,
@@ -81,7 +81,7 @@ public MyCustomDocumentExecuter(
 When using a custom complexity analyzer implementation added through the `IGraphQLBuilder.AddComplexityAnalyzer`
 methods, no change is required.
 
-```cs
+```csharp
 /// GraphQL 5.x or 6.x
 builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(complexityConfig => {
     // set configuration here
@@ -92,7 +92,7 @@ When using a custom complexity analyzer implementation configured through DI, an
 add the `ComplexityValidationRule` validation rule to the validation rules, pass the implementation
 from DI through to `ComplexityValidationRule`.
 
-```cs
+```csharp
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
@@ -104,4 +104,4 @@ options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
     ));
 ```
 
-Using the `IGraphQLBuilder` interface to configure GraphQL is the recommended approach.
+Using the `IGraphQLBuilder` interface to configure the GraphQL.NET execution engine is the recommended approach.
