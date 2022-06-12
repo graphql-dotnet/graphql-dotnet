@@ -20,14 +20,14 @@ public class GraphQLBuilderTests
         mockRegister.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(register).Verifiable();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
-        mockRegister.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+        mockRegister.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
+            .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
             {
                 var options = new ExecutionOptions()
                 {
                     RequestServices = mockServiceProvider.Object
                 };
-                action.ConfigureAsync(options).Wait();
+                action.ExecuteAsync(options, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
                 options.Listeners.ShouldContain(instance);
                 return register;
             }).Verifiable();

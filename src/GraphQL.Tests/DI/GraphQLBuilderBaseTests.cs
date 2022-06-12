@@ -37,12 +37,12 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IExecutionStrategySelector), typeof(DefaultExecutionStrategySelector), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder.ServiceRegister).Verifiable();
-        mock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<IConfigureExecutionOptions>(), false)).Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+        mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false)).Returns<Type, IConfigureExecution, bool>((_, action, _) =>
         {
             var schema = Mock.Of<ISchema>(MockBehavior.Strict);
 
             //verify no action if schema is set
-            action.ConfigureAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }).Wait();
+            action.ExecuteAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
 
             //verify schema is pulled from service provider if schema is not set
             var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -51,7 +51,7 @@ public class GraphQLBuilderBaseTests
             {
                 RequestServices = mockServiceProvider.Object,
             };
-            action.ConfigureAsync(opts).Wait();
+            action.ExecuteAsync(opts, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
             opts.Schema.ShouldBe(schema);
             mockServiceProvider.Verify();
 

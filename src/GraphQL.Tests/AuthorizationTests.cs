@@ -9,10 +9,10 @@ public class AuthorizationTests
     {
         var field = new FieldType();
         field.IsAuthorizationRequired().ShouldBeFalse();
-        field.AuthorizeWith("Policy1");
+        field.AuthorizeWithPolicy("Policy1");
         field.IsAuthorizationRequired().ShouldBeTrue();
-        field.AuthorizeWith("Policy2");
-        field.AuthorizeWith("Policy2");
+        field.AuthorizeWithPolicy("Policy2");
+        field.AuthorizeWithPolicy("Policy2");
         field.AuthorizeWithPolicy("Policy3");
         field.AuthorizeWithPolicy("Policy3");
         field.AuthorizeWithRoles("Role1,Role2");
@@ -59,9 +59,9 @@ public class AuthorizationTests
     {
         var graph = new ObjectGraphType();
         graph.Field<StringGraphType>("Field")
-            .AuthorizeWith("Policy1")
-            .AuthorizeWith("Policy2")
-            .AuthorizeWith("Policy2")
+            .AuthorizeWithPolicy("Policy1")
+            .AuthorizeWithPolicy("Policy2")
+            .AuthorizeWithPolicy("Policy2")
             .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithRoles("Role1,Role2")
@@ -80,9 +80,9 @@ public class AuthorizationTests
         var graph = new ObjectGraphType();
         graph.Connection<StringGraphType>()
             .Name("Field")
-            .AuthorizeWith("Policy1")
-            .AuthorizeWith("Policy2")
-            .AuthorizeWith("Policy2")
+            .AuthorizeWithPolicy("Policy1")
+            .AuthorizeWithPolicy("Policy2")
+            .AuthorizeWithPolicy("Policy2")
             .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithPolicy("Policy3")
             .AuthorizeWithRoles("Role1,Role2")

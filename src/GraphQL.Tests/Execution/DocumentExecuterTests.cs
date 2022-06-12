@@ -28,8 +28,8 @@ public class DocumentExecuterTests
             new DocumentValidator(),
             new ComplexityAnalyzer(),
             DefaultDocumentCache.Instance,
-            new IConfigureExecutionOptions[] { },
-            selector);
+            selector,
+            new IConfigureExecution[] { });
         var schema = new Schema();
         var graphType = new AutoRegisteringObjectGraphType<SampleGraph>();
         schema.Query = graphType;
