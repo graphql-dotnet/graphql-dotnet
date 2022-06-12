@@ -26,6 +26,12 @@ public class AppliedDirectivesTests
     {
         public AppliedSchema()
         {
+            var query = new ObjectGraphType
+            {
+                Name = "Query"
+            };
+            query.Field<IntGraphType>("dummy");
+            Query = query;
             Mutation = new RootMutation();
             Directives.Register(new TraitsDirective());
             this.ApplyDirective("traits", "quality", "high");
