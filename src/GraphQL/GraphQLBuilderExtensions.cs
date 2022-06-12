@@ -9,6 +9,7 @@ using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -361,19 +362,19 @@ namespace GraphQL
         /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-            => builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+        {
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
+            return builder;
+        }
 
         /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-            => builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+        {
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
@@ -383,11 +384,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -396,11 +394,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -412,11 +407,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -425,11 +417,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -441,11 +430,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -454,11 +440,8 @@ namespace GraphQL
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
         #endregion
@@ -907,7 +890,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
@@ -922,7 +905,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an asynchronous action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
