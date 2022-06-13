@@ -7,6 +7,7 @@ namespace GraphQL.Validation.Complexity
     /// Analyzes a document to determine if its complexity exceeds a threshold,
     /// throwing an exception if it is too complex.
     /// </summary>
+    [Obsolete("Please write a custom complexity analyzer as a validation rule. This interface will be removed in v8.")]
     public interface IComplexityAnalyzer
     {
         /// <summary>
