@@ -380,6 +380,7 @@ namespace GraphQL
         /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
         /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
@@ -390,6 +391,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
@@ -403,6 +405,7 @@ namespace GraphQL
         /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
         /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
@@ -413,6 +416,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
@@ -426,6 +430,7 @@ namespace GraphQL
         /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
         /// using the specified factory delegate, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
@@ -436,6 +441,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {

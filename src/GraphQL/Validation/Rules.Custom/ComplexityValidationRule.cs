@@ -9,19 +9,24 @@ namespace GraphQL.Validation.Rules.Custom;
 public class ComplexityValidationRule : IValidationRule
 {
     private readonly ComplexityConfiguration _complexityConfiguration;
+#pragma warning disable CS0618 // Type or member is obsolete
     private readonly IComplexityAnalyzer _complexityAnalyzer;
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes an instance with the specified complexity configuration.
     /// </summary>
     public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration)
+#pragma warning disable CS0618 // Type or member is obsolete
         : this(complexityConfiguration, new ComplexityAnalyzer())
+#pragma warning restore CS0618 // Type or member is obsolete
     {
     }
 
     /// <summary>
     /// Initializes an instance with the specified complexity configuration and complexity analyzer.
     /// </summary>
+    [Obsolete("Please write a custom complexity analyzer as a validation rule. This constructor will be removed in v8.")]
     public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration, IComplexityAnalyzer complexityAnalyzer)
     {
         _complexityConfiguration = complexityConfiguration;

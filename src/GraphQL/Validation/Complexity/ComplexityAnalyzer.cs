@@ -8,6 +8,7 @@ namespace GraphQL.Validation.Complexity
     /// <summary>
     /// The default complexity analyzer.
     /// </summary>
+    [Obsolete("Please write a custom complexity analyzer as a validation rule. This class will be removed in v8.")]
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
         /// <inheritdoc/>
