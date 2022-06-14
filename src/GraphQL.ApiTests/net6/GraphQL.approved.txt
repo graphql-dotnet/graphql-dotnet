@@ -2867,6 +2867,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -2901,6 +2902,7 @@ namespace GraphQL.Validation
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }

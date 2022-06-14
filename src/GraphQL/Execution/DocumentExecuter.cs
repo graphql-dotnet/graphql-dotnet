@@ -155,6 +155,7 @@ namespace GraphQL
                             RequestServices = options.RequestServices,
                             CancellationToken = options.CancellationToken,
                             Schema = options.Schema,
+                            Metrics = metrics,
                             Variables = options.Variables ?? Inputs.Empty,
                             Extensions = options.Extensions ?? Inputs.Empty,
                         }).ConfigureAwait(false);
