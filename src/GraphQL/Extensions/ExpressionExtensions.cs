@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace GraphQL
+namespace GraphQL.Extensions
 {
     internal static class ExpressionExtensions
     {
