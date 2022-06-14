@@ -38,7 +38,8 @@ public class ComplexityValidationRule : IValidationRule
     {
         try
         {
-            _complexityAnalyzer.Validate(context.Document, _complexityConfiguration, context.Schema);
+            using (context.Metrics.Subject("document", "Analyzing complexity"))
+                _complexityAnalyzer.Validate(context.Document, _complexityConfiguration, context.Schema);
         }
         catch (ComplexityError ex)
         {

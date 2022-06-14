@@ -1366,6 +1366,12 @@ namespace GraphQL.Instrumentation
         public InstrumentFieldsMiddleware() { }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
     }
+    public readonly struct Marker : System.IDisposable
+    {
+        public static readonly GraphQL.Instrumentation.Marker Empty;
+        public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
+        public void Dispose() { }
+    }
     public class Metrics
     {
         public Metrics(bool enabled = true) { }
@@ -1374,13 +1380,7 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.PerfRecord[]? Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(GraphQLParser.ROM name) { }
         public GraphQL.Instrumentation.Metrics Start(string? operationName) { }
-        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
-        public readonly struct Marker : System.IDisposable
-        {
-            public static readonly GraphQL.Instrumentation.Metrics.Marker Empty;
-            public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
-            public void Dispose() { }
-        }
+        public GraphQL.Instrumentation.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
     }
     public class PerfRecord
     {
@@ -2853,6 +2853,7 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }
         public bool HasErrors { get; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -2887,6 +2888,7 @@ namespace GraphQL.Validation
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
         public System.IServiceProvider? RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }

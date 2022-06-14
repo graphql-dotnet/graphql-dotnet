@@ -1,5 +1,6 @@
 using System.Collections;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -26,6 +27,7 @@ namespace GraphQL.Validation
             Variables = null!;
             Extensions = null!;
             RequestServices = null!;
+            Metrics = null!;
         }
 
         /// <summary>
@@ -44,6 +46,9 @@ namespace GraphQL.Validation
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext { get; set; } = null!;
+
+        /// <inheritdoc cref="IExecutionContext.Metrics"/>
+        public Metrics Metrics { get; set; } = null!;
 
         /// <summary>
         /// Dictionary of temporary data used by validation rules.
