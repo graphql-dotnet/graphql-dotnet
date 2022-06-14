@@ -1366,12 +1366,6 @@ namespace GraphQL.Instrumentation
         public InstrumentFieldsMiddleware() { }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
     }
-    public readonly struct Marker : System.IDisposable
-    {
-        public static readonly GraphQL.Instrumentation.Marker Empty;
-        public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
-        public void Dispose() { }
-    }
     public class Metrics
     {
         public Metrics(bool enabled = true) { }
@@ -1380,7 +1374,13 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.PerfRecord[]? Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(GraphQLParser.ROM name) { }
         public GraphQL.Instrumentation.Metrics Start(string? operationName) { }
-        public GraphQL.Instrumentation.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
+        public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string? subject, System.Collections.Generic.Dictionary<string, object?>? metadata = null) { }
+        public readonly struct Marker : System.IDisposable
+        {
+            public static readonly GraphQL.Instrumentation.Metrics.Marker Empty;
+            public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
+            public void Dispose() { }
+        }
     }
     public class PerfRecord
     {
