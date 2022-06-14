@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.5" />
   </ItemGroup>
 
 </Project>
