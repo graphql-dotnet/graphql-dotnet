@@ -329,9 +329,7 @@ namespace GraphQL
             if (options.Schema != null)
                 throw new InvalidOperationException("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
 
-            var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-            var schema = requestServices.GetRequiredService<TSchema>();
-            options.Schema = schema;
+            options.Schema = options.RequestServicesOrThrow().GetRequiredService<TSchema>();
             return _documentExecuter.ExecuteAsync(options);
         }
     }

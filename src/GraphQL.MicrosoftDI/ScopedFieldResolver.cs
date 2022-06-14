@@ -20,7 +20,7 @@ namespace GraphQL.MicrosoftDI
         {
             return context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
             };
         }
@@ -32,7 +32,7 @@ namespace GraphQL.MicrosoftDI
         {
             return async context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return await resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }
@@ -48,7 +48,7 @@ namespace GraphQL.MicrosoftDI
         {
             return context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
             };
         }
@@ -60,7 +60,7 @@ namespace GraphQL.MicrosoftDI
         {
             return async context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return await resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }

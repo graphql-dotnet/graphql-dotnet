@@ -638,11 +638,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecutionOptions(options =>
-            {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
-            });
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -678,11 +674,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
-            builder.ConfigureExecutionOptions(options =>
-            {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
-            });
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
             return builder;
         }
         #endregion
@@ -962,8 +954,7 @@ namespace GraphQL
             builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                var rule = requestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -1016,8 +1007,7 @@ namespace GraphQL
             builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                var rule = requestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
