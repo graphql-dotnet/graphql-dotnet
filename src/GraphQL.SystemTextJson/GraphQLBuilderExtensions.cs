@@ -2,8 +2,9 @@
 
 using System.Text.Json;
 using GraphQL.DI;
+using GraphQL.SystemTextJson;
 
-namespace GraphQL.SystemTextJson
+namespace GraphQL
 {
     /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
     public static class GraphQLBuilderExtensions

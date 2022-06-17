@@ -1,8 +1,9 @@
 #nullable enable
 
+using GraphQL.DataLoader;
 using GraphQL.DI;
 
-namespace GraphQL.DataLoader
+namespace GraphQL
 {
     /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
     public static class GraphQLBuilderExtensions

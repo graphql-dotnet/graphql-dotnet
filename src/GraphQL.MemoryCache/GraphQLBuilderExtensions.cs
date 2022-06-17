@@ -1,6 +1,7 @@
+using GraphQL.Caching;
 using GraphQL.DI;
 
-namespace GraphQL.Caching
+namespace GraphQL
 {
     /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
     public static class GraphQLBuilderExtensions

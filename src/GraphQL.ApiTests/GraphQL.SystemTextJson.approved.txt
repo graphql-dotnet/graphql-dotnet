@@ -1,3 +1,11 @@
+namespace GraphQL
+{
+    public static class GraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
+    }
+}
 namespace GraphQL.SystemTextJson
 {
     public class ApolloTraceJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Instrumentation.ApolloTrace>
@@ -19,11 +27,6 @@ namespace GraphQL.SystemTextJson
         public override bool CanConvert(System.Type typeToConvert) { }
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
-    }
-    public static class GraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
     }
     public class GraphQLRequestJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transport.GraphQLRequest>
     {
