@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using GraphQL.DI;
@@ -53,9 +54,22 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// </summary>
     protected virtual bool CheckHash(string hash, string query)
     {
-        var inputBytes = Encoding.UTF8.GetBytes(query);
+        var expected = Encoding.UTF8.GetByteCount(query);
+        var inputBytes = ArrayPool<byte>.Shared.Rent(expected);
+        var written = Encoding.UTF8.GetBytes(query, 0, query.Length, inputBytes, 0);
+        Debug.Assert(written == expected, $"Encoding.UTF8.GetBytes returned unexpected bytes: {written} instead of {expected}");
+
         var shaShared = Interlocked.Exchange(ref _sha256, null) ?? SHA256.Create();
-        var bytes = shaShared.ComputeHash(inputBytes);
+
+#if NET5_0_OR_GREATER
+        Span<byte> bytes = stackalloc byte[32];
+        if (!shaShared.TryComputeHash(inputBytes.AsSpan().Slice(0, written), bytes, out int bytesWritten))
+            throw new InvalidOperationException("Too small buffer for hash"); // should never happen
+#else
+        byte[] bytes = shaShared.ComputeHash(inputBytes, 0, written);
+#endif
+
+        ArrayPool<byte>.Shared.Return(inputBytes);
         Interlocked.CompareExchange(ref _sha256, shaShared, null);
 
 #if NET5_0_OR_GREATER
