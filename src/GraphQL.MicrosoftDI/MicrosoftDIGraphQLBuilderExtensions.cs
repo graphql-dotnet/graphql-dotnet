@@ -29,7 +29,7 @@ namespace GraphQL
         /// registered if it is not already registered within the dependency injection framework. Services required by
         /// <typeparamref name="TSchema"/> are instantiated directly if not registered within the dependency injection framework.
         /// This can eliminate the need to register each of the graph types with the dependency injection framework, either
-        /// manually or via GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder). Singleton and scoped
+        /// manually or via <see cref="GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder)"/>. Singleton and scoped
         /// lifetimes are supported.
         /// </summary>
         /// <remarks>
