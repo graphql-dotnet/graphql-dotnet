@@ -117,7 +117,7 @@ namespace GraphQL.DataLoader
 }
 namespace GraphQL
 {
-    public static class GraphQLBuilderExtensions
+    public static class DataLoaderGraphQLBuilderExtensions
     {
         public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
     }

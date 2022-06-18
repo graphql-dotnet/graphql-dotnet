@@ -5,8 +5,8 @@ using GraphQL.DI;
 
 namespace GraphQL
 {
-    /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    /// <inheritdoc cref="GraphQLBuilderExtensions"/>
+    public static class DataLoaderGraphQLBuilderExtensions
     {
         /// <summary>
         /// Registers <see cref="DataLoaderDocumentListener"/> and <see cref="DataLoaderContextAccessor"/> within the

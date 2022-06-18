@@ -8,7 +8,7 @@ using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 namespace GraphQL
 {
     /// <inheritdoc cref="GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    public static class MicrosoftDIGraphQLBuilderExtensions
     {
         /// <summary>
         /// Configures a GraphQL pipeline using the configuration delegate passed into

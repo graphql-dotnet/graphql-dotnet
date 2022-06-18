@@ -3,8 +3,8 @@ using GraphQL.DI;
 
 namespace GraphQL
 {
-    /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    /// <inheritdoc cref="GraphQLBuilderExtensions"/>
+    public static class MemoryCacheGraphQLBuilderExtensions
     {
         /// <summary>
         /// Registers <see cref="MemoryDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the

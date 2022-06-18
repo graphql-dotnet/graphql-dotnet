@@ -58,7 +58,7 @@ namespace GraphQL.Caching
 }
 namespace GraphQL
 {
-    public static class GraphQLBuilderExtensions
+    public static class MemoryCacheGraphQLBuilderExtensions
     {
         public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
