@@ -3,7 +3,6 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.NewtonsoftJson;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
