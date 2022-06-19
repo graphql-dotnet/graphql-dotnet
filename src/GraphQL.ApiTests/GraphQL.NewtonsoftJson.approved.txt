@@ -25,11 +25,6 @@ namespace GraphQL.NewtonsoftJson
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter jWriter, object? value, Newtonsoft.Json.JsonSerializer jSerializer) { }
     }
-    public static class GraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings, System.IServiceProvider>? action) { }
-    }
     public class GraphQLContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
         public GraphQLContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
@@ -98,5 +93,13 @@ namespace GraphQL.NewtonsoftJson
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+    }
+}
+namespace GraphQL
+{
+    public static class NewtonsoftJsonGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings, System.IServiceProvider>? action) { }
     }
 }

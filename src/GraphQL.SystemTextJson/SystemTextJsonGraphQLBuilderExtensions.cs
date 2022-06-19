@@ -2,11 +2,12 @@
 
 using System.Text.Json;
 using GraphQL.DI;
+using GraphQL.SystemTextJson;
 
-namespace GraphQL.SystemTextJson
+namespace GraphQL
 {
-    /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    /// <inheritdoc cref="GraphQLBuilderExtensions"/>
+    public static class SystemTextJsonGraphQLBuilderExtensions
     {
         /// <summary>
         /// Registers the System.Text.Json <see cref="GraphQLSerializer"/> as singletons of types

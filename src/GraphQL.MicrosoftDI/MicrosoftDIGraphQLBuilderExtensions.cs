@@ -1,13 +1,14 @@
 using GraphQL.DI;
 using GraphQL.Execution;
+using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
-namespace GraphQL.MicrosoftDI
+namespace GraphQL
 {
-    /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    /// <inheritdoc cref="GraphQLBuilderExtensions"/>
+    public static class MicrosoftDIGraphQLBuilderExtensions
     {
         /// <summary>
         /// Configures a GraphQL pipeline using the configuration delegate passed into
@@ -28,7 +29,7 @@ namespace GraphQL.MicrosoftDI
         /// registered if it is not already registered within the dependency injection framework. Services required by
         /// <typeparamref name="TSchema"/> are instantiated directly if not registered within the dependency injection framework.
         /// This can eliminate the need to register each of the graph types with the dependency injection framework, either
-        /// manually or via <see cref="GraphQL.GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder)"/>. Singleton and scoped
+        /// manually or via <see cref="GraphQLBuilderExtensions.AddGraphTypes(IGraphQLBuilder)"/>. Singleton and scoped
         /// lifetimes are supported.
         /// </summary>
         /// <remarks>

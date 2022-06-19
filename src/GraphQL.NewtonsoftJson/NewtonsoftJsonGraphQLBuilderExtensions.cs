@@ -1,11 +1,12 @@
 #nullable enable
 
 using GraphQL.DI;
+using GraphQL.NewtonsoftJson;
 
-namespace GraphQL.NewtonsoftJson
+namespace GraphQL
 {
-    /// <inheritdoc cref="GraphQL.GraphQLBuilderExtensions"/>
-    public static class GraphQLBuilderExtensions
+    /// <inheritdoc cref="GraphQLBuilderExtensions"/>
+    public static class NewtonsoftJsonGraphQLBuilderExtensions
     {
         /// <summary>
         /// Registers the Newtonsoft.Json <see cref="GraphQLSerializer"/> as singletons of types

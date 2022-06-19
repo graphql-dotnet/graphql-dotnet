@@ -1,7 +1,5 @@
 using GraphQL.Instrumentation;
-using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
-using GraphQL.SystemTextJson;
 using GraphQL.Tests.StarWars;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;

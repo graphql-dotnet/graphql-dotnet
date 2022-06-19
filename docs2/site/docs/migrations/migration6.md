@@ -174,3 +174,16 @@ Now only the following types or generic types are considered list types:
 - `ISet<T>`
 
 There is no change as compared to when `GlobalSwitches.MapAllEnumerableTypes` was set to `false`.
+
+### 7. Unification of namespaces for DI extension methods
+
+All extension methods to configure GraphQL.NET services within a dependency injection framework
+were moved into `GraphQL` namespace. Also class names were changed:
+
+- `GraphQL.DataLoader.GraphQLBuilderExtensions` -> `GraphQL.DataLoaderGraphQLBuilderExtensions`
+- `GraphQL.MemoryCache.GraphQLBuilderExtensions` -> `GraphQL.MemoryCacheGraphQLBuilderExtensions`
+- `GraphQL.MicrosoftDI.GraphQLBuilderExtensions` -> `GraphQL.MicrosoftDIGraphQLBuilderExtensions`
+- `GraphQL.NewtonsoftJson.GraphQLBuilderExtensions` -> `GraphQL.NewtonsoftJsonGraphQLBuilderExtensions`
+- `GraphQL.SystemTextJson.GraphQLBuilderExtensions` -> `GraphQL.SystemTextJsonGraphQLBuilderExtensions`
+
+This change was done for better discoverability and usability of extension methods when configuring DI.

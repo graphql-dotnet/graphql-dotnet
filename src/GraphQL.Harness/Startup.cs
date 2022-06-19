@@ -1,8 +1,6 @@
 using Example;
 using GraphQL.Instrumentation;
-using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
-using GraphQL.SystemTextJson;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Harness
