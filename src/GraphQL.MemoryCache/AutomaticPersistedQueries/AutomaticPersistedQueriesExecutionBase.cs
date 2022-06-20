@@ -40,9 +40,10 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
                     hashResult = sha256Hash;
                 }
 
-                if (persistedQuery.TryGetValue("version", out var versionObject) && versionObject is string version && !string.IsNullOrEmpty(version))
+                // version should be integer value but here we handle any type (mostly string)
+                if (persistedQuery.TryGetValue("version", out var versionObject))
                 {
-                    versionResult = version;
+                    versionResult = versionObject.ToString();
                 }
             }
         }
