@@ -34,7 +34,7 @@ namespace GraphQL.SystemTextJson
                 }
                 else
                 {
-                    WriteValue(writer, result.Data, options);
+                    JsonSerializer.Serialize(writer, result.Data, options);
                 }
             }
         }
@@ -43,7 +43,7 @@ namespace GraphQL.SystemTextJson
         {
             if (node is ValueExecutionNode valueExecutionNode)
             {
-                WriteValue(writer, valueExecutionNode.ToValue(), options);
+                JsonSerializer.Serialize(writer, valueExecutionNode.ToValue(), options);
             }
             else if (node is ObjectExecutionNode objectExecutionNode)
             {
@@ -88,132 +88,7 @@ namespace GraphQL.SystemTextJson
             }
             else
             {
-                WriteValue(writer, node.ToValue(), options);
-            }
-        }
-
-        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object? propertyValue, JsonSerializerOptions options)
-        {
-            if (options.PropertyNamingPolicy != null)
-                propertyName = options.PropertyNamingPolicy.ConvertName(propertyName);
-            writer.WritePropertyName(propertyName);
-            WriteValue(writer, propertyValue, options);
-        }
-
-        private static void WriteValue(Utf8JsonWriter writer, object? value, JsonSerializerOptions options)
-        {
-            switch (value)
-            {
-                case null:
-                {
-                    writer.WriteNullValue();
-                    break;
-                }
-                case string s:
-                {
-                    writer.WriteStringValue(s);
-                    break;
-                }
-                case bool b:
-                {
-                    writer.WriteBooleanValue(b);
-                    break;
-                }
-                case int i:
-                {
-                    writer.WriteNumberValue(i);
-                    break;
-                }
-                case long l:
-                {
-                    writer.WriteNumberValue(l);
-                    break;
-                }
-                case float f:
-                {
-                    writer.WriteNumberValue(f);
-                    break;
-                }
-                case double d:
-                {
-                    writer.WriteNumberValue(d);
-                    break;
-                }
-                case decimal dm:
-                {
-                    writer.WriteNumberValue(dm);
-                    break;
-                }
-                case uint ui:
-                {
-                    writer.WriteNumberValue(ui);
-                    break;
-                }
-                case ulong ul:
-                {
-                    writer.WriteNumberValue(ul);
-                    break;
-                }
-                case short sh:
-                {
-                    writer.WriteNumberValue(sh);
-                    break;
-                }
-                case ushort ush:
-                {
-                    writer.WriteNumberValue(ush);
-                    break;
-                }
-                case byte bt:
-                {
-                    writer.WriteNumberValue(bt);
-                    break;
-                }
-                case sbyte sbt:
-                {
-                    writer.WriteNumberValue(sbt);
-                    break;
-                }
-                case Dictionary<string, object> dictionary:
-                {
-                    writer.WriteStartObject();
-
-                    foreach (var kvp in dictionary)
-                        WriteProperty(writer, kvp.Key, kvp.Value, options);
-
-                    writer.WriteEndObject();
-
-                    break;
-                }
-                case List<object> list:
-                {
-                    writer.WriteStartArray();
-
-                    foreach (object item in list)
-                        WriteValue(writer, item, options);
-
-                    writer.WriteEndArray();
-
-                    break;
-                }
-                case object[] list:
-                {
-                    writer.WriteStartArray();
-
-                    foreach (object item in list)
-                        WriteValue(writer, item, options);
-
-                    writer.WriteEndArray();
-
-                    break;
-                }
-                default:
-                {
-                    // TODO: Guid, BigInteger, DateTime, <Anonymous Type> fall here
-                    // Need to avoid this call by all means! The question remains open - why this API so expensive?
-                    JsonSerializer.Serialize(writer, value, options);
-                    break;
-                }
+                JsonSerializer.Serialize(writer, node.ToValue(), options);
             }
         }
 
