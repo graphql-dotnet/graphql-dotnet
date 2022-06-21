@@ -19,8 +19,8 @@ internal sealed class NestedFragmentsComparer : IComparer<GraphQLFragmentDefinit
 
     public int Compare(GraphQLFragmentDefinition? x, GraphQLFragmentDefinition? y)
     {
-        bool yInX = Contains(x!, y!);
-        bool xInY = Contains(y!, x!);
+        bool yInX = Contains(x!, y!, out var xHasSpreads);
+        bool xInY = Contains(y!, x!, out var yHasSpreads);
 
         if (yInX && xInY)
             throw new InvalidOperationException("Fragment cycle detected, NoFragmentCycles validation rule should be used.");
@@ -31,11 +31,18 @@ internal sealed class NestedFragmentsComparer : IComparer<GraphQLFragmentDefinit
         if (xInY)
             return -1; // 'x' should go first
 
+        if (xHasSpreads && !yHasSpreads)
+            return 1; // 'y' should go first
+
+        if (yHasSpreads && !xHasSpreads)
+            return -1; // 'x' should go first
+
         return 0;
     }
 
-    private bool Contains(GraphQLFragmentDefinition outer, GraphQLFragmentDefinition inner)
+    private bool Contains(GraphQLFragmentDefinition outer, GraphQLFragmentDefinition inner, out bool hasAnySpreads)
     {
+        hasAnySpreads = false;
         _selectionSetsToVisit.Clear();
         _selectionSetsToVisit.Push(outer.SelectionSet);
 
@@ -45,6 +52,7 @@ internal sealed class NestedFragmentsComparer : IComparer<GraphQLFragmentDefinit
             {
                 if (selection is GraphQLFragmentSpread spread)
                 {
+                    hasAnySpreads = true;
                     if (spread.FragmentName.Name == inner.FragmentName.Name)
                     {
                         _selectionSetsToVisit.Clear();

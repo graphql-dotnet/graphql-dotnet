@@ -143,6 +143,65 @@ fragment comparisonFields on Character {
         withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
     }
 
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3191
+    [Fact]
+    public void nested_fragments_2()
+    {
+        var result = AnalyzeComplexity(@"
+{
+  car(id: 1)
+  {
+    ...lastUpdated
+    ...optionsOnCar
+  }
+}
+
+fragment optionsOnCar on Car
+{
+  options
+  {
+    edges
+    {
+      node
+      {
+        ...optionDetail
+      }
+    }
+  }
+}
+
+fragment optionPrice on Option
+{
+  price
+}
+
+fragment lastUpdated on Car
+{
+  updatedAt
+}
+
+fragment optionDetail on Option
+{
+  name
+  ...optionPrice
+  optionContents(first: 9999999)
+  {
+    edges
+    {
+      node
+      {
+        optionContent
+        {
+          name
+        }
+      }
+    }
+  }
+}");
+
+        result.Complexity.ShouldBe(1839999841); // WOW! :)
+    }
+
     [Fact]
     public void absurdly_huge_query()
     {
