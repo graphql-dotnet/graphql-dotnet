@@ -39,7 +39,7 @@ type Query {
     {
     }
 
-    private abstract class BaseType
+    private abstract class BaseType  // abstract ensures that BaseType cannot be constructed
     {
         public string Hello() => "World";
         public string Hello2 => "World";
