@@ -2,6 +2,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3194
 public class Bug3194
 {
     [Fact]
