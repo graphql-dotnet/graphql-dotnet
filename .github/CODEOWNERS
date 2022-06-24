@@ -1,0 +1,5 @@
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# https://github.com/dotnet/runtime/blob/main/.github/CODEOWNERS example
+*                           @Shane32 @sungam3r
+/src/GraphQL.DataLoader/    @Shane32
+
