@@ -7,7 +7,7 @@ namespace GraphQL.Reflection
     {
         public SingleMethodAccessor(Type declaringType, MethodInfo method)
         {
-            DeclaringType = declaringType; // may be a derived type rather than property.DeclaringType
+            DeclaringType = declaringType; // may be a derived type rather than method.DeclaringType
             MethodInfo = method;
         }
 
