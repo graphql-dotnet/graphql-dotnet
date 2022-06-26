@@ -41,7 +41,7 @@ You can also use the method to add logging of any execution errors; not just unh
 Note: you can access `options.RequestServices` for access to the scoped DI service provider
 for the request.
 
-### 5. Complexity analzyer allows configuration of each field's impact towards the total complexity factor
+### 5. Complexity analyzer allows configuration of each field's impact towards the total complexity factor
 
 With this change the complexity analyzer could be configured to operate in terms of 'database calls'
 or similar means which more closely represent the complexity of the request.
