@@ -18,7 +18,7 @@ namespace GraphQL.Reflection
             var methodInfo = type.MethodForField(field, resolverType);
             if (methodInfo != null)
             {
-                return new SingleMethodAccessor(methodInfo);
+                return new SingleMethodAccessor(type, methodInfo);
             }
 
             if (resolverType != ResolverType.Resolver)
@@ -29,7 +29,7 @@ namespace GraphQL.Reflection
             var propertyInfo = type.PropertyForField(field);
             if (propertyInfo != null)
             {
-                return new SinglePropertyAccessor(propertyInfo);
+                return new SinglePropertyAccessor(type, propertyInfo);
             }
 
             return null;

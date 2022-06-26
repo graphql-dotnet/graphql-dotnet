@@ -7,8 +7,9 @@ namespace GraphQL.Reflection
     {
         private readonly PropertyInfo _property;
 
-        public SinglePropertyAccessor(PropertyInfo property)
+        public SinglePropertyAccessor(Type declaringType, PropertyInfo property)
         {
+            DeclaringType = declaringType; // may be a derived type rather than property.DeclaringType
             _property = property;
         }
 
@@ -16,7 +17,7 @@ namespace GraphQL.Reflection
 
         public Type ReturnType => _property.PropertyType;
 
-        public Type DeclaringType => _property.DeclaringType!;
+        public Type DeclaringType { get; }
 
         public ParameterInfo[]? Parameters => null;
 
