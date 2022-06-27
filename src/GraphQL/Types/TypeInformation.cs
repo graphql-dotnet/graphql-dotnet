@@ -250,7 +250,7 @@ namespace GraphQL.Types
                     }
                     else
                     {
-                        list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                        list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                     }
                     foreach (var t in info.GenericTypeArguments)
                     {
@@ -259,12 +259,12 @@ namespace GraphQL.Types
                 }
                 else if (info.ElementType != null)
                 {
-                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                     RecursiveLoop(info.ElementType);
                 }
                 else
                 {
-                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                 }
             }
         }

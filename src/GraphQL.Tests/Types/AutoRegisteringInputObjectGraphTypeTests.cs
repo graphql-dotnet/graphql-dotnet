@@ -172,6 +172,8 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NullableIntField), typeof(GraphQLClrInputTypeReference<int>))]
     [InlineData(nameof(FieldTests.NotNullStringField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
     [InlineData(nameof(FieldTests.NullableStringField), typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(FieldTests.NotNullStringWriteOnlyField), typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(FieldTests.NullableStringWriteOnlyField), typeof(GraphQLClrInputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NotNullListNullableStringField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<string>>>))]
     [InlineData(nameof(FieldTests.NotNullListNotNullStringField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<string>>>>))]
     [InlineData(nameof(FieldTests.NullableListNullableStringField), typeof(ListGraphType<GraphQLClrInputTypeReference<string>>))]
@@ -324,6 +326,8 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public int? NullableIntField { get; set; }
         public string NotNullStringField { get; set; } = null!;
         public string? NullableStringField { get; set; }
+        public string NotNullStringWriteOnlyField { set { } }
+        public string? NullableStringWriteOnlyField { set { } }
         public List<string?> NotNullListNullableStringField { get; set; } = null!;
         public List<string> NotNullListNotNullStringField { get; set; } = null!;
         public List<string?>? NullableListNullableStringField { get; set; }
