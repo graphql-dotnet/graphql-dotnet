@@ -54,6 +54,34 @@ Field<IntGraphType>("id").WithComplexityImpact(123);
 
 For more details, please review the PR here: https://github.com/graphql-dotnet/graphql-dotnet/pull/3159
 
+### 6. GraphQL attributes can be applied globally
+
+GraphQL attributes (`GraphQLAttribute`) can now be applied at the module or assembly level, which
+will apply to all applicable CLR types within the module or assembly.
+
+This allow global changes to how the schema builder or auto-registering graph type builds graph types,
+field types or field arguments.
+
+For an example use case, users could add a global attribute which converts query arguments of type
+`DbContext` to pull from services, like this:
+
+```csharp
+public class DbContextFromServicesAttribute : GraphQLAttribute
+{
+    public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+    {
+        if (typeof(TParameterType) == typeof(DbContext))
+            argumentInformation.SetDelegate(context => (context.RequestServices ?? throw new MissingRequestServicesException())
+                .GetRequiredService<TParameterType>());
+    }
+}
+
+// in AssemblyInfo.cs
+[assembly: DbContextFromServices]
+```
+
+Similar code could be used to pull your user context class into a method argument.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
