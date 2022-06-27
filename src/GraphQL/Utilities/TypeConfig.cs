@@ -1,4 +1,3 @@
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
