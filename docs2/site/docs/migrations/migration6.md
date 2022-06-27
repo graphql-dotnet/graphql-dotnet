@@ -83,7 +83,7 @@ public class DbContextFromServicesAttribute : GraphQLAttribute
 Similar code could be used to pull your user context class into a method argument.
 
 If it is necessary for a custom global GraphQL attribute to execute prior to or after other attributes,
-adjust the return value of the Priority property of the attribute.
+adjust the return value of the `Priority` property of the attribute.
 
 ## Breaking Changes
 
