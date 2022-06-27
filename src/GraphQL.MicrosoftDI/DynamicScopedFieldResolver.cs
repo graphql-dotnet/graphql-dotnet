@@ -20,10 +20,8 @@ namespace GraphQL.MicrosoftDI
         {
             _resolverFunc = async context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return await resolver.ResolveAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
-                }
+                using var scope = context.RequestServicesOrThrow().CreateScope();
+                return await resolver.ResolveAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
             };
         }
 

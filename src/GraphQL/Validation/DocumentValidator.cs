@@ -63,6 +63,7 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.Metrics = options.Metrics;
             context.RequestServices = options.RequestServices;
             context.CancellationToken = options.CancellationToken;
 
@@ -117,7 +118,7 @@ namespace GraphQL.Validation
                 }
 
                 // can report errors even without rules enabled
-                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                variables = await context.GetVariableValuesAsync(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
 
                 return context.HasErrors
                     ? (new ValidationResult(context.Errors), variables)

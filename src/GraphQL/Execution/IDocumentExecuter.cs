@@ -7,9 +7,8 @@ namespace GraphQL
     /// be called by user code to process a query.
     /// <br/><br/>
     /// Typical implementation starts metrics if enabled (see <see cref="Instrumentation.Metrics">Metrics</see>),
-    /// relies on <see cref="Execution.IDocumentBuilder">IDocumentBuilder</see> to parse the query,
-    /// <see cref="Validation.IDocumentValidator">IDocumentValidator</see> to validate it, and
-    /// <see cref="Validation.Complexity.IComplexityAnalyzer">IComplexityAnalyzer</see> to validate the complexity constraints.
+    /// relies on <see cref="Execution.IDocumentBuilder">IDocumentBuilder</see> to parse the query and
+    /// <see cref="Validation.IDocumentValidator">IDocumentValidator</see> to validate it.
     /// Then it executes document listeners if attached, selects an execution strategy, and executes the query
     /// via <see cref="Execution.IExecutionStrategy">IExecutionStrategy</see>. Unhandled exceptions are handled as appropriate for the selected options.
     /// </summary>

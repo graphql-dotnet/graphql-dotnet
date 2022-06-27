@@ -1,5 +1,3 @@
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 

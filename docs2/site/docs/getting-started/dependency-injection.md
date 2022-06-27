@@ -64,7 +64,6 @@ The `AddGraphQL()` method will register default implementations of the following
 * `IDocumentExecuter`
 * `IDocumentBuilder`
 * `IDocumentValidator`
-* `IComplexityAnalyzer` - which is not used unless configured within `ExecutionOptions`
 * `IErrorInfoProvider`
 * `IDocumentCache` - an implemenation which does not cache documents
 * `IExecutionStrategySelector` - which does not support subscriptions by default
@@ -73,6 +72,7 @@ A list of the available extension methods is below:
 
 | Method    | Description / Notes | Library |
 |-----------|---------------------|---------|
+| `AddApolloTracing`      | Registers and enables metrics depending on the supplied arguments, and adds Apollo Tracing data to the execution result | |
 | `AddAutoClrMappings`    | Configures unmapped CLR types to use auto-registering graph types | |
 | `AddAutoSchema`         | Registers a schema based on CLR types | |
 | `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
@@ -87,7 +87,6 @@ A list of the available extension methods is below:
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
 | `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
-| `AddMetrics`            | Registers and enables metrics depending on the supplied arguments | |
 | `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
@@ -95,6 +94,7 @@ A list of the available extension methods is below:
 | `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
+| `ConfigureExecution`    | Configures execution middleware to monitor or modify both options and the result | |
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |

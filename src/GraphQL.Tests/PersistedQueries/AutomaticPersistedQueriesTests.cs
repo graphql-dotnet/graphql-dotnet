@@ -1,6 +1,4 @@
 using GraphQL.Caching;
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

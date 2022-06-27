@@ -26,20 +26,22 @@ namespace GraphQL.Validation
             _leave = leave;
         }
 
-        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
+        ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
         {
             if (_enter != null && node is TNode n)
             {
                 _enter(n, context);
             }
+            return default;
         }
 
-        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
+        ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
         {
             if (_leave != null && node is TNode n)
             {
                 _leave(n, context);
             }
+            return default;
         }
     }
 
@@ -70,20 +72,22 @@ namespace GraphQL.Validation
             _state = state;
         }
 
-        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
+        ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
         {
             if (_enter != null && node is TNode n)
             {
                 _enter(n, context, _state);
             }
+            return default;
         }
 
-        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
+        ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
         {
             if (_leave != null && node is TNode n)
             {
                 _leave(n, context, _state);
             }
+            return default;
         }
     }
 }

@@ -11,7 +11,6 @@ namespace GraphQL
     {
         /// <inheritdoc/>
         public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
-            => argumentInformation.SetDelegate(context => (context.RequestServices ?? throw new MissingRequestServicesException())
-                .GetRequiredService<TParameterType>());
+            => argumentInformation.SetDelegate(context => context.RequestServicesOrThrow().GetRequiredService<TParameterType>());
     }
 }

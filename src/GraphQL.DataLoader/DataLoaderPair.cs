@@ -16,7 +16,7 @@ namespace GraphQL.DataLoader
         /// </summary>
         public DataLoaderPair(IDataLoader loader, TKey key)
         {
-            Loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
             Key = key;
         }
 
@@ -30,17 +30,29 @@ namespace GraphQL.DataLoader
         /// <summary>
         /// Returns the data loader that is called when the result is requested
         /// </summary>
-        public IDataLoader Loader { get; }
+        private IDataLoader? _loader;
 
         /// <summary>
         /// Returns the result if it has been set, or throws an exception if not
         /// </summary>
-        public T Result => IsResultSet ? _result : throw new InvalidOperationException("Result has not been set");
+        public T Result
+        {
+            get
+            {
+                if (IsResultSet)
+                {
+                    Interlocked.MemoryBarrier(); // ensure that _loader is read before _result is read
+                    return _result;
+                }
+                else
+                    throw new InvalidOperationException("Result has not been set");
+            }
+        }
 
         /// <summary>
         /// Returns a boolean that indicates if the result has been set
         /// </summary>
-        public bool IsResultSet { get; private set; }
+        public bool IsResultSet => _loader == null;
 
         /// <summary>
         /// Sets the result if it has not yet been set
@@ -51,7 +63,8 @@ namespace GraphQL.DataLoader
             if (IsResultSet)
                 throw new InvalidOperationException("Result has already been set");
             _result = value;
-            IsResultSet = true;
+            Interlocked.MemoryBarrier(); // ensure that _result is written before _loader is written
+            _loader = null;
         }
 
         /// <summary>
@@ -60,15 +73,22 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public async Task<T> GetResultAsync(CancellationToken cancellationToken = default)
         {
-            if (!IsResultSet)
-                await Loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
+            var loader = _loader;
+            if (loader != null)
+            {
+                // it does not matter if there are simultaneous calls to DispatchAsync as DataLoaderList
+                // protects against double calls to DispatchAsync
+                await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
+            }
             return Result;
         }
 
         async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
         {
-            if (!IsResultSet)
-                await Loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
+            // same code as above; prevents an additional allocation
+            var loader = _loader;
+            if (loader != null)
+                await loader.DispatchAsync(cancellationToken).ConfigureAwait(false);
             return Result;
         }
     }

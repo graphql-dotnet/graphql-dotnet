@@ -20,7 +20,7 @@ namespace GraphQL.MicrosoftDI
                 throw new ArgumentNullException(nameof(resolver));
             builder.Resolve(context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
             });
         }
@@ -32,7 +32,7 @@ namespace GraphQL.MicrosoftDI
                 throw new ArgumentNullException(nameof(resolver));
             builder.ResolveAsync(async context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             });
         }
@@ -52,7 +52,7 @@ namespace GraphQL.MicrosoftDI
                 throw new ArgumentNullException(nameof(resolver));
             builder.Resolve(context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
             });
         }
@@ -64,7 +64,7 @@ namespace GraphQL.MicrosoftDI
                 throw new ArgumentNullException(nameof(resolver));
             builder.ResolveAsync(async context =>
             {
-                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                using var scope = context.RequestServicesOrThrow().CreateScope();
                 return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             });
         }
@@ -72,5 +72,11 @@ namespace GraphQL.MicrosoftDI
         /// <inheritdoc cref="Resolve{TSourceType}(ConnectionBuilder{TSourceType})"/>
         public static ConnectionResolverBuilder<TSourceType, TReturnType> Resolve<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder)
             => new ConnectionResolverBuilder<TSourceType, TReturnType>(builder, false);
+
+        /// <summary>
+        /// Returns <see cref="IResolveFieldContext.RequestServices"/> if specified or throws <see cref="MissingRequestServicesException"/>.
+        /// </summary>
+        internal static IServiceProvider RequestServicesOrThrow(this IResolveFieldContext context)
+            => context.RequestServices ?? throw new MissingRequestServicesException();
     }
 }
