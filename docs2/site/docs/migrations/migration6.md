@@ -76,7 +76,7 @@ public class DbContextFromServicesAttribute : GraphQLAttribute
     }
 }
 
-// in AssemblyInfo.cs
+// in AssemblyInfo.cs or whereever in your code at assembly level
 [assembly: DbContextFromServices]
 ```
 
