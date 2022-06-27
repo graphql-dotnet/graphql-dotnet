@@ -18,3 +18,11 @@ The current options list is presented below:
 | `UseDeclaringTypeNames` | `false` |
 
 For a detailed description of each option, see [GlobalSwitches](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/GlobalSwitches.cs).
+
+# Global GraphQL Attributes
+
+You may apply `GraphQLAttribute`s globally by applying them to the module or assembly.
+Code that utilizes `GraphQLAttribute`s, such as auto-registering graph types, will scan
+the CLR type's owning module and assembly and apply any globally-defined attributes found.
+Globally-defined attributes may be configured to execute before or after individually-specified
+attributes by changing the `GraphQLAttribute.Priority` value.

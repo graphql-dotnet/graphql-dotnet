@@ -75,7 +75,7 @@ namespace GraphQL.Utilities
 
         private void ApplyMetadata(Type? type)
         {
-            var attributes = type?.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = type?.GetGraphQLAttributes();
 
             if (attributes == null)
                 return;

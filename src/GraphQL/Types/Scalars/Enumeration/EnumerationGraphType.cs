@@ -153,7 +153,7 @@ namespace GraphQL.Types
                     DeprecationReason = deprecation,
                 };
                 bool ignore = false;
-                foreach (var attr in member.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in member.GetGraphQLAttributes())
                 {
                     if (!attr.ShouldInclude(member, null))
                     {
@@ -167,7 +167,7 @@ namespace GraphQL.Types
                 Add(enumValue);
             }
 
-            foreach (var attr in type.GetCustomAttributes<GraphQLAttribute>())
+            foreach (var attr in type.GetGraphQLAttributes())
             {
                 attr.Modify(this);
             }
