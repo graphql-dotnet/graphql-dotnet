@@ -25,4 +25,6 @@ You may apply `GraphQLAttribute`s globally by applying them to the module or ass
 Code that utilizes `GraphQLAttribute`s, such as auto-registering graph types, will scan
 the CLR type's owning module and assembly and apply any globally-defined attributes found.
 Globally-defined attributes may be configured to execute before or after individually-specified
-attributes by changing the `GraphQLAttribute.Priority` value.
+attributes by changing the `GraphQLAttribute.Priority` value. When writing your globally-defined
+attribute do not forget to mark it with `AttributeUsage` attribute and include `AttributeTargets.Assembly`
+or `AttributeTargets.Module`.
