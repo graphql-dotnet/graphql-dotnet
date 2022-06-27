@@ -199,7 +199,7 @@ fragment optionDetail on Option
   }
 }");
 
-        result.Complexity.ShouldBe(1839999841); // WOW! :)
+        result.Complexity.ShouldBe(1839999848); // WOW! :)
     }
 
     [Fact]
