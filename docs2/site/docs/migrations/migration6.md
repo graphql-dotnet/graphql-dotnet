@@ -54,6 +54,10 @@ Field<IntGraphType>("id").WithComplexityImpact(123);
 
 For more details, please review the PR here: https://github.com/graphql-dotnet/graphql-dotnet/pull/3159
 
+### 6. `AutoRegisteringObjectGraphType` recognizes inherited methods
+
+Inherited methods are now recognized by `AutoRegisteringObjectGraphType` and fields are built for them.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
