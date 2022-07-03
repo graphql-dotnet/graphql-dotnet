@@ -63,17 +63,26 @@ namespace GraphQL.Validation.Complexity
             // Sort fragment definitions so that independent fragments go in front.
             var dependencies = BuildDependencies(doc);
             List<GraphQLFragmentDefinition> orderedFragments = new();
+            List<GraphQLFragmentDefinition> fragsToNull = new();
+
             while (dependencies.Count > 0)
             {
                 var independentFragment = GetFirstFragmentWithoutPendingDependencies(dependencies);
+
                 orderedFragments.Add(independentFragment);
                 dependencies.Remove(independentFragment);
-                foreach (var frag in dependencies.Keys)
+
+                foreach (var item in dependencies) // no deconstruct syntax for netstandard2.0
                 {
-                    var fragDeps = dependencies[frag];
-                    if (fragDeps != null && fragDeps.Remove(independentFragment) && fragDeps.Count == 0)
-                        dependencies[frag] = null; // next candidate for GetFirstFragmentWithoutPendingDependencies
+                    if (item.Value?.Remove(independentFragment) == true && item.Value.Count == 0)
+                        fragsToNull.Add(item.Key);
                 }
+
+                // next candidates for GetFirstFragmentWithoutPendingDependencies
+                foreach (var frag in fragsToNull)
+                    dependencies[frag] = null;
+
+                fragsToNull.Clear();
             }
 
             foreach (var frag in orderedFragments)
