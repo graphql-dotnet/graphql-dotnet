@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity
@@ -40,6 +41,8 @@ namespace GraphQL.Validation.Complexity
 #endif
         }
 
+        private static readonly ComplexityVisitor _visitor = new(); // stateless
+
         /// <summary>
         /// Analyzes the complexity of a document.
         /// </summary>
@@ -55,17 +58,94 @@ namespace GraphQL.Validation.Complexity
                 CurrentSubSelectionImpact = avgImpact,
                 CurrentEndNodeImpact = 1d
             };
-            var visitor = new ComplexityVisitor();
 
             // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
-            foreach (var frag in doc.Definitions.OfType<GraphQLFragmentDefinition>().OrderBy(x => x, new NestedFragmentsComparer(doc)))
-                visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
+            // Sort fragment definitions so that independent fragments go in front.
+            var dependencies = BuildDependencies(doc);
+            List<GraphQLFragmentDefinition> orderedFragments = new();
+            List<GraphQLFragmentDefinition> fragsToNull = new();
+
+            while (dependencies.Count > 0)
+            {
+                var independentFragment = GetFirstFragmentWithoutPendingDependencies(dependencies);
+
+                orderedFragments.Add(independentFragment);
+                dependencies.Remove(independentFragment);
+
+                foreach (var item in dependencies) // no deconstruct syntax for netstandard2.0
+                {
+                    if (item.Value?.Remove(independentFragment) == true && item.Value.Count == 0)
+                        fragsToNull.Add(item.Key);
+                }
+
+                // next candidates for GetFirstFragmentWithoutPendingDependencies
+                foreach (var frag in fragsToNull)
+                    dependencies[frag] = null;
+
+                fragsToNull.Clear();
+            }
+
+            foreach (var frag in orderedFragments)
+                _visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
 
             context.FragmentMapAlreadyBuilt = true;
 
-            visitor.VisitAsync(doc, context).GetAwaiter().GetResult();
+            _visitor.VisitAsync(doc, context).GetAwaiter().GetResult();
 
             return context.Result;
+        }
+
+        private static GraphQLFragmentDefinition GetFirstFragmentWithoutPendingDependencies(Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> dependencies)
+        {
+            foreach (var item in dependencies)
+            {
+                if (item.Value == null)
+                    return item.Key;
+            }
+
+            throw new InvalidOperationException("Fragments dependency cycle detected!");
+        }
+
+        private static Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
+        {
+            Stack<GraphQLSelectionSet> _selectionSetsToVisit = new();
+            Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> dependencies = new();
+
+            foreach (var fragmentDef in document.Definitions.OfType<GraphQLFragmentDefinition>())
+            {
+                dependencies[fragmentDef] = GetDependencies(fragmentDef);
+            }
+
+            return dependencies;
+
+            List<GraphQLFragmentDefinition>? GetDependencies(GraphQLFragmentDefinition def)
+            {
+                List<GraphQLFragmentDefinition>? dependencies = null;
+                _selectionSetsToVisit.Push(def.SelectionSet);
+
+                while (_selectionSetsToVisit.Count > 0)
+                {
+                    foreach (var selection in _selectionSetsToVisit.Pop().Selections)
+                    {
+                        if (selection is GraphQLFragmentSpread spread)
+                        {
+                            var frag = document.FindFragmentDefinition(spread.FragmentName.Name.Value);
+                            if (frag != null)
+                            {
+                                (dependencies ??= new()).Add(frag);
+                                _selectionSetsToVisit.Push(frag.SelectionSet);
+                            }
+                        }
+                        else if (selection is IHasSelectionSetNode hasSet && hasSet.SelectionSet != null)
+                        {
+                            _selectionSetsToVisit.Push(hasSet.SelectionSet);
+                        }
+                    }
+                }
+
+                _selectionSetsToVisit.Clear();
+                return dependencies;
+            }
         }
     }
 }
