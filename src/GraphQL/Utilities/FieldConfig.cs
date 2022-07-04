@@ -42,15 +42,27 @@ namespace GraphQL.Utilities
         /// </summary>
         public object? DefaultValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the field resolver.
+        /// </summary>
         public IFieldResolver? Resolver { get; set; }
 
-        public IEventStreamResolver? Subscriber { get; set; }
+        /// <summary>
+        /// Gets or sets the event stream resolver.
+        /// </summary>
+        public ISourceStreamResolver? StreamResolver { get; set; }
 
-        public IAsyncEventStreamResolver? AsyncSubscriber { get; set; }
-
+        /// <summary>
+        /// Gets or sets the <see cref="IAccessor"/> representing the class member
+        /// to be executed for the field resolver.
+        /// </summary>
         public IAccessor? ResolverAccessor { get; set; }
 
-        public IAccessor? SubscriberAccessor { get; set; }
+        /// <summary>
+        /// Gets or sets the <see cref="IAccessor"/> representing the class member
+        /// to be executed for the subscription field's event stream resolver.
+        /// </summary>
+        public IAccessor? StreamResolverAccessor { get; set; }
 
         /// <summary>
         /// Gets configuration for specific field argument by argument name.

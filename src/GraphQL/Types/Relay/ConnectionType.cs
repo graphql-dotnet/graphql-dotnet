@@ -58,6 +58,5 @@ namespace GraphQL.Types.Relay
     public class ConnectionType<TNodeType> : ConnectionType<TNodeType, EdgeType<TNodeType>>
         where TNodeType : IGraphType
     {
-
     }
 }

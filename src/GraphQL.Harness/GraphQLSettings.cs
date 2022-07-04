@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-
 namespace Example
 {
     public class GraphQLSettings

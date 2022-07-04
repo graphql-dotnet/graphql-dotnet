@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace GraphQL
@@ -23,13 +21,13 @@ namespace GraphQL
         // arr => ArrayPool<ElementType>.Shared.Return((ElementType[])arr, true)
         private static Action<Array> CreateDelegate(Type arrayType)
         {
-            var poolType = typeof(System.Buffers.ArrayPool<>).MakeGenericType(arrayType.GetElementType());
+            var poolType = typeof(System.Buffers.ArrayPool<>).MakeGenericType(arrayType.GetElementType()!);
             var parameter = Expression.Parameter(typeof(Array), "arr");
 
             var lambda = Expression.Lambda<Action<Array>>(
                 Expression.Call(
-                    Expression.Property(null, poolType.GetProperty(nameof(System.Buffers.ArrayPool<object>.Shared))),
-                    poolType.GetMethod(nameof(System.Buffers.ArrayPool<object>.Return)),
+                    Expression.Property(null, poolType.GetProperty(nameof(System.Buffers.ArrayPool<object>.Shared))!),
+                    poolType.GetMethod(nameof(System.Buffers.ArrayPool<object>.Return))!,
                 Expression.Convert(parameter, arrayType),
                 Expression.Constant(true, typeof(bool))), parameter);
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
@@ -16,7 +13,7 @@ namespace GraphQL.Types
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
-        private readonly object _allTypesInitializationLock = new object();
+        private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
         private List<IGraphType>? _additionalInstances;
@@ -57,14 +54,11 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (runConfigurations)
+            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
             {
-                if (services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
+                foreach (var configuration in configurations)
                 {
-                    foreach (var configuration in configurations)
-                    {
-                        configuration.Configure(this, services);
-                    }
+                    configuration.Configure(this, services);
                 }
             }
         }
@@ -183,7 +177,7 @@ namespace GraphQL.Types
         /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
         /// object of type serviceType.
         /// </returns>
-        object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
+        object? IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
         /// <inheritdoc/>
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
@@ -227,7 +221,7 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            (_visitors ??= new List<ISchemaNodeVisitor>()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+            (_visitors ??= new()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
         }
 
         /// <inheritdoc/>
@@ -244,7 +238,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
             }
 
-            if (!(_visitorTypes ??= new List<Type>()).Contains(type))
+            if (!(_visitorTypes ??= new()).Contains(type))
                 _visitorTypes.Add(type);
         }
 
@@ -254,7 +248,7 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            (_additionalInstances ??= new List<IGraphType>()).Add(type ?? throw new ArgumentNullException(nameof(type)));
+            (_additionalInstances ??= new()).Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         /// <inheritdoc/>
@@ -271,7 +265,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
             }
 
-            _additionalTypes ??= new List<Type>();
+            _additionalTypes ??= new();
 
             if (!_additionalTypes.Contains(type))
                 _additionalTypes.Add(type);
@@ -299,7 +293,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType, Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new List<(Type, Type)>()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
         }
 
         /// <inheritdoc/>
@@ -445,7 +439,7 @@ namespace GraphQL.Types
                         var baseType = field.ResolvedType!.GetNamedType();
                         if (baseType is IInputObjectGraphType inputFieldType)
                             ExamineType(inputFieldType, completed, inProcess);
-                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, Language.CoreToVanillaConverter.Value(value)).Value;
+                        field.DefaultValue = Execution.ExecutionHelper.CoerceValue(field.ResolvedType!, value).Value;
                     }
                 }
                 inProcess.Pop();

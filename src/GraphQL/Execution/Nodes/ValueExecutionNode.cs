@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -11,15 +11,15 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ValueExecutionNode"/> with the specified values.
         /// </summary>
-        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
 
         /// <summary>
         /// Returns <see cref="ExecutionNode.Result"/>, which has already been serialized by <see cref="ScalarGraphType.Serialize(object)"/>
-        /// within <see cref="ExecutionStrategy.CompleteNode(ExecutionContext, ExecutionNode)"/> or
-        /// <see cref="ExecutionStrategy.SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)"/>.
+        /// within <see cref="ExecutionStrategy.CompleteNodeAsync(ExecutionContext, ExecutionNode)"/> or
+        /// <see cref="ExecutionStrategy.SetArrayItemNodesAsync(ExecutionContext, ArrayExecutionNode)"/>.
         /// </summary>
         public override object? ToValue() => Result;
 

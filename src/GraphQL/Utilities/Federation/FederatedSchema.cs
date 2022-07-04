@@ -1,8 +1,11 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities.Federation
 {
+    /// <summary>
+    /// A schema builder for GraphQL federation
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1102:Make class static.", Justification = "TODO: rewrite")]
     public class FederatedSchema
     {
         /// <summary>

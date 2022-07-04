@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -24,8 +18,8 @@ namespace GraphQL.DataLoader
         /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchDelegate,
-               IEqualityComparer<TKey> keyComparer = null,
-               T defaultValue = default,
+               IEqualityComparer<TKey>? keyComparer = null,
+               T defaultValue = default!,
                int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
@@ -42,8 +36,8 @@ namespace GraphQL.DataLoader
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default,
+            IEqualityComparer<TKey>? keyComparer = null,
+            T defaultValue = default!,
             int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             if (fetchDelegate == null)

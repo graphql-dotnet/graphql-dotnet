@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.MicrosoftDI
 {
@@ -25,7 +23,7 @@ namespace GraphQL.MicrosoftDI
             {
                 try
                 {
-                    Source = (TSource)baseContext.Source;
+                    Source = (TSource)baseContext.Source!;
                 }
                 catch (InvalidCastException)
                 {
@@ -37,23 +35,25 @@ namespace GraphQL.MicrosoftDI
 
         public TSource Source { get; }
 
-        public Field FieldAst => _baseContext.FieldAst;
+        public GraphQLField FieldAst => _baseContext.FieldAst;
 
         public FieldType FieldDefinition => _baseContext.FieldDefinition;
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IResolveFieldContext Parent => _baseContext.Parent;
+        public IResolveFieldContext? Parent => _baseContext.Parent;
 
-        public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
+        public IDictionary<string, ArgumentValue>? Arguments => _baseContext.Arguments;
 
-        public object RootValue => _baseContext.RootValue;
+        public IDictionary<string, DirectiveInfo>? Directives => _baseContext.Directives;
+
+        public object? RootValue => _baseContext.RootValue;
 
         public ISchema Schema => _baseContext.Schema;
 
-        public Document Document => _baseContext.Document;
+        public GraphQLDocument Document => _baseContext.Document;
 
-        public Operation Operation => _baseContext.Operation;
+        public GraphQLOperationDefinition Operation => _baseContext.Operation;
 
         public Variables Variables => _baseContext.Variables;
 
@@ -67,15 +67,17 @@ namespace GraphQL.MicrosoftDI
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public Dictionary<string, Field> SubFields => _baseContext.SubFields;
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
 
-        public IDictionary<string, object> UserContext => _baseContext.UserContext;
+        public IDictionary<string, object?> UserContext => _baseContext.UserContext;
 
-        public IDictionary<string, object> Extensions => _baseContext.Extensions;
+        public IReadOnlyDictionary<string, object?> InputExtensions => _baseContext.InputExtensions;
 
-        object IResolveFieldContext.Source => _baseContext.Source;
+        public IDictionary<string, object?> OutputExtensions => _baseContext.OutputExtensions;
+
+        object? IResolveFieldContext.Source => _baseContext.Source;
 
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }

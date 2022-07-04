@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     //this class could always be unsealed, but it seems pointless, as
@@ -24,7 +20,7 @@ namespace GraphQL.DataLoader
             Key = key;
         }
 
-        private T _result;
+        private T _result = default!;
 
         /// <summary>
         /// Returns the key that is passed to the data loader's fetch delegate
@@ -37,7 +33,7 @@ namespace GraphQL.DataLoader
         public IDataLoader Loader { get; }
 
         /// <summary>
-        /// Returns the result if it has been set, or default(T) if not
+        /// Returns the result if it has been set, or throws an exception if not
         /// </summary>
         public T Result => IsResultSet ? _result : throw new InvalidOperationException("Result has not been set");
 
@@ -69,7 +65,7 @@ namespace GraphQL.DataLoader
             return Result;
         }
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+        async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
         {
             if (!IsResultSet)
                 await Loader.DispatchAsync(cancellationToken).ConfigureAwait(false);

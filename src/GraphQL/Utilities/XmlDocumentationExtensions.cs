@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -28,7 +25,7 @@ namespace GraphQL.Utilities
                 return $"{baseName}{{{string.Join(",", type.GetGenericArguments().Select(GetTypeName))}}}";
             }
 
-            return type.FullName;
+            return type.FullName!;
         }
 
         /// <summary>
@@ -40,8 +37,8 @@ namespace GraphQL.Utilities
         {
             char prefixCode;
             string memberName = member is Type t
-                ? t.FullName // member is a Type
-                : member.DeclaringType.FullName + "." + member.Name;  // member belongs to a Type
+                ? t.FullName! // member is a Type
+                : member.DeclaringType!.FullName + "." + member.Name;  // member belongs to a Type
             memberName = memberName.Replace('+', '.');
 
             switch (member.MemberType)
@@ -94,6 +91,7 @@ namespace GraphQL.Utilities
 
             return _cachedXml.GetOrAdd(assemblyName, key =>
             {
+
                 try
                 {
                     if (File.Exists(pathToXmlFile))
@@ -101,15 +99,17 @@ namespace GraphQL.Utilities
 
                     if (doc == null)
                     {
-                        string relativePath = Path.Combine(Path.GetDirectoryName(asm.Location), pathToXmlFile);
+                        string relativePath = Path.Combine(Path.GetDirectoryName(asm.Location)!, pathToXmlFile);
                         if (File.Exists(relativePath))
                             doc = XDocument.Load(relativePath);
                     }
                 }
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
                 catch (Exception)
                 {
                     // No logging is needed
                 }
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
 
                 return doc;
             });
@@ -137,7 +137,7 @@ namespace GraphQL.Utilities
         /// <param name="xml">XML documentation.</param>
         /// <returns>The contents of the summary tag for the member.</returns>
         public static string? GetXmlDocumentation(this MemberInfo member, XDocument? xml) => xml?.XPathEvaluate(
-            $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString().Trim().NullIfEmpty();
+            $"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)").ToString()!.Trim().NullIfEmpty();
 
         /// <summary>
         /// Returns the XML documentation (returns/param tag) for the specified parameter.
@@ -163,8 +163,8 @@ namespace GraphQL.Utilities
         public static string? GetXmlDocumentation(this ParameterInfo parameter, XDocument? xml) =>
             parameter.IsRetval || string.IsNullOrEmpty(parameter.Name)
                 ? xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString().Trim().NullIfEmpty()
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString()!.Trim().NullIfEmpty()
                 : xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString().Trim().NullIfEmpty();
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString()!.Trim().NullIfEmpty();
     }
 }

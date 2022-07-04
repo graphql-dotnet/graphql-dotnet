@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,14 +11,14 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public NoUndefinedVariablesError(ValidationContext context, Operation node, VariableReference variableReference)
-            : base(context.Document.OriginalQuery!, NUMBER, UndefinedVarMessage(variableReference.Name, node.Name), variableReference, node)
+        public NoUndefinedVariablesError(ValidationContext context, GraphQLOperationDefinition node, GraphQLVariable variableReference)
+            : base(context.Document.Source, NUMBER, UndefinedVarMessage(variableReference.Name.StringValue, node.Name?.StringValue), variableReference, node)
         {
         }
 
-        internal static string UndefinedVarMessage(string varName, string opName)
+        internal static string UndefinedVarMessage(string varName, string? opName)
         {
-            return string.IsNullOrWhiteSpace(opName)
+            return string.IsNullOrEmpty(opName)
                 ? $"Variable '${varName}' is not defined."
                 : $"Variable '${varName}' is not defined by operation '{opName}'.";
         }

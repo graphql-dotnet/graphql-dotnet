@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -16,8 +11,8 @@ namespace GraphQL.DataLoader
         //this class supports adding more items after DispatchAsync has been called,
         //  and calling DispatchAsync will then load those items
 
-        private DataLoaderList _list;
-        private readonly Dictionary<TKey, DataLoaderPair<TKey, T>> _cachedList;
+        private DataLoaderList? _list;
+        private readonly Dictionary<TKey, DataLoaderPair<TKey, T>>? _cachedList;
         private readonly object _sync = new object();
 
         /// <summary>
@@ -59,7 +54,7 @@ namespace GraphQL.DataLoader
         /// </summary>
         /// <param name="equalityComparer">Specifies the equality comparer to be used, or <see langword="null"/> for the default equality comparer</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
-        public DataLoaderBase(IEqualityComparer<TKey> equalityComparer, int maxBatchSize) : this(true, equalityComparer, maxBatchSize) { }
+        public DataLoaderBase(IEqualityComparer<TKey>? equalityComparer, int maxBatchSize) : this(true, equalityComparer, maxBatchSize) { }
 
         /// <summary>
         /// Initialize a DataLoaderBase with the specified options.
@@ -67,7 +62,7 @@ namespace GraphQL.DataLoader
         /// <param name="caching">Indicates if responses should be cached</param>
         /// <param name="equalityComparer">Specifies the equality comparer to be used, or <see langword="null"/> for the default equality comparer</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
-        public DataLoaderBase(bool caching, IEqualityComparer<TKey> equalityComparer, int maxBatchSize)
+        public DataLoaderBase(bool caching, IEqualityComparer<TKey>? equalityComparer, int maxBatchSize)
         {
             if (maxBatchSize < 1)
                 throw new ArgumentOutOfRangeException(nameof(maxBatchSize));
@@ -154,7 +149,7 @@ namespace GraphQL.DataLoader
         public Task DispatchAsync(CancellationToken cancellationToken = default)
         {
             //start loading the currently queued items
-            DataLoaderList listToLoad;
+            DataLoaderList? listToLoad;
             lock (_sync)
             {
                 //once it enters the lock, it is guaranteed to exit the lock, as it does not depend on external code

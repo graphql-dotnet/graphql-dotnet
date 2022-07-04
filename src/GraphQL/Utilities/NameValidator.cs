@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Utilities
 {
     /// <summary>
@@ -22,7 +20,7 @@ namespace GraphQL.Utilities
         internal static void ValidateNameOnSchemaInitialize(string name, NamedElement type) => ValidateDefault(name, type);
 
         /// <summary>
-        /// Validates a specified name according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
+        /// Validates a specified name according to the GraphQL <see href="https://spec.graphql.org/October2021/#sec-Names">specification</see>.
         /// </summary>
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum or directive.</param>

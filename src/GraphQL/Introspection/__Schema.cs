@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -46,7 +45,6 @@ namespace GraphQL.Introspection
                     return types.Constrained(index);
                 });
 
-
             Field<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",
@@ -77,7 +75,7 @@ namespace GraphQL.Introspection
                 "A list of all directives supported by this server.",
                 resolve: async context =>
                 {
-                    var directives = context.ArrayPool.Rent<DirectiveGraphType>(context.Schema.Directives.Count);
+                    var directives = context.ArrayPool.Rent<Directive>(context.Schema.Directives.Count);
 
                     int index = 0;
                     foreach (var directive in context.Schema.Directives.List)

@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -25,7 +23,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// The parsed GraphQL request
         /// </summary>
-        Document Document { get; }
+        GraphQLDocument Document { get; }
 
         /// <summary>
         /// A list of errors generated during GraphQL request processing
@@ -50,7 +48,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// The GraphQL operation that is being executed
         /// </summary>
-        Operation Operation { get; }
+        GraphQLOperationDefinition Operation { get; }
 
         /// <summary>
         /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers
@@ -72,7 +70,7 @@ namespace GraphQL.Execution
         /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored
         /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
         /// </summary>
-        Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
+        Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
 
         /// <summary>
         /// Input variables to the GraphQL request
@@ -80,10 +78,17 @@ namespace GraphQL.Execution
         Variables Variables { get; }
 
         /// <summary>
+        /// A dictionary of extra information supplied with the GraphQL request.
+        /// This is reserved for implementors to extend the protocol however they see fit, and
+        /// hence there are no additional restrictions on its contents.
+        /// </summary>
+        IReadOnlyDictionary<string, object?> InputExtensions { get; }
+
+        /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents.
         /// </summary>
-        Dictionary<string, object?> Extensions { get; }
+        Dictionary<string, object?> OutputExtensions { get; }
 
         /// <summary>
         /// The service provider for the executing request. Typically this is a scoped service provider

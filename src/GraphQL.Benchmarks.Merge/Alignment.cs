@@ -1,8 +1,7 @@
-namespace GraphQL.Benchmarks.Merge
+namespace GraphQL.Benchmarks.Merge;
+
+internal enum Alignment
 {
-    internal enum Alignment
-    {
-        Left,
-        Right
-    }
+    Left,
+    Right
 }

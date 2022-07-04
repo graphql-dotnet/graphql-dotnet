@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
@@ -14,7 +11,7 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -26,7 +23,7 @@ namespace GraphQL
             where T : class
             => (T)ToObject(source, typeof(T));
 
-        private static readonly List<object> _emptyValues = new List<object>();
+        private static readonly List<object> _emptyValues = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -72,8 +69,8 @@ namespace GraphQL
                         bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
                         if (matched)
                         {
-                            (values ??= new List<object>()).Add(keyValue.Value);
-                            (keys ??= new List<string>()).Add(keyValue.Key);
+                            (values ??= new()).Add(keyValue.Value);
+                            (keys ??= new()).Add(keyValue.Key);
                         }
                         return matched;
                     }))
@@ -84,7 +81,7 @@ namespace GraphQL
                     // Then check for default values if any
                     if (p.HasDefaultValue)
                     {
-                        (values ??= new List<object>()).Add(p.DefaultValue);
+                        (values ??= new()).Add(p.DefaultValue);
                         return true;
                     }
 
@@ -100,9 +97,12 @@ namespace GraphQL
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            // force sourceType to be IDictionary<string, object>
+            // if conversion from IDictionary<string, object> to desired type is registered then use it
             if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
                 return result!;
+
+            if (type.IsAbstract)
+                throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.");
 
             // attempt to use the most specific constructor sorting in decreasing order of parameters number
             var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
@@ -142,7 +142,7 @@ namespace GraphQL
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return ""; // never executed, necessary only for intellisense
             }
 
@@ -168,6 +168,25 @@ namespace GraphQL
                 {
                     object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
+                }
+                else
+                {
+                    FieldInfo? fieldInfo;
+
+                    try
+                    {
+                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    }
+                    catch (AmbiguousMatchException)
+                    {
+                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                    }
+
+                    if (fieldInfo != null)
+                    {
+                        object? value = GetPropertyValue(item.Value, fieldInfo.FieldType, field?.ResolvedType);
+                        fieldInfo.SetValue(obj, value);
+                    }
                 }
             }
 
@@ -224,7 +243,7 @@ namespace GraphQL
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
-                    newCollection = (IList)Activator.CreateInstance(genericListType);
+                    newCollection = (IList)Activator.CreateInstance(genericListType)!;
                 }
 
                 if (!(propertyValue is IEnumerable valueList))
@@ -248,7 +267,7 @@ namespace GraphQL
                     }
 
                     if (fieldType.IsArray)
-                        newCollection = ((dynamic)newCollection).ToArray();
+                        newCollection = ((dynamic)newCollection!).ToArray();
                 }
 
                 return newCollection;
@@ -287,7 +306,7 @@ namespace GraphQL
                     throw new InvalidOperationException($"Unknown value '{value}' for enum '{fieldType.Name}'.");
                 }
 
-                string str = value.ToString();
+                string str = value.ToString()!;
                 value = Enum.Parse(fieldType, str, true);
             }
 

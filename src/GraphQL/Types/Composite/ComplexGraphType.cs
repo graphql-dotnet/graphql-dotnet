@@ -1,11 +1,9 @@
-using System;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -33,7 +31,7 @@ namespace GraphQL.Types
         /// Returns the <see cref="FieldType"/> for the field matching the specified name that
         /// is configured for this graph type, or <see langword="null"/> if none is found.
         /// </summary>
-        FieldType? GetField(string name);
+        FieldType? GetField(ROM name);
     }
 
     /// <summary>
@@ -70,16 +68,13 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public FieldType? GetField(string name)
+        public FieldType? GetField(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
-            if (!string.IsNullOrWhiteSpace(name))
+            foreach (var field in Fields.List)
             {
-                foreach (var field in Fields.List)
-                {
-                    if (string.Equals(field.Name, name, StringComparison.Ordinal))
-                        return field;
-                }
+                if (field.Name == name)
+                    return field;
             }
 
             return null;
@@ -214,6 +209,19 @@ namespace GraphQL.Types
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
+            IFieldResolver? resolver = null;
+
+            if (resolve != null)
+            {
+                // create an instance expression that points to the instance represented by the delegate
+                // for instance, if the delegate represents obj.MyMethod,
+                // then the lambda would be: _ => obj
+                var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
+                var body = Expression.Constant(resolve.Target, resolve.Method.DeclaringType!);
+                var lambda = Expression.Lambda(body, param);
+                resolver = AutoRegisteringHelper.BuildFieldResolver(resolve.Method, null, null, lambda);
+            }
+
             return AddField(new FieldType
             {
                 Name = name,
@@ -221,9 +229,7 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = typeof(TGraphType),
                 Arguments = arguments,
-                Resolver = resolve != null
-                    ? new DelegateFieldModelBinderResolver(resolve)
-                    : null
+                Resolver = resolver,
             });
         }
 
@@ -253,7 +259,7 @@ namespace GraphQL.Types
                 Type = type,
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
+                    ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             });
         }
@@ -284,7 +290,7 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
+                    ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             });
         }
@@ -316,21 +322,32 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<TSourceType, TReturnType>(resolve)
+                    ? new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context)))
                     : null
             });
         }
 
+        /// <summary>
+        /// Adds a subscription field with the specified properties to this graph type.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of this field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
+        /// <param name="subscribe">A source stream resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribe<TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
             Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-            Func<IResolveEventStreamContext, IObservable<object?>>? subscribe = null,
+            Func<IResolveFieldContext, IObservable<object?>>? subscribe = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new EventStreamFieldType
+            return AddField(new FieldType
             {
                 Name = name,
                 Description = description,
@@ -340,22 +357,33 @@ namespace GraphQL.Types
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
-                Subscriber = subscribe != null
-                    ? new EventStreamResolver<object>(subscribe)
+                StreamResolver = subscribe != null
+                    ? new SourceStreamResolver<object>(subscribe)
                     : null
             });
         }
 
+        /// <summary>
+        /// Adds a subscription field with the specified properties to this graph type.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of this field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
+        /// <param name="subscribeAsync">A source stream resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
             Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-            Func<IResolveEventStreamContext, Task<IObservable<object?>>>? subscribeAsync = null,
+            Func<IResolveFieldContext, Task<IObservable<object?>>>? subscribeAsync = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new EventStreamFieldType
+            return AddField(new FieldType
             {
                 Name = name,
                 Description = description,
@@ -365,8 +393,8 @@ namespace GraphQL.Types
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
-                AsyncSubscriber = subscribeAsync != null
-                    ? new AsyncEventStreamResolver<object>(subscribeAsync)
+                StreamResolver = subscribeAsync != null
+                    ? new SourceStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
                     : null
             });
         }

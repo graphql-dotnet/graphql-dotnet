@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -11,7 +7,7 @@ namespace GraphQL.DataLoader
     public class SimpleDataLoader<T> : IDataLoader, IDataLoader<T>, IDataLoaderResult<T>
     {
         private readonly Func<CancellationToken, Task<T>> _fetchDelegate;
-        private Task<T> _result;
+        private Task<T>? _result;
 
         /// <summary>
         /// Initializes a new SimpleDataLoader with the given fetch delegate
@@ -39,7 +35,9 @@ namespace GraphQL.DataLoader
             if (_result != null)
                 return _result;
 
+#pragma warning disable RCS1059 // Avoid locking on publicly accessible instance.
             lock (this)
+#pragma warning restore RCS1059 // Avoid locking on publicly accessible instance.
             {
                 if (_result != null)
                     return _result;
@@ -64,7 +62,7 @@ namespace GraphQL.DataLoader
         /// </returns>
         public IDataLoaderResult<T> LoadAsync() => this;
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+        async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
             => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

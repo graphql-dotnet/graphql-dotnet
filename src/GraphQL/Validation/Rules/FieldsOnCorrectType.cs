@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -20,13 +16,13 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
+        public static readonly FieldsOnCorrectType Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="FieldsOnCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Field>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLField>((node, context) =>
         {
             var type = context.TypeInfo.GetParentType()?.GetNamedType();
 
@@ -39,18 +35,18 @@ namespace GraphQL.Validation.Rules
                     var fieldName = node.Name;
 
                     // First determine if there are any suggested types to condition on.
-                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
+                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName.StringValue).ToList(); //ISSUE:allocation
 
                     // If there are no suggested types, then perhaps this was a typo?
                     var suggestedFieldNames = suggestedTypeNames.Count > 0
                         ? Array.Empty<string>()
-                        : GetSuggestedFieldNames(type, fieldName);
+                        : GetSuggestedFieldNames(type, fieldName.StringValue); //ISSUE:allocation
 
                     // Report an error, including helpful suggestions.
                     context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
                 }
             }
-        }).ToTask();
+        });
 
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces

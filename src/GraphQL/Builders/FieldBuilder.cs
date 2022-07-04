@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
@@ -35,9 +32,12 @@ namespace GraphQL.Builders
         /// <summary>
         /// Returns the generated field.
         /// </summary>
-        public EventStreamFieldType FieldType { get; }
+        public FieldType FieldType { get; }
 
-        private FieldBuilder(EventStreamFieldType fieldType)
+        /// <summary>
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+        /// </summary>
+        protected FieldBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -49,7 +49,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the field.</param>
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
         {
-            var fieldType = new EventStreamFieldType
+            var fieldType = new FieldType
             {
                 Name = name,
                 ResolvedType = type,
@@ -61,7 +61,7 @@ namespace GraphQL.Builders
         /// <inheritdoc cref="Create(IGraphType, string)"/>
         public static FieldBuilder<TSourceType, TReturnType> Create(Type? type = null, string name = "default")
         {
-            var fieldType = new EventStreamFieldType
+            var fieldType = new FieldType
             {
                 Name = name,
                 Type = type,
@@ -132,12 +132,12 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
-        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolve)
-            => Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
+            => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context))));
 
         /// <summary>
         /// Sets the return type of the field.
@@ -194,7 +194,7 @@ namespace GraphQL.Builders
                 Name = name,
             };
             configure?.Invoke(arg);
-            FieldType.Arguments ??= new QueryArguments();
+            FieldType.Arguments ??= new();
             FieldType.Arguments.Add(arg);
             return this;
         }
@@ -208,15 +208,21 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType?>> subscribe)
+        /// <summary>
+        /// Sets a source stream resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStream(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
         {
-            FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
+            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
             return this;
         }
 
-        public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType?>>> subscribeAsync)
+        /// <summary>
+        /// Sets a source stream resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
         {
-            FieldType.AsyncSubscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
+            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
             return this;
         }
 

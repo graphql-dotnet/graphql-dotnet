@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;

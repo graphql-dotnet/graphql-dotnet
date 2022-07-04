@@ -162,9 +162,9 @@ If this type of functionality is necessary for your data types, you will need to
 field resolvers to perform the conversion, as a custom scalar cannot do this. This is a limitation
 of GraphQL.NET.
 
-### Should I use `GraphQLAuthorizeAttribute` or the `AuthorizeWith` method?
+### Should I use `AuthorizeAttribute` or the `AuthorizeWith` method?
 
-`GraphQLAuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
+`AuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
 with the code-first approach.
 
 See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
@@ -246,9 +246,26 @@ so it is safe to preserve these instances without calling `.Copy()`.
 
 ## Known Issues
 
+### IResolveFieldContext.HasArgument issue
+
 `IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.
 It cannot identify which arguments have been provided a `null` value compared to arguments which were not provided.
 This issue should supposedly be resolved in version 4.
+
+### Serialization of decimals does not respect precision
+
+This one is `Newtonsoft.Json` specific issue. For more information see:
+- https://github.com/JamesNK/Newtonsoft.Json/issues/1726
+- https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
+
+As a workaround you may add `FixPrecisionConverter`:
+
+```csharp
+new NewtonsoftJson.DocumentWriter(settings =>
+{
+    settings.Converters.Add(new NewtonsoftJson.FixPrecisionConverter(true, true, true));
+})
+```
 
 ## Common Errors
 
@@ -304,7 +321,7 @@ execution strategy. Please read the section on this in the
 > see https://go.microsoft.com/fwlink/?linkid=2097913.
 
 This problem is due to the fact that the default execution strategy for a query operation
-is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/June2018/#sec-Normal-and-Serial-Execution),
+is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/October2021/#sec-Normal-and-Serial-Execution),
 combined with the fact that you are using a shared instance of the Entity Framework
 `DbContext`.
 

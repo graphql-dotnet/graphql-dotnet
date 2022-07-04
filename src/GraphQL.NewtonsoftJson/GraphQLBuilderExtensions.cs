@@ -1,8 +1,6 @@
 #nullable enable
 
-using System;
 using GraphQL.DI;
-using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {
@@ -10,15 +8,21 @@ namespace GraphQL.NewtonsoftJson
     public static class GraphQLBuilderExtensions
     {
         /// <summary>
-        /// Registers the Newtonsoft.Json <see cref="DocumentWriter"/> as a singleton of type
-        /// <see cref="IDocumentWriter"/> within the dependency injection framework and configures
-        /// it with the specified configuration delegate.
+        /// Registers the Newtonsoft.Json <see cref="GraphQLSerializer"/> as singletons of types
+        /// <see cref="IGraphQLSerializer"/> and <see cref="IGraphQLTextSerializer"/> within the
+        /// dependency injection framework and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings>? action = null)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddSerializer<GraphQLSerializer>();
+        }
 
         /// <inheritdoc cref="AddNewtonsoftJson(IGraphQLBuilder, Action{JsonSerializerSettings})"/>
         public static IGraphQLBuilder AddNewtonsoftJson(this IGraphQLBuilder builder, Action<JsonSerializerSettings, IServiceProvider>? action)
-            => builder.AddDocumentWriter<DocumentWriter>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddSerializer<GraphQLSerializer>();
+        }
     }
 }

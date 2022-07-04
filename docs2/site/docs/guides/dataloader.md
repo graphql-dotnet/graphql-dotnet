@@ -45,7 +45,6 @@ public class MySchema : Schema
 {
     public MySchema(IServiceProvider services) : base(services)
     {
-
     }
 }
 ```
@@ -126,7 +125,6 @@ public interface IUsersStore
     Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
 }
 ```
-
 
 This is an example of using a DataLoader to batch requests for loading a collection of items by a key. This is used when a key may be associated with more than one item. `LoadAsync()` is called by the field resolver for each User. A User can have zero to many Orders. `IOrdersStore.GetOrdersByUserIdAsync` will be called with a batch of userIds that have been requested.
 

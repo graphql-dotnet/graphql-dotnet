@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.NewtonsoftJson
@@ -11,7 +9,7 @@ namespace GraphQL.NewtonsoftJson
     {
         /// <summary>
         /// Configures an <see cref="ExecutionOptions"/> using the given <paramref name="configure"/> action
-        /// then executes those options using the <paramref name="schema"/> and a <see cref="DocumentWriter"/>
+        /// then executes those options using the <paramref name="schema"/> and a <see cref="GraphQLSerializer"/>
         /// with indentation turned on.
         /// </summary>
         /// <param name="schema">A schema to use.</param>
@@ -22,6 +20,6 @@ namespace GraphQL.NewtonsoftJson
         /// Part of the public API and should not be removed even if it has no references.
         /// </remarks>
         public static Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
-            => schema.ExecuteAsync(new DocumentWriter(indent: true), configure);
+            => schema.ExecuteAsync(new GraphQLSerializer(indent: true), configure);
     }
 }

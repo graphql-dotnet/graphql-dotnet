@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Validation;
 
 namespace GraphQL.Execution
@@ -9,7 +6,7 @@ namespace GraphQL.Execution
     /// <inheritdoc cref="IErrorInfoProvider"/>
     public class ErrorInfoProvider : IErrorInfoProvider
     {
-        private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
+        private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new();
 
         private readonly ErrorInfoProviderOptions _options;
 

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Execution;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -28,11 +25,14 @@ namespace GraphQL
         /// <summary>GraphQL query operation name; optional, defaults to first (if any) operation defined in query</summary>
         public string? OperationName { get; set; }
 
-        /// <summary>Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed GraphQL requests (a <see cref="Language.AST.Document"/>). If not set, it will be parsed from <see cref="Query"/></summary>
-        public Document? Document { get; set; }
+        /// <summary>Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed GraphQL requests (a <see cref="GraphQLDocument"/>). If not set, it will be parsed from <see cref="Query"/></summary>
+        public GraphQLDocument? Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
-        public Inputs? Inputs { get; set; }
+        public Inputs? Variables { get; set; }
+
+        /// <summary>Input extensions to GraphQL request</summary>
+        public Inputs? Extensions { get; set; }
 
         /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }
@@ -63,7 +63,7 @@ namespace GraphQL
         /// within <see cref="ExecutionResult.Errors"/> as an <see cref="ExecutionError"/>.
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
-        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; } = context => { };
+        public Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; set; } = _ => Task.CompletedTask;
 
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }

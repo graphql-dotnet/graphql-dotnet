@@ -1,7 +1,6 @@
-using System;
-using System.Linq;
 using GraphQL.Execution;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
@@ -10,20 +9,27 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class ExecutionResultJsonConverter : JsonConverter
     {
-        private readonly IErrorInfoProvider _errorInfoProvider;
+        private readonly NamingStrategy? _namingStrategy;
 
         /// <summary>
-        /// Initializes a new instance with the specified <see cref="IErrorInfoProvider"/>.
+        /// Initializes a new instance.
         /// </summary>
-        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
+        public ExecutionResultJsonConverter()
         {
-            _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified <see cref="NamingStrategy"/>.
+        /// </summary>
+        public ExecutionResultJsonConverter(NamingStrategy? namingStrategy)
+        {
+            _namingStrategy = namingStrategy;
         }
 
         /// <inheritdoc/>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            var result = (ExecutionResult)value;
+            var result = (ExecutionResult)value!;
 
             writer.WriteStartObject();
 
@@ -67,7 +73,10 @@ namespace GraphQL.NewtonsoftJson
                     writer.WriteStartObject();
                     foreach (var childNode in objectExecutionNode.SubFields)
                     {
-                        writer.WritePropertyName(childNode.Name);
+                        var propName = childNode.Name!;
+                        if (_namingStrategy != null)
+                            propName = _namingStrategy.GetPropertyName(propName, false);
+                        writer.WritePropertyName(propName);
                         WriteExecutionNode(writer, childNode, serializer);
                     }
                     writer.WriteEndObject();
@@ -100,7 +109,7 @@ namespace GraphQL.NewtonsoftJson
             }
         }
 
-        private void WriteErrors(JsonWriter writer, ExecutionErrors errors, JsonSerializer serializer)
+        private void WriteErrors(JsonWriter writer, ExecutionErrors? errors, JsonSerializer serializer)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -109,50 +118,7 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WritePropertyName("errors");
 
-            writer.WriteStartArray();
-
-            foreach (var error in errors)
-            {
-                var info = _errorInfoProvider.GetInfo(error);
-
-                writer.WriteStartObject();
-
-                writer.WritePropertyName("message");
-
-                serializer.Serialize(writer, info.Message);
-
-                if (error.Locations != null)
-                {
-                    writer.WritePropertyName("locations");
-                    writer.WriteStartArray();
-                    foreach (var location in error.Locations)
-                    {
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("line");
-                        serializer.Serialize(writer, location.Line);
-                        writer.WritePropertyName("column");
-                        serializer.Serialize(writer, location.Column);
-                        writer.WriteEndObject();
-                    }
-                    writer.WriteEndArray();
-                }
-
-                if (error.Path != null && error.Path.Any())
-                {
-                    writer.WritePropertyName("path");
-                    serializer.Serialize(writer, error.Path);
-                }
-
-                if (info.Extensions?.Count > 0)
-                {
-                    writer.WritePropertyName("extensions");
-                    serializer.Serialize(writer, info.Extensions);
-                }
-
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndArray();
+            serializer.Serialize(writer, errors);
         }
 
         private void WriteExtensions(JsonWriter writer, ExecutionResult result, JsonSerializer serializer)
@@ -167,7 +133,7 @@ namespace GraphQL.NewtonsoftJson
         /// <summary>
         /// This JSON converter does not support reading.
         /// </summary>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => throw new NotImplementedException();
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public override bool CanRead => false;

@@ -1,141 +1,151 @@
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
+using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
     /// <summary>
     /// Provides extension methods to configure GraphQL.NET services within a dependency injection framework.
     /// </summary>
-    public static class GraphQLBuilderExtensions
+    public static class GraphQLBuilderExtensions // TODO: split
     {
         #region - Additional overloads for Register, TryRegister and Configure -
-        /// <inheritdoc cref="Register{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime, bool replace = false)
+        /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
+        public static IServiceRegister Register<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
-            => builder.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
+            => services.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
         /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
+            => services.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder builder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<TService>(this IServiceRegister services, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
-            => builder.Register(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime, replace);
+            => services.Register(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime, replace);
 
         /// <summary>
         /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IGraphQLBuilder Register<TService>(this IGraphQLBuilder builder, TService implementationInstance, bool replace = false)
+        public static IServiceRegister Register<TService>(this IServiceRegister services, TService implementationInstance, bool replace = false)
             where TService : class
-            => builder.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
+            => services.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
 
-        /// <inheritdoc cref="TryRegister{TService}(IGraphQLBuilder, Func{IServiceProvider, TService}, ServiceLifetime)"/>
-        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        /// <inheritdoc cref="TryRegister{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime)"/>
+        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
-            => builder.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
+            => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
         /// <summary>
-        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
-        /// of the same type has not already been registered.
-        /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency
+        /// injection provider if a service of the same type (and of the same implementation type
+        /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
+        /// has not already been registered. An instance of <typeparamref name="TImplementation"/>
+        /// will be created when an instance is needed.
         /// </summary>
-        public static IGraphQLBuilder TryRegister<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
-            => builder.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime);
+            => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, mode);
 
         /// <summary>
         /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
         /// of the same type has not already been registered.
         /// </summary>
-        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder builder, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
-            => builder.TryRegister(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime);
+            where TImplementation : class, TService
+            => services.TryRegister(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime, mode);
+
+        /// <summary>
+        /// Registers the service of type <typeparamref name="TService"/> with the dependency injection provider if a service
+        /// of the same type has not already been registered.
+        /// </summary>
+        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, Func<IServiceProvider, TService> implementationFactory, ServiceLifetime serviceLifetime)
+            where TService : class
+            => services.TryRegister(typeof(TService), implementationFactory ?? throw new ArgumentNullException(nameof(implementationFactory)), serviceLifetime);
 
         /// <summary>
         /// Registers <paramref name="implementationInstance"/> as type <typeparamref name="TService"/> with the dependency injection provider
         /// if a service of the same type has not already been registered.
         /// </summary>
-        public static IGraphQLBuilder TryRegister<TService>(this IGraphQLBuilder builder, TService implementationInstance)
+        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, TService implementationInstance, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
-            => builder.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)));
+            => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), mode);
 
-        /// <inheritdoc cref="IGraphQLBuilder.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
-        public static IGraphQLBuilder Configure<TOptions>(this IGraphQLBuilder builder, Action<TOptions>? action)
+        /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
+        public static IServiceRegister Configure<TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
-            => builder.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
+            => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
 
         #region - RegisterAsBoth and TryRegisterAsBoth -
         /// <summary>
         /// Calls Register for both the implementation and service
         /// </summary>
-        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register<TImplementation>(serviceLifetime).Register<TService, TImplementation>(serviceLifetime);
+            => services.Register<TImplementation>(serviceLifetime).Register<TService, TImplementation>(serviceLifetime);
 
         /// <summary>
         /// Calls Register for both the implementation and service
         /// </summary>
-        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+        private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register(implementationFactory, serviceLifetime).Register<TService>(implementationFactory, serviceLifetime);
+            => services.Register(implementationFactory, serviceLifetime).Register<TService>(implementationFactory, serviceLifetime);
 
         /// <summary>
         /// Calls Register for both the implementation and service
         /// </summary>
-        private static IGraphQLBuilder RegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+        private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register(implementationInstance).Register<TService>(implementationInstance);
+            => services.Register(implementationInstance).Register<TService>(implementationInstance);
 
         /// <summary>
         /// Calls Register for the implementation and TryRegister for the service
         /// </summary>
-        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime)
+        private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register<TImplementation>(serviceLifetime).TryRegister<TService, TImplementation>(serviceLifetime);
+            => services.Register<TImplementation>(serviceLifetime).TryRegister<TService, TImplementation>(serviceLifetime);
 
         /// <summary>
         /// Calls Register for the implementation and TryRegister for the service
         /// </summary>
-        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+        private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register(implementationFactory, serviceLifetime).TryRegister<TService>(implementationFactory, serviceLifetime);
+            => services.Register(implementationFactory, serviceLifetime).TryRegister<TService>(implementationFactory, serviceLifetime);
 
         /// <summary>
         /// Calls Register for the implementation and TryRegister for the service
         /// </summary>
-        private static IGraphQLBuilder TryRegisterAsBoth<TService, TImplementation>(this IGraphQLBuilder builder, TImplementation implementationInstance)
+        private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
             where TService : class
             where TImplementation : class, TService
-            => builder.Register(implementationInstance).TryRegister<TService>(implementationInstance);
+            => services.Register(implementationInstance).TryRegister<TService>(implementationInstance);
         #endregion
 
         #region - AddSchema -
@@ -163,7 +173,7 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             // Also register the service as ISchema if not already registered.
-            builder.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
+            builder.Services.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
 
             return builder;
         }
@@ -180,7 +190,7 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             // Also register the service as ISchema if not already registered.
-            builder.TryRegisterAsBoth<ISchema, TSchema>(schema);
+            builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schema);
 
             return builder;
         }
@@ -204,8 +214,109 @@ namespace GraphQL
 
             // Register the service with the DI provider as TSchema, overwriting any existing registration
             // Also register the service as ISchema if not already registered.
-            builder.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
+            builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
 
+            return builder;
+        }
+        #endregion
+
+        #region - AddGraphTypeMappingProvider -
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingProvider"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingProvider"/>.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingProvider"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this IGraphQLBuilder builder)
+            where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
+        {
+            builder.Services.Register<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingProvider"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingProvider"/> using the specified factory delegate.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingProvider"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TGraphTypeMappingProvider> factory)
+            where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
+        {
+            builder.Services.Register<IGraphTypeMappingProvider>(factory, ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an instance of <typeparamref name="TGraphTypeMappingProvider"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingProvider"/> using the specified instance.
+        /// <br/><br/>
+        /// An <see cref="IGraphTypeMappingProvider"/> can be used to map one or more CLR types to graph types.
+        /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// types.
+        /// </summary>
+        public static IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this IGraphQLBuilder builder, TGraphTypeMappingProvider instance)
+            where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
+        {
+            builder.Services.Register<IGraphTypeMappingProvider>(instance);
+            return builder;
+        }
+        #endregion
+
+        #region - AddAutoSchema / WithMutation / WithSubscription -
+        /// <summary>
+        /// Registers an instance of the <see cref="AutoSchema{TQueryClrType}"/> class within the dependency injection framework as a singleton.
+        /// <see cref="ISchema"/> is also registered if it is not already registered within the dependency injection framework.
+        /// <see cref="Schema.Query"/> is set to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> with
+        /// <typeparamref name="TQueryClrType"/> as TSourceType.
+        /// <br/><br/>
+        /// Additionally, this method calls <see cref="AddAutoClrMappings(IGraphQLBuilder, bool, bool)">AddAutoClrMappings</see>
+        /// so that unmapped CLR input or output types are mapped to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>
+        /// and <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> respectively.
+        /// <br/><br/>
+        /// To register a mutation or subscription CLR type within the schema, use the <paramref name="configure"/> delegate and
+        /// call <see cref="WithMutation{TMutationClrType}(IConfigureAutoSchema)">WithMutation</see> or
+        /// <see cref="WithSubscription{TSubscriptionClrType}(IConfigureAutoSchema)">WithSubscription</see>, respsectively.
+        /// <br/><br/>
+        /// This allows for a schema that is entirely configured with CLR types.
+        /// </summary>
+        public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
+        {
+            builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            configure?.Invoke(new ConfigureAutoSchema<TQueryClrType>(builder));
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures <see cref="Schema.Mutation"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// with <typeparamref name="TMutationClrType"/> as TSourceType.
+        /// </summary>
+        public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
+        {
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Mutation = provider.GetRequiredService<AutoRegisteringObjectGraphType<TMutationClrType>>();
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures <see cref="Schema.Subscription"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
+        /// with <typeparamref name="TSubscriptionClrType"/> as TSourceType.
+        /// </summary>
+        public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
+        {
+            builder.Builder.ConfigureSchema((schema, provider) =>
+            {
+                if (schema.GetType() == builder.SchemaType)
+                    schema.Subscription = provider.GetRequiredService<AutoRegisteringObjectGraphType<TSubscriptionClrType>>();
+            });
             return builder;
         }
         #endregion
@@ -217,7 +328,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
             where TDocumentExecuter : class, IDocumentExecuter
-            => builder.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
+        {
+            builder.Services.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <paramref name="documentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
@@ -225,7 +339,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, TDocumentExecuter documentExecuter)
             where TDocumentExecuter : class, IDocumentExecuter
-            => builder.Register<IDocumentExecuter>(documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter)));
+        {
+            builder.Services.Register<IDocumentExecuter>(documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter)));
+            return builder;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
@@ -233,7 +350,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentExecuter> documentExecuterFactory)
             where TDocumentExecuter : class, IDocumentExecuter
-            => builder.Register<IDocumentExecuter>(documentExecuterFactory ?? throw new ArgumentNullException(nameof(documentExecuterFactory)), ServiceLifetime.Singleton);
+        {
+            builder.Services.Register<IDocumentExecuter>(documentExecuterFactory ?? throw new ArgumentNullException(nameof(documentExecuterFactory)), ServiceLifetime.Singleton);
+            return builder;
+        }
         #endregion
 
         #region - AddComplexityAnalyzer -
@@ -241,17 +361,17 @@ namespace GraphQL
         /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-            => builder.ConfigureExecution(opts =>
+            => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
 
         /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-            => builder.ConfigureExecution(opts =>
+            => builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
 
@@ -262,10 +382,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -275,10 +395,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -291,10 +411,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -304,10 +424,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -320,10 +440,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration);
             });
             return builder;
@@ -333,10 +453,10 @@ namespace GraphQL
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
-            builder.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecution(opts =>
+            builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(opts =>
             {
-                opts.ComplexityConfiguration ??= new ComplexityConfiguration();
+                opts.ComplexityConfiguration ??= new();
                 action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
             });
             return builder;
@@ -348,11 +468,17 @@ namespace GraphQL
         /// Configures the default error info provider with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions>? action = null)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddErrorInfoProvider<ErrorInfoProvider>();
+        }
 
         /// <inheritdoc cref="AddErrorInfoProvider(IGraphQLBuilder, Action{ErrorInfoProviderOptions})"/>
         public static IGraphQLBuilder AddErrorInfoProvider(this IGraphQLBuilder builder, Action<ErrorInfoProviderOptions, IServiceProvider>? action)
-            => builder.AddErrorInfoProvider<ErrorInfoProvider>().Configure(action);
+        {
+            builder.Services.Configure(action);
+            return builder.AddErrorInfoProvider<ErrorInfoProvider>();
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TProvider"/> as a singleton of type <see cref="IErrorInfoProvider"/> within the
@@ -360,7 +486,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
             where TProvider : class, IErrorInfoProvider
-            => builder.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
+        {
+            builder.Services.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <paramref name="errorInfoProvider"/> as a singleton of type <see cref="IErrorInfoProvider"/> within the
@@ -368,7 +497,13 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, TProvider errorInfoProvider)
             where TProvider : class, IErrorInfoProvider
-            => errorInfoProvider == null ? throw new ArgumentNullException(nameof(errorInfoProvider)) : builder.Register<IErrorInfoProvider>(errorInfoProvider);
+        {
+            if (errorInfoProvider == null)
+                throw new ArgumentNullException(nameof(errorInfoProvider));
+
+            builder.Services.Register<IErrorInfoProvider>(errorInfoProvider);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <see cref="IErrorInfoProvider"/> within the dependency injection framework using the supplied
@@ -376,7 +511,13 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> errorInfoProviderFactory)
             where TProvider : class, IErrorInfoProvider
-            => errorInfoProviderFactory == null ? throw new ArgumentNullException(nameof(errorInfoProviderFactory)) : builder.Register<IErrorInfoProvider>(errorInfoProviderFactory, ServiceLifetime.Singleton);
+        {
+            if (errorInfoProviderFactory == null)
+                throw new ArgumentNullException(nameof(errorInfoProviderFactory));
+
+            builder.Services.Register<IErrorInfoProvider>(errorInfoProviderFactory, ServiceLifetime.Singleton);
+            return builder;
+        }
         #endregion
 
         #region - AddGraphTypes -
@@ -422,17 +563,17 @@ namespace GraphQL
             foreach (var type in assembly.GetTypes()
                 .Where(x => x.IsClass && !x.IsAbstract && typeof(IGraphType).IsAssignableFrom(x) && !x.IsDefined(typeof(DoNotRegisterAttribute))))
             {
-                builder.TryRegister(type, type, ServiceLifetime.Transient);
+                builder.Services.TryRegister(type, type, ServiceLifetime.Transient);
             }
 
-            builder.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
-            builder.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
-            builder.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
-            builder.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
-            builder.TryRegister<PageInfoType>(ServiceLifetime.Transient);
-            builder.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
-            builder.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
-            builder.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister<PageInfoType>(ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
+            builder.Services.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
 
             return builder;
         }
@@ -472,14 +613,25 @@ namespace GraphQL
             // retreive all of the type mappings ahead-of-time, in case of a scoped or transient schema,
             // as reflection is relatively slow
             var typeMappings = assembly.GetClrTypeMappings();
-            builder.ConfigureSchema((schema, serviceProvider) =>
+            foreach (var typeMapping in typeMappings)
             {
-                foreach (var typeMapping in typeMappings)
-                {
-                    schema.RegisterTypeMapping(typeMapping.ClrType, typeMapping.GraphType);
-                }
-            });
+                builder.AddGraphTypeMappingProvider(new ManualGraphTypeMappingProvider(typeMapping.ClrType, typeMapping.GraphType));
+            }
 
+            return builder;
+        }
+        #endregion
+
+        #region - AddAutoClrMappings -
+        /// <summary>
+        /// Registers an instance of <see cref="AutoRegisteringGraphTypeMappingProvider"/> with the dependency injection
+        /// framework as a singleton of type <see cref="IGraphTypeMappingProvider"/> and configures it to map input
+        /// and/or output types to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> or
+        /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> graph types.
+        /// </summary>
+        public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
+        {
+            builder.AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(mapInputTypes, mapOutputTypes));
             return builder;
         }
         #endregion
@@ -496,8 +648,12 @@ namespace GraphQL
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
+            builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
+            builder.ConfigureExecutionOptions(options =>
+            {
+                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
+            });
             return builder;
         }
 
@@ -515,8 +671,8 @@ namespace GraphQL
             if (documentListener == null)
                 throw new ArgumentNullException(nameof(documentListener));
 
-            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListener);
-            builder.ConfigureExecution(options => options.Listeners.Add(documentListener));
+            builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListener);
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(documentListener));
             return builder;
         }
 
@@ -532,8 +688,12 @@ namespace GraphQL
         public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentListener> documentListenerFactory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TDocumentListener : class, IDocumentExecutionListener
         {
-            builder.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
-            builder.ConfigureExecution(options => options.Listeners.Add(options.RequestServices!.GetRequiredService<TDocumentListener>()));
+            builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
+            builder.ConfigureExecutionOptions(options =>
+            {
+                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
+            });
             return builder;
         }
         #endregion
@@ -561,7 +721,7 @@ namespace GraphQL
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
+            builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
             return builder;
@@ -592,7 +752,7 @@ namespace GraphQL
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
+            builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
@@ -619,7 +779,7 @@ namespace GraphQL
             if (middleware == null)
                 throw new ArgumentNullException(nameof(middleware));
 
-            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
+            builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
             if (install)
                 builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(middleware));
             return builder;
@@ -646,7 +806,7 @@ namespace GraphQL
             if (installPredicate == null)
                 throw new ArgumentNullException(nameof(installPredicate));
 
-            builder.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
+            builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
             builder.ConfigureSchema((schema, serviceProvider) =>
             {
                 if (installPredicate(serviceProvider, schema))
@@ -663,7 +823,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder)
             where TDocumentCache : class, IDocumentCache
-            => builder.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
+        {
+            builder.Services.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <paramref name="documentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
@@ -671,7 +834,10 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
             where TDocumentCache : class, IDocumentCache
-            => builder.Register<IDocumentCache>(documentCache ?? throw new ArgumentNullException(nameof(documentCache)));
+        {
+            builder.Services.Register<IDocumentCache>(documentCache ?? throw new ArgumentNullException(nameof(documentCache)));
+            return builder;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
@@ -679,36 +845,59 @@ namespace GraphQL
         /// </summary>
         public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentCache> documentCacheFactory)
             where TDocumentCache : class, IDocumentCache
-            => builder.Register<IDocumentCache>(documentCacheFactory ?? throw new ArgumentNullException(nameof(documentCacheFactory)), ServiceLifetime.Singleton);
+        {
+            builder.Services.Register<IDocumentCache>(documentCacheFactory ?? throw new ArgumentNullException(nameof(documentCacheFactory)), ServiceLifetime.Singleton);
+            return builder;
+        }
         #endregion
 
-        #region - AddDocumentWriter -
+        #region - AddSerializer -
         /// <summary>
-        /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
+        /// Registers <typeparamref name="TSerializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
         /// dependency injection framework.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder)
-            where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter, TDocumentWriter>(ServiceLifetime.Singleton, true);
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder)
+            where TSerializer : class, IGraphQLSerializer
+        {
+            builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);
+            if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
+                builder.Services.Register(typeof(IGraphQLTextSerializer), typeof(TSerializer), ServiceLifetime.Singleton, true);
+            // builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
+            return builder;
+        }
 
         /// <summary>
-        /// Registers <paramref name="documentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
+        /// Registers <paramref name="serializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
         /// dependency injection framework.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, TDocumentWriter documentWriter)
-            where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter>(documentWriter ?? throw new ArgumentNullException(nameof(documentWriter)), true);
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder, TSerializer serializer)
+            where TSerializer : class, IGraphQLSerializer
+        {
+            builder.Services.Register<IGraphQLSerializer>(serializer ?? throw new ArgumentNullException(nameof(serializer)), true);
+            if (serializer is IGraphQLTextSerializer textSerializer)
+                builder.Services.Register(textSerializer, true);
+            return builder;
+        }
 
         /// <summary>
-        /// Registers <typeparamref name="TDocumentWriter"/> as a singleton of type <see cref="IDocumentWriter"/> within the
-        /// dependency injection framework. The supplied factory method is used to create the document writer.
+        /// Registers <typeparamref name="TSerializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
+        /// dependency injection framework. The supplied factory method is used to create the serializer.
+        /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddDocumentWriter<TDocumentWriter>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentWriter> documentWriterFactory)
-            where TDocumentWriter : class, IDocumentWriter
-            => builder.Register<IDocumentWriter>(documentWriterFactory ?? throw new ArgumentNullException(nameof(documentWriterFactory)), ServiceLifetime.Singleton, true);
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder, Func<IServiceProvider, TSerializer> serializerFactory)
+            where TSerializer : class, IGraphQLSerializer
+        {
+            builder.Services.Register<IGraphQLSerializer>(serializerFactory ?? throw new ArgumentNullException(nameof(serializerFactory)), ServiceLifetime.Singleton, true);
+            if (typeof(IGraphQLTextSerializer).IsAssignableFrom(typeof(TSerializer)))
+                builder.Services.Register(typeof(IGraphQLTextSerializer), serializerFactory, ServiceLifetime.Singleton, true);
+            // builder.Services.Register(services => (IGraphQLTextSerializer)services.GetRequiredService<IGraphQLSerializer>(), ServiceLifetime.Singleton);
+            return builder;
+        }
         #endregion
 
-        #region - ConfigureSchema and ConfigureExecution -
+        #region - ConfigureSchema and ConfigureExecutionOptions and ConfigureExecution -
         /// <summary>
         /// Configures an action to run prior to the code within the schema's constructor.
         /// Assumes that the schema derives from <see cref="Schema"/>.
@@ -718,31 +907,52 @@ namespace GraphQL
 
         /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
         public static IGraphQLBuilder ConfigureSchema(this IGraphQLBuilder builder, Action<ISchema, IServiceProvider> action)
-            => builder.Register<IConfigureSchema>(new ConfigureSchema(action ?? throw new ArgumentNullException(nameof(action))));
+        {
+            builder.Services.Register<IConfigureSchema>(new ConfigureSchema(action ?? throw new ArgumentNullException(nameof(action))));
+            return builder;
+        }
 
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecution})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
-            => builder.Register<IConfigureExecution>(new ConfigureExecution(action ?? throw new ArgumentNullException(nameof(action))));
+        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
+        {
+            builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            return builder;
+        }
 
         /// <summary>
         /// Configures an asynchronous action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecution})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
-            => builder.Register<IConfigureExecution>(new ConfigureExecutionAsync(action ?? throw new ArgumentNullException(nameof(action))));
+        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
+        {
+            builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures an action that can modify or replace document execution behavior.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
+        {
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
+            return builder;
+        }
         #endregion
 
         #region - AddValidationRule -
@@ -760,10 +970,11 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
-            builder.ConfigureExecution(options =>
+            builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(options =>
             {
-                var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
+                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+                var rule = requestServices.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -787,8 +998,8 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.RegisterAsBoth<IValidationRule, TValidationRule>(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
-            builder.ConfigureExecution(options =>
+            builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRule ?? throw new ArgumentNullException(nameof(validationRule)));
+            builder.ConfigureExecutionOptions(options =>
             {
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(validationRule);
                 if (useForCachedDocuments)
@@ -813,10 +1024,11 @@ namespace GraphQL
         public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
             where TValidationRule : class, IValidationRule
         {
-            builder.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecution(options =>
+            builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
+            builder.ConfigureExecutionOptions(options =>
             {
-                var rule = options.RequestServices!.GetRequiredService<TValidationRule>();
+                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+                var rule = requestServices.GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -827,18 +1039,57 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddMetrics -
+        #region - AddApolloTracing / AddMetrics -
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// When <paramref name="enableMetrics"/> is <see langword="true"/>, configures execution to set
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => AddApolloTracing(builder, _ => enableMetrics);
+
+        /// <summary>
+        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
+        /// configures it to be installed within the schema, and configures responses to include Apollo
+        /// Tracing data when enabled via <see cref="ExecutionOptions.EnableMetrics"/>.
+        /// Configures execution to run <paramref name="enableMetricsPredicate"/> and when <see langword="true"/>, sets
+        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
+        /// </summary>
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
+        {
+            if (enableMetricsPredicate == null)
+                throw new ArgumentNullException(nameof(enableMetricsPredicate));
+
+            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            builder.ConfigureExecution(async (options, next) =>
+            {
+                if (enableMetricsPredicate(options))
+                    options.EnableMetrics = true;
+                DateTime start = DateTime.UtcNow;
+                var ret = await next(options).ConfigureAwait(false);
+                if (options.EnableMetrics)
+                {
+                    ret.EnrichWithApolloTracing(start);
+                }
+                return ret;
+            });
+            return builder;
+        }
+
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema.
         /// When <paramref name="enable"/> is <see langword="true"/>, configures execution to set
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
         {
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
             if (enable)
-                builder.ConfigureExecution(options => options.EnableMetrics = true);
+                builder.ConfigureExecutionOptions(options => options.EnableMetrics = true);
             return builder;
         }
 
@@ -848,13 +1099,14 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
         {
             if (enablePredicate == null)
                 throw new ArgumentNullException(nameof(enablePredicate));
 
             builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 if (enablePredicate(options))
                 {
@@ -870,6 +1122,7 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
+        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
         public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
         {
             if (enablePredicate == null)
@@ -878,13 +1131,109 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(installPredicate));
 
             builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
-            builder.ConfigureExecution(options =>
+            builder.ConfigureExecutionOptions(options =>
             {
                 if (enablePredicate(options))
                 {
                     options.EnableMetrics = true;
                 }
             });
+            return builder;
+        }
+        #endregion
+
+        #region - AddExecutionStrategySelector -
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            builder.Services.Register<IExecutionStrategySelector, TExecutionStrategySelector>(ServiceLifetime.Singleton);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <paramref name="executionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder, TExecutionStrategySelector executionStrategySelector)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            if (executionStrategySelector == null)
+                throw new ArgumentNullException(nameof(executionStrategySelector));
+
+            builder.Services.Register<IExecutionStrategySelector>(executionStrategySelector);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategySelector"/> with the dependency injection framework as
+        /// a singleton of type <see cref="IExecutionStrategySelector"/>, using the supplied factory delegate.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder, Func<IServiceProvider, TExecutionStrategySelector> executionStrategySelectorFactory)
+            where TExecutionStrategySelector : class, IExecutionStrategySelector
+        {
+            builder.Services.Register<IExecutionStrategySelector>(executionStrategySelectorFactory ?? throw new ArgumentNullException(nameof(executionStrategySelectorFactory)), ServiceLifetime.Singleton);
+            return builder;
+        }
+        #endregion
+
+        #region - AddExecutionStrategy -
+        /// <summary>
+        /// Registers <typeparamref name="TExecutionStrategy"/> with the dependency injection framework as
+        /// a singleton, and registers an <see cref="ExecutionStrategyRegistration"/> for this <typeparamref name="TExecutionStrategy"/>
+        /// configured for the selected <paramref name="operationType"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            builder.Services.Register<TExecutionStrategy>(ServiceLifetime.Singleton);
+            builder.Services.Register(
+                provider => new ExecutionStrategyRegistration(
+                    provider.GetRequiredService<TExecutionStrategy>(),
+                    operationType),
+                ServiceLifetime.Singleton);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a <see cref="ExecutionStrategyRegistration"/> with the dependency injection framework
+        /// for the specified <paramref name="executionStrategy"/> and <paramref name="operationType"/>.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, TExecutionStrategy executionStrategy, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            if (executionStrategy == null)
+                throw new ArgumentNullException(nameof(executionStrategy));
+
+            builder.Services.Register(
+                new ExecutionStrategyRegistration(
+                    executionStrategy,
+                    operationType));
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers an <see cref="ExecutionStrategyRegistration"/> with the dependency injection framework
+        /// as a singleton for the specified <typeparamref name="TExecutionStrategy"/> and <paramref name="operationType"/>,
+        /// using the supplied factory delegate.
+        /// </summary>
+        public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, Func<IServiceProvider, TExecutionStrategy> executionStrategyFactory, OperationType operationType)
+            where TExecutionStrategy : class, IExecutionStrategy
+        {
+            if (executionStrategyFactory == null)
+                throw new ArgumentNullException(nameof(executionStrategyFactory));
+
+            builder.Services.Register(
+                provider => new ExecutionStrategyRegistration(
+                    executionStrategyFactory(provider),
+                    operationType),
+                ServiceLifetime.Singleton);
+
             return builder;
         }
         #endregion

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Builders;
 
 namespace GraphQL.MicrosoftDI
@@ -13,12 +11,12 @@ namespace GraphQL.MicrosoftDI
         /// Sets the resolver for the field. A dependency injection scope is created for the duration of the resolver's execution
         /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
         /// </summary>
-        public static FieldBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public static FieldBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
             => builder.Resolve(new ScopedFieldResolver<TSourceType, TReturnType>(resolver));
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public static FieldBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
-            => builder.Resolve(new ScopedAsyncFieldResolver<TSourceType, TReturnType>(resolver));
+        public static FieldBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
+            => builder.Resolve(new ScopedFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolver(context))));
 
         /// <summary>
         /// Creates a resolve builder for the field.

@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections;
 using GraphQL.Builders;
 using GraphQL.Resolvers;
 
@@ -46,7 +42,7 @@ namespace GraphQL.DataLoader
             public Task<T[]> GetResultAsync(CancellationToken cancellationToken = default)
                 => Task.WhenAll(_dataLoaderResults.Select(x => x.GetResultAsync(cancellationToken)));
 
-            async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+            async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
                 => await GetResultAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -113,13 +109,73 @@ namespace GraphQL.DataLoader
             });
         }
 
+        /// <summary>
+        /// Chains post-processing to a list of pending data loader operations.
+        /// <br/><br/>
+        /// Be sure the source list has been enumerated, for instance by calling
+        /// <see cref="Enumerable.ToList{TSource}(IEnumerable{TSource})">ToList</see>,
+        /// before calling this function.
+        /// </summary>
+        /// <typeparam name="T">The type of the return value of the data loaders.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="parents">The list of pending data loader operations.</param>
+        /// <param name="chainedDelegate">The delegate to execute once the data loaders finish loading.</param>
+        /// <returns>A pending data loader operation that can return a value once the data loaders and the chained delegate finish.</returns>
+        public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, CancellationToken, Task<TResult>> chainedDelegate)
+        {
+            return new SimpleDataLoader<TResult>(async cancellationToken =>
+            {
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
+                foreach (var parent in parents)
+                {
+                    list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
+                }
+                return await chainedDelegate(list, cancellationToken).ConfigureAwait(false);
+            });
+        }
+
+        /// <inheritdoc cref="Then{T, TResult}(IEnumerable{IDataLoaderResult{T}}, Func{IEnumerable{T}, CancellationToken, Task{TResult}})"/>
+        public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, Task<TResult>> chainedDelegate)
+        {
+            return new SimpleDataLoader<TResult>(async cancellationToken =>
+            {
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
+                foreach (var parent in parents)
+                {
+                    list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
+                }
+                return await chainedDelegate(list).ConfigureAwait(false);
+            });
+        }
+
+        /// <inheritdoc cref="Then{T, TResult}(IEnumerable{IDataLoaderResult{T}}, Func{IEnumerable{T}, CancellationToken, Task{TResult}})"/>
+        public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, TResult> chainedDelegate)
+        {
+            return new SimpleDataLoader<TResult>(async cancellationToken =>
+            {
+                List<T> list = parents is ICollection collection
+                    ? new(collection.Count)
+                    : new();
+                foreach (var parent in parents)
+                {
+                    list.Add(await parent.GetResultAsync(cancellationToken).ConfigureAwait(false));
+                }
+                return chainedDelegate(list);
+            });
+        }
+
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
             => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(context => new ValueTask<IDataLoaderResult<TReturnType>>(resolve(context))));
 
         // chained data loaders
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
@@ -128,7 +184,7 @@ namespace GraphQL.DataLoader
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve));
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(context => new ValueTask<IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve(context))));
 
         // chain of 3 data loaders
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
@@ -137,6 +193,7 @@ namespace GraphQL.DataLoader
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Resolve(IFieldResolver)"/>
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>> resolve)
-            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve));
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(context => new ValueTask<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve(context))));
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
     }
 }

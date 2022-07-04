@@ -1,15 +1,8 @@
-using System.Collections.Generic;
 using Example;
 using GraphQL.Instrumentation;
 using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
 using GraphQL.SystemTextJson;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Harness
@@ -27,7 +20,7 @@ namespace GraphQL.Harness
         public void ConfigureServices(IServiceCollection services)
         {
             // add execution components
-            services.AddGraphQL()
+            services.AddGraphQL(builder => builder
                 .AddSystemTextJson()
                 .AddErrorInfoProvider((opts, serviceProvider) =>
                 {
@@ -48,7 +41,7 @@ namespace GraphQL.Harness
                         foreach (var middleware in middlewares)
                             schema.FieldMiddleware.Use(middleware);
                     }
-                });
+                }));
 
             // add something like repository
             services.AddSingleton<StarWarsData>();
@@ -56,6 +49,7 @@ namespace GraphQL.Harness
             // add infrastructure stuff
             services.AddHttpContextAccessor();
             services.AddLogging(builder => builder.AddConsole());
+            services.AddSingleton<GraphQLMiddleware>();
 
             // add options configuration
             services.Configure<GraphQLSettings>(Configuration);

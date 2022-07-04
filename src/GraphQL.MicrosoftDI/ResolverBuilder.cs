@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,11 +57,11 @@ namespace GraphQL.MicrosoftDI
         /// <summary>
         /// Specifies the delegate to execute when the field is being resolved.
         /// </summary>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
             => _scoped ? _builder.ResolveScoped(resolver) : _builder.Resolve(resolver);
 
         /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
             => _scoped ? _builder.ResolveScopedAsync(resolver) : _builder.ResolveAsync(resolver);
     }
 
@@ -94,9 +92,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, TReturnType?> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>());
@@ -105,9 +103,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, Task<TReturnType?>> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>());
@@ -143,9 +141,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, TReturnType?> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -155,9 +153,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, Task<TReturnType?>> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -194,9 +192,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, TReturnType?> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -207,9 +205,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, Task<TReturnType?>> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -247,9 +245,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, TReturnType?> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -261,9 +259,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType?>> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -298,9 +296,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType> resolver)
+        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType?> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, TReturnType> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),
@@ -313,9 +311,9 @@ namespace GraphQL.MicrosoftDI
         }
 
         /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType>> resolver)
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType?>> resolver)
         {
-            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolver2 =
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
                 context => resolver(
                     context,
                     context.RequestServices.GetRequiredService<T1>(),

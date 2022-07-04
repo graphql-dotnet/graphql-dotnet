@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace GraphQL.Validation
 {
     /// <summary>
@@ -11,6 +9,6 @@ namespace GraphQL.Validation
         /// Prepares and returns a node visitor to be used to validate a document (via a node walker) against this
         /// validation rule. Validation failures are added then by this visitor to a list stored within <see cref="ValidationContext.Errors"/>.
         /// </summary>
-        Task<INodeVisitor>? ValidateAsync(ValidationContext context); //TODO: change to ValueTask
+        ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context);
     }
 }

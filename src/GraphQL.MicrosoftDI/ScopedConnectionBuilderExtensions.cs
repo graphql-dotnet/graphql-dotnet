@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Builders;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,30 +14,26 @@ namespace GraphQL.MicrosoftDI
         /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
         /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
-        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
             builder.Resolve(context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
             });
         }
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
             builder.ResolveAsync(async context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             });
         }
 
@@ -52,30 +46,26 @@ namespace GraphQL.MicrosoftDI
             => new ConnectionResolverBuilder<TSourceType, object>(builder.Returns<object>(), false);
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
             builder.Resolve(context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
             });
         }
 
         /// <inheritdoc cref="ResolveScopedAsync{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType>> resolver)
+        public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
             builder.ResolveAsync(async context =>
             {
-                using (var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope())
-                {
-                    return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
-                }
+                using var scope = (context.RequestServices ?? throw new MissingRequestServicesException()).CreateScope();
+                return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
             });
         }
 

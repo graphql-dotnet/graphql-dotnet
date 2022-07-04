@@ -10,7 +10,7 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Static instance of <see cref="DefaultNameConverter"/> that can be reused instead of creating new.
         /// </summary>
-        public static readonly DefaultNameConverter Instance = new DefaultNameConverter();
+        public static readonly DefaultNameConverter Instance = new();
 
         /// <summary>
         /// Returns the field name without modification

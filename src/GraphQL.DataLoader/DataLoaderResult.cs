@@ -1,7 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -15,7 +11,7 @@ namespace GraphQL.DataLoader
         /// <summary>
         /// Returns an instance which always returns the default value.
         /// </summary>
-        internal static readonly DataLoaderResult<T> DefaultValue = new(default(T));
+        internal static readonly DataLoaderResult<T> DefaultValue = new(default(T)!);
 
         /// <summary>
         /// Initializes a DataLoaderResult with the given asynchronous task
@@ -39,6 +35,6 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public Task<T> GetResultAsync(CancellationToken cancellationToken = default) => _result;
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
+        async Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

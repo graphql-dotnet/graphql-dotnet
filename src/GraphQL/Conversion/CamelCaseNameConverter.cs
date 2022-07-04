@@ -11,7 +11,7 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Static instance of <see cref="CamelCaseNameConverter"/> that can be reused instead of creating new.
         /// </summary>
-        public static readonly CamelCaseNameConverter Instance = new CamelCaseNameConverter();
+        public static readonly CamelCaseNameConverter Instance = new();
 
         /// <summary>
         /// Returns the field name converted to camelCase.

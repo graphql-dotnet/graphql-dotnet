@@ -1,4 +1,4 @@
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -9,15 +9,16 @@ namespace GraphQL.Types
     public class BooleanGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            BooleanValue b => b.Value.Boxed(),
-            NullValue _ => null,
+            GraphQLBooleanValue b => b.BoolValue.Boxed(),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value is BooleanValue || value is NullValue;
+        public override bool CanParseLiteral(GraphQLValue value)
+            => value is GraphQLBooleanValue || value is GraphQLNullValue;
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch
@@ -31,10 +32,10 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) => value is bool || value == null;
 
         /// <inheritdoc/>
-        public override IValue? ToAST(object? value) => value switch
+        public override GraphQLValue ToAST(object? value) => value switch
         {
-            bool b => new BooleanValue(b),
-            null => new NullValue(),
+            bool b => b ? GraphQLValuesCache.True : GraphQLValuesCache.False,
+            null => GraphQLValuesCache.Null,
             _ => ThrowASTConversionError(value)
         };
     }

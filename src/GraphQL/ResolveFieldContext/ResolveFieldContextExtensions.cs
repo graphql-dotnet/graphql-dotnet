@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -11,6 +8,32 @@ namespace GraphQL
     /// </summary>
     public static class ResolveFieldContextExtensions
     {
+        /// <summary>
+        /// Determines if currently executed field has any directives provided in the GraphQL query request.
+        /// </summary>
+        public static bool HasDirectives(this IResolveFieldContext context)
+        {
+            return context.Directives?.Count > 0;
+        }
+
+        /// <summary>
+        /// Determines if the specified directive has been provided in the GraphQL query request for currently executed field.
+        /// </summary>
+        public static bool HasDirective(this IResolveFieldContext context, string name)
+        {
+            return context.Directives != null && context.Directives.ContainsKey(name);
+        }
+
+        /// <summary>
+        /// Gets directive provided in the GraphQL query request by its name.
+        /// </summary>
+        public static DirectiveInfo? GetDirective(this IResolveFieldContext context, string name)
+        {
+            return context.Directives != null && context.Directives.TryGetValue(name, out var value)
+                ? value
+                : null;
+        }
+
         /// <summary>
         /// Returns the value of the specified field argument, or <paramref name="defaultValue"/> when unspecified or when specified as <see langword="null"/>.
         /// Field and variable default values take precedence over the <paramref name="defaultValue"/> parameter.
@@ -32,7 +55,7 @@ namespace GraphQL
                 : defaultValue;
         }
 
-        private static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
+        internal static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
@@ -82,35 +105,25 @@ namespace GraphQL
             return new ResolveFieldContextAdapter<TSourceType>(context);
         }
 
-        /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
-        public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
-        {
-            if (context is IResolveEventStreamContext<T> typedContext)
-                return typedContext;
-
-            return new ResolveEventStreamContext<T>(context);
-        }
-
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
-        /// Thread safe method to get value by path (key1.key2.keyN) from extensions dictionary.
+        /// Thread safe method to get value by path (key1.key2.keyN) from output extensions dictionary.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
-        public static object? GetExtension(this IResolveFieldContext context, string path)
+        public static object? GetOutputExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Extensions == null || context.Extensions.Count == 0)
+            if (context.OutputExtensions == null || context.OutputExtensions.Count == 0)
                 return null;
 
-            lock (context.Extensions)
+            lock (context.OutputExtensions)
             {
-                var values = context.Extensions;
+                var values = context.OutputExtensions;
 
                 if (path.IndexOf('.') != -1)
                 {
@@ -134,23 +147,23 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Thread safe method to set value by path (key1.key2.keyN) to extensions dictionary.
+        /// Thread safe method to set value by path (key1.key2.keyN) to output extensions dictionary.
         /// if the given path or its part contains values, then they will be overwritten.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
         /// <param name="value">Value to set.</param>
-        public static void SetExtension(this IResolveFieldContext context, string path, object? value)
+        public static void SetOutputExtension(this IResolveFieldContext context, string path, object? value)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.Extensions == null)
+            if (context.OutputExtensions == null)
                 throw new ArgumentException("Extensions property is null", nameof(context));
 
-            lock (context.Extensions)
+            lock (context.OutputExtensions)
             {
-                var values = context.Extensions;
+                var values = context.OutputExtensions;
 
                 if (path.IndexOf('.') != -1)
                 {

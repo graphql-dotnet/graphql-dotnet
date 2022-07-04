@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -7,93 +6,105 @@ using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using Moq;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.DI
+namespace GraphQL.Tests.DI;
+
+public class GraphQLBuilderBaseTests
 {
-    public class GraphQLBuilderBaseTests
+    [Fact]
+    public void Initialize()
     {
-        [Fact]
-        public void Initialize()
-        {
-            var builder = new TestBuilder();
-            var mock = builder.MockBuilder;
-            mock.Setup(b => b.TryRegister(typeof(IDocumentWriter), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient))
-                .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime>((_, func, serviceLifetime) =>
-                {
-                    Should.Throw<InvalidOperationException>(() => func(null));
-                    return builder;
-                }).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter), typeof(DocumentExecuter), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IDocumentBuilder), typeof(GraphQLDocumentBuilder), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IComplexityAnalyzer), typeof(ComplexityAnalyzer), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton)).Returns(builder).Verifiable();
-            mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder).Verifiable();
-            mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false)).Returns<Type, IConfigureExecution, bool>((_, action, _) =>
+        var builder = new TestBuilder();
+        var mock = builder.ServiceRegister.MockBuilder;
+        mock.Setup(b => b.TryRegister(typeof(IGraphQLSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType))
+            .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, RegistrationCompareMode>((_, func, serviceLifetime, _) =>
             {
-                var schema = Mock.Of<ISchema>(MockBehavior.Strict);
-
-                //verify no action if schema is set
-                action.ConfigureAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }).Wait();
-
-                //verify schema is pulled from service provider if schema is not set
-                var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-                mockServiceProvider.Setup(s => s.GetService(typeof(ISchema))).Returns(schema).Verifiable();
-                var opts = new ExecutionOptions()
-                {
-                    RequestServices = mockServiceProvider.Object,
-                };
-                action.ConfigureAsync(opts).Wait();
-                opts.Schema.ShouldBe(schema);
-                mockServiceProvider.Verify();
-
-                return builder;
+                Should.Throw<InvalidOperationException>(() => func(null));
+                return builder.ServiceRegister;
             }).Verifiable();
-
-            mock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-            mock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient)).Returns(builder).Verifiable();
-
-            builder.CallInitialize();
-            mock.Verify();
-            mock.VerifyNoOtherCalls();
-        }
-
-        private class TestBuilder : GraphQLBuilderBase
+        mock.Setup(b => b.TryRegister(typeof(IGraphQLTextSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType))
+            .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, RegistrationCompareMode>((_, func, serviceLifetime, _) =>
+            {
+                Should.Throw<InvalidOperationException>(() => func(null));
+                return builder.ServiceRegister;
+            }).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter), typeof(DocumentExecuter), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentBuilder), typeof(GraphQLDocumentBuilder), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IComplexityAnalyzer), typeof(ComplexityAnalyzer), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IDocumentCache), DefaultDocumentCache.Instance, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(IExecutionStrategySelector), typeof(DefaultExecutionStrategySelector), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<IConfigureExecutionOptions>(), false)).Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
         {
-            public readonly Mock<IGraphQLBuilder> MockBuilder = new Mock<IGraphQLBuilder>(MockBehavior.Strict);
+            var schema = Mock.Of<ISchema>(MockBehavior.Strict);
 
-            public void CallInitialize()
-                => Initialize();
+            //verify no action if schema is set
+            action.ConfigureAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }).Wait();
 
-            public override IGraphQLBuilder Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
-                => MockBuilder.Object.Configure(action);
+            //verify schema is pulled from service provider if schema is not set
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(s => s.GetService(typeof(ISchema))).Returns(schema).Verifiable();
+            var opts = new ExecutionOptions()
+            {
+                RequestServices = mockServiceProvider.Object,
+            };
+            action.ConfigureAsync(opts).Wait();
+            opts.Schema.ShouldBe(schema);
+            mockServiceProvider.Verify();
 
-            public override IGraphQLBuilder Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
-                => MockBuilder.Object.Register(serviceType, implementationFactory, serviceLifetime, replace);
+            return builder.ServiceRegister;
+        }).Verifiable();
 
-            public override IGraphQLBuilder Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
-                => MockBuilder.Object.Register(serviceType, implementationType, serviceLifetime, replace);
+        mock.Setup(b => b.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(EdgeType<>), typeof(EdgeType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(PageInfoType), typeof(PageInfoType), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
 
-            public override IGraphQLBuilder Register(Type serviceType, object implementationInstance, bool replace = false)
-                => MockBuilder.Object.Register(serviceType, implementationInstance, replace);
+        builder.CallInitialize();
+        mock.Verify();
+        mock.VerifyNoOtherCalls();
+    }
 
-            public override IGraphQLBuilder TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
-                => MockBuilder.Object.TryRegister(serviceType, implementationFactory, serviceLifetime);
+    private class TestServiceRegister : IServiceRegister
+    {
+        public readonly Mock<IServiceRegister> MockBuilder = new Mock<IServiceRegister>(MockBehavior.Strict);
 
-            public override IGraphQLBuilder TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
-                => MockBuilder.Object.TryRegister(serviceType, implementationType, serviceLifetime);
+        public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+            where TOptions : class, new()
+            => MockBuilder.Object.Configure(action);
 
-            public override IGraphQLBuilder TryRegister(Type serviceType, object implementationInstance)
-                => MockBuilder.Object.TryRegister(serviceType, implementationInstance);
-        }
+        public IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
+            => MockBuilder.Object.Register(serviceType, implementationFactory, serviceLifetime, replace);
+
+        public IServiceRegister Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
+            => MockBuilder.Object.Register(serviceType, implementationType, serviceLifetime, replace);
+
+        public IServiceRegister Register(Type serviceType, object implementationInstance, bool replace = false)
+            => MockBuilder.Object.Register(serviceType, implementationInstance, replace);
+
+        public IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+            => MockBuilder.Object.TryRegister(serviceType, implementationFactory, serviceLifetime, mode);
+
+        public IServiceRegister TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+            => MockBuilder.Object.TryRegister(serviceType, implementationType, serviceLifetime, mode);
+
+        public IServiceRegister TryRegister(Type serviceType, object implementationInstance, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+            => MockBuilder.Object.TryRegister(serviceType, implementationInstance, mode);
+    }
+
+    private class TestBuilder : GraphQLBuilderBase
+    {
+        public TestServiceRegister ServiceRegister { get; set; } = new TestServiceRegister();
+
+        public void CallInitialize() => RegisterDefaultServices();
+
+        public override IServiceRegister Services => ServiceRegister;
     }
 }

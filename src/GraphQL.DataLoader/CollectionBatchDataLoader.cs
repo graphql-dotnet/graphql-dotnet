@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -22,7 +16,7 @@ namespace GraphQL.DataLoader
         /// <param name="keyComparer">An optional equality comparer for the keys</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
-               IEqualityComparer<TKey> keyComparer = null,
+               IEqualityComparer<TKey>? keyComparer = null,
                int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
@@ -37,7 +31,7 @@ namespace GraphQL.DataLoader
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null,
+            IEqualityComparer<TKey>? keyComparer = null,
             int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             if (fetchDelegate == null)

@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -8,7 +7,7 @@ namespace GraphQL.Validation
     /// </summary>
     /// <typeparam name="TNode">A specified AST node type.</typeparam>
     public class MatchingNodeVisitor<TNode> : INodeVisitor
-        where TNode : INode
+        where TNode : ASTNode
     {
         private readonly Action<TNode, ValidationContext>? _enter;
         private readonly Action<TNode, ValidationContext>? _leave;
@@ -27,7 +26,7 @@ namespace GraphQL.Validation
             _leave = leave;
         }
 
-        void INodeVisitor.Enter(INode node, ValidationContext context)
+        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
         {
             if (_enter != null && node is TNode n)
             {
@@ -35,7 +34,7 @@ namespace GraphQL.Validation
             }
         }
 
-        void INodeVisitor.Leave(INode node, ValidationContext context)
+        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
         {
             if (_leave != null && node is TNode n)
             {
@@ -50,7 +49,7 @@ namespace GraphQL.Validation
     /// <typeparam name="TNode">A specified AST node type.</typeparam>
     /// <typeparam name="TState">Type of the provided state.</typeparam>
     public class MatchingNodeVisitor<TNode, TState> : INodeVisitor
-        where TNode : INode
+        where TNode : ASTNode
     {
         private readonly Action<TNode, ValidationContext, TState?>? _enter;
         private readonly Action<TNode, ValidationContext, TState?>? _leave;
@@ -71,7 +70,7 @@ namespace GraphQL.Validation
             _state = state;
         }
 
-        void INodeVisitor.Enter(INode node, ValidationContext context)
+        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
         {
             if (_enter != null && node is TNode n)
             {
@@ -79,7 +78,7 @@ namespace GraphQL.Validation
             }
         }
 
-        void INodeVisitor.Leave(INode node, ValidationContext context)
+        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
         {
             if (_leave != null && node is TNode n)
             {

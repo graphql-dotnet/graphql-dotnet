@@ -1,66 +1,68 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Execution;
+using GraphQLParser.AST;
 
-namespace GraphQL.Tests
+namespace GraphQL.Tests;
+
+internal static class TestExtensions
 {
-    internal static class TestExtensions
+    public static GraphQLOperationDefinition Operation(this GraphQLDocument document)
     {
-        public static IReadOnlyDictionary<string, object> ToDict(this object data)
+        return document.Definitions.OfType<GraphQLOperationDefinition>().First();
+    }
+
+    public static IReadOnlyDictionary<string, object> ToDict(this object data)
+    {
+        if (data == null)
+            return new Dictionary<string, object>();
+
+        if (data is ObjectExecutionNode objectExecutionNode)
+            return (IReadOnlyDictionary<string, object>)objectExecutionNode.ToValue();
+
+        if (data is IReadOnlyDictionary<string, object> properties)
         {
-            if (data == null)
-                return new Dictionary<string, object>();
-
-            if (data is ObjectExecutionNode objectExecutionNode)
-                return (IReadOnlyDictionary<string, object>)objectExecutionNode.ToValue();
-
-            if (data is IReadOnlyDictionary<string, object> properties)
-            {
-                return properties;
-            }
-
-            throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type ObjectExecutionNode or IDictionary<string, object>.", nameof(data));
+            return properties;
         }
 
-        public static RootExecutionNode ToExecutionTree(this IReadOnlyDictionary<string, object> dictionary)
+        throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type ObjectExecutionNode or IDictionary<string, object>.", nameof(data));
+    }
+
+    public static RootExecutionNode ToExecutionTree(this IReadOnlyDictionary<string, object> dictionary)
+    {
+        var root = new RootExecutionNode(null, null)
         {
-            var root = new RootExecutionNode(null, null)
+            SubFields = dictionary.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray()
+        };
+        return root;
+    }
+
+    private static ExecutionNode CreateExecutionNode(string name, object value)
+    {
+        if (value is IEnumerable<KeyValuePair<string, object>> dict)
+        {
+            return new ObjectExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
             {
-                SubFields = dictionary.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray()
+                SubFields = dict.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray(),
             };
-            return root;
         }
-
-        private static ExecutionNode CreateExecutionNode(string name, object value)
+        else if (value?.GetType() != typeof(string) && value is IEnumerable list)
         {
-            if (value is IEnumerable<KeyValuePair<string, object>> dict)
+            var newList = new List<ExecutionNode>();
+            foreach (var item in list)
             {
-                return new ObjectExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
-                {
-                    SubFields = dict.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray(),
-                };
+                newList.Add(CreateExecutionNode(null, item));
             }
-            else if (value?.GetType() != typeof(string) && value is IEnumerable list)
+            return new ArrayExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
             {
-                var newList = new List<ExecutionNode>();
-                foreach (var item in list)
-                {
-                    newList.Add(CreateExecutionNode(null, item));
-                }
-                return new ArrayExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
-                {
-                    Items = newList,
-                };
-            }
-            else
+                Items = newList,
+            };
+        }
+        else
+        {
+            return new ValueExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
             {
-                return new ValueExecutionNode(null, null, new GraphQL.Language.AST.Field(new GraphQL.Language.AST.NameNode(name), default), null, default)
-                {
-                    Result = value
-                };
-            }
+                Result = value
+            };
         }
     }
 }

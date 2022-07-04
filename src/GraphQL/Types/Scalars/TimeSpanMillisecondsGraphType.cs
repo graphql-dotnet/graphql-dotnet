@@ -1,6 +1,5 @@
-using System;
 using System.Numerics;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -20,12 +19,11 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => TimeSpan.FromMilliseconds(intValue.Value),
-            LongValue longValue => TimeSpan.FromMilliseconds(longValue.Value),
-            BigIntValue bigIntValue => TimeSpan.FromMilliseconds(checked((double)bigIntValue.Value)),
-            NullValue _ => null,
+            // TimeSpan stores the time as a long in ticks - 1/10000 of a millisecond. So the millisecond value must be representable in a long.
+            GraphQLIntValue v when Long.TryParse(v.Value, out long l) => TimeSpan.FromMilliseconds(l),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 

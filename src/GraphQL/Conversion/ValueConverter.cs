@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 
@@ -17,8 +15,7 @@ namespace GraphQL
     /// </summary>
     public static class ValueConverter
     {
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
-            = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
 
         /// <summary>
         /// Register built-in conversions. This list is expected to grow over time.
@@ -38,8 +35,8 @@ namespace GraphQL
             Register<string, double>(value => double.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
             Register<string, decimal>(value => decimal.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
 #if NET6_0_OR_GREATER
-            Register<string, DateOnly>(value => DateOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));      
-            Register<string, TimeOnly>(value => TimeOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));      
+            Register<string, DateOnly>(value => DateOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));
+            Register<string, TimeOnly>(value => TimeOnly.Parse(value, DateTimeFormatInfo.InvariantInfo));
 #endif
             Register<string, DateTime>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal).UtcDateTime);
             Register<string, DateTimeOffset>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo));
@@ -209,9 +206,9 @@ namespace GraphQL
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object>? conversion)
         {
-            if (!_valueConversions.TryGetValue(valueType, out var conversions))
-                if (!_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
-                    conversions = _valueConversions[valueType];
+            if (!_valueConversions.TryGetValue(valueType, out var conversions) &&
+                !_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
+                conversions = _valueConversions[valueType];
 
             if (conversion == null)
                 conversions.TryRemove(targetType, out var _);

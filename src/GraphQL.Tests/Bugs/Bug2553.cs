@@ -1,30 +1,27 @@
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class Bug2553
 {
-    public class Bug2553
+    [Fact]
+    public void ShouldSerializeErrorExtensionsAccordingToOptions()
     {
-        [Fact]
-        public async Task ShouldSerializeErrorExtensionsAccordingToOptions()
+        var options = new JsonSerializerOptions
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            options.Converters.Add(new ExecutionResultJsonConverter(new TestErrorInfoProvider()));
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        options.Converters.Add(new ExecutionErrorJsonConverter(new TestErrorInfoProvider()));
 
-            var executionResult = new ExecutionResult();
-            executionResult.AddError(new ExecutionError("An error occurred."));
+        var executionResult = new ExecutionResult();
+        executionResult.AddError(new ExecutionError("An error occurred."));
 
-            var writer = new DocumentWriter(options);
-            string json = await writer.WriteToStringAsync(executionResult);
+        var writer = new GraphQLSerializer(options);
+        string json = writer.Serialize(executionResult);
 
-            json.ShouldBeCrossPlatJson(@"{
+        json.ShouldBeCrossPlatJson(@"{
                 ""errors"": [{
                     ""message"":""An error occurred."",
                     ""extensions"": {
@@ -35,33 +32,32 @@ namespace GraphQL.Tests.Bugs
                     }
                 }]
             }");
-        }
     }
+}
 
-    internal class TestErrorInfoProvider : ErrorInfoProvider
+internal class TestErrorInfoProvider : ErrorInfoProvider
+{
+    public override ErrorInfo GetInfo(ExecutionError executionError)
     {
-        public override ErrorInfo GetInfo(ExecutionError executionError)
+        return base.GetInfo(executionError) with
         {
-            return base.GetInfo(executionError) with
+            Extensions = new Dictionary<string, object>
             {
-                Extensions = new Dictionary<string, object>
-                {
-                    { "violations", new TestExecutionError("An error occurred on field Email.", "Email") }
-                }
-            };
-        }
+                { "violations", new TestExecutionError("An error occurred on field Email.", "Email") }
+            }
+        };
     }
+}
 
-    internal class TestExecutionError
+internal class TestExecutionError
+{
+    public string Message { get; }
+
+    public string Field { get; }
+
+    public TestExecutionError(string message, string field)
     {
-        public string Message { get; }
-
-        public string Field { get; }
-
-        public TestExecutionError(string message, string field)
-        {
-            Message = message;
-            Field = field;
-        }
+        Message = message;
+        Field = field;
     }
 }

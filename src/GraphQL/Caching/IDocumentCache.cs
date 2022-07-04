@@ -1,4 +1,4 @@
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Caching
 {
@@ -8,8 +8,17 @@ namespace GraphQL.Caching
     public interface IDocumentCache
     {
         /// <summary>
-        /// Gets or sets a document in the cache. Must be thread-safe. Returns <see langword="null"/> if no entry is found.
+        /// Gets a document in the cache. Must be thread-safe.
         /// </summary>
-        Document? this[string query] { get; set; }
+        /// <param name="query">As the cache key.</param>
+        /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
+        ValueTask<GraphQLDocument?> GetAsync(string query);
+
+        /// <summary>
+        /// Sets a document in the cache. Must be thread-safe.
+        /// </summary>
+        /// <param name="query">As the cache key.</param>
+        /// <param name="value">The document object to cache.</param>
+        ValueTask SetAsync(string query, GraphQLDocument value);
     }
 }

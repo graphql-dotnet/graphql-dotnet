@@ -1,5 +1,5 @@
-using System.Collections.Generic;
-using GraphQL.Language.AST;
+using System.Reflection;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -18,7 +18,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Returns a boolean indicating if the provided value is valid as a default value for a
-        /// field of this type.
+        /// field or argument of this type.
         /// </summary>
         bool IsValidDefault(object value);
 
@@ -27,7 +27,7 @@ namespace GraphQL.Types
         /// to return the default value for fields of this scalar type. This method may throw an exception
         /// or return <see langword="null"/> for a failed conversion.
         /// </summary>
-        IValue? ToAST(object value);
+        GraphQLValue ToAST(object value);
     }
 
     /// <inheritdoc/>
@@ -60,20 +60,79 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidDefault(object value) => value is TSourceType;
+        public virtual bool IsValidDefault(object value)
+        {
+            if (value is not TSourceType)
+                return false;
+
+            foreach (var field in Fields)
+            {
+                if (!field.ResolvedType!.IsValidDefault(GetFieldValue(field, value)))
+                    return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Converts a value to an AST representation. This is necessary for introspection queries
-        /// to return the default value for fields of this input object type. This method may throw an exception
-        /// or return <see langword="null"/> for a failed conversion.
+        /// to return the default value for fields of this input object type. Also AST representation
+        /// is used while printing schema as SDL.
+        /// <br/>
+        /// This method may throw an exception or return <see langword="null"/> for a failed conversion.
         /// <br/><br/>
-        /// The default implementation always throws an exception. It is recommended that this method be
-        /// overridden to support introspection of fields of this type that have default values. This method
-        /// is not otherwise needed to be implemented.
+        /// The default implementation returns <see cref="GraphQLNullValue"/> if <paramref name="value"/>
+        /// is <see langword="null"/> and <see cref="GraphQLObjectValue"/> filled with the values
+        /// for all input fields except ones returning <see cref="GraphQLNullValue"/>.
+        /// <br/><br/>
+        /// Note that you may need to override this method if you have already overrided <see cref="ParseDictionary"/>.
         /// </summary>
-        public virtual IValue? ToAST(object value)
+        public virtual GraphQLValue ToAST(object? value)
         {
-            throw new System.NotImplementedException($"Please override the '{nameof(ToAST)}' method of the '{GetType().Name}' Input Object to support this operation.");
+            if (value == null)
+                return GraphQLValuesCache.Null;
+
+            var objectValue = new GraphQLObjectValue
+            {
+                Fields = new List<GraphQLObjectField>(Fields.Count)
+            };
+
+            foreach (var field in Fields)
+            {
+                var fieldValue = field.ResolvedType!.ToAST(GetFieldValue(field, value));
+                if (fieldValue is not GraphQLNullValue)
+                {
+                    objectValue.Fields.Add(new GraphQLObjectField
+                    {
+                        Name = new GraphQLName(field.Name),
+                        Value = fieldValue
+                    });
+                }
+            }
+
+            return objectValue;
+        }
+
+        private static object? GetFieldValue(FieldType field, object? value)
+        {
+            if (value == null)
+                return null;
+
+            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+            string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+            PropertyInfo? propertyInfo;
+            try
+            {
+                propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            }
+            catch (AmbiguousMatchException)
+            {
+                propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            }
+
+            return propertyInfo?.CanRead == true
+                ? propertyInfo.GetValue(value)
+                : null;
         }
     }
 }

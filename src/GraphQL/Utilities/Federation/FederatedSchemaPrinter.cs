@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
-    public class FederatedSchemaPrinter : SchemaPrinter
+    public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
     {
         private readonly List<string> _federatedDirectives = new List<string>
         {
@@ -48,7 +46,7 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective((string)x.Name!.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name)) //TODO:alloc
                     .Select(PrintAstDirective)
             );
 
@@ -59,7 +57,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            return AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+            return directive.Print();
         }
 
         public override string PrintObject(IObjectGraphType type)
@@ -111,7 +109,7 @@ namespace GraphQL.Utilities.Federation
                     FederatedDirectives = PrintFederatedDirectivesFromAst(x)
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
+            return fields == null ? "" : string.Join(Environment.NewLine, fields.Select(
                 f => "{3}  {0}{1}: {2}{4}{5}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation, f.FederatedDirectives)));
         }
 

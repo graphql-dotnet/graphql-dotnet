@@ -1,5 +1,5 @@
 using System.Numerics;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,22 +10,18 @@ namespace GraphQL.Types
     public class ByteGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => checked((byte)intValue.Value),
-            LongValue longValue => checked((byte)longValue.Value),
-            BigIntValue bigIntValue => checked((byte)bigIntValue.Value),
-            NullValue _ => null,
+            GraphQLIntValue x => Byte.Parse(x.Value),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue,
-            LongValue longValue => byte.MinValue <= longValue.Value && longValue.Value <= byte.MaxValue,
-            BigIntValue bigIntValue => byte.MinValue <= bigIntValue.Value && bigIntValue.Value <= byte.MaxValue,
-            NullValue _ => true,
+            GraphQLIntValue x => Byte.TryParse(x.Value, out var _),
+            GraphQLNullValue _ => true,
             _ => false
         };
 

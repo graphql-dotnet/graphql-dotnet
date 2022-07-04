@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using System.Globalization;
 using System.Numerics;
@@ -26,7 +25,7 @@ namespace GraphQL.SystemTextJson
         {
             var byteArray = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan.ToArray();
             var str = Encoding.UTF8.GetString(byteArray);
-            return BigInteger.TryParse(str, out bi);
+            return BigInteger.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out bi);
         }
 #else
         public static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
@@ -34,7 +33,7 @@ namespace GraphQL.SystemTextJson
             var byteSpan = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
             Span<char> chars = stackalloc char[byteSpan.Length];
             Encoding.UTF8.GetChars(reader.ValueSpan, chars);
-            return BigInteger.TryParse(chars, out bi);
+            return BigInteger.TryParse(chars, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out bi);
         }
 #endif
 

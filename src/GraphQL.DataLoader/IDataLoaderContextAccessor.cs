@@ -8,6 +8,6 @@ namespace GraphQL.DataLoader
         /// <summary>
         /// The current <seealso cref="DataLoaderContext"/>
         /// </summary>
-        DataLoaderContext Context { get; set; }
+        DataLoaderContext? Context { get; set; }
     }
 }

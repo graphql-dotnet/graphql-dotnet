@@ -1,7 +1,5 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,27 +14,27 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly UniqueInputFieldNames Instance = new UniqueInputFieldNames();
+        public static readonly UniqueInputFieldNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueInputFieldNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-                new MatchingNodeVisitor<ObjectValue>(
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+                new MatchingNodeVisitor<GraphQLObjectValue>(
                     enter: (objVal, context) =>
                     {
-                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                     },
                     leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop()),
 
-                new MatchingNodeVisitor<ObjectField>(
+                new MatchingNodeVisitor<GraphQLObjectField>(
                     leave: (objField, context) =>
                     {
-                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new();
 
                         if (knownNames.TryGetValue(objField.Name, out var value))
                         {
@@ -47,6 +45,6 @@ namespace GraphQL.Validation.Rules
                             knownNames[objField.Name] = objField.Value;
                         }
                     })
-            ).ToTask();
+            );
     }
 }

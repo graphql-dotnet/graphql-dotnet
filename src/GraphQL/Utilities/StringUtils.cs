@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL.Utilities
 {
     /// <summary>
@@ -88,7 +84,7 @@ namespace GraphQL.Utilities
             for (int i = 0; i <= maxi; i++)
                 dCurrent[i] = i;
 
-            int jm1 = 0, im1 = 0, im2 = -1;
+            int jm1 = 0, im1, im2;
 
             for (int j = 1; j <= maxj; j++)
             {
@@ -106,7 +102,6 @@ namespace GraphQL.Utilities
 
                 for (int i = 1; i <= maxi; i++)
                 {
-
                     int cost = source[im1] == target[jm1] ? 0 : 1;
 
                     int del = dCurrent[im1] + 1;

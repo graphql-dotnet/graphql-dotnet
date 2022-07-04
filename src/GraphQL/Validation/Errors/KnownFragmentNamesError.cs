@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +11,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownFragmentNamesError(ValidationContext context, FragmentSpread node, string fragmentName)
-            : base(context.Document.OriginalQuery!, NUMBER, UnknownFragmentMessage(fragmentName), node)
+        public KnownFragmentNamesError(ValidationContext context, GraphQLFragmentSpread node, string fragmentName)
+            : base(context.Document.Source, NUMBER, UnknownFragmentMessage(fragmentName), node)
         {
         }
 

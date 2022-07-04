@@ -1,21 +1,34 @@
 using GraphQL.Caching;
-using GraphQL.Language.AST;
-using Shouldly;
-using Xunit;
+using GraphQLParser.AST;
 
-namespace GraphQL.Tests.Caching
+namespace GraphQL.Tests.Caching;
+
+public class MemoryCacheTests
 {
-    public class MemoryCacheTests
+    [Fact]
+    public async Task Validate_Entry_Is_Cached()
     {
-        [Fact]
-        public void ValidateEntryIsCached()
-        {
-            var doc = new Document();
-            var query = "test";
-            var memoryCache = new MemoryDocumentCache();
-            memoryCache[query].ShouldBeNull();
-            memoryCache[query] = doc;
-            memoryCache[query].ShouldBe(doc);
-        }
+        var doc = new GraphQLDocument();
+        var query = "test";
+        var memoryCache = new MemoryDocumentCache();
+
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBeNull();
+
+        await memoryCache.SetAsync(query, doc).ConfigureAwait(false);
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBe(doc);
+    }
+
+    [Fact]
+    public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
+    {
+        var doc = new GraphQLDocument();
+        var query = "test";
+        var memoryCache = new MemoryDocumentCache();
+
+        await memoryCache.SetAsync(query, doc).ConfigureAwait(false);
+
+        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsync(query, null).ConfigureAwait(false)).ConfigureAwait(false);
+
+        (await memoryCache.GetAsync(query).ConfigureAwait(false)).ShouldBe(doc);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using GraphQL.Utilities;
 
@@ -105,7 +104,7 @@ namespace GraphQL.Types
 
         private IGraphType? CheckResolvedType(IGraphType? type)
         {
-            if (type != null && !type.IsGraphQLTypeReference() && type.IsInputType() == false)
+            if (type != null && !type.IsGraphQLTypeReference() && !type.IsInputType())
                 throw Create(nameof(ResolvedType), type.GetType());
 
             return type;

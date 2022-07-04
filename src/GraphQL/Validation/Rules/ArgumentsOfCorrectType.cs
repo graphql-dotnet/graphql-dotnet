@@ -1,6 +1,5 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -15,13 +14,13 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
+        public static readonly ArgumentsOfCorrectType Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentsOfCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Argument>((argAst, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((argAst, context) =>
         {
             var argDef = context.TypeInfo.GetArgument();
             if (argDef == null)
@@ -33,6 +32,6 @@ namespace GraphQL.Validation.Rules
             {
                 context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));
             }
-        }).ToTask();
+        });
     }
 }

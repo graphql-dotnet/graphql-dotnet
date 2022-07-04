@@ -1,64 +1,62 @@
-using System.Linq;
-using GraphQL.Language;
-using GraphQL.Language.AST;
-using GraphQLParser;
-using Shouldly;
-using Xunit;
+using GraphQL.Execution;
+using GraphQLParser.AST;
 
-namespace GraphQL.Tests.Language
+namespace GraphQL.Tests.Language;
+
+public class CommentTests
 {
-    public class CommentTests
+    private static readonly GraphQLDocumentBuilder _builder = new GraphQLDocumentBuilder { IgnoreComments = false };
+
+    [Fact]
+    public void operation_comment_should_be_null()
     {
-        [Fact]
-        public void operation_comment_should_be_null()
-        {
-            const string query = @"
+        const string query = @"
 query _ {
     person {
         name
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
-            document.Operations.First().Comment.ShouldBeNull();
-        }
+        var document = _builder.Build(query);
+        document.Operation().Comments.ShouldBeNull();
+    }
 
-        [Fact]
-        public void operation_comment_should_not_be_null()
-        {
-            const string query = @"#comment
+    [Fact]
+    public void operation_comment_should_not_be_null()
+    {
+        const string query = @"#comment
 query _ {
     person {
         name
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Operation().Comments[0].Value.ShouldBe("comment");
+    }
 
-        [Fact]
-        public void field_comment_should_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void field_comment_should_be_null()
+    {
+        const string query = @"
 query _ {
     person {
         name
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First()
+            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
+    }
 
-        [Fact]
-        public void field_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void field_comment_should_not_be_null()
+    {
+        const string query = @"
 query _ {
     #comment1
     person {
@@ -67,18 +65,18 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment1");
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment2");
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment1");
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First()
+            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment2");
+    }
 
-        [Fact]
-        public void fragmentdefinition_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void fragmentdefinition_comment_should_not_be_null()
+    {
+        const string query = @"
 query _ {
     person {
         ...human
@@ -90,14 +88,14 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Fragments.First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comments[0].Value.ShouldBe("comment");
+    }
 
-        [Fact]
-        public void fragmentspread_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void fragmentspread_comment_should_not_be_null()
+    {
+        const string query = @"
 query _ {
     person {
         #comment
@@ -109,16 +107,16 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<FragmentSpread>().First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First()
+            .SelectionSet.Selections.OfType<GraphQLFragmentSpread>().First().Comments[0].Value.ShouldBe("comment");
+    }
 
-        [Fact]
-        public void inlinefragment_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void inlinefragment_comment_should_not_be_null()
+    {
+        const string query = @"
 query _ {
     person {
         #comment
@@ -128,16 +126,16 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<InlineFragment>().First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First()
+            .SelectionSet.Selections.OfType<GraphQLInlineFragment>().First().Comments[0].Value.ShouldBe("comment");
+    }
 
-        [Fact]
-        public void argument_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void argument_comment_should_not_be_null()
+    {
+        const string query = @"
 query _ {
     person(
         #comment
@@ -146,16 +144,16 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First()
-                .Arguments.First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .SelectionSet.Selections.OfType<GraphQLField>().First()
+            .Arguments.First().Comments[0].Value.ShouldBe("comment");
+    }
 
-        [Fact]
-        public void variable_comment_should_not_be_null()
-        {
-            const string query = @"
+    [Fact]
+    public void variable_comment_should_not_be_null()
+    {
+        const string query = @"
 query _(
     #comment
     $id: ID) {
@@ -164,9 +162,8 @@ query _(
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(Parser.Parse(query, new ParserOptions { Ignore = IgnoreOptions.None }));
-            document.Operations.First()
-                .Variables.First().Comment.ShouldBe("comment");
-        }
+        var document = _builder.Build(query);
+        document.Operation()
+            .Variables.First().Comments[0].Value.ShouldBe("comment");
     }
 }

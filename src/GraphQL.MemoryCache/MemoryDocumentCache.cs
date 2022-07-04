@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -62,17 +61,27 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public virtual Document? this[string query]
-        {
-            get => _memoryCache.TryGetValue<Document>(query, out var value) ? value : null;
-            set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));
-        }
-
-        /// <inheritdoc/>
         public virtual void Dispose()
         {
             if (_memoryCacheIsOwned)
                 _memoryCache.Dispose();
+        }
+
+        /// <inheritdoc/>
+        public virtual ValueTask<GraphQLDocument?> GetAsync(string query) =>
+            new(_memoryCache.TryGetValue<GraphQLDocument>(query, out var value) ? value : null);
+
+        /// <inheritdoc/>
+        public virtual ValueTask SetAsync(string query, GraphQLDocument value)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            _memoryCache.Set(query, value, GetMemoryCacheEntryOptions(query));
+
+            return default;
         }
     }
 }

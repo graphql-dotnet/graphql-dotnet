@@ -1,15 +1,15 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Resolvers;
+using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -21,7 +21,10 @@ namespace GraphQL.Types
     /// </summary>
     public class SchemaTypes : IEnumerable<IGraphType>
     {
-        internal static readonly Dictionary<Type, Type> BuiltInScalarMappings = new Dictionary<Type, Type>
+        /// <summary>
+        /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
+        /// </summary>
+        public static ReadOnlyDictionary<Type, Type> BuiltInScalarMappings { get; } = new(new Dictionary<Type, Type>
         {
             [typeof(int)] = typeof(IntGraphType),
             [typeof(long)] = typeof(LongGraphType),
@@ -46,12 +49,12 @@ namespace GraphQL.Types
             [typeof(byte)] = typeof(ByteGraphType),
             [typeof(sbyte)] = typeof(SByteGraphType),
             [typeof(Uri)] = typeof(UriGraphType),
-        };
+        });
 
-        // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
+        // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
 
-        // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
+        // Standard scalars https://spec.graphql.org/October2021/#sec-Scalars
         private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
         {
             new StringGraphType(),
@@ -105,11 +108,23 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public SchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+            : this(schema, serviceProvider, (IEnumerable<IGraphTypeMappingProvider>?)serviceProvider.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance for the specified schema, with the specified type resolver,
+        /// with the specified set of <see cref="IGraphTypeMappingProvider"/> instances.
+        /// </summary>
+        /// <param name="schema">A schema for which this instance is created.</param>
+        /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+        /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            Initialize(schema, serviceProvider);
+            Initialize(schema, serviceProvider, graphTypeMappings);
         }
 
         private bool _initialized = false;
@@ -118,7 +133,8 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
-        protected void Initialize(ISchema schema, IServiceProvider serviceProvider)
+        /// <param name="graphTypeMappings">A service used to map CLR types to graph types.</param>
+        protected void Initialize(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
@@ -129,21 +145,25 @@ namespace GraphQL.Types
             _initialized = true;
 
             var types = GetSchemaTypes(schema, serviceProvider);
-            var typeMappingsEnumerable = schema.TypeMappings ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.TypeMappings));
-            var typeMappings = typeMappingsEnumerable is List<(Type, Type)> typeMappingsList ? typeMappingsList : typeMappingsEnumerable.ToList();
+            if (schema.TypeMappings != null)
+            {
+                // this code could be moved into Schema
+                var additionalMappings = schema.TypeMappings.Select(x => new ManualGraphTypeMappingProvider(x.clrType, x.graphType));
+                graphTypeMappings = graphTypeMappings != null ? graphTypeMappings.Concat(additionalMappings).ToList() : additionalMappings.ToList();
+            }
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
             _typeDictionary = new Dictionary<Type, IGraphType>();
             _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
 
             _context = new TypeCollectionContext(
-               type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
+               type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
                (name, type, ctx) =>
                {
                    SetGraphType(name, type);
                    ctx.AddType(name, type, null!);
                },
-               typeMappings);
+               graphTypeMappings);
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
@@ -172,7 +192,7 @@ namespace GraphQL.Types
                         AddType(graphType, context);
                     }
                 },
-                typeMappings);
+                graphTypeMappings);
 
             foreach (var type in types)
             {
@@ -210,7 +230,7 @@ namespace GraphQL.Types
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+            //    throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
 
             if (schema.Query != null)
                 yield return schema.Query;
@@ -257,7 +277,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a dictionary that relates type names to graph types.
         /// </summary>
-        protected internal virtual Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
+        protected internal virtual Dictionary<ROM, IGraphType> Dictionary { get; } = new Dictionary<ROM, IGraphType>();
         private Dictionary<Type, IGraphType> _typeDictionary;
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
@@ -270,7 +290,44 @@ namespace GraphQL.Types
         /// </summary>
         public int Count => Dictionary.Count;
 
-        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => FindGraphType(t) ?? resolver(t));
+        private IGraphType BuildGraphQLType(Type type, IGraphType resolvedType)
+            => BuildGraphQLType(type, _ => resolvedType);
+
+        /// <summary>
+        /// Returns a new instance of the specified graph type, using the specified resolver to
+        /// instantiate a new instance if the required type cannot be found from the lookup table.
+        /// Defaults to <see cref="Activator.CreateInstance(Type)"/> if no <paramref name="resolve"/>
+        /// parameter is specified. List and non-null graph types are instantiated and their
+        /// <see cref="IProvideResolvedType.ResolvedType"/> property is set to a new instance of
+        /// the base (wrapped) type.
+        /// </summary>
+        protected internal virtual IGraphType BuildGraphQLType(Type type, Func<Type, IGraphType> resolve)
+        {
+            var local = resolve;
+            local ??= t => (IGraphType)Activator.CreateInstance(t)!;
+            resolve = t => FindGraphType(t) ?? local(t);
+
+            if (type.IsGenericType)
+            {
+                if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
+                {
+                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type)!;
+                    nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
+                    return nonNull;
+                }
+
+                if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
+                {
+                    var list = (ListGraphType)Activator.CreateInstance(type)!;
+                    list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
+                    return list;
+                }
+            }
+
+            return resolve(type) ??
+                   throw new InvalidOperationException(
+                       $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
+        }
 
         /// <summary>
         /// Applies all delegates specified by the middleware builder to the schema.
@@ -319,11 +376,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type instance from the lookup table by its GraphQL type name.
         /// </summary>
-        public IGraphType? this[string typeName]
+        public IGraphType? this[ROM typeName]
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(typeName))
+                if (typeName.IsEmpty)
                 {
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }
@@ -336,7 +393,12 @@ namespace GraphQL.Types
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
-        private IGraphType? FindGraphType(Type type) => _typeDictionary.TryGetValue(type, out var value) ? value : null;
+        private IGraphType? FindGraphType(Type type)
+        {
+            return _typeDictionary == null
+                ? null
+                : _typeDictionary.TryGetValue(type, out var value) ? value : null;
+        }
 
         private void AddType(IGraphType type, TypeCollectionContext context)
         {
@@ -364,9 +426,7 @@ namespace GraphQL.Types
             {
                 foreach (var objectInterface in obj.Interfaces.List)
                 {
-                    AddTypeIfNotRegistered(objectInterface, context);
-
-                    if (FindGraphType(objectInterface) is IInterfaceGraphType interfaceInstance)
+                    if (AddTypeIfNotRegistered(objectInterface, context) is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);
@@ -408,9 +468,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
-                    AddTypeIfNotRegistered(unionedType, context);
-
-                    var objType = FindGraphType(unionedType) as IObjectGraphType;
+                    var objType = AddTypeIfNotRegistered(unionedType, context) as IObjectGraphType;
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
@@ -449,13 +507,13 @@ namespace GraphQL.Types
                 if (field.Type == null)
                     throw new InvalidOperationException($"Both ResolvedType and Type properties on field '{parentType?.Name}.{field.Name}' are null.");
 
-                object typeOrError = RebuildType(field.Type, parentType is IInputObjectGraphType, context.TypeMappings);
+                object typeOrError = RebuildType(field.Type, parentType is IInputObjectGraphType, context.ClrToGraphTypeMappings);
                 if (typeOrError is string error)
                     throw new InvalidOperationException($"The GraphQL type for field '{parentType?.Name}.{field.Name}' could not be derived implicitly. " + error);
                 field.Type = (Type)typeOrError;
 
-                AddTypeIfNotRegistered(field.Type, context);
-                field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
+                var namedType = AddTypeIfNotRegistered(field.Type, context);
+                field.ResolvedType = BuildGraphQLType(field.Type, namedType);
             }
             else
             {
@@ -477,13 +535,13 @@ namespace GraphQL.Types
                         if (arg.Type == null)
                             throw new InvalidOperationException($"Both ResolvedType and Type properties on argument '{parentType?.Name}.{field.Name}.{arg.Name}' are null.");
 
-                        object typeOrError = RebuildType(arg.Type, true, context.TypeMappings);
+                        object typeOrError = RebuildType(arg.Type, true, context.ClrToGraphTypeMappings);
                         if (typeOrError is string error)
                             throw new InvalidOperationException($"The GraphQL type for argument '{parentType?.Name}.{field.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
 
-                        AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                        var namedType = AddTypeIfNotRegistered(arg.Type, context);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, namedType);
                     }
                     else
                     {
@@ -493,7 +551,7 @@ namespace GraphQL.Types
             }
         }
 
-        private void HandleDirective(DirectiveGraphType directive, TypeCollectionContext context)
+        private void HandleDirective(Directive directive, TypeCollectionContext context)
         {
             if (directive.Arguments?.Count > 0)
             {
@@ -504,13 +562,13 @@ namespace GraphQL.Types
                         if (arg.Type == null)
                             throw new InvalidOperationException($"Both ResolvedType and Type properties on argument '{directive.Name}.{arg.Name}' are null.");
 
-                        object typeOrError = RebuildType(arg.Type, true, context.TypeMappings);
+                        object typeOrError = RebuildType(arg.Type, true, context.ClrToGraphTypeMappings);
                         if (typeOrError is string error)
                             throw new InvalidOperationException($"The GraphQL type for argument '{directive.Name}.{arg.Name}' could not be derived implicitly. " + error);
                         arg.Type = (Type)typeOrError;
 
-                        AddTypeIfNotRegistered(arg.Type, context);
-                        arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                        var namedType = AddTypeIfNotRegistered(arg.Type, context);
+                        arg.ResolvedType = BuildGraphQLType(arg.Type, namedType);
                     }
                     else
                     {
@@ -542,7 +600,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
+        private IGraphType AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
             var namedType = type.GetNamedType();
             var foundType = FindGraphType(namedType);
@@ -550,21 +608,26 @@ Make sure that your ServiceProvider is configured correctly.");
             {
                 if (namedType == typeof(PageInfoType))
                 {
-                    AddType(new PageInfoType(), context);
+                    foundType = new PageInfoType();
+                    AddType(foundType, context);
                 }
                 else if (namedType.IsGenericType && (namedType.ImplementsGenericType(typeof(EdgeType<>)) || namedType.ImplementsGenericType(typeof(ConnectionType<,>))))
                 {
-                    AddType((IGraphType)Activator.CreateInstance(namedType), context);
+                    foundType = (IGraphType)Activator.CreateInstance(namedType)!;
+                    AddType(foundType, context);
                 }
                 else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
                 {
-                    AddType(builtInCustomScalar, _context);
+                    foundType = builtInCustomScalar;
+                    AddType(foundType, _context);
                 }
                 else
                 {
-                    AddTypeWithLoopCheck(context.ResolveType(namedType), context, namedType);
+                    foundType = context.ResolveType(namedType);
+                    AddTypeWithLoopCheck(foundType, context, namedType);
                 }
             }
+            return foundType;
         }
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
@@ -579,7 +642,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private object RebuildType(Type type, bool input, List<(Type, Type)> typeMappings)
+        private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
         {
             if (!type.IsGenericType)
                 return type;
@@ -606,7 +669,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        private object GetGraphType(Type clrType, bool input, List<(Type clr, Type graph)> typeMappings)
+        private object GetGraphType(Type clrType, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
         {
             var ret = GetGraphTypeFromClrType(clrType, input, typeMappings);
 
@@ -629,20 +692,21 @@ Make sure that your ServiceProvider is configured correctly.");
         /// These are handled within <see cref="GraphQL.TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
         /// and should already have been wrapped around the type reference.
         /// </remarks>
-        protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, List<(Type ClrType, Type GraphType)> typeMappings)
+        protected virtual Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
         {
+            Type? mappedType = null;
+
             // check custom mappings first
             if (typeMappings != null)
             {
                 foreach (var mapping in typeMappings)
                 {
-                    if (mapping.ClrType == clrType)
-                    {
-                        if (isInputType && mapping.GraphType.IsInputType() || !isInputType && mapping.GraphType.IsOutputType())
-                            return mapping.GraphType;
-                    }
+                    mappedType = mapping.GetGraphTypeFromClrType(clrType, isInputType, mappedType);
                 }
             }
+
+            if (mappedType != null)
+                return mappedType;
 
             // then built-in mappings
             if (BuiltInScalarMappings.TryGetValue(clrType, out var graphType))

@@ -1,11 +1,9 @@
-using System;
+#nullable enable
+
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
-using Microsoft.AspNetCore.Http;
 
 namespace Example
 {
@@ -25,7 +23,7 @@ namespace Example
             Debug.Assert(data != null);
         }
 
-        public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             Interlocked.Increment(ref _count);
 

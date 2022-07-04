@@ -9,7 +9,7 @@ exceptions occurring during the execution of a field resolver, such as a timeout
 
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
 property as a list of `ExecutionError` objects. `ExecutionError` is derived from `Exception`, and the `Message`
-property is serialized [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors)
+property is serialized [according to the spec](https://spec.graphql.org/October2021/#sec-Errors)
 with location and path information. In addition, by default three additional pieces of information are serialized
 to the `extensions` property of the GraphQL error which contain:
 
@@ -129,7 +129,7 @@ var result = executer.ExecuteAsync(options =>
 
     ...
 
-    options.UnhandledExceptionDelegate = context =>
+    options.UnhandledExceptionDelegate = async context =>
     {
         try
         {
@@ -140,7 +140,7 @@ var result = executer.ExecuteAsync(options =>
                 Details = context.Exception.ToString()
             };
             db.ErrorLogs.Add(errorLog);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             context.Exception.Data["errorLogId"] = errorLog.Id;
         }
         catch
@@ -164,11 +164,11 @@ options.UnhandledExecutionDelegate = ctx =>
 ## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
-typically you will pass this object to an implementation of `IDocumentWriter` to convert the
-object tree into json. The `IDocumentWriter` implementations provided by the `GraphQL.SystemTextJson`
+typically you will pass this object to an implementation of `IGraphQLSerializer` to convert the
+object tree into json. The `IGraphQLSerializer` implementations provided by the `GraphQL.SystemTextJson`
 and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
 `IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
-the `IErrorInfoProvider` instance and it will be consumed by the `IDocumentWriter` implementation
+the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
 automatically. Please review the [serialization](../guides/serialization) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list

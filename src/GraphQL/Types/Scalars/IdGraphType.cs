@@ -1,6 +1,5 @@
-using System;
 using System.Numerics;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -25,24 +24,22 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            StringValue str => str.Value,
-            IntValue num => num.Value,
-            LongValue longVal => longVal.Value,
-            BigIntValue bigIntValue => bigIntValue.Value,
-            NullValue _ => null,
+            GraphQLStringValue str => (string)str.Value, //ISSUE:allocation
+            GraphQLIntValue num when Int.TryParse(num.Value, out int i) => i,
+            GraphQLIntValue num when Long.TryParse(num.Value, out long l) => l,
+            GraphQLIntValue num when BigInt.TryParse(num.Value, out var b) => b,
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value),
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            StringValue _ => true,
-            IntValue _ => true,
-            LongValue _ => true,
-            BigIntValue _ => true,
-            NullValue _ => true,
+            GraphQLStringValue _ => true,
+            GraphQLIntValue _ => true,
+            GraphQLNullValue _ => true,
             _ => false
         };
 

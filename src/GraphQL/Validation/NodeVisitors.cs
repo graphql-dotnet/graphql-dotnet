@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -19,13 +18,13 @@ namespace GraphQL.Validation
             _nodeVisitors = nodeVisitors ?? throw new ArgumentNullException(nameof(nodeVisitors));
         }
 
-        void INodeVisitor.Enter(INode node, ValidationContext context)
+        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
         {
             foreach (var n in _nodeVisitors)
                 n.Enter(node, context);
         }
 
-        void INodeVisitor.Leave(INode node, ValidationContext context)
+        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
         {
             foreach (var n in _nodeVisitors)
                 n.Leave(node, context);

@@ -1,7 +1,5 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,19 +14,19 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
+        public static readonly UniqueArgumentNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
-            new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
-            new MatchingNodeVisitor<Argument>((argument, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<GraphQLField>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
+            new MatchingNodeVisitor<GraphQLDirective>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
+            new MatchingNodeVisitor<GraphQLArgument>((argument, context) =>
             {
-                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
-                string argName = argument.Name;
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new();
+                var argName = argument.Name;
                 if (knownArgs.TryGetValue(argName, out var arg))
                 {
                     context.ReportError(new UniqueArgumentNamesError(context, arg, argument));
@@ -38,6 +36,6 @@ namespace GraphQL.Validation.Rules
                     knownArgs[argName] = argument;
                 }
             })
-        ).ToTask();
+        );
     }
 }

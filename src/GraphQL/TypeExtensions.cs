@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -32,17 +29,6 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Determines whether this instance is a subclass of Nullable&lt;T&gt;.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
-        /// </returns>
-        [Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static bool IsNullable(this Type type)
-            => type == typeof(string) || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-
-        /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>
         /// <param name="type">The type.</param>
@@ -51,6 +37,30 @@ namespace GraphQL
         /// </returns>
         public static bool IsGraphType(this Type type)
             => typeof(IGraphType).IsAssignableFrom(type);
+
+        /// <summary>
+        /// Determines if the specified type represents a named graph type (not a wrapper type such as <see cref="ListGraphType"/>).
+        /// </summary>
+        internal static bool IsNamedType(this Type type)
+        {
+            if (!IsGraphType(type))
+                return false;
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(NonNullGraphType<>) ||
+                    genericType == typeof(ListGraphType<>))
+                {
+                    return false;
+                }
+            }
+            else if (type == typeof(NonNullGraphType) || type == typeof(ListGraphType))
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
@@ -108,7 +118,7 @@ namespace GraphQL
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
-                if (isNullable == false)
+                if (!isNullable)
                 {
                     throw new ArgumentOutOfRangeException(nameof(isNullable),
                         $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type.");
@@ -119,20 +129,26 @@ namespace GraphQL
 
             if (type.IsArray)
             {
-                var clrElementType = type.GetElementType();
+                var clrElementType = type.GetElementType()!;
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent array
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-            else if (IsAnIEnumerable(type))
+#pragma warning disable CS0618 // Type or member is obsolete -- remove this block for v6
+            else if (GlobalSwitches.MapAllEnumerableTypes && IsAnIEnumerable(type))
             {
-#pragma warning disable 0618
                 var clrElementType = GetEnumerableElementType(type);
-#pragma warning restore 0618
+                var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            else if (!GlobalSwitches.MapAllEnumerableTypes && TryGetEnumerableElementType(type, out var clrElementType))
+            {
                 var elementType = GetGraphTypeFromType(clrElementType, IsNullableType(clrElementType), mode); // isNullable from elementType, not from parent container
                 graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
             else
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
                 if (attr != null)
                 {
@@ -142,6 +158,20 @@ namespace GraphQL
                         graphType = attr.OutputType;
                     else if (attr.InputType == attr.OutputType) // scalar
                         graphType = attr.InputType;
+                }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                if (mode == TypeMappingMode.InputType)
+                {
+                    var inputAttr = type.GetCustomAttribute<InputTypeAttribute>();
+                    if (inputAttr != null)
+                        graphType = inputAttr.InputType;
+                }
+                else if (mode == TypeMappingMode.OutputType)
+                {
+                    var outputAttr = type.GetCustomAttribute<OutputTypeAttribute>();
+                    if (outputAttr != null)
+                        graphType = outputAttr.OutputType;
                 }
 
                 if (graphType == null)
@@ -209,6 +239,7 @@ namespace GraphQL
             return friendlyName;
         }
 
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
@@ -217,8 +248,8 @@ namespace GraphQL
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
         /// as a one-dimensional container type.
         /// </summary>
-        [Obsolete("This member will be removed in GraphQL.NET v5.")]
-        public static Type GetEnumerableElementType(this Type type)
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
+        private static Type GetEnumerableElementType(this Type type)
         {
             // prefer a known type, just in case multiple enumerable interfaces are supported
             if (type.IsConstructedGenericType)
@@ -247,7 +278,29 @@ namespace GraphQL
             throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
         }
 
+        [Obsolete("This method along with GlobalSwitches.MapAllEnumerableTypes should be removed in v6")]
         private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
+
+        /// <summary>
+        /// Returns the type of element for a one-dimensional container type.
+        /// </summary>
+        private static bool TryGetEnumerableElementType(Type type, [NotNullWhen(true)] out Type? elementType)
+        {
+            if (type == typeof(IEnumerable))
+            {
+                elementType = typeof(object);
+                return true;
+            }
+
+            if (!type.IsGenericType || !TypeInformation.EnumerableListTypes.Contains(type.GetGenericTypeDefinition()))
+            {
+                elementType = null;
+                return false;
+            }
+
+            elementType = type.GetGenericArguments()[0];
+            return true;
+        }
 
         /// <summary>
         /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
@@ -299,6 +352,32 @@ namespace GraphQL
             if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
             {
                 description = memberInfo.GetXmlDocumentation();
+            }
+
+            return description;
+        }
+
+        /// <summary>
+        /// Looks for a <see cref="DescriptionAttribute"/> on the specified parameter and returns
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any. Otherwise
+        /// returns XML documentation on the specified member, if any. Note that behavior of this
+        /// method depends from <see cref="GlobalSwitches.EnableReadDescriptionFromAttributes"/>
+        /// and <see cref="GlobalSwitches.EnableReadDescriptionFromXmlDocumentation"/> settings.
+        /// </summary>
+        public static string? Description(this ParameterInfo parameterInfo)
+        {
+            string? description = null;
+
+            if (GlobalSwitches.EnableReadDescriptionFromAttributes)
+            {
+                description = (parameterInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+                if (description != null)
+                    return description;
+            }
+
+            if (GlobalSwitches.EnableReadDescriptionFromXmlDocumentation)
+            {
+                description = parameterInfo.GetXmlDocumentation();
             }
 
             return description;

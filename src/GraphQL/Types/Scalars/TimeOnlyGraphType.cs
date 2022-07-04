@@ -1,8 +1,8 @@
 #if NET6_0_OR_GREATER
 
-using System;
 using System.Globalization;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -22,10 +22,10 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            NullValue _ => null,
-            StringValue stringValue => ParseTime(stringValue.Value),
+            GraphQLNullValue _ => null,
+            GraphQLStringValue stringValue => ParseTime(stringValue.Value),
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -46,7 +46,7 @@ namespace GraphQL.Types
             _ => ThrowSerializationError(value)
         };
 
-        private static TimeOnly ParseTime(string stringValue)
+        private static TimeOnly ParseTime(ROM stringValue)
         {
             if (TimeOnly.TryParseExact(stringValue, "HH:mm:ss.FFFFFFF", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var time))
             {

@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
-using Field = GraphQL.Language.AST.Field;
+using GraphQL.Validation;
+using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -17,7 +16,8 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue>? _arguments;
-        private Dictionary<string, Field>? _subFields;
+        private IDictionary<string, DirectiveInfo>? _directives;
+        private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
         /// <summary>
@@ -34,6 +34,7 @@ namespace GraphQL
             _executionNode = node!;
             _executionContext = context!;
             _arguments = null;
+            _directives = null;
             _subFields = null;
             _parent = null;
 
@@ -41,13 +42,16 @@ namespace GraphQL
         }
 
         private IDictionary<string, ArgumentValue>? GetArguments()
-            => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
+            => ExecutionHelper.GetArguments(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
+
+        private IDictionary<string, DirectiveInfo>? GetDirectives()
+            => ExecutionHelper.GetDirectives(_executionNode.Field, _executionContext.Variables, _executionContext.Schema);
 
         /// <inheritdoc/>
         public object? Source => _executionNode.Source;
 
         /// <inheritdoc/>
-        public Field FieldAst => _executionNode.Field!;
+        public GraphQLField FieldAst => _executionNode.Field!;
 
         /// <inheritdoc/>
         public FieldType FieldDefinition => _executionNode.FieldDefinition!;
@@ -78,16 +82,19 @@ namespace GraphQL
         public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= GetArguments();
 
         /// <inheritdoc/>
+        public IDictionary<string, DirectiveInfo>? Directives => _directives ??= GetDirectives();
+
+        /// <inheritdoc/>
         public object? RootValue => _executionContext.RootValue;
 
         /// <inheritdoc/>
         public ISchema Schema => _executionContext.Schema;
 
         /// <inheritdoc/>
-        public Document Document => _executionContext.Document;
+        public GraphQLDocument Document => _executionContext.Document;
 
         /// <inheritdoc/>
-        public Operation Operation => _executionContext.Operation;
+        public GraphQLOperationDefinition Operation => _executionContext.Operation;
 
         /// <inheritdoc/>
         public Variables Variables => _executionContext.Variables;
@@ -108,7 +115,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, Field>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext => _executionContext.UserContext;
@@ -116,7 +123,10 @@ namespace GraphQL
         object? IResolveFieldContext.Source => _executionNode.Source;
 
         /// <inheritdoc/>
-        public IDictionary<string, object?> Extensions => _executionContext.Extensions;
+        public IReadOnlyDictionary<string, object?> InputExtensions => _executionContext.InputExtensions;
+
+        /// <inheritdoc/>
+        public IDictionary<string, object?> OutputExtensions => _executionContext.OutputExtensions;
 
         /// <inheritdoc/>
         public IServiceProvider? RequestServices => _executionContext.RequestServices;

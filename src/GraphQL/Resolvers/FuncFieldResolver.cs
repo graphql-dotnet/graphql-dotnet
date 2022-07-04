@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 
 namespace GraphQL.Resolvers
@@ -8,22 +6,38 @@ namespace GraphQL.Resolvers
     /// <summary>
     /// When resolving a field, this implementation calls a predefined <see cref="Func{T, TResult}"/> and returns the result
     /// </summary>
-    public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TReturnType> : IFieldResolver
     {
-        private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
+        private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
         /// <summary>
         /// Initializes a new instance that runs the specified delegate when resolving a field.
         /// </summary>
         public FuncFieldResolver(Func<IResolveFieldContext, TReturnType?> resolver)
         {
-            _resolver = resolver;
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            var returnType = resolver.Method.ReturnType; // in case the delegate was cast so TReturnType is just object, pull the original return type
+            if (typeof(Task).IsAssignableFrom(returnType) || (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+                throw new InvalidOperationException("Please use the proper FuncFieldResolver constructor for asynchronous delegates, or call FieldAsync when adding your field to the graph.");
+
+            _resolver = context => new ValueTask<object?>(resolver(context));
+        }
+
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        public FuncFieldResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
+        {
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            _resolver = resolver is Func<IResolveFieldContext, ValueTask<object?>> resolverObject
+                ? resolverObject
+                : async context => await resolver(context).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
-
-        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
     }
 
     /// <summary>
@@ -31,55 +45,60 @@ namespace GraphQL.Resolvers
     /// <br/><br/>
     /// This implementation provides a typed <see cref="IResolveFieldContext{TSource}"/> to the resolver function.
     /// </summary>
-    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
     {
-        private readonly Func<IResolveFieldContext, TReturnType?> _resolver;
+        private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
         private static ResolveFieldContextAdapter<TSourceType>? _sharedAdapter;
 
         /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             if (resolver == null)
-                throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+                throw new ArgumentNullException(nameof(resolver));
+
             _resolver = GetResolverFor(resolver);
         }
 
-        private Func<IResolveFieldContext, TReturnType?> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver)
         {
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
+
+            _resolver = resolver is Func<IResolveFieldContext<TSourceType>, ValueTask<object?>> resolverObject
+                ? context => resolverObject(context.As<TSourceType>())
+                : async context => await resolver(context.As<TSourceType>()).ConfigureAwait(false);
+        }
+
+        private Func<IResolveFieldContext, ValueTask<object?>> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
+        {
+            var returnType = resolver.Method.ReturnType; // in case the delegate was cast so TReturnType is just object, pull the original return type
+            if (typeof(Task).IsAssignableFrom(returnType) || (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+                throw new InvalidOperationException("Please use the proper FuncFieldResolver constructor for asynchronous delegates, or call FieldAsync when adding your field to the graph.");
+
             // also see ExecutionStrategy.ExecuteNodeAsync as it relates to context re-use
 
-            // when source type is object, just pass the context through
+            // when source type is object, just pass the context through, letting the execution strategy handle context re-use
             if (typeof(TSourceType) == typeof(object))
             {
                 // ReadonlyResolveFieldContext implements IResolveFieldContext<object>
-                return (context) => resolver(context.As<TSourceType>());
+                return (context) => new ValueTask<object?>(resolver(context.As<TSourceType>()));
             }
 
             // for return types of IDataLoaderResult or IEnumerable
-            if (!CanReuseContextForType(typeof(TReturnType)))
+            if (!CanReuseContextForType(returnType))
             {
                 // Data loaders and IEnumerable results cannot use pooled contexts
-                return (context) => resolver(context.As<TSourceType>());
+                return (context) => new ValueTask<object?>(resolver(context.As<TSourceType>()));
             }
 
-            // for return types of Task<IDataLoaderResult> or Task<IEnumerable>
-            if (typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>))
-            {
-                var returnType = typeof(TReturnType).GetGenericArguments()[0];
-                if (!CanReuseContextForType(returnType))
-                {
-                    // Data loaders and IEnumerable results cannot use pooled contexts
-                    return (context) => resolver(context.As<TSourceType>());
-                }
-            }
-
-            // for return types of object or Task<object>
-            if (typeof(TReturnType) == typeof(object) || typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>) && typeof(TReturnType).GetGenericArguments()[0] == typeof(object))
+            // for return types of object, examine the return type at runtime to determine if context re-use is applicable
+            if (returnType == typeof(object))
             {
                 // must determine type at runtime
                 return (context) =>
                 {
-                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
+                    var adapter = Interlocked.Exchange(ref _sharedAdapter, null);
                     if (adapter == null)
                     {
                         adapter = new ResolveFieldContextAdapter<TSourceType>(context);
@@ -89,58 +108,28 @@ namespace GraphQL.Resolvers
                         adapter.Set(context);
                     }
                     var ret = resolver(adapter);
-                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
-                    if (ret is Task task)
-                    {
-                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion)
-                        {
-                            var ret2 = task.GetResult();
-                            if (CanReuseContextForValue(ret2))
-                            {
-                                adapter.Reset();
-                                System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
-                            }
-                        }
-                    }
-                    else if (CanReuseContextForValue(ret))
+                    // only re-use contexts that do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
+                    if (CanReuseContextForValue(ret))
                     {
                         adapter.Reset();
-                        System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                        Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     }
-                    return ret;
+                    return new ValueTask<object?>(ret);
                 };
             }
 
-            // not an IEnumerable, IDataLoaderResult, Task<IEnumerable>, Task<IDataLoaderResult>, object or Task<object>
+            // TSourceType is not object
+            // TReturnType is not an IEnumerable, IDataLoaderResult, or object
             // use a pooled context
-            if (typeof(Task).IsAssignableFrom(typeof(TReturnType)))
+            return (context) =>
             {
-                return (context) =>
-                {
-                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
-                    adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
-                    var ret = resolver(adapter);
-                    var t = (Task)(object)ret!;
-                    if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion)
-                    {
-                        adapter.Reset();
-                        System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
-                    }
-                    return ret;
-                };
-            }
-            else
-            {
-                return (context) =>
-                {
-                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
-                    adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
-                    var ret = resolver(adapter);
-                    adapter.Reset();
-                    System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
-                    return ret;
-                };
-            }
+                var adapter = Interlocked.Exchange(ref _sharedAdapter, null);
+                adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
+                var ret = resolver(adapter);
+                adapter.Reset();
+                Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                return new ValueTask<object?>(ret);
+            };
 
             static bool CanReuseContextForType(Type type) => !IsDataLoaderType(type) && !IsEnumerableType(type);
             static bool CanReuseContextForValue(object? value) => !IsDataLoaderValue(value) && !IsEnumerableValue(value);
@@ -153,8 +142,6 @@ namespace GraphQL.Resolvers
         }
 
         /// <inheritdoc/>
-        public TReturnType? Resolve(IResolveFieldContext context) => _resolver(context);
-
-        object? IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
     }
 }

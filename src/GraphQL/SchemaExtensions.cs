@@ -1,6 +1,4 @@
-using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -126,7 +124,6 @@ namespace GraphQL
             schema.AutoRegister(typeof(TClrType), mode);
         }
 
-
         /// <summary>
         /// Scans the calling assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
         /// <see cref="InputObjectGraphType{TSourceType}"/>, or <see cref="EnumerationGraphType{TEnum}"/>, and
@@ -195,12 +192,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IDocumentWriter"/>, and returns the result
+        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IGraphQLTextSerializer"/>, and returns the result
         /// </summary>
         /// <param name="schema">An instance of <see cref="ISchema"/> to use to execute the query</param>
-        /// <param name="documentWriter">An instance of <see cref="IDocumentExecuter"/> to use to serialize the result</param>
+        /// <param name="serializer">An instance of <see cref="IGraphQLTextSerializer"/> to use to serialize the result</param>
         /// <param name="configure">A delegate which configures the execution options</param>
-        public static async Task<string> ExecuteAsync(this ISchema schema, IDocumentWriter documentWriter, Action<ExecutionOptions> configure)
+        public static async Task<string> ExecuteAsync(this ISchema schema, IGraphQLTextSerializer serializer, Action<ExecutionOptions> configure)
         {
             if (configure == null)
             {
@@ -214,7 +211,7 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
+            return serializer.Serialize(result);
         }
 
         /// <summary>
@@ -242,7 +239,7 @@ namespace GraphQL
                 {
                     case EnumerationGraphType e:
                         visitor.VisitEnum(e, schema);
-                        foreach (var value in e.Values.List) // List is always non-null
+                        foreach (var value in e.Values) //ISSUE:allocation
                             visitor.VisitEnumValue(value, e, schema);
                         break;
 
@@ -322,7 +319,7 @@ namespace GraphQL
                 }
             }
 
-            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema) => Replace(argument);
+            public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => Replace(argument);
 
             public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
 

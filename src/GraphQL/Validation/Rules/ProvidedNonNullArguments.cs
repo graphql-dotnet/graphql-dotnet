@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,14 +15,14 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
+        public static readonly ProvidedNonNullArguments Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="ProvidedNonNullArgumentsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Field>(leave: (node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<GraphQLField>(leave: (node, context) =>
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
 
@@ -41,7 +40,7 @@ namespace GraphQL.Validation.Rules
                 }
             }),
 
-            new MatchingNodeVisitor<Directive>(leave: (node, context) =>
+            new MatchingNodeVisitor<GraphQLDirective>(leave: (node, context) =>
             {
                 var directive = context.TypeInfo.GetDirective();
 
@@ -59,6 +58,6 @@ namespace GraphQL.Validation.Rules
                     }
                 }
             })
-        ).ToTask();
+        );
     }
 }

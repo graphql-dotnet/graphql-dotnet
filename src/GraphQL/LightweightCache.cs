@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace GraphQL
 {
@@ -12,6 +10,7 @@ namespace GraphQL
     /// <seealso cref="System.Collections.Generic.IEnumerable{TValue}" />
     /// <remarks>https://github.com/JasperFx/baseline/blob/master/src/Baseline/LightweightCache.cs</remarks>
     public class LightweightCache<TKey, TValue> : IEnumerable<TValue>
+        where TKey : notnull
     {
         private readonly IDictionary<TKey, TValue> _values;
         private Func<TKey, TValue> _onMissing = delegate (TKey key)

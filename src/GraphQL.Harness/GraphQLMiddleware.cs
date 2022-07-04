@@ -1,44 +1,39 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.SystemTextJson;
+using GraphQL.Transport;
 using GraphQL.Types;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Example
 {
-    public class GraphQLMiddleware
+    public class GraphQLMiddleware : IMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
-        private readonly IDocumentWriter _writer;
+        private readonly IGraphQLSerializer _serializer;
+        private readonly ISchema _schema;
 
         public GraphQLMiddleware(
-            RequestDelegate next,
             IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
-            IDocumentWriter writer)
+            IGraphQLSerializer serializer,
+            ISchema schema)
         {
-            _next = next;
             _settings = options.Value;
             _executer = executer;
-            _writer = writer;
+            _serializer = serializer;
+            _schema = schema;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ASP.NET Core convention")]
-        public async Task Invoke(HttpContext context, ISchema schema)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             if (!IsGraphQLRequest(context))
             {
-                await _next(context);
+                await next(context).ConfigureAwait(false);
                 return;
             }
 
-            await ExecuteAsync(context, schema);
+            await ExecuteAsync(context).ConfigureAwait(false);
         }
 
         private bool IsGraphQLRequest(HttpContext context)
@@ -47,30 +42,30 @@ namespace Example
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
-        private async Task ExecuteAsync(HttpContext context, ISchema schema)
+        private async Task ExecuteAsync(HttpContext context)
         {
             var start = DateTime.UtcNow;
 
-            var request = await context.Request.Body.FromJsonAsync<GraphQLRequest>(context.RequestAborted);
+            var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false);
 
             var result = await _executer.ExecuteAsync(options =>
             {
-                options.Schema = schema;
+                options.Schema = _schema;
                 options.Query = request.Query;
                 options.OperationName = request.OperationName;
-                options.Inputs = request.Variables;
+                options.Variables = request.Variables;
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
                 options.CancellationToken = context.RequestAborted;
-            });
+            }).ConfigureAwait(false);
 
             if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
             }
 
-            await WriteResponseAsync(context, result, context.RequestAborted);
+            await WriteResponseAsync(context, result, context.RequestAborted).ConfigureAwait(false);
         }
 
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
@@ -78,7 +73,7 @@ namespace Example
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200; // OK
 
-            await _writer.WriteAsync(context.Response.Body, result, cancellationToken);
+            await _serializer.WriteAsync(context.Response.Body, result, cancellationToken).ConfigureAwait(false);
         }
     }
 }

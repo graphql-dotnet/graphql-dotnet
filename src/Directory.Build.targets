@@ -1,9 +1,18 @@
 <Project>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
-    <CoverletOutputFormat>opencover</CoverletOutputFormat>
-    <CoverletOutput>$(MSBuildThisFileDirectory)../.coverage/$(AssemblyName)/</CoverletOutput>
-    <Exclude>[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*</Exclude>
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' != 'true'">
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>

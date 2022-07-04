@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
@@ -16,6 +15,6 @@ namespace GraphQL.Instrumentation
         /// <param name="middleware">Middleware instance.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, IFieldMiddleware middleware)
-            => builder.Use(next => context => middleware.Resolve(context, next));
+            => builder.Use(next => context => middleware.ResolveAsync(context, next));
     }
 }

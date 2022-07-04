@@ -1,75 +1,74 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
-using Xunit;
 
-namespace GraphQL.Tests.Validation
+namespace GraphQL.Tests.Validation;
+
+public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, ValidationSchema>
 {
-    public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, ValidationSchema>
+    [Fact]
+    public void single_arg_is_known()
     {
-        [Fact]
-        public void single_arg_is_known()
-        {
-            ShouldPassRule(@"
+        ShouldPassRule(@"
               fragment argOnRequiredArg on Dog {
                 doesKnowCommand(dogCommand: SIT)
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void no_args_are_known()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void no_args_are_known()
+    {
+        ShouldPassRule(@"
               fragment multipleArgs on ComplicatedArgs {
                 noArgsField
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void multiple_args_are_known()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void multiple_args_are_known()
+    {
+        ShouldPassRule(@"
               fragment multipleArgs on ComplicatedArgs {
                 multipleReqs(req1: 1, req2: 2)
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void ignores_args_of_unknown_fields()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void ignores_args_of_unknown_fields()
+    {
+        ShouldPassRule(@"
               fragment argOnUnknownField on Dog {
                 unknownField(unknownArg: SIT)
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void multiple_args_in_reverse_order_are_known()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void multiple_args_in_reverse_order_are_known()
+    {
+        ShouldPassRule(@"
               fragment multipleArgsReverseOrder on ComplicatedArgs {
                 multipleReqs(req2: 2, req1: 1)
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void no_args_on_optional_arg()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void no_args_on_optional_arg()
+    {
+        ShouldPassRule(@"
               fragment noArgOnOptionalArg on Dog {
                 isHousetrained
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void args_are_known_deeply()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void args_are_known_deeply()
+    {
+        ShouldPassRule(@"
               {
                 dog {
                   doesKnowCommand(dogCommand: SIT)
@@ -83,67 +82,67 @@ namespace GraphQL.Tests.Validation
                 }
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void directive_args_are_known()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void directive_args_are_known()
+    {
+        ShouldPassRule(@"
               {
                 dog @skip(if: true)
               }
             ");
-        }
+    }
 
-        [Fact]
-        public void field_with_no_args_given_arg_is_invalid()
+    [Fact]
+    public void field_with_no_args_given_arg_is_invalid()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   fragment multipleArgs on ComplicatedArgs {
                     noArgsField(first: 1)
                   }
                 ";
-                _.Error(KnownArgumentNamesError.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 3, 33);
-            });
-        }
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 3, 33);
+        });
+    }
 
-        [Fact]
-        public void undirective_args_are_invalid()
+    [Fact]
+    public void undirective_args_are_invalid()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   {
                     dog @skip(unless: true)
                   }
                 ";
-                _.Error(KnownArgumentNamesError.UnknownDirectiveArgMessage("unless", "skip", null), 3, 31);
-            });
-        }
+            _.Error(KnownArgumentNamesError.UnknownDirectiveArgMessage("unless", "skip", null), 3, 31);
+        });
+    }
 
-        [Fact]
-        public void invalid_arg_name()
+    [Fact]
+    public void invalid_arg_name()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   fragment oneGoodArgOneInvalidArg on Dog {
                     doesKnowCommand(whoknows: 1, dogCommand: SIT, unknown: true)
                   }
                 ";
-                _.Error(KnownArgumentNamesError.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog", null), 3, 37);
-                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 3, 67);
-            });
-        }
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog", null), 3, 37);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 3, 67);
+        });
+    }
 
-        [Fact]
-        public void unknown_args_deeply()
+    [Fact]
+    public void unknown_args_deeply()
+    {
+        ShouldFailRule(_ =>
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
+            _.Query = @"
                   {
                     dog {
                       doesKnowCommand(unknown: true)
@@ -157,9 +156,8 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 4, 39);
-                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 9, 43);
-            });
-        }
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 4, 39);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 9, 43);
+        });
     }
 }

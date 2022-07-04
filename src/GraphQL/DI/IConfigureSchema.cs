@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL.DI
@@ -20,7 +19,7 @@ namespace GraphQL.DI
         void Configure(ISchema schema, IServiceProvider serviceProvider);
     }
 
-    internal class ConfigureSchema : IConfigureSchema
+    internal sealed class ConfigureSchema : IConfigureSchema
     {
         private readonly Action<ISchema, IServiceProvider> _action;
 
