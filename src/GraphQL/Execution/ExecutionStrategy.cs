@@ -155,7 +155,7 @@ namespace GraphQL.Execution
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
             var parentType = parent.GetObjectGraphType(context.Schema)!;
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
+            var fields = Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];
@@ -171,7 +171,7 @@ namespace GraphQL.Execution
             parent.SubFields = subFields;
 
             fields.Clear();
-            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
+            Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
@@ -429,6 +429,15 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Selects resolver for the specified execution node. By default returns resolver from
+        /// <see cref="ExecutionNode.FieldDefinition"/> if specified. Otherwise returns
+        /// <see cref="SourceFieldResolver.Instance"/> for top level nodes of subscriptions or
+        /// <see cref="NameFieldResolver.Instance"/> for all other cases.
+        /// </summary>
+        protected virtual IFieldResolver SelectResolver(ExecutionNode node, ExecutionContext context)
+            => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
+
+        /// <summary>
         /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
         /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
@@ -442,10 +451,10 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext? resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                ReadonlyResolveFieldContext? resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
-                var resolver = node.FieldDefinition!.Resolver ?? NameFieldResolver.Instance;
+                var resolver = SelectResolver(node, context);
                 var result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
                 node.Result = result;
@@ -459,7 +468,7 @@ namespace GraphQL.Execution
                     {
                         // also see FuncFieldResolver.GetResolverFor as it relates to context re-use
                         resolveContext.Reset(null, null);
-                        System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                        Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                     }
                 }
             }

@@ -342,7 +342,7 @@ namespace GraphQL.Types
             string name,
             string? description = null,
             QueryArguments? arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null, // TODO: remove?
             Func<IResolveFieldContext, IObservable<object?>>? subscribe = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
@@ -378,7 +378,7 @@ namespace GraphQL.Types
             string name,
             string? description = null,
             QueryArguments? arguments = null,
-            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
+            Func<IResolveFieldContext<TSourceType>, object?>? resolve = null, // TODO: remove?
             Func<IResolveFieldContext, Task<IObservable<object?>>>? subscribeAsync = null,
             string? deprecationReason = null)
             where TGraphType : IGraphType
