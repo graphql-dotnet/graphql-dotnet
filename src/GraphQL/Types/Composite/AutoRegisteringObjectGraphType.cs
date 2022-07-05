@@ -226,8 +226,8 @@ namespace GraphQL.Types
         /// Returns a list of properties, methods or fields that should have fields created for them.
         /// <br/><br/>
         /// Unless overridden, returns a list of public instance readable properties and public instance methods
-        /// (including properties and methods declared on inherited classes) that
-        /// do not return <see langword="void"/> or <see cref="Task"/>.
+        /// that do not return <see langword="void"/> or <see cref="Task"/>
+        /// including properties and methods declared on inherited classes.
         /// </summary>
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         {
