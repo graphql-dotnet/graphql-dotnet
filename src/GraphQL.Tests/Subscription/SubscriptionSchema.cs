@@ -27,7 +27,6 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageAdded",
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(Subscribe)
         });
 
@@ -38,7 +37,6 @@ public class ChatSubscriptions : ObjectGraphType
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
             ),
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeById)
         });
 
@@ -46,7 +44,6 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageAddedAsync",
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeAsync)
         });
 
@@ -57,7 +54,6 @@ public class ChatSubscriptions : ObjectGraphType
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
             ),
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeByIdAsync)
         });
 
@@ -65,15 +61,13 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageGetAll",
             Type = typeof(ListGraphType<MessageType>),
-            Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
-            StreamResolver = new SourceStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
+            StreamResolver = new SourceStreamResolver<List<Message>>(_ => _chat.MessagesGetAll())
         });
 
         AddField(new FieldType
         {
             Name = "newMessageContent",
             Type = typeof(StringGraphType),
-            Resolver = new FuncFieldResolver<string>(context => context.Source as string),
             StreamResolver = new SourceStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
         });
     }
@@ -93,13 +87,6 @@ public class ChatSubscriptions : ObjectGraphType
 
         var messages = await _chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
-    }
-
-    private Message ResolveMessage(IResolveFieldContext context)
-    {
-        var message = context.Source as Message;
-
-        return message;
     }
 
     private IObservable<Message> Subscribe(IResolveFieldContext context)

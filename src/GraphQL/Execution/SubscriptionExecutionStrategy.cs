@@ -90,13 +90,15 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         try
         {
-            if (node.FieldDefinition?.StreamResolver == null)
+            var resolver = node.FieldDefinition?.StreamResolver;
+
+            if (resolver == null)
             {
                 // todo: this should be caught by schema validation
                 throw new InvalidOperationException($"Stream resolver not set for field '{node.Field.Name}'.");
             }
 
-            sourceStream = await node.FieldDefinition.StreamResolver.ResolveAsync(resolveContext).ConfigureAwait(false);
+            sourceStream = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
             if (sourceStream == null)
             {

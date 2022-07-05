@@ -18,18 +18,10 @@ public class SubscriptionType : ObjectGraphType
         {
             Name = "orderAdded",
             Type = typeof(OrderType),
-            Resolver = new FuncFieldResolver<Order>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Order>(ResolveStream)
         });
     }
 
-    private Order ResolveMessage(IResolveFieldContext context)
-    {
-        return context.Source as Order;
-    }
-
     private IObservable<Order> ResolveStream(IResolveFieldContext context)
-    {
-        return ordersStore.GetOrderObservable();
-    }
+        => ordersStore.GetOrderObservable();
 }
