@@ -71,7 +71,7 @@ namespace GraphQL
         /// <see cref="Types.AutoRegisteringInputObjectGraphType{TSourceType}">AutoRegisteringInputObjectGraphType</see>,
         /// <see cref="Types.EnumerationGraphType{TEnum}">EnumerationGraphType</see>,
         /// <see cref="Types.ComplexGraphType{TSourceType}.FieldDelegate{TGraphType}(string, string?, Types.QueryArguments?, Delegate?, string?)">FieldDelegate</see>
-        /// or the schema builder are building graph types, field definitions, arguments, or similar.
+        /// or the schema builder is building graph types, field definitions, arguments, or similar.
         /// <br/><br/>
         /// The collection is not thread-safe; instances should be added prior to schema initialization.
         /// </summary>
