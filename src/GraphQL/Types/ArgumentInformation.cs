@@ -134,10 +134,11 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes pulled from the <see cref="ArgumentInformation.ParameterInfo">ParameterInfo</see> onto this instance.
+        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
         /// </summary>
         public virtual void ApplyAttributes()
         {
-            var attributes = ParameterInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = ParameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(this);

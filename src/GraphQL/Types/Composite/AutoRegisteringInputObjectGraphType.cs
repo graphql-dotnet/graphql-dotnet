@@ -53,7 +53,7 @@ namespace GraphQL.Types
             foreach (var memberInfo in GetRegisteredMembers())
             {
                 bool include = true;
-                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in memberInfo.GetGraphQLAttributes())
                 {
                     include = attr.ShouldInclude(memberInfo, true);
                     if (!include)

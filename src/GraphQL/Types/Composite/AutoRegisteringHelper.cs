@@ -68,7 +68,7 @@ namespace GraphQL.Types
                 {
                     // even though the query argument is not used, it is necessary to apply attributes to the generated argument in case the name is overridden,
                     // as the generated query argument's name is used within the expression for the call to GetArgument
-                    var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
+                    var attributes = parameterInfo.GetGraphQLAttributes();
                     foreach (var attr in attributes)
                         attr.Modify(queryArgument);
                 }
@@ -115,13 +115,14 @@ namespace GraphQL.Types
         /// <summary>
         /// Scans a specific CLR type for <see cref="GraphQLAttribute"/> attributes and applies
         /// them to the specified <see cref="IGraphType"/>.
+        /// Also scans the CLR type's owning module and assembly for globally-applied attributes.
         /// </summary>
         internal static void ApplyGraphQLAttributes<TSourceType>(IGraphType graphType)
         {
             // Description and deprecation reason are already set in ComplexGraphType<TSourceType> constructor
 
             // Apply derivatives of GraphQLAttribute
-            var attributes = typeof(TSourceType).GetCustomAttributes<GraphQLAttribute>();
+            var attributes = typeof(TSourceType).GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(graphType);
@@ -167,11 +168,12 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/>s defined on <paramref name="memberInfo"/> to <paramref name="fieldType"/>.
+        /// Also scans the member's owning module and assembly for globally-applied attributes.
         /// </summary>
         internal static void ApplyFieldAttributes(MemberInfo memberInfo, FieldType fieldType, bool isInputType)
         {
             // Apply derivatives of GraphQLAttribute
-            var attributes = memberInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = memberInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);

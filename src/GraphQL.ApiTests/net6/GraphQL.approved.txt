@@ -206,6 +206,7 @@ namespace GraphQL
     public static class GlobalSwitches
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
+        public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -216,6 +217,7 @@ namespace GraphQL
     public abstract class GraphQLAttribute : System.Attribute
     {
         protected GraphQLAttribute() { }
+        public virtual float Priority { get; }
         public virtual void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
         public virtual void Modify(GraphQL.Types.IGraphType graphType) { }
@@ -700,6 +702,8 @@ namespace GraphQL
         public static object? DefaultValue(this System.Reflection.MemberInfo memberInfo) { }
         public static string? Description(this System.Reflection.MemberInfo memberInfo) { }
         public static string? Description(this System.Reflection.ParameterInfo parameterInfo) { }
+        public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.MemberInfo memberInfo) { }
+        public static System.Collections.Generic.IEnumerable<GraphQL.GraphQLAttribute> GetGraphQLAttributes(this System.Reflection.ParameterInfo parameterInfo) { }
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }

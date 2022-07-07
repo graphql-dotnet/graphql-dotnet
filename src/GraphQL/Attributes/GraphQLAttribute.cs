@@ -95,5 +95,12 @@ namespace GraphQL
         /// When called for enumeration values, <paramref name="isInputType"/> is <see langword="null"/>.
         /// </summary>
         public virtual bool ShouldInclude(MemberInfo memberInfo, bool? isInputType) => true;
+
+        /// <summary>
+        /// Determines the order in which GraphQL attributes are applied to the graph type, field type, or parameter definition.
+        /// Attributes with the lowest <see cref="Priority"/> value are applied first.
+        /// The default priority is 1.
+        /// </summary>
+        public virtual float Priority => 1.0f;
     }
 }

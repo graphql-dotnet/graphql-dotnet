@@ -58,6 +58,40 @@ For more details, please review the PR here: https://github.com/graphql-dotnet/g
 
 Inherited methods are now recognized by `AutoRegisteringObjectGraphType` and fields are built for them.
 
+### 7. GraphQL attributes can be applied globally
+
+GraphQL attributes (`GraphQLAttribute`) can now be applied at the module or assembly level, which
+will apply to all applicable CLR types within the module or assembly.
+
+This allow global changes to how the schema builder or auto-registering graph type builds graph types,
+field types or field arguments.
+
+For an example use case, users could add a global attribute which converts query arguments of type
+`DbContext` to pull from services, like this:
+
+```csharp
+[AttributeUsage(AttributeTargets.Assembly)]
+public class DbContextFromServicesAttribute : GraphQLAttribute
+{
+    public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+    {
+        if (typeof(TParameterType) == typeof(DbContext))
+            argumentInformation.SetDelegate(context => (context.RequestServices ?? throw new MissingRequestServicesException())
+                .GetRequiredService<TParameterType>());
+    }
+}
+
+// in AssemblyInfo.cs or whereever in your code at assembly level
+[assembly: DbContextFromServices]
+```
+
+Similar code could be used to pull your user context class into a method argument.
+
+If it is necessary for a custom global GraphQL attribute to execute prior to or after other attributes,
+adjust the return value of the `Priority` property of the attribute.
+
+Note that global attributes may also be added to the `GlobalSwitches.GlobalAttributes` collection.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed

@@ -53,7 +53,7 @@ namespace GraphQL.Types
             foreach (var memberInfo in GetRegisteredMembers())
             {
                 bool include = true;
-                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in memberInfo.GetGraphQLAttributes())
                 {
                     include = attr.ShouldInclude(memberInfo, false);
                     if (!include)
@@ -197,11 +197,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
         /// to the specified <see cref="QueryArgument"/>.
+        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
         /// </summary>
         protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         {
             // Apply derivatives of GraphQLAttribute
-            var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = parameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(queryArgument);
