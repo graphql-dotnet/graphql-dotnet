@@ -16,12 +16,14 @@ The current options list is presented below:
 | `EnableReadDescriptionFromXmlDocumentation` | `false` |
 | `NameValidation` | `NameValidator.ValidateDefault` |
 | `UseDeclaringTypeNames` | `false` |
+| `GlobalAttributes` | An empty collection |
 
 For a detailed description of each option, see [GlobalSwitches](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/GlobalSwitches.cs).
 
 # Global GraphQL Attributes
 
-You may apply `GraphQLAttribute`s globally by applying them to the module or assembly.
+In addition to adding `GraphQLAttribute` instances to the collection noted above,
+you may also apply `GraphQLAttribute`s globally by applying them to the module or assembly.
 Code that utilizes `GraphQLAttribute`s, such as auto-registering graph types, will scan
 the CLR type's owning module and assembly and apply any globally-defined attributes found.
 Globally-defined attributes may be configured to execute before or after individually-specified
