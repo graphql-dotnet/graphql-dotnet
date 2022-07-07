@@ -64,5 +64,17 @@ namespace GraphQL
         /// By default disabled.
         /// </summary>
         public static bool UseDeclaringTypeNames { get; set; } = false;
+
+        /// <summary>
+        /// A collection of global <see cref="GraphQLAttribute"/> instances which are applied while
+        /// <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>,
+        /// <see cref="Types.AutoRegisteringInputObjectGraphType{TSourceType}">AutoRegisteringInputObjectGraphType</see>,
+        /// <see cref="Types.EnumerationGraphType{TEnum}">EnumerationGraphType</see>,
+        /// <see cref="Types.ComplexGraphType{TSourceType}.FieldDelegate{TGraphType}(string, string?, Types.QueryArguments?, Delegate?, string?)">FieldDelegate</see>
+        /// or the schema builder are building graph types, field definitions, arguments, or similar.
+        /// <br/><br/>
+        /// The collection is not thread-safe; instances should be added prior to schema initialization.
+        /// </summary>
+        public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
     }
 }

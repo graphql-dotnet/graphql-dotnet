@@ -368,6 +368,7 @@ namespace GraphQL
             return memberInfo.GetCustomAttributes<GraphQLAttribute>()
                 .Concat(module.GetCustomAttributes<GraphQLAttribute>())
                 .Concat(assembly.GetCustomAttributes<GraphQLAttribute>())
+                .Concat(GlobalSwitches.GlobalAttributes)
                 .OrderBy(x => x.Priority);
         }
 

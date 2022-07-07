@@ -90,6 +90,8 @@ Similar code could be used to pull your user context class into a method argumen
 If it is necessary for a custom global GraphQL attribute to execute prior to or after other attributes,
 adjust the return value of the `Priority` property of the attribute.
 
+Note that global attributes may also be added to the `GlobalSwitches.GlobalAttributes` collection.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
