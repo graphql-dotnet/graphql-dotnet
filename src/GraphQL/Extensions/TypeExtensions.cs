@@ -359,7 +359,8 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the set of <see cref="GraphQLAttribute"/>s applied to the specified member or its
-        /// owning module or assembly. Attributes are sorted by <see cref="GraphQLAttribute.Priority"/>, lowest first.
+        /// owning module or assembly, or are listed within <see cref="GlobalSwitches.GlobalAttributes"/>.
+        /// Attributes are sorted by <see cref="GraphQLAttribute.Priority"/>, lowest first.
         /// </summary>
         public static IEnumerable<GraphQLAttribute> GetGraphQLAttributes(this MemberInfo memberInfo)
         {
@@ -374,7 +375,8 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the set of <see cref="GraphQLAttribute"/>s applied to the specified parameter or its
-        /// owning module or assembly. Attributes are sorted by <see cref="GraphQLAttribute.Priority"/>, lowest first.
+        /// owning module or assembly, or are listed within <see cref="GlobalSwitches.GlobalAttributes"/>.
+        /// Attributes are sorted by <see cref="GraphQLAttribute.Priority"/>, lowest first.
         /// </summary>
         public static IEnumerable<GraphQLAttribute> GetGraphQLAttributes(this ParameterInfo parameterInfo)
         {
@@ -383,6 +385,7 @@ namespace GraphQL
             return parameterInfo.GetCustomAttributes<GraphQLAttribute>()
                 .Concat(module.GetCustomAttributes<GraphQLAttribute>())
                 .Concat(assembly.GetCustomAttributes<GraphQLAttribute>())
+                .Concat(GlobalSwitches.GlobalAttributes)
                 .OrderBy(x => x.Priority);
         }
     }
