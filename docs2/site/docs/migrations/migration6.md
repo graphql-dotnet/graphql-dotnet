@@ -54,7 +54,11 @@ Field<IntGraphType>("id").WithComplexityImpact(123);
 
 For more details, please review the PR here: https://github.com/graphql-dotnet/graphql-dotnet/pull/3159
 
-### 6. GraphQL attributes can be applied globally
+### 6. `AutoRegisteringObjectGraphType` recognizes inherited methods
+
+Inherited methods are now recognized by `AutoRegisteringObjectGraphType` and fields are built for them.
+
+### 7. GraphQL attributes can be applied globally
 
 GraphQL attributes (`GraphQLAttribute`) can now be applied at the module or assembly level, which
 will apply to all applicable CLR types within the module or assembly.
