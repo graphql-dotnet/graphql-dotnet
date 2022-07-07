@@ -271,7 +271,8 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
-        /// Also scans the member's owning module and assembly for globally-applied attributes.
+        /// Also scans the member's owning module and assembly for globally-applied attributes,
+        /// and applies attributes defined within <see cref="GlobalSwitches.GlobalAttributes"/>.
         /// </summary>
         public virtual void ApplyAttributes()
         {
