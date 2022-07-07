@@ -66,6 +66,7 @@ For an example use case, users could add a global attribute which converts query
 `DbContext` to pull from services, like this:
 
 ```csharp
+[AttributeUsage(AttributeTargets.Assembly)]
 public class DbContextFromServicesAttribute : GraphQLAttribute
 {
     public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
