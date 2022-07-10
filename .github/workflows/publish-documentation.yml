@@ -49,7 +49,7 @@ jobs:
           cd published
           git config user.name github-actions
           git config user.email github-actions@graphql-dotnet.net
-          git add docs/reports/${{ github.event.pull_request.head.sha }}
+          git add --all
           git commit -a -m "Documentation update"
           # git push
 
