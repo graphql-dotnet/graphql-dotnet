@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - master
-      - fix_docs
+    paths:
+      - docs2/**
+      - package.json
+      - yarn.lock
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
