@@ -45,7 +45,6 @@ jobs:
       - name: Commit coverage report
         shell: bash
         run: |
-          mkdir -p reports/docs/reports
           rsync -a --quiet --delete --exclude ".git" "main/docs2/public/" "published/" || exit 1
           cd published
           git config user.name github-actions
