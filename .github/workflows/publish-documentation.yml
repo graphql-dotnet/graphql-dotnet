@@ -42,7 +42,7 @@ jobs:
           name: Documentation
           path: main/docs2/public/**
           if-no-files-found: error
-      - name: Commit coverage report
+      - name: Commit docs
         shell: bash
         run: |
           rsync -a --quiet --delete --exclude ".git" "main/docs2/public/" "published/" || exit 1
@@ -51,14 +51,4 @@ jobs:
           git config user.email github-actions@graphql-dotnet.net
           git add --all
           git commit -a -m "Documentation update"
-          # git push
-
-
-#      - name: Deploy documentation
-#        uses: seanmiddleditch/gha-publish-to-git@v2
-#        with:
-#          repository: graphql-dotnet/graphql-dotnet.github.io
-#          branch: master
-#          github_token: '${{ secrets.GITHUB_TOKEN  }}'
-#          github_pat: '${{ secrets.ORG_PAT_TOKEN }}'
-#          source_folder: docs2/public
+          git push
