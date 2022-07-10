@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - fix_docs
     paths:
       - docs2/**
       - package.json
@@ -36,6 +37,8 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
+      - name: Git add safe directory
+        run: git config --global --add safe.directory '*'
       - name: Deploy documentation
         uses: seanmiddleditch/gha-publish-to-git@v2
         with:
