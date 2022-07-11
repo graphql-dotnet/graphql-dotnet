@@ -246,7 +246,7 @@ query fragmentTest
             ? frag1 + frag2 + otherFrags
             : frag2 + frag1 + otherFrags);
 
-        //result.Complexity.ShouldBe(12345);
+        result.Complexity.ShouldBe(2);
     }
 
 
@@ -277,7 +277,7 @@ fragment pricing on Car
 ";
         var result = AnalyzeComplexity(query);
 
-        //result.Complexity.ShouldBe(12345);
+        result.Complexity.ShouldBe(4);
     }
 
     [Fact]
@@ -315,7 +315,7 @@ fragment furtherDetail on Car
 }";
         var result = AnalyzeComplexity(query);
 
-        //result.Complexity.ShouldBe(12345);
+        result.Complexity.ShouldBe(4);
     }
 
     [Fact]
