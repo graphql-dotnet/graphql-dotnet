@@ -249,6 +249,75 @@ query fragmentTest
         //result.Complexity.ShouldBe(12345);
     }
 
+
+    [Fact]
+    public void duplicate_fragment_ok()
+    {
+        var query = @"
+query carFragmentTest
+{
+  car(id: 1)
+  {
+    name
+    ... carInfo
+    ... carInfo
+  }
+}
+
+fragment carInfo on Car
+{
+    ...pricing
+    ...pricing
+}
+
+fragment pricing on Car
+{
+  msrp
+}
+";
+        var result = AnalyzeComplexity(query);
+
+        //result.Complexity.ShouldBe(12345);
+    }
+
+    [Fact]
+    public void no_fragment_cycle()
+    {
+        var query = @"
+query carFragmentTest
+{
+  car(id: 1)
+  {
+    name
+    ... carInfo
+  }
+}
+
+fragment carInfo on Car
+{
+    ...pricing
+    ... detail
+}
+
+fragment pricing on Car
+{
+  msrp
+}
+
+fragment detail on Car
+{
+  ... furtherDetail
+}
+
+fragment furtherDetail on Car
+{
+  ... pricing
+}";
+        var result = AnalyzeComplexity(query);
+
+        //result.Complexity.ShouldBe(12345);
+    }
+
     [Fact]
     public void absurdly_huge_query()
     {
