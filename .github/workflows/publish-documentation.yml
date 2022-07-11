@@ -8,6 +8,7 @@ on:
       - docs2/**
       - package.json
       - yarn.lock
+      - .github/workflows/publish-documentation.yml
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
