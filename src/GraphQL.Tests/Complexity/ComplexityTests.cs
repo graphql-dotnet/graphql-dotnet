@@ -249,7 +249,6 @@ query fragmentTest
         result.Complexity.ShouldBe(2);
     }
 
-
     [Fact]
     public void duplicate_fragment_ok()
     {
@@ -280,6 +279,7 @@ fragment pricing on Car
         result.Complexity.ShouldBe(4);
     }
 
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3221
     [Fact]
     public void no_fragment_cycle()
     {
