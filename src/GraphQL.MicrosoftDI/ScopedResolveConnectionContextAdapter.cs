@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -76,5 +77,7 @@ namespace GraphQL.MicrosoftDI
         public string? Before => _baseContext.Before;
 
         public int? PageSize => _baseContext.PageSize;
+
+        public IPrincipal? User => _baseContext.User;
     }
 }

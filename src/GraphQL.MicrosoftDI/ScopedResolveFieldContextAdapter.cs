@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -80,5 +81,7 @@ namespace GraphQL.MicrosoftDI
         object? IResolveFieldContext.Source => _baseContext.Source;
 
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
+
+        public IPrincipal? User => _baseContext.User;
     }
 }

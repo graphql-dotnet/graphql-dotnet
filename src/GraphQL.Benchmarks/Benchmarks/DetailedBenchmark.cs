@@ -259,7 +259,8 @@ public class DetailedBenchmark : IBenchmark
                 ThrowOnUnhandledException = true,
                 UnhandledExceptionDelegate = _ => Task.CompletedTask,
                 MaxParallelExecutionCount = int.MaxValue,
-                RequestServices = null
+                RequestServices = null,
+                User = null,
             };
             return _parallelExecutionStrategy.ExecuteAsync(context).Result;
         }

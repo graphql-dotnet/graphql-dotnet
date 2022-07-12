@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using GraphQL.Execution;
+using GraphQL.Types;
 
 namespace GraphQL.Tests.Execution;
 
@@ -178,6 +180,26 @@ public class ResolveFieldContextTests
 
         _context.SetOutputExtension("a.b.c", "override");
         _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task User_Returns_ClaimsPrincipal(bool isAuthenticated)
+    {
+        var schema = new Schema();
+        var queryType = new ObjectGraphType();
+        queryType.Field<BooleanGraphType>("IsAuthenticated", resolve: context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
+        schema.Query = queryType;
+        var executer = new DocumentExecuter();
+        var result = await executer.ExecuteAsync(new()
+        {
+            Schema = schema,
+            Query = "{ isAuthenticated }",
+            User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
+        }).ConfigureAwait(false);
+        var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
     }
 
     [Fact]

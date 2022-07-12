@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -96,5 +97,10 @@ namespace GraphQL.Execution
         /// from your dependency injection framework.
         /// </summary>
         IServiceProvider? RequestServices { get; }
+
+        /// <summary>
+        /// Gets security information for the executing request.
+        /// </summary>
+        IPrincipal? User { get; }
     }
 }
