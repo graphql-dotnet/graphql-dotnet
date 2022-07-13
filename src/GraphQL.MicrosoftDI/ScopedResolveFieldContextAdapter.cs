@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -82,6 +82,6 @@ namespace GraphQL.MicrosoftDI
 
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
 
-        public IPrincipal? User => _baseContext.User;
+        public ClaimsPrincipal? User => _baseContext.User;
     }
 }

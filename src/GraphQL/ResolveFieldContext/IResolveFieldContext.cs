@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -110,7 +110,7 @@ namespace GraphQL
         IExecutionArrayPool ArrayPool { get; }
 
         /// <inheritdoc cref="IExecutionContext.User"/>
-        IPrincipal? User { get; }
+        ClaimsPrincipal? User { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

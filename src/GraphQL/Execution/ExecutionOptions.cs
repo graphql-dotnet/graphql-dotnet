@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -74,6 +74,6 @@ namespace GraphQL
         /// <summary>
         /// Gets or sets security information for the executing request.
         /// </summary>
-        public IPrincipal? User { get; set; }
+        public ClaimsPrincipal? User { get; set; }
     }
 }

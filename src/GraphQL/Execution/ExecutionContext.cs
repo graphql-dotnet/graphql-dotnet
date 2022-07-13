@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -97,7 +97,7 @@ namespace GraphQL.Execution
         public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
-        public IPrincipal? User { get; set; }
+        public ClaimsPrincipal? User { get; set; }
 
         /// <inheritdoc/>
         public TElement[] Rent<TElement>(int minimumLength)

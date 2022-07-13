@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -64,7 +64,7 @@ namespace GraphQL.Validation
         public IServiceProvider? RequestServices { get; init; } = null;
 
         /// <inheritdoc cref="ExecutionOptions.User"/>
-        public IPrincipal? User { get; init; } = null;
+        public ClaimsPrincipal? User { get; init; } = null;
 
         /// <summary>
         /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;

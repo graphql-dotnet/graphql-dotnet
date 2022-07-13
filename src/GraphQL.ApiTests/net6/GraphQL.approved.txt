@@ -149,7 +149,7 @@ namespace GraphQL
         public GraphQL.Types.ISchema? Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; set; }
-        public System.Security.Principal.IPrincipal? User { get; set; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? ValidationRules { get; set; }
         public GraphQL.Inputs? Variables { get; set; }
@@ -458,7 +458,7 @@ namespace GraphQL
                 "Field",
                 "FieldType"})]
         System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; }
-        System.Security.Principal.IPrincipal? User { get; }
+        System.Security.Claims.ClaimsPrincipal? User { get; }
         GraphQL.Validation.Variables Variables { get; }
     }
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
@@ -610,7 +610,7 @@ namespace GraphQL
                 "Field",
                 "FieldType"})]
         public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; }
-        public System.Security.Principal.IPrincipal? User { get; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; }
         public GraphQL.Validation.Variables Variables { get; }
     }
@@ -642,7 +642,7 @@ namespace GraphQL
                 "Field",
                 "FieldType"})]
         public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; set; }
-        public System.Security.Principal.IPrincipal? User { get; set; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Validation.Variables Variables { get; set; }
     }
@@ -1073,7 +1073,7 @@ namespace GraphQL.Execution
         public GraphQL.Types.ISchema Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; set; }
-        public System.Security.Principal.IPrincipal? User { get; set; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Validation.Variables Variables { get; set; }
         protected virtual void ClearContext() { }
@@ -1183,7 +1183,7 @@ namespace GraphQL.Execution
         GraphQL.Types.ISchema Schema { get; }
         bool ThrowOnUnhandledException { get; }
         System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; }
-        System.Security.Principal.IPrincipal? User { get; }
+        System.Security.Claims.ClaimsPrincipal? User { get; }
         GraphQL.Validation.Variables Variables { get; }
     }
     public interface IExecutionStrategy
@@ -2882,7 +2882,7 @@ namespace GraphQL.Validation
         public System.IServiceProvider? RequestServices { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Validation.TypeInfo TypeInfo { get; set; }
-        public System.Security.Principal.IPrincipal? User { get; set; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Inputs Variables { get; set; }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentSpread> GetFragmentSpreads(GraphQLParser.AST.GraphQLSelectionSet node) { }
@@ -2918,7 +2918,7 @@ namespace GraphQL.Validation
         public System.IServiceProvider? RequestServices { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public System.Security.Principal.IPrincipal? User { get; set; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Inputs Variables { get; set; }
     }

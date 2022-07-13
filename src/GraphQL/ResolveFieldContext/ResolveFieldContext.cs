@@ -1,4 +1,4 @@
-using System.Security.Principal;
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -82,7 +82,7 @@ namespace GraphQL
         public IExecutionArrayPool ArrayPool { get; set; }
 
         /// <inheritdoc/>
-        public IPrincipal? User { get; set; }
+        public ClaimsPrincipal? User { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
