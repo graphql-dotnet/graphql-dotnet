@@ -190,18 +190,33 @@ public class ResolveFieldContextTests
     {
         var schema = new Schema();
         var queryType = new ObjectGraphType();
-        queryType.Field<BooleanGraphType>("IsAuthenticated", resolve: context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
+        queryType.Field<BooleanGraphType>(
+            "IsAuthenticated",
+            resolve: context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
         schema.Query = queryType;
         var executer = new DocumentExecuter();
-        var result = await executer.ExecuteAsync(new()
+        var options = new ExecutionOptions
         {
             Schema = schema,
             Query = "{ isAuthenticated }",
             ValidationRules = DocumentValidator.CoreRules.Append(new VerifyUserValidationRule { ShouldBeAuthenticated = isAuthenticated }),
             User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
-        }).ConfigureAwait(false);
+        };
+        options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
+        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
         var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
         resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
+    }
+
+    private class VerifyUserDocumentListener : DocumentExecutionListenerBase
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public override Task BeforeExecutionAsync(IExecutionContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return Task.CompletedTask;
+        }
     }
 
     private class VerifyUserValidationRule : IValidationRule
