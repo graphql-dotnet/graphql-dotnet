@@ -250,3 +250,7 @@ were moved into `GraphQL` namespace. Also class names were changed:
 - `GraphQL.SystemTextJson.GraphQLBuilderExtensions` -> `GraphQL.SystemTextJsonGraphQLBuilderExtensions`
 
 This change was done for better discoverability and usability of extension methods when configuring DI.
+
+### 8. `IResolveFieldContext.User` property added
+
+Custom implementations of `IResolveFieldContext` must implement the new `User` property.
