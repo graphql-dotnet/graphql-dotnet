@@ -153,6 +153,7 @@ namespace GraphQL
                             Operation = operation,
                             UserContext = options.UserContext,
                             RequestServices = options.RequestServices,
+                            User = options.User,
                             CancellationToken = options.CancellationToken,
                             Schema = options.Schema,
                             Metrics = metrics,
