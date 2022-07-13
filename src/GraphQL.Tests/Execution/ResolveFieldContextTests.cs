@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation;
 
 namespace GraphQL.Tests.Execution;
 
@@ -196,10 +197,22 @@ public class ResolveFieldContextTests
         {
             Schema = schema,
             Query = "{ isAuthenticated }",
+            ValidationRules = DocumentValidator.CoreRules.Append(new VerifyUserValidationRule { ShouldBeAuthenticated = isAuthenticated }),
             User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
         }).ConfigureAwait(false);
         var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
         resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
+    }
+
+    private class VerifyUserValidationRule : IValidationRule
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return default;
+        }
     }
 
     [Fact]

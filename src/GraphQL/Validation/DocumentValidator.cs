@@ -65,6 +65,7 @@ namespace GraphQL.Validation
             context.Operation = options.Operation;
             context.Metrics = options.Metrics;
             context.RequestServices = options.RequestServices;
+            context.User = options.User;
             context.CancellationToken = options.CancellationToken;
 
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
