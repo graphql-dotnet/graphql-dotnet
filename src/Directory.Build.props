@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>5.0.0-preview</VersionPrefix>
+    <NextVersion>6.0.0</NextVersion>
     <LangVersion>latest</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
