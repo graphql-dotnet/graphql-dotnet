@@ -56,12 +56,9 @@ jobs:
           git config user.email github-actions@graphql-dotnet.net
           git add --all
 
-          # fix 'nothing to commit, working tree clean'
           err=$(git status 2>&1)
-          echo "1"
-          echo $err
-          echo "2"
-          if [ -z "err" ]
+          str="nothing to commit, working tree clean"
+          if [ "$err" == *"$str"* ]
           then
             echo "Documentation is up to date, nothing to push"
           else
