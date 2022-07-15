@@ -54,5 +54,12 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@graphql-dotnet.net
           git add --all
-          git commit -a -m "Documentation update"
-          git push
+
+          err=$(git status 2>&1)
+          str="nothing to commit, working tree clean"
+          if [[ "$err" == *"$str"* ]]; then
+            echo "Documentation files are up to date, nothing to commit/push"
+          else
+            git commit -a -m "Documentation update"
+            git push
+          fi
