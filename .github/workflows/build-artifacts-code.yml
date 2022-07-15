@@ -7,7 +7,6 @@ on:
     branches:
       - master
       - develop
-      - versioning
     paths:
       - src/**
       - .github/workflows/**
