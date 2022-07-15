@@ -96,7 +96,7 @@ Note that global attributes may also be added to the `GlobalSwitches.GlobalAttri
 
 ### 8. `ExecutionOptions.User` property added and available to validation rules and field resolvers
 
-You may pass an `IPrincipal` instance into `ExecutionOptions` and it will be fed through to
+You may pass a `ClaimsPrincipal` instance into `ExecutionOptions` and it will be fed through to
 `ValidationContext.User`, `IExecutionContext.User` and `IResolveFieldContext.User` so the value
 is accessible by validation rules, document listeners, field middleware and field resolvers.
 
