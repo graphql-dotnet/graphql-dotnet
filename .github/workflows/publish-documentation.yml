@@ -58,6 +58,9 @@ jobs:
 
           # fix 'nothing to commit, working tree clean'
           err=$(git status 2>&1)
+          echo "1"
+          echo $err
+          echo "2"
           if [ -z "err" ]
           then
             echo "Documentation is up to date, nothing to push"
