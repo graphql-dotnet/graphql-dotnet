@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ci
     paths:
       - docs2/**
       - package.json
@@ -54,5 +55,13 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@graphql-dotnet.net
           git add --all
-          git commit -a -m "Documentation update"
-          git push
+
+          # fix 'nothing to commit, working tree clean'
+          err=$(git status 2>&1)
+          if [ -z "err" ]
+          then
+            echo "Documentation is up to date, nothing to push"
+          else
+            git commit -a -m "Documentation update"
+            git push
+          fi
