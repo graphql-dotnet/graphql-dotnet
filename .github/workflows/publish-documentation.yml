@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ci
     paths:
       - docs2/**
       - package.json
@@ -59,7 +58,7 @@ jobs:
           err=$(git status 2>&1)
           str="nothing to commit, working tree clean"
           if [[ "$err" == *"$str"* ]]; then
-            echo "Documentation is up to date, nothing to push"
+            echo "Documentation files are up to date, nothing to commit/push"
           else
             git commit -a -m "Documentation update"
             git push
