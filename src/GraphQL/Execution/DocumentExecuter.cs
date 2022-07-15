@@ -153,6 +153,7 @@ namespace GraphQL
                             Operation = operation,
                             UserContext = options.UserContext,
                             RequestServices = options.RequestServices,
+                            User = options.User,
                             CancellationToken = options.CancellationToken,
                             Schema = options.Schema,
                             Metrics = metrics,
@@ -282,6 +283,7 @@ namespace GraphQL
                 UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
                 MaxParallelExecutionCount = options.MaxParallelExecutionCount,
                 RequestServices = options.RequestServices,
+                User = options.User,
             };
 
             context.ExecutionStrategy = SelectExecutionStrategy(context);

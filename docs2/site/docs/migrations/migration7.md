@@ -94,6 +94,16 @@ adjust the return value of the `Priority` property of the attribute.
 
 Note that global attributes may also be added to the `GlobalSwitches.GlobalAttributes` collection.
 
+### 8. `ExecutionOptions.User` property added and available to validation rules and field resolvers
+
+You may pass a `ClaimsPrincipal` instance into `ExecutionOptions` and it will be fed through to
+`ValidationContext.User`, `IExecutionContext.User` and `IResolveFieldContext.User` so the value
+is accessible by validation rules, document listeners, field middleware and field resolvers.
+
+This property is similar in nature to the ASP.NET Core `HttpContext.User` property, not being
+used by the GraphQL.NET engine internally but merely being a convenience property similar to
+`RequestServices` and `UserContext` for use by separate authentication packages.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
@@ -240,3 +250,7 @@ were moved into `GraphQL` namespace. Also class names were changed:
 - `GraphQL.SystemTextJson.GraphQLBuilderExtensions` -> `GraphQL.SystemTextJsonGraphQLBuilderExtensions`
 
 This change was done for better discoverability and usability of extension methods when configuring DI.
+
+### 8. `IResolveFieldContext.User` property added
+
+Custom implementations of `IResolveFieldContext` must implement the new `User` property.
