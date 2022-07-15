@@ -58,8 +58,7 @@ jobs:
 
           err=$(git status 2>&1)
           str="nothing to commit, working tree clean"
-          if [ "$err" == *"$str"* ]
-          then
+          if [[ "$err" == *"$str"* ]]; then
             echo "Documentation is up to date, nothing to push"
           else
             git commit -a -m "Documentation update"
