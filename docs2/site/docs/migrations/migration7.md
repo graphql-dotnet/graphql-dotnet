@@ -100,7 +100,7 @@ You may pass a `ClaimsPrincipal` instance into `ExecutionOptions` and it will be
 `ValidationContext.User`, `IExecutionContext.User` and `IResolveFieldContext.User` so the value
 is accessible by validation rules, document listeners, field middleware and field resolvers.
 
-This property is similar in nature to the ASP.NET Core `HttpContext.User` propery, not being
+This property is similar in nature to the ASP.NET Core `HttpContext.User` property, not being
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
