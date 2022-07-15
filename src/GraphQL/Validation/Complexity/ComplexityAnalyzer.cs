@@ -95,7 +95,7 @@ namespace GraphQL.Validation.Complexity
             return context.Result;
         }
 
-        private static GraphQLFragmentDefinition GetFirstFragmentWithoutPendingDependencies(Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> dependencies)
+        private static GraphQLFragmentDefinition GetFirstFragmentWithoutPendingDependencies(Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> dependencies)
         {
             foreach (var item in dependencies)
             {
@@ -106,10 +106,10 @@ namespace GraphQL.Validation.Complexity
             throw new InvalidOperationException("Fragments dependency cycle detected!");
         }
 
-        private static Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
+        private static Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
         {
             Stack<GraphQLSelectionSet> _selectionSetsToVisit = new();
-            Dictionary<GraphQLFragmentDefinition, List<GraphQLFragmentDefinition>?> dependencies = new();
+            Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> dependencies = new();
 
             foreach (var fragmentDef in document.Definitions.OfType<GraphQLFragmentDefinition>())
             {
@@ -118,9 +118,9 @@ namespace GraphQL.Validation.Complexity
 
             return dependencies;
 
-            List<GraphQLFragmentDefinition>? GetDependencies(GraphQLFragmentDefinition def)
+            HashSet<GraphQLFragmentDefinition>? GetDependencies(GraphQLFragmentDefinition def)
             {
-                List<GraphQLFragmentDefinition>? dependencies = null;
+                HashSet<GraphQLFragmentDefinition>? dependencies = null;
                 _selectionSetsToVisit.Push(def.SelectionSet);
 
                 while (_selectionSetsToVisit.Count > 0)
