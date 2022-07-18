@@ -23,18 +23,48 @@ ExecutionResult result = executor.ExecuteAsync(_ =>
 result.EnrichWithApolloTracing(start);
 ```
 
-Alternatively, you can use the `ApolloTracingDocumentExecuter` to append the tracing results
+Alternatively, you can use the `AddApolloTracing` extension method to append the tracing results
 to the execution; this is ideal when wiring up GraphQL via dependency injection.
 
 ```csharp
 services.AddGraphQL(b => b
     .AddSchema<StarWarsSchema>()
-    .AddMetrics(true)
-    .AddDocumentExecuter<ApolloTracingDocumentExecuter>()
+    .AddApolloTracing()
     .AddSystemTextJson());
 ```
 
-Here is a sample of the results:
+Also you could create a listener that hooks in after the execution and uses the Apollo tracing
+data to synthesize some other traces, for example, for Application Insights.
+
+## Conditionally enable metrics by HTTP header
+
+If you want to enable metrics for just some HTTP requests then you may provide a special tracing
+HTTP header and configure GraphQL execution engine to check the presence of that header.
+
+```csharp
+public static class GraphQLBuilderMetricsExtensions
+{
+    public static IGraphQLBuilder EnableMetricsByHeader(this IGraphQLBuilder builder, string headerName = "X-GRAPHQL-METRICS")
+    {
+        return builder.ConfigureExecution(async (options, next) =>
+        {
+            if (!options.EnableMetrics)
+            {
+                var accessor = options.RequestServices.GetRequiredService<IHttpContextAccessor>();
+                options.EnableMetrics = accessor.HttpContext.Request.Headers.ContainsKey(headerName);
+            }
+            return await next(options).ConfigureAwait(false);
+        });
+    }
+}
+
+services.AddGraphQL(b => b
+    .AddSchema<StarWarsSchema>()
+    .EnableMetricsByHeader()
+    .AddSystemTextJson());
+```
+
+## Metrics data example
 
 ```json
 {
@@ -131,6 +161,3 @@ Here is a sample of the results:
   }
 }
 ```
-
-Also you could create a listener that hooks in after the execution and uses the Apollo tracing
-data to synthesize some other traces, for example, for Application Insights.
