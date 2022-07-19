@@ -202,6 +202,122 @@ fragment optionDetail on Option
         result.Complexity.ShouldBe(1839999848); // WOW! :)
     }
 
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3207
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void nested_fragments_3(bool reverse)
+    {
+        var frag1 = @"
+fragment frag1 on QueryType
+{
+  ...frag4
+}
+";
+        var frag2 = @"
+fragment frag2 on QueryType
+{
+  ...frag3
+}
+";
+        var otherFrags = @"
+fragment frag3 on QueryType
+{
+  ...frag5
+}
+
+fragment frag5 on QueryType
+{
+  __typename
+}
+
+fragment frag4 on QueryType
+{
+  __typename
+}
+
+query fragmentTest
+{
+  ...frag1
+  ...frag2
+}
+";
+        var result = AnalyzeComplexity(reverse
+            ? frag1 + frag2 + otherFrags
+            : frag2 + frag1 + otherFrags);
+
+        result.Complexity.ShouldBe(2);
+    }
+
+    [Fact]
+    public void duplicate_fragment_ok()
+    {
+        var query = @"
+query carFragmentTest
+{
+  car(id: 1)
+  {
+    name
+    ... carInfo
+    ... carInfo
+  }
+}
+
+fragment carInfo on Car
+{
+    ...pricing
+    ...pricing
+}
+
+fragment pricing on Car
+{
+  msrp
+}
+";
+        var result = AnalyzeComplexity(query);
+
+        result.Complexity.ShouldBe(6);
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3221
+    [Fact]
+    public void no_fragment_cycle()
+    {
+        var query = @"
+query carFragmentTest
+{
+  car(id: 1)
+  {
+    name
+    ... carInfo
+  }
+}
+
+fragment carInfo on Car
+{
+    ...pricing
+    ... detail
+}
+
+fragment pricing on Car
+{
+  msrp
+}
+
+fragment detail on Car
+{
+  ... furtherDetail
+}
+
+fragment furtherDetail on Car
+{
+  ... pricing
+}";
+        var result = AnalyzeComplexity(query);
+
+        result.Complexity.ShouldBe(4);
+    }
+
     [Fact]
     public void absurdly_huge_query()
     {

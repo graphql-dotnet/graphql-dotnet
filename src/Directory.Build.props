@@ -1,7 +1,8 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>6.0.0-preview</VersionPrefix>
+    <VersionPrefix>7.0.0-preview</VersionPrefix>
+    <NextVersion>8.0.0</NextVersion>
     <LangVersion>latest</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>

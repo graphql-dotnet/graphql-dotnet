@@ -52,7 +52,7 @@
     "eslint-plugin-react": "^7.10.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "ignore-loader": "^0.1.2",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "postcss-loader": "^2.0.9",
     "rimraf": "^2.5.2",
     "shelljs": "^0.8.5",
