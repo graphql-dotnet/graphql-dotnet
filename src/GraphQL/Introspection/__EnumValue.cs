@@ -19,11 +19,11 @@ namespace GraphQL.Introspection
                 "a placeholder for a string or numeric value. However an Enum value is " +
                 "returned in a JSON response as a string.";
 
-            Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source!.Name);
-            Field<StringGraphType>("description", resolve: context => context.Source!.Description);
+            Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source!.Name);
+            Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
 
-            Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
-            Field<StringGraphType>("deprecationReason", resolve: context => context.Source!.DeprecationReason);
+            Field<NonNullGraphType<BooleanGraphType>>("isDeprecated").Resolve(context => (!string.IsNullOrWhiteSpace(context.Source?.DeprecationReason)).Boxed());
+            Field<StringGraphType>("deprecationReason").Resolve(context => context.Source!.DeprecationReason);
 
             if (allowAppliedDirectives)
                 this.AddAppliedDirectivesField("enum value");

@@ -44,9 +44,7 @@ public class Bug3046 : QueryTestBase<Bug3046.MySchema>
         public MyQuery()
         {
             // note: the exception is thrown during execution of this instruction, so debugging can easily identify the incorrect code
-            Field<StringGraphType>(
-                "test1",
-                resolve: HelloAsync);
+            Field<StringGraphType>("test1").Resolve(HelloAsync);
         }
 
         public virtual Task<string> HelloAsync(IResolveFieldContext context)

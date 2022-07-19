@@ -210,7 +210,7 @@ public class SchemaWithArgumentsOnInputField : Schema
     {
         public MyInputGraphType()
         {
-            Field<NonNullGraphType<StringGraphType>>("id", arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "x" }));
+            Field<NonNullGraphType<StringGraphType>>("id").Argument<StringGraphType>("x");
         }
     }
 
@@ -263,14 +263,8 @@ public class SchemaWithInvalidDefault1 : Schema
     public SchemaWithInvalidDefault1()
     {
         var root = new ObjectGraphType();
-        root.Field<NonNullGraphType<StringGraphType>>(
-           "field",
-           arguments: new QueryArguments(
-               new QueryArgument<NonNullGraphType<SomeInputType>>
-               {
-                   Name = "argOne",
-                   DefaultValue = new SomeInput { Names = null }
-               }));
+        root.Field<NonNullGraphType<StringGraphType>>("field")
+            .Argument<NonNullGraphType<SomeInputType>>("argOne", arg => arg.DefaultValue = new SomeInput { Names = null });
         Query = root;
     }
 
@@ -294,14 +288,8 @@ public class SchemaWithInvalidDefault2 : Schema
     public SchemaWithInvalidDefault2()
     {
         var root = new ObjectGraphType();
-        root.Field<NonNullGraphType<StringGraphType>>(
-           "field",
-           arguments: new QueryArguments(
-               new QueryArgument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>
-               {
-                   Name = "argOne",
-                   DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } }
-               }));
+        root.Field<NonNullGraphType<StringGraphType>>("field")
+            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } });
         Query = root;
     }
 }

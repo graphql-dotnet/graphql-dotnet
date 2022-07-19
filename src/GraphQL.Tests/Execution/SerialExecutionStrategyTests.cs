@@ -19,8 +19,8 @@ public class SerialExecutionStrategyTests
         {
             Name = "LoaderType"
         };
-        leaderGraphType.Field<StringGraphType>("lastName", resolve: resolver);
-        leaderGraphType.Field<StringGraphType>("name", resolve: resolver);
+        leaderGraphType.Field<StringGraphType>("lastName").Resolve(resolver);
+        leaderGraphType.Field<StringGraphType>("name").Resolve(resolver);
         var familiesGraphType = new ObjectGraphType()
         {
             Name = "FamiliesType"

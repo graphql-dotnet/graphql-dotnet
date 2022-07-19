@@ -19,7 +19,7 @@ public class FieldRegistrationTests
     public void can_register_field_of_compatible_type()
     {
         var graphType = new ObjectGraphType();
-        graphType.Field(typeof(BooleanGraphType), "isValid").Type.ShouldBe(typeof(BooleanGraphType));
+        graphType.Field(typeof(BooleanGraphType), "isValid").FieldType.Type.ShouldBe(typeof(BooleanGraphType));
     }
 
     [Fact]

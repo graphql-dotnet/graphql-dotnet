@@ -91,8 +91,8 @@ public class ComplexityMetaDataFixture : IDisposable
     {
         public ComplexityQuery()
         {
-            Field<Hero>("hero", resolve: _ => 0)
-                .WithComplexityImpact(2);
+            Field<Hero>("hero").Resolve(_ => 0)
+                .ComplexityImpact(2);
         }
     }
 
@@ -100,13 +100,13 @@ public class ComplexityMetaDataFixture : IDisposable
     {
         public Hero()
         {
-            Field<IntGraphType>("id", resolve: context => context.Source)
-                .WithComplexityImpact(0);
+            Field<IntGraphType>("id").Resolve(context => context.Source)
+                .ComplexityImpact(0);
 
-            Field<StringGraphType>("name", resolve: context => $"Tom_{context.Source}");
+            Field<StringGraphType>("name").Resolve(context => $"Tom_{context.Source}");
 
-            Field<ListGraphType<Hero>>("friends", resolve: context => new List<int> { 0, 1, 2 }.Where(x => x != context.Source).ToList())
-                .WithComplexityImpact(3);
+            Field<ListGraphType<Hero>>("friends").Resolve(context => new List<int> { 0, 1, 2 }.Where(x => x != context.Source).ToList())
+                .ComplexityImpact(3);
         }
     }
 

@@ -24,12 +24,9 @@ public class Issue1837Query : ObjectGraphType
 {
     public Issue1837Query()
     {
-        Field<ListGraphType<IntGraphType>>(
-            "getsome",
-            arguments: new QueryArguments(
-                new QueryArgument<Issue1837ArrayInputType> { Name = "input" }
-            ),
-            resolve: ctx =>
+        Field<ListGraphType<IntGraphType>>("getsome")
+            .Argument<Issue1837ArrayInputType>("input")
+            .Resolve(ctx =>
             {
                 _ = ctx.GetArgument<Issue1837ArrayInput>("input");
 
@@ -47,7 +44,7 @@ public class OutputIntGraphType : ObjectGraphType
 {
     public OutputIntGraphType()
     {
-        Field<IntGraphType>("value", resolve: _ => 1);
+        Field<IntGraphType>("value").Resolve(_ => 1);
     }
 }
 

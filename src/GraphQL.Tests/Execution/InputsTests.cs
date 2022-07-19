@@ -121,23 +121,17 @@ public class UserQuery : ObjectGraphType
 {
     public UserQuery()
     {
-        Field<UserType>(
-            "user",
-            resolve: c => new User
+        Field<UserType>("user")
+            .Resolve(c => new User
             {
                 Id = 1,
                 Gender = Gender.Male,
                 ProfileImage = "hello.png"
             });
-        Field<UserType>("getIntUser", "get user api",
-            new QueryArguments(
-                new QueryArgument<NonNullGraphType<IntGraphType>>
-                {
-                    Name = "userId",
-                    Description = "user id"
-                }
-            ),
-            context =>
+        Field<UserType>("getIntUser")
+            .Description("get user api")
+            .Argument<NonNullGraphType<IntGraphType>>("userId", "user id")
+            .Resolve(context =>
             {
                 var id = context.GetArgument<int>("userId");
                 return new User
@@ -147,15 +141,10 @@ public class UserQuery : ObjectGraphType
             }
         );
 
-        Field<UserType>("getLongUser", "get user api",
-            new QueryArguments(
-                new QueryArgument<NonNullGraphType<LongGraphType>>
-                {
-                    Name = "userId",
-                    Description = "user id"
-                }
-            ),
-            context =>
+        Field<UserType>("getLongUser")
+            .Description("get user api")
+            .Argument<NonNullGraphType<LongGraphType>>("userId", "user id")
+            .Resolve(context =>
             {
                 var id = context.GetArgument<long>("userId");
                 return new User
@@ -173,8 +162,8 @@ public class UserInputType : InputObjectGraphType
     {
         Name = "UserInput";
         Description = "User information for user creation";
-        Field<StringGraphType>("profileImage", "profileImage of user.");
-        Field<GenderEnum>("gender", "user gender.");
+        Field<StringGraphType>("profileImage").Description("profileImage of user.");
+        Field<GenderEnum>("gender").Description("user gender.");
     }
 }
 
@@ -197,15 +186,10 @@ public class MutationRoot : ObjectGraphType
         Name = "MutationRoot";
         Description = "GraphQL MutationRoot for supporting create, update, delete or perform custom actions";
 
-        Field<UserType>("createUser", "create user api",
-            new QueryArguments(
-                new QueryArgument<NonNullGraphType<UserInputType>>
-                {
-                    Name = "userInput",
-                    Description = "user info details"
-                }
-            ),
-            context =>
+        Field<UserType>("createUser")
+            .Description("create user api")
+            .Argument<NonNullGraphType<UserInputType>>("userInput", "user info details")
+            .Resolve(context =>
             {
                 var input = context.GetArgument<CreateUser>("userInput");
                 return new User
@@ -227,10 +211,9 @@ public class UserType : ObjectGraphType
         Field<LongGraphType>("idLong");
         Field<StringGraphType>("profileImage");
         Field<GenderEnum>("gender");
-        Field<StringGraphType>(
-            "printGender",
-            arguments: new QueryArguments(new QueryArgument<GenderEnum> { Name = "g" }),
-            resolve: c =>
+        Field<StringGraphType>("printGender")
+            .Argument<GenderEnum>("g")
+            .Resolve(c =>
             {
                 var gender = c.GetArgument<Gender>("g");
                 return $"gender: {gender}";

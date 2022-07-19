@@ -104,11 +104,9 @@ public class ChatMutation : ObjectGraphType<object>
 {
     public ChatMutation(IChat chat)
     {
-        Field<MessageType>("addMessage",
-            arguments: new QueryArguments(
-                new QueryArgument<MessageInputType> { Name = "message" }
-            ),
-            resolve: context =>
+        Field<MessageType>("addMessage")
+            .Argument<MessageInputType>("message")
+            .Resolve(context =>
             {
                 var receivedMessage = context.GetArgument<ReceivedMessage>("message");
                 var message = chat.AddMessage(receivedMessage);
@@ -121,7 +119,7 @@ public class ChatQuery : ObjectGraphType
 {
     public ChatQuery(IChat chat)
     {
-        Field<ListGraphType<MessageType>>("messages", resolve: context => chat.AllMessages.Take(100));
+        Field<ListGraphType<MessageType>>("messages").Resolve(_ => chat.AllMessages.Take(100));
     }
 }
 

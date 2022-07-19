@@ -15,15 +15,13 @@ namespace GraphQL.Introspection
             Description =
                 "Directive applied to a schema element";
 
-            Field<NonNullGraphType<StringGraphType>>(
-                "name",
-                "Directive name",
-                resolve: context => context.Source!.Name);
+            Field<NonNullGraphType<StringGraphType>>("name")
+                .Description("Directive name")
+                .Resolve(context => context.Source!.Name);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>(
-                "args",
-                "Values of explicitly specified directive arguments",
-                resolve: context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>("args")
+                .Description("Values of explicitly specified directive arguments")
+                .Resolve(context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
         }
     }
 }

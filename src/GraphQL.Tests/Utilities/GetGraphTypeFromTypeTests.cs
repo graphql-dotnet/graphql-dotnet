@@ -290,11 +290,8 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_Argument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(referenceType) { Name = "arg" }
-            });
+        query.Field(typeof(IntGraphType), "test")
+            .Argument(referenceType, "arg");
         var schema = new Schema
         {
             Query = query
@@ -365,11 +362,8 @@ public class GetGraphTypeFromTypeTests
         var inputType = new InputObjectGraphType();
         inputType.Field(referenceType, "field");
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(inputType) { Name = "arg" }
-            });
+        query.Field(typeof(IntGraphType), "test")
+            .Arguments(new QueryArgument(inputType) { Name = "arg" });
         var schema = new Schema
         {
             Query = query

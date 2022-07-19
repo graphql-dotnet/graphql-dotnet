@@ -55,9 +55,9 @@ public class Bug68NonNullEnumGraphTypeTests
         {
             var query = new ObjectGraphType();
             if (includeNullable)
-                query.Field<NullableSchemaType>("nullable", resolve: c => new NullableSchemaType());
+                query.Field<NullableSchemaType>("nullable").Resolve(_ => new NullableSchemaType());
             if (includeNonNullable)
-                query.Field<NonNullableSchemaType>("nonNullable", resolve: c => new NonNullableSchemaType());
+                query.Field<NonNullableSchemaType>("nonNullable").Resolve(_ => new NonNullableSchemaType());
 
             Query = query;
         }
@@ -67,7 +67,7 @@ public class Bug68NonNullEnumGraphTypeTests
     {
         public NullableSchemaType()
         {
-            Field<EnumType<Foo>>("a", resolve: _ => Foo.Bar);
+            Field<EnumType<Foo>>("a").Resolve(_ => Foo.Bar);
         }
     }
 
@@ -75,7 +75,7 @@ public class Bug68NonNullEnumGraphTypeTests
     {
         public NonNullableSchemaType()
         {
-            Field<NonNullGraphType<EnumType<Foo>>>("a", resolve: _ => Foo.Bar);
+            Field<NonNullGraphType<EnumType<Foo>>>("a").Resolve(_ => Foo.Bar);
         }
     }
 }

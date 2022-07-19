@@ -33,10 +33,7 @@ public class QueryErrorTests : QueryTestBase<QueryErrorTests.TestSchema>
         public TestQuery()
         {
             Name = "Query";
-            Field<StringGraphType>(
-                "firstSync",
-                resolve: _ => "3"
-            );
+            Field<StringGraphType>("firstSync").Resolve(_ => "3");
         }
     }
 

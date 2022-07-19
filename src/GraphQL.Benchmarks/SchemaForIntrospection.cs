@@ -15,7 +15,8 @@ public class MyQuery : ObjectGraphType
 {
     public MyQuery()
     {
-        Field<StringGraphType>("get", arguments: new QueryArguments(
+        Field<StringGraphType>("get")
+            .Arguments(
             new QueryArgument<BigIntGraphType>
             {
                 Name = "arg01",
@@ -133,9 +134,8 @@ public class MyQuery : ObjectGraphType
                 DefaultValue = new TimeOnly(1, 1, 3)
             }
 #endif
-            ),
-
-            resolve: ctx =>
+            )
+            .Resolve(ctx =>
             {
                 var arg01 = ctx.GetArgument<BigInteger>("arg01");
                 var arg02 = ctx.GetArgument<bool>("arg02");

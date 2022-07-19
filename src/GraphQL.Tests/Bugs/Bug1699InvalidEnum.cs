@@ -141,69 +141,44 @@ public class Bug1699InvalidEnumQuery : ObjectGraphType
 {
     public Bug1699InvalidEnumQuery()
     {
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "grumpy",
-            resolve: ctx => Bug1699Enum.Grumpy);
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "happy",
-            resolve: ctx => (int)Bug1699Enum.Happy);
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "sleepy",
-            resolve: ctx => Bug1699Enum.Sleepy.ToString());
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "invalidEnum",
-            resolve: ctx => 50);
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "enumByNumber",
-            resolve: ctx => (int)Bug1699Enum.Happy);
-        Field<ListGraphType<EnumerationGraphType<Bug1699Enum>>>(
-            "invalidEnumWithinList",
-            resolve: ctx => new Bug1699Enum[] { Bug1699Enum.Happy, Bug1699Enum.Sleepy, (Bug1699Enum)50 });
-        Field<ListGraphType<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>>>(
-            "invalidEnumWithinNonNullList",
-            resolve: ctx => new Bug1699Enum[] { Bug1699Enum.Happy, Bug1699Enum.Sleepy, (Bug1699Enum)50 });
-        Field<EnumerationGraphType<Bug1699Enum>>(
-            "inputEnum",
-            arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg"));
-        Field<StringGraphType>(
-            "input",
-            arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
-        Field<StringGraphType>(
-            "inputWithDefault",
-            arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
-        Field<StringGraphType>(
-            "inputWithDefaultNullable",
-            arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum?>("arg")?.ToString());
-        Field<StringGraphType>(
-            "inputRequired",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
-        Field<StringGraphType>(
-            "inputRequiredWithDefault",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
-        Field<Bug1699CustomEnumGraphType>(
-            "customEnum",
-            resolve: context => Bug1699Enum.Happy);
-        Field<StringGraphType>(
-            "customEnumInput",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<Bug1699CustomEnumGraphType>> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
-        Field<Bug1699CustomEnumGraphType>(
-            "customEnumSleepy",
-            resolve: context => Bug1699Enum.Sleepy);
-        Field<StringGraphType>(
-            "inputList",
-            arguments: new QueryArguments(new QueryArgument<ListGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg" }),
-            resolve: ctx => string.Join(",", ctx.GetArgument<List<Bug1699Enum>>("arg").Select(x => x.ToString())));
-        Field<StringGraphType>(
-            "inputListCustom",
-            arguments: new QueryArguments(new QueryArgument<ListGraphType<Bug1699CustomEnumGraphType>> { Name = "arg" }),
-            resolve: ctx => string.Join(",", ctx.GetArgument<List<object>>("arg").Select(x => x.ToString())));
+        Field<EnumerationGraphType<Bug1699Enum>>("grumpy").Resolve(_ => Bug1699Enum.Grumpy);
+        Field<EnumerationGraphType<Bug1699Enum>>("happy").Resolve(_ => (int)Bug1699Enum.Happy);
+        Field<EnumerationGraphType<Bug1699Enum>>("sleepy").Resolve(_ => Bug1699Enum.Sleepy.ToString());
+        Field<EnumerationGraphType<Bug1699Enum>>("invalidEnum").Resolve(_ => 50);
+        Field<EnumerationGraphType<Bug1699Enum>>("enumByNumber").Resolve(_ => (int)Bug1699Enum.Happy);
+        Field<ListGraphType<EnumerationGraphType<Bug1699Enum>>>("invalidEnumWithinList").Resolve(_ => new Bug1699Enum[] { Bug1699Enum.Happy, Bug1699Enum.Sleepy, (Bug1699Enum)50 });
+        Field<ListGraphType<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>>>("invalidEnumWithinNonNullList").Resolve(_ => new Bug1699Enum[] { Bug1699Enum.Happy, Bug1699Enum.Sleepy, (Bug1699Enum)50 });
+        Field<EnumerationGraphType<Bug1699Enum>>("inputEnum")
+            .Argument<EnumerationGraphType<Bug1699Enum>>("arg")
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg"));
+        Field<StringGraphType>("input")
+            .Argument<EnumerationGraphType<Bug1699Enum>>("arg")
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+        Field<StringGraphType>("inputWithDefault")
+            .Argument<EnumerationGraphType<Bug1699Enum>>("arg", arg => arg.DefaultValue = Bug1699Enum.Happy)
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+        Field<StringGraphType>("inputWithDefaultNullable")
+            .Argument<EnumerationGraphType<Bug1699Enum>>("arg", arg => arg.DefaultValue = Bug1699Enum.Happy)
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum?>("arg")?.ToString());
+        Field<StringGraphType>("inputRequired")
+            .Argument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>>("arg")
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+        Field<StringGraphType>("inputRequiredWithDefault")
+            .Argument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>>("arg", arg => arg.DefaultValue = Bug1699Enum.Happy)
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+        Field<Bug1699CustomEnumGraphType>("customEnum")
+            .Resolve(_ => Bug1699Enum.Happy);
+        Field<StringGraphType>("customEnumInput")
+            .Argument<NonNullGraphType<Bug1699CustomEnumGraphType>>("arg")
+            .Resolve(ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+        Field<Bug1699CustomEnumGraphType>("customEnumSleepy")
+            .Resolve(_ => Bug1699Enum.Sleepy);
+        Field<StringGraphType>("inputList")
+            .Argument<ListGraphType<EnumerationGraphType<Bug1699Enum>>>("arg")
+            .Resolve(ctx => string.Join(",", ctx.GetArgument<List<Bug1699Enum>>("arg").Select(x => x.ToString())));
+        Field<StringGraphType>("inputListCustom")
+            .Argument<ListGraphType<Bug1699CustomEnumGraphType>>("arg")
+            .Resolve(ctx => string.Join(",", ctx.GetArgument<List<object>>("arg").Select(x => x.ToString())));
     }
 }
 

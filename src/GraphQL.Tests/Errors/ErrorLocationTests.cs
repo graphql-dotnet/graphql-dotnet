@@ -102,9 +102,8 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
                 .Name("test")
                 .Resolve(_ => throw new Exception("wat"));
 
-            FieldAsync<StringGraphType>(
-                "testasync",
-                resolve: _ => throw new Exception("wat"));
+            Field<StringGraphType>("testasync")
+                .ResolveAsync(_ => throw new Exception("wat"));
 
             Field<TestSubObject>()
                 .Name("testSub")

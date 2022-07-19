@@ -106,7 +106,7 @@ public class DocumentExecuterTests
         public Schema1(IServiceProvider provider) : base(provider)
         {
             var graph = new ObjectGraphType { Name = "Query" };
-            graph.Field<StringGraphType>("hero", resolve: context => "hello");
+            graph.Field<StringGraphType>("hero").Resolve(_ => "hello");
             Query = graph;
         }
     }
@@ -116,7 +116,7 @@ public class DocumentExecuterTests
         public Schema2(IServiceProvider provider) : base(provider)
         {
             var graph = new ObjectGraphType { Name = "Query" };
-            graph.Field<StringGraphType>("hero", resolve: context => "hello2");
+            graph.Field<StringGraphType>("hero").Resolve(_ => "hello2");
             Query = graph;
         }
     }

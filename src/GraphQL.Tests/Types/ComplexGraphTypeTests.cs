@@ -124,7 +124,7 @@ public class ComplexGraphTypeTests
             var schema = new Schema();
             var type = new AutoRegisteringInputObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
             var query = new ObjectGraphType();
-            query.Field<StringGraphType>("test", arguments: new QueryArguments(new QueryArgument(type) { Name = "input" }));
+            query.Field<StringGraphType>("test").Arguments(new QueryArgument(type) { Name = "input" });
             schema.Query = query;
             schema.Initialize();
 
@@ -282,7 +282,7 @@ public class ComplexGraphTypeTests
     public void create_field_with_func_resolver()
     {
         var type = new ComplexType<Droid>();
-        _ = type.Field<StringGraphType>("name", resolve: context => context.Source.Name);
+        _ = type.Field<StringGraphType>("name").Resolve(context => context.Source.Name);
 
         type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
     }
@@ -453,7 +453,7 @@ public class ComplexGraphTypeTests
         var type = new ComplexType<TestObject>();
         var field = type.Field<StringGraphType>(fieldName);
 
-        field.Name.ShouldBe(fieldName);
+        field.FieldType.Name.ShouldBe(fieldName);
     }
 
     [Theory]
