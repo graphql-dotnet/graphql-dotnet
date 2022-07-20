@@ -275,10 +275,8 @@ public class StarWarsQuery : ObjectGraphType
 {
     public StarWarsQuery()
     {
-        Field<DroidType>(
-            "hero",
-            resolve: context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2")
-        );
+        Field<DroidType>("hero")
+            .Resolve(context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2"));
     }
 }
 ```
@@ -298,15 +296,13 @@ public class StarWarsQuery : ObjectGraphType
 {
     public StarWarsQuery()
     {
-        Field<DroidType>(
-            "hero",
-            resolve: context =>
+        Field<DroidType>("hero")
+            .Resolve(context =>
             {
                 using var scope = context.RequestServices.CreateScope();
                 var services = scope.ServiceProvider;
                 return services.GetRequiredService<MyDbContext>().Droids.Find(1);
-            }
-        );
+            });
     }
 }
 ```
@@ -319,7 +315,7 @@ public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {
-        Field("Name", context => context.Source.Name);
+        Field("Name").Resolve(context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products")
             .ResolveScopedAsync(context => {
                 var db = context.RequestServices.GetRequiredService<MyDbContext>();
@@ -344,8 +340,8 @@ public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {
-        Field("Name", context => context.Source.Name);
-        Field<ListGraphType<ProductGraphType>>().Name("Products")
+        Field("Name").Resolve(context => context.Source.Name);
+        Field<ListGraphType<ProductGraphType>>("Products")
             .Resolve()
             .WithScope() // creates a service scope as described above; not necessary for serial execution
             .WithService<MyDbContext>()
@@ -385,13 +381,9 @@ public class StarWarsQuery : ObjectGraphType
   // #1 - Add dependencies using Defer<T>
   public StarWarsQuery(Defer<IDroidRepo> repoFactory)
   {
-    Field<DroidType>(
-      "hero",
-
-      // #2 Resolve dependencies using current scope provider
-      resolve: context => repoFactory.Value.GetDroid("R2-D2")
-
-    );
+    Field<DroidType>("hero")
+        // #2 Resolve dependencies using current scope provider
+        .Resolve(context => repoFactory.Value.GetDroid("R2-D2"));
   }
 }
 ```

@@ -127,14 +127,11 @@ public class SchemaWithDuplicateArguments : Schema
 {
     public SchemaWithDuplicateArguments()
     {
-        Query = new ObjectGraphType { Name = "Dup" };
-        Query.Field(
-            "field",
-            new StringGraphType(),
-            arguments: new QueryArguments(
-                new QueryArgument<StringGraphType> { Name = "arg" },
-                new QueryArgument<StringGraphType> { Name = "arg" }
-            ));
+        var query = new ObjectGraphType { Name = "Dup" };
+        query.Field("field", new StringGraphType())
+            .Argument<StringGraphType>("arg")
+            .Argument<StringGraphType>("arg");
+        Query = query;
     }
 }
 
@@ -249,12 +246,11 @@ public class SchemaWithNotFullSpecifiedResolvedType : Schema
             ResolvedType = new NonNullGraphType<StringGraphType>()
         });
 
-        Query = new ObjectGraphType();
-        Query.Field(
-            "test",
-            new StringGraphType(),
-            arguments: new QueryArguments(new QueryArgument(stringFilterInputType) { Name = "a" }),
-            resolve: context => "ok");
+        var query = new ObjectGraphType();
+        query.Field("test", new StringGraphType())
+            .Arguments(new QueryArgument(stringFilterInputType) { Name = "a" })
+            .Resolve(_ => "ok");
+        Query = query;
     }
 }
 

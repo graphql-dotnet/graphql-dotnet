@@ -46,10 +46,8 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
         person.Field("business", business);
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Field(
-            "person",
-            person,
-            resolve: ctx =>
+        query.Field("person", person)
+            .Resolve(ctx =>
             {
                 return new Person
                 {

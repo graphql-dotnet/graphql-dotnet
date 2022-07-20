@@ -72,10 +72,9 @@ Any other thrown error is treated as a processing error (see [Processing Errors]
 Here is an example of typical validation within a field resolver that returns an input error:
 
 ```csharp
-Field<NonNullGraphType<OrderGraph>>("order",
-    arguments: new QueryArguments(
-        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }),
-    resolve: context =>
+Field<NonNullGraphType<OrderGraph>>("order")
+    .Argument<NonNullGraphType<IntGraphType>>("id")
+    .Resolve(context =>
     {
         var order = _orderService.GetById(context.GetArgument<int>("id"));
         if (order == null)
@@ -86,9 +85,12 @@ Field<NonNullGraphType<OrderGraph>>("order",
 You can also add errors to the `IResolveFieldContext.Errors` property directly.
 
 ```csharp
-Field<DroidType>(
-  "hero",
-  resolve: context => context.Errors.Add(new ExecutionError("Error Message"))
+Field<DroidType>("hero")
+    .Resolve(context =>
+    {
+        context.Errors.Add(new ExecutionError("Error Message"));
+        return ...;
+    });
 );
 ```
 

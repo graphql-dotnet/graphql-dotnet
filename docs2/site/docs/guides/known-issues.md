@@ -15,7 +15,7 @@ generic class.
 Here is a sample of using an enumeration graph type:
 
 ```csharp
-Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn", "Which movie they appear in.");
+Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn").Description("Which movie they appear in.");
 ```
 
 Here is a sample of an auto registering input graph type:
@@ -27,11 +27,9 @@ class Person
     public int Age { get; set; }
 }
 
-Field<StringGraphType>("addPerson",
-    arguments: new QueryArguments(
-        new QueryArgument<AutoRegisteringInputObjectGraphType<Person>> { Name = "value" }
-    ),
-    resolve: context => {
+Field<StringGraphType>("addPerson")
+    .Arguments<AutoRegisteringInputObjectGraphType<Person>>("value")
+    .Resolve(context => {
         var person = context.GetArgument<Person>("value");
         db.Add(person);
         return "ok";
@@ -57,7 +55,7 @@ class ProductGraphType : AutoRegisteringObjectGraphType<Product>
     }
 }
 
-Field<ListGraphType<ProductGraphType>>("products", resolve: _ => db.Products);
+Field<ListGraphType<ProductGraphType>>("products").Resolve(_ => db.Products);
 ```
 
 Note that you may need to register the classes within your dependency injection framework:
@@ -132,20 +130,16 @@ enum MyFlags
 }
 
 // this returns the list ["GRUMPY", "HAPPY"]
-Field<ListGraphType<EnumerationGraphType<MyFlags>>>(
-    "getFlagEnum",
-    resolve: ctx => {
+Field<ListGraphType<EnumerationGraphType<MyFlags>>>("getFlagEnum")
+    .Resolve(ctx => {
         var myFlags = MyFlags.Grumpy | MyFlags.Happy;
         return myFlags.FromFlags()
     });
 
 // when calling convertEnumListToString(arg: [GRUMPY, HAPPY]), it returns the string "Grumpy, Happy"
-Field<StringGraphType>(
-    "convertEnumListToString",
-    arguments: new QueryArguments(
-        new QueryArgument<ListGraphType<EnumerationGraphType<MyFlags>>> { Name = "arg" }),
-    resolve: ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString()
-    );
+Field<StringGraphType>("convertEnumListToString")
+    .Argument<ListGraphType<EnumerationGraphType<MyFlags>>>("arg")
+    .Resolve(ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString());
 ```
 
 ### Can custom scalars serialize non-null data to a null value and vice versa?

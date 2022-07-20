@@ -52,14 +52,12 @@ namespace GraphQL.Builders
         /// </summary>
         /// <param name="type">The graph type of the field.</param>
         /// <param name="name">The name of the field.</param>
-        [Obsolete("This method will be removed in v8.")]
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
         {
             var fieldType = new FieldType
             {
                 Name = name,
                 ResolvedType = type,
-                Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
@@ -71,7 +69,6 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = type,
-                Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
