@@ -438,7 +438,7 @@ public class ComplexGraphTypeTests
     public void throws_when_field_name_is_null_or_empty_using_field_builder(string fieldName)
     {
         var type = new ComplexType<TestObject>();
-        var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>().Name(fieldName));
+        var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
 
         exception.Message.ShouldStartWith("A field name can not be null or empty.");
     }
@@ -453,7 +453,7 @@ public class ComplexGraphTypeTests
         var type = new ComplexType<TestObject>();
         var field = type.Field<StringGraphType>(fieldName);
 
-        field.Name.ShouldBe(fieldName);
+        field.FieldType.Name.ShouldBe(fieldName);
     }
 
     [Theory]
@@ -464,7 +464,7 @@ public class ComplexGraphTypeTests
     public void should_not_throw_exception_on_valid_field_name_using_field_builder(string fieldName)
     {
         var type = new ComplexType<TestObject>();
-        type.Field<StringGraphType>().Name(fieldName);
+        type.Field<StringGraphType>(fieldName);
 
         type.Fields.Last().Name.ShouldBe(fieldName);
     }

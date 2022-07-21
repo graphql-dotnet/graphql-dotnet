@@ -51,8 +51,8 @@ public sealed class QueryType : ObjectGraphType
 {
     public QueryType()
     {
-        Field<Type1>().Name("type1").Resolve(x => new { });
-        Field<Type2>().Name("type2").Resolve(x => new { });
+        Field<Type1>("type1").Resolve(x => new { });
+        Field<Type2>("type2").Resolve(x => new { });
     }
 }
 

@@ -19,7 +19,7 @@ public class FieldRegistrationTests
     public void can_register_field_of_compatible_type()
     {
         var graphType = new ObjectGraphType();
-        graphType.Field(typeof(BooleanGraphType), "isValid").Type.ShouldBe(typeof(BooleanGraphType));
+        graphType.Field("isValid", typeof(BooleanGraphType)).FieldType.Type.ShouldBe(typeof(BooleanGraphType));
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class FieldRegistrationTests
         var graphType = new ObjectGraphType();
 
         Should.Throw<ArgumentOutOfRangeException>(
-            () => graphType.Field(typeof(string), "id")
+            () => graphType.Field("id", typeof(string))
         );
     }
 
@@ -38,7 +38,7 @@ public class FieldRegistrationTests
         var graphType = new ObjectGraphType();
 
         Should.Throw<ArgumentOutOfRangeException>(
-            () => graphType.Field(typeof(NonNullGraphType<>), "id")
+            () => graphType.Field("id", typeof(NonNullGraphType<>))
         );
     }
 }

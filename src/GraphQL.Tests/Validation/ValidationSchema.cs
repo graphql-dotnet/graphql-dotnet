@@ -187,7 +187,7 @@ public class ComplexInput : InputObjectGraphType
         Name = "ComplexInput";
         Field<NonNullGraphType<BooleanGraphType>>("requiredField");
         Field<IntGraphType>("intField");
-        Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
+        Field<StringGraphType>("stringField").Directive("length", "min", 3, "max", 7);
         Field<BooleanGraphType>("booleanField");
         Field<ListGraphType<StringGraphType>>("stringListField");
     }

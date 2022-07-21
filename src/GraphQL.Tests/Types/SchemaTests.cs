@@ -200,12 +200,12 @@ public class SchemaTests
     {
         var schema = new Schema();
         var query = new ObjectGraphType();
-        var field = query.Field(typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>), "test");
+        var field = query.Field("test", typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>));
         schema.Query = query;
         schema.RegisterTypeMapping<MyDto, MyDtoGraphType>();
         schema.Initialize();
-        field.ResolvedType.ShouldNotBeNull();
-        field.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
+        field.FieldType.ResolvedType.ShouldNotBeNull();
+        field.FieldType.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
     }
 
     [Fact]
@@ -503,7 +503,7 @@ public class CycleType : ObjectGraphType
 {
     public CycleType()
     {
-        Field<CycleType>();
+        Field<CycleType>("_");
     }
 }
 
@@ -519,7 +519,7 @@ public class CyclingQueryType : ObjectGraphType
 {
     public CyclingQueryType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 
@@ -527,7 +527,7 @@ public abstract class AbstractGraphType : ObjectGraphType
 {
     public AbstractGraphType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 

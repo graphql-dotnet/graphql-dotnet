@@ -8,33 +8,6 @@ using GraphQLParser;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Represents an interface for all complex (that is, having their own properties) input and output graph types.
-    /// </summary>
-    public interface IComplexGraphType : IGraphType
-    {
-        /// <summary>
-        /// Returns a list of the fields configured for this graph type.
-        /// </summary>
-        TypeFields Fields { get; }
-
-        /// <summary>
-        /// Adds a field to this graph type.
-        /// </summary>
-        FieldType AddField(FieldType fieldType);
-
-        /// <summary>
-        /// Returns <see langword="true"/> when a field matching the specified name is configured for this graph type.
-        /// </summary>
-        bool HasField(string name);
-
-        /// <summary>
-        /// Returns the <see cref="FieldType"/> for the field matching the specified name that
-        /// is configured for this graph type, or <see langword="null"/> if none is found.
-        /// </summary>
-        FieldType? GetField(ROM name);
-    }
-
-    /// <summary>
     /// Represents a default base class for all complex (that is, having their own properties) input and output graph types.
     /// </summary>
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
@@ -49,7 +22,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public TypeFields Fields { get; } = new TypeFields();
+        public TypeFields Fields { get; } = new();
 
         /// <inheritdoc/>
         public bool HasField(string name)
@@ -127,6 +100,22 @@ namespace GraphQL.Types
             Fields.Add(fieldType);
 
             return fieldType;
+        }
+
+        /// <summary>
+        /// Creates a field builder used by Field() methods.
+        /// </summary>
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(Type type)
+        {
+            return FieldBuilder<TSourceType, TReturnType>.Create(type);
+        }
+
+        /// <summary>
+        /// Creates a field builder used by Field() methods.
+        /// </summary>
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type)
+        {
+            return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
 
         /// <summary>
@@ -408,8 +397,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
             where TGraphType : IGraphType
         {
-            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
-                .Name(name);
+            var builder = CreateBuilder<TReturnType>(typeof(TGraphType)).Name(name);
             AddField(builder.FieldType);
             return builder;
         }
@@ -418,9 +406,34 @@ namespace GraphQL.Types
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+        /// <param name="name">The name of the field.</param>
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : IGraphType
-            => Field<TGraphType, object>();
+            => Field<TGraphType, object>(name);
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
+        /// <param name="type">The .NET type of the graph type of this field.</param>
+        /// <param name="name">The name of the field.</param>
+        public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
+        {
+            var builder = CreateBuilder<object>(type).Name(name);
+            AddField(builder.FieldType);
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
+        /// <param name="type">The graph type of this field.</param>
+        /// <param name="name">The name of the field.</param>
+        public virtual FieldBuilder<TSourceType, object> Field(string name, IGraphType type)
+        {
+            var builder = CreateBuilder<object>(type).Name(name);
+            AddField(builder.FieldType);
+            return builder;
+        }
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -449,7 +462,7 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'.", exp);
             }
 
-            var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
+            var builder = CreateBuilder<TProperty>(type)
                 .Name(name)
                 .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
                 .Description(expression.DescriptionOf())

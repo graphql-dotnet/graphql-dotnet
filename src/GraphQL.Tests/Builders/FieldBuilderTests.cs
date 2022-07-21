@@ -11,8 +11,7 @@ public class FieldBuilderTests
     public void should_have_name()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
-            .Name("TheName");
+        objectType.Field<StringGraphType>("TheName");
 
         var fields = objectType.Fields.ToList();
         fields.Count.ShouldBe(1);
@@ -25,8 +24,7 @@ public class FieldBuilderTests
     public void should_have_name_and_description()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
-            .Name("TheName")
+        objectType.Field<StringGraphType>("TheName")
             .Description("TheDescription");
 
         var fields = objectType.Fields.ToList();
@@ -41,7 +39,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
 
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .DeprecationReason("Old field");
 
         objectType.Fields
@@ -52,8 +50,7 @@ public class FieldBuilderTests
     public async Task should_return_the_right_type()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
-            .Name("TheName")
+        objectType.Field<StringGraphType>("TheName")
             .Returns<string>()
             .Resolve(_ => "SomeString");
 
@@ -72,12 +69,9 @@ public class FieldBuilderTests
     public void can_be_defined_of_graphtype()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<IntGraphType>()
-            .Name("Field1");
-        objectType.Field<FloatGraphType>()
-            .Name("Field2");
-        objectType.Field<DateGraphType>()
-            .Name("Field3");
+        objectType.Field<IntGraphType>("Field1");
+        objectType.Field<FloatGraphType>("Field2");
+        objectType.Field<DateGraphType>("Field3");
 
         var fields = objectType.Fields.ToList();
         fields.Count.ShouldBe(3);
@@ -93,7 +87,7 @@ public class FieldBuilderTests
     public void can_have_a_default_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<IntGraphType>()
+        objectType.Field<IntGraphType>("_")
             .Returns<int>()
             .DefaultValue(15);
 
@@ -104,7 +98,7 @@ public class FieldBuilderTests
     public void can_have_arguments_with_and_without_default_values_and_with_metadata()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<IntGraphType>()
+        objectType.Field<IntGraphType>("_")
             .Argument<StringGraphType, string>("arg1", "desc1", "12345")
             .Argument<IntGraphType, int>("arg2", "desc2", 9)
             .Argument<IntGraphType>("arg3", "desc3", cfg => cfg.WithMetadata("secure", true))
@@ -140,7 +134,7 @@ public class FieldBuilderTests
     public async Task can_determine_whether_argument_exists_in_resolver()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<IntGraphType>()
+        objectType.Field<IntGraphType>("_")
             .Argument<StringGraphType, string>("arg1", "desc1", "12345")
             .Returns<int>()
             .Resolve(context =>
@@ -170,7 +164,7 @@ public class FieldBuilderTests
     public async Task getting_unspecified_argument_in_resolver_yields_null()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<StringGraphType, string>("arg1", "desc1")
             .Resolve(context =>
             {
@@ -190,7 +184,7 @@ public class FieldBuilderTests
     public async Task getting_unspecified_argument_in_resolver_yields_overridden_default_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<StringGraphType, string>("arg1", "desc1", "default")
             .Resolve(context =>
             {
@@ -210,7 +204,7 @@ public class FieldBuilderTests
     public async Task can_get_nullable_argument_with_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<IntGraphType, int?>("skip", "desc1", 1)
             .Resolve(context =>
             {
@@ -233,7 +227,7 @@ public class FieldBuilderTests
     public async Task can_get_nullable_argument_with_null_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<IntGraphType, int?>("skip", "desc1")
             .Resolve(context =>
             {
@@ -256,7 +250,7 @@ public class FieldBuilderTests
     public async Task can_get_nullable_argument_missing_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<IntGraphType, int?>("skip", "desc1")
             .Resolve(context =>
             {
@@ -276,7 +270,7 @@ public class FieldBuilderTests
     public async Task can_get_enum_argument()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<EpisodeEnum, Episodes>("episode", "episodes")
             .Resolve(context =>
             {
@@ -299,7 +293,7 @@ public class FieldBuilderTests
     public async Task can_get_enum_argument_with_overriden_default_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<EpisodeEnum, Episodes>("episode", "episodes")
             .Resolve(context =>
             {
@@ -319,7 +313,7 @@ public class FieldBuilderTests
     public async Task can_get_list_argument()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
             .Resolve(context =>
             {
@@ -342,7 +336,7 @@ public class FieldBuilderTests
     public async Task can_get_collection_argument()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
             .Resolve(context =>
             {
@@ -365,7 +359,7 @@ public class FieldBuilderTests
     public async Task getting_specified_argument_in_resolver_overrides_default_value()
     {
         var objectType = new ObjectGraphType();
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Argument<StringGraphType, string>("arg1", "desc1", "default")
             .Resolve(context =>
             {
@@ -389,7 +383,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType<int>();
 
-        objectType.Field<StringGraphType>()
+        objectType.Field<StringGraphType>("_")
             .Resolve(context =>
             {
                 context.Source.ShouldBe(12345);
