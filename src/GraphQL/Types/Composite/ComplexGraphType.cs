@@ -128,6 +128,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType Field(
             Type type,
             string name,
@@ -159,6 +160,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType Field<TGraphType>(
             string name,
             string? description = null,
@@ -190,6 +192,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldDelegate<TGraphType>(
             string name,
             string? description = null,
@@ -232,6 +235,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldAsync(
             Type type,
             string name,
@@ -263,6 +267,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldAsync<TGraphType>(
             string name,
             string? description = null,
@@ -295,6 +300,7 @@ namespace GraphQL.Types
         /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldAsync<TGraphType, TReturnType>(
             string name,
             string? description = null,
@@ -327,6 +333,7 @@ namespace GraphQL.Types
         /// <param name="subscribe">A source stream resolver delegate.</param>
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldSubscribe<TGraphType>(
             string name,
             string? description = null,
@@ -363,6 +370,7 @@ namespace GraphQL.Types
         /// <param name="subscribeAsync">A source stream resolver delegate.</param>
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
             string? description = null,
