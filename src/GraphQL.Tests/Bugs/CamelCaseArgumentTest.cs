@@ -31,10 +31,9 @@ public sealed class CamelCaseSchema : Schema
     public CamelCaseSchema()
     {
         var query = new ObjectGraphType();
-        query.Field<IntGraphType>(
-            name: "Query",
-            arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "ArgumentValue" }),
-            resolve: context => context.GetArgument<int>("ArgumentValue")
+        query.Field<IntGraphType>("Query")
+            .Argument<IntGraphType>("ArgumentValue")
+            .Resolve(context => context.GetArgument<int>("ArgumentValue")
         );
         Query = query;
     }

@@ -40,9 +40,7 @@ public class Bug2839SystemTextJson
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>(
-                name: "test",
-                resolve: context => new TestResponse());
+            Field<TestResponseType>("test").Resolve(_ => new TestResponse());
         }
     }
 

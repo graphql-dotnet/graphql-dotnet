@@ -347,40 +347,36 @@ public class ScalarsMutation : ObjectGraphType
     {
         Name = "ScalarsMutation";
 
-        Field<ScalarsType>(
-            "create",
-            arguments: new QueryArguments(new QueryArgument<ScalarsInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<ScalarsType>("create")
+            .Argument<ScalarsInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ScalarsModel>("input");
                 arg.decZero.ShouldBe(12.10m);
                 return arg;
             });
 
-        Field<ScalarsType>(
-            "create_with_defaults",
-            arguments: new QueryArguments(new QueryArgument<ScalarsInputWithDefaults> { Name = "input" }),
-            resolve: ctx =>
+        Field<ScalarsType>("create_with_defaults")
+            .Argument<ScalarsInputWithDefaults>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ScalarsModel>("input");
                 arg.decZero.ShouldBe(12.10m);
                 return arg;
             });
 
-        Field<LongGraphType>(
-            "long",
-            arguments: new QueryArguments(new QueryArgument<LongGraphType> { Name = "number" }),
-            resolve: ctx =>
+        Field<LongGraphType>("long")
+            .Argument<LongGraphType>("number")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<long>("number");
                 arg.ShouldBe(100L);
                 return arg;
             });
 
-        Field<IntGraphType>(
-            "int",
-            arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "number" }),
-            resolve: ctx =>
+        Field<IntGraphType>("int")
+            .Argument<IntGraphType>("number")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<int>("number");
                 arg.ShouldBe(100);

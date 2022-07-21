@@ -10,12 +10,8 @@ public class SchemaPrinterTests
         IEnumerable<QueryArgument> arguments = null)
         where T : GraphType
     {
-        var args = arguments != null ? new QueryArguments(arguments) : null;
-
         var root = new ObjectGraphType { Name = "Query" };
-        root.Field<T>(
-            "singleField",
-            arguments: args);
+        root.Field<T>("singleField").Arguments(arguments);
 
         var schema = new Schema
         {
@@ -794,9 +790,8 @@ union SingleUnion = Foo
     public void prints_input_type()
     {
         var root = new ObjectGraphType { Name = "Query" };
-        root.Field<NonNullGraphType<StringGraphType>>(
-            "str",
-            arguments: new QueryArguments(new QueryArgument<InputType> { Name = "argOne" }));
+        root.Field<NonNullGraphType<StringGraphType>>("str")
+            .Argument<InputType>("argOne");
 
         var schema = new Schema { Query = root };
 
@@ -822,12 +817,9 @@ union SingleUnion = Foo
     public void prints_input_type_with_default()
     {
         var root = new ObjectGraphType { Name = "Query" };
-        root.Field<NonNullGraphType<StringGraphType>>(
-            "str",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<SomeInputType>> { Name = "argOne", DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true } },
-                new QueryArgument<ListGraphType<SomeInputType>> { Name = "argTwo", DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } } })
-            );
+        root.Field<NonNullGraphType<StringGraphType>>("str")
+            .Argument<NonNullGraphType<SomeInputType>>("argOne", arg => arg.DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true })
+            .Argument<ListGraphType<SomeInputType>>("argTwo", arg => arg.DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } });
 
         var schema = new Schema { Query = root };
 
@@ -855,11 +847,8 @@ union SingleUnion = Foo
     public void prints_input_type_with_default_null_value()
     {
         var root = new ObjectGraphType { Name = "Query" };
-        root.Field<NonNullGraphType<StringGraphType>>(
-            "str",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<SomeInputType2>> { Name = "argOne", DefaultValue = new SomeInput2 { Names = null } })
-            );
+        root.Field<NonNullGraphType<StringGraphType>>("str")
+            .Argument<NonNullGraphType<SomeInputType2>>("argOne", arg => arg.DefaultValue = new SomeInput2 { Names = null });
 
         var schema = new Schema { Query = root };
 
@@ -1900,13 +1889,10 @@ type Zebra {
         {
             Name = "Foo";
             Description = "This is a Foo object type";
-            Field<StringGraphType>(
-                name: "str",
-                description: "This is of type String");
-            Field<IntGraphType>(
-                name: "int",
-                description: "This is of type Integer",
-                deprecationReason: "This field is now deprecated");
+            Field<StringGraphType>("str").Description("This is of type String");
+            Field<IntGraphType>("int")
+                .Description("This is of type Integer")
+                .DeprecationReason("This field is now deprecated");
         }
     }
 
@@ -1916,10 +1902,8 @@ type Zebra {
         {
             Name = "IFoo";
             Description = "This is a Foo interface type";
-            ResolveType = obj => null;
-            Field<StringGraphType>(
-                name: "str",
-                description: "This is of type String");
+            ResolveType = _ => null;
+            Field<StringGraphType>("str").Description("This is of type String");
         }
     }
 
@@ -1928,10 +1912,8 @@ type Zebra {
         public BaazInterfaceType()
         {
             Name = "Baaz";
-            ResolveType = obj => null;
-            Field<IntGraphType>(
-                name: "int",
-                description: "This is of type Integer");
+            ResolveType = _ => null;
+            Field<IntGraphType>("int").Description("This is of type Integer");
         }
     }
 
@@ -1940,9 +1922,7 @@ type Zebra {
         public BarType()
         {
             Name = "Bar";
-            Field<StringGraphType>(
-                name: "str",
-                description: "This is of type String");
+            Field<StringGraphType>("str").Description("This is of type String");
             Interface<FooInterfaceType>();
         }
     }
@@ -1952,12 +1932,8 @@ type Zebra {
         public BarMultipleType()
         {
             Name = "Bar";
-            Field<StringGraphType>(
-                name: "str",
-                description: "This is of type String");
-            Field<IntGraphType>(
-              name: "int",
-              description: "This is of type Integer");
+            Field<StringGraphType>("str").Description("This is of type String");
+            Field<IntGraphType>("int").Description("This is of type Integer");
             Interface<FooInterfaceType>();
             Interface<BaazInterfaceType>();
         }

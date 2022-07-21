@@ -55,10 +55,9 @@ public class RecordQuery : ObjectGraphType
 {
     public RecordQuery()
     {
-        Field<RecordType>(
-            "search",
-            arguments: new QueryArguments(new QueryArgument<RecordInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<RecordType>("search")
+            .Argument<RecordInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<RecordModel>("input");
                 return arg;

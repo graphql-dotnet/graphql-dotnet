@@ -267,19 +267,16 @@ public class BubbleNullSchema : Schema
     {
         var query = new ObjectGraphType();
 
-        query.Field<NonNullGraphType<DataGraphType>>(
-            "nonNullableDataGraph",
-            resolve: c => new DataGraphType { Data = c.Source as Data }
+        query.Field<NonNullGraphType<DataGraphType>>("nonNullableDataGraph")
+            .Resolve(c => new DataGraphType { Data = c.Source as Data }
         );
 
-        query.Field<DataGraphType>(
-            "nullableDataGraph",
-            resolve: c => new DataGraphType { Data = c.Source as Data }
+        query.Field<DataGraphType>("nullableDataGraph")
+            .Resolve(c => new DataGraphType { Data = c.Source as Data }
         );
 
-        query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>(
-           "nonNullableListOfNonNullableDataGraph",
-           resolve: c => new[] { new DataGraphType() });
+        query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>("nonNullableListOfNonNullableDataGraph")
+            .Resolve(_ => new[] { new DataGraphType() });
 
         Query = query;
     }
@@ -291,37 +288,29 @@ public class DataGraphType : ObjectGraphType<DataGraphType>
     {
         Name = "dataType";
 
-        Field<StringGraphType>(
-            "nullable",
-            resolve: c => c.Source.Data.Nullable);
+        Field<StringGraphType>("nullable")
+            .Resolve(c => c.Source.Data.Nullable);
 
-        Field<NonNullGraphType<StringGraphType>>(
-            "nonNullable",
-            resolve: c => c.Source.Data.NonNullable);
+        Field<NonNullGraphType<StringGraphType>>("nonNullable")
+            .Resolve(c => c.Source.Data.NonNullable);
 
-        Field<ListGraphType<NonNullGraphType<StringGraphType>>>(
-            "listOfNonNullable",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<ListGraphType<NonNullGraphType<StringGraphType>>>("listOfNonNullable")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<StringGraphType>>>(
-            "nonNullableList",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<NonNullGraphType<ListGraphType<StringGraphType>>>("nonNullableList")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
-            "nonNullableListOfNonNullable",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("nonNullableListOfNonNullable")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
-            "nonNullableListOfNonNullableThrow",
-            resolve: c => throw new Exception("test"));
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("nonNullableListOfNonNullableThrow")
+            .Resolve(_ => throw new Exception("test"));
 
-        Field<NonNullGraphType<DataGraphType>>(
-            "nonNullableNest",
-            resolve: c => new DataGraphType { Data = c.Source.Data.NonNullableNest });
+        Field<NonNullGraphType<DataGraphType>>("nonNullableNest")
+            .Resolve(c => new DataGraphType { Data = c.Source.Data.NonNullableNest });
 
-        Field<DataGraphType>(
-             "nullableNest",
-            resolve: c => new DataGraphType { Data = c.Source.Data.NullableNest });
+        Field<DataGraphType>("nullableNest")
+            .Resolve(c => new DataGraphType { Data = c.Source.Data.NullableNest });
     }
 
     public Data Data { get; set; }

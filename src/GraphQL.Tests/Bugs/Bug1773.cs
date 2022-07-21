@@ -103,17 +103,17 @@ public class Bug1773Query : ObjectGraphType
 {
     public Bug1773Query()
     {
-        Field<ListGraphType<IntGraphType>>("testListValid", resolve: context => new object[] { 123 });
-        Field<ListGraphType<IntGraphType>>("testListInvalid", resolve: context => 123);
-        Field<ListGraphType<IntGraphType>>("testListInvalidType", resolve: context => new object[] { "test" });
-        Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2", resolve: context => new object[] { "test" });
-        Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType3", resolve: context => new object[] { "test", Bug1773Enum.Hello });
-        Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullValid", resolve: context => new object[] { 123 });
-        Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullInvalid", resolve: context => new object[] { null });
-        Field<IntGraphType>("testNullValid", resolve: context => null);
-        Field<NonNullGraphType<IntGraphType>>("testNullInvalid", resolve: context => null);
-        Field<IntGraphType>("testInvalidType", resolve: context => "test");
-        Field<EnumerationGraphType<Bug1773Enum>>("testInvalidType2", resolve: context => "test");
+        Field<ListGraphType<IntGraphType>>("testListValid").Resolve(_ => new object[] { 123 });
+        Field<ListGraphType<IntGraphType>>("testListInvalid").Resolve(_ => 123);
+        Field<ListGraphType<IntGraphType>>("testListInvalidType").Resolve(_ => new object[] { "test" });
+        Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType2").Resolve(_ => new object[] { "test" });
+        Field<ListGraphType<EnumerationGraphType<Bug1773Enum>>>("testListInvalidType3").Resolve(_ => new object[] { "test", Bug1773Enum.Hello });
+        Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullValid").Resolve(_ => new object[] { 123 });
+        Field<ListGraphType<NonNullGraphType<IntGraphType>>>("testListNullInvalid").Resolve(_ => new object[] { null });
+        Field<IntGraphType>("testNullValid").Resolve(_ => null);
+        Field<NonNullGraphType<IntGraphType>>("testNullInvalid").Resolve(_ => null);
+        Field<IntGraphType>("testInvalidType").Resolve(_ => "test");
+        Field<EnumerationGraphType<Bug1773Enum>>("testInvalidType2").Resolve(_ => "test");
     }
 }
 

@@ -29,25 +29,11 @@ public class Bug2194
     {
         public Bug2194Query()
         {
-            Field<StringGraphType>(
-                "test",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<GuidGraphType>>
-                    {
-                        Name = "applicationId",
-                        DefaultValue = Guid.Parse("A62413D8-41DF-45C5-B228-447F2CD2D368")
-                    },
-                    new QueryArgument<NonNullGraphType<DateGraphType>>
-                    {
-                        Name = "date1",
-                        DefaultValue = new DateTime(2021, 03, 06)
-                    },
-                    new QueryArgument<NonNullGraphType<DateTimeGraphType>>
-                    {
-                        Name = "date2",
-                        DefaultValue = new DateTime(2021, 03, 06, 17, 53, 21),
-                    }),
-                resolve: _ => "ok!");
+            Field<StringGraphType>("test")
+                .Argument<NonNullGraphType<GuidGraphType>>("applicationId", arg => arg.DefaultValue = Guid.Parse("A62413D8-41DF-45C5-B228-447F2CD2D368"))
+                .Argument<NonNullGraphType<DateGraphType>>("date1", arg => arg.DefaultValue = new DateTime(2021, 03, 06))
+                .Argument<NonNullGraphType<DateTimeGraphType>>("date2", arg => arg.DefaultValue = new DateTime(2021, 03, 06, 17, 53, 21))
+                .Resolve(_ => "ok!");
         }
     }
 }

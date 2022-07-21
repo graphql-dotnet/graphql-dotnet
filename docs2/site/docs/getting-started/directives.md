@@ -149,15 +149,8 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
+        Field<Human>("human")
+            .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
     }
 }
 ```
@@ -287,8 +280,9 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>("human", resolve: context => GetHuman(context))
-            .ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
+        Field<Human>("human")
+            .Resolve(context => GetHuman(context))
+            .Directive("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
     }
 }
 ```

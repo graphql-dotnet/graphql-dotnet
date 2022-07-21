@@ -83,10 +83,9 @@ public class NullMutation : ObjectGraphType
     public NullMutation()
     {
         Name = "MyMutation";
-        Field<StringGraphType>(
-            "run",
-            arguments: new QueryArguments(new QueryArgument<NullInputRoot> { Name = "input" }),
-            resolve: ctx =>
+        Field<StringGraphType>("run")
+            .Argument<NullInputRoot>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<NullInputClass>("input");
                 var r = (arg.Id == null ? "id" : string.Empty) +

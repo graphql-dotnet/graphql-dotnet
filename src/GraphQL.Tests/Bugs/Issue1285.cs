@@ -32,12 +32,9 @@ public class Issue1285Query : ObjectGraphType
 {
     public Issue1285Query()
     {
-        Field<ListGraphType<IntGraphType>>(
-            "getsome",
-            arguments: new QueryArguments(
-                new QueryArgument<ArrayInputType> { Name = "input" }
-            ),
-            resolve: ctx =>
+        Field<ListGraphType<IntGraphType>>("getsome")
+            .Argument<ArrayInputType>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ArrayInput>("input");
 

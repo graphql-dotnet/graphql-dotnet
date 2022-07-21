@@ -30,10 +30,9 @@ public class MyMutation : ObjectGraphType
 {
     public MyMutation()
     {
-        Field<StringGraphType>(
-            "run",
-            arguments: new QueryArguments(new QueryArgument<MyInput> { Name = "input" }),
-            resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
+        Field<StringGraphType>("run")
+            .Argument<MyInput>("input")
+            .Resolve(ctx => ctx.GetArgument<MyInputClass>("input").Id);
     }
 }
 

@@ -700,15 +700,10 @@ type, or provide an instance of a built-in type to an applicable constructor, it
 with your registered replacement built-in type. For example, consider this code:
 
 ```csharp
-Field<StringGraphType>("sample",
-    arguments: new QueryArguments {
-        // will be replaced with MyBooleanGraphType
-        new QueryArgument<BooleanGraphType> { Name = "argNewBehavior" }
-
-        // will retain default behavior
-        new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }
-    },
-    resolve: ...);
+Field<StringGraphType>("sample")
+  .Argument<BooleanGraphType>("argNewBehavior") // will be replaced with MyBooleanGraphType
+  .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }) // will retain default behavior
+  .Resolve(...);
 ```
 
 This is by design. However, you can call the `ReplaceScalar` extension method after the schema is

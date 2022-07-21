@@ -48,8 +48,8 @@ public class Issue1004Query : ObjectGraphType
     {
         Name = "Query";
         IsTypeOf = o => true;
-        Field<StringGraphType>("field1", resolve: ctx => throw null);
-        Field<StringGraphType>("field2", description: "Not so important", resolve: ctx => throw null);
+        Field<StringGraphType>("field1").Resolve(_ => throw null);
+        Field<StringGraphType>("field2").Description("Not so important").Resolve(_ => throw null);
         Interface<Issue1004Interface>();
     }
 }
@@ -58,7 +58,7 @@ public class Issue1004Interface : InterfaceGraphType
 {
     public Issue1004Interface()
     {
-        Field<StringGraphType>("field1", "Very important field1");
-        Field<StringGraphType>("field2", "Very important field2");
+        Field<StringGraphType>("field1").Description("Very important field1");
+        Field<StringGraphType>("field2").Description("Very important field2");
     }
 }

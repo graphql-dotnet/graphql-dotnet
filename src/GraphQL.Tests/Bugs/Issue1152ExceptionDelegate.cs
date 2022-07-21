@@ -45,8 +45,7 @@ public class Issue1152Query : ObjectGraphType
 {
     public Issue1152Query()
     {
-        Field<StringGraphType>(
-            "somefield",
-            resolve: ctx => throw new InvalidTimeZoneException("Oops"));
+        Field<StringGraphType>("somefield")
+            .Resolve(_ => throw new InvalidTimeZoneException("Oops"));
     }
 }

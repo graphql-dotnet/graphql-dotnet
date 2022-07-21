@@ -54,7 +54,8 @@ public class Issue1981Query : ObjectGraphType
     public Issue1981Query()
     {
         Name = "Query";
-        Field<StringGraphType>("fieldWith2Literal", resolve: ctx =>
+        Field<StringGraphType>("fieldWith2Literal")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -79,7 +80,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "1";
         });
-        Field<StringGraphType>("fieldWithVariable", resolve: ctx =>
+        Field<StringGraphType>("fieldWithVariable")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -96,7 +98,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "2";
         });
-        Field<StringGraphType>("fieldWithVariableDefault", resolve: ctx =>
+        Field<StringGraphType>("fieldWithVariableDefault")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -109,7 +112,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "3";
         });
-        Field<StringGraphType>("fieldWithoutDirectives", resolve: ctx =>
+        Field<StringGraphType>("fieldWithoutDirectives")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldBeNull();
             ctx.HasDirectives().ShouldBeFalse();

@@ -29,7 +29,7 @@ public class AbstractQueryType : ObjectGraphType
     public AbstractQueryType()
     {
         Name = "Query";
-        Field<PetInterfaceType>("pets", resolve: ctx => new { name = "Eli" });
+        Field<PetInterfaceType>("pets").Resolve(_ => new { name = "Eli" });
     }
 }
 
