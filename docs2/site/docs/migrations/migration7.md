@@ -303,3 +303,5 @@ Field<HumanType>("human")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
   .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
 ```
+
+Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
