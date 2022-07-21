@@ -200,12 +200,12 @@ public class SchemaTests
     {
         var schema = new Schema();
         var query = new ObjectGraphType();
-        var field = query.Field(typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>), "test");
+        var field = query.Field("test", typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>));
         schema.Query = query;
         schema.RegisterTypeMapping<MyDto, MyDtoGraphType>();
         schema.Initialize();
-        field.ResolvedType.ShouldNotBeNull();
-        field.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
+        field.FieldType.ResolvedType.ShouldNotBeNull();
+        field.FieldType.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
     }
 
     [Fact]

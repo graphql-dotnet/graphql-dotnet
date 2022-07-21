@@ -416,7 +416,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="type">The .NET type of the graph type of this field.</param>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, object> Field(Type type, string name = "default")
+        public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
         {
             var builder = CreateBuilder<object>(type).Name(name);
             AddField(builder.FieldType);

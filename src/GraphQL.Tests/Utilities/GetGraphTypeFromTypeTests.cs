@@ -261,7 +261,7 @@ public class GetGraphTypeFromTypeTests
     public void OutputTypeIsDereferenced(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(referenceType, "test");
+        query.Field("test", referenceType);
         var schema = new Schema
         {
             Query = query
@@ -324,7 +324,7 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_DirectiveArgument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(StringGraphType), "test");
+        query.Field("test", typeof(StringGraphType));
         var schema = new Schema
         {
             Query = query
@@ -363,7 +363,7 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_InputField(Type referenceType, Type mappedType)
     {
         var inputType = new InputObjectGraphType();
-        inputType.Field(referenceType, "field");
+        inputType.Field("field", referenceType);
         var query = new ObjectGraphType();
         query.Field(typeof(IntGraphType), "test",
             arguments: new QueryArguments

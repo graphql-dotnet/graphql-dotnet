@@ -453,7 +453,7 @@ public class ComplexGraphTypeTests
         var type = new ComplexType<TestObject>();
         var field = type.Field<StringGraphType>(fieldName);
 
-        field.Name.ShouldBe(fieldName);
+        field.FieldType.Name.ShouldBe(fieldName);
     }
 
     [Theory]
