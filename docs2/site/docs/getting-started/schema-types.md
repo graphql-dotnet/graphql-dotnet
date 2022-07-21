@@ -206,9 +206,9 @@ public class EpisodeEnum : EnumerationGraphType
     {
         Name = "Episode";
         Description = "One of the films in the Star Wars Trilogy.";
-        AddValue("NEWHOPE", 4, "Released in 1977.");
-        AddValue("EMPIRE", 5, "Released in 1980.");
-        AddValue("JEDI", 6, "Released in 1983.");
+        Add("NEWHOPE", 4, "Released in 1977.");
+        Add("EMPIRE", 5, "Released in 1980.");
+        Add("JEDI", 6, "Released in 1983.");
     }
 }
 ```
