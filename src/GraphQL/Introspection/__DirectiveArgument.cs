@@ -20,15 +20,13 @@ namespace GraphQL.Introspection
             Description =
                 "Value of an argument provided to directive";
 
-            Field<NonNullGraphType<StringGraphType>>(
-                "name",
-                "Argument name",
-                resolve: context => context.Source!.Name);
+            Field<NonNullGraphType<StringGraphType>>("name")
+                .Description("Argument name")
+                .Resolve(context => context.Source!.Name);
 
-            Field<NonNullGraphType<StringGraphType>>(
-                "value",
-                "A GraphQL-formatted string representing the value for argument.",
-                resolve: context =>
+            Field<NonNullGraphType<StringGraphType>>("value")
+                .Description("A GraphQL-formatted string representing the value for argument.")
+                .Resolve(context =>
                 {
                     var argument = context.Source!;
                     if (argument.Value == null)
