@@ -91,8 +91,7 @@ public class QueryType : ObjectGraphType
                 return ret2;
             });
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>()
-            .Name("ExerciseListsOfLists")
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ExerciseListsOfLists")
             .Argument<ListGraphType<ListGraphType<IntGraphType>>>("values")
             .Resolve(ctx =>
             {

@@ -51,7 +51,7 @@ public class Bug3100
     {
         public Query1()
         {
-            Field(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>), "Class2")
+            Field("Class2", typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>))
                 .Resolve(_ => new Class2[] { new Class2() });
         }
     }

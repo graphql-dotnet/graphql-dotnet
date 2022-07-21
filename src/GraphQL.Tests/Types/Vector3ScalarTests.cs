@@ -99,14 +99,14 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
     {
         public Vector3ScalarQuery()
         {
-            Field(typeof(StringGraphType), "input")
+            Field("input", typeof(StringGraphType))
                 .Argument<Vector3Type>("arg", arg => arg.DefaultValue = new Vector3(7, 8, 9))
                 .Resolve(context => context.GetArgument<Vector3?>("arg")?.ToString());
 
-            Field(typeof(Vector3Type), "output")
+            Field("output", typeof(Vector3Type))
                 .Resolve(_ => new Vector3(4, 5, 6));
 
-            Field(typeof(Vector3Type), "loopback")
+            Field("loopback", typeof(Vector3Type))
                 .Argument<Vector3Type>("arg")
                 .Resolve(context => context.GetArgument<Vector3?>("arg"));
         }

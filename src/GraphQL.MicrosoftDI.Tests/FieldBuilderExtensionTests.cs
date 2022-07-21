@@ -29,7 +29,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope0()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .Resolve(context => "hello")
@@ -42,7 +42,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope1()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithService<string>()
@@ -56,7 +56,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope2()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithService<string>()
@@ -71,7 +71,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope3()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithService<string>()
@@ -87,7 +87,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope4()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithService<string>()
@@ -104,7 +104,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope5()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithService<string>()
@@ -122,7 +122,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope2Alt()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithServices<string, int>()
@@ -136,7 +136,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope3Alt()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithServices<string, int, short>()
@@ -150,7 +150,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope4Alt()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithServices<string, int, short, byte>()
@@ -164,7 +164,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope5Alt()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .WithServices<string, int, short, byte, long>()
@@ -178,7 +178,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope0()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .Resolve(context => "hello")
             .FieldType;
@@ -190,7 +190,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope1()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .Resolve((context, value) => value)
@@ -203,7 +203,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope2()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -217,7 +217,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope3()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -232,7 +232,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope4()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -248,7 +248,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope5()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -265,7 +265,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope0Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
             .ResolveAsync(context => Task.FromResult<object>("hello"))
@@ -278,7 +278,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope1Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithScope()
@@ -292,7 +292,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope2Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -307,7 +307,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope3Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -323,7 +323,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope4Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -340,7 +340,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithScope5Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -358,7 +358,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope0Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .ResolveAsync(context => Task.FromResult<object>("hello"))
             .FieldType;
@@ -370,7 +370,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope1Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .ResolveAsync((context, value) => Task.FromResult<object>(value))
@@ -383,7 +383,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope2Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -397,7 +397,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope3Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -412,7 +412,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope4Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()
@@ -428,7 +428,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     public void WithoutScope5Async()
     {
         var graph = new ObjectGraphType();
-        var field = graph.Field<StringGraphType>()
+        var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
             .WithService<int>()

@@ -18,6 +18,6 @@ public class StarWarsQuery : ObjectGraphType<object>
 
         Field<DroidType, string>("droid")
             .Argument<NonNullGraphType<StringGraphType>>("id", "id of the droid")
-            .Resolve(func);
+            .ResolveDelegate(func);
     }
 }

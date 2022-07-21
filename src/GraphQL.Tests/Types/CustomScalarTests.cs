@@ -202,26 +202,26 @@ public class CustomScalarQuery : ObjectGraphType
 {
     public CustomScalarQuery()
     {
-        Field(typeof(StringGraphType), "input")
+        Field("input", typeof(StringGraphType))
             .Argument(typeof(CustomScalar), "arg")
             .Resolve(context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "output")
+        Field("output", typeof(CustomScalar))
             .Argument(typeof(StringGraphType), "arg")
             .Resolve(context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "inputOutput")
+        Field("inputOutput", typeof(CustomScalar))
             .Argument(typeof(CustomScalar), "arg")
             .Resolve(context => context.GetArgument<string>("arg"));
-        Field(typeof(StringGraphType), "nonNullInput")
+        Field("nonNullInput", typeof(StringGraphType))
             .Argument(typeof(NonNullGraphType<CustomScalar>), "arg")
             .Resolve(context => context.GetArgument<string>("arg"));
-        Field(typeof(NonNullGraphType<CustomScalar>), "nonNullOutput")
+        Field("nonNullOutput", typeof(NonNullGraphType<CustomScalar>))
             .Argument(typeof(StringGraphType), "arg")
             .Resolve(context => context.GetArgument<string>("arg"));
-        Field(typeof(ListGraphType<CustomScalar>), "list")
+        Field("list", typeof(ListGraphType<CustomScalar>))
             .Resolve(_ => new object[] { "hello", "internalNull", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullValid")
+        Field("listNonNullValid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
             .Resolve(_ => new object[] { "hello", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullInvalid")
+        Field("listNonNullInvalid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
             .Resolve(_ => new object[] { "hello", "internalNull" });
     }
 }

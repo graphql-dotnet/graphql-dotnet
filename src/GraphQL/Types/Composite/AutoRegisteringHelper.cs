@@ -5,7 +5,7 @@ using GraphQL.Resolvers;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Helper methods for auto-registering graph types, <see cref="Builders.FieldBuilder{TSourceType, TReturnType}.Resolve(Delegate?)">Resolve</see>,
+    /// Helper methods for auto-registering graph types, <see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveDelegate(Delegate?)">Resolve</see>,
     /// schema builder method builders, and <see cref="NameFieldResolver"/>.
     /// </summary>
     public static class AutoRegisteringHelper
