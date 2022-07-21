@@ -307,7 +307,6 @@ namespace GraphQL.Builders
             return this;
         }
 
-
         /// <summary>
         /// Apply directive specifying two arguments. If the directive declaration has other arguments,
         /// then their default values (if any) will be used.
