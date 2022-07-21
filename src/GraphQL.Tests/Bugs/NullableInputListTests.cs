@@ -49,15 +49,9 @@ public class TestQuery : ObjectGraphType
     public TestQuery()
     {
         Name = "Query";
-        Field<StringGraphType>(
-            "example",
-            arguments: new QueryArguments(
-                new QueryArgument<ListGraphType<TestInputType>>
-                {
-                    Name = "testInputs"
-                }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("example")
+            .Argument<ListGraphType<TestInputType>>("testInputs")
+            .Resolve(context =>
             {
                 var testInputs = context.GetArgument<List<TestInput>>("testInputs");
                 return testInputs == null

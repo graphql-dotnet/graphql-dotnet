@@ -19,14 +19,14 @@ public class SerialExecutionStrategyTests
         {
             Name = "LoaderType"
         };
-        leaderGraphType.Field<StringGraphType>("lastName", resolve: resolver);
-        leaderGraphType.Field<StringGraphType>("name", resolve: resolver);
+        leaderGraphType.Field<StringGraphType>("lastName").Resolve(resolver);
+        leaderGraphType.Field<StringGraphType>("name").Resolve(resolver);
         var familiesGraphType = new ObjectGraphType()
         {
             Name = "FamiliesType"
         };
-        familiesGraphType.Field("leader", leaderGraphType, resolve: resolver);
-        familiesGraphType.Field("leader_dataLoader", leaderGraphType, resolve: context =>
+        familiesGraphType.Field("leader", leaderGraphType).Resolve(resolver);
+        familiesGraphType.Field("leader_dataLoader", leaderGraphType).Resolve(context =>
         {
             resolver(context);
             return new SimpleDataLoader<object>(ctx =>
@@ -36,7 +36,7 @@ public class SerialExecutionStrategyTests
             });
         });
         var queryGraphType = new ObjectGraphType();
-        queryGraphType.Field("families", new ListGraphType(familiesGraphType), resolve: context =>
+        queryGraphType.Field("families", new ListGraphType(familiesGraphType)).Resolve(context =>
         {
             resolver(context);
             return new object[] { "a", "a", "a" };

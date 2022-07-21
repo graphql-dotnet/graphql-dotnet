@@ -55,8 +55,8 @@ public class PR1735Query : ObjectGraphType
 {
     public PR1735Query()
     {
-        Field<StringGraphType>("Test",
-            resolve: context => "ok",
-            arguments: new QueryArguments(new QueryArgument(typeof(ByteGraphType)) { Name = "arg" }));
+        Field<StringGraphType>("Test")
+            .Resolve(_ => "ok")
+            .Argument(typeof(ByteGraphType), "arg");
     }
 }

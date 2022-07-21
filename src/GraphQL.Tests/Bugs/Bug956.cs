@@ -18,22 +18,21 @@ public sealed class Bug956QueryType : ObjectGraphType
 {
     public Bug956QueryType()
     {
-        Field<StringGraphType>(
-           "get",
-           arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "base64" }),
-           resolve: ctx =>
-           {
-               var asString = ctx.GetArgument<string>("base64");
-               asString.ShouldBe("R3JhcGhRTCE="); // GraphQL!
+        Field<StringGraphType>("get")
+            .Argument<StringGraphType>("base64")
+            .Resolve(ctx =>
+            {
+                var asString = ctx.GetArgument<string>("base64");
+                asString.ShouldBe("R3JhcGhRTCE="); // GraphQL!
 
-               var asList = ctx.GetArgument<List<byte>>("base64");
-               asList.Count.ShouldBe(12);
+                var asList = ctx.GetArgument<List<byte>>("base64");
+                asList.Count.ShouldBe(12);
 
-               var asBinary = ctx.GetArgument<byte[]>("base64");
-               Encoding.UTF8.GetString(asBinary).ShouldBe("GraphQL!");
+                var asBinary = ctx.GetArgument<byte[]>("base64");
+                Encoding.UTF8.GetString(asBinary).ShouldBe("GraphQL!");
 
-               return asString;
-           });
+                return asString;
+            });
     }
 }
 

@@ -169,25 +169,18 @@ type Query {
     {
         public MyQuery()
         {
-            Field<IntGraphType>("testOutput", resolve: context => 123);
-            Field<IdGraphType>("testInput",
-                arguments: new QueryArguments {
-                    new QueryArgument<IntGraphType> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<int>("arg").ToString());
-            Field<NonNullGraphType<IntGraphType>>("testNonNullOutput", resolve: context => 123);
-            Field<IdGraphType>("testNonNullInput",
-                arguments: new QueryArguments {
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<int>("arg").ToString());
-            Field<StringGraphType>("testOutputString", resolve: context => "hello");
-            Field<IdGraphType>("testInputString",
-                arguments: new QueryArguments
-                {
-                    new QueryArgument<StringGraphType> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<string>("arg"));
+            Field<IntGraphType>("testOutput").Resolve(_ => 123);
+            Field<IdGraphType>("testInput")
+                .Argument<IntGraphType>("arg")
+                .Resolve(context => context.GetArgument<int>("arg").ToString());
+            Field<NonNullGraphType<IntGraphType>>("testNonNullOutput").Resolve(_ => 123);
+            Field<IdGraphType>("testNonNullInput")
+                .Argument<NonNullGraphType<IntGraphType>>("arg")
+                .Resolve(context => context.GetArgument<int>("arg").ToString());
+            Field<StringGraphType>("testOutputString").Resolve(_ => "hello");
+            Field<IdGraphType>("testInputString")
+                .Argument<StringGraphType>("arg")
+                .Resolve(context => context.GetArgument<string>("arg"));
         }
     }
 

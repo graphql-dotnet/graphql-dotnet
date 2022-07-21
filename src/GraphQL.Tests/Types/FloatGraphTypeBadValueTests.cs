@@ -76,10 +76,8 @@ public class PR1781Query : ObjectGraphType
 {
     public PR1781Query()
     {
-        Field<StringGraphType>("Test",
-            resolve: context => "ok",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(FloatGraphType)) { Name = "arg" }
-            ));
+        Field<StringGraphType>("Test")
+            .Resolve(_ => "ok")
+            .Argument(typeof(FloatGraphType), "arg");
     }
 }

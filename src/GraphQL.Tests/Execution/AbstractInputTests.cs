@@ -30,10 +30,9 @@ public class AbstractInputMutation : ObjectGraphType
 {
     public AbstractInputMutation()
     {
-        Field<StringGraphType>(
-            "run",
-            arguments: new QueryArguments(new QueryArgument<MyInputGraphType> { Name = "input" }),
-            resolve: ctx => ctx.GetArgument<int>("input")); // type does not matter here
+        Field<StringGraphType>("run")
+            .Argument<MyInputGraphType>("input")
+            .Resolve(ctx => ctx.GetArgument<int>("input")); // type does not matter here
     }
 }
 

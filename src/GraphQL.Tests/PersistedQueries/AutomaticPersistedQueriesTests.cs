@@ -140,7 +140,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
         {
             public AutomaticPersistedQueriesTestQuery()
             {
-                Field<StringGraphType>("ping", resolve: _ => "pong");
+                Field<StringGraphType>("ping").Resolve(_ => "pong");
             }
         }
 

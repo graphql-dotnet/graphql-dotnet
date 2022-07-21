@@ -60,20 +60,18 @@ public class Issue1874Query : ObjectGraphType
 {
     public Issue1874Query()
     {
-        Field<Issue1874OutputBytesType>(
-            "bytes",
-            arguments: new QueryArguments(new QueryArgument<Issue1874InputBytesType> { Name = "bytesObject" }),
-            resolve: context =>
+        Field<Issue1874OutputBytesType>("bytes")
+            .Argument<Issue1874InputBytesType>("bytesObject")
+            .Resolve(context =>
             {
                 var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
                 return bytesObject;
             }
         );
 
-        Field<Issue1874Output64BytesType>(
-            "bytes64",
-            arguments: new QueryArguments(new QueryArgument<Issue1874Input64BytesType> { Name = "bytesObject" }),
-            resolve: context =>
+        Field<Issue1874Output64BytesType>("bytes64")
+            .Argument<Issue1874Input64BytesType>("bytesObject")
+            .Resolve(context =>
             {
                 var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
                 bytesObject.Bytes.ShouldBe(new byte[] { 1, 2, 3, 4 });

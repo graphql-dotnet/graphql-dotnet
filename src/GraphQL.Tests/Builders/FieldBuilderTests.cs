@@ -99,8 +99,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<IntGraphType>("_")
-            .Argument<StringGraphType, string>("arg1", "desc1", "12345")
-            .Argument<IntGraphType, int>("arg2", "desc2", 9)
+            .Argument<StringGraphType>("arg1", "desc1", arg => arg.DefaultValue = "12345")
+            .Argument<IntGraphType>("arg2", "desc2", arg => arg.DefaultValue = 9)
             .Argument<IntGraphType>("arg3", "desc3", cfg => cfg.WithMetadata("secure", true))
             .Argument<BooleanGraphType>("arg4", cfg => cfg.WithMetadata("useBefore", new DateTime(2030, 1, 2)).DefaultValue = true);
 
@@ -135,7 +135,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<IntGraphType>("_")
-            .Argument<StringGraphType, string>("arg1", "desc1", "12345")
+            .Argument<StringGraphType>("arg1", "desc1", arg => arg.DefaultValue = "12345")
             .Returns<int>()
             .Resolve(context =>
             {
@@ -165,7 +165,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<StringGraphType, string>("arg1", "desc1")
+            .Argument<StringGraphType>("arg1", arg => arg.DefaultValue = "desc1")
             .Resolve(context =>
             {
                 context.GetArgument<string>("arg1").ShouldBe(null);
@@ -185,7 +185,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<StringGraphType, string>("arg1", "desc1", "default")
+            .Argument<StringGraphType>("arg1", "desc1", arg => arg.DefaultValue = "default")
             .Resolve(context =>
             {
                 context.GetArgument("arg1", "default2").ShouldBe("default2");
@@ -205,7 +205,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType, int?>("skip", "desc1", 1)
+            .Argument<IntGraphType>("skip", "desc1", arg => arg.DefaultValue = 1)
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(1);
@@ -360,7 +360,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<StringGraphType, string>("arg1", "desc1", "default")
+            .Argument<StringGraphType>("arg1", "desc1", arg => arg.DefaultValue = "default")
             .Resolve(context =>
             {
                 context.GetArgument("arg1", "default2").ShouldBe("arg1value");

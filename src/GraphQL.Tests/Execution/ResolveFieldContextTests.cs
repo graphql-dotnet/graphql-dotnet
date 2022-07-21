@@ -190,9 +190,8 @@ public class ResolveFieldContextTests
     {
         var schema = new Schema();
         var queryType = new ObjectGraphType();
-        queryType.Field<BooleanGraphType>(
-            "IsAuthenticated",
-            resolve: context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
+        queryType.Field<BooleanGraphType>("IsAuthenticated")
+            .Resolve(context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
         schema.Query = queryType;
         var executer = new DocumentExecuter();
         var options = new ExecutionOptions

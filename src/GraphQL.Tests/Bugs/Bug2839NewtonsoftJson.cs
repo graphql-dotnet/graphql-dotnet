@@ -48,9 +48,7 @@ public class Bug2839NewtonsoftJson
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>(
-                name: "test",
-                resolve: context => new TestResponse());
+            Field<TestResponseType>("test").Resolve(_ => new TestResponse());
         }
     }
 

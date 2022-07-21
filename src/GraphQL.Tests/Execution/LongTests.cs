@@ -37,7 +37,7 @@ public class LongTests
     {
         public Query()
         {
-            Field<NonNullGraphType<LongGraphType>>("TestField", resolve: _ => long.MaxValue);
+            Field<NonNullGraphType<LongGraphType>>("TestField").Resolve(_ => long.MaxValue);
         }
     }
 }

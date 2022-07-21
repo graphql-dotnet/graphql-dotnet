@@ -10,10 +10,10 @@ public class DroidType : ObjectGraphType<Droid>
         Name = "Droid";
         Description = "A mechanical creature in the Star Wars universe.";
 
-        Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.", resolve: context => context.Source.Id);
-        Field<StringGraphType>("name", "The name of the droid.", resolve: context => context.Source.Name);
+        Field<NonNullGraphType<StringGraphType>>("id").Description("The id of the droid.").Resolve(context => context.Source.Id);
+        Field<StringGraphType>("name").Description("The name of the droid.").Resolve(context => context.Source.Name);
 
-        Field<ListGraphType<CharacterInterface>>("friends", resolve: context => data.GetFriends(context.Source));
+        Field<ListGraphType<CharacterInterface>>("friends").Resolve(context => data.GetFriends(context.Source));
 
         Connection<CharacterInterface>()
             .Name("friendsConnection")
@@ -21,8 +21,8 @@ public class DroidType : ObjectGraphType<Droid>
             .Bidirectional()
             .Resolve(context => context.GetPagedResults<Droid, StarWarsCharacter>(data, context.Source.Friends));
 
-        Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
-        Field<StringGraphType>("primaryFunction", "The primary function of the droid.", resolve: context => context.Source.PrimaryFunction);
+        Field<ListGraphType<EpisodeEnum>>("appearsIn").Description("Which movie they appear in.");
+        Field<StringGraphType>("primaryFunction").Description("The primary function of the droid.").Resolve(context => context.Source.PrimaryFunction);
 
         Interface<CharacterInterface>();
     }

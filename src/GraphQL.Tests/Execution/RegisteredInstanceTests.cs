@@ -18,18 +18,13 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         product.IsTypeOf = obj => obj is Product;
 
         var catalog = new ObjectGraphType { Name = "Catalog" };
-        catalog.Field("products", new ListGraphType(product), resolve: ctx =>
-        {
-            return new List<Product> {
-                new Product { Name = "Book" }
-            };
-        });
+        catalog.Field("products", new ListGraphType(product)).Resolve(_ => new List<Product> { new Product { Name = "Book" } });
 
         var retail = new ObjectGraphType { Name = "Retail" };
-        retail.Field("catalog", catalog, resolve: ctx => new { });
+        retail.Field("catalog", catalog).Resolve(_ => new { });
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("retail", retail, resolve: ctx => new { });
+        root.Field("retail", retail).Resolve(_ => new { });
 
         var schema = new Schema { Query = root };
         schema.RegisterTypes(retail);
@@ -49,13 +44,11 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         var person = new ObjectGraphType { Name = "Person" };
         person.Field("name", new StringGraphType());
-        person.Field(
-            "friends",
-            new ListGraphType(new NonNullGraphType(person)),
-            resolve: ctx => new[] { new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" } });
+        person.Field("friends", new ListGraphType(new NonNullGraphType(person)))
+            .Resolve(_ => new[] { new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" } });
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("hero", person, resolve: ctx => ctx.RootValue);
+        root.Field("hero", person).Resolve(ctx => ctx.RootValue);
 
         schema.Query = root;
         schema.RegisterTypes(person);
@@ -85,7 +78,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         personOrRobot.AddPossibleType(robot);
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("hero", personOrRobot, resolve: ctx => ctx.RootValue);
+        root.Field("hero", personOrRobot).Resolve(ctx => ctx.RootValue);
 
         schema.Query = root;
 

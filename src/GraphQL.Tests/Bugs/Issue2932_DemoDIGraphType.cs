@@ -82,12 +82,10 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
     {
         public QueryGraph()
         {
-            Field<NonNullGraphType<DIGraphType<SampleGraph, SampleSource>>>(
-                "example",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" }),
-                resolve: context => new SampleSource { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
+            Field<NonNullGraphType<DIGraphType<SampleGraph, SampleSource>>>("example")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
+                .Argument<NonNullGraphType<StringGraphType>>("name")
+                .Resolve(context => new SampleSource { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
         }
     }
 

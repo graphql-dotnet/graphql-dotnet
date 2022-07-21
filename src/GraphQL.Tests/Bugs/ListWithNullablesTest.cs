@@ -35,9 +35,8 @@ public class ListWithNullablesQuery : ObjectGraphType
     {
         Name = "Query";
 
-        Field<ListGraphType<ListEntityGraphType>>(
-            "list",
-            resolve: context => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
+        Field<ListGraphType<ListEntityGraphType>>("list")
+            .Resolve(_ => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
     }
 }
 

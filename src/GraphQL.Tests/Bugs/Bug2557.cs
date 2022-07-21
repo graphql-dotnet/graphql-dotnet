@@ -65,14 +65,12 @@ public class Bug2557 : QueryTestBase<Bug2557.MySchema>
     {
         public MyQuery()
         {
-            Field<StringGraphType>(
-                "noDefault",
-                resolve: ctx => ctx.GetArgument<string>("arg", "getArgumentDefault"),
-                arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg" } });
-            Field<StringGraphType>(
-                "withDefault",
-                resolve: ctx => ctx.GetArgument<string>("arg", "getArgumentDefault"),
-                arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg", DefaultValue = "fieldDefault" } });
+            Field<StringGraphType>("noDefault")
+                .Resolve(ctx => ctx.GetArgument<string>("arg", "getArgumentDefault"))
+                .Argument(typeof(StringGraphType), "arg");
+            Field<StringGraphType>("withDefault")
+                .Resolve(ctx => ctx.GetArgument<string>("arg", "getArgumentDefault"))
+                .Argument(typeof(StringGraphType), "arg", arg => arg.DefaultValue = "fieldDefault");
         }
     }
 }

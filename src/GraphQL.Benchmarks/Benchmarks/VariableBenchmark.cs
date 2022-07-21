@@ -111,12 +111,9 @@ public class VariableBenchmark : IBenchmark
     {
         public MyQueryGraphType()
         {
-            Field(
-                typeof(StringGraphType),
-                "test",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(NonNullGraphType<ListGraphType<MyInputObjectGraphType>>)) { Name = "inputs" }),
-                resolve: context =>
+            Field<StringGraphType>("test")
+                .Argument<NonNullGraphType<ListGraphType<MyInputObjectGraphType>>>("inputs")
+                .Resolve(context =>
                 {
                     var arg = context.GetArgument<IList<MyInputObject>>("inputs");
                     if (arg.Count != 3)
@@ -153,8 +150,8 @@ public class VariableBenchmark : IBenchmark
         public MyInputObjectGraphType()
         {
             Name = "MyInputObject";
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ints", resolve: context => context.Source.Ints);
-            Field<NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>>("widgets", resolve: context => context.Source.Widgets);
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ints").Resolve(context => context.Source.Ints);
+            Field<NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>>("widgets").Resolve(context => context.Source.Widgets);
         }
     }
 
@@ -163,10 +160,10 @@ public class VariableBenchmark : IBenchmark
         public MySubInputObjectGraphType()
         {
             Name = "MySubInputObject";
-            Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source.Name);
-            Field<StringGraphType>("description", resolve: context => context.Source.Description);
-            Field<NonNullGraphType<FloatGraphType>>("amount", resolve: context => context.Source.Amount);
-            Field<NonNullGraphType<IntGraphType>>("quantity", resolve: context => context.Source.Quantity);
+            Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source.Name);
+            Field<StringGraphType>("description").Resolve(context => context.Source.Description);
+            Field<NonNullGraphType<FloatGraphType>>("amount").Resolve(context => context.Source.Amount);
+            Field<NonNullGraphType<IntGraphType>>("quantity").Resolve(context => context.Source.Quantity);
         }
     }
 }

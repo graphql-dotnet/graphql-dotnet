@@ -17,11 +17,9 @@ public class NameConverterTests : BasicQueryTestBase
         person.Field("Name", new StringGraphType());
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Field(
-            "PeRsoN",
-            person,
-            arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
-            resolve: ctx => new Person { Name = "Quinn" });
+        query.Field("PeRsoN", person)
+            .Argument<StringGraphType>(argument)
+            .Resolve(_ => new Person { Name = "Quinn" });
 
         schema.Query = query;
         return schema;

@@ -28,7 +28,7 @@ public class CovariantQuery : ObjectGraphType
     {
         Name = "CovariantQuery";
 
-        Field<NonNullGraphType<SpecializedAGraphType>>("A", resolve: ctx => new SpecializedA());
+        Field<NonNullGraphType<SpecializedAGraphType>>("A").Resolve(_ => new SpecializedA());
     }
 }
 
@@ -58,7 +58,7 @@ public class RGraphInterface : InterfaceGraphType<R>
     {
         Name = "RInterface";
 
-        Field<NonNullGraphType<StringGraphType>>("Value", resolve: ctx => ctx.Source.Value);
+        Field<NonNullGraphType<StringGraphType>>("Value").Resolve(ctx => ctx.Source.Value);
     }
 }
 
@@ -68,7 +68,7 @@ public class SpecializedRGraphType : ObjectGraphType<SpecializedR>
     {
         Interface<RGraphInterface>();
 
-        Field<NonNullGraphType<StringGraphType>>("Value", resolve: ctx => ctx.Source.Value);
+        Field<NonNullGraphType<StringGraphType>>("Value").Resolve(ctx => ctx.Source.Value);
     }
 }
 
@@ -78,7 +78,7 @@ public class AGraphInterface : InterfaceGraphType<A>
     {
         Name = "AInterface";
 
-        Field<NonNullGraphType<RGraphInterface>>("R", resolve: ctx => ctx.Source.methodUsedToGetRValue());
+        Field<NonNullGraphType<RGraphInterface>>("R").Resolve(ctx => ctx.Source.methodUsedToGetRValue());
     }
 }
 
@@ -88,6 +88,6 @@ public class SpecializedAGraphType : ObjectGraphType<SpecializedA>
     {
         Interface<AGraphInterface>();
 
-        Field<NonNullGraphType<SpecializedRGraphType>>("R", resolve: ctx => ctx.Source.methodUsedToGetSpecializedRValue());
+        Field<NonNullGraphType<SpecializedRGraphType>>("R").Resolve(ctx => ctx.Source.methodUsedToGetSpecializedRValue());
     }
 }

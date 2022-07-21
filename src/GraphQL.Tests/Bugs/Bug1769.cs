@@ -77,6 +77,6 @@ public class Bug1769Query : ObjectGraphType
 {
     public Bug1769Query()
     {
-        Field<StringGraphType>("Test", resolve: context => "ok");
+        Field<StringGraphType>("Test").Resolve(_ => "ok");
     }
 }
