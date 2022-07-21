@@ -503,7 +503,7 @@ public class CycleType : ObjectGraphType
 {
     public CycleType()
     {
-        Field<CycleType>();
+        Field<CycleType>("_");
     }
 }
 
@@ -519,7 +519,7 @@ public class CyclingQueryType : ObjectGraphType
 {
     public CyclingQueryType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 
@@ -527,7 +527,7 @@ public abstract class AbstractGraphType : ObjectGraphType
 {
     public AbstractGraphType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 

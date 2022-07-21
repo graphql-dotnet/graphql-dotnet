@@ -407,7 +407,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name = "default")
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : IGraphType
             => Field<TGraphType, object>(name);
 
