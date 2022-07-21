@@ -2,7 +2,7 @@
 
 Note that v6 was skipped to align GraphQL.NET version with versions of packages from [server](https://github.com/graphql-dotnet/server) project. The historically established discrepancy in one major version constantly caused problems among the developers.
 
-See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A7.0+is%3Aissue+is%3Aclosed) and [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A7.0+is%3Aclosed) done in v6.
+See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A7.0+is%3Aissue+is%3Aclosed) and [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A7.0+is%3Aclosed) done in v7.
 
 ## New Features
 
@@ -122,7 +122,7 @@ Complexity analysis is now a validation rule and has been removed from execution
 There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` methods as shown below:
 
 ```csharp
-// GraphQL 5.x or 6.x
+// GraphQL 5.x or 7.x
 builder.AddComplexityAnalyzer(complexityConfig => {
     // set configuration here
 });
@@ -135,7 +135,7 @@ However, when manually setting `options.ComplexityConfiguration`, you will need 
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
-// GraphQL 6.x
+// GraphQL 7.x
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
 ```
 
@@ -157,7 +157,7 @@ public MyCustomDocumentExecuter(
 {
 }
 
-/// GraphQL 6.x
+/// GraphQL 7.x
 public MyCustomDocumentExecuter(
     IDocumentBuilder documentBuilder,
     IDocumentValidator documentValidator,
@@ -173,7 +173,7 @@ When using a custom complexity analyzer implementation added through the `IGraph
 methods, no change is required.
 
 ```csharp
-/// GraphQL 5.x or 6.x
+/// GraphQL 5.x or 7.x
 builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(complexityConfig => {
     // set configuration here
 });
@@ -187,7 +187,7 @@ from DI through to `ComplexityValidationRule`.
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
-// GraphQL 6.x
+// GraphQL 7.x
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
     new ComplexityValidationRule(
         complexityConfig,
@@ -254,3 +254,54 @@ This change was done for better discoverability and usability of extension metho
 ### 8. `IResolveFieldContext.User` property added
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
+
+### 9. A bunch of FieldXXX APIs were deprecated
+
+After upgrade to v7 you will notice with ~100% probability compiler warnings with message
+> Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just
+> use AddField() method directly. This method will be removed in v8.
+
+The goal of this [change](https://github.com/graphql-dotnet/graphql-dotnet/pull/3237) was to simplify
+APIs and guide developer with well-discovered APIs.
+
+You will need to change a way of setting fields on your Graph Types. Instead of many `FieldXXX`
+overloads start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
+All such methods define a new field and return an instance of `FieldBuilder<T,U>`. Then continue to
+configure defined field with rich APIs provided by the returned builder. 
+
+```csharp
+// GraphQL 5.x
+Field<NonNullGraphType<StringGraphType>>(
+  "name",
+  "Argument name",
+  resolve: context => context.Source!.Name);
+
+// GraphQL 7.x
+Field<NonNullGraphType<StringGraphType>>("name")
+  .Description("Argument name")
+  .Resolve(context => context.Source!.Name);
+
+
+// GraphQL 5.x
+FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+
+// GraphQL 7.x
+Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+
+
+// GraphQL 5.x
+FieldAsync<HumanType>(
+  "human",
+  arguments: new QueryArguments(
+      new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
+  ),
+  resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false)
+);
+
+// GraphQL 7.x
+Field<HumanType>("human")
+  .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
+  .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
+```
+
+Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
