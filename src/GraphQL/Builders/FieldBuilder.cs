@@ -142,7 +142,7 @@ namespace GraphQL.Builders
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context))));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
-        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Delegate? resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveDelegate(Delegate? resolve)
         {
             IFieldResolver? resolver = null;
 
