@@ -117,27 +117,17 @@ that implements an Interface you are required to alter the Interface for that ne
 ```csharp
 public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 {
-  public CharacterInterface(
-    DroidType droidType,
-    HumanType humanType)
+  public CharacterInterface()
   {
     Name = "Character";
 
     ...
 
-    ResolveType = obj =>
+    ResolveType = (obj, schema) => obj switch
     {
-        if (obj is Droid)
-        {
-            return droidType;
-        }
-
-        if (obj is Human)
-        {
-            return humanType;
-        }
-
-        throw new ArgumentOutOfRangeException($"Could not resolve graph type for {obj.GetType().Name}");
+        Droid _ => schema.AllTypes[typeof(DroidType)] as IObjectGraphType,
+        Class2 _ => schema.AllTypes[typeof(HumanType)] as IObjectGraphType,
+        _ => throw new ArgumentOutOfRangeException($"Could not resolve graph type for {obj.GetType().Name}"),
     };
   }
 }
