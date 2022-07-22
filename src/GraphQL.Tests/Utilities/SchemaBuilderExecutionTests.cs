@@ -224,7 +224,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         var schema = Schema.For(
             fileName.ReadSDL(),
-            builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+            builder => builder.Types.ForAll(config => config.ResolveType = (_, _) => null)
         );
 
         schema.AllTypes.Count.ShouldBe(expectedCount);
@@ -237,7 +237,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             "PetComplex".ReadSDL(),
             builder =>
             {
-                builder.Types.ForAll(config => config.ResolveType = _ => null);
+                builder.Types.ForAll(config => config.ResolveType = (_, _) => null);
                 builder.IgnoreComments = false;
             }
         );

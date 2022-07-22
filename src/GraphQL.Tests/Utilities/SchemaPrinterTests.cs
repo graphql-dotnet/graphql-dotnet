@@ -1902,7 +1902,7 @@ type Zebra {
         {
             Name = "IFoo";
             Description = "This is a Foo interface type";
-            ResolveType = _ => null;
+            ResolveType = (_, _) => null;
             Field<StringGraphType>("str").Description("This is of type String");
         }
     }
@@ -1912,7 +1912,7 @@ type Zebra {
         public BaazInterfaceType()
         {
             Name = "Baaz";
-            ResolveType = _ => null;
+            ResolveType = (_, _) => null;
             Field<IntGraphType>("int").Description("This is of type Integer");
         }
     }
@@ -1944,7 +1944,7 @@ type Zebra {
         public SingleUnion()
         {
             Name = "SingleUnion";
-            ResolveType = obj => null;
+            ResolveType = (_, _) => null;
             Type<FooType>();
         }
     }
@@ -1954,7 +1954,7 @@ type Zebra {
         public MultipleUnion()
         {
             Name = "MultipleUnion";
-            ResolveType = obj => null;
+            ResolveType = (_, _) => null;
             Type<FooType>();
             Type<BarType>();
         }

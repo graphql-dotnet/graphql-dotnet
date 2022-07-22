@@ -353,7 +353,7 @@ public class AnInterfaceType : InterfaceGraphType
     {
         Name = "AnInterfaceType";
         Field<StringGraphType>("name");
-        ResolveType = value => null;
+        ResolveType = (_, _) => null;
     }
 }
 
@@ -460,7 +460,7 @@ public class AUnionType : UnionGraphType
         Name = "AUnion";
         Type<WithoutIsTypeOf1Type>();
         Type<WithoutIsTypeOf2Type>();
-        ResolveType = value => null;
+        ResolveType = (_, _) => null;
     }
 }
 

@@ -14,7 +14,7 @@ namespace GraphQL.Types
         public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 
         /// <inheritdoc/>
-        public Func<object, IObjectGraphType?>? ResolveType { get; set; }
+        public Func<object, ISchema, IObjectGraphType?>? ResolveType { get; set; }
 
         /// <inheritdoc/>
         public void AddPossibleType(IObjectGraphType type)

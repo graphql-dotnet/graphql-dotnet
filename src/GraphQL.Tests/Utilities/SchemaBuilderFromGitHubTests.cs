@@ -11,14 +11,14 @@ public class SchemaBuilderFromGitHubTests
         protected override UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
             var type = base.ToUnionType(unionDef);
-            type.ResolveType = _ => null;
+            type.ResolveType = (_, _) => null;
             return type;
         }
 
         protected override InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
             var type = base.ToInterfaceType(interfaceDef);
-            type.ResolveType = _ => null;
+            type.ResolveType = (_, _) => null;
             return type;
         }
     }

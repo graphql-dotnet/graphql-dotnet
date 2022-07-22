@@ -57,7 +57,7 @@ public class SchemaBuilderNestedTypesTests : SchemaBuilderTestBase
             ";
 
         Builder.Types.Include<DroidType>("Droid");
-        Builder.Types.For("Droid").ResolveType = obj => new GraphQLTypeReference("Droid");
+        Builder.Types.For("Droid").ResolveType = (_, _) => new GraphQLTypeReference("Droid");
         Builder.Types.Include<Query>();
 
         var query = @"{ hero { id name friend { name } } }";

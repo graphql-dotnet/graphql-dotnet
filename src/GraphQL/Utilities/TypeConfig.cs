@@ -51,7 +51,7 @@ namespace GraphQL.Utilities
         public string? DeprecationReason { get; set; }
 
         /// <inheritdoc cref="IAbstractGraphType.ResolveType"/>
-        public Func<object, IObjectGraphType>? ResolveType { get; set; }
+        public Func<object, ISchema, IObjectGraphType>? ResolveType { get; set; }
 
         /// <inheritdoc cref="IObjectGraphType.IsTypeOf"/>
         public Func<object, bool>? IsTypeOfFunc { get; set; }

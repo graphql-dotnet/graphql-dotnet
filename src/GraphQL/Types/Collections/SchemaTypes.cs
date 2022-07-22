@@ -392,6 +392,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
+        public IGraphType? this[Type graphType]
+            => Dictionary.Values.SingleOrDefault(obj => obj.GetType() == graphType);
+
+        /// <summary>
+        /// Returns a graph type instance from the lookup table by its .NET type.
+        /// </summary>
         /// <param name="type">The .NET type of the graph type.</param>
         private IGraphType? FindGraphType(Type type)
         {

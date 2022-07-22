@@ -165,7 +165,7 @@ namespace GraphQL.Utilities.Federation
                 union.AddPossibleType(e!);
             }
 
-            union.ResolveType = x =>
+            union.ResolveType = (x, schema) =>
             {
                 if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
                 {

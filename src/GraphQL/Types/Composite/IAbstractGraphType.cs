@@ -9,7 +9,7 @@ namespace GraphQL.Types
         /// Gets or sets a delegate that can be used to determine the proper graph type for the specified object value. See
         /// <see cref="AbstractGraphTypeExtensions.GetObjectType(IAbstractGraphType, object, ISchema)"/> for more details.
         /// </summary>
-        Func<object, IObjectGraphType?>? ResolveType { get; set; }
+        Func<object, ISchema, IObjectGraphType?>? ResolveType { get; set; }
 
         /// <summary>
         /// Returns a set of possible types for this abstract graph type.
@@ -50,7 +50,7 @@ namespace GraphQL.Types
         public static IObjectGraphType? GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
         {
             var result = abstractType.ResolveType != null
-                ? abstractType.ResolveType(value)
+                ? abstractType.ResolveType(value, schema)
                 : GetTypeOf(abstractType, value);
 
             if (result is GraphQLTypeReference reference)

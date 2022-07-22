@@ -95,7 +95,7 @@ public class CatOrDog : UnionGraphType
     {
         Type<Cat>();
         Type<Dog>();
-        ResolveType = value => null;
+        ResolveType = (_, _) => null;
     }
 }
 

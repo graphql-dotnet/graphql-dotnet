@@ -142,7 +142,7 @@ public class EmptyInterfaceSchema : Schema
         Query = new ObjectGraphType { Name = "Query" };
         Query.AddField(new FieldType { Name = "field", ResolvedType = new StringGraphType() });
 
-        var iface = new InterfaceGraphType { Name = "Empty", ResolveType = _ => null };
+        var iface = new InterfaceGraphType { Name = "Empty", ResolveType = (_, _) => null };
         RegisterType(iface);
         Query.ResolvedInterfaces.Add(iface);
     }
@@ -154,7 +154,7 @@ public class SchemaWithDuplicateInterfaceFields : Schema
     {
         Query = new ObjectGraphType { Name = "Query" };
 
-        var iface = new InterfaceGraphType { Name = "Dup", ResolveType = _ => null };
+        var iface = new InterfaceGraphType { Name = "Dup", ResolveType = (_, _) => null };
         iface.AddField(new FieldType { Name = "field", ResolvedType = new StringGraphType() });
         iface.AddField(new FieldType { Name = "field_2", ResolvedType = new StringGraphType() }); // bypass HasField check
         iface.Fields.List[1].Name = "field";

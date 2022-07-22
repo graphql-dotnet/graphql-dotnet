@@ -254,3 +254,31 @@ This change was done for better discoverability and usability of extension metho
 ### 8. `IResolveFieldContext.User` property added
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
+
+### 9. `ResolveType` property of `UnionGraphType` and `InterfaceGraphType` now includes the schema.
+
+This change is necessary to be able to pull graph types from the schema when used when graph types
+are registered within the DI engine as transient (the recommended and default method).
+
+```csharp
+// v5
+ResolveType = obj => ...;
+
+// v7
+ResolveType = (obj, schema) => ...;
+```
+
+In order to pull types from the schema, you may use code like this:
+
+```csharp
+ResolveType = (obj, schema) => obj switch
+{
+    Class1 _ => schema.AllTypes[typeof(Class1Type)] as IObjectGraphType,   // by CLR type
+    Class2 _ => schema.AllTypes["Class2Type"] as IObjectGraphType,         // by name
+    _ => null,
+};
+```
+
+Of course the `ResolveType` delegate is not necessary if `IsTypeOf` is implemented for all of the
+types of the union, and `ObjectGraphType<T>` has a default implementation; so it should be rare
+that `ResolveType` is necessary at all.
