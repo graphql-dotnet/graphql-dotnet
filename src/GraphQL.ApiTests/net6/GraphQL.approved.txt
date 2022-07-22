@@ -1976,7 +1976,7 @@ namespace GraphQL.Types
     public interface IAbstractGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        System.Func<object, GraphQL.Types.ISchema, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         void AddPossibleType(GraphQL.Types.IObjectGraphType type);
     }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
@@ -2111,7 +2111,7 @@ namespace GraphQL.Types
     {
         public InterfaceGraphType() { }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        public System.Func<object, GraphQL.Types.ISchema, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
@@ -2322,6 +2322,7 @@ namespace GraphQL.Types
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
+        public GraphQL.Types.IGraphType? this[System.Type graphType] { get; }
         protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
@@ -2433,7 +2434,7 @@ namespace GraphQL.Types
     {
         public UnionGraphType() { }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        public System.Func<object, GraphQL.Types.ISchema, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
         public void Type(System.Type type) { }
@@ -2700,7 +2701,7 @@ namespace GraphQL.Utilities
         public string? Description { get; set; }
         public System.Func<object, bool>? IsTypeOfFunc { get; set; }
         public string Name { get; }
-        public System.Func<object, GraphQL.Types.IObjectGraphType>? ResolveType { get; set; }
+        public System.Func<object, GraphQL.Types.ISchema, GraphQL.Types.IObjectGraphType>? ResolveType { get; set; }
         public System.Type? Type { get; set; }
         public GraphQL.Utilities.FieldConfig FieldFor(string fieldName) { }
         public void IsTypeOf<T>() { }
