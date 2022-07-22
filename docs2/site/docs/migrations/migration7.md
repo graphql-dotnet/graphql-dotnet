@@ -121,7 +121,7 @@ Field<IntGraphType, int>("test")
 Now you can simply specify the return type, and the graph type will be inferred:
 
 ```csharp
-Field<int>("test")        // assumes not-null
+Field<int>("test")        // by defaut assumes not-null
     .Resolve(_ => 123);
 
 // or
