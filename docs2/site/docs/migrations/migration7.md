@@ -104,6 +104,38 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
+### 9. Add `Field<TReturnType>` overload to create field builder with an inferred graph type
+
+To define a field with a field builder, previously the graph type was always required, like this:
+
+```csharp
+Field<IntGraphType>("test")
+    .Resolve(_ => 123);
+
+// or
+
+Field<IntGraphType, int>("test")
+    .Resolve(_ => 123);
+```
+
+Now you can simply specify the return type, and the graph type will be inferred:
+
+```csharp
+Field<int>("test")        // assumes not-null
+    .Resolve(_ => 123);
+
+// or
+
+Field<int>("test", true)  // specify true or false to indicate nullability
+    .Resolve(_ => 123);
+```
+
+This is similar to the expression syntax (`Field(x => x.Name)`) which does not require
+the graph type to be specified in order to define a field.
+
+As with the expression syntax or the `AutoRegisteringObjectGraphType`,
+CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
