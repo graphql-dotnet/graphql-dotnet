@@ -126,7 +126,7 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
     ResolveType = (obj, schema) => obj switch
     {
         Droid _ => schema.AllTypes[typeof(DroidType)] as IObjectGraphType,
-        Class2 _ => schema.AllTypes[typeof(HumanType)] as IObjectGraphType,
+        Human _ => schema.AllTypes[typeof(HumanType)] as IObjectGraphType,
         _ => throw new ArgumentOutOfRangeException($"Could not resolve graph type for {obj.GetType().Name}"),
     };
   }
