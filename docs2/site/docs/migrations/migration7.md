@@ -281,4 +281,4 @@ ResolveType = (obj, schema) => obj switch
 
 Of course the `ResolveType` delegate is not necessary if `IsTypeOf` is implemented for all of the
 types of the union, and `ObjectGraphType<T>` has a default implementation; so it should be rare
-that `ResolveType` is necessary at all.
+that `ResolveType` is necessary at all. See Interfaces in the documentation for more details.
