@@ -1789,6 +1789,7 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
     }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -1955,6 +1956,7 @@ namespace GraphQL.Types
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
+        public virtual void Initialize(GraphQL.Types.ISchema schema) { }
         public override string ToString() { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
@@ -1984,7 +1986,10 @@ namespace GraphQL.Types
         GraphQL.Types.QueryArguments? Arguments { get; set; }
         string Name { get; set; }
     }
-    public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    {
+        void Initialize(GraphQL.Types.ISchema schema);
+    }
     public interface IGraphTypeMappingProvider
     {
         System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType);
@@ -2422,6 +2427,7 @@ namespace GraphQL.Types
         public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public void Type(System.Type type) { }
         public void Type<TType>()
             where TType : GraphQL.Types.IObjectGraphType { }

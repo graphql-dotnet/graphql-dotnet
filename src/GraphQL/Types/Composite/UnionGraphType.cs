@@ -6,6 +6,15 @@ namespace GraphQL.Types
     public class UnionGraphType : GraphType, IAbstractGraphType
     {
         private List<Type>? _types;
+        private bool _initialized;
+
+        /// <inheritdoc/>
+        public override void Initialize(ISchema schema)
+        {
+            if (_initialized)
+                throw new InvalidOperationException($"This graph type '{Name}' has already been initialized.");
+            _initialized = true;
+        }
 
         /// <inheritdoc/>
         public PossibleTypes PossibleTypes { get; } = new PossibleTypes();

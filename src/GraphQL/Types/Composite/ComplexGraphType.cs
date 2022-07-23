@@ -14,11 +14,21 @@ namespace GraphQL.Types
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
 
+        private bool _initialized;
+
         /// <inheritdoc/>
         protected ComplexGraphType()
         {
             Description ??= typeof(TSourceType).Description();
             DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
+        }
+
+        /// <inheritdoc/>
+        public override void Initialize(ISchema schema)
+        {
+            if (_initialized)
+                throw new InvalidOperationException($"This graph type '{Name}' has already been initialized.");
+            _initialized = true;
         }
 
         /// <inheritdoc/>

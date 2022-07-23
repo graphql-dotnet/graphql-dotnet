@@ -387,6 +387,38 @@ public class ComplexGraphTypeTests
     }
 
     [Fact]
+    public void cannot_initialize_same_instance_twice()
+    {
+        var type = new ComplexType<string> { Name = "Query" };
+        type.Field<IntGraphType>("field1");
+        var schema = new Schema() { Query = type };
+        schema.Initialize();
+
+        var schema2 = new Schema() { Query = type };
+        Should.Throw<InvalidOperationException>(
+            () => schema2.Initialize())
+            .Message.ShouldBe("This graph type 'Query' has already been initialized.");
+    }
+
+    [Fact]
+    public void can_initalize_two_schemas()
+    {
+        {
+            var type = new ComplexType<string> { Name = "Query" };
+            type.Field<IntGraphType>("field1");
+            var schema = new Schema() { Query = type };
+            schema.Initialize();
+        }
+
+        {
+            var type = new ComplexType<string> { Name = "Query" };
+            type.Field<IntGraphType>("field1");
+            var schema = new Schema() { Query = type };
+            schema.Initialize();
+        }
+    }
+
+    [Fact]
     public void throws_with_bad_namevalidator()
     {
         var exception = Should.Throw<ArgumentOutOfRangeException>(() =>
