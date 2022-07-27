@@ -349,6 +349,6 @@ Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/
 
 ### Enumeration members' case sensitivity
 
-Prior to GraphQL.NET version 4, enumeration values were case insensitive matches, which
+Prior to GraphQL.NET version 5, enumeration values were case insensitive matches, which
 did not meet the GraphQL specification. This has been updated to match the spec; to revert to the prior
 behavior, please see [issue #3105](https://github.com/graphql-dotnet/graphql-dotnet/issues/3105#issuecomment-1109991628).
