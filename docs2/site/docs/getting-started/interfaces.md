@@ -124,7 +124,7 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
     ...
 
     // Note: be sure not to pull in these references from DI when the graph types
-    // are registered as transient, which is the default
+    // are registered as transients (the default lifetime for graph types)
 
     var droidType = new GraphQLTypeReference("Droid");
     var humanType = new GraphQLTypeReference("Human");
