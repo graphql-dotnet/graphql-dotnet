@@ -423,6 +423,7 @@ namespace GraphQL
         where TSchema : GraphQL.Types.ISchema { }
     public interface IGraphQLSerializer
     {
+        bool IsNativelyAsync { get; }
         System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default);
         T? ReadNode<T>(object? value);
         System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T? value, System.Threading.CancellationToken cancellationToken = default);

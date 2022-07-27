@@ -28,5 +28,11 @@ namespace GraphQL
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
         T? ReadNode<T>(object? value);
+
+        /// <summary>
+        /// Indicates whether this serializer makes asynchronous calls to the underlying stream
+        /// while serializing or deserializing.
+        /// </summary>
+        bool IsNativelyAsync { get; }
     }
 }

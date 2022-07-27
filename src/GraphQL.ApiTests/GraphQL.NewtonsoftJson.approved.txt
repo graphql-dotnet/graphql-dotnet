@@ -60,6 +60,7 @@ namespace GraphQL.NewtonsoftJson
         public GraphQLSerializer(GraphQL.NewtonsoftJson.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public bool IsNativelyAsync { get; }
         protected Newtonsoft.Json.JsonSerializer Serializer { get; }
         public T? Deserialize<T>(string? json) { }
         public T? Read<T>(System.IO.TextReader json) { }
