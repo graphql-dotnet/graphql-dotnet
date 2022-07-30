@@ -241,5 +241,8 @@ namespace GraphQL.SystemTextJson
         /// </summary>
         public T? ReadNode<T>(object? value)
             => value == null ? default : ReadNode<T>((JsonElement)value);
+
+        /// <inheritdoc/>
+        public bool IsNativelyAsync => true;
     }
 }
