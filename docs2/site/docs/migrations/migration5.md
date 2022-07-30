@@ -963,7 +963,8 @@ All classes which implemented the above interfaces have been modified as necessa
 
 These properties have been removed:
 
-- `EventStreamFieldType.AsyncSubscriber` (note: the `EventStreamFieldType` class was removed and the `Subscriber` property moved to the `FieldType` class)
+- `EventStreamFieldType.AsyncSubscriber` (note: the `EventStreamFieldType` class was removed and the `Subscriber`
+   property moved to the `FieldType` class and renamed to `StreamResolver`)
 - `FieldConfig.AsyncSubscriber`
 
 Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
