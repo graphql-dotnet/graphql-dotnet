@@ -1789,7 +1789,6 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
-        public override void Initialize(GraphQL.Types.ISchema schema) { }
     }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -2244,6 +2243,7 @@ namespace GraphQL.Types
         protected ScalarGraphType() { }
         public virtual bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public virtual bool CanParseValue(object? value) { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
             where TValueNode : GraphQLParser.AST.GraphQLValue, GraphQLParser.AST.IHasValueNode { }
@@ -2441,7 +2441,6 @@ namespace GraphQL.Types
         public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
-        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public void Type(System.Type type) { }
         public void Type<TType>()
             where TType : GraphQL.Types.IObjectGraphType { }

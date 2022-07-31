@@ -22,7 +22,7 @@ public class UnionGraphTypeTests
         var schema2 = new Schema() { Query = queryType2 };
         Should.Throw<InvalidOperationException>(
             () => schema2.Initialize())
-            .Message.ShouldBe("This graph type 'UnionType' has already been initialized.");
+            .Message.ShouldBe("This graph type 'UnionType' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
     }
 
     public class Type1 : ObjectGraphType
