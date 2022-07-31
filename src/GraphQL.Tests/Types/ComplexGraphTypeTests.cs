@@ -413,7 +413,7 @@ public class ComplexGraphTypeTests
         {
             var type = new ComplexType<string> { Name = "Query" };
             type.Field<IntGraphType>("field1");
-            var schema = new Schema() { Query = type };
+            var schema = new Schema { Query = type };
             schema.Initialize();
         }
     }
