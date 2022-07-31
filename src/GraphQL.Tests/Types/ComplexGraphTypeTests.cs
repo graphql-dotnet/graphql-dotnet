@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -26,10 +28,10 @@ public class ComplexGraphTypeTests
     internal class TestObject
     {
         public int? someInt { get; set; }
-        public KeyValuePair<int, string> valuePair { get; set; }
-        public List<int> someList { get; set; }
+        public KeyValuePair<int, string?> valuePair { get; set; }
+        public List<int>? someList { get; set; }
         [Description("Super secret")]
-        public string someString { get; set; }
+        public string? someString { get; set; }
         [Obsolete("Use someInt")]
         public bool someBoolean { get; set; }
         [DefaultValue(typeof(DateTime), "2019/03/14")]
@@ -41,26 +43,26 @@ public class ComplexGraphTypeTests
         public ushort someUShort { get; set; }
         public ulong someULong { get; set; }
         public uint someUInt { get; set; }
-        public IEnumerable someEnumerable { get; set; }
-        public IEnumerable<string> someEnumerableOfString { get; set; }
+        public IEnumerable? someEnumerable { get; set; }
+        public IEnumerable<string?>? someEnumerableOfString { get; set; }
         [Required]
-        public string someRequiredString { get; set; }
+        public string? someRequiredString { get; set; }
         public Direction someEnum { get; set; }
         public Direction? someNullableEnum { get; set; }
-        public List<int?> someListWithNullable { get; set; }
+        public List<int?>? someListWithNullable { get; set; }
         [Required]
-        public List<int> someRequiredList { get; set; }
+        public List<int>? someRequiredList { get; set; }
         [Required]
-        public List<int?> someRequiredListWithNullable { get; set; }
+        public List<int?>? someRequiredListWithNullable { get; set; }
         public int someNotNullInt { get; set; }
-        public Money someMoney { get; set; }
+        public Money? someMoney { get; set; }
     }
 
     [GraphQLMetadata(InputType = typeof(AutoRegisteringInputObjectGraphType<Money>), OutputType = typeof(AutoRegisteringObjectGraphType<Money>))]
     internal class Money
     {
         public decimal Amount { get; set; }
-        public string Currency { get; set; }
+        public string? Currency { get; set; }
     }
 
     internal enum Direction
@@ -106,8 +108,8 @@ public class ComplexGraphTypeTests
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
-            enumType.Values["DESC"].Description.ShouldBe("Descending Order");
-            enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
+            enumType.Values["DESC"].ShouldNotBeNull().Description.ShouldBe("Descending Order");
+            enumType.Values["RANDOM"].ShouldNotBeNull().DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
         }
         finally
         {
@@ -150,8 +152,8 @@ public class ComplexGraphTypeTests
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringInputObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
-            enumType.Values["DESC"].Description.ShouldBe("Descending Order");
-            enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
+            enumType.Values["DESC"].ShouldNotBeNull().Description.ShouldBe("Descending Order");
+            enumType.Values["RANDOM"].ShouldNotBeNull().DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
         }
         finally
         {
@@ -275,7 +277,7 @@ public class ComplexGraphTypeTests
 
         var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.someInt));
 
-        exp.InnerException.Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
+        exp.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
     }
 
     [Fact]
@@ -467,5 +469,55 @@ public class ComplexGraphTypeTests
         type.Field<StringGraphType>(fieldName);
 
         type.Fields.Last().Name.ShouldBe(fieldName);
+    }
+
+    [Fact]
+    public void create_fieldbuilder_with_inferred_graph_type()
+    {
+        var type = new ComplexType<TestObject>();
+
+        type.Field<int>("field1").Resolve(_ => 3);
+        type.Fields.Find("field1").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>));
+
+        type.Field<int>("field2", false).Resolve(_ => 3);
+        type.Fields.Find("field2").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>));
+
+        type.Field<int>("field3", true).Resolve(_ => 3);
+        type.Fields.Find("field3").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
+
+        var e1 = Should.Throw<ArgumentException>(() => type.Field<int?>("field4"));
+        e1.Message.ShouldBe("The GraphQL type for field 'TestObject.field4' could not be derived implicitly from type 'Nullable`1'.");
+        e1.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
+
+        var e2 = Should.Throw<ArgumentException>(() => type.Field<int?>("field5", false));
+        e2.Message.ShouldBe("The GraphQL type for field 'TestObject.field5' could not be derived implicitly from type 'Nullable`1'.");
+        e2.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
+
+        type.Field<int?>("field6", true).Resolve(_ => 3);
+        type.Fields.Find("field6").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
+
+        // note: NRT attributes cannot be inferred/read below as they are not actually stored in the compiled code
+
+        type.Field<string>("field7").Resolve(_ => "hello");
+        type.Fields.Find("field7").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+
+        type.Field<string>("field8", false).Resolve(_ => "hello");
+        type.Fields.Find("field8").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+
+        type.Field<string>("field9", true).Resolve(_ => "hello");
+        type.Fields.Find("field9").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<string>));
+
+        type.Field<string?>("field10").Resolve(_ => "hello");
+        type.Fields.Find("field10").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+
+        type.Field<string?>("field11", false).Resolve(_ => "hello");
+        type.Fields.Find("field11").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+
+        type.Field<string?>("field12", true).Resolve(_ => "hello");
+        type.Fields.Find("field12").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<string>));
+
+        // notice here that since the NRT attribute of 'string' cannot be read, it is assumed to be nullable
+        type.Field<IEnumerable<string>>("field13").Resolve(_ => Array.Empty<string>());
+        type.Fields.Find("field13").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
     }
 }
