@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Execution;
 public class FuncFieldResolverTests
 {
     private readonly ResolveFieldContext _context;
-    private readonly OkDataLoader _okDataLoader = new OkDataLoader();
+    private readonly OkDataLoader _okDataLoader = new();
 
     private class OkDataLoader : IDataLoaderResult<string>
     {

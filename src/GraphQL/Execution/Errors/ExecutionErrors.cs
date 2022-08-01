@@ -7,7 +7,7 @@ namespace GraphQL
     /// </summary>
     public class ExecutionErrors : IEnumerable<ExecutionError>
     {
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
         internal List<ExecutionError>? List;
 
         internal ExecutionErrors(int capacity)
@@ -63,7 +63,7 @@ namespace GraphQL
     {
         private EmptyExecutionErrors() { }
 
-        public static readonly EmptyExecutionErrors Instance = new EmptyExecutionErrors();
+        public static readonly EmptyExecutionErrors Instance = new();
 
         public override void Add(ExecutionError error) => throw new NotSupportedException();
 

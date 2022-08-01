@@ -11,7 +11,7 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class GraphQLContractResolver : DefaultContractResolver
     {
-        private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
+        private readonly CamelCaseNamingStrategy _camelCase = new();
         private readonly IErrorInfoProvider _errorInfoProvider;
 
         /// <summary>

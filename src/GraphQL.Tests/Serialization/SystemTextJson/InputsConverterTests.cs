@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Serialization.SystemTextJson;
 
 public class InputsConverterTests
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions
+    private readonly JsonSerializerOptions _options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true,

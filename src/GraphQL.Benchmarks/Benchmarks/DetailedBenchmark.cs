@@ -42,8 +42,8 @@ public class DetailedBenchmark : IBenchmark
     private BenchmarkInfo _bHero;
     private BenchmarkInfo _bVariable;
     private BenchmarkInfo _bLiteral;
-    private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
-    private static readonly GraphQLSerializer _serializer = new GraphQLSerializer();
+    private readonly DocumentExecuter _documentExecuter = new();
+    private static readonly GraphQLSerializer _serializer = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -226,7 +226,7 @@ public class DetailedBenchmark : IBenchmark
             }.GetVariableValuesAsync().Result;
         }
 
-        private static readonly DocumentValidator _documentValidator = new DocumentValidator();
+        private static readonly DocumentValidator _documentValidator = new();
         public IValidationResult Validate()
         {
             return _documentValidator.ValidateAsync(new ValidationOptions
@@ -237,7 +237,7 @@ public class DetailedBenchmark : IBenchmark
             }).Result.validationResult;
         }
 
-        private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();
+        private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new();
         public ExecutionResult Execute()
         {
             var context = new Execution.ExecutionContext

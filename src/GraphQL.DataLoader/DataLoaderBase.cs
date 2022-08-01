@@ -13,7 +13,7 @@ namespace GraphQL.DataLoader
 
         private DataLoaderList? _list;
         private readonly Dictionary<TKey, DataLoaderPair<TKey, T>>? _cachedList;
-        private readonly object _sync = new object();
+        private readonly object _sync = new();
 
         /// <summary>
         /// Returns the maximum number of keys passed to the fetch function at a time.

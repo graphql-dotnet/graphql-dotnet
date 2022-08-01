@@ -114,7 +114,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
 
     public class Vector3Type : ScalarGraphType
     {
-        private readonly FloatGraphType _floatScalar = new FloatGraphType();
+        private readonly FloatGraphType _floatScalar = new();
 
         public Vector3Type()
         {

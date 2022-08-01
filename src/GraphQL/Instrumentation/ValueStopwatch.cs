@@ -20,7 +20,7 @@ namespace GraphQL.Instrumentation
         }
 
         /// <inheritdoc cref="Stopwatch.StartNew"/>
-        public static ValueStopwatch StartNew() => new ValueStopwatch(Stopwatch.GetTimestamp());
+        public static ValueStopwatch StartNew() => new(Stopwatch.GetTimestamp());
 
         /// <inheritdoc cref="Stopwatch.Elapsed"/>
         public TimeSpan Elapsed

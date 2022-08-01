@@ -27,25 +27,25 @@ namespace GraphQL.MicrosoftDI
         /// Specifies a type that is to be resolved via dependency injection during the resolver's execution.
         /// </summary>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithService<T1>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <summary>
         /// Specifies types that are to be resolved via dependency injection during the resolver's execution.
         /// </summary>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithServices<T1, T2>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="WithServices{T1, T2}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithServices<T1, T2, T3>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="WithServices{T1, T2}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithServices<T1, T2, T3, T4>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="WithServices{T1, T2}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithServices<T1, T2, T3, T4, T5>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <summary>
         /// Specifies that the resolver should run within its own dependency injection scope.
@@ -94,7 +94,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithService<T2>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1> WithScope()
@@ -149,7 +149,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithService<T3>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2> WithScope()
@@ -206,7 +206,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithService<T4>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3> WithScope()
@@ -265,7 +265,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithService{T1}"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithService<T5>()
-            => new ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>(_builder, _scoped);
+            => new(_builder, _scoped);
 
         /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.WithScope"/>
         public ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4> WithScope()

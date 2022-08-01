@@ -91,7 +91,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     /// <summary>
     /// Create <see cref="ExecutionResult"/> with provided error.
     /// </summary>
-    protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new ExecutionResult { Errors = new ExecutionErrors { error } };
+    protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new() { Errors = new ExecutionErrors { error } };
 
     /// <summary>
     /// Get query by hash. It is likely to be implemented via cache mechanism.
