@@ -314,11 +314,13 @@ Field<NonNullGraphType<StringGraphType>>("name")
   .Resolve(context => context.Source!.Name);
 
 
+
 // GraphQL 5.x
 FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
 
 // GraphQL 7.x
 Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+
 
 
 // GraphQL 5.x
@@ -334,6 +336,60 @@ FieldAsync<HumanType>(
 Field<HumanType>("human")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
   .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
+
+
+
+// GraphQL 5.x
+Func<IResolveFieldContext<object>, Task<string?>> resolver = context => Task.FromResult("abc");
+FieldAsync<StringGraphType, string>("name", resolve: resolver);
+
+// GraphQL 7.x
+Func<IResolveFieldContext<object>, Task<string?>> resolver = context => Task.FromResult("abc");
+Field<StringGraphType, string>("name").ResolveAsync(resolver);
+
+
+
+// GraphQL 5.x
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+
+FieldDelegate<DroidType>(
+  "droid",
+  arguments: new QueryArguments(
+    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+  ),
+  resolve: func
+);
+
+
+
+// GraphQL 7.x
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+
+Field<DroidType, string>("droid")
+  .Argument<NonNullGraphType<StringGraphType>>("id", "id of the droid")
+  .ResolveDelegate(func);
+
+
+
+// GraphQL 5.x
+IObservable<object> observable = ...;
+FieldSubscribe<MessageGraphType>("messages", subscribe: context => observable);
+
+// GraphQL 7.x
+IObservable<object> observable = ...;
+Field<MessageGraphType>("messages").ResolveStream(context => observable);
+
+
+
+// GraphQL 5.x
+Task<IObservable<object>> observable = null!;
+FieldSubscribeAsync<MessageGraphType>("messages", subscribeAsync: context => observable);
+
+
+
+// GraphQL 7.x
+Task<IObservable<object>> observable = null!;
+Field<MessageGraphType>("messages").ResolveStreamAsync(context => observable);
 ```
 
 Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
