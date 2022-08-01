@@ -219,5 +219,8 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         public T? ReadNode<T>(object? value)
             => ReadNode<T>((JObject?)value);
+
+        /// <inheritdoc/>
+        public bool IsNativelyAsync => false;
     }
 }

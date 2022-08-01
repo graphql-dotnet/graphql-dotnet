@@ -422,6 +422,29 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false)
+        {
+            Type type;
+
+            try
+            {
+                type = typeof(TReturnType).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+            }
+            catch (ArgumentOutOfRangeException exp)
+            {
+                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from type '{typeof(TReturnType).Name}'.", exp);
+            }
+
+            var builder = CreateBuilder<TReturnType>(type)
+                .Name(name);
+
+            AddField(builder.FieldType);
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
         /// <param name="type">The .NET type of the graph type of this field.</param>
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
