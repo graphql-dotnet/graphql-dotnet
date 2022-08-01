@@ -7,13 +7,13 @@ namespace GraphQL.Types;
 /// <summary>
 /// A scalar that can represent a simple or complex object, including lists.
 /// <br/><br/>
-/// When used with the provided serializers, objects within literals or variables are returned as
+/// When used with the provided serializers, input objects within literals or variables are parsed as
 /// <see cref="IDictionary{TKey, TValue}">IDictionary</see>&lt;<see cref="string"/>,<see cref="object"/>?&gt; objects,
-/// and lists are returned as <see cref="IEnumerable{T}">IEnumerable</see>&lt;<see cref="object"/>?&gt; objects.
+/// and lists are parsed as <see cref="IEnumerable{T}">IEnumerable</see>&lt;<see cref="object"/>?&gt; objects.
 /// Integers are parsed as <see cref="int"/>, <see cref="long"/> or <see cref="BigInteger"/> objects, while
-/// floating point values parsed as <see cref="double"/> or <see cref="decimal"/> objects.
+/// floating point values are parsed as <see cref="double"/> or <see cref="decimal"/> objects.
 /// <br/><br/>
-/// Serialized values are passed directly to the underlying JSON serializer, and as such will support any
+/// Serialized (output) values are passed directly to the underlying JSON serializer, and as such will support any
 /// object type they support, such as anonymous types.
 /// <br/><br/>
 /// If a default value is set on a <see cref="ComplexScalarGraphType"/> field, complex types must be limited to
