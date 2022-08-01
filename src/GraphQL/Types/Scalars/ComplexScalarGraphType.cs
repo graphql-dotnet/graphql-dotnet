@@ -40,8 +40,13 @@ public class ComplexScalarGraphType : ScalarGraphType
             GraphQLBooleanValue booleanValue => booleanValue.BoolValue,
             GraphQLObjectValue objectValue => ParseObject(objectValue),
             GraphQLListValue listValue => ParseList(listValue),
+            GraphQLVariable variableValue => ParseVariable(variableValue),
             _ => ThrowLiteralConversionError(value),
         };
+
+        // todo: need access to request variables to be able to properly support this
+        object? ParseVariable(GraphQLVariable node)
+            => throw new NotSupportedException($"Cannot read referenced variable '{node.Name.Value}' within a complex literal object.");
 
         IDictionary<string, object?> ParseObject(GraphQLObjectValue node)
             => node.Fields.ToDictionary(n => (string)n.Name.Value, n => ParseLiteral(n.Value), StringComparer.Ordinal);
