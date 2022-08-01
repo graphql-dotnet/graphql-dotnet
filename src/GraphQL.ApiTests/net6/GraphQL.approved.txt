@@ -1964,6 +1964,7 @@ namespace GraphQL.Types
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
+        public virtual void Initialize(GraphQL.Types.ISchema schema) { }
         public override string ToString() { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
@@ -1993,7 +1994,10 @@ namespace GraphQL.Types
         GraphQL.Types.QueryArguments? Arguments { get; set; }
         string Name { get; set; }
     }
-    public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    {
+        void Initialize(GraphQL.Types.ISchema schema);
+    }
     public interface IGraphTypeMappingProvider
     {
         System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredGraphType);
@@ -2241,6 +2245,7 @@ namespace GraphQL.Types
         protected ScalarGraphType() { }
         public virtual bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public virtual bool CanParseValue(object? value) { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
             where TValueNode : GraphQLParser.AST.GraphQLValue, GraphQLParser.AST.IHasValueNode { }

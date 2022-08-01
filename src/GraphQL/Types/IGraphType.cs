@@ -43,5 +43,9 @@ namespace GraphQL.Types
     /// </summary>
     public interface IGraphType : IProvideMetadata, IProvideDescription, IProvideDeprecationReason, INamedType
     {
+        /// <summary>
+        /// Initializes the graph type.
+        /// </summary>
+        void Initialize(ISchema schema);
     }
 }
