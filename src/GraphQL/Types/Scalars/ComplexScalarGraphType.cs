@@ -56,19 +56,32 @@ public class ComplexScalarGraphType : ScalarGraphType
 
         object ParseInteger(GraphQLIntValue node)
         {
+#if NETSTANDARD2_0
+            if (int.TryParse((string)node.Value, out int intValue))
+                return intValue;
+
+            if (long.TryParse((string)node.Value, out long longValue))
+                return longValue;
+#else
             if (int.TryParse(node.Value, out int intValue))
                 return intValue;
 
             if (long.TryParse(node.Value, out long longValue))
                 return longValue;
+#endif
 
             return BigInt.Parse(node.Value);
         }
 
         object ParseFloat(GraphQLFloatValue node)
         {
+#if NETSTANDARD2_0
+            bool isDouble = double.TryParse((string)node.Value, out double dbl);
+            bool isDecimal = decimal.TryParse((string)node.Value, out decimal dec);
+#else
             bool isDouble = double.TryParse(node.Value, out double dbl);
             bool isDecimal = decimal.TryParse(node.Value, out decimal dec);
+#endif
 
             if (isDouble && !isDecimal)
                 return dbl;
