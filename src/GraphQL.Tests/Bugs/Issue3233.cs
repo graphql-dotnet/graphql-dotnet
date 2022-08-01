@@ -18,8 +18,8 @@ public class Issue3233
 
         var ex = Should.Throw<NotSupportedException>(() => serializer.Serialize(result));
         if (Environment.OSVersion.ToString().Contains("Windows"))
-            ex.Message.ShouldBe("The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.ObjectConverter'. Path: $.");
+            ex.Message.ShouldBe("The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.ObjectConverter'. Path: $.", Environment.OSVersion.ToString());
         else
-            ex.Message.ShouldBe("The collection type 'System.Collections.ListDictionaryInternal' is not supported.");
+            ex.Message.ShouldBe("The collection type 'System.Collections.ListDictionaryInternal' is not supported.", Environment.OSVersion.ToString());
     }
 }
