@@ -21,7 +21,7 @@ internal sealed class BenchmarkResult
         return result;
     }
 
-    public List<string> Header = new List<string>();
+    public List<string> Header = new();
 
     public Table Table { get; set; } = new Table();
 

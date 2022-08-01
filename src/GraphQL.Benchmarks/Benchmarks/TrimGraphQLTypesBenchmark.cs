@@ -6,7 +6,7 @@ namespace GraphQL.Benchmarks;
 [MemoryDiagnoser]
 public class TrimGraphQLTypesBenchmark
 {
-    private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
+    private static readonly Regex _trimPattern = new("[\\[!\\]]", RegexOptions.Compiled);
 
     [Benchmark(Baseline = true)]
     public string Old() => _trimPattern.Replace(Name, string.Empty).Trim();

@@ -5,7 +5,7 @@ namespace GraphQL.DataLoader
     /// </summary>
     public class DataLoaderContext
     {
-        private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
+        private readonly Dictionary<string, IDataLoader> _loaders = new();
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key

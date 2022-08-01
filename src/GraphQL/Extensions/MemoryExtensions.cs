@@ -8,7 +8,7 @@ namespace GraphQL
     /// </summary>
     public static class MemoryExtensions
     {
-        private static readonly ConcurrentDictionary<Type, Action<Array>> _delegates = new ConcurrentDictionary<Type, Action<Array>>();
+        private static readonly ConcurrentDictionary<Type, Action<Array>> _delegates = new();
         private static readonly Func<Type, Action<Array>> _factory = CreateDelegate;
 
         internal static void Return(this Array array) => _delegates.GetOrAdd(array.GetType(), _factory)(array);

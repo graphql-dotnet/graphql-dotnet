@@ -11,7 +11,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Returns a static instance of the <see cref="AppliedDirectivesValidationVisitor"/> class.
         /// </summary>
-        public static readonly AppliedDirectivesValidationVisitor Instance = new AppliedDirectivesValidationVisitor();
+        public static readonly AppliedDirectivesValidationVisitor Instance = new();
 
         private AppliedDirectivesValidationVisitor()
         {

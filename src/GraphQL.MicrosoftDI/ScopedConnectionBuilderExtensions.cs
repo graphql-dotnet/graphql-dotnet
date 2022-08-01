@@ -43,7 +43,7 @@ namespace GraphQL.MicrosoftDI
         /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
         /// </summary>
         public static ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this ConnectionBuilder<TSourceType> builder)
-            => new ConnectionResolverBuilder<TSourceType, object>(builder.Returns<object>(), false);
+            => new(builder.Returns<object>(), false);
 
         /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
         public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
@@ -71,7 +71,7 @@ namespace GraphQL.MicrosoftDI
 
         /// <inheritdoc cref="Resolve{TSourceType}(ConnectionBuilder{TSourceType})"/>
         public static ConnectionResolverBuilder<TSourceType, TReturnType> Resolve<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder)
-            => new ConnectionResolverBuilder<TSourceType, TReturnType>(builder, false);
+            => new(builder, false);
 
         /// <summary>
         /// Returns <see cref="IResolveFieldContext.RequestServices"/> if specified or throws <see cref="MissingRequestServicesException"/>.

@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DateGraphTypeTests
 {
-    private readonly DateGraphType _type = new DateGraphType();
+    private readonly DateGraphType _type = new();
 
     [Fact]
     public void serialize_string_to_date_throws()

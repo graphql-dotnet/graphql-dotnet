@@ -72,7 +72,7 @@ public class GraphQLBuilderBaseTests
 
     private class TestServiceRegister : IServiceRegister
     {
-        public readonly Mock<IServiceRegister> MockBuilder = new Mock<IServiceRegister>(MockBehavior.Strict);
+        public readonly Mock<IServiceRegister> MockBuilder = new(MockBehavior.Strict);
 
         public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
             where TOptions : class, new()

@@ -60,7 +60,7 @@ namespace GraphQL
         /// <summary>
         /// Returns a new instance with the specified name.
         /// </summary>
-        public static implicit operator VariableName(string name) => new VariableName { Name = name };
+        public static implicit operator VariableName(string name) => new() { Name = name };
 
         /// <inheritdoc cref="ToString"/>
         public static implicit operator string(VariableName variableName) => variableName.ToString();

@@ -14,7 +14,7 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     public class GraphQLSerializer : IGraphQLTextSerializer
     {
-        private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
+        private readonly JsonArrayPool _jsonArrayPool = new(ArrayPool<char>.Shared);
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace GraphQL.Utilities
     public class TypeConfig : MetadataProvider
     {
         private readonly LightweightCache<string, FieldConfig> _fields =
-            new LightweightCache<string, FieldConfig>(f => new FieldConfig(f));
+            new(f => new FieldConfig(f));
 
         private Type? _type;
 

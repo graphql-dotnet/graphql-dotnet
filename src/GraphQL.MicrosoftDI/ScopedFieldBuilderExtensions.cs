@@ -22,6 +22,6 @@ namespace GraphQL.MicrosoftDI
         /// Creates a resolve builder for the field.
         /// </summary>
         public static ResolverBuilder<TSourceType, TReturnType> Resolve<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
-            => new ResolverBuilder<TSourceType, TReturnType>(builder, false);
+            => new(builder, false);
     }
 }

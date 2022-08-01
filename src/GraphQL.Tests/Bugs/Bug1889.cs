@@ -44,12 +44,12 @@ public class SpecializedR : R
 
 public class A
 {
-    public R methodUsedToGetRValue() => new R();
+    public R methodUsedToGetRValue() => new();
 }
 
 public class SpecializedA : A
 {
-    public SpecializedR methodUsedToGetSpecializedRValue() => new SpecializedR();
+    public SpecializedR methodUsedToGetSpecializedRValue() => new();
 }
 
 public class RGraphInterface : InterfaceGraphType<R>

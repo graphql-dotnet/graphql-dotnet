@@ -11,11 +11,11 @@ namespace GraphQL.Validation
     public class TypeInfo : INodeVisitor
     {
         private readonly ISchema _schema;
-        private readonly Stack<IGraphType?> _typeStack = new Stack<IGraphType?>();
-        private readonly Stack<IGraphType?> _inputTypeStack = new Stack<IGraphType?>();
-        private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
-        private readonly Stack<FieldType?> _fieldDefStack = new Stack<FieldType?>();
-        private readonly Stack<ASTNode> _ancestorStack = new Stack<ASTNode>();
+        private readonly Stack<IGraphType?> _typeStack = new();
+        private readonly Stack<IGraphType?> _inputTypeStack = new();
+        private readonly Stack<IGraphType> _parentTypeStack = new();
+        private readonly Stack<FieldType?> _fieldDefStack = new();
+        private readonly Stack<ASTNode> _ancestorStack = new();
         private Directive? _directive;
         private QueryArgument? _argument;
 

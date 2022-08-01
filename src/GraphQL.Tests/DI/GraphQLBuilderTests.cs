@@ -20,7 +20,7 @@ public class GraphQLBuilderExtensionTests
     {
     }
 
-    private readonly Mock<IGraphQLBuilderAndServiceRegister> _builderMock = new Mock<IGraphQLBuilderAndServiceRegister>(MockBehavior.Strict);
+    private readonly Mock<IGraphQLBuilderAndServiceRegister> _builderMock = new(MockBehavior.Strict);
     private IGraphQLBuilderAndServiceRegister _builder => _builderMock.Object;
 
     public GraphQLBuilderExtensionTests()
