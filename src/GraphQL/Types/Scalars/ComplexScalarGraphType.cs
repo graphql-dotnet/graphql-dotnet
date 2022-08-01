@@ -49,7 +49,7 @@ public class ComplexScalarGraphType : ScalarGraphType
             => throw new NotSupportedException($"Cannot read referenced variable '{node.Name.Value}' within a complex literal object.");
 
         IDictionary<string, object?> ParseObject(GraphQLObjectValue node)
-            => node.Fields.ToDictionary(n => (string)n.Name.Value, n => ParseLiteral(n.Value), StringComparer.Ordinal);
+            => node.Fields?.ToDictionary(n => (string)n.Name.Value, n => ParseLiteral(n.Value), StringComparer.Ordinal) ?? new Dictionary<string, object?>();
 
         IEnumerable<object?> ParseList(GraphQLListValue node)
             => node.Values?.Select(ParseLiteral) ?? Array.Empty<object?>();
