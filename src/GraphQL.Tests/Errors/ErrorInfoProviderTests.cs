@@ -76,8 +76,6 @@ public class ErrorInfoProviderTests
         var info = new ErrorInfoProvider().GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions.ShouldBeNull();
-        GraphQL.DI.IGraphQLBuilder z;
-        z.AddErrorInfoProvider(o => o.ExposeData = true);
     }
 
     [Fact]
