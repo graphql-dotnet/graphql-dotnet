@@ -365,7 +365,7 @@ FieldDelegate<DroidType>(
 // GraphQL 7.x
 Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
 
-Field<DroidType, string>("droid")
+Field<DroidType, Droid>("droid")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the droid")
   .ResolveDelegate(func);
 
