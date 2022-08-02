@@ -295,7 +295,7 @@ After upgrading to v7 you will likely notice many compiler warnings with a messa
 > use this API but we do not encourage this.
 
 The goal of this [change](https://github.com/graphql-dotnet/graphql-dotnet/pull/3237) was to simplify
-APIs and guide developer with well-discovered APIs.
+APIs and guide developers with well-discovered APIs.
 
 You will need to change a way of setting fields on your graph types. Instead of many `FieldXXX`
 overloads start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
