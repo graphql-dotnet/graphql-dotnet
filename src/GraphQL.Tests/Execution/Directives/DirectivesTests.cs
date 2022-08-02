@@ -36,7 +36,7 @@ public class DirectiveData
 
 public class DirectiveScalarTests : QueryTestBase<DirectiveSchema>
 {
-    private readonly DirectiveData _data = new DirectiveData();
+    private readonly DirectiveData _data = new();
 
     [Fact]
     public void works_without_directives()
@@ -95,7 +95,7 @@ public class DirectiveScalarTests : QueryTestBase<DirectiveSchema>
 
 public class DirectiveFragmentTests : QueryTestBase<DirectiveSchema>
 {
-    private readonly DirectiveData _data = new DirectiveData();
+    private readonly DirectiveData _data = new();
 
     [Fact]
     public void if_false_omits_fragment_spread()

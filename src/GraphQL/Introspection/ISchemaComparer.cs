@@ -67,11 +67,11 @@ namespace GraphQL.Introspection
     /// </summary>
     public class AlphabeticalSchemaComparer : ISchemaComparer
     {
-        private static readonly TypeByNameComparer _instance1 = new TypeByNameComparer();
-        private static readonly DirectiveByNameComparer _instance2 = new DirectiveByNameComparer();
-        private static readonly ArgumentByNameComparer _instance3 = new ArgumentByNameComparer();
-        private static readonly EnumValueByNameComparer _instance4 = new EnumValueByNameComparer();
-        private static readonly FieldByNameComparer _instance5 = new FieldByNameComparer();
+        private static readonly TypeByNameComparer _instance1 = new();
+        private static readonly DirectiveByNameComparer _instance2 = new();
+        private static readonly ArgumentByNameComparer _instance3 = new();
+        private static readonly EnumValueByNameComparer _instance4 = new();
+        private static readonly FieldByNameComparer _instance5 = new();
 
         private sealed class TypeByNameComparer : IComparer<IGraphType>
         {

@@ -4,7 +4,7 @@ namespace GraphQL.Tests;
 
 public class GraphQLSerializersTestData : IEnumerable<object[]>
 {
-    public static readonly List<IGraphQLTextSerializer> AllWriters = new List<IGraphQLTextSerializer>
+    public static readonly List<IGraphQLTextSerializer> AllWriters = new()
     {
         new SystemTextJson.GraphQLSerializer(new System.Text.Json.JsonSerializerOptions
         {

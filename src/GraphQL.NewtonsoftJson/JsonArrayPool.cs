@@ -1,26 +1,25 @@
 using System.Buffers;
 using Newtonsoft.Json;
 
-namespace GraphQL.NewtonsoftJson
+namespace GraphQL.NewtonsoftJson;
+
+internal class JsonArrayPool : IArrayPool<char>
 {
-    internal class JsonArrayPool : IArrayPool<char>
+    private readonly ArrayPool<char> _inner;
+
+    public JsonArrayPool(ArrayPool<char> inner)
     {
-        private readonly ArrayPool<char> _inner;
+        _inner = inner;
+    }
 
-        public JsonArrayPool(ArrayPool<char> inner)
-        {
-            _inner = inner;
-        }
+    public char[] Rent(int minimumLength)
+    {
+        return _inner.Rent(minimumLength);
+    }
 
-        public char[] Rent(int minimumLength)
-        {
-            return _inner.Rent(minimumLength);
-        }
-
-        public void Return(char[]? array)
-        {
-            if (array != null)
-                _inner.Return(array);
-        }
+    public void Return(char[]? array)
+    {
+        if (array != null)
+            _inner.Return(array);
     }
 }

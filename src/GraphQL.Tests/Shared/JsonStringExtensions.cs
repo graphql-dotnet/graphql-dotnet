@@ -16,7 +16,7 @@ public static class JsonStringExtensions
     /// <param name="executed">Indicates if the operation included execution.</param>
     /// <returns>ExecutionResult.</returns>
     public static ExecutionResult ToExecutionResult(this string? json, ExecutionErrors? errors = null, bool executed = true)
-        => new ExecutionResult
+        => new()
         {
             Data = string.IsNullOrWhiteSpace(json) ? null : json.ToDictionary(),
             Errors = errors,

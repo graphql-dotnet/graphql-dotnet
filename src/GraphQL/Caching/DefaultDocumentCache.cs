@@ -13,7 +13,7 @@ namespace GraphQL.Caching
         /// <summary>
         /// Provides a static instance of this class.
         /// </summary>
-        public static readonly DefaultDocumentCache Instance = new DefaultDocumentCache();
+        public static readonly DefaultDocumentCache Instance = new();
 
         /// <inheritdoc/>
         public ValueTask<GraphQLDocument?> GetAsync(string query) => default;

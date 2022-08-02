@@ -39,7 +39,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
 
-        private InvalidOperationException Invalid() => new InvalidOperationException($"This is just a reference to '{TypeName}'. Resolve the real type first.");
+        private InvalidOperationException Invalid() => new($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         /// <inheritdoc/>
         public override bool Equals(object? obj)

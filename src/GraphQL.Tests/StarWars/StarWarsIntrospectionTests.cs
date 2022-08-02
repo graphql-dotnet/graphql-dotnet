@@ -201,15 +201,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                 ""__schema"": {
                     ""types"": [
                     {
-                        ""name"": ""__DirectiveLocation"",
-                        ""kind"": ""ENUM""
-                    },
-                    {
-                        ""name"": ""__TypeKind"",
-                        ""kind"": ""ENUM""
-                    },
-                    {
-                        ""name"": ""__EnumValue"",
+                        ""name"": ""__Schema"",
                         ""kind"": ""OBJECT""
                     },
                     {
@@ -217,11 +209,15 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                         ""kind"": ""SCALAR""
                     },
                     {
-                        ""name"": ""Boolean"",
-                        ""kind"": ""SCALAR""
+                        ""name"": ""__Type"",
+                        ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__Directive"",
+                        ""name"": ""__TypeKind"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""__Field"",
                         ""kind"": ""OBJECT""
                     },
                     {
@@ -229,16 +225,20 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__Type"",
+                        ""name"": ""Boolean"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""__EnumValue"",
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__Field"",
+                        ""name"": ""__Directive"",
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__Schema"",
-                        ""kind"": ""OBJECT""
+                        ""name"": ""__DirectiveLocation"",
+                        ""kind"": ""ENUM""
                     },
                     {
                         ""name"": ""Query"",

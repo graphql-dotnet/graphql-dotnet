@@ -287,7 +287,22 @@ This change was done for better discoverability and usability of extension metho
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
 
-### 9. A bunch of FieldXXX APIs were deprecated
+### 9. Errors do not serialize the `Data` property within the response by default.
+
+This change was made because various .NET services add data to the `Exception` instance
+which may be unintentionally returned to the caller.
+
+To revert to prior behavior, register a custom `ErrorInfoProvider` instance configured
+to return the data to the caller.
+
+```csharp
+//
+services.AddGraphQL(b => b
+    // add schema, serializer, etc
+    .AddErrorInfoProvider(o => o.ExposeData = true));
+```
+
+### 10. A bunch of FieldXXX APIs were deprecated
 
 After upgrading to v7 you will likely notice many compiler warnings with a message similar to the following:
 > Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use
