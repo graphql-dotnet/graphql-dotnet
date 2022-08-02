@@ -49,12 +49,35 @@ public class ErrorInfoProviderTests
         error.Data["test2"].ShouldBe(15);
         error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
 
-        var info = new ErrorInfoProvider().GetInfo(error);
+        var info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.Count.ShouldBe(1);
         info.Extensions.ShouldContainKey("data");
         info.Extensions["data"].ShouldBeAssignableTo<IDictionary>().ShouldBe(error.Data);
+    }
+
+    [Fact]
+    public void data_not_serialized_by_default()
+    {
+        var data = new Dictionary<string, object>()
+        {
+            { "test1", "object1" },
+            { "test2", 15 },
+            { "test3", new Dictionary<string, object>() { { "test4", "object4" } } },
+        };
+        var error = new ExecutionError(null, data);
+        error.Data.ShouldNotBeNull();
+        error.Data.Count.ShouldBe(3);
+        error.Data["test1"].ShouldBe("object1");
+        error.Data["test2"].ShouldBe(15);
+        error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
+
+        var info = new ErrorInfoProvider().GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions.ShouldBeNull();
+        GraphQL.DI.IGraphQLBuilder z;
+        z.AddErrorInfoProvider(o => o.ExposeData = true);
     }
 
     [Fact]
@@ -111,7 +134,7 @@ public class ErrorInfoProviderTests
         error.AddLocation(new Location(5, 6));
         error.AddLocation(new Location(7, 8));
 
-        var info = new ErrorInfoProvider().GetInfo(error);
+        var info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.Count.ShouldBe(3);
@@ -205,7 +228,7 @@ public class ErrorInfoProviderTests
 
         error.Data.Add("test1", "object1");
 
-        info = new ErrorInfoProvider().GetInfo(error);
+        info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");

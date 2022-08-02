@@ -286,3 +286,18 @@ This change was done for better discoverability and usability of extension metho
 ### 8. `IResolveFieldContext.User` property added
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
+
+### 9. Errors do not serialize the `Data` property within the response by default.
+
+This change was made because various .NET services add data to the `Exception` instance
+which may be unintentionally returned to the caller.
+
+To revert to prior behavior, register a custom `ErrorInfoProvider` instance configured
+to return the data to the caller.
+
+```csharp
+//
+services.AddGraphQL(b => b
+    // add schema, serializer, etc
+    .AddErrorInfoProvider(o => o.ExposeData = true));
+```
