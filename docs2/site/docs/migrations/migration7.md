@@ -289,7 +289,7 @@ Custom implementations of `IResolveFieldContext` must implement the new `User` p
 
 ### 9. A bunch of FieldXXX APIs were deprecated
 
-After upgrade to v7 you will notice with ~100% probability compiler warnings with message
+After upgrading to v7 you will likely notice many compiler warnings with a message similar to the following:
 > Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just
 > use AddField() method directly. This method will be removed in v8.
 
