@@ -297,7 +297,7 @@ After upgrading to v7 you will likely notice many compiler warnings with a messa
 The goal of this [change](https://github.com/graphql-dotnet/graphql-dotnet/pull/3237) was to simplify
 APIs and guide developer with well-discovered APIs.
 
-You will need to change a way of setting fields on your Graph Types. Instead of many `FieldXXX`
+You will need to change a way of setting fields on your graph types. Instead of many `FieldXXX`
 overloads start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
 All such methods define a new field and return an instance of `FieldBuilder<T,U>`. Then continue to
 configure defined field with rich APIs provided by the returned builder. 
