@@ -298,7 +298,7 @@ The goal of this [change](https://github.com/graphql-dotnet/graphql-dotnet/pull/
 APIs and guide developers with well-discovered APIs.
 
 You will need to change a way of setting fields on your graph types. Instead of many `FieldXXX`
-overloads start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
+overloads, start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
 All such methods define a new field and return an instance of `FieldBuilder<T,U>`. Then continue to
 configure defined field with rich APIs provided by the returned builder. 
 
