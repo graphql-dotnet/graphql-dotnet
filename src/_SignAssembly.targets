@@ -1,0 +1,40 @@
+<Project>
+  <!--
+      Conditional strong name signing of netstandard assemblies for better cross-runtime compatibility.
+      
+        Ref: https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/strong-name-signing-exceptions#recommended-action
+     -->
+
+  <!--
+    NOTE: Tests depends on netstandard 2.1 for netcore3.1 and net5.0 tests, requiring a signed friend assembly for internals visible to.
+  -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net6'">
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup  Condition="'$(TargetFramework)'!='net6'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)graphql.snk</AssemblyOriginatorKeyFile>
+    <PublicKeyToken>e6238258560628ee</PublicKeyToken>
+  </PropertyGroup>
+
+
+  <!--
+    Workaround for: https://github.com/Microsoft/msbuild/issues/1490 (lack of support for public-signing satellites)
+    Delay-signs the satellite assemblies when main assembly is public-signed.
+    
+    Ref: https://github.com/dotnet/project-system/blob/main/eng/imports/StrongName.targets
+  -->
+  <Target Name="PrepareToDelaySignSatelliteAssemblies" BeforeTargets="GenerateSatelliteAssemblies" Condition="'$(MSBuildRuntimeType)' != 'Core' and '$(SignAssembly)' == 'true'">
+    <PropertyGroup>
+      <_DelaySignMainAssembly>$(DelaySign)</_DelaySignMainAssembly>
+      <DelaySign Condition="'$(PublicSign)' == 'true'">true</DelaySign>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="CleanupAfterDelaySigningSatelliteAssemblies" AfterTargets="GenerateSatelliteAssemblies" Condition="'$(MSBuildRuntimeType)' != 'Core' and '$(SignAssembly)' == 'true'">
+    <PropertyGroup>
+      <DelaySign>$(_DelaySignMainAssembly)</DelaySign>
+    </PropertyGroup>
+  </Target>
+</Project>

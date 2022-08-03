@@ -30,5 +30,5 @@
       <_ProjectReferencesWithVersions Include="@(_ProjectReferenceWithReassignedVersion)" />
     </ItemGroup>
   </Target>
-  
+
 </Project>

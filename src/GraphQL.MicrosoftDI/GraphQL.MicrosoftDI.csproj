@@ -11,6 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1 Condition="'$(SignAssembly)' == 'true'">$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)</_Parameter1>
+      <_Parameter1 Condition="'$(SignAssembly)' != 'true'">$(MSBuildProjectName).Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
   </ItemGroup>
 

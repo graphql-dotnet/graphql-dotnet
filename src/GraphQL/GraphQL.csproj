@@ -9,7 +9,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="8.0.0" />
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1 Condition="'$(SignAssembly)' == 'true'">$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)</_Parameter1>
+      <_Parameter1 Condition="'$(SignAssembly)' != 'true'">$(MSBuildProjectName).Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO:
+        Change when possible;
+        This is a temporary reference to local nuget until strongly named GraphQL-Parser is available.
+
+        See: https://github.com/graphql-dotnet/parser/pull/262 
+    -->
+    <PackageReference Include="GraphQL-Parser" Version="8.0.0-strongname" Condition="'$(SignAssembly)' == 'true'" />
+    <PackageReference Include="GraphQL-Parser" Version="8.0.0" Condition="'$(SignAssembly)' != 'true'" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="NullabilityInfo" Version="1.0.7">
       <PrivateAssets>all</PrivateAssets>
