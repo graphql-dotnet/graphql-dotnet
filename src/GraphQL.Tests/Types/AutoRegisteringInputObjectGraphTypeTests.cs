@@ -302,6 +302,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
         var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
         graphType.Fields.Find(nameof(FieldTests.FieldWithInitSetter)).ShouldNotBeNull();
     }
+
     private class FieldTests
     {
         [Name("Test1")]
