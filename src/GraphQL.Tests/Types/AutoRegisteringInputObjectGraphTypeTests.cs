@@ -296,6 +296,12 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Count.ShouldBe(2);
     }
 
+    [Fact]
+    public void RegistersInitFields()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
+        graphType.Fields.Find(nameof(FieldTests.FieldWithInitSetter)).ShouldNotBeNull();
+    }
     private class FieldTests
     {
         [Name("Test1")]
@@ -349,6 +355,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public IEnumerable? NullableEnumerableField { get; set; }
         public ICollection? NullableCollectionField { get; set; }
         public int?[]?[]? ListOfListOfIntsField { get; set; }
+        public string FieldWithInitSetter { get; init; } = null!;
     }
 
     private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
