@@ -19,6 +19,15 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLBuilderExtensions // TODO: split
     {
+        // see matching list in ConfigureExecution xml comments
+        private const float SORT_ORDER_APOLLO_TRACING = 100;
+        private const float SORT_ORDER_DOCUMENT_LISTENERS = 200;
+        private const float SORT_ORDER_VALIDATION_RULES = 200;
+        private const float SORT_ORDER_CONFIGURE_EXECUTION_OPTIONS = 300;
+        private const float SORT_ORDER_APQ = 400;
+        private const float SORT_ORDER_CACHING = 500;
+        private const float SORT_ORDER_CONFIGURE_EXECUTION = 600;
+
         #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
         public static IServiceRegister Register<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
@@ -638,7 +647,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()), SORT_ORDER_DOCUMENT_LISTENERS);
             return builder;
         }
 
@@ -657,7 +666,7 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(documentListener));
 
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListener);
-            builder.ConfigureExecutionOptions(options => options.Listeners.Add(documentListener));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(documentListener), SORT_ORDER_DOCUMENT_LISTENERS);
             return builder;
         }
 
@@ -674,7 +683,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
-            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()), SORT_ORDER_DOCUMENT_LISTENERS);
             return builder;
         }
         #endregion
@@ -894,7 +903,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Configures an action to run immediately prior to document execution.
+        /// Configures an action to run prior to document execution, after initial options are set and prior to caching.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
         /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
@@ -903,13 +912,17 @@ namespace GraphQL
         /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
+            => ConfigureExecutionOptions(builder, action, SORT_ORDER_CONFIGURE_EXECUTION_OPTIONS);
+
+        /// <inheritdoc cref="ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})"/>
+        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action, float sortOrder)
         {
-            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action)), sortOrder));
             return builder;
         }
 
         /// <summary>
-        /// Configures an asynchronous action to run immediately prior to document execution.
+        /// Configures an asynchronous action to run prior to document execution, after initial options are set and prior to caching.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
         /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
@@ -919,19 +932,41 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
-            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action)), SORT_ORDER_CONFIGURE_EXECUTION_OPTIONS));
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures an action that can modify or replace document execution behavior.
+        /// <para>
+        /// By specifying a <paramref name="sortOrder"/>, the order that this delegate is executed in relation to
+        /// other configuration settings can set. The default sort order of other configurations are as follows:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>100: Apollo tracing</item>
+        /// <item>200: Validation rules, document executers, and other 'initial' setting configurations</item>
+        /// <item>300: User calls to ConfigureExecutionOptions</item>
+        /// <item>400: Automatic Persisted Query processing</item>
+        /// <item>500: Memory cache</item>
+        /// <item>600: User calls to ConfigureExecution</item>
+        /// </list>
+        /// </summary>
+        /// <remarks>
+        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
+        /// </remarks>
+        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action, float sortOrder = SORT_ORDER_CONFIGURE_EXECUTION)
+        {
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action, sortOrder));
             return builder;
         }
 
         /// <summary>
         /// Configures an action that can modify or replace document execution behavior.
         /// </summary>
-        /// <remarks>
-        /// <see cref="ExecutionOptions.RequestServices"/> can be used within the delegate to access the service provider for this execution.
-        /// </remarks>
-        public static IGraphQLBuilder ConfigureExecution(this IGraphQLBuilder builder, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
+        public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
+            where TConfigureExecution : class, IConfigureExecution
         {
-            builder.Services.Register<IConfigureExecution>(new ConfigureExecution(action));
+            builder.Services.Register<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton);
             return builder;
         }
         #endregion
@@ -960,7 +995,7 @@ namespace GraphQL
                 {
                     options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
                 }
-            });
+            }, SORT_ORDER_VALIDATION_RULES);
             return builder;
         }
 
@@ -986,7 +1021,7 @@ namespace GraphQL
                 {
                     options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(validationRule);
                 }
-            });
+            }, SORT_ORDER_VALIDATION_RULES);
             return builder;
         }
 
@@ -1013,7 +1048,7 @@ namespace GraphQL
                 {
                     options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
                 }
-            });
+            }, SORT_ORDER_VALIDATION_RULES);
             return builder;
         }
         #endregion
@@ -1053,7 +1088,7 @@ namespace GraphQL
                     ret.EnrichWithApolloTracing(start);
                 }
                 return ret;
-            });
+            }, SORT_ORDER_APOLLO_TRACING);
             return builder;
         }
         #endregion

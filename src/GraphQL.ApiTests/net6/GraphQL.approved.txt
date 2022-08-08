@@ -338,9 +338,12 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action, float sortOrder = 600) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action, float sortOrder) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
         public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
@@ -948,6 +951,7 @@ namespace GraphQL.DI
     }
     public interface IConfigureExecution
     {
+        float SortOrder { get; }
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next);
     }
     public interface IConfigureSchema

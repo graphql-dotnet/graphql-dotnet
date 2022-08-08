@@ -68,10 +68,13 @@ namespace GraphQL
         private ExecutionDelegate BuildExecutionDelegate(IEnumerable<IConfigureExecution> configurations)
         {
             ExecutionDelegate execution = CoreExecuteAsync;
-            var configurationArray = configurations.ToArray();
-            for (var i = configurationArray.Length - 1; i >= 0; i--)
+
+            // OrderBy here performs a stable sort; that is, if the sort order of two elements are equal,
+            // the order of the elements are preserved. The order is reversed since each execution wraps
+            // the prior configured executions. OrderByDescending is not used because that would result
+            // in a different sort order when there are two executions with equal sort orders.
+            foreach (var action in configurations.OrderBy(x => x.SortOrder).Reverse())
             {
-                var action = configurationArray[i];
                 var nextExecution = execution;
                 execution = async options => await action.ExecuteAsync(options, nextExecution).ConfigureAwait(false);
             }

@@ -148,4 +148,7 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
 
         return await next(options).ConfigureAwait(false);
     }
+
+    /// <inheritdoc/>
+    public virtual float SortOrder { get; protected set; } = 400;
 }
