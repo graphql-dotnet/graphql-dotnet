@@ -27,7 +27,7 @@ namespace GraphQL
 
         /// <summary>
         /// Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed
-        /// GraphQL requests (a <see cref="GraphQLDocument"/>). If not set, it will be parsed from <see cref="Query"/>
+        /// GraphQL requests (a <see cref="GraphQLDocument"/>). If not set, it will be parsed from <see cref="Query"/>.
         /// </summary>
         public GraphQLDocument? Document { get; set; }
 
