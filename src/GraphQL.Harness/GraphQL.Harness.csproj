@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
+    <Description>Example ASP.NET Core project to demonstrate GraphQL.NET setup</Description>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
